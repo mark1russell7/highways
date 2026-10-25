@@ -1,4 +1,4 @@
-import { dist, inflate, pointBoxDistance, segmentHitsBox, type Point } from "./geom.ts";
+import { dist, inflate, segmentHitsRect, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
 
@@ -16,7 +16,10 @@ export class Obstacles {
   clear(a: Point, b: Point, pad: number, skip?: ReadonlySet<Node>): boolean {
     let ok = true;
     this.#grid.querySegment(a, b, pad, (n) => {
-      if (ok && !skip?.has(n) && segmentHitsBox(a, b, inflate(n.box, pad))) ok = false;
+      if (ok && !skip?.has(n)) {
+        const x = n.box;
+        if (segmentHitsRect(a, b, x.x - pad, x.y - pad, x.x + x.w + pad, x.y + x.h + pad)) ok = false;
+      }
     });
     return ok;
   }
@@ -32,8 +35,8 @@ export class Obstacles {
     let hit = false;
     this.#grid.query({ x: p.x, y: p.y, w: 0, h: 0 }, (n) => {
       if (!hit && n !== skip) {
-        const b = inflate(n.box, pad);
-        hit = p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h && pointBoxDistance(p, b) === 0;
+        const b = n.box;
+        hit = p.x > b.x - pad && p.x < b.x + b.w + pad && p.y > b.y - pad && p.y < b.y + b.h + pad;
       }
     });
     return hit;
@@ -62,6 +65,8 @@ export interface CornerGraphOptions {
 export class CornerGraph {
   readonly points: Point[] = [];
   readonly #adj: number[][] = [];
+  // The length of each link, in the order of #adj.
+  readonly #len: number[][] = [];
   readonly #obstacles: Obstacles;
   readonly #pointGrid: Grid<number>;
   readonly #cell: number;
@@ -73,6 +78,9 @@ export class CornerGraph {
   #open = new Int32Array(0);
   #closed = new Int32Array(0);
   #stamp = 0;
+  // The stamp of the last call of nearestVisible that tested each corner.
+  #tested = new Int32Array(0);
+  #testStamp = 0;
 
   /** This constructor makes the graph of the nodes. */
   constructor(nodes: readonly Node[], obstacles: Obstacles, options: CornerGraphOptions) {
@@ -120,7 +128,11 @@ export class CornerGraph {
         links[j]!.add(i);
       }
     }
-    for (const s of links) this.#adj.push([...s].sort((a, b) => a - b));
+    links.forEach((s, i) => {
+      const adj = [...s].sort((a, b) => a - b);
+      this.#adj.push(adj);
+      this.#len.push(adj.map((j) => dist(this.points[i]!, this.points[j]!)));
+    });
   }
 
   #addPoint(c: Point): void {
@@ -156,17 +168,19 @@ export class CornerGraph {
   /** This method gives at most `k` corners that `p` can see, nearest first. The corner `self` does not count. */
   nearestVisible(p: Point, k: number, self = -1): number[] {
     const out: number[] = [];
-    const tested = new Set<number>();
+    if (this.#tested.length < this.points.length) this.#tested = new Int32Array(this.points.length);
+    const tested = this.#tested;
+    const stamp = ++this.#testStamp;
     for (let r = this.#cell; r <= this.#cell * 8; r *= 2) {
       const cands: [number, number][] = [];
       this.#pointGrid.query({ x: p.x - r, y: p.y - r, w: 2 * r, h: 2 * r }, (j) => {
-        if (j !== self && !tested.has(j)) cands.push([dist(p, this.points[j]!), j]);
+        if (j !== self && tested[j] !== stamp) cands.push([dist(p, this.points[j]!), j]);
       });
       cands.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
       for (const [d, j] of cands) {
         // A corner beyond r can be nearer than a corner of the next ring, so it waits for that ring.
         if (d > r) break;
-        tested.add(j);
+        tested[j] = stamp;
         if (this.#obstacles.clear(p, this.points[j]!, this.#pad)) out.push(j);
         if (out.length >= k) return out;
       }
@@ -207,8 +221,8 @@ export class CornerGraph {
     let best = Infinity;
     let bestEnd = -1;
     while (heap.size > 0) {
-      const [f, i] = heap.pop();
-      if (f >= best) break;
+      if (heap.topKey >= best) break;
+      const i = heap.pop();
       if (this.#closed[i] === stamp) continue;
       this.#closed[i] = stamp;
       const gi = this.#g[i]!;
@@ -217,8 +231,11 @@ export class CornerGraph {
         best = gi + tail;
         bestEnd = i;
       }
-      for (const j of this.#adj[i]!) {
-        const d = dist(this.points[i]!, this.points[j]!);
+      const adj = this.#adj[i]!;
+      const len = this.#len[i]!;
+      for (let m = 0; m < adj.length; m++) {
+        const j = adj[m]!;
+        const d = len[m]!;
         relax(j, gi + (cost ? cost(i, j, d) : d), i);
       }
     }
@@ -258,8 +275,17 @@ class MinHeap {
   }
 
   #swap(a: number, b: number): void {
-    [this.#k[a], this.#k[b]] = [this.#k[b]!, this.#k[a]!];
-    [this.#v[a], this.#v[b]] = [this.#v[b]!, this.#v[a]!];
+    const k = this.#k[a]!;
+    this.#k[a] = this.#k[b]!;
+    this.#k[b] = k;
+    const v = this.#v[a]!;
+    this.#v[a] = this.#v[b]!;
+    this.#v[b] = v;
+  }
+
+  /** The smallest key. */
+  get topKey(): number {
+    return this.#k[0]!;
   }
 
   push(key: number, value: number): void {
@@ -274,8 +300,9 @@ class MinHeap {
     }
   }
 
-  pop(): [number, number] {
-    const top: [number, number] = [this.#k[0]!, this.#v[0]!];
+  /** This method removes the pair with the smallest key and gives its value. */
+  pop(): number {
+    const top = this.#v[0]!;
     const k = this.#k.pop()!;
     const v = this.#v.pop()!;
     if (this.#k.length > 0) {

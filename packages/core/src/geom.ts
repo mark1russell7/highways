@@ -14,7 +14,9 @@ export interface Box {
 
 /** This function gives the distance between two points. */
 export function dist(a: Point, b: Point): number {
-  return Math.hypot(a.x - b.x, a.y - b.y);
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 /** This function gives the center of a box. */
@@ -53,31 +55,34 @@ export function segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
  * The function clips the segment to the box (Liang-Barsky) and asks for a part longer than `eps`.
  */
 export function segmentHitsBox(a: Point, b: Point, box: Box, eps = 1e-6): boolean {
+  return segmentHitsRect(a, b, box.x, box.y, box.x + box.w, box.y + box.h, eps);
+}
+
+/** This function tells if the segment `ab` goes through the inside of the box from (`x0`, `y0`) to (`x1`, `y1`). */
+export function segmentHitsRect(a: Point, b: Point, x0: number, y0: number, x1: number, y1: number, eps = 1e-6): boolean {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   let t0 = 0;
   let t1 = 1;
-  const edges: [number, number][] = [
-    [-dx, a.x - box.x],
-    [dx, box.x + box.w - a.x],
-    [-dy, a.y - box.y],
-    [dy, box.y + box.h - a.y],
-  ];
-  for (const [p, q] of edges) {
-    if (p === 0) {
-      if (q <= 0) return false;
-      continue;
-    }
-    const t = q / p;
-    if (p < 0) {
-      if (t > t1) return false;
-      if (t > t0) t0 = t;
-    } else {
-      if (t < t0) return false;
-      if (t < t1) t1 = t;
-    }
+  if (dx === 0) {
+    if (a.x <= x0 || a.x >= x1) return false;
+  } else {
+    const ta = (x0 - a.x) / dx;
+    const tb = (x1 - a.x) / dx;
+    t0 = Math.max(t0, Math.min(ta, tb));
+    t1 = Math.min(t1, Math.max(ta, tb));
+    if (t0 > t1) return false;
   }
-  return (t1 - t0) * Math.hypot(dx, dy) > eps;
+  if (dy === 0) {
+    if (a.y <= y0 || a.y >= y1) return false;
+  } else {
+    const ta = (y0 - a.y) / dy;
+    const tb = (y1 - a.y) / dy;
+    t0 = Math.max(t0, Math.min(ta, tb));
+    t1 = Math.min(t1, Math.max(ta, tb));
+    if (t0 > t1) return false;
+  }
+  return (t1 - t0) * Math.sqrt(dx * dx + dy * dy) > eps;
 }
 
 /** This function gives the distance from a point to a box. The distance is 0 when the point is in the box. */
