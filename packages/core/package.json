@@ -8,6 +8,7 @@
   "scripts": {
     "test": "vitest run",
     "bench": "node scripts/bench.ts",
+    "profile": "node scripts/profile.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
   },
