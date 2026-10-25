@@ -1,0 +1,248 @@
+import { dist, inflate, pointBoxDistance, segmentHitsBox, type Point } from "./geom.ts";
+import { Grid } from "./grid.ts";
+import type { Node } from "./model.ts";
+
+/** The nodes as obstacles, with a grid for fast tests. */
+export class Obstacles {
+  readonly #grid: Grid<Node>;
+
+  /** This constructor indexes the boxes of the nodes. */
+  constructor(nodes: readonly Node[], cell: number) {
+    this.#grid = new Grid<Node>(cell);
+    for (const n of nodes) this.#grid.add(n, n.box);
+  }
+
+  /** This method tells if the segment `ab` stays out of each box, made larger by `pad`. The nodes in `skip` do not count. */
+  clear(a: Point, b: Point, pad: number, skip?: ReadonlySet<Node>): boolean {
+    let ok = true;
+    this.#grid.querySegment(a, b, pad, (n) => {
+      if (ok && !skip?.has(n) && segmentHitsBox(a, b, inflate(n.box, pad))) ok = false;
+    });
+    return ok;
+  }
+
+  /** This method tells if the polyline stays out of each box, made larger by `pad`. The nodes in `skip` do not count. */
+  clearPath(p: readonly Point[], pad: number, skip?: ReadonlySet<Node>): boolean {
+    for (let i = 1; i < p.length; i++) if (!this.clear(p[i - 1]!, p[i]!, pad, skip)) return false;
+    return true;
+  }
+
+  /** This method tells if the point is inside a box, made larger by `pad`. The node `skip` does not count. */
+  inside(p: Point, pad: number, skip?: Node): boolean {
+    let hit = false;
+    this.#grid.query({ x: p.x, y: p.y, w: 0, h: 0 }, (n) => {
+      if (!hit && n !== skip) {
+        const b = inflate(n.box, pad);
+        hit = p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h && pointBoxDistance(p, b) === 0;
+      }
+    });
+    return hit;
+  }
+}
+
+/** The options of the corner graph. */
+export interface CornerGraphOptions {
+  /** The distance from a box to its corners. */
+  readonly margin: number;
+  /** The number of visible neighbours of each corner. */
+  readonly k: number;
+}
+
+/**
+ * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
+ * Each corner links to its `k` nearest corners that it can see. A path goes from corner to corner around the boxes.
+ * The obstacle test uses half of the margin, so a path keeps a clearance of at least half of the margin.
+ */
+export class CornerGraph {
+  readonly points: Point[] = [];
+  readonly #adj: number[][] = [];
+  readonly #obstacles: Obstacles;
+  readonly #pointGrid: Grid<number>;
+  readonly #cell: number;
+  readonly #pad: number;
+  readonly #k: number;
+  // The work arrays of A*, made once and cleared by a stamp.
+  #g = new Float64Array(0);
+  #parent = new Int32Array(0);
+  #open = new Int32Array(0);
+  #closed = new Int32Array(0);
+  #stamp = 0;
+
+  /** This constructor makes the graph of the nodes. */
+  constructor(nodes: readonly Node[], obstacles: Obstacles, options: CornerGraphOptions) {
+    this.#obstacles = obstacles;
+    this.#pad = options.margin / 2;
+    this.#k = options.k;
+    let size = 0;
+    for (const n of nodes) size += (n.box.w + n.box.h) / 2;
+    this.#cell = Math.max(1, size / Math.max(1, nodes.length) + 2 * options.margin);
+    this.#pointGrid = new Grid<number>(this.#cell);
+    for (const n of nodes) {
+      const b = inflate(n.box, options.margin);
+      for (const c of [
+        { x: b.x, y: b.y },
+        { x: b.x + b.w, y: b.y },
+        { x: b.x + b.w, y: b.y + b.h },
+        { x: b.x, y: b.y + b.h },
+      ]) {
+        if (obstacles.inside(c, this.#pad)) continue;
+        const i = this.points.length;
+        this.points.push(c);
+        this.#pointGrid.add(i, { x: c.x, y: c.y, w: 0, h: 0 });
+      }
+    }
+    const links: Set<number>[] = this.points.map(() => new Set<number>());
+    for (let i = 0; i < this.points.length; i++) {
+      for (const j of this.nearestVisible(this.points[i]!, this.#k, i)) {
+        links[i]!.add(j);
+        links[j]!.add(i);
+      }
+    }
+    for (const s of links) this.#adj.push([...s].sort((a, b) => a - b));
+  }
+
+  /** This method gives the number of links of the graph. */
+  get linkCount(): number {
+    let n = 0;
+    for (const a of this.#adj) n += a.length;
+    return n / 2;
+  }
+
+  /** This method gives at most `k` corners that `p` can see, nearest first. The corner `self` does not count. */
+  nearestVisible(p: Point, k: number, self = -1): number[] {
+    const out: number[] = [];
+    const tested = new Set<number>();
+    for (let r = this.#cell; r <= this.#cell * 8; r *= 2) {
+      const cands: [number, number][] = [];
+      this.#pointGrid.query({ x: p.x - r, y: p.y - r, w: 2 * r, h: 2 * r }, (j) => {
+        if (j !== self && !tested.has(j)) cands.push([dist(p, this.points[j]!), j]);
+      });
+      cands.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      for (const [d, j] of cands) {
+        // A corner beyond r can be nearer than a corner of the next ring, so it waits for that ring.
+        if (d > r) break;
+        tested.add(j);
+        if (this.#obstacles.clear(p, this.points[j]!, this.#pad)) out.push(j);
+        if (out.length >= k) return out;
+      }
+    }
+    return out;
+  }
+
+  /**
+   * This method gives a shortest path from `from` to `to` in the graph (A*), with the two points as its ends.
+   * It gives `undefined` when the graph links no corner near `from` to a corner near `to`.
+   */
+  path(from: Point, to: Point): Point[] | undefined {
+    if (this.#obstacles.clear(from, to, this.#pad)) return [from, to];
+    const n = this.points.length;
+    if (this.#g.length < n) {
+      this.#g = new Float64Array(n);
+      this.#parent = new Int32Array(n);
+      this.#open = new Int32Array(n);
+      this.#closed = new Int32Array(n);
+    }
+    const stamp = ++this.#stamp;
+    const goal = new Map<number, number>();
+    for (const j of this.nearestVisible(to, this.#k * 2)) goal.set(j, dist(this.points[j]!, to));
+    if (goal.size === 0) return undefined;
+    const heap = new MinHeap();
+    const h = (i: number): number => dist(this.points[i]!, to);
+    const relax = (j: number, g: number, parent: number): void => {
+      if (this.#closed[j] === stamp) return;
+      if (this.#open[j] === stamp && this.#g[j]! <= g) return;
+      this.#open[j] = stamp;
+      this.#g[j] = g;
+      this.#parent[j] = parent;
+      heap.push(g + h(j), j);
+    };
+    for (const j of this.nearestVisible(from, this.#k * 2)) relax(j, dist(from, this.points[j]!), -1);
+    let best = Infinity;
+    let bestEnd = -1;
+    while (heap.size > 0) {
+      const [f, i] = heap.pop();
+      if (f >= best) break;
+      if (this.#closed[i] === stamp) continue;
+      this.#closed[i] = stamp;
+      const gi = this.#g[i]!;
+      const tail = goal.get(i);
+      if (tail !== undefined && gi + tail < best) {
+        best = gi + tail;
+        bestEnd = i;
+      }
+      for (const j of this.#adj[i]!) relax(j, gi + dist(this.points[i]!, this.points[j]!), i);
+    }
+    if (bestEnd < 0) return undefined;
+    const out: Point[] = [to];
+    for (let i = bestEnd; i >= 0; i = this.#parent[i]!) out.push(this.points[i]!);
+    out.push(from);
+    return out.reverse();
+  }
+
+  /** This method removes the vertices that a later vertex makes needless: from each vertex, it goes to the farthest vertex in view. */
+  pull(p: readonly Point[], lookahead = 16): Point[] {
+    if (p.length < 3) return [...p];
+    const out: Point[] = [p[0]!];
+    let i = 0;
+    while (i < p.length - 1) {
+      let j = Math.min(p.length - 1, i + lookahead);
+      while (j > i + 1 && !this.#obstacles.clear(p[i]!, p[j]!, this.#pad)) j--;
+      out.push(p[j]!);
+      i = j;
+    }
+    return out;
+  }
+}
+
+/** A binary min-heap of (key, value) pairs. Equal keys come out by the smaller value, so the order is deterministic. */
+class MinHeap {
+  readonly #k: number[] = [];
+  readonly #v: number[] = [];
+
+  get size(): number {
+    return this.#k.length;
+  }
+
+  #less(a: number, b: number): boolean {
+    return this.#k[a]! < this.#k[b]! || (this.#k[a] === this.#k[b] && this.#v[a]! < this.#v[b]!);
+  }
+
+  #swap(a: number, b: number): void {
+    [this.#k[a], this.#k[b]] = [this.#k[b]!, this.#k[a]!];
+    [this.#v[a], this.#v[b]] = [this.#v[b]!, this.#v[a]!];
+  }
+
+  push(key: number, value: number): void {
+    this.#k.push(key);
+    this.#v.push(value);
+    let i = this.#k.length - 1;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (!this.#less(i, p)) break;
+      this.#swap(i, p);
+      i = p;
+    }
+  }
+
+  pop(): [number, number] {
+    const top: [number, number] = [this.#k[0]!, this.#v[0]!];
+    const k = this.#k.pop()!;
+    const v = this.#v.pop()!;
+    if (this.#k.length > 0) {
+      this.#k[0] = k;
+      this.#v[0] = v;
+      let i = 0;
+      for (;;) {
+        const l = 2 * i + 1;
+        const r = l + 1;
+        let m = i;
+        if (l < this.#k.length && this.#less(l, m)) m = l;
+        if (r < this.#k.length && this.#less(r, m)) m = r;
+        if (m === i) break;
+        this.#swap(i, m);
+        i = m;
+      }
+    }
+    return top;
+  }
+}

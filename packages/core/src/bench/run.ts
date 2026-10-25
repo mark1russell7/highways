@@ -33,7 +33,7 @@ export function runBenchmark(routers: readonly Router[], fixtures: readonly Fixt
   const rows: BenchRow[] = [];
   for (const spec of fixtures) {
     const graph = makeFixture(spec);
-    for (const router of routers) rows.push(benchOne(router, spec.name, graph, options.repeat ?? 3));
+    for (const router of routers) if (graph.nodes.length <= (router.maxNodes ?? Infinity)) rows.push(benchOne(router, spec.name, graph, options.repeat ?? 3));
   }
   return rows;
 }

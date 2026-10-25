@@ -18,11 +18,28 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 | Step | Content | State |
 |---|---|---|
 | H0 | The repository, the benchmark, the fixtures and a straight-line control | Done |
-| H1 | One region: plugs, routes around the nodes and the inflection rule | Next |
-| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | Later |
+| H1 | One region: plugs, routes around the nodes and the inflection rule | Done |
+| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | Next |
 | H3 | The tree of sections, the highways and the zoom levels | Later |
 | H4 | A race of the strategies for each step | Later |
 | H5 | Stability: an incremental mode and a full recompute | Later |
+
+## The routers
+
+| Router | Method |
+|---|---|
+| `straight` | The control. Each edge is one straight line between its plugs. |
+| `plugs` | Each edge leaves its plug along the normal of the side and follows the curve of the inflection rule. It does not go around the nodes. |
+| `corners` | Each edge goes around the nodes on a shortest path (A*) through a sparse visibility graph of the box corners. |
+| `corners-smooth` | The same paths as `corners`. A route in clear view follows the inflection rule, and the other routes get round corners. |
+
+A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
+
+The inflection rule sets the number of inflections from the angle of the chord: 0 near an axis, 1 near a diagonal, 2 between them. The inflections are at 1/2, or at 1/3 and 2/3, of the chord.
+
+The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). The benchmark races `corners` only to 10 000 nodes. The zoom levels of H3 are for larger graphs.
+
+The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 
 ## The benchmark
 

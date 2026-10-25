@@ -82,6 +82,8 @@ export interface Result {
 /** A router: a strategy with a name. The same input must give the same result. */
 export interface Router {
   readonly name: string;
+  /** The benchmark skips a fixture with more nodes than this. Without it, the router takes each fixture. */
+  readonly maxNodes?: number;
   route(graph: Graph): Result;
 }
 
