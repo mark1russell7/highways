@@ -44,7 +44,7 @@ The inflection rule sets the number of inflections from the angle of the chord: 
 
 The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). A coarse lattice of free points links groups of nodes across empty space.
 
-The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 45 s. The zoom levels of H3 are for larger graphs.
+The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 21 s. The routers with sections also race at 100 000 nodes.
 
 The rule of `trunks` in the benchmark groups the edges by the collection of the target. The result gives each bundle with its trunk and the order of its lanes. Lane 0 turns most to the left, so two lanes do not cross at the split point.
 

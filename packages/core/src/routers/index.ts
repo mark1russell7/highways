@@ -22,6 +22,6 @@ export const ROUTERS: readonly Router[] = [
   trunksRouter({ name: "trunks", rule: byCollection, maxNodes: 10_000 }),
   sharedRouter({ name: "shared", rule: byCollection, maxNodes: 10_000 }),
   sharedRouter({ name: "shared-all", maxNodes: 10_000 }),
-  sectionsRouter({ name: "sections", maxNodes: 10_000 }),
-  sectionsRouter({ name: "sections-tree", stretch: Infinity, maxNodes: 10_000 }),
+  sectionsRouter({ name: "sections", maxNodes: 100_000 }),
+  sectionsRouter({ name: "sections-tree", stretch: Infinity, maxNodes: 100_000 }),
 ];
