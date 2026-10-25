@@ -1,0 +1,1 @@
+The routers `sections` and `sections-tree` give zoom levels. Move the slider to go from one group for all nodes down to each edge. Select **Follow the zoom** to change the level when you zoom the map.

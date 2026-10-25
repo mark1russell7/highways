@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "@highways/site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
+  },
+  "devDependencies": {
+    "@mark1russell7/cue": "github:mark1russell7/cue",
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@highways/core": "workspace:*",
+    "marked": "^18.1.1"
+  },
+  "description": "The GitHub Pages site of highways: a live demo of the routers, the idea and the benchmark."
+}

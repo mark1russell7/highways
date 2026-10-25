@@ -1,0 +1,3 @@
+# The Pages workflow writes the benchmark rows at deploy time.
+public/bench.json
+public/bench-meta.json

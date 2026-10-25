@@ -4,6 +4,8 @@
 
 The core is plain TypeScript. It knows no renderer. It takes boxes and edges, and it gives polylines and zoom levels.
 
+The site [mark1russell7.github.io/highways](https://mark1russell7.github.io/highways/) shows a live map. Pick a router and a fixture, and your browser routes the graph. The site also shows the benchmark.
+
 ## The idea
 
 - A tree of sections divides the plane. Each section has a highway that bends around the nodes in it.
@@ -112,6 +114,7 @@ The benchmark also measures the quality of each result:
 | Package | Content |
 |---|---|
 | `packages/core` | The geometry, the model, the fixtures, the routers and the benchmark |
+| `packages/site` | The GitHub Pages site: a live map of the routers, the idea and the benchmark. The workflow `Pages` deploys it from `main`. |
 
 ## Development
 
