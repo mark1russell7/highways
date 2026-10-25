@@ -10,7 +10,7 @@ import {
   type Point,
 } from "../geom.ts";
 import { rng } from "../fixtures.ts";
-import { Grid, segmentBounds } from "../grid.ts";
+import { Grid } from "../grid.ts";
 import { nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 
 /** The quality of a result. Lower is better for each value except `clearance`. */
@@ -78,8 +78,7 @@ export function measureQuality(graph: Graph, result: Result): Quality {
     for (let i = 1; i < p.length; i++) {
       const a = p[i - 1]!;
       const b = p[i]!;
-      const bb = segmentBounds(a, b);
-      nodes.query({ x: bb.x - c, y: bb.y - c, w: bb.w + 2 * c, h: bb.h + 2 * c }, (n) => {
+      nodes.querySegment(a, b, c, (n) => {
         if (n !== ends.source && n !== ends.target) c = Math.min(c, segmentBoxDistance(a, b, n.box));
       });
     }
@@ -170,14 +169,14 @@ export function countCrossings(segs: readonly (readonly [Point, Point])[]): [num
   if (segs.length < 2) return [0, false];
   const len = segs.reduce((s, [a, b]) => s + dist(a, b), 0) / segs.length;
   const grid = new Grid<number>(Math.max(20, len));
-  segs.forEach(([a, b], i) => grid.add(i, segmentBounds(a, b)));
+  segs.forEach(([a, b], i) => grid.addSegment(i, a, b));
   const exact = segs.length <= EXACT_CROSSINGS;
   const R = rng(segs.length);
   const pick = exact ? segs.map((_, i) => i) : Array.from({ length: SAMPLE }, () => Math.floor(R() * segs.length));
   let count = 0;
   for (const i of pick) {
     const [a, b] = segs[i]!;
-    grid.query(segmentBounds(a, b), (j) => {
+    grid.querySegment(a, b, 0, (j) => {
       if (exact && j <= i) return;
       if (j === i) return;
       const [c, d] = segs[j]!;

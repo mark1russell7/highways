@@ -1,5 +1,5 @@
 import { dist, inflate, pointBoxDistance, segmentHitsBox } from "../geom.ts";
-import { Grid, segmentBounds } from "../grid.ts";
+import { Grid } from "../grid.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 
 /** A broken hard rule. A correct router has none. */
@@ -49,7 +49,7 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
       const p = r.points[i - 1]!;
       const q = r.points[i]!;
       let hit: Node | undefined;
-      grid.query(segmentBounds(p, q), (n) => {
+      grid.querySegment(p, q, 0, (n) => {
         if (!hit && n !== s && n !== t && segmentHitsBox(p, q, inflate(n.box, -TOLERANCE))) hit = n;
       });
       if (hit) {
