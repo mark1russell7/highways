@@ -7,7 +7,7 @@ import {
   ROUTERS,
   segmentsOf,
   type Graph,
-} from "@highways/core";
+} from "@mark1russell7/highways";
 import type { RouteReply, RouteRequest } from "./protocol.ts";
 
 // The routing runs here, so the page stays responsive while a router works on 1 000 nodes.

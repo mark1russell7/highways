@@ -1,4 +1,4 @@
-import { FIXTURES, makeFixture, ROUTERS, type BenchRow, type Graph } from "@highways/core";
+import { FIXTURES, makeFixture, ROUTERS, type BenchRow, type Graph } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";

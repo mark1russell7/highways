@@ -1,4 +1,4 @@
-import type { Quality, Result, Route, SegmentGraph } from "@highways/core";
+import type { Quality, Result, Route, SegmentGraph } from "@mark1russell7/highways";
 
 /** A request to the worker: route one fixture with one router. */
 export interface RouteRequest {

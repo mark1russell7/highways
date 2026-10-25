@@ -1,11 +1,41 @@
 {
   "$schema": "https://json.schemastore.org/package",
-  "name": "@highways/core",
+  "name": "@mark1russell7/highways",
+  "description": "Edge routers for node-link diagrams: shared trunks, bundles and zoom levels, with a benchmark of their quality.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mark1russell7/highways.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://mark1russell7.github.io/highways/",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "build",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "main": "./build/index.js",
+    "types": "./build/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
   "scripts": {
+    "build": "tsdown",
     "test": "vitest run",
     "bench": "node scripts/bench.ts",
     "profile": "node scripts/profile.ts",

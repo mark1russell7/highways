@@ -1,4 +1,4 @@
-import { polylineLength, type Box, type Graph, type Level, type Point, type Route } from "@highways/core";
+import { polylineLength, type Box, type Graph, type Level, type Point, type Route } from "@mark1russell7/highways";
 import { itemSizes, pickLevel } from "./levels.ts";
 import type { RouteDone } from "./protocol.ts";
 

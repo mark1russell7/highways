@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ROUTERS } from "@highways/core";
+import { ROUTERS } from "@mark1russell7/highways";
 import { firstTable, README, routerMethods, sectionOf } from "./content.ts";
 
 const md = ["# T", "", "## A", "text a", "", "## B", "| x | y |", "|---|---|", "| `one` | first |", "", "after", "# C"].join("\n");

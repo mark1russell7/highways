@@ -43,7 +43,7 @@ jobs:
       - name: Run the benchmark
         run: |
           set -o pipefail
-          pnpm --filter @highways/core bench --max "$MAX" --repeat "$REPEAT" --json "$GITHUB_WORKSPACE/bench.json" | tee table.txt
+          pnpm --filter @mark1russell7/highways bench --max "$MAX" --repeat "$REPEAT" --json "$GITHUB_WORKSPACE/bench.json" | tee table.txt
           { echo "## Bench (max $MAX nodes, $REPEAT runs)"; echo; echo '```'; cat table.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()

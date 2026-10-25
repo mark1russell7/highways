@@ -35,7 +35,7 @@ jobs:
       # A router that is not deterministic makes the benchmark fail. The site still deploys, with a warning.
       build: |
         mkdir -p packages/site/public
-        pnpm --filter @highways/core bench --max 1000 --json "$PWD/packages/site/public/bench.json" \
+        pnpm --filter @mark1russell7/highways bench --max 1000 --json "$PWD/packages/site/public/bench.json" \
           || echo "::warning::The benchmark failed or found a router that is not deterministic."
         printf '{"sha":"%s","date":"%s"}\n' "$(git rev-parse HEAD)" "$(date -u +%F)" > packages/site/public/bench-meta.json
         pnpm --filter @highways/site run build
