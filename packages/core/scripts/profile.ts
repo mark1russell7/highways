@@ -1,4 +1,4 @@
-// The profile of one router on one fixture: `pnpm profile --router <name> --fixture <name> [--out <file>]`.
+// The profile of one router on one fixture: `pnpm run profile --router <name> --fixture <name> [--out <file>]`.
 // It prints the functions that take the most time (self time) and can keep the raw profile for a viewer.
 import { writeFileSync } from "node:fs";
 import { Session } from "node:inspector/promises";
