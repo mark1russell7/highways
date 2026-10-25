@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FIXTURES, makeFixture, ROUTERS } from "@highways/core";
+import { FIXTURES, makeFixture, ROUTERS } from "@mark1russell7/highways";
 import { itemSizes, pickLevel } from "./levels.ts";
 
 describe("pickLevel", () => {

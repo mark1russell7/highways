@@ -35,7 +35,7 @@ jobs:
       - name: Profile the router
         run: |
           set -o pipefail
-          pnpm --filter @highways/core run profile --router "$ROUTER" --fixture "$FIXTURE" --out "$GITHUB_WORKSPACE/profile.cpuprofile" | tee table.txt
+          pnpm --filter @mark1russell7/highways run profile --router "$ROUTER" --fixture "$FIXTURE" --out "$GITHUB_WORKSPACE/profile.cpuprofile" | tee table.txt
           { echo "## Profile"; echo; cat table.txt; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()

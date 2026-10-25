@@ -21,7 +21,7 @@
     "vitest": "^5.0.3"
   },
   "dependencies": {
-    "@highways/core": "workspace:*",
+    "@mark1russell7/highways": "workspace:*",
     "marked": "^18.1.1"
   },
   "description": "The GitHub Pages site of highways: a live demo of the routers, the idea and the benchmark."

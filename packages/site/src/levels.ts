@@ -1,4 +1,4 @@
-import type { Level } from "@highways/core";
+import type { Level } from "@mark1russell7/highways";
 
 /** The median width of the shown items of each level, in units of the plane. */
 export function itemSizes(levels: readonly Level[]): number[] {

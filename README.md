@@ -78,7 +78,7 @@ A renderer uses these segments for the three views of a bundle:
 
 ## The benchmark
 
-`pnpm --filter @highways/core bench` races the routers on the fixtures and writes a Markdown table.
+`pnpm --filter @mark1russell7/highways bench` races the routers on the fixtures and writes a Markdown table.
 
 - `--max <nodes>` sets the largest fixture. The default is 1 000. The fixtures go from 10 to 100 000 nodes.
 - `--json <file>` also writes the rows as JSON.
