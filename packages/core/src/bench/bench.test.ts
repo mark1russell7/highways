@@ -72,7 +72,8 @@ describe("measureQuality", () => {
     expect(est).toBe(true);
     expect(n / (15_000 * 15_000)).toBeGreaterThan(0.85);
     expect(n / (15_000 * 15_000)).toBeLessThan(1.15);
-  });
+    // All the segments share one or two buckets, so each query visits each segment. A CI runner needs more than 5 s.
+  }, 30_000);
   it("gives the angle of a route at the side of its node", () => {
     const box = { x: 0, y: 0, w: 10, h: 10 };
     expect(sideAngle(box, { x: 10, y: 5 }, { x: 20, y: 5 })).toBeCloseTo(0);
