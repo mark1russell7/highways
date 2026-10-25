@@ -31,6 +31,8 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 - `--max <nodes>` sets the largest fixture. The default is 1 000. The fixtures go from 10 to 100 000 nodes.
 - `--json <file>` also writes the rows as JSON.
 
+The workflow `Bench` races the routers on all the fixtures, to 100 000 nodes, in CI. It starts on each change of `packages/core` on `main`, or by hand. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
+
 Each router must obey the hard rules. A broken rule is a violation:
 
 - Each edge has one route.

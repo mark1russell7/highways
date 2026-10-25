@@ -35,4 +35,4 @@ Write all prose of this repository in the style of ASD-STE100 Simplified Technic
 - This repository is public. Do not name the private apps that use it, in code, prose or commit messages.
 - The core knows no renderer. It takes boxes and edges, and it gives polylines and zoom levels.
 - Each strategy of a step has its own folder, its tests and a row in the benchmark.
-- `pnpm --filter @highways/core bench` races the routers. Run the large fixtures in CI only.
+- `pnpm --filter @highways/core bench` races the routers. Start the large fixtures only in CI, with the workflow `Bench`.
