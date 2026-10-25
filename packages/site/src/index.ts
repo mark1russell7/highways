@@ -20,6 +20,10 @@ const DEMO_FIXTURES = FIXTURES.filter((f) => f.nodes <= 1000);
 const START = { fixture: "small-clustered", router: "shared" };
 const fmt = new Intl.NumberFormat("en-US");
 
+/** This function escapes text for HTML. */
+const esc = (text: string): string =>
+  text.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[ch]!);
+
 interface State {
   fixture: string;
   router: string;
@@ -180,7 +184,10 @@ let control: RouteDone | undefined;
 let ticket = 0;
 
 function pickRouter(name: string): void {
-  state.router = name;
+  // Only the name of a router of the core goes into the state.
+  const router = ROUTERS.find((r) => r.name === name);
+  if (!router) return;
+  state.router = router.name;
   update();
 }
 
@@ -196,7 +203,11 @@ async function update(): Promise<void> {
     const x = b.offsetLeft - routerRow.offsetLeft;
     if (on && (x < routerRow.scrollLeft || x + b.offsetWidth > routerRow.scrollLeft + routerRow.clientWidth)) routerRow.scrollLeft = x - 8;
   }
-  $("method").innerHTML = `<strong>${state.router}</strong> ${inline(README.methods.get(state.router) ?? "")}`;
+  const method = $("method");
+  const title = document.createElement("strong");
+  title.textContent = state.router;
+  method.replaceChildren(title);
+  method.insertAdjacentHTML("beforeend", inline(README.methods.get(state.router) ?? ""));
   const status = $("status");
   status.textContent = `Routing ${fmt.format(graph.edges.length)} edges with ${state.router}…`;
   status.hidden = false;
@@ -288,7 +299,7 @@ function stats(graph: Graph, done: RouteDone | undefined): void {
   ];
   if (state.selected) {
     const n = graph.edges.filter((e) => e.source.node === state.selected || e.target.node === state.selected).length;
-    rows.push(["Selected", `${state.selected}, ${n} edges <button type="button" class="link" id="clear">Clear</button>`]);
+    rows.push(["Selected", `${esc(state.selected)}, ${n} edges <button type="button" class="link" id="clear">Clear</button>`]);
   }
   dl.innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
   document.getElementById("clear")?.addEventListener("click", () => {
@@ -330,8 +341,9 @@ async function bench(): Promise<void> {
   }
   $("bench-intro").innerHTML = html(benchText);
   if (meta.sha) {
-    const short = meta.sha.slice(0, 7);
-    $("bench-meta").innerHTML = `Raced on a GitHub runner${meta.date ? ` on ${meta.date}` : ""}, at commit <a href="https://github.com/mark1russell7/highways/commit/${meta.sha}"><code>${short}</code></a>.`;
+    const sha = esc(meta.sha);
+    const short = sha.slice(0, 7);
+    $("bench-meta").innerHTML = `Raced on a GitHub runner${meta.date ? ` on ${esc(meta.date)}` : ""}, at commit <a href="https://github.com/mark1russell7/highways/commit/${sha}"><code>${short}</code></a>.`;
   }
   const fixtures = [...new Set(rows.map((r) => r.fixture))];
   const tabs = $("bench-tabs");
@@ -365,7 +377,7 @@ async function bench(): Promise<void> {
     const body = list
       .map(
         (r) =>
-          `<tr><th scope="row"><button type="button" class="table-pick" data-router="${r.router}" title="Show ${r.router} on the map"><code>${r.router}</code></button></th>${cols
+          `<tr><th scope="row"><button type="button" class="table-pick" data-router="${esc(r.router)}" title="Show ${esc(r.router)} on the map"><code>${esc(r.router)}</code></button></th>${cols
             .map((c, i) => {
               const v = c.get(r);
               return `<td class="${v === best[i] && list.length > 1 ? "best" : ""}">${c.show(v, r)}</td>`;
@@ -373,7 +385,7 @@ async function bench(): Promise<void> {
             .join("")}</tr>`,
       )
       .join("");
-    $("bench-table").innerHTML = `<table class="num"><caption>${pick}${first ? `: ${fmt.format(first.nodes)} nodes, ${fmt.format(first.edges)} edges` : ""}</caption><thead>${head}</thead><tbody>${body}</tbody></table>`;
+    $("bench-table").innerHTML = `<table class="num"><caption>${esc(pick)}${first ? `: ${fmt.format(first.nodes)} nodes, ${fmt.format(first.edges)} edges` : ""}</caption><thead>${head}</thead><tbody>${body}</tbody></table>`;
     for (const b of $("bench-table").querySelectorAll<HTMLButtonElement>("[data-router]"))
       b.addEventListener("click", () => {
         if (DEMO_FIXTURES.some((f) => f.name === pick)) {
