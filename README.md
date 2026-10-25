@@ -19,8 +19,8 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 |---|---|---|
 | H0 | The repository, the benchmark, the fixtures and a straight-line control | Done |
 | H1 | One region: plugs, routes around the nodes and the inflection rule | Done |
-| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | In progress |
-| H3 | The tree of sections, the highways and the zoom levels | Later |
+| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | Done |
+| H3 | The tree of sections, the highways and the zoom levels | Next |
 | H4 | A race of the strategies for each step | Later |
 | H5 | Stability: an incremental mode and a full recompute | Later |
 
@@ -53,6 +53,16 @@ The routers `shared` and `shared-all` follow Pupyrev, Nachmanson, Bereg and Holr
 On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than `corners`. `shared-all` uses 60% to 74% less. The routes are 10% to 17% longer, with more bends. The crossings go down by 4 to 30 times, but the metric counts a crossing of two shared stretches one time.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
+
+## The segments
+
+`segmentsOf(result)` breaks the routes into segments. Each run and each trunk becomes a shared segment, with its edges in lane order and their count. The other parts of the routes become private segments. A path gives the segments of one edge in order, with its lane in each segment.
+
+A renderer uses these segments for the three views of a bundle:
+
+- **Unpack:** draw each shared segment one time, as a fat edge with its count. A click shows the edges of the segment.
+- **Pull apart:** `pullApart(graph, { spacing, maxWidth })` draws each lane next to the others, in lane order. The ends of each route stay at their plugs.
+- **Expand:** draw the route of each edge.
 
 ## The benchmark
 
