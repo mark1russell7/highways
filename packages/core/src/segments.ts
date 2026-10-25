@@ -169,3 +169,59 @@ export function pullApart(graph: SegmentGraph, options: PullApartOptions): Route
   }
   return routes;
 }
+
+/** The angle, from -π to π, of the turn at `base` from the direction `from` → `base` to the point `to`. */
+function turn(from: Point, base: Point, to: Point): number {
+  const dx = base.x - from.x;
+  const dy = base.y - from.y;
+  const vx = to.x - base.x;
+  const vy = to.y - base.y;
+  return Math.atan2(dx * vy - dy * vx, dx * vx + dy * vy);
+}
+
+/**
+ * This function gives the lane order of the edges on a shared way `run` (metro-line order). Two routes go on together
+ * past the last point of the run until they part. The route that turns more to the left there gets the lane more to the left.
+ * Two routes can part only before the first point. Then the route that comes from more to the left gets the lane more to the left.
+ * A route that does not hold the run goes last.
+ */
+export function orderLanes(run: readonly Point[], routes: readonly Route[]): string[] {
+  const placed: { edge: string; p: readonly Point[]; s: number; e: number }[] = [];
+  const lost: string[] = [];
+  for (const r of routes) {
+    let at = indexOf(r.points, run, 0);
+    if (at >= 0) placed.push({ edge: r.edge, p: r.points, s: at, e: at + run.length - 1 });
+    else {
+      const p = [...r.points].reverse();
+      at = indexOf(p, run, 0);
+      if (at >= 0) placed.push({ edge: r.edge, p, s: at, e: at + run.length - 1 });
+      else lost.push(r.edge);
+    }
+  }
+  const same = (a: Point, b: Point): boolean => dist(a, b) <= SAME;
+  placed.sort((P, Q) => {
+    for (let j = 1; ; j++) {
+      const a = P.p[P.e + j];
+      const b = Q.p[Q.e + j];
+      if (a === undefined || b === undefined) break;
+      if (!same(a, b)) {
+        const d = turn(P.p[P.e + j - 2]!, P.p[P.e + j - 1]!, a) - turn(P.p[P.e + j - 2]!, P.p[P.e + j - 1]!, b);
+        if (d !== 0) return d;
+        break;
+      }
+    }
+    for (let j = 1; ; j++) {
+      const a = P.p[P.s - j];
+      const b = Q.p[Q.s - j];
+      if (a === undefined || b === undefined) break;
+      if (!same(a, b)) {
+        // Seen backward, the left side is the right side. Thus the order turns around.
+        const d = turn(P.p[P.s - j + 2]!, P.p[P.s - j + 1]!, b) - turn(P.p[P.s - j + 2]!, P.p[P.s - j + 1]!, a);
+        if (d !== 0) return d;
+        break;
+      }
+    }
+    return P.edge < Q.edge ? -1 : P.edge > Q.edge ? 1 : 0;
+  });
+  return [...placed.map((x) => x.edge), ...lost.sort()];
+}

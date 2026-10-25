@@ -135,6 +135,24 @@ export class CornerGraph {
     return n / 2;
   }
 
+  /** This method gives the index of the corner nearest to `p`, seen or not, or -1 when the graph has no corner near it. */
+  nearest(p: Point): number {
+    for (let r = this.#cell; r <= this.#cell * 64; r *= 2) {
+      let best = -1;
+      let bestD = Infinity;
+      this.#pointGrid.query({ x: p.x - r, y: p.y - r, w: 2 * r, h: 2 * r }, (j) => {
+        const d = dist(p, this.points[j]!);
+        if (d < bestD || (d === bestD && j < best)) {
+          bestD = d;
+          best = j;
+        }
+      });
+      // A corner beyond r can be nearer than a corner in a corner of the square. Within r, none is.
+      if (best >= 0 && bestD <= r) return best;
+    }
+    return -1;
+  }
+
   /** This method gives at most `k` corners that `p` can see, nearest first. The corner `self` does not count. */
   nearestVisible(p: Point, k: number, self = -1): number[] {
     const out: number[] = [];

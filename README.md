@@ -20,7 +20,7 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 | H0 | The repository, the benchmark, the fixtures and a straight-line control | Done |
 | H1 | One region: plugs, routes around the nodes and the inflection rule | Done |
 | H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | Done |
-| H3 | The tree of sections, the highways and the zoom levels | Next |
+| H3 | The tree of sections, the highways and the zoom levels | In progress |
 | H4 | A race of the strategies for each step | Later |
 | H5 | Stability: an incremental mode and a full recompute | Later |
 
@@ -35,6 +35,8 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 | `trunks` | A rule puts edges in groups. The edges of a group leave one plug of one node on one trunk. At a split point, each edge goes on to its target. |
 | `shared` | The edges of one collection share their ways through the corner graph. A link that the group uses already costs half. |
 | `shared-all` | The same as `shared`, but all edges share their ways. |
+| `sections` | A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly. |
+| `sections-tree` | The same as `sections`, but each edge goes through the hubs. |
 
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 
@@ -51,6 +53,14 @@ The fixture `mid-fanout` has nodes that link to many nodes of one collection. Th
 The routers `shared` and `shared-all` follow Pupyrev, Nachmanson, Bereg and Holroyd, "Edge routing with ordered bundles". The edges go one by one, the longest first. A stretch that several edges share has the same points in each of their routes. The result gives each stretch as a run, with the order of its lanes. Where two edges part, the edge that turns more to the left has the lane more to the left. Thus two lanes do not cross where they part.
 
 On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than `corners`. `shared-all` uses 60% to 74% less. The routes are 10% to 17% longer, with more bends. The crossings go down by 4 to 30 times, but the metric counts a crossing of two shared stretches one time.
+
+The routers `sections` and `sections-tree` divide the plane into a quadtree of sections. A section with more than 8 nodes splits in four. The hub of a section is the free corner nearest to the center of its nodes. An edge goes from its node up the hubs to the lowest common section, then down the hubs to the other node. The router finds each way between two hubs one time, so all the edges on it share its points.
+
+The result gives one zoom level for each depth of the tree. A link of a level counts the edges between two items.
+
+On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 50% to 71% less ink than `corners`. It has 10 to 38 times fewer crossings and is faster. But its routes are 3.8 to 5.9 times as long as the line between their plugs.
+
+`sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 17% to 29% and the crossings by 1.5 to 2.3 times. The routes are 16% to 23% longer.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 

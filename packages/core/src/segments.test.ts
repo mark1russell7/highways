@@ -5,7 +5,7 @@ import { dist, segmentsCross } from "./geom.ts";
 import type { Router } from "./model.ts";
 import { sharedRouter } from "./routers/shared.ts";
 import { byCollection, trunksRouter } from "./routers/trunks.ts";
-import { offsetPolyline, pathPoints, pullApart, segmentsOf } from "./segments.ts";
+import { offsetPolyline, orderLanes, pathPoints, pullApart, segmentsOf } from "./segments.ts";
 
 const routers: Router[] = [
   sharedRouter({ name: "shared-all" }),
@@ -86,5 +86,27 @@ describe("pullApart", () => {
       const route = routes.find((r) => r.edge === edge)!.points;
       for (const q of lanes[lane]!) expect(route.some((p) => dist(p, q) < 1e-9), `${edge} lane ${lane}`).toBe(true);
     }
+  });
+});
+
+describe("orderLanes", () => {
+  const run = [
+    { x: 0, y: 0 },
+    { x: 100, y: 0 },
+  ];
+  const via = (edge: string, ...rest: [number, number][]) => ({ edge, points: [...run, ...rest.map(([x, y]) => ({ x, y }))] });
+
+  it("puts the route that turns more to the left after the run on the left lane", () => {
+    // The y axis points down, so a route that goes up after the run turns left.
+    const d = { edge: "d", points: [...via("d", [200, 50]).points].reverse() };
+    const lost = { edge: "lost", points: [{ x: 500, y: 500 }, { x: 600, y: 500 }] };
+    const order = orderLanes(run, [via("c", [200, 100]), lost, via("b", [200, 0]), d, via("a", [200, -100])]);
+    expect(order).toEqual(["a", "b", "d", "c", "lost"]);
+  });
+
+  it("uses the way before the run when the routes go on together after it", () => {
+    const p = { edge: "p", points: [{ x: -100, y: -100 }, ...run] };
+    const q = { edge: "q", points: [{ x: -100, y: 100 }, ...run] };
+    expect(orderLanes(run, [q, p])).toEqual(["p", "q"]);
   });
 });
