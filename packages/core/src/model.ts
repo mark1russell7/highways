@@ -77,7 +77,27 @@ export interface LevelLink {
 export interface Result {
   readonly routes: readonly Route[];
   readonly levels?: readonly Level[];
+  readonly bundles?: readonly Bundle[];
 }
+
+/**
+ * A bundle: edges from one node that share one plug and one trunk. Then the edges fan out to their targets.
+ * A renderer draws a bundle as one fat edge with a count, or as one lane for each edge.
+ */
+export interface Bundle {
+  readonly id: string;
+  /** The key that the grouping rule gave each edge of the bundle. */
+  readonly key: string;
+  /** The node where the edges share their plug. */
+  readonly node: string;
+  /** The edges in lane order. Lane 0 turns most to the left of the trunk, in a frame with the y axis down. */
+  readonly edges: readonly string[];
+  /** The shared start of each route of the bundle, from the plug to the split point. */
+  readonly trunk: readonly Point[];
+}
+
+/** A grouping rule gives each edge a key. The edges from one plug with one key make a bundle. An edge without a key stays alone. */
+export type GroupRule = (edge: Edge) => string | undefined;
 
 /** A router: a strategy with a name. The same input must give the same result. */
 export interface Router {

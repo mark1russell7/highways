@@ -14,8 +14,11 @@ export function rng(seed: number): () => number {
   };
 }
 
-/** The ways a fixture puts its nodes and picks its edges. */
-export type FixtureKind = "uniform" | "clustered" | "grid" | "hubs";
+/**
+ * The ways a fixture puts its nodes and picks its edges. In `collections`, each cluster is one collection,
+ * and some nodes link to many nodes of one other collection (a fan-out).
+ */
+export type FixtureKind = "uniform" | "clustered" | "grid" | "hubs" | "collections";
 
 /** The parameters of a generated graph. */
 export interface FixtureSpec {
@@ -39,6 +42,7 @@ export const FIXTURES: readonly FixtureSpec[] = [
   { name: "mid-uniform", kind: "uniform", nodes: 1000, edgesPerNode: 2, seed: 4 },
   { name: "mid-clustered", kind: "clustered", nodes: 1000, edgesPerNode: 3, seed: 5, fixedPorts: 0.2 },
   { name: "mid-hubs", kind: "hubs", nodes: 1000, edgesPerNode: 2, seed: 6 },
+  { name: "mid-fanout", kind: "collections", nodes: 1000, edgesPerNode: 2, seed: 9 },
   { name: "large-clustered", kind: "clustered", nodes: 10_000, edgesPerNode: 3, seed: 7 },
   { name: "huge-clustered", kind: "clustered", nodes: 100_000, edgesPerNode: 2, seed: 8 },
 ];
@@ -58,6 +62,7 @@ export function makeFixture(spec: FixtureSpec): Graph {
   const side = Math.sqrt(spec.nodes) * SPACING;
   const grid = new Grid<Box>(SPACING);
   const nodes: Node[] = [];
+  const clusterOf: number[] = [];
   const free = (b: Box): boolean => {
     let ok = true;
     const g: Box = { x: b.x - GAP, y: b.y - GAP, w: b.w + 2 * GAP, h: b.h + 2 * GAP };
@@ -78,12 +83,14 @@ export function makeFixture(spec: FixtureSpec): Graph {
     const h = 18 + Math.floor(R() * 12);
     let cx: number;
     let cy: number;
+    let cluster = -1;
     if (spec.kind === "grid") {
       const i = nodes.length;
       cx = ((i % cols) + 0.5) * SPACING;
       cy = (Math.floor(i / cols) + 0.5) * SPACING;
-    } else if (spec.kind === "clustered") {
-      const c = centers[Math.floor(R() * centers.length)]!;
+    } else if (spec.kind === "clustered" || spec.kind === "collections") {
+      cluster = Math.floor(R() * centers.length);
+      const c = centers[cluster]!;
       cx = c.x + gauss() * spread;
       cy = c.y + gauss() * spread;
     } else {
@@ -93,6 +100,7 @@ export function makeFixture(spec: FixtureSpec): Graph {
     const box: Box = { x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h };
     if (spec.kind !== "grid" && !free(box)) continue;
     grid.add(box, box);
+    clusterOf.push(cluster);
     const id = `n${nodes.length}`;
     if (R() < (spec.fixedPorts ?? 0)) {
       const s = SIDES[Math.floor(R() * 4)]!;
@@ -103,21 +111,54 @@ export function makeFixture(spec: FixtureSpec): Graph {
       nodes.push({ id, box, ports });
     } else nodes.push({ id, box });
   }
-  return { nodes, edges: makeEdges(spec, nodes, R) };
+  return { nodes, edges: makeEdges(spec, nodes, clusterOf, R) };
 }
 
-function makeEdges(spec: FixtureSpec, nodes: readonly Node[], R: () => number): Edge[] {
+function makeEdges(spec: FixtureSpec, nodes: readonly Node[], clusterOf: readonly number[], R: () => number): Edge[] {
   const n = nodes.length;
   if (n < 2) return [];
   const locality = spec.locality ?? 0.65;
   const near = new Grid<number>(SPACING * 2);
   nodes.forEach((v, i) => near.add(i, v.box));
-  const kindOf = nodes.map(() => COLLECTIONS[Math.floor(R() * COLLECTIONS.length)]!);
+  const kindOf =
+    spec.kind === "collections"
+      ? clusterOf.map((c) => `${COLLECTIONS[c % COLLECTIONS.length]!}-${c}`)
+      : nodes.map(() => COLLECTIONS[Math.floor(R() * COLLECTIONS.length)]!);
   // Hubs: a few nodes get most of the far edges (preferential attachment by a power law).
   const pickFar = (): number => (spec.kind === "hubs" ? Math.floor(n * R() ** 3) : Math.floor(R() * n));
   const target = Math.round(n * spec.edgesPerNode);
   const seen = new Set<string>();
   const edges: Edge[] = [];
+  const add = (u: number, v: number): void => {
+    const key = u < v ? `${u}-${v}` : `${v}-${u}`;
+    if (u === v || seen.has(key)) return;
+    seen.add(key);
+    const src = nodes[u]!;
+    edges.push({
+      id: `e${edges.length}`,
+      source: src.ports ? { node: src.id, port: "out" } : { node: src.id },
+      target: { node: nodes[v]!.id },
+      data: { collection: kindOf[v]! },
+    });
+  };
+  if (spec.kind === "collections") {
+    // Six of ten edges are fan-outs: a node links to 4 to 15 nodes of one other cluster.
+    const members = new Map<number, number[]>();
+    clusterOf.forEach((c, i) => {
+      const list = members.get(c);
+      if (list) list.push(i);
+      else members.set(c, [i]);
+    });
+    const clusters = [...members.keys()].sort((a, c) => a - c);
+    let rounds = 0;
+    while (edges.length < target * 0.6 && clusters.length > 1 && rounds++ < target) {
+      const u = Math.floor(R() * n);
+      const others = clusters.filter((c) => c !== clusterOf[u]);
+      const pool = members.get(others[Math.floor(R() * others.length)]!)!;
+      const fan = 4 + Math.floor(R() * 12);
+      for (let i = 0; i < fan; i++) add(u, pool[Math.floor(R() * pool.length)]!);
+    }
+  }
   let tries = 0;
   while (edges.length < target && tries++ < target * 30) {
     const u = Math.floor(R() * n);
@@ -134,17 +175,7 @@ function makeEdges(spec: FixtureSpec, nodes: readonly Node[], R: () => number): 
       cand.sort((a, c) => a - c);
       if (cand.length) v = cand[Math.floor(R() * cand.length)]!;
     } else v = pickFar();
-    if (v < 0 || v === u) continue;
-    const key = u < v ? `${u}-${v}` : `${v}-${u}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const src = nodes[u]!;
-    edges.push({
-      id: `e${edges.length}`,
-      source: src.ports ? { node: src.id, port: "out" } : { node: src.id },
-      target: { node: nodes[v]!.id },
-      data: { collection: kindOf[v]! },
-    });
+    if (v >= 0) add(u, v);
   }
   return edges;
 }

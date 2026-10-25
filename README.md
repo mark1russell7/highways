@@ -19,7 +19,7 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 |---|---|---|
 | H0 | The repository, the benchmark, the fixtures and a straight-line control | Done |
 | H1 | One region: plugs, routes around the nodes and the inflection rule | Done |
-| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | Next |
+| H2 | Bundles by rule, ordered lanes and the data to unpack a bundle | In progress |
 | H3 | The tree of sections, the highways and the zoom levels | Later |
 | H4 | A race of the strategies for each step | Later |
 | H5 | Stability: an incremental mode and a full recompute | Later |
@@ -32,6 +32,7 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 | `plugs` | Each edge leaves its plug along the normal of the side and follows the curve of the inflection rule. It does not go around the nodes. |
 | `corners` | Each edge goes around the nodes on a shortest path (A*) through a sparse visibility graph of the box corners. |
 | `corners-smooth` | The same paths as `corners`. A route in clear view follows the inflection rule, and the other routes get round corners. |
+| `trunks` | A rule puts edges in groups. The edges of a group leave one plug of one node on one trunk. At a split point, each edge goes on to its target. |
 
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 
@@ -40,6 +41,10 @@ The inflection rule sets the number of inflections from the angle of the chord: 
 The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). A coarse lattice of free points links groups of nodes across empty space.
 
 The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 45 s. The zoom levels of H3 are for larger graphs.
+
+The rule of `trunks` in the benchmark groups the edges by the collection of the target. The result gives each bundle with its trunk and the order of its lanes. Lane 0 turns most to the left, so two lanes do not cross at the split point.
+
+The fixture `mid-fanout` has nodes that link to many nodes of one collection. There, `trunks` uses 8% less ink and has 10% fewer crossings than `corners`. The metric `ink` counts a shared trunk one time for each edge, thus the ink on the screen is less again.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 

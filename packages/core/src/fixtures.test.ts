@@ -35,6 +35,17 @@ describe("makeFixture", () => {
     expect(g.edges.length).toBeGreaterThan(spec.nodes * spec.edgesPerNode * 0.9);
   });
 
+  it("gives fan-outs to one collection in the collections kind", () => {
+    const g = makeFixture(FIXTURES.find((f) => f.name === "mid-fanout")!);
+    const groups = new Map<string, number>();
+    for (const e of g.edges) {
+      const k = `${e.source.node}|${String(e.data?.["collection"])}`;
+      groups.set(k, (groups.get(k) ?? 0) + 1);
+    }
+    const fans = [...groups.values()].filter((n) => n >= 4).length;
+    expect(fans).toBeGreaterThan(50);
+  });
+
   it("gives fixed plugs on the side of the box", () => {
     const g = makeFixture(FIXTURES.find((f) => f.name === "small-clustered")!);
     const fixed = g.nodes.filter((n) => n.ports);

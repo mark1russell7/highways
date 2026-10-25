@@ -4,7 +4,7 @@ import { fixedPortPoint, nodeIndex, type Graph, type Node, type Result } from ".
 
 /** A broken hard rule. A correct router has none. */
 export interface Violation {
-  readonly rule: "complete" | "ends-at-plugs" | "fixed-plugs" | "no-pass-through" | "counts-sum";
+  readonly rule: "complete" | "ends-at-plugs" | "fixed-plugs" | "no-pass-through" | "counts-sum" | "bundle-trunk";
   readonly edge?: string;
   readonly detail: string;
 }
@@ -15,7 +15,8 @@ export const TOLERANCE = 0.5;
 /**
  * This function checks the hard rules of a result. Each edge has one route, and each route starts and ends at its nodes.
  * Fixed plugs stay in place. No route goes through a node that is not one of its ends. The counts of each level add up.
- * The function gives at most `limit` violations.
+ *
+ * Each route of a bundle starts with its trunk, and an edge is in one bundle at most. The function gives at most `limit` violations.
  */
 export function checkProperties(graph: Graph, result: Result, limit = 100): Violation[] {
   const out: Violation[] = [];
@@ -56,6 +57,16 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
         if (add({ rule: "no-pass-through", edge: e.id, detail: `segment ${i} goes through ${hit.id}` })) return out;
         break;
       }
+    }
+  }
+  const bundled = new Set<string>();
+  for (const b of result.bundles ?? []) {
+    for (const id of b.edges) {
+      const r = routes.get(id);
+      const shares = r !== undefined && r.points.length >= b.trunk.length && b.trunk.every((p, i) => dist(p, r.points[i]!) <= TOLERANCE);
+      if (bundled.has(id) || !shares)
+        if (add({ rule: "bundle-trunk", edge: id, detail: `bundle ${b.id}: the route is in two bundles or does not start with the trunk` })) return out;
+      bundled.add(id);
     }
   }
   for (const level of result.levels ?? []) {

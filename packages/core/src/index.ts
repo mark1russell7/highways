@@ -5,6 +5,7 @@ export * from "./fixtures.ts";
 export * from "./plugs.ts";
 export * from "./curves.ts";
 export * from "./visibility.ts";
+export * from "./ways.ts";
 export * from "./routers/index.ts";
 export * from "./bench/properties.ts";
 export * from "./bench/quality.ts";

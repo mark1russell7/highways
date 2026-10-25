@@ -43,8 +43,8 @@ describe("cornersRouter", () => {
     }
   });
 
-  it("keeps the hard rules on generated graphs (property, 4 kinds × 4 seeds)", () => {
-    const kinds: FixtureKind[] = ["uniform", "clustered", "grid", "hubs"];
+  it("keeps the hard rules on generated graphs (property, 5 kinds × 4 seeds)", () => {
+    const kinds: FixtureKind[] = ["uniform", "clustered", "grid", "hubs", "collections"];
     for (const kind of kinds) {
       for (let seed = 1; seed <= 4; seed++) {
         const g = makeFixture({ name: "t", kind, nodes: 80, edgesPerNode: 2, seed, fixedPorts: 0.2 });
