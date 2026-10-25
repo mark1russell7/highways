@@ -37,7 +37,9 @@ A free plug goes on the side that faces the other end. Thus the angle between th
 
 The inflection rule sets the number of inflections from the angle of the chord: 0 near an axis, 1 near a diagonal, 2 between them. The inflections are at 1/2, or at 1/3 and 2/3, of the chord.
 
-The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). A coarse lattice of free points links groups of nodes across empty space. The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 45 s. The zoom levels of H3 are for larger graphs.
+The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). A coarse lattice of free points links groups of nodes across empty space.
+
+The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 45 s. The zoom levels of H3 are for larger graphs.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 
