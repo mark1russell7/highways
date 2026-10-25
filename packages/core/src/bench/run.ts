@@ -38,6 +38,30 @@ export function runBenchmark(routers: readonly Router[], fixtures: readonly Fixt
   return rows;
 }
 
+/**
+ * This function tells if two values hold the same data, as JSON sees it. It does not make a string,
+ * because the result of a large graph can be longer than the longest string.
+ */
+export function sameData(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a === "number" && typeof b === "number") return Number.isNaN(a) && Number.isNaN(b);
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    const y = b as unknown[];
+    if (a.length !== y.length) return false;
+    for (let i = 0; i < a.length; i++) if (!sameData(a[i], y[i])) return false;
+    return true;
+  }
+  const x = a as Record<string, unknown>;
+  const y = b as Record<string, unknown>;
+  const kx = Object.keys(x).filter((k) => x[k] !== undefined);
+  const ky = Object.keys(y).filter((k) => y[k] !== undefined);
+  if (kx.length !== ky.length) return false;
+  for (const k of kx) if (!sameData(x[k], y[k])) return false;
+  return true;
+}
+
 /** This function routes one graph with one router and measures the result. */
 export function benchOne(router: Router, fixture: string, graph: Graph, repeat = 3): BenchRow {
   const times: number[] = [];
@@ -48,7 +72,7 @@ export function benchOne(router: Router, fixture: string, graph: Graph, repeat =
     const r = router.route(graph);
     times.push(now() - t0);
     if (!first) first = r;
-    else if (i === 1 && JSON.stringify(r) !== JSON.stringify(first)) deterministic = false;
+    else if (i === 1 && !sameData(r, first)) deterministic = false;
   }
   times.sort((a, b) => a - b);
   const result = first!;

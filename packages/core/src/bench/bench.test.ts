@@ -4,7 +4,7 @@ import type { Graph, Result, Router } from "../model.ts";
 import { straightRouter } from "../routers/straight.ts";
 import { checkProperties } from "./properties.ts";
 import { countCrossings, measureQuality, measureStability, sideAngle } from "./quality.ts";
-import { benchOne, formatTable, runBenchmark } from "./run.ts";
+import { benchOne, formatTable, runBenchmark, sameData } from "./run.ts";
 
 // Three nodes in a row: a straight edge from a to c goes through b.
 const row: Graph = {
@@ -106,5 +106,16 @@ describe("runBenchmark", () => {
     let n = 0;
     const flaky: Router = { name: "flaky", route: (g) => ({ routes: straightRouter.route(g).routes.map((r) => ({ ...r, points: r.points.map((p) => ({ x: p.x + n++, y: p.y })) })) }) };
     expect(benchOne(flaky, "x", makeFixture(FIXTURES[0]!), 2).deterministic).toBe(false);
+  });
+});
+
+describe("sameData", () => {
+  it("compares values as JSON sees them", () => {
+    expect(sameData({ a: [1, { b: "x" }], c: undefined }, { a: [1, { b: "x" }] })).toBe(true);
+    expect(sameData({ a: [1, 2] }, { a: [1, 3] })).toBe(false);
+    expect(sameData({ a: [1] }, { a: { 0: 1 } })).toBe(false);
+    expect(sameData({ a: 1 }, { a: 1, b: 2 })).toBe(false);
+    expect(sameData(Number.NaN, Number.NaN)).toBe(true);
+    expect(sameData(null, {})).toBe(false);
   });
 });
