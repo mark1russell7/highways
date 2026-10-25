@@ -1,0 +1,46 @@
+# Builds packages/site and publishes it to GitHub Pages at https://mark1russell7.github.io/highways/, with
+# the shared Pages workflow of mark1russell7 (reusable-pages.yml of mark1russell7/template, its CI.md).
+# The Pages source of the repository is "GitHub Actions" (Settings > Pages).
+# Before the build, the benchmark races the routers on the fixtures to 1 000 nodes. The site shows that table.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+# One deployment at a time. A newer push cancels a deployment that waits.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    uses: mark1russell7/template/.github/workflows/reusable-pages.yml@9b17adc229b6ecf4f6a16d61d38c6ef34ba17d94 # main
+    # The build job of the shared workflow gets only the read permissions. Only its deploy job,
+    # which runs no code of the repository, writes to Pages.
+    permissions:
+      contents: read
+      actions: read
+      issues: read
+      pull-requests: read
+      checks: read
+      statuses: read
+      pages: write
+      id-token: write
+    with:
+      # The benchmark rows (bench.json) and their commit go into the public folder of the site, then the site builds.
+      # A router that is not deterministic makes the benchmark fail. The site still deploys, with a warning.
+      build: |
+        mkdir -p packages/site/public
+        pnpm --filter @highways/core bench --max 1000 --json "$PWD/packages/site/public/bench.json" \
+          || echo "::warning::The benchmark failed or found a router that is not deterministic."
+        printf '{"sha":"%s","date":"%s"}\n' "$(git rev-parse HEAD)" "$(date -u +%F)" > packages/site/public/bench-meta.json
+        pnpm --filter @highways/site run build
+      out: packages/site/dist
+      env: '{"SITE_BASE": "/${{ github.event.repository.name }}"}'
+      # The site has no npm packages and no roadmap file, so it needs no Releases page and no Status page.
+      site-pages: false
+      timeout-minutes: 30

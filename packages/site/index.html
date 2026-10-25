@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways: edge routing for large graphs</title>
+    <meta name="description" content="highways routes the edges of large graphs with a hierarchy of highways, bundles and zoom levels. Try each router on a live map." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <a class="skip" href="#map">Skip to the map</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <h1 class="wordmark">highways</h1>
+          <p class="tagline" id="tagline"></p>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+          <a href="#idea">The idea</a>
+          <a href="#bench">Benchmark</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="demo" aria-label="Live demo">
+        <div class="router-row" role="radiogroup" aria-label="Router" id="routers"></div>
+        <div class="stage">
+          <div class="map-wrap">
+            <canvas id="map" tabindex="0" aria-label="The map of the routed graph"></canvas>
+            <div class="map-tools">
+              <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+              <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+              <button type="button" id="zoom-fit">Fit</button>
+            </div>
+            <p class="map-status" id="status" role="status" aria-live="polite"></p>
+            <p class="map-level" id="level-badge" hidden></p>
+          </div>
+          <aside class="panel">
+            <p class="method" id="method"></p>
+            <div class="field">
+              <label for="fixture">Fixture</label>
+              <select id="fixture"></select>
+            </div>
+            <fieldset class="field" id="bundle-field">
+              <legend>Bundles</legend>
+              <div class="seg">
+                <label><input type="radio" name="bundles" value="unpack" checked /><span>Unpack</span></label>
+                <label><input type="radio" name="bundles" value="apart" /><span>Pull apart</span></label>
+                <label><input type="radio" name="bundles" value="expand" /><span>Expand</span></label>
+              </div>
+              <p class="hint" id="bundle-hint"></p>
+            </fieldset>
+            <fieldset class="field" id="level-field">
+              <legend>Zoom level</legend>
+              <input type="range" id="level" min="0" max="1" step="1" value="1" aria-describedby="level-name" />
+              <p class="level-name" id="level-name"></p>
+              <label class="check"><input type="checkbox" id="follow" checked /> Follow the zoom</label>
+            </fieldset>
+            <dl class="stats" id="stats"></dl>
+          </aside>
+        </div>
+        <div class="demo-help" id="demo-help"></div>
+      </section>
+
+      <section class="prose" id="idea">
+        <h2>The idea</h2>
+        <div id="idea-body"></div>
+        <h3>Bundles</h3>
+        <div id="segments-body"></div>
+      </section>
+
+      <section class="prose wide" id="routers-section">
+        <h2>The routers</h2>
+        <div id="routers-body" class="table-wrap"></div>
+      </section>
+
+      <section class="prose wide" id="status-section">
+        <h2>The road so far</h2>
+        <ol class="road" id="road"></ol>
+      </section>
+
+      <section class="prose wide" id="bench">
+        <h2>The benchmark</h2>
+        <div id="bench-intro"></div>
+        <div class="bench-tabs" role="tablist" aria-label="Fixture" id="bench-tabs"></div>
+        <div class="table-wrap" id="bench-table"></div>
+        <p class="hint" id="bench-meta"></p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The core is plain TypeScript with no renderer. This page draws its output on a canvas.
+      </p>
+    </footer>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>
