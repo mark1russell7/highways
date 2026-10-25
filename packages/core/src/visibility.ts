@@ -46,11 +46,17 @@ export interface CornerGraphOptions {
   readonly margin: number;
   /** The number of visible neighbours of each corner. */
   readonly k: number;
+  /**
+   * The spacing of a lattice of free points over the plane, in units of the mean node size. The default is 3, and 0 turns it off.
+   * The lattice links groups of nodes across empty space. Without it, the nearest corners of a group are all in that group.
+   */
+  readonly lattice?: number;
 }
 
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
- * Each corner links to its `k` nearest corners that it can see. A path goes from corner to corner around the boxes.
+ * Each corner links to its `k` nearest corners that it can see. A lattice of free points links the groups of nodes.
+ * A path goes from corner to corner around the boxes.
  * The obstacle test uses half of the margin, so a path keeps a clearance of at least half of the margin.
  */
 export class CornerGraph {
@@ -85,10 +91,26 @@ export class CornerGraph {
         { x: b.x + b.w, y: b.y + b.h },
         { x: b.x, y: b.y + b.h },
       ]) {
-        if (obstacles.inside(c, this.#pad)) continue;
-        const i = this.points.length;
-        this.points.push(c);
-        this.#pointGrid.add(i, { x: c.x, y: c.y, w: 0, h: 0 });
+        if (!obstacles.inside(c, this.#pad)) this.#addPoint(c);
+      }
+    }
+    const spacing = (options.lattice ?? 3) * this.#cell;
+    if (spacing > 0 && nodes.length > 0) {
+      let x0 = Infinity;
+      let y0 = Infinity;
+      let x1 = -Infinity;
+      let y1 = -Infinity;
+      for (const n of nodes) {
+        x0 = Math.min(x0, n.box.x);
+        y0 = Math.min(y0, n.box.y);
+        x1 = Math.max(x1, n.box.x + n.box.w);
+        y1 = Math.max(y1, n.box.y + n.box.h);
+      }
+      for (let x = x0 - spacing / 2; x <= x1 + spacing; x += spacing) {
+        for (let y = y0 - spacing / 2; y <= y1 + spacing; y += spacing) {
+          const c = { x, y };
+          if (!obstacles.inside(c, options.margin)) this.#addPoint(c);
+        }
       }
     }
     const links: Set<number>[] = this.points.map(() => new Set<number>());
@@ -99,6 +121,11 @@ export class CornerGraph {
       }
     }
     for (const s of links) this.#adj.push([...s].sort((a, b) => a - b));
+  }
+
+  #addPoint(c: Point): void {
+    this.#pointGrid.add(this.points.length, { x: c.x, y: c.y, w: 0, h: 0 });
+    this.points.push(c);
   }
 
   /** This method gives the number of links of the graph. */

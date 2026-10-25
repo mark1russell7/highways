@@ -19,7 +19,22 @@ const wall: Graph = {
   edges: [{ id: "ab", source: { node: "a" }, target: { node: "b" } }],
 };
 
+// Two groups of nodes, far apart, and one edge between them. The nearest corners of each group are all in that group.
+const groups: Graph = {
+  nodes: [0, 1].flatMap((gi) =>
+    Array.from({ length: 16 }, (_, i) => ({
+      id: `g${gi}n${i}`,
+      box: { x: gi * 3000 + (i % 4) * 60, y: Math.floor(i / 4) * 60, w: 40, h: 40 },
+    })),
+  ),
+  edges: [{ id: "far", source: { node: "g0n5" }, target: { node: "g1n10" } }],
+};
+
 describe("cornersRouter", () => {
+  it("links groups of nodes across empty space", () => {
+    for (const r of [corners, smooth]) expect(checkProperties(groups, r.route(groups))).toEqual([]);
+  });
+
   it("goes around a wall", () => {
     for (const r of [corners, smooth]) {
       const result = r.route(wall);
