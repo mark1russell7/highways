@@ -78,6 +78,8 @@ export interface Result {
   readonly routes: readonly Route[];
   readonly levels?: readonly Level[];
   readonly bundles?: readonly Bundle[];
+  /** The stretches of way that several routes share, if the router gives them. */
+  readonly runs?: readonly SharedRun[];
 }
 
 /**
@@ -94,6 +96,19 @@ export interface Bundle {
   readonly edges: readonly string[];
   /** The shared start of each route of the bundle, from the plug to the split point. */
   readonly trunk: readonly Point[];
+}
+
+/**
+ * A stretch of way that several routes share, with the same points. Each route of `edges` has `points` in it,
+ * in this order or in the reverse order. A renderer draws a run as one fat line, or as one lane for each edge.
+ */
+export interface SharedRun {
+  readonly id: string;
+  /** The key of the grouping rule of the edges. */
+  readonly key: string;
+  readonly points: readonly Point[];
+  /** The edges in lane order. Lane 0 is on the left of the run, from its first point to its last. The y axis points down. */
+  readonly edges: readonly string[];
 }
 
 /** A grouping rule gives each edge a key. The edges from one plug with one key make a bundle. An edge without a key stays alone. */

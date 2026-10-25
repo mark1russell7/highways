@@ -159,8 +159,10 @@ export class CornerGraph {
   /**
    * This method gives a shortest path from `from` to `to` in the graph (A*), with the two points as its ends.
    * It gives `undefined` when the graph links no corner near `from` to a corner near `to`.
+   * The function `cost` can change the cost of the link from corner `i` to corner `j`, of length `d`.
+   * It must give at least `floor` × `d`, so that the estimate of A* stays below the true cost.
    */
-  path(from: Point, to: Point): Point[] | undefined {
+  path(from: Point, to: Point, cost?: (i: number, j: number, d: number) => number, floor: number = 1): Point[] | undefined {
     if (this.#obstacles.clear(from, to, this.#pad)) return [from, to];
     const n = this.points.length;
     if (this.#g.length < n) {
@@ -174,7 +176,7 @@ export class CornerGraph {
     for (const j of this.nearestVisible(to, this.#k * 2)) goal.set(j, dist(this.points[j]!, to));
     if (goal.size === 0) return undefined;
     const heap = new MinHeap();
-    const h = (i: number): number => dist(this.points[i]!, to);
+    const h = (i: number): number => floor * dist(this.points[i]!, to);
     const relax = (j: number, g: number, parent: number): void => {
       if (this.#closed[j] === stamp) return;
       if (this.#open[j] === stamp && this.#g[j]! <= g) return;
@@ -197,7 +199,10 @@ export class CornerGraph {
         best = gi + tail;
         bestEnd = i;
       }
-      for (const j of this.#adj[i]!) relax(j, gi + dist(this.points[i]!, this.points[j]!), i);
+      for (const j of this.#adj[i]!) {
+        const d = dist(this.points[i]!, this.points[j]!);
+        relax(j, gi + (cost ? cost(i, j, d) : d), i);
+      }
     }
     if (bestEnd < 0) return undefined;
     const out: Point[] = [to];

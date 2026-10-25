@@ -1,10 +1,10 @@
-import { dist, inflate, pointBoxDistance, segmentHitsBox } from "../geom.ts";
+import { dist, inflate, pointBoxDistance, segmentHitsBox, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 
 /** A broken hard rule. A correct router has none. */
 export interface Violation {
-  readonly rule: "complete" | "ends-at-plugs" | "fixed-plugs" | "no-pass-through" | "counts-sum" | "bundle-trunk";
+  readonly rule: "complete" | "ends-at-plugs" | "fixed-plugs" | "no-pass-through" | "counts-sum" | "bundle-trunk" | "run-shared";
   readonly edge?: string;
   readonly detail: string;
 }
@@ -16,7 +16,9 @@ export const TOLERANCE = 0.5;
  * This function checks the hard rules of a result. Each edge has one route, and each route starts and ends at its nodes.
  * Fixed plugs stay in place. No route goes through a node that is not one of its ends. The counts of each level add up.
  *
- * Each route of a bundle starts with its trunk, and an edge is in one bundle at most. The function gives at most `limit` violations.
+ * Each route of a bundle starts with its trunk, and an edge is in one bundle at most.
+ * Each run has two edges or more, and the route of each edge holds the points of the run in a row.
+ * The function gives at most `limit` violations.
  */
 export function checkProperties(graph: Graph, result: Result, limit = 100): Violation[] {
   const out: Violation[] = [];
@@ -69,6 +71,15 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
       bundled.add(id);
     }
   }
+  for (const run of result.runs ?? []) {
+    if (run.edges.length < 2)
+      if (add({ rule: "run-shared", detail: `run ${run.id} has fewer than two edges` })) return out;
+    for (const id of run.edges) {
+      const r = routes.get(id);
+      if (!r || !(holds(r.points, run.points) || holds(r.points, [...run.points].reverse())))
+        if (add({ rule: "run-shared", edge: id, detail: `run ${run.id}: the route does not hold the points of the run in a row` })) return out;
+    }
+  }
   for (const level of result.levels ?? []) {
     const itemOf = new Map<string, string>();
     for (const it of level.items) for (const n of it.nodes) itemOf.set(n, it.id);
@@ -82,4 +93,11 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
       if (add({ rule: "counts-sum", detail: `level ${level.depth}: the links count ${sum} edges, not ${between}` })) return out;
   }
   return out;
+}
+
+/** This function tells if the polyline `p` holds the points of `part` in a row. */
+function holds(p: readonly Point[], part: readonly Point[]): boolean {
+  if (part.length === 0) return true;
+  for (let i = 0; i + part.length <= p.length; i++) if (part.every((q, j) => dist(q, p[i + j]!) <= TOLERANCE)) return true;
+  return false;
 }

@@ -33,6 +33,8 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 | `corners` | Each edge goes around the nodes on a shortest path (A*) through a sparse visibility graph of the box corners. |
 | `corners-smooth` | The same paths as `corners`. A route in clear view follows the inflection rule, and the other routes get round corners. |
 | `trunks` | A rule puts edges in groups. The edges of a group leave one plug of one node on one trunk. At a split point, each edge goes on to its target. |
+| `shared` | The edges of one collection share their ways through the corner graph. A link that the group uses already costs half. |
+| `shared-all` | The same as `shared`, but all edges share their ways. |
 
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 
@@ -44,7 +46,11 @@ The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rul
 
 The rule of `trunks` in the benchmark groups the edges by the collection of the target. The result gives each bundle with its trunk and the order of its lanes. Lane 0 turns most to the left, so two lanes do not cross at the split point.
 
-The fixture `mid-fanout` has nodes that link to many nodes of one collection. There, `trunks` uses 8% less ink and has 10% fewer crossings than `corners`. The metric `ink` counts a shared trunk one time for each edge, thus the ink on the screen is less again.
+The fixture `mid-fanout` has nodes that link to many nodes of one collection. There, `trunks` uses 8% less ink and has 10% fewer crossings than `corners`. The metric `ink` counts a shared segment one time.
+
+The routers `shared` and `shared-all` follow Pupyrev, Nachmanson, Bereg and Holroyd, "Edge routing with ordered bundles". The edges go one by one, the longest first. A stretch that several edges share has the same points in each of their routes. The result gives each stretch as a run, with the order of its lanes. Where two edges part, the edge that turns more to the left has the lane more to the left. Thus two lanes do not cross where they part.
+
+On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than `corners`. `shared-all` uses 60% to 74% less. The routes are 10% to 17% longer, with more bends. The crossings go down by 4 to 30 times, but the metric counts a crossing of two shared stretches one time.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 
