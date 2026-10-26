@@ -81,6 +81,8 @@ export class CornerGraph {
   // The stamp of the last call of nearestVisible that tested each corner.
   #tested = new Int32Array(0);
   #testStamp = 0;
+  // The corners that each end of a path sees, by the coordinates of the end.
+  readonly #endCache = new Map<string, number[]>();
 
   /** This constructor makes the graph of the nodes. */
   constructor(nodes: readonly Node[], obstacles: Obstacles, options: CornerGraphOptions) {
@@ -167,6 +169,10 @@ export class CornerGraph {
 
   /** This method gives at most `k` corners that `p` can see, nearest first. The corner `self` does not count. */
   nearestVisible(p: Point, k: number, self = -1): number[] {
+    return this.#nearestVisible(p, k, self, this.#pad);
+  }
+
+  #nearestVisible(p: Point, k: number, self: number, pad: number): number[] {
     const out: number[] = [];
     if (this.#tested.length < this.points.length) this.#tested = new Int32Array(this.points.length);
     const tested = this.#tested;
@@ -181,7 +187,7 @@ export class CornerGraph {
         // A corner beyond r can be nearer than a corner of the next ring, so it waits for that ring.
         if (d > r) break;
         tested[j] = stamp;
-        if (this.#obstacles.clear(p, this.points[j]!, this.#pad)) out.push(j);
+        if (this.#obstacles.clear(p, this.points[j]!, pad)) out.push(j);
         if (out.length >= k) return out;
       }
     }
@@ -205,7 +211,7 @@ export class CornerGraph {
     }
     const stamp = ++this.#stamp;
     const goal = new Map<number, number>();
-    for (const j of this.nearestVisible(to, this.#k * 2)) goal.set(j, dist(this.points[j]!, to));
+    for (const j of this.#ends(to)) goal.set(j, dist(this.points[j]!, to));
     if (goal.size === 0) return undefined;
     const heap = new MinHeap();
     const h = (i: number): number => floor * dist(this.points[i]!, to);
@@ -217,7 +223,7 @@ export class CornerGraph {
       this.#parent[j] = parent;
       heap.push(g + h(j), j);
     };
-    for (const j of this.nearestVisible(from, this.#k * 2)) relax(j, dist(from, this.points[j]!), -1);
+    for (const j of this.#ends(from)) relax(j, dist(from, this.points[j]!), -1);
     let best = Infinity;
     let bestEnd = -1;
     while (heap.size > 0) {
@@ -244,6 +250,22 @@ export class CornerGraph {
     for (let i = bestEnd; i >= 0; i = this.#parent[i]!) out.push(this.points[i]!);
     out.push(from);
     return out.reverse();
+  }
+
+  /**
+   * This method gives the corners that an end of a path can see. An end near a box sees no corner with the clearance.
+   * Then the end takes the corners that it sees without the clearance, so the path does not cut through the boxes.
+   * The graph does not change, so the method keeps the corners of each end.
+   */
+  #ends(p: Point): number[] {
+    const key = `${p.x},${p.y}`;
+    let out = this.#endCache.get(key);
+    if (!out) {
+      out = this.nearestVisible(p, this.#k * 2);
+      if (out.length === 0) out = this.#nearestVisible(p, this.#k * 2, -1, 0);
+      this.#endCache.set(key, out);
+    }
+    return out;
   }
 
   /** This method removes the vertices that a later vertex makes needless: from each vertex, it goes to the farthest vertex in view. */

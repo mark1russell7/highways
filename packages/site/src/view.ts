@@ -13,6 +13,7 @@ import {
   type SegmentGraph,
 } from "@mark1russell7/highways";
 import { itemSizes, pickLevel, type PickOptions } from "./levels.ts";
+import { endsOnOutlines, groupShapes, type GroupShape } from "./outlines.ts";
 
 /** The three views of a bundle: each route, each shared segment one time, or the lanes pulled apart. */
 export type BundleView = "expand" | "unpack" | "apart";
@@ -55,8 +56,8 @@ export interface Scene {
   /** The thresholds that pick the level for the zoom of the camera. */
   readonly pick?: PickOptions;
   /**
-   * With this pad, a group of a level is the union of the boxes of its nodes, each larger by the pad.
-   * Its links show count badges.
+   * With this pad, a group of a level has an outline at most this pad from its cards, and two outlines do not touch.
+   * Its links go from outline to outline and show count badges.
    * Without it, a group is the box around its nodes.
    */
   readonly groupPad?: number;
@@ -120,6 +121,7 @@ export class MapView {
   private fade = 1;
   private placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
   private nodeById = new Map<string, Node>();
+  private shapes = new WeakMap<Level, Map<string, GroupShape>>();
   private badges: Badge[] = [];
   private lanes: { graph: SegmentGraph; open: ReadonlySet<string>; width: number; routes: Route[] } | undefined;
 
@@ -642,43 +644,37 @@ export class MapView {
     return true;
   }
 
-  /** This method draws a level with each group as the union of the boxes of its nodes, each larger by `pad`. */
-  private paintBlobs(level: Level, scene: Scene, pad: number): void {
+  /**
+   * This method draws a level with an outline around each group, at most `pad` from its cards.
+   * Each link goes from outline to outline.
+   */
+  private paintOutlines(level: Level, scene: Scene, pad: number): void {
     const { ctx, colors: c } = this;
     const groups = level.items.filter((i) => i.nodes.length > 1);
     const singles = level.items.filter((i) => i.nodes.length === 1);
     const boxesOf = (ids: readonly string[]): Box[] =>
       ids.map((id) => this.nodeById.get(id)?.box).filter((b): b is Box => b !== undefined);
-    // Two boxes of a group that touch overlap by a little, so the union has no small holes at the corners.
-    const p = pad + 1.5 / this.s;
-    const rect = (x0: number, y0: number, x1: number, y1: number, r: number): void => {
-      ctx.roundRect(x0 * this.s + this.tx, y0 * this.s + this.ty, (x1 - x0) * this.s, (y1 - y0) * this.s, r);
-    };
+    let shapes = this.shapes.get(level);
+    if (!shapes) {
+      shapes = groupShapes(level, (id) => this.nodeById.get(id)?.box, pad);
+      this.shapes.set(level, shapes);
+    }
     for (const g of groups) {
-      ctx.beginPath();
-      const boxes = boxesOf(g.nodes).map((b) => ({ x0: b.x - p, y0: b.y - p, x1: b.x + b.w + p, y1: b.y + b.h + p }));
-      for (const b of boxes) rect(b.x0, b.y0, b.x1, b.y1, 0);
-      // A bridge fills the narrow space between two boxes of the group that face each other, so the group is one shape.
-      for (let i = 0; i < boxes.length; i++)
-        for (let j = i + 1; j < boxes.length; j++) {
-          const a = boxes[i]!;
-          const b = boxes[j]!;
-          const [x0, x1] = [Math.max(a.x0, b.x0), Math.min(a.x1, b.x1)];
-          const [y0, y1] = [Math.max(a.y0, b.y0), Math.min(a.y1, b.y1)];
-          if (x1 > x0 && y0 - y1 <= 2 * pad && y0 > y1) rect(x0, y1, x1, y0, 0);
-          if (y1 > y0 && x0 - x1 <= 2 * pad && x0 > x1) rect(x1, y0, x0, y1, 0);
-        }
-      // The outline first, then an opaque fill: the fill hides the lines inside the union, and the outer line stays.
-      ctx.lineWidth = 2.5;
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = c.sign;
-      ctx.stroke();
+      const shape = shapes.get(g.id);
+      if (!shape) continue;
+      this.roundedPath(shape.outline, Math.min(14, Math.max(5, (shape.pad + 10) * this.s)));
       ctx.fillStyle = c.bg;
       ctx.fill();
       ctx.fillStyle = c.group;
       ctx.fill();
+      ctx.lineWidth = 1.75;
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = c.sign;
+      ctx.stroke();
     }
-    const links = [...level.links].sort((a, b) => a.count - b.count);
+    const links = [...level.links]
+      .sort((a, b) => a.count - b.count)
+      .map((l) => ({ ...l, points: endsOnOutlines(l.points, shapes.get(l.source), shapes.get(l.target)) }));
     for (const l of links) this.strokeAll([l.points], c.sign, this.fat(l.count), 0.85);
     this.paintNodeIds(
       scene,
@@ -688,11 +684,12 @@ export class MapView {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (const g of groups) {
-      // The label goes on the card of the group nearest to the middle of the group, so it is not in a hole of the union.
+      // The label goes in the middle of a rectangle. In another outline, it goes on the card nearest to the middle of the group.
       const mid = { x: g.box.x + g.box.w / 2, y: g.box.y + g.box.h / 2 };
       let at = mid;
       let best = Infinity;
-      for (const b of boxesOf(g.nodes)) {
+      const square = (shapes.get(g.id)?.outline.length ?? 0) === 4;
+      for (const b of square ? [] : boxesOf(g.nodes)) {
         const q = { x: b.x + b.w / 2, y: b.y + b.h / 2 };
         const d = Math.hypot(q.x - mid.x, q.y - mid.y);
         if (d < best) [best, at] = [d, q];
@@ -720,12 +717,31 @@ export class MapView {
     }
   }
 
+  /** This method starts a closed path through the points, in world units, with corners rounded by `r` pixels at most. */
+  private roundedPath(points: readonly Point[], r: number): void {
+    const { ctx } = this;
+    const p = points.map((q) => ({ x: q.x * this.s + this.tx, y: q.y * this.s + this.ty }));
+    const n = p.length;
+    ctx.beginPath();
+    if (n < 3) return;
+    const half = (a: Point, b: Point): number => Math.hypot(b.x - a.x, b.y - a.y) / 2;
+    const first = p[n - 1]!;
+    ctx.moveTo((first.x + p[0]!.x) / 2, (first.y + p[0]!.y) / 2);
+    for (let i = 0; i < n; i++) {
+      const a = p[(i + n - 1) % n]!;
+      const b = p[i]!;
+      const next = p[(i + 1) % n]!;
+      ctx.arcTo(b.x, b.y, next.x, next.y, Math.min(r, half(a, b), half(b, next)));
+    }
+    ctx.closePath();
+  }
+
   private paintLevel(level: Level, scene: Scene): void {
     const { ctx, colors: c } = this;
     const groups = level.items.filter((i) => i.nodes.length > 1);
     const singles = level.items.filter((i) => i.nodes.length === 1);
     if (scene.groupPad !== undefined) {
-      this.paintBlobs(level, scene, scene.groupPad);
+      this.paintOutlines(level, scene, scene.groupPad);
       return;
     }
     for (const g of groups) {

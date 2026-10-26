@@ -1,16 +1,6 @@
 import { center, dist, polylineLength, type Box, type Point } from "../geom.ts";
-import {
-  nodeIndex,
-  type Graph,
-  type Level,
-  type LevelItem,
-  type LevelLink,
-  type Node,
-  type Result,
-  type Route,
-  type Router,
-  type SharedRun,
-} from "../model.ts";
+import { levelLinks, type ItemPair } from "../levels.ts";
+import { nodeIndex, type Graph, type Level, type LevelItem, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 import { allSections, buildSections, treeDepth, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes } from "../segments.ts";
@@ -37,7 +27,10 @@ const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || d
  * This function makes a router with a tree of sections. Each section has a hub: the free corner nearest to the center of its nodes.
  * An edge goes from its node up the hubs of its sections to the lowest common section, across, and down to the other node.
  * Each way from hub to hub is found one time, so all the edges on it share its points.
- * The edges in one section of the lowest level go straight around the nodes. The result gives one zoom level for each depth of the tree.
+ * The edges in one section of the lowest level go straight around the nodes.
+ *
+ * The result gives one zoom level for each depth of the tree.
+ * A link of a level goes from the boundary of one item to the boundary of the other, around the other items.
  */
 export function sectionsRouter(options: SectionsOptions): Router {
   const router: Router = {
@@ -98,8 +91,6 @@ export function sectionsRouter(options: SectionsOptions): Router {
       const at = (p: Point): string => `${p.x},${p.y}`;
 
       const routes: Route[] = [];
-      // The index in the route of each hub that the route passes, by section.
-      const marks = new Map<string, Map<Section, number>>();
       for (const e of graph.edges) {
         const s = byId.get(e.source.node);
         const t = byId.get(e.target.node);
@@ -122,18 +113,13 @@ export function sectionsRouter(options: SectionsOptions): Router {
         const side = (list: Section[]): Section[] => list.slice(Math.max(0, list.indexOf(lca) - keep), list.indexOf(lca));
         const chain = [...side(a), ...side(b).reverse()];
         const out: Point[] = [ps.point];
-        const mark = new Map<Section, number>();
         const append = (p: readonly Point[]): void => {
           for (const q of p) if (dist(q, out[out.length - 1]!) > 1e-9) out.push(q);
         };
         const used: string[] = [];
         const start = ways.out(ps);
         append(piece(at(start), start, chain[0]!.id, hub(chain[0]!), used));
-        mark.set(chain[0]!, out.length - 1);
-        for (let i = 1; i < chain.length; i++) {
-          append(piece(chain[i - 1]!.id, hub(chain[i - 1]!), chain[i]!.id, hub(chain[i]!), used));
-          mark.set(chain[i]!, out.length - 1);
-        }
+        for (let i = 1; i < chain.length; i++) append(piece(chain[i - 1]!.id, hub(chain[i - 1]!), chain[i]!.id, hub(chain[i]!), used));
         const end = ways.out(pt);
         append(piece(chain[chain.length - 1]!.id, hub(chain[chain.length - 1]!), at(end), end, used));
         append([pt.point]);
@@ -148,7 +134,6 @@ export function sectionsRouter(options: SectionsOptions): Router {
           else users.set(key, [e.id]);
         }
         routes.push({ edge: e.id, points: out });
-        marks.set(e.id, mark);
       }
 
       const routeOf = new Map(routes.map((r) => [r.edge, r]));
@@ -158,7 +143,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         if (list.length < 2 || p.length < 2) continue;
         runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!)) });
       }
-      return { routes, runs, levels: makeLevels(graph, root, routeOf, marks) };
+      return { routes, runs, levels: makeLevels(graph, root, routeOf, options) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
@@ -167,14 +152,10 @@ export function sectionsRouter(options: SectionsOptions): Router {
 /**
  * This function gives one zoom level for each depth of the tree, and a last level with each node alone.
  * At depth d, a section of depth d is one item. A link joins two items and counts the edges between them.
- * Its points are the part of the route of its first edge between the two items.
+ * In a level with groups, a link goes around the boxes of the other items (`levelLinks`).
+ * In the last level, the points of a link are the route of its first edge.
  */
-function makeLevels(
-  graph: Graph,
-  root: Section,
-  routeOf: ReadonlyMap<string, Route>,
-  marks: ReadonlyMap<string, ReadonlyMap<Section, number>>,
-): Level[] {
+function makeLevels(graph: Graph, root: Section, routeOf: ReadonlyMap<string, Route>, options: WayOptions): Level[] {
   const indexOfNode = new Map(graph.nodes.map((n, i) => [n.id, i]));
   const levels: Level[] = [];
   const deepest = treeDepth(root);
@@ -208,7 +189,7 @@ function makeLevels(
         }
     };
     if (graph.nodes.length > 0) visit(root);
-    const links = new Map<string, { source: string; target: string; count: number; points: readonly Point[] }>();
+    const links = new Map<string, { source: string; target: string; count: number; edge: string }>();
     for (const e of graph.edges) {
       const iu = indexOfNode.get(e.source.node);
       const iv = indexOfNode.get(e.target.node);
@@ -224,13 +205,12 @@ function makeLevels(
         link.count++;
         continue;
       }
-      const route = routeOf.get(e.id)?.points ?? [];
-      const mark = marks.get(e.id);
-      const from = typeof a === "number" ? 0 : (mark?.get(a) ?? 0);
-      const to = typeof b === "number" ? route.length - 1 : (mark?.get(b) ?? route.length - 1);
-      links.set(key, { source: ida, target: idb, count: 1, points: route.slice(from, to + 1) });
+      links.set(key, { source: ida, target: idb, count: 1, edge: e.id });
     }
-    levels.push({ depth: d, items, links: [...links.values()] as LevelLink[] });
+    const pairs: ItemPair[] = [...links.values()].map(({ source, target, count }) => ({ source, target, count }));
+    if (d > deepest)
+      levels.push({ depth: d, items, links: [...links.values()].map(({ edge, ...l }) => ({ ...l, points: routeOf.get(edge)?.points ?? [] })) });
+    else levels.push({ depth: d, items, links: levelLinks(items, pairs, options) });
   }
   return levels;
 }

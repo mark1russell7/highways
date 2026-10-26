@@ -4,7 +4,7 @@ import deliveryText from "../content/examples/delivery.md?raw";
 import howtoText from "../content/examples/howto.md?raw";
 import introText from "../content/examples/intro.md?raw";
 import servicesText from "../content/examples/services.md?raw";
-import { BOARDS, GAP, type Board } from "./boards.ts";
+import { BOARDS, type Board } from "./boards.ts";
 import { html, sectionOf } from "./content.ts";
 import "./style.css";
 import { MapView, type Routed } from "./view.ts";
@@ -18,8 +18,11 @@ const $ = <T extends HTMLElement>(id: string): T => {
 const fmt = new Intl.NumberFormat("en-US");
 const TEXT: Readonly<Record<string, string>> = { delivery: deliveryText, services: servicesText, courses: coursesText };
 
-/** The router of the boards. The margin puts the roads in the middle of the free space between two cards. */
-const router = sectionsRouter({ name: "sections", margin: 20, stretch: 3, cap: 6 });
+/** The space between a road and a card. This margin puts the roads in the middle of the free space between two cards. */
+const MARGIN = 20;
+
+/** The router of the boards. */
+const router = sectionsRouter({ name: "sections", margin: MARGIN, stretch: 3, cap: 6 });
 
 /** A routed board: the board, its routes and the key of each shared run. */
 interface Shown {
@@ -164,7 +167,8 @@ function render(): void {
     noun: board.noun,
     // A card shows its routes when it is about 52 pixels wide. Its title is easy to read at that size.
     pick: { routesAt: 52, itemAt: 120 },
-    groupPad: GAP / 2,
+    // The links of a level keep half the margin from the groups. A smaller pad keeps the outlines clear of the links.
+    groupPad: MARGIN / 2 - 2,
     home: s.home,
   });
   const openAll = $<HTMLButtonElement>("open-all");
