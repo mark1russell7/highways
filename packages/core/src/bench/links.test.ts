@@ -63,11 +63,12 @@ describe("the case boards", () => {
     }
   });
 
-  it("dense groups: the groups overlap, and some level links go straight through other groups", () => {
+  it("dense groups: the groups overlap, but no level link goes through another group (ER3a)", () => {
     const g = denseGroupsBoard();
     const levels = measureLevelFaults(router.route(g));
     expect(levels.reduce((s, l) => s + l.overlaps, 0)).toBe(30);
-    expect(sumFaults(levels).through).toBe(26);
+    // Before ER3a, 26 level links went through other groups.
+    expect(sumFaults(levels).through).toBe(0);
   });
 
   it("hub chain: some routes go away from their target and come back", () => {
