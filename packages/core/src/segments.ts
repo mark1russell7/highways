@@ -148,6 +148,30 @@ export interface PullApartOptions {
  * The lanes keep the lane order, so they do not cross in a segment. The two ends of each route stay at their plugs.
  */
 export function pullApart(graph: SegmentGraph, options: PullApartOptions): Route[] {
+  return lanePaths(graph, (s) => (s.count > 1 ? Math.min(options.spacing, options.maxWidth / (s.count - 1)) : 0));
+}
+
+/** This function gives the key of a shared run: the ids of its edges, sorted and joined with commas. */
+export function runKey(edges: readonly string[]): string {
+  return [...edges].sort().join(",");
+}
+
+/**
+ * This function opens the shared segments whose key is in `open`: each edge of an open segment gets its own lane.
+ * The lanes are `laneWidth` apart, and an open segment is at most `maxWidth` wide. The other segments stay as one way.
+ *
+ * Lane 0 is on the left of the segment, from its first point to its last, with the y axis down.
+ * The function takes a result or its segments. It gives a route for each edge, with the ends at their plugs.
+ * The key of a segment is `runKey` of its edges.
+ */
+export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<string>, laneWidth: number, maxWidth: number = Infinity): Route[] {
+  const graph = "paths" in source ? source : segmentsOf(source);
+  if (open.size === 0) return graph.paths.map((path) => ({ edge: path.edge, points: pathPoints(graph, path) }));
+  return lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0));
+}
+
+/** This function gives the route of each path, with the lanes of each segment at the spacing that `spacingOf` gives. */
+function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number): Route[] {
   const byId = new Map(graph.segments.map((s) => [s.id, s]));
   const routes: Route[] = [];
   for (const path of graph.paths) {
@@ -156,9 +180,8 @@ export function pullApart(graph: SegmentGraph, options: PullApartOptions): Route
     for (const ref of path.segments) {
       const s = byId.get(ref.segment);
       if (!s) continue;
-      const n = s.count;
-      const spacing = n > 1 ? Math.min(options.spacing, options.maxWidth / (n - 1)) : 0;
-      const moved = offsetPolyline(s.points, ((n - 1) / 2 - ref.lane) * spacing);
+      const spacing = spacingOf(s);
+      const moved = offsetPolyline(s.points, ((s.count - 1) / 2 - ref.lane) * spacing);
       for (const q of ref.reverse ? moved.reverse() : moved) if (out.length === 0 || dist(q, out[out.length - 1]!) > SAME) out.push(q);
     }
     if (out.length >= 2 && ends.length >= 2) {

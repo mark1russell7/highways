@@ -747,3 +747,217 @@ td.best {
     scroll-behavior: auto;
   }
 }
+
+/* The examples page: a board picker, a map of cards and a panel with the steps to try. */
+.wordmark-small {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+}
+
+.wordmark a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1.tagline {
+  max-width: 36ch;
+}
+
+.ex-intro {
+  max-width: 72ch;
+  margin: 18px 0 0;
+  font-size: 1.08rem;
+}
+
+.ex-intro p {
+  margin: 0 0 0.6rem;
+}
+
+.ex-intro p:first-child {
+  font-size: clamp(1.1rem, 2.4vw, 1.3rem);
+  font-weight: 600;
+}
+
+.exit[aria-selected="true"] {
+  color: var(--yellow-ink);
+  background: var(--yellow);
+  border-color: var(--yellow-ink);
+  box-shadow: 0 0 0 2px var(--yellow);
+}
+
+.board-head {
+  margin: 6px 4px 12px;
+}
+
+.board-head h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.4vw, 2rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.board-lede {
+  max-width: 72ch;
+}
+
+.board-lede p {
+  margin: 0.3rem 0 0;
+}
+
+.try h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--sign);
+}
+
+.try ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.try li {
+  margin: 0.35rem 0;
+  line-height: 1.4;
+}
+
+.try li::marker {
+  color: var(--sign);
+}
+
+.run-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 2px;
+}
+
+.run-buttons .exit {
+  font-size: 0.92rem;
+}
+
+.exit.quiet {
+  color: var(--ink);
+  background: var(--map);
+  border-color: var(--rule);
+  box-shadow: none;
+}
+
+.exit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0;
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.92rem;
+}
+
+.legend li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.legend svg {
+  flex: none;
+  width: 40px;
+  height: 20px;
+}
+
+.lg-card {
+  fill: var(--node);
+  stroke: var(--node-line);
+}
+
+.lg-road {
+  stroke: var(--sign);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.lg-badge {
+  fill: var(--sign-bg);
+  stroke: var(--sign-ink);
+  stroke-width: 1.5;
+}
+
+.lg-lane {
+  stroke: var(--sign);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.lg-group {
+  fill: var(--group);
+  stroke: var(--sign);
+  stroke-width: 1.25;
+}
+
+.map-level.far {
+  color: var(--sign-ink);
+  background: var(--sign-bg);
+  border-color: var(--sign-ink);
+  box-shadow: 0 0 0 2px var(--sign-bg);
+}
+
+.stats .picked dd {
+  font-weight: 700;
+  color: var(--hi);
+}
+
+.stats .picked .link {
+  margin-left: 0.4rem;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+pre code {
+  padding: 0;
+  background: none;
+}
+
+@media (max-width: 860px) {
+  .examples .map-wrap {
+    height: clamp(340px, 64vh, 620px);
+  }
+}
+
+/* The boards wrap to a second row on a phone, so each board stays in view. */
+.examples .router-row {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+@media (max-width: 560px) {
+  .ex-intro,
+  .ex-intro p:first-child {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .examples .router-row .exit {
+    font-size: 0.95rem;
+  }
+
+  .examples .sign-links a {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem 0.1rem;
+  }
+}

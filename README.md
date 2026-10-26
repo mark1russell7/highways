@@ -75,6 +75,9 @@ A renderer uses these segments for the three views of a bundle:
 - **Unpack:** draw each shared segment one time, as a fat edge with its count. A click shows the edges of the segment.
 - **Pull apart:** `pullApart(graph, { spacing, maxWidth })` draws each lane next to the others, in lane order. The ends of each route stay at their plugs.
 - **Expand:** draw the route of each edge.
+- **Open some runs:** `laneRoutes(result, open, laneWidth, maxWidth)` pulls apart only the shared segments whose key is in `open`. The other segments stay as one way. `runKey(edges)` gives the key of a segment: its sorted edge ids, joined with commas.
+
+The [examples page](https://mark1russell7.github.io/highways/examples.html) shows these views on boards of made-up data.
 
 ## The benchmark
 
