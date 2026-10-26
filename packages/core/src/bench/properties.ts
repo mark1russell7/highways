@@ -1,10 +1,18 @@
-import { dist, inflate, pointBoxDistance, segmentHitsBox, type Point } from "../geom.ts";
+import { dist, inflate, pointBoxDistance, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 
 /** A broken hard rule. A correct router has none. */
 export interface Violation {
-  readonly rule: "complete" | "ends-at-plugs" | "fixed-plugs" | "no-pass-through" | "counts-sum" | "bundle-trunk" | "run-shared";
+  readonly rule:
+    | "complete"
+    | "ends-at-plugs"
+    | "fixed-plugs"
+    | "no-pass-through"
+    | "counts-sum"
+    | "link-ends"
+    | "bundle-trunk"
+    | "run-shared";
   readonly edge?: string;
   readonly detail: string;
 }
@@ -15,6 +23,7 @@ export const TOLERANCE = 0.5;
 /**
  * This function checks the hard rules of a result. Each edge has one route, and each route starts and ends at its nodes.
  * Fixed plugs stay in place. No route goes through a node that is not one of its ends. The counts of each level add up.
+ * Each link of a level starts on the box of its source and ends on the box of its target.
  *
  * Each route of a bundle starts with its trunk, and an edge is in one bundle at most.
  * Each run has two edges or more, and the route of each edge holds the points of the run in a row.
@@ -91,8 +100,24 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
     const sum = level.links.reduce((s, l) => s + l.count, 0);
     if (sum !== between)
       if (add({ rule: "counts-sum", detail: `level ${level.depth}: the links count ${sum} edges, not ${between}` })) return out;
+    const boxOf = new Map(level.items.map((it) => [it.id, it.box]));
+    for (const l of level.links) {
+      const s = boxOf.get(l.source);
+      const t = boxOf.get(l.target);
+      const p = l.points;
+      if (!s || !t || p.length < 2 || !onBoundary(p[0]!, s) || !onBoundary(p[p.length - 1]!, t))
+        if (add({ rule: "link-ends", detail: `level ${level.depth}: the link ${l.source} to ${l.target} does not start and end on the boundaries of its items` }))
+          return out;
+    }
   }
   return out;
+}
+
+/** This function tells if the point is on the boundary of the box, within `TOLERANCE`. */
+function onBoundary(p: Point, b: Box): boolean {
+  const inner = inflate(b, -TOLERANCE);
+  const deep = p.x > inner.x && p.x < inner.x + inner.w && p.y > inner.y && p.y < inner.y + inner.h;
+  return !deep && pointBoxDistance(p, b) <= TOLERANCE;
 }
 
 /** This function tells if the polyline `p` holds the points of `part` in a row. */

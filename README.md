@@ -60,6 +60,8 @@ The routers `sections` and `sections-tree` divide the plane into a quadtree of s
 
 The result gives one zoom level for each depth of the tree. A link of a level counts the edges between two items.
 
+A link between two groups starts on the box of one group and ends on the box of the other group. It goes around the boxes of the other items of its level. Where there is space, its legs are horizontal or vertical. Where two boxes overlap, no clear way is possible, and the link goes straight. The last level shows each node, and its links are the routes of the edges.
+
 On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 50% to 71% less ink than `corners`. It has 10 to 38 times fewer crossings and is faster. But its routes are 3.8 to 5.9 times as long as the line between their plugs.
 
 `sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 17% to 29% and the crossings by 1.5 to 2.3 times. The routes are 16% to 23% longer.
@@ -95,6 +97,7 @@ Each router must obey the hard rules. A broken rule is a violation:
 - A fixed plug stays in its place.
 - No route goes through a node that is not one of its ends.
 - At each zoom level, the counts of the links add up to the edges between the shown items.
+- Each link of a zoom level starts and ends on the boxes of its items.
 - The same input gives the same result.
 
 The benchmark also measures the quality of each result:

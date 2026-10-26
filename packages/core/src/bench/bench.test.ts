@@ -42,6 +42,18 @@ describe("checkProperties", () => {
     const bad: Result = { ...good, levels: [{ ...good.levels![0]!, links: [{ source: "ab", target: "c", count: 2, points: [] }] }] };
     expect(checkProperties(g, bad).filter((v) => v.rule === "counts-sum")).toHaveLength(1);
   });
+  it("checks that each link of a level starts and ends on the boundaries of its items", () => {
+    const g: Graph = { nodes: row.nodes, edges: [...row.edges, { id: "ab", source: { node: "a" }, target: { node: "b" } }] };
+    const level = (points: { x: number; y: number }[]): Result => ({
+      routes: [],
+      levels: [{ depth: 0, items: [{ id: "ab", box: { x: 0, y: 0, w: 70, h: 20 }, nodes: ["a", "b"] }, { id: "c", box: row.nodes[2]!.box, nodes: ["c"] }], links: [{ source: "ab", target: "c", count: 1, points }] }],
+    });
+    const ends = (r: Result): number => checkProperties(g, r).filter((v) => v.rule === "link-ends").length;
+    expect(ends(level([{ x: 70, y: 10 }, { x: 100, y: 10 }]))).toBe(0);
+    // The link starts in the middle of its source, and it ends short of its target.
+    expect(ends(level([{ x: 35, y: 10 }, { x: 100, y: 10 }]))).toBe(1);
+    expect(ends(level([{ x: 70, y: 10 }, { x: 90, y: 10 }]))).toBe(1);
+  });
 });
 
 describe("measureQuality", () => {
