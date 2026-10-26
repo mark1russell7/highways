@@ -38,7 +38,7 @@ The site [mark1russell7.github.io/highways](https://mark1russell7.github.io/high
 | `shared` | The edges of one collection share their ways through the corner graph. A link that the group uses already costs half. |
 | `shared-all` | The same as `shared`, but all edges share their ways. |
 | `sections` | A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly. |
-| `sections-tree` | The same as `sections`, but each edge goes through the hubs. |
+| `sections-tree` | The same as `sections`, but without the limit of the stretch. |
 
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 
@@ -58,13 +58,15 @@ On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than 
 
 The routers `sections` and `sections-tree` divide the plane into a quadtree of sections. A section with more than 8 nodes splits in four. The hub of a section is the free corner nearest to the center of its nodes. An edge goes from its node up the hubs to the lowest common section, then down the hubs to the other node. The router finds each way between two hubs one time, so all the edges on it share its points.
 
+An edge skips a hub that is more than 80 units farther from its target than the nearest approach of the way before it. When the way through the hubs still goes out and back, the edge goes directly around the nodes. Thus no route of these two routers goes away from its target and comes back.
+
 The result gives one zoom level for each depth of the tree. A link of a level counts the edges between two items.
 
 A link between two groups starts on the box of one group and ends on the box of the other group. It goes around the boxes of the other items of its level. Where there is space, its legs are horizontal or vertical. Where two boxes overlap, no clear way is possible, and the link goes straight. The last level shows each node, and its links are the routes of the edges.
 
-On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 50% to 71% less ink than `corners`. It has 10 to 38 times fewer crossings and is faster. But its routes are 3.8 to 5.9 times as long as the line between their plugs.
+On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less ink than `corners`. It has 3.4 to 5.1 times fewer crossings. Its routes are 1.45 to 1.56 times as long as the line between their plugs.
 
-`sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 17% to 29% and the crossings by 1.5 to 2.3 times. The routes are 16% to 23% longer.
+`sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39% and the crossings by 2.2 to 3 times. The routes are 20% to 32% longer.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
 

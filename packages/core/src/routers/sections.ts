@@ -1,4 +1,5 @@
-import { center, dist, polylineLength, type Box, type Point } from "../geom.ts";
+import { BACKTRACK_MIN, goesOutAndBack } from "../bench/links.ts";
+import { center, dist, pointSegmentDistance, polylineLength, type Box, type Point } from "../geom.ts";
 import { levelLinks, type ItemPair } from "../levels.ts";
 import { nodeIndex, type Graph, type Level, type LevelItem, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
@@ -24,10 +25,18 @@ export interface SectionsOptions extends WayOptions, SectionOptions {
 const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || dist(q, p[i - 1]!) > 1e-9);
 
 /**
+ * A hub can be this many units farther from the target than the nearest approach of the way before it.
+ * A hub farther away goes out and back, so the way skips it.
+ */
+const HUB_SLACK = 2 * BACKTRACK_MIN;
+
+/**
  * This function makes a router with a tree of sections. Each section has a hub: the free corner nearest to the center of its nodes.
  * An edge goes from its node up the hubs of its sections to the lowest common section, across, and down to the other node.
  * Each way from hub to hub is found one time, so all the edges on it share its points.
  * The edges in one section of the lowest level go straight around the nodes.
+ *
+ * An edge skips a hub that takes it away from its target. A way that still goes out and back gives way to the direct way.
  *
  * The result gives one zoom level for each depth of the tree.
  * A link of a level goes from the boundary of one item to the boundary of the other, around the other items.
@@ -65,6 +74,20 @@ export function sectionsRouter(options: SectionsOptions): Router {
           hubs.set(s, h);
         }
         return h;
+      };
+      // The sections of the chain whose hubs do not take the way away from its target. The test uses the straight lines from hub to hub.
+      const forward = (list: readonly Section[], from: Point, to: Point): Section[] => {
+        const kept: Section[] = [];
+        let near = dist(from, to);
+        let last = from;
+        for (const c of list) {
+          const h = hub(c);
+          if (dist(h, to) > near + HUB_SLACK) continue;
+          near = Math.min(near, pointSegmentDistance(to, last, h));
+          last = h;
+          kept.push(c);
+        }
+        return kept;
       };
       const up = (s: Section): Section[] => {
         const out: Section[] = [];
@@ -111,20 +134,24 @@ export function sectionsRouter(options: SectionsOptions): Router {
         const lca = a.find((x) => common.has(x))!;
         const keep = options.hubs ?? Infinity;
         const side = (list: Section[]): Section[] => list.slice(Math.max(0, list.indexOf(lca) - keep), list.indexOf(lca));
-        const chain = [...side(a), ...side(b).reverse()];
+        const end = ways.out(pt);
+        const start = ways.out(ps);
+        const chain = forward([...side(a), ...side(b).reverse()], start, pt.point);
+        if (chain.length === 0) {
+          routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
+          continue;
+        }
         const out: Point[] = [ps.point];
         const append = (p: readonly Point[]): void => {
           for (const q of p) if (dist(q, out[out.length - 1]!) > 1e-9) out.push(q);
         };
         const used: string[] = [];
-        const start = ways.out(ps);
         append(piece(at(start), start, chain[0]!.id, hub(chain[0]!), used));
         for (let i = 1; i < chain.length; i++) append(piece(chain[i - 1]!.id, hub(chain[i - 1]!), chain[i]!.id, hub(chain[i]!), used));
-        const end = ways.out(pt);
         append(piece(chain[chain.length - 1]!.id, hub(chain[chain.length - 1]!), at(end), end, used));
         append([pt.point]);
-        // A way through the hubs that is too long gives way to the direct way.
-        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + 4 * ways.margin) {
+        // A way through the hubs that is too long, or that goes out and back, gives way to the direct way.
+        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + 4 * ways.margin || goesOutAndBack(out)) {
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
