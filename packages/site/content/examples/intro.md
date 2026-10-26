@@ -1,0 +1,1 @@
+Each board on this page holds made-up data. Your browser routes it with the `sections` router when you open the board. A green number on a road counts the edges that share it: tap it to give each edge its own lane.

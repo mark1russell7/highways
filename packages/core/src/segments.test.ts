@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import { checkProperties } from "./bench/properties.ts";
 import { makeFixture, type FixtureKind } from "./fixtures.ts";
 import { dist, segmentsCross } from "./geom.ts";
-import type { Router } from "./model.ts";
+import type { Graph, Router } from "./model.ts";
 import { sharedRouter } from "./routers/shared.ts";
+import { sectionsRouter } from "./routers/sections.ts";
 import { byCollection, trunksRouter } from "./routers/trunks.ts";
-import { offsetPolyline, orderLanes, pathPoints, pullApart, segmentsOf } from "./segments.ts";
+import { laneRoutes, offsetPolyline, orderLanes, pathPoints, pullApart, runKey, segmentsOf } from "./segments.ts";
 
 const routers: Router[] = [
   sharedRouter({ name: "shared-all" }),
@@ -108,5 +109,94 @@ describe("orderLanes", () => {
     const p = { edge: "p", points: [{ x: -100, y: -100 }, ...run] };
     const q = { edge: "q", points: [{ x: -100, y: 100 }, ...run] };
     expect(orderLanes(run, [q, p])).toEqual(["p", "q"]);
+  });
+});
+
+describe("runKey", () => {
+  it("sorts the edge ids and joins them with commas", () => {
+    expect(runKey(["e2", "e10", "e1"])).toBe("e1,e10,e2");
+    expect(runKey([])).toBe("");
+  });
+});
+
+describe("laneRoutes", () => {
+  const box = (x: number, y: number) => ({ x, y, w: 40, h: 20 });
+  // Two far groups. Each node of the left group has an edge to each node of the right group, on one shared way.
+  const groups: Graph = {
+    nodes: [
+      { id: "a0", box: box(0, 0) },
+      { id: "a1", box: box(0, 60) },
+      { id: "b0", box: box(1000, 0) },
+      { id: "b1", box: box(1000, 60) },
+      { id: "c", box: box(500, 400) },
+    ],
+    edges: [
+      { id: "e00", source: { node: "a0" }, target: { node: "b0" } },
+      { id: "e01", source: { node: "a0" }, target: { node: "b1" } },
+      { id: "e10", source: { node: "a1" }, target: { node: "b0" } },
+      { id: "e11", source: { node: "a1" }, target: { node: "b1" } },
+      { id: "ec", source: { node: "c" }, target: { node: "a0" } },
+    ],
+  };
+  const result = sectionsRouter({ name: "sections", cap: 2 }).route(groups);
+  const sg = segmentsOf(result);
+  const widest = [...sg.segments].sort((p, q) => q.count - p.count)[0]!;
+  const pointsOf = (routes: readonly { edge: string; points: readonly { x: number; y: number }[] }[]) =>
+    new Map(routes.map((r) => [r.edge, r.points]));
+
+  it("gives the routes again when no run is open", () => {
+    const routes = pointsOf(laneRoutes(result, new Set(), 4));
+    for (const r of result.routes) expect(routes.get(r.edge)).toEqual(r.points);
+  });
+
+  it("takes a result or its segments, and gives the same routes", () => {
+    const open = new Set([runKey(widest.edges)]);
+    expect(laneRoutes(sg, open, 4)).toEqual(laneRoutes(result, open, 4));
+  });
+
+  it("moves only the edges of an open run, into lanes at the lane width", () => {
+    expect(widest.count).toBeGreaterThanOrEqual(2);
+    const open = new Set([runKey(widest.edges)]);
+    const routes = pointsOf(laneRoutes(result, open, 4));
+    const before = pointsOf(result.routes);
+    for (const [edge, points] of routes) {
+      if (widest.edges.includes(edge)) continue;
+      // An edge that shares no open run keeps its route.
+      if (!sg.paths.find((p) => p.edge === edge)!.segments.some((r) => r.segment === widest.id)) expect(points).toEqual(before.get(edge));
+    }
+    const lanes = widest.edges.map((_, lane) => offsetPolyline(widest.points, ((widest.count - 1) / 2 - lane) * 4));
+    for (const [lane, edge] of widest.edges.entries()) {
+      const route = routes.get(edge)!;
+      for (const q of lanes[lane]!) expect(route.some((p) => dist(p, q) < 1e-9), `${edge} lane ${lane}`).toBe(true);
+      // The ends stay at the plugs.
+      expect(route[0]).toEqual(before.get(edge)![0]);
+      expect(route[route.length - 1]).toEqual(before.get(edge)![before.get(edge)!.length - 1]);
+    }
+    expect(dist(lanes[0]![0]!, lanes[1]![0]!)).toBeCloseTo(4);
+  });
+
+  it("puts lane 0 on the left of the run, with the y axis down", () => {
+    const a = widest.points[0]!;
+    const b = widest.points[1]!;
+    const routes = pointsOf(laneRoutes(result, new Set([runKey(widest.edges)]), 4));
+    // The left normal of the direction a → b is (dy, -dx) when the y axis points down.
+    const l = dist(a, b);
+    const k = ((widest.count - 1) / 2) * 4;
+    const left = { x: a.x + ((b.y - a.y) / l) * k, y: a.y - ((b.x - a.x) / l) * k };
+    const right = { x: 2 * a.x - left.x, y: 2 * a.y - left.y };
+    expect(routes.get(widest.edges[0]!)!.some((p) => dist(p, left) < 1e-6)).toBe(true);
+    expect(routes.get(widest.edges[widest.count - 1]!)!.some((p) => dist(p, right) < 1e-6)).toBe(true);
+  });
+
+  it("keeps an open run in the largest width", () => {
+    const open = new Set([runKey(widest.edges)]);
+    const routes = pointsOf(laneRoutes(result, open, 10, 6));
+    const first = offsetPolyline(widest.points, ((widest.count - 1) / 2) * (6 / (widest.count - 1)));
+    for (const q of first) expect(routes.get(widest.edges[0]!)!.some((p) => dist(p, q) < 1e-9)).toBe(true);
+  });
+
+  it("gives the routes of pullApart when each run is open", () => {
+    const all = new Set(sg.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+    expect(laneRoutes(sg, all, 2, 5)).toEqual(pullApart(sg, { spacing: 2, maxWidth: 5 }));
   });
 });

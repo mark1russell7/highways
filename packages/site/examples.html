@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways examples: routed boards</title>
+    <meta name="description" content="Boards of made-up data, routed live by highways: a delivery network, a service map and a course plan. Open shared runs into lanes, and zoom out to groups." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body class="examples">
+    <a class="skip" href="#map">Skip to the map</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <p class="wordmark wordmark-small"><a href="./">highways</a></p>
+          <h1 class="tagline">Examples: real boards, made-up data</h1>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="./">Live demo</a>
+          <a href="examples.html" aria-current="page">Examples</a>
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-intro" id="intro"></div>
+
+      <section class="demo" aria-labelledby="board-title">
+        <div class="router-row" role="tablist" aria-label="Board" id="boards"></div>
+        <div class="board-head">
+          <h2 id="board-title"></h2>
+          <div class="board-lede" id="board-lede"></div>
+        </div>
+        <div class="stage">
+          <div class="map-wrap">
+            <canvas id="map" tabindex="0" aria-describedby="board-lede"></canvas>
+            <div class="map-tools">
+              <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+              <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+              <button type="button" id="zoom-fit">Fit</button>
+            </div>
+            <p class="map-level" id="level-badge" role="status" aria-live="polite" hidden></p>
+          </div>
+          <aside class="panel">
+            <div class="try" id="board-try"></div>
+            <div class="run-buttons">
+              <button type="button" class="exit" id="open-all">Open every run</button>
+              <button type="button" class="exit quiet" id="close-all">Close every run</button>
+            </div>
+            <ul class="legend" aria-label="Legend">
+              <li><svg viewBox="0 0 40 20" aria-hidden="true"><rect class="lg-card" x="2" y="3" width="36" height="14" rx="3" /></svg>A card</li>
+              <li><svg viewBox="0 0 40 20" aria-hidden="true"><path class="lg-road" d="M2 10 H38" /><rect class="lg-badge" x="11" y="3" width="18" height="14" rx="4" /></svg>A shared run, with its count</li>
+              <li><svg viewBox="0 0 40 20" aria-hidden="true"><path class="lg-lane" d="M2 5 H38 M2 10 H38 M2 15 H38" /></svg>An open run: one lane for each edge</li>
+              <li><svg viewBox="0 0 40 20" aria-hidden="true"><rect class="lg-group" x="2" y="2" width="36" height="16" rx="4" /></svg>A group of cards, far out</li>
+            </ul>
+            <dl class="stats" id="facts"></dl>
+          </aside>
+        </div>
+      </section>
+
+      <section class="prose wide" id="howto">
+        <h2>How a board is made</h2>
+        <div id="howto-body"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The names and the numbers on these boards are made up.
+      </p>
+    </footer>
+    <script type="module" src="/src/examples.ts"></script>
+  </body>
+</html>
