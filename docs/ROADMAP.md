@@ -15,7 +15,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SITE | The public site routes the fixtures in the browser. The examples page shows boards of made-up data. | 2026-10-25 | #3, #5 |
 | REL1 | The core is on npm as `@mark1russell7/highways`. Version 0.1.1 adds `laneRoutes` and `runKey`. | 2026-10-25 | #4, #6 |
 | ER2 | Version 0.1.2: a level link goes from box to box around the other items. The far view draws calm outlines. | 2026-10-26 | #7 |
-| HW0 | This roadmap and its tracker. | 2026-10-26 | |
+| HW0 | This roadmap and its tracker. | 2026-10-26 | #11 |
 | QFIX | The case boards and the measures of the faults of the links: through, out and back, worst detour and outside. The benchmark reports them. | 2026-10-26 | #12 |
 
 ## Open
