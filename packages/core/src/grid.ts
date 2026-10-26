@@ -80,7 +80,6 @@ export class Grid<T> {
   #walk(a: Point, b: Point, margin: number, visit: (item: T) => boolean | void): boolean {
     const stamp = ++this.#stamp;
     const c = this.#cell;
-    const seen = this.#seen;
     const items = this.#items;
     const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (c / 2)));
     let px = a.x;
@@ -97,6 +96,8 @@ export class Grid<T> {
       const j0 = Math.floor((Math.min(py, qy) - margin) / c);
       const i1 = Math.floor((Math.max(px, qx) + margin) / c);
       const j1 = Math.floor((Math.max(py, qy) + margin) / c);
+      // A visit can add an item and so replace the array of stamps. Each step reads it again, as `#take` does.
+      const seen = this.#seen;
       for (let i = i0; i <= i1; i++) {
         const before = i >= pi0 && i <= pi1;
         for (let j = j0; j <= j1; j++) {
