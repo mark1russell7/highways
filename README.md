@@ -113,6 +113,24 @@ The benchmark also measures the quality of each result:
 | detour | The mean ratio of the length of a route to the distance between its ends. |
 | plug angle | The mean angle between the route and the normal of the side of its node, in degrees. |
 
+The benchmark also counts the faults of the links. It writes a second table: the routes first, then the sum of the zoom levels with groups.
+
+| Value | Meaning |
+|---|---|
+| through | The links that go through the inside of a box that is not one of their ends. |
+| out and back | The links whose distance to their target grows by more than 40 units and more than a quarter of the span. |
+| worst detour | The largest ratio of the length of a link to the distance between its ends. |
+| outside | The links that go more than 24 units outside the bounding box of all the boxes. |
+| level overlaps | The pairs of items of a zoom level whose boxes overlap. |
+
+The benchmark also races the routers on three case boards of made-up data. Each case shows one known defect:
+
+| Case | Defect |
+|---|---|
+| `case-dense-groups` | The groups of the far view overlap, and level links go through other groups. |
+| `case-hub-chain` | A route climbs a chain of hubs away from its target and comes back. |
+| `case-many-groups` | On a level with many groups, links go around the outer edge of the board. |
+
 `measureStability` compares two results of the same graph with the discrete Fréchet distance of each route.
 
 ## Packages
