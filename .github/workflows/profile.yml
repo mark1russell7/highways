@@ -1,5 +1,7 @@
 # The profile of one router on one fixture. It writes the functions that take the most time to the summary
 # of the run and keeps the raw profile (profile.cpuprofile) as an artifact. Profiles run here, not on a local machine.
+# With "levels", the profile covers only the level links. With "compare", the run also times the level links
+# of the router of the example boards at each given commit and at this commit.
 name: Profile
 
 on:
@@ -11,6 +13,13 @@ on:
       fixture:
         description: "The fixture"
         default: "large-clustered"
+      levels:
+        description: "Profile only the level links"
+        type: boolean
+        default: false
+      compare:
+        description: "Commits to time against this commit, separated by spaces (for example 4cf0673 origin/main)"
+        default: ""
 
 permissions:
   contents: read
@@ -22,10 +31,13 @@ jobs:
     env:
       ROUTER: ${{ inputs.router }}
       FIXTURE: ${{ inputs.fixture }}
+      LEVELS: ${{ inputs.levels && '--levels' || '' }}
+      COMPARE: ${{ inputs.compare }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -35,8 +47,22 @@ jobs:
       - name: Profile the router
         run: |
           set -o pipefail
-          pnpm --filter @mark1russell7/highways run profile --router "$ROUTER" --fixture "$FIXTURE" --out "$GITHUB_WORKSPACE/profile.cpuprofile" | tee table.txt
+          pnpm --filter @mark1russell7/highways run profile --router "$ROUTER" --fixture "$FIXTURE" $LEVELS --out "$GITHUB_WORKSPACE/profile.cpuprofile" | tee table.txt
           { echo "## Profile"; echo; cat table.txt; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Time the level links at each commit
+        if: inputs.compare != ''
+        run: |
+          set -o pipefail
+          srcs=()
+          n=0
+          for ref in $COMPARE; do
+            n=$((n + 1))
+            git worktree add --detach "$RUNNER_TEMP/at-$n" "$ref"
+            srcs+=(--src "$ref=$RUNNER_TEMP/at-$n/packages/core/src")
+          done
+          srcs+=(--src "this commit=$GITHUB_WORKSPACE/packages/core/src")
+          pnpm --filter @mark1russell7/highways run levels --fixture "$FIXTURE" --repeat 5 "${srcs[@]}" | tee times.txt
+          { echo "## Times"; echo; cat times.txt; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

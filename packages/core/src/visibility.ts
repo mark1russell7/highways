@@ -14,14 +14,21 @@ export class Obstacles {
 
   /** This method tells if the segment `ab` stays out of each box, made larger by `pad`. The nodes in `skip` do not count. */
   clear(a: Point, b: Point, pad: number, skip?: ReadonlySet<Node>): boolean {
-    let ok = true;
-    this.#grid.querySegment(a, b, pad, (n) => {
-      if (ok && !skip?.has(n)) {
-        const x = n.box;
-        if (segmentHitsRect(a, b, x.x - pad, x.y - pad, x.x + x.w + pad, x.y + x.h + pad)) ok = false;
-      }
+    return this.hit(a, b, pad, skip) === undefined;
+  }
+
+  /**
+   * This method gives a node whose box, made larger by `pad`, the segment `ab` goes into, or `undefined` when the segment is clear.
+   * The nodes in `skip` do not count. The test stops at the first such node.
+   */
+  hit(a: Point, b: Point, pad: number, skip?: ReadonlySet<Node>): Node | undefined {
+    let found: Node | undefined;
+    this.#grid.someSegment(a, b, pad, (n) => {
+      if (skip?.has(n) || !hits(a, b, n, pad)) return false;
+      found = n;
+      return true;
     });
-    return ok;
+    return found;
   }
 
   /** This method tells if the polyline stays out of each box, made larger by `pad`. The nodes in `skip` do not count. */
@@ -41,6 +48,12 @@ export class Obstacles {
     });
     return hit;
   }
+}
+
+/** This function tells if the segment `ab` goes into the box of the node, made larger by `pad`. */
+function hits(a: Point, b: Point, n: Node, pad: number): boolean {
+  const x = n.box;
+  return segmentHitsRect(a, b, x.x - pad, x.y - pad, x.x + x.w + pad, x.y + x.h + pad);
 }
 
 /** The options of the corner graph. */
@@ -78,9 +91,12 @@ export class CornerGraph {
   #open = new Int32Array(0);
   #closed = new Int32Array(0);
   #stamp = 0;
-  // The stamp of the last call of nearestVisible that tested each corner.
-  #tested = new Int32Array(0);
-  #testStamp = 0;
+  // The corners in each bucket of the point grid, by the key of the bucket. A corner is in one bucket: the bucket of its point.
+  readonly #buckets = new Map<number, number[]>();
+  // The distance from the point of the last call of nearestVisible to each corner that the call found.
+  #dist = new Float64Array(0);
+  // The corners of one ring of nearestVisible, nearest first.
+  readonly #near = new MinHeap();
   // The corners that each end of a path sees, by the coordinates of the end.
   readonly #endCache = new Map<string, number[]>();
 
@@ -138,7 +154,12 @@ export class CornerGraph {
   }
 
   #addPoint(c: Point): void {
-    this.#pointGrid.add(this.points.length, { x: c.x, y: c.y, w: 0, h: 0 });
+    const j = this.points.length;
+    this.#pointGrid.add(j, { x: c.x, y: c.y, w: 0, h: 0 });
+    const key = bucketKey(Math.floor(c.x / this.#cell), Math.floor(c.y / this.#cell));
+    const list = this.#buckets.get(key);
+    if (list === undefined) this.#buckets.set(key, [j]);
+    else list.push(j);
     this.points.push(c);
   }
 
@@ -172,24 +193,78 @@ export class CornerGraph {
     return this.#nearestVisible(p, k, self, this.#pad);
   }
 
+  /**
+   * This method tests the corners in rings of radius `r` = 1, 2, 4 and 8 cells. In each ring, it tests the corners
+   * within `r` that an earlier ring did not test, nearest first, and equal distances by index.
+   * The ring of `r` takes the corners of the buckets that the square of side `2r` around `p` touches.
+   * A corner of these buckets beyond `r` waits for the next ring. So the method visits each bucket one time.
+   */
   #nearestVisible(p: Point, k: number, self: number, pad: number): number[] {
     const out: number[] = [];
-    if (this.#tested.length < this.points.length) this.#tested = new Int32Array(this.points.length);
-    const tested = this.#tested;
-    const stamp = ++this.#testStamp;
-    for (let r = this.#cell; r <= this.#cell * 8; r *= 2) {
-      const cands: [number, number][] = [];
-      this.#pointGrid.query({ x: p.x - r, y: p.y - r, w: 2 * r, h: 2 * r }, (j) => {
-        if (j !== self && tested[j] !== stamp) cands.push([dist(p, this.points[j]!), j]);
-      });
-      cands.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-      for (const [d, j] of cands) {
-        // A corner beyond r can be nearer than a corner of the next ring, so it waits for that ring.
-        if (d > r) break;
-        tested[j] = stamp;
-        if (this.#obstacles.clear(p, this.points[j]!, pad)) out.push(j);
-        if (out.length >= k) return out;
+    if (this.#dist.length < this.points.length) this.#dist = new Float64Array(this.points.length);
+    const dd = this.#dist;
+    const points = this.points;
+    const cell = this.#cell;
+    const blockers: Node[] = [];
+    const now = this.#near;
+    // The corners that the rings found beyond their radius. The next ring takes them.
+    let wait: number[] = [];
+    // The bucket range of the ring before. The first ring has none.
+    let pi0 = 1;
+    let pi1 = 0;
+    let pj0 = 1;
+    let pj1 = 0;
+    for (let r = cell; r <= cell * 8; r *= 2) {
+      // These bounds are the bounds of a query of the box at (p.x - r, p.y - r) with the side 2r.
+      const x0 = p.x - r;
+      const y0 = p.y - r;
+      const i0 = Math.floor(x0 / cell);
+      const j0 = Math.floor(y0 / cell);
+      const i1 = Math.floor((x0 + 2 * r) / cell);
+      const j1 = Math.floor((y0 + 2 * r) / cell);
+      const later: number[] = [];
+      now.clear();
+      for (const j of wait) {
+        if (dd[j]! > r) later.push(j);
+        else now.add(dd[j]!, j);
       }
+      for (let bi = i0; bi <= i1; bi++) {
+        const before = bi >= pi0 && bi <= pi1;
+        for (let bj = j0; bj <= j1; bj++) {
+          if (before && bj >= pj0 && bj <= pj1) continue;
+          const list = this.#buckets.get(bucketKey(bi, bj));
+          if (list === undefined) continue;
+          for (const j of list) {
+            if (j === self) continue;
+            const d = dist(p, points[j]!);
+            dd[j] = d;
+            if (d > r) later.push(j);
+            else now.add(d, j);
+          }
+        }
+      }
+      // The heap gives the corners nearest first, and equal distances by index. A call often stops after a few corners.
+      now.build();
+      while (now.size > 0) {
+        const j = now.pop();
+        // A node that stopped an earlier segment often stops this segment too, so the test takes these nodes first.
+        // The order of the nodes does not change the result.
+        const q = points[j]!;
+        let blocked = false;
+        for (let b = 0; b < blockers.length && !blocked; b++) blocked = hits(p, q, blockers[b]!, pad);
+        if (blocked) continue;
+        const hit = this.#obstacles.hit(p, q, pad);
+        if (hit !== undefined) blockers.push(hit);
+        else {
+          out.push(j);
+          if (out.length >= k) return out;
+        }
+      }
+      wait = later;
+      pi0 = i0;
+      pi1 = i1;
+      pj0 = j0;
+      pj1 = j1;
     }
     return out;
   }
@@ -214,24 +289,28 @@ export class CornerGraph {
     for (const j of this.#ends(to)) goal.set(j, dist(this.points[j]!, to));
     if (goal.size === 0) return undefined;
     const heap = new MinHeap();
-    const h = (i: number): number => floor * dist(this.points[i]!, to);
+    const points = this.points;
+    const G = this.#g;
+    const parentOf = this.#parent;
+    const open = this.#open;
+    const closed = this.#closed;
     const relax = (j: number, g: number, parent: number): void => {
-      if (this.#closed[j] === stamp) return;
-      if (this.#open[j] === stamp && this.#g[j]! <= g) return;
-      this.#open[j] = stamp;
-      this.#g[j] = g;
-      this.#parent[j] = parent;
-      heap.push(g + h(j), j);
+      if (closed[j] === stamp) return;
+      if (open[j] === stamp && G[j]! <= g) return;
+      open[j] = stamp;
+      G[j] = g;
+      parentOf[j] = parent;
+      heap.push(g + floor * dist(points[j]!, to), j);
     };
-    for (const j of this.#ends(from)) relax(j, dist(from, this.points[j]!), -1);
+    for (const j of this.#ends(from)) relax(j, dist(from, points[j]!), -1);
     let best = Infinity;
     let bestEnd = -1;
     while (heap.size > 0) {
       if (heap.topKey >= best) break;
       const i = heap.pop();
-      if (this.#closed[i] === stamp) continue;
-      this.#closed[i] = stamp;
-      const gi = this.#g[i]!;
+      if (closed[i] === stamp) continue;
+      closed[i] = stamp;
+      const gi = G[i]!;
       const tail = goal.get(i);
       if (tail !== undefined && gi + tail < best) {
         best = gi + tail;
@@ -241,6 +320,7 @@ export class CornerGraph {
       const len = this.#len[i]!;
       for (let m = 0; m < adj.length; m++) {
         const j = adj[m]!;
+        if (closed[j] === stamp) continue;
         const d = len[m]!;
         relax(j, gi + (cost ? cost(i, j, d) : d), i);
       }
@@ -283,65 +363,91 @@ export class CornerGraph {
   }
 }
 
-/** A binary min-heap of (key, value) pairs. Equal keys come out by the smaller value, so the order is deterministic. */
+/** This function packs the two indices of a bucket into one number. Each index stays within ±2^20. */
+const bucketKey = (i: number, j: number): number => (i + 1_048_576) * 2_097_152 + (j + 1_048_576);
+
+/**
+ * A binary min-heap of (key, value) pairs in typed arrays. The pairs come out by key, and equal keys by value, so the order is deterministic.
+ * The method `push` adds a pair to the heap. The method `add` only appends a pair, and the method `build` then makes the heap of all the pairs.
+ */
 class MinHeap {
-  readonly #k: number[] = [];
-  readonly #v: number[] = [];
-
-  get size(): number {
-    return this.#k.length;
-  }
-
-  #less(a: number, b: number): boolean {
-    return this.#k[a]! < this.#k[b]! || (this.#k[a] === this.#k[b] && this.#v[a]! < this.#v[b]!);
-  }
-
-  #swap(a: number, b: number): void {
-    const k = this.#k[a]!;
-    this.#k[a] = this.#k[b]!;
-    this.#k[b] = k;
-    const v = this.#v[a]!;
-    this.#v[a] = this.#v[b]!;
-    this.#v[b] = v;
-  }
+  #d = new Float64Array(64);
+  #j = new Int32Array(64);
+  size = 0;
 
   /** The smallest key. */
   get topKey(): number {
-    return this.#k[0]!;
+    return this.#d[0]!;
   }
 
   push(key: number, value: number): void {
-    this.#k.push(key);
-    this.#v.push(value);
-    let i = this.#k.length - 1;
+    this.add(key, value);
+    const d = this.#d;
+    const jj = this.#j;
+    let i = this.size - 1;
     while (i > 0) {
       const p = (i - 1) >> 1;
-      if (!this.#less(i, p)) break;
-      this.#swap(i, p);
+      if (!(key < d[p]! || (key === d[p] && value < jj[p]!))) break;
+      d[i] = d[p]!;
+      jj[i] = jj[p]!;
       i = p;
     }
+    d[i] = key;
+    jj[i] = value;
+  }
+
+  clear(): void {
+    this.size = 0;
+  }
+
+  add(d: number, j: number): void {
+    if (this.size === this.#d.length) {
+      const dd = new Float64Array(2 * this.size);
+      dd.set(this.#d);
+      this.#d = dd;
+      const jj = new Int32Array(2 * this.size);
+      jj.set(this.#j);
+      this.#j = jj;
+    }
+    this.#d[this.size] = d;
+    this.#j[this.size] = j;
+    this.size++;
+  }
+
+  build(): void {
+    for (let i = (this.size >> 1) - 1; i >= 0; i--) this.#down(i);
   }
 
   /** This method removes the pair with the smallest key and gives its value. */
   pop(): number {
-    const top = this.#v[0]!;
-    const k = this.#k.pop()!;
-    const v = this.#v.pop()!;
-    if (this.#k.length > 0) {
-      this.#k[0] = k;
-      this.#v[0] = v;
-      let i = 0;
-      for (;;) {
-        const l = 2 * i + 1;
-        const r = l + 1;
-        let m = i;
-        if (l < this.#k.length && this.#less(l, m)) m = l;
-        if (r < this.#k.length && this.#less(r, m)) m = r;
-        if (m === i) break;
-        this.#swap(i, m);
-        i = m;
-      }
+    const top = this.#j[0]!;
+    this.size--;
+    if (this.size > 0) {
+      this.#d[0] = this.#d[this.size]!;
+      this.#j[0] = this.#j[this.size]!;
+      this.#down(0);
     }
     return top;
+  }
+
+  #down(i: number): void {
+    const d = this.#d;
+    const jj = this.#j;
+    const n = this.size;
+    const di = d[i]!;
+    const ji = jj[i]!;
+    for (;;) {
+      const l = 2 * i + 1;
+      if (l >= n) break;
+      const r = l + 1;
+      let m = l;
+      if (r < n && (d[r]! < d[l]! || (d[r] === d[l] && jj[r]! < jj[l]!))) m = r;
+      if (!(d[m]! < di || (d[m] === di && jj[m]! < ji))) break;
+      d[i] = d[m]!;
+      jj[i] = jj[m]!;
+      i = m;
+    }
+    d[i] = di;
+    jj[i] = ji;
   }
 }

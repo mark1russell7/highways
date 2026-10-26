@@ -71,6 +71,55 @@ export class Grid<T> {
     }
   }
 
+  /**
+   * This method gives each item in the buckets along the segment `ab`, widened by `margin`, to `visit`, one time each.
+   * The buckets are those of `#segment`, in the same order, so the items come in the same order.
+   * A bucket in the range of the step before has no new item, so the walk skips it.
+   * The walk stops when `visit` gives true, and then the method gives true.
+   */
+  #walk(a: Point, b: Point, margin: number, visit: (item: T) => boolean | void): boolean {
+    const stamp = ++this.#stamp;
+    const c = this.#cell;
+    const seen = this.#seen;
+    const items = this.#items;
+    const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (c / 2)));
+    let px = a.x;
+    let py = a.y;
+    // The bucket range of the step before. The first step has none.
+    let pi0 = 1;
+    let pi1 = 0;
+    let pj0 = 1;
+    let pj1 = 0;
+    for (let k = 1; k <= n; k++) {
+      const qx = k === n ? b.x : a.x + ((b.x - a.x) * k) / n;
+      const qy = k === n ? b.y : a.y + ((b.y - a.y) * k) / n;
+      const i0 = Math.floor((Math.min(px, qx) - margin) / c);
+      const j0 = Math.floor((Math.min(py, qy) - margin) / c);
+      const i1 = Math.floor((Math.max(px, qx) + margin) / c);
+      const j1 = Math.floor((Math.max(py, qy) + margin) / c);
+      for (let i = i0; i <= i1; i++) {
+        const before = i >= pi0 && i <= pi1;
+        for (let j = j0; j <= j1; j++) {
+          if (before && j >= pj0 && j <= pj1) continue;
+          const list = this.#buckets.get(this.#key(i, j));
+          if (list === undefined) continue;
+          for (const id of list) {
+            if (seen[id] === stamp) continue;
+            seen[id] = stamp;
+            if (visit(items[id]!) === true) return true;
+          }
+        }
+      }
+      pi0 = i0;
+      pi1 = i1;
+      pj0 = j0;
+      pj1 = j1;
+      px = qx;
+      py = qy;
+    }
+    return false;
+  }
+
   // The buckets along a segment, widened by `margin`: the boxes of steps of at most half a bucket.
   #segment(a: Point, b: Point, margin: number, each: (x0: number, y0: number, x1: number, y1: number) => void): void {
     const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (this.#cell / 2)));
@@ -103,8 +152,17 @@ export class Grid<T> {
 
   /** This method gives each item whose buckets come within `margin` of the segment `ab` to `visit`, one time each. */
   querySegment(a: Point, b: Point, margin: number, visit: (item: T) => void): void {
-    const stamp = ++this.#stamp;
-    this.#segment(a, b, margin, (x0, y0, x1, y1) => this.#take(stamp, x0, y0, x1, y1, visit));
+    this.#walk(a, b, margin, (item) => {
+      visit(item);
+    });
+  }
+
+  /**
+   * This method tells if `test` gives true for an item whose buckets come within `margin` of the segment `ab`.
+   * It gives the items in the order of `querySegment`, and it stops at the first item that passes the test.
+   */
+  someSegment(a: Point, b: Point, margin: number, test: (item: T) => boolean): boolean {
+    return this.#walk(a, b, margin, test);
   }
 }
 
