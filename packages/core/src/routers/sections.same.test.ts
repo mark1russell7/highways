@@ -9,15 +9,17 @@ import { sectionsRouter, type SectionsOptions } from "./sections.ts";
 /**
  * The digests of the results of version 0.1.2. A host app pins `^0.1.2`, so a change that only makes the router faster
  * keeps each digest. A digest covers the routes, the shared runs, the levels with their links, the run keys and the lane routes.
+ * ER3a changed the level links of three digests: `case-dense-groups` with both options, and `small-clustered` with the options `site`.
+ * Those links went through other groups before. The routes, the runs, the run keys and the lane routes did not change.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  "case-dense-groups/site": "8944b7456b995cf00678c3e11e23a028324e1aeb51a422f87370abcac221b309",
-  "case-dense-groups/sections": "846a736f423e86653f385f1ab4bcf2ab07af2cc2d752ea4d1a203bfdfa706343",
+  "case-dense-groups/site": "be45da15914caec7798d79ea02990bfdd2faad1bbc530d1e19ba2faeb36ffcd1",
+  "case-dense-groups/sections": "46cfe03cadc36918ea398c5d48e837bb1849886962d63e23450f1259a2b1c66b",
   "case-hub-chain/site": "deb11cf3634910091de5fb0df89f3b5655bc3d04634ae383f9a1ce9197dbcceb",
   "case-hub-chain/sections": "a59d89aed79d831b94422188cf72860fa90806f3d5f68a613ba2accda1824cf0",
   "case-many-groups/site": "4f2a017a055c32bdbe25eb4017c0aefa2325f44f75deebfda543f15d4413bd99",
   "case-many-groups/sections": "09af86e040e4afe5c45d699c1f080b2fa860b849a7d526af5be2ac5bbedc2b52",
-  "small-clustered/site": "e5433afdb9c09b40e6a353f81c7da15f74e04d851ee1dfc1dbdad27c425d0f20",
+  "small-clustered/site": "b5a84fd134b05cfa5a5a43f7d828b0b1420d048cf90cbae9b52b0be124f7fcfc",
   "small-clustered/sections": "d280bf3dfc399028eff366405019a052ec4fbf5c3cc5f6d8606692001b1d2e11",
 };
 

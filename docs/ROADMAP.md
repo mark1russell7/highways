@@ -18,14 +18,15 @@ Status: `done`, `active`, `blocked`, `later`.
 | HW0 | This roadmap and its tracker. | 2026-10-26 | #11 |
 | QFIX | The case boards and the measures of the faults of the links: through, out and back, worst detour and outside. The benchmark reports them. | 2026-10-26 | #12 |
 | PERF1 | The level links are fast again, with the same output. On `mid-clustered`, the level links take 307 ms, not 891 ms. The full route takes 935 ms, not 3 416 ms. | 2026-10-26 | #13 |
+| ER3a | In the far view of a dense board, the level links go around the groups. Level through on `case-dense-groups`: 26 before, 0 after. | 2026-10-26 | #16 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| ER3a | The far view of a dense board: boxes that overlap make straight links. Measure: level through on `case-dense-groups`. | `later` | | P1 |
 | ER3b | The near view: a chain of hubs goes out and back. Measure: out and back on `case-hub-chain`. | `later` | | P1 |
 | ER3c | On a level with many groups, some links go around the outer edge. Measure: level outside on `case-many-groups`. | `later` | | P1 |
+| ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | CURVE | Curve types for the edges: straight, rounded corners, splines and arcs, as an option of the route. | `later` | | P2 |
 | STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
 | CUSTOM | Options for the generalizations: the grouping rule, the levels and their limits. | `later` | STRAT | P2 |

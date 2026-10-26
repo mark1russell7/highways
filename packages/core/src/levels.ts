@@ -1,4 +1,4 @@
-import { center, dist, type Box, type Point } from "./geom.ts";
+import { center, dist, polylineLength, type Box, type Point } from "./geom.ts";
 import type { LevelItem, LevelLink, Node, Side } from "./model.ts";
 import { pointOnSide, SIDE_NORMAL, sideToward, type Plug } from "./plugs.ts";
 import { CornerGraph, Obstacles } from "./visibility.ts";
@@ -13,6 +13,23 @@ export interface ItemPair {
 
 /** The parts of a way finder that a link uses. */
 type Ways = Pick<WayFinder, "obstacles" | "corners" | "margin" | "out">;
+
+/** The free plugs of a node, and the reach of each plug. */
+interface FreePlugs {
+  readonly plugs: readonly Plug[];
+  readonly reach: readonly number[];
+}
+
+/** The ways of a level, with a second corner graph and the free plugs of the nodes. */
+interface LevelWays extends Ways {
+  /** This function gives a second corner graph with a small margin. The first link that needs it makes it. */
+  readonly tight: () => CornerGraph;
+  /** The free plugs of each node that a link needed. */
+  readonly free: Map<Node, FreePlugs>;
+}
+
+/** The margin of the second corner graph. A gap between two boxes wider than approximately 1.5 times this margin lets a link through. */
+const TIGHT_MARGIN = 1;
 
 const EPS = 1e-6;
 
@@ -58,23 +75,42 @@ export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair
     const [fs, ft] = facingPlugs(s.box, t.box, inset);
     let points = isFree(ways, s, fs) && isFree(ways, t, ft) ? quickWay(ways, ends(ways, s, fs, t, ft)) : undefined;
     // Else the link goes from the middle of a side. Each item has at most four such plugs, so the corner graph finds their ends one time.
-    points ??= squareWay(ways, ends(ways, s, sidePlug(ways, s, center(t.box)), t, sidePlug(ways, t, center(s.box))));
+    points ??= sideWay(ways, s, t, inset);
     out.push({ source: p.source, target: p.target, count: p.count, points });
   }
   return out;
 }
 
 /**
+ * This function gives a way from plug to plug between the plugs at the middle of a side of the two nodes.
+ * Without a way in the corner graph, the link goes straight between the ends, with legs parallel to the axes where they are clear.
+ * When that line goes through another box, the link goes between the free plugs of the two nodes (`freeWay`) instead.
+ */
+function sideWay(ways: LevelWays, s: Node, t: Node, inset: number): Point[] {
+  const e = ends(ways, s, sidePlug(ways, s, center(t.box)), t, sidePlug(ways, t, center(s.box)));
+  const quick = quickWay(ways, e);
+  if (quick) return quick;
+  const path = ways.corners.path(e.a, e.b);
+  const way = pulled(ways, e.ps, path ?? [e.a, e.b], e.pt);
+  if (path || ways.obstacles.clearPath(way, 0, new Set([s, t]))) return way;
+  return freeWay(ways, s, t, inset) ?? way;
+}
+
+/**
  * This function makes the obstacles and the corner graph of the items of a level.
  * The buckets of the obstacles grow with the items, so a long link visits few buckets.
  */
-function levelWays(nodes: readonly Node[], options: WayOptions): Ways {
+function levelWays(nodes: readonly Node[], options: WayOptions): LevelWays {
   const margin = options.margin ?? 5;
+  const k = options.k ?? 8;
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
-  const corners = new CornerGraph(nodes, obstacles, { margin, k: options.k ?? 8 });
-  return { obstacles, corners, margin, out: (p) => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin }) };
+  const corners = new CornerGraph(nodes, obstacles, { margin, k });
+  const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
+  let tight: CornerGraph | undefined;
+  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, TIGHT_MARGIN), k }));
+  return { obstacles, corners, margin, out, tight: tightGraph, free: new Map() };
 }
 
 /**
@@ -129,6 +165,105 @@ function sidePlug(ways: Ways, node: Node, toward: Point): Plug {
   return plug(order[0]!);
 }
 
+/**
+ * This function gives the free plugs of a node: on each side, the free point nearest to the middle of the side.
+ * A point is free when it and the point at `margin` from it are in no other box. The function keeps the plugs of each node.
+ */
+function freePlugs(ways: LevelWays, node: Node, inset: number): FreePlugs {
+  const known = ways.free.get(node);
+  if (known) return known;
+  const b = node.box;
+  const out: Plug[] = [];
+  for (const side of SIDES) {
+    const n = SIDE_NORMAL[side];
+    const across = n.x === 0;
+    // The side goes from `lo` to `hi` along its axis, at the coordinate `at` of the other axis.
+    const lo = across ? b.x : b.y;
+    const hi = across ? b.x + b.w : b.y + b.h;
+    const at = across ? (n.y > 0 ? b.y + b.h : b.y) : n.x > 0 ? b.x + b.w : b.x;
+    const far = at + (across ? n.y : n.x) * ways.margin;
+    // A box covers a point of the side when the point or its way out is inside the box, as in `isFree`.
+    const covered: [number, number][] = [];
+    const strip = across
+      ? { x: lo, y: Math.min(at, far), w: hi - lo, h: Math.abs(far - at) }
+      : { x: Math.min(at, far), y: lo, w: Math.abs(far - at), h: hi - lo };
+    ways.obstacles.query(strip, (m) => {
+      if (m === node) return;
+      const o = m.box;
+      const [o0, o1, p0, p1] = across ? [o.x, o.x + o.w, o.y, o.y + o.h] : [o.y, o.y + o.h, o.x, o.x + o.w];
+      if ((at > p0 && at < p1) || (far > p0 && far < p1)) covered.push([o0, o1]);
+    });
+    const mid = (lo + hi) / 2;
+    let best: number | undefined;
+    for (const [f0, f1] of freeSpans(lo, hi, covered)) {
+      const room = Math.min(inset, (f1 - f0) / 2);
+      const u = Math.max(f0 + room, Math.min(f1 - room, mid));
+      if (best === undefined || Math.abs(u - mid) < Math.abs(best - mid)) best = u;
+    }
+    if (best !== undefined) out.push({ point: across ? { x: best, y: at } : { x: at, y: best }, normal: n });
+  }
+  const free = { plugs: out, reach: out.map((p) => reach(ways, node, p)) };
+  ways.free.set(node, free);
+  return free;
+}
+
+/** This function gives the indices of the plugs, and the plugs that face `toward` most come first. */
+function facingOrder(plugs: readonly Plug[], from: Point, toward: Point): number[] {
+  const facing = (p: Plug): number => p.normal.x * (toward.x - from.x) + p.normal.y * (toward.y - from.y);
+  return plugs.map((_, i) => i).sort((u, v) => facing(plugs[v]!) - facing(plugs[u]!) || u - v);
+}
+
+/** This function gives the parts of the span from `lo` to `hi` outside each open interval of `covered`. A part of zero length does not count. */
+function freeSpans(lo: number, hi: number, covered: [number, number][]): [number, number][] {
+  covered.sort((u, v) => u[0] - v[0]);
+  const out: [number, number][] = [];
+  let x = lo;
+  for (const [c0, c1] of covered) {
+    if (c0 > x) out.push([x, Math.min(c0, hi)]);
+    x = Math.max(x, c1);
+    if (x >= hi) break;
+  }
+  if (x < hi) out.push([x, hi]);
+  return out.filter(([a, b]) => b - a > EPS);
+}
+
+/**
+ * This function gives the shortest way between the free plugs of the two nodes, or `undefined` when the second corner graph has none.
+ * A link uses it when its plugs at the middle of a side find no way. Other boxes can cover such a plug, or close the space in front of it.
+ */
+function freeWay(ways: LevelWays, s: Node, t: Node, inset: number): Point[] | undefined {
+  const fs = freePlugs(ways, s, inset);
+  const ft = freePlugs(ways, t, inset);
+  const cs = center(s.box);
+  const ct = center(t.box);
+  const is = facingOrder(fs.plugs, cs, ct);
+  const it = facingOrder(ft.plugs, ct, cs);
+  const from = is.map((i) => fs.plugs[i]!);
+  const to = it.map((k) => ft.plugs[k]!);
+  const ra = is.map((i) => fs.reach[i]!);
+  const rb = it.map((k) => ft.reach[k]!);
+  // A pair of plugs with one or two clear legs between them gives the short way.
+  let best: Point[] | undefined;
+  let bestLength = Infinity;
+  from.forEach((ps, i) =>
+    to.forEach((pt, k) => {
+      const way = quickWay(ways, endsAt(ps, ra[i]!, pt, rb[k]!));
+      const length = way ? polylineLength(way) : Infinity;
+      if (length < bestLength) {
+        best = way;
+        bestLength = length;
+      }
+    }),
+  );
+  if (best) return best;
+  // Else one search of the second corner graph finds the shortest way from a plug of `s` to a plug of `t`.
+  // The corners of the second graph are near the boxes, so the way can go through a gap that is narrower than the margin.
+  const a = from.map((ps, i) => ({ point: along(ps, ra[i]!), cost: ra[i]! }));
+  const b = to.map((pt, k) => ({ point: along(pt, rb[k]!), cost: rb[k]! }));
+  const found = ways.tight().pathAmong(a, b);
+  return found && pulled(ways, from[found.from]!, found.points, to[found.to]!);
+}
+
 /** The two ends of a link: each plug, and the point where the link turns away from the normal of the plug. */
 interface Ends {
   readonly ps: Plug;
@@ -143,8 +278,11 @@ interface Ends {
  * Two plugs that face each other across a narrow space make the link turn in the middle of that space.
  */
 function ends(ways: Ways, s: Node, ps: Plug, t: Node, pt: Plug): Ends {
-  let ra = reach(ways, s, ps);
-  let rb = reach(ways, t, pt);
+  return endsAt(ps, reach(ways, s, ps), pt, reach(ways, t, pt));
+}
+
+/** This function gives the ends of a link from the plug `ps` to the plug `pt`, with the reach of each plug. */
+function endsAt(ps: Plug, ra: number, pt: Plug, rb: number): Ends {
   // Two plugs that face each other turn at the same distance, so the link does not go past itself.
   if (ps.normal.x === -pt.normal.x && ps.normal.y === -pt.normal.y) {
     const d = (pt.point.x - ps.point.x) * ps.normal.x + (pt.point.y - ps.point.y) * ps.normal.y;
@@ -182,14 +320,12 @@ function quickWay(ways: Ways, e: Ends): Point[] | undefined {
 }
 
 /**
- * This function gives a way from plug to plug through the corner graph. The way leaves and enters each plug along its normal.
- * Then it pulls the corners tight with legs that are parallel to the axes, where the obstacles let it.
+ * This function gives a way from the plug `ps` through the points of `path` to the plug `pt`.
+ * The way leaves and enters each plug along its normal. Then it pulls the corners tight with legs that are parallel to the axes, where the obstacles let it.
  */
-function squareWay(ways: Ways, e: Ends): Point[] {
-  const quick = quickWay(ways, e);
-  if (quick) return quick;
-  const legs = squarePull(ways.corners.path(e.a, e.b) ?? [e.a, e.b], ways.obstacles, ways.margin / 2, axisOf(e.ps.normal), axisOf(e.pt.normal));
-  return tidy([e.ps.point, ...legs, e.pt.point]);
+function pulled(ways: Ways, ps: Plug, path: readonly Point[], pt: Plug): Point[] {
+  const legs = squarePull(path, ways.obstacles, ways.margin / 2, axisOf(ps.normal), axisOf(pt.normal));
+  return tidy([ps.point, ...legs, pt.point]);
 }
 
 type Axis = "x" | "y";

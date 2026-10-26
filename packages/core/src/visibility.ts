@@ -1,4 +1,4 @@
-import { dist, inflate, segmentHitsRect, type Point } from "./geom.ts";
+import { dist, inflate, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
 
@@ -37,6 +37,11 @@ export class Obstacles {
     return true;
   }
 
+  /** This method gives each node whose bucket the box touches to `visit`. A node can be outside the box. */
+  query(box: Box, visit: (n: Node) => void): void {
+    this.#grid.query(box, visit);
+  }
+
   /** This method tells if the point is inside a box, made larger by `pad`. The node `skip` does not count. */
   inside(p: Point, pad: number, skip?: Node): boolean {
     let hit = false;
@@ -54,6 +59,20 @@ export class Obstacles {
 function hits(a: Point, b: Point, n: Node, pad: number): boolean {
   const x = n.box;
   return segmentHitsRect(a, b, x.x - pad, x.y - pad, x.x + x.w + pad, x.y + x.h + pad);
+}
+
+/** A free point at an end of a search of `CornerGraph.pathAmong`, and the cost to reach it. */
+export interface Terminal {
+  readonly point: Point;
+  readonly cost: number;
+}
+
+/** A path of `CornerGraph.pathAmong`: its points, the index of its first point in `from`, the index of its last point in `to`, and its cost. */
+export interface Among {
+  readonly points: Point[];
+  readonly from: number;
+  readonly to: number;
+  readonly cost: number;
 }
 
 /** The options of the corner graph. */
@@ -99,6 +118,10 @@ export class CornerGraph {
   readonly #near = new MinHeap();
   // The corners that each end of a path sees, by the coordinates of the end.
   readonly #endCache = new Map<string, number[]>();
+  // The corners that each end of a path of `pathAmong` sees. Such a path has several ends, so each end takes fewer corners.
+  readonly #fewCache = new Map<string, number[]>();
+  // The connected part of the graph of each corner. The first call of `path` makes it.
+  #part: Int32Array | undefined;
 
   /** This constructor makes the graph of the nodes. */
   constructor(nodes: readonly Node[], obstacles: Obstacles, options: CornerGraphOptions) {
@@ -277,6 +300,35 @@ export class CornerGraph {
    */
   path(from: Point, to: Point, cost?: (i: number, j: number, d: number) => number, floor: number = 1): Point[] | undefined {
     if (this.#obstacles.clear(from, to, this.#pad)) return [from, to];
+    return this.#search([{ point: from, cost: 0 }], [{ point: to, cost: 0 }], cost, floor, this.#k * 2)?.points;
+  }
+
+  /**
+   * This method gives the shortest path from a point of `from` to a point of `to`, or `undefined` when the graph has none.
+   * The cost of a path includes the costs of its two points. One search finds the path, so this method is faster than a call of `path` for each pair.
+   */
+  pathAmong(from: readonly Terminal[], to: readonly Terminal[]): Among | undefined {
+    const found = this.#search(from, to, undefined, 1, this.#k);
+    // A straight line between two points that costs less than the found path is better. The test takes the lines in order of cost.
+    const lines: Among[] = [];
+    from.forEach((a, i) =>
+      to.forEach((b, k) => {
+        const c = a.cost + dist(a.point, b.point) + b.cost;
+        if (!found || c < found.cost) lines.push({ points: [a.point, b.point], from: i, to: k, cost: c });
+      }),
+    );
+    lines.sort((u, v) => u.cost - v.cost);
+    return lines.find((l) => this.#obstacles.clear(l.points[0]!, l.points[1]!, this.#pad)) ?? found;
+  }
+
+  /** This method is the search (A*) of `path` and `pathAmong`. */
+  #search(
+    from: readonly Terminal[],
+    to: readonly Terminal[],
+    cost: ((i: number, j: number, d: number) => number) | undefined,
+    floor: number,
+    count: number,
+  ): Among | undefined {
     const n = this.points.length;
     if (this.#g.length < n) {
       this.#g = new Float64Array(n);
@@ -285,24 +337,46 @@ export class CornerGraph {
       this.#closed = new Int32Array(n);
     }
     const stamp = ++this.#stamp;
-    const goal = new Map<number, number>();
-    for (const j of this.#ends(to)) goal.set(j, dist(this.points[j]!, to));
-    if (goal.size === 0) return undefined;
-    const heap = new MinHeap();
     const points = this.points;
+    // The cost from each corner near a point of `to` to that point, and the index of that point.
+    const goal = new Map<number, number>();
+    const goalOf = new Map<number, number>();
+    to.forEach((b, k) => {
+      for (const j of this.#ends(b.point, count)) {
+        const tail = dist(points[j]!, b.point) + b.cost;
+        const now = goal.get(j);
+        if (now === undefined || tail < now) {
+          goal.set(j, tail);
+          goalOf.set(j, k);
+        }
+      }
+    });
+    if (goal.size === 0) return undefined;
+    const starts = from.map((a) => this.#ends(a.point, count));
+    // Without a start and a goal in one connected part, A* finds no path. This test stops it before it visits the whole part.
+    if (!starts.some((list) => this.#joined(list, goal))) return undefined;
+    const heap = new MinHeap();
     const G = this.#g;
     const parentOf = this.#parent;
     const open = this.#open;
     const closed = this.#closed;
+    const estimate = (p: Point): number => {
+      let h = Infinity;
+      for (const b of to) h = Math.min(h, dist(p, b.point));
+      return floor * h;
+    };
     const relax = (j: number, g: number, parent: number): void => {
       if (closed[j] === stamp) return;
       if (open[j] === stamp && G[j]! <= g) return;
       open[j] = stamp;
       G[j] = g;
       parentOf[j] = parent;
-      heap.push(g + floor * dist(points[j]!, to), j);
+      heap.push(g + estimate(points[j]!), j);
     };
-    for (const j of this.#ends(from)) relax(j, dist(from, points[j]!), -1);
+    // The parent of a first corner is -1 - i, where i is the index of its point in `from`.
+    from.forEach((a, i) => {
+      for (const j of starts[i]!) relax(j, a.cost + dist(a.point, points[j]!), -1 - i);
+    });
     let best = Infinity;
     let bestEnd = -1;
     while (heap.size > 0) {
@@ -326,24 +400,61 @@ export class CornerGraph {
       }
     }
     if (bestEnd < 0) return undefined;
-    const out: Point[] = [to];
-    for (let i = bestEnd; i >= 0; i = this.#parent[i]!) out.push(this.points[i]!);
-    out.push(from);
-    return out.reverse();
+    const k = goalOf.get(bestEnd)!;
+    const out: Point[] = [to[k]!.point];
+    for (let i = bestEnd; ; i = parentOf[i]!) {
+      out.push(points[i]!);
+      if (parentOf[i]! < 0) {
+        const f = -1 - parentOf[i]!;
+        out.push(from[f]!.point);
+        return { points: out.reverse(), from: f, to: k, cost: best };
+      }
+    }
+  }
+
+  /** This method tells if a corner of `starts` and a corner of `goal` are in one connected part of the graph. */
+  #joined(starts: readonly number[], goal: ReadonlyMap<number, number>): boolean {
+    const part = (this.#part ??= this.#parts());
+    const goals = new Set<number>();
+    for (const j of goal.keys()) goals.add(part[j]!);
+    for (const j of starts) if (goals.has(part[j]!)) return true;
+    return false;
+  }
+
+  /** This method gives the number of the connected part of each corner. */
+  #parts(): Int32Array {
+    const part = new Int32Array(this.points.length).fill(-1);
+    const stack: number[] = [];
+    let count = 0;
+    for (let i = 0; i < part.length; i++) {
+      if (part[i] !== -1) continue;
+      part[i] = count;
+      stack.push(i);
+      while (stack.length > 0) {
+        for (const j of this.#adj[stack.pop()!]!) {
+          if (part[j] !== -1) continue;
+          part[j] = count;
+          stack.push(j);
+        }
+      }
+      count++;
+    }
+    return part;
   }
 
   /**
-   * This method gives the corners that an end of a path can see. An end near a box sees no corner with the clearance.
+   * This method gives at most `count` corners that an end of a path can see. An end near a box sees no corner with the clearance.
    * Then the end takes the corners that it sees without the clearance, so the path does not cut through the boxes.
    * The graph does not change, so the method keeps the corners of each end.
    */
-  #ends(p: Point): number[] {
+  #ends(p: Point, count: number): number[] {
+    const cache = count === this.#k * 2 ? this.#endCache : this.#fewCache;
     const key = `${p.x},${p.y}`;
-    let out = this.#endCache.get(key);
+    let out = cache.get(key);
     if (!out) {
-      out = this.nearestVisible(p, this.#k * 2);
-      if (out.length === 0) out = this.#nearestVisible(p, this.#k * 2, -1, 0);
-      this.#endCache.set(key, out);
+      out = this.nearestVisible(p, count);
+      if (out.length === 0) out = this.#nearestVisible(p, count, -1, 0);
+      cache.set(key, out);
     }
     return out;
   }
