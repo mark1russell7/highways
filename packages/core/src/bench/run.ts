@@ -1,5 +1,6 @@
 import { makeFixture, type FixtureSpec } from "../fixtures.ts";
 import type { Graph, Result, Router } from "../model.ts";
+import { measureLevelFaults, measureRouteFaults, sumFaults, type LevelFaults, type LinkFaults } from "./links.ts";
 import { checkProperties, type Violation } from "./properties.ts";
 import { measureQuality, type Quality } from "./quality.ts";
 
@@ -20,6 +21,10 @@ export interface BenchRow {
   /** The first violations, for the report. */
   readonly sample: readonly Violation[];
   readonly quality: Quality;
+  /** The faults of the routes of the edges (`measureRouteFaults`). */
+  readonly faults: LinkFaults;
+  /** The faults of each zoom level with groups (`measureLevelFaults`). The list is empty for a router without levels. */
+  readonly levelFaults: readonly LevelFaults[];
 }
 
 /** The options of a benchmark run. */
@@ -87,6 +92,8 @@ export function benchOne(router: Router, fixture: string, graph: Graph, repeat =
     violations: all.length,
     sample: all.slice(0, 5),
     quality: measureQuality(graph, result),
+    faults: measureRouteFaults(graph, result),
+    levelFaults: measureLevelFaults(result),
   };
 }
 
@@ -98,6 +105,27 @@ export function formatTable(rows: readonly BenchRow[]): string {
   const body = rows.map((r) => {
     const q = r.quality;
     return `| ${r.router} | ${r.fixture} | ${r.nodes} | ${r.edges} | ${f(r.ms, 1)} | ${r.deterministic ? "yes" : "NO"} | ${r.violations} | ${Math.round(q.ink)} | ${q.crossingsEstimated ? "≈" : ""}${q.crossings} | ${f(q.bends)} | ${f(q.inflections)} | ${f(q.clearance, 1)} | ${f(q.tight)} | ${f(q.detour)} | ${f(q.plugAngle, 1)} |`;
+  });
+  return [head, line, ...body].join("\n");
+}
+
+/**
+ * This function writes the faults of the rows as a Markdown table: the routes first, then the sum of the levels with groups.
+ * A router without such levels gets a dash in the columns of the levels.
+ */
+export function formatFaults(rows: readonly BenchRow[]): string {
+  const head =
+    "| router | fixture | through | out and back | worst detour | outside | level links | level overlaps | level through | level out and back | level worst detour | level outside |";
+  const line = "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+  const body = rows.map((r) => {
+    const f = r.faults;
+    const cells = [r.router, r.fixture, f.through, f.backtrack, f.worstDetour.toFixed(2), f.outside];
+    if (r.levelFaults.length === 0) cells.push("-", "-", "-", "-", "-", "-");
+    else {
+      const l = sumFaults(r.levelFaults);
+      cells.push(l.links, r.levelFaults.reduce((s, x) => s + x.overlaps, 0), l.through, l.backtrack, l.worstDetour.toFixed(2), l.outside);
+    }
+    return `| ${cells.join(" | ")} |`;
   });
   return [head, line, ...body].join("\n");
 }
