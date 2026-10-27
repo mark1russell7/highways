@@ -199,6 +199,9 @@ importers:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
+      '@mark1russell7/layout-contract':
+        specifier: github:mark1russell7/layout-contract#52fefbb81922dd7fc4244e116f466c818d7a26dc&path:/packages/layout-contract
+        version: https://codeload.github.com/mark1russell7/layout-contract/tar.gz/52fefbb81922dd7fc4244e116f466c818d7a26dc#path:/packages/layout-contract
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.5
@@ -437,6 +440,11 @@ packages:
     version: 1.0.2
     engines: {node: '>=22'}
     hasBin: true
+
+  '@mark1russell7/layout-contract@https://codeload.github.com/mark1russell7/layout-contract/tar.gz/52fefbb81922dd7fc4244e116f466c818d7a26dc#path:/packages/layout-contract':
+    resolution: {gitHosted: true, integrity: sha512-lfBwqX/g1ihDUiaNxhP42Q5jvs3TRvbo+tOwj3tQuG/LziEsvtkIzIbA3HEwhobHe5fLS6/B6Iy/xtUqfZi5Mw==, path: /packages/layout-contract, tarball: https://codeload.github.com/mark1russell7/layout-contract/tar.gz/52fefbb81922dd7fc4244e116f466c818d7a26dc}
+    version: 0.1.0
+    engines: {node: '>=22.12'}
 
   '@mark1russell7/ste-lint@https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db':
     resolution: {gitHosted: true, integrity: sha512-hrHkCmLY/CDhcv7EjOirt6OFdW0aTeJVPy5aGxKulhpWCIH4UTjb048DpieLpbrVrwta5aKe7l3ctZLZenqbwA==, tarball: https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db}
@@ -1519,6 +1527,8 @@ snapshots:
       '@braidai/lang': 1.1.2
 
   '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8': {}
+
+  '@mark1russell7/layout-contract@https://codeload.github.com/mark1russell7/layout-contract/tar.gz/52fefbb81922dd7fc4244e116f466c818d7a26dc#path:/packages/layout-contract': {}
 
   '@mark1russell7/ste-lint@https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db':
     dependencies:
