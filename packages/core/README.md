@@ -80,7 +80,7 @@ A curve of one lane does not know the other lanes of its bundle. So the lanes of
 - The bend grows to keep the inner lane at `minRadius`. It shrinks to fit on its legs and in the free space.
 - A lane joins or leaves a bundle on an S curve on the leg with fewer lanes. The tangent has no break there.
 - The option `jog` sets the shape of the S curve. A `biarc` (the default) is two arcs. A `cubic` S curve is one cubic Bezier curve. A `quintic` S curve has no jump of the curvature, in `jogPieces` cubic pieces.
-- The curvature of each S curve is `1 / radius` or less. So a `cubic` or a `quintic` S curve is longer than a biarc.
+- The curvature of each S curve is `1 / radius` or less. So a `cubic` or a `quintic` S curve is longer than a biarc. Where it does not fit on its leg, the lane gets a biarc.
 - A lane in no open bundle gets the curve of `arcCurve`.
 
 ```ts

@@ -34,8 +34,11 @@ export interface HighwayOptions {
  */
 export type JogStyle = "biarc" | "cubic" | "quintic";
 
-/** The S curves of the lanes, by the order of `laneRoutes`. Each S curve is the first and the last index of its segments in the curve of its lane. */
-export type JogTrace = (readonly [number, number])[][];
+/**
+ * The S curves of the lanes, by the order of `laneRoutes`. Each S curve has the first and the last index of its segments in the curve of its lane, and its shape.
+ * A polynomial S curve that does not fit on its leg is a biarc.
+ */
+export type JogTrace = (readonly [number, number, JogStyle])[][];
 
 /** The curve of the lane of one edge: a list of segments for any renderer, as `curveOf` gives. */
 export interface LaneCurve {
@@ -152,7 +155,7 @@ function largestClear(max: number, clear: (size: number) => boolean): number {
  * This function gives the segments of a polyline with an arc at each vertex. The arc of a vertex has the radius of the vertex.
  * The arc is tangent to the two legs, so the curve has no break of its tangent. A vertex with the radius 0 stays sharp.
  */
-function filletPolyline(vertices: readonly LaneVertex[], trace?: [number, number][]): CurveSegment[] {
+function filletPolyline(vertices: readonly LaneVertex[], trace?: [number, number, JogStyle][]): CurveSegment[] {
   const v: LaneVertex[] = [];
   for (const q of vertices) {
     const last = v[v.length - 1];
@@ -205,7 +208,7 @@ function filletPolyline(vertices: readonly LaneVertex[], trace?: [number, number
   };
   const finish = (i: number): void => {
     if (open >= 0 && v[i]!.jog?.part === "end" && v[i]!.jog?.style === "biarc") {
-      trace?.push([open, out.length - 1]);
+      trace?.push([open, out.length - 1, "biarc"]);
       open = -1;
     }
   };
@@ -219,7 +222,7 @@ function filletPolyline(vertices: readonly LaneVertex[], trace?: [number, number
     }
     const first = out.length;
     out.push(...jogSegments(from, to, mark.u, mark.style, mark.pieces ?? 4));
-    trace?.push([first, out.length - 1]);
+    trace?.push([first, out.length - 1, mark.style]);
   };
   for (let i = 1; i + 1 < v.length; i++) {
     const q = v[i]!.p;
@@ -414,7 +417,7 @@ export function tracedHighwayCurves(
   const curves = graph.paths.map((path, i): LaneCurve => {
     const polyline = polylines[i]!.points;
     const plan = plans[i];
-    const trace: [number, number][] = [];
+    const trace: [number, number, JogStyle][] = [];
     jogs.push(trace);
     if (!plan) return { edge: path.edge, segments: highwayCurve(polyline, { radius, ...(space ? { space } : {}) }) };
     if (plan.legs.length === 0) return { edge: path.edge, segments: [{ kind: "move", to: polyline[0]! }] };
@@ -486,8 +489,8 @@ function laneCurve(
   plan: LanePlan,
   bends: Bends,
   polyline: readonly Point[],
-  { radius, minRadius, space, style, pieces }: { radius: number; minRadius: number; space: CurveSpace | undefined; style: JogStyle; pieces: number },
-  trace?: [number, number][],
+  { radius, minRadius, space, style: wanted, pieces }: { radius: number; minRadius: number; space: CurveSpace | undefined; style: JogStyle; pieces: number },
+  trace?: [number, number, JogStyle][],
 ): CurveSegment[] {
   const { legs, at } = plan;
   const L = legs.length;
@@ -519,7 +522,7 @@ function laneCurve(
   }
   // The shape near the vertex `j` for the scale `s` of the wanted radius. The radius of each arc is at least `floor`.
   // The arcs of a short leg shrink in `filletPolyline`, so a large floor keeps each tangent and does not make an arc too large for its leg.
-  const near = (j: number, s: number, floor: number, loose: boolean): Near => {
+  const near = (j: number, s: number, floor: number, loose: boolean, style: JogStyle): Near => {
     const A = j > 0 ? legs[j - 1] : undefined;
     const B = j < L ? legs[j] : undefined;
     const v = B ? B.a : A!.b;
@@ -577,21 +580,21 @@ function laneCurve(
     };
   };
   // The vertices of the lane near `j`, between the middles of its two legs. The free space tests this piece.
-  const piece = (j: number, s: number, floor: number, loose: boolean): LaneVertex[] => {
+  const piece = (j: number, s: number, floor: number, loose: boolean, style: JogStyle): LaneVertex[] => {
     const A = j > 0 ? legs[j - 1] : undefined;
     const B = j < L ? legs[j] : undefined;
     const v = B ? B.a : A!.b;
     const head = A ? [{ p: along(v, A.u, -A.len / 2, A.n, A.off), r: 0 }] : [];
     const tail = B ? [{ p: along(v, B.u, B.len / 2, B.n, B.off), r: 0 }] : [];
-    return [...head, ...near(j, s, floor, loose).vertices, ...tail];
+    return [...head, ...near(j, s, floor, loose, style).vertices, ...tail];
   };
   // Each vertex gets the half of each leg next to it. The scale of the radii is the largest that fits, then the largest that is clear.
   // A bend of bundles keeps its fixed radius. It is loose, with the radii of a lane alone, only when the fixed arc does not fit or is not clear.
   // The smallest radius shrinks only as far as a short leg or the free space needs. A radius of 0 makes a sharp corner.
-  const vertices: LaneVertex[] = [];
-  for (let j = 0; j <= L; j++) {
+  // A polynomial S curve is longer than a biarc. Where it does not fit on its leg, is not clear, or needs a smaller radius than the biarc, the vertex takes the biarc.
+  const solve = (j: number, style: JogStyle): { readonly vertices: readonly LaneVertex[]; readonly ok: boolean; readonly want: number } => {
     const fits = (s: number, f: number, loose: boolean): boolean => {
-      const q = near(j, s, f, loose);
+      const q = near(j, s, f, loose, style);
       return (j === 0 || q.back <= legs[j - 1]!.len / 2 + 1e-9) && (j === L || q.ahead <= legs[j]!.len / 2 + 1e-9);
     };
     let floor = minRadius;
@@ -602,8 +605,9 @@ function laneCurve(
     const most = (): number => (fits(1, floor, loose) ? 1 : largestClear(1, (x) => fits(x, floor, loose)));
     fitFloor();
     let s = most();
+    let clearAtEnd = true;
     if (space) {
-      const clear = (x: number, f: number): boolean => !space.addsHit(sampleCurve(filletPolyline(piece(j, x, f, loose)), space.tolerance), polyline);
+      const clear = (x: number, f: number): boolean => !space.addsHit(sampleCurve(filletPolyline(piece(j, x, f, loose, style)), space.tolerance), polyline);
       s = largestClear(s, (x) => clear(x, floor));
       if (!loose && !clear(s, floor)) {
         loose = true;
@@ -614,8 +618,19 @@ function laneCurve(
         const f = largestClear(floor, (x) => clear(s, x));
         if (clear(s, f)) floor = f;
       }
+      clearAtEnd = clear(s, floor);
     }
-    vertices.push(...near(j, s, floor, loose).vertices);
+    return { vertices: near(j, s, floor, loose, style).vertices, ok: fits(s, floor, loose) && clearAtEnd, want: Math.max(radius * s, floor) };
+  };
+  const vertices: LaneVertex[] = [];
+  for (let j = 0; j <= L; j++) {
+    const first = solve(j, wanted);
+    if (wanted === "biarc" || (startJog[j] === undefined && (j === 0 || endJog[j - 1] === undefined))) {
+      vertices.push(...first.vertices);
+      continue;
+    }
+    const biarc = solve(j, "biarc");
+    vertices.push(...(first.ok && first.want >= biarc.want - 1e-9 ? first : biarc).vertices);
   }
   return filletPolyline(vertices, trace);
 }

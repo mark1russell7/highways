@@ -89,7 +89,7 @@ describe("highwayCurves", () => {
 describe("the S curves of highwayCurves", () => {
   const jogsOf = (options: Parameters<typeof tracedHighwayCurves>[3]): ReturnType<typeof measureJogs> => {
     const t = tracedHighwayCurves(graph, open, 4, options);
-    return measureJogs(t.curves, t.jogs);
+    return measureJogs(t.curves, t.jogs, options?.jog);
   };
   it("gives the same curves with the jog biarc as with no jog", () => {
     expect(highwayCurves(graph, open, 4, { maxWidth: 16, jog: "biarc" })).toEqual(highwayCurves(graph, open, 4, { maxWidth: 16 }));
@@ -108,8 +108,9 @@ describe("the S curves of highwayCurves", () => {
   for (const jog of ["cubic", "quintic"] as const) {
     it(`draws ${jog} S curves with no break of the tangent, and keeps the lanes at the spacing`, () => {
       const { curves, jogs } = tracedHighwayCurves(graph, open, 4, { maxWidth: 16, minRadius: 4, jog });
-      const m = measureJogs(curves, jogs);
+      const m = measureJogs(curves, jogs, jog);
       expect(m.count).toBe(jogsOf({ maxWidth: 16, minRadius: 4 }).count);
+      expect(m.biarcs).toBeLessThan(m.count);
       // Each S curve keeps its curvature at 1 / 4 or less: the radius of the smallest arc of a biarc.
       expect(m.peakMax).toBeLessThanOrEqual(1 / 4 + 1e-3);
       const h = measureHighways(graph, open, 4, curves, { maxWidth: 16, minRadius: 4 });
@@ -121,7 +122,8 @@ describe("the S curves of highwayCurves", () => {
 
   it("draws quintic S curves with no jump of the curvature", () => {
     const { curves, jogs } = tracedHighwayCurves(graph, open, 4, { maxWidth: 16, jog: "quintic" });
-    const m = measureJogs(curves, jogs);
+    const m = measureJogs(curves, jogs, "quintic");
+    expect(m.biarcs).toBeLessThan(m.count);
     expect(m.endJump).toBeLessThan(1e-9);
     expect(m.innerJump).toBeLessThan(1e-6);
     const one = jogsOf({ maxWidth: 16, jog: "quintic", jogPieces: 1 });
