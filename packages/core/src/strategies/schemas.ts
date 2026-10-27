@@ -1,3 +1,5 @@
+import type { CutOptions } from "../groups/cut/index.ts";
+import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
@@ -169,4 +171,27 @@ export const LEVEL_ROOM_SCHEMA: OptionSchema<LevelRoomPreset> = {
 export const KEY_SCHEMA: OptionSchema<KeyOptions> = {
   key: { type: "function", describe: "This function gives the key of the group of each node." },
   split: { type: "object", describe: "With these limits of the quadtree, a large group splits into cells. Without them, each group is one leaf." },
+};
+
+/** The declarations of the limits of the tree of the grouping rules `kd` and `cut`. */
+const SPLIT_TREE_SCHEMA: OptionSchema<Required<Pick<KdOptions, "cap" | "maxDepth" | "fanout">>> = {
+  cap: { ...SECTION_SCHEMA.cap, describe: "The section limit. A section with more nodes splits." },
+  maxDepth: SECTION_SCHEMA.maxDepth,
+  fanout: { type: "integer", min: 2, max: 4, step: 2, default: 4, describe: "The number of children of a section. With 4, a section splits two times on one level." },
+};
+
+/** The declarations of the options of the grouping rule `kd`. */
+export const KD_SCHEMA: OptionSchema<KdOptions> = {
+  ...SPLIT_TREE_SCHEMA,
+  line: { type: "enum", values: ["median", "middle", "slide"], default: "slide", describe: "The place of the line in the cell: the median node, the middle, or the middle that slides to the nearest node." },
+  axis: { type: "enum", values: ["longer", "alternate"], default: "longer", describe: "The axis of each split: across the longer side of the cell, or x and y in turn." },
+};
+
+/** The declarations of the options of the grouping rule `cut`. */
+export const CUT_SCHEMA: OptionSchema<CutOptions> = {
+  ...SPLIT_TREE_SCHEMA,
+  balance: { type: "number", min: 0.05, max: 0.5, step: 0.05, marks: [0.1, 0.25, 0.4], default: 0.25, describe: "The smallest share of the nodes in each part of a split." },
+  objective: { type: "enum", values: ["ratio", "normalized", "sparsest"], default: "ratio", describe: "The cost of a line: the ratio cut, the normalized cut or the sparsest cut." },
+  pull: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 0.5, 1, 2, 4], default: 0.5, describe: "The cost of a line grows with its distance from the middle of the cell, by this factor." },
+  guard: { type: "boolean", default: true, describe: "With `true`, each section also tests the quadtree split, and keeps the split that cuts fewer edges." },
 };

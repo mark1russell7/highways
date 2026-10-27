@@ -53,6 +53,22 @@ export function cutShare(graph: Graph, groups: Grouping): number {
 }
 
 /**
+ * This function gives the balance of one level (G6 of MEAS0): `H(s) / log(k)`, with `s` the shares of the nodes of the `k` items and `H` the entropy.
+ * The scale is 0 to 1, and higher is better. A value of 1 is items of equal size. A level with one item gives 1.
+ */
+export function balance(level: Level): number {
+  const k = level.items.length;
+  const total = level.items.reduce((s, item) => s + item.nodes.length, 0);
+  if (k < 2 || total === 0) return 1;
+  let h = 0;
+  for (const item of level.items) {
+    const p = item.nodes.length / total;
+    if (p > 0) h -= p * Math.log(p);
+  }
+  return h / Math.log(k);
+}
+
+/**
  * This function gives the tree cost of the levels (G8 of MEAS0, Dasgupta, 2016): `D = Σ_(u,v) leaves(lca(u, v)) / (m n)`.
  * The levels make the tree. `leaves(lca(u, v))` is the number of nodes of the deepest item that holds both ends.
  * Without such an item, the value is `n`. The scale is 0 to 1, and lower is better. The cost is linear times the depth.

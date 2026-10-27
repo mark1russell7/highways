@@ -3,6 +3,8 @@ import { highwayCurve } from "../curves/highway/index.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
 import { splineCurve, type SplineOptions } from "../curves/spline/index.ts";
 import { straightCurve } from "../curves/straight/index.ts";
+import { CUT_DEFAULTS, cutGroups, type CutOptions } from "../groups/cut/index.ts";
+import { KD_DEFAULTS, kdGroups, type KdOptions } from "../groups/kd/index.ts";
 import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts";
 import { quadtreeGroups } from "../groups/quadtree/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
@@ -17,7 +19,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CORNERS_SCHEMA, HIGHWAY_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CORNERS_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -215,6 +217,8 @@ export const roomStrategies: {
 export const groupStrategies: {
   readonly quadtree: Strategy<"group", Required<SectionOptions>>;
   readonly keys: Strategy<"group", KeyOptions>;
+  readonly kd: Strategy<"group", Required<KdOptions>>;
+  readonly cut: Strategy<"group", Required<CutOptions>>;
 } = Object.freeze({
   quadtree: defineStrategy({
     step: "group",
@@ -231,6 +235,22 @@ export const groupStrategies: {
     defaults: { key: byDataGroup } as KeyOptions,
     schema: KEY_SCHEMA,
     run: (graph: Graph, o: Readonly<KeyOptions>) => keyGroups(graph, o),
+  }),
+  kd: defineStrategy({
+    step: "group",
+    name: "kd",
+    describe: "The cells of a k-d tree of the plane. A cell with more than `cap` nodes splits in two with a line across one axis, and each half splits again.",
+    defaults: { ...KD_DEFAULTS },
+    schema: KD_SCHEMA,
+    run: (graph: Graph, o: Readonly<Required<KdOptions>>) => kdGroups(graph, o),
+  }),
+  cut: defineStrategy({
+    step: "group",
+    name: "cut",
+    describe: "A guillotine cut that reads the edges. Each line goes where it cuts the fewest edges for its balance, so the far view has fewer links.",
+    defaults: { ...CUT_DEFAULTS },
+    schema: CUT_SCHEMA,
+    run: (graph: Graph, o: Readonly<Required<CutOptions>>) => cutGroups(graph, o),
   }),
 });
 

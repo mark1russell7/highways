@@ -1,6 +1,6 @@
 import { dist, inflate, pointBoxDistance, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
-import { fixedPortPoint, nodeIndex, type Graph, type Node, type Result } from "../model.ts";
+import { fixedPortPoint, nodeIndex, type Graph, type Level, type Node, type Result } from "../model.ts";
 
 /** A broken hard rule. A correct router has none. */
 export interface Violation {
@@ -89,7 +89,23 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
         if (add({ rule: "run-shared", edge: id, detail: `run ${run.id}: the route does not hold the points of the run in a row` })) return out;
     }
   }
-  for (const level of result.levels ?? []) {
+  out.push(...checkLevels(graph, result.levels ?? [], limit - out.length));
+  return out;
+}
+
+/**
+ * This function checks the hard rules of the zoom levels. The counts of each level add up (`counts-sum`).
+ * Each link of a level starts on the box of its source and ends on the box of its target (`link-ends`).
+ * The function gives at most `limit` violations.
+ */
+export function checkLevels(graph: Graph, levels: readonly Level[], limit = 100): Violation[] {
+  const out: Violation[] = [];
+  const add = (v: Violation): boolean => {
+    out.push(v);
+    return out.length >= limit;
+  };
+  if (limit <= 0) return out;
+  for (const level of levels) {
     const itemOf = new Map<string, string>();
     for (const it of level.items) for (const n of it.nodes) itemOf.set(n, it.id);
     if (itemOf.size !== graph.nodes.length)

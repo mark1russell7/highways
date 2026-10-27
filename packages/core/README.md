@@ -255,6 +255,10 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 
 The built-in grouping rules are in `groupStrategies`. The rule `quadtree` splits the plane, as `buildSections` does. The rule `keys` makes one group for each key of the nodes. Its default key is the string `data.group` of a node, and a node without a key is a group alone. With the option `split`, a large group splits into a quadtree.
 
+The rule `kd` splits the plane with lines across one axis, as a k-d tree does. The option `line` sets the place of each line. The value `median` puts half of the nodes on each side. The value `middle` cuts the cell in half. The value `slide` cuts the cell in half and moves a line with an empty side to the nearest node. With the fan-out 4, each half splits again on the same level.
+
+The rule `cut` also splits the plane with lines, but each line cuts the fewest edges. The option `balance` gives the smallest share of the nodes on each side. The option `objective` sets the cost of a line, and the option `pull` moves the line to the middle of the cell. With the option `guard`, each section also tries the split of the quadtree and keeps the split that cuts fewer edges.
+
 A consumer rule groups the nodes by its own field. Then the far view shows one item for each group:
 
 ```ts
@@ -309,7 +313,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
-| `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys` |
+| `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
