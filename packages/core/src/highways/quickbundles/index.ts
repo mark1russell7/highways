@@ -53,8 +53,9 @@ export function resample(line: readonly Point[], k: number): Point[] {
 }
 
 /**
- * This function gives the MDF distance of two lines with the same number of points: the mean distance of their points,
- * in the same direction or in the opposite direction, whichever is smaller. `flip` is `true` when the opposite direction is smaller.
+ * This function gives the MDF distance of two lines with the same number of points. It is the mean distance of their points.
+ * The function compares the points in the same direction and in the opposite direction, and keeps the smaller mean.
+ * `flip` is `true` when the opposite direction is smaller.
  */
 export function mdf(p: readonly Point[], q: readonly Point[]): { d: number; flip: boolean } {
   const n = p.length;

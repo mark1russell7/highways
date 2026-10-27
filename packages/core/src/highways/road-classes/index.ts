@@ -25,7 +25,8 @@ function rank(values: readonly number[], q: number): number {
 
 /**
  * This function gives the highways of the road classes (HWY-034, EDA-050). It counts how many first ways use each link of the corner graph.
- * The links with a use at the quantile `quantile` or higher, and at least `minSize`, are the highway links: the main roads of a road map.
+ * The links with a use at the quantile `quantile` or higher, and at least `minSize`, are the highway links.
+ * They are the main roads of a road map.
  * A second pass routes each edge again, with the discount on the highway links, so more edges join them.
  * Each stretch of highway links that `minSize` ways or more share after the second pass is one highway.
  */

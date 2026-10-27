@@ -74,8 +74,8 @@ interface Candidate {
 }
 
 /**
- * This function gives the ink that a highway saves: the length of the spine that each member uses, less the length of the spine that any member uses.
- * The extra length of a member is the length of its detour from its first route: to the merge point, along the spine and back from the split point.
+ * This function gives the ink that a highway saves. It is the sum of the spine lengths of the members, less the length of their union.
+ * The extra length of a member is its detour from its first route. The detour goes to the merge point, along the spine and back from the split point.
  */
 export function candidateScore(h: Highway, routes: ReadonlyMap<string, readonly Point[]>): { gain: number; extra: number } {
   const spans = h.members.map((m) => [Math.min(m.on, m.off), Math.max(m.on, m.off)] as const).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
@@ -106,9 +106,10 @@ export function candidateScore(h: Highway, routes: ReadonlyMap<string, readonly 
 /**
  * This function gives the highways of the candidate generation and selection (HWY-045). Each generator proposes its highways as candidates.
  * The net gain of a candidate is the ink that it saves, less `lambda` times the length that it adds to its edges.
- * Two candidates of two generators conflict when they share an edge. The highways of one generator never conflict, so an edge keeps its trip.
+ * Two candidates of two generators conflict when they share an edge. The highways of one generator do not conflict.
+ *
  * The selection takes the candidates by net gain for each edge, without a conflict. Then each pass of the local search
- * swaps in a candidate when its net gain is more than the sum of the selected candidates that it conflicts with.
+ * swaps in a candidate. The swap occurs when the net gain of the candidate is more than the sum of the selected candidates in conflict with it.
  */
 export function selectPlan(input: HighwayInput, o: Readonly<SelectOptions>): HighwayPlan {
   const routes = firstRoutes(input);
