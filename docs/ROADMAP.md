@@ -22,13 +22,13 @@ Status: `done`, `active`, `blocked`, `later`.
 | ER3b | A route of `sections` skips a hub that takes it away from its target. Out and back on `case-hub-chain`: `sections` 6 to 0, `sections-tree` 25 to 0. | 2026-10-26 | #14 |
 | REL2 | Version 0.1.3 on npm: PERF1, ER3a, ER3b and the measures of QFIX. | 2026-10-26 | #17 |
 | ER3c | On a level with many groups, the level links go through the groups, not around the outer edge. Level outside on `case-many-groups`: 4 before, 0 after. | 2026-10-26 | #19 |
+| CURVE | Curve types for the routes: straight, rounded, spline and arc, as segments for any renderer. With the free space, no curve goes through a box. | 2026-10-26 | #21 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
-| CURVE | Curve types for the edges: straight, rounded corners, splines and arcs, as an option of the route. | `later` | | P2 |
 | STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
 | CUSTOM | Options for the generalizations: the grouping rule, the levels and their limits. | `later` | STRAT | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
