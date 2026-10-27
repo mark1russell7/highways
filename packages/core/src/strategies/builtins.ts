@@ -2,6 +2,8 @@ import { arcCurve, type ArcOptions } from "../curves/arc/index.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
 import { splineCurve, type SplineOptions } from "../curves/spline/index.ts";
 import { straightCurve } from "../curves/straight/index.ts";
+import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts";
+import { quadtreeGroups } from "../groups/quadtree/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
 import { cornersRouter, type CornersOptions } from "../routers/corners.ts";
@@ -10,6 +12,7 @@ import { sectionsRouter, type SectionsOptions } from "../routers/sections.ts";
 import { sharedRouter, type SharedOptions } from "../routers/shared.ts";
 import { straightRouter } from "../routers/straight.ts";
 import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
+import { SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
@@ -158,8 +161,30 @@ export const roomStrategies: {
   lines: roomStrategy("lines", "The lanes of a gap are the straight lines between the centers of the boxes that cross the gap."),
 });
 
+/** The built-in grouping rules: the strategies of the step `group`. The router `sections` makes its hubs and its zoom levels from their tree. */
+export const groupStrategies: {
+  readonly quadtree: Strategy<"group", Required<SectionOptions>>;
+  readonly keys: Strategy<"group", KeyOptions>;
+} = Object.freeze({
+  quadtree: defineStrategy({
+    step: "group",
+    name: "quadtree",
+    describe: "The cells of a quadtree of the plane. A cell with more than `cap` nodes splits in four. It is the default rule of the router `sections`.",
+    defaults: { ...SECTION_DEFAULTS },
+    run: (graph: Graph, o: Readonly<Required<SectionOptions>>) => quadtreeGroups(graph, o),
+  }),
+  keys: defineStrategy({
+    step: "group",
+    name: "keys",
+    describe: "One group for each key of the nodes. The default key is the string `data.group` of the node. A node without a key is a group alone.",
+    defaults: { key: byDataGroup } as KeyOptions,
+    run: (graph: Graph, o: Readonly<KeyOptions>) => keyGroups(graph, o),
+  }),
+});
+
 /** The built-in strategies of each step, in order. A consumer adds its own: `createRegistry([...BUILT_IN_STRATEGIES, mine])`. */
 export const BUILT_IN_STRATEGIES: readonly AnyStrategy[] = Object.freeze([
+  ...Object.values(groupStrategies),
   ...Object.values(routerStrategies),
   ...Object.values(curveStrategies),
   ...Object.values(roomStrategies),

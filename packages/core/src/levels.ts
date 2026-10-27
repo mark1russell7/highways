@@ -28,8 +28,19 @@ interface LevelWays extends Ways {
   readonly free: Map<Node, FreePlugs>;
 }
 
-/** The margin of the second corner graph. A gap between two boxes wider than approximately 1.5 times this margin lets a link through. */
-const TIGHT_MARGIN = 1;
+/** The options of the links of a level: the options of the ways, and two limits of the level links. */
+export interface LevelLinkOptions extends WayOptions {
+  /**
+   * The margin of the second corner graph. A gap between two boxes wider than approximately 1.5 times this margin lets a link through.
+   * The second graph uses the smaller of this value and `margin`. The default is 1.
+   */
+  readonly tightMargin?: number;
+  /** A plug stays at least this far from the corners of its side. The level links use the smaller of this value and `margin`. The default is 6. */
+  readonly plugInset?: number;
+}
+
+/** The default values of the two limits of `LevelLinkOptions`. */
+export const LEVEL_LINK_DEFAULTS: Readonly<Required<Pick<LevelLinkOptions, "tightMargin" | "plugInset">>> = Object.freeze({ tightMargin: 1, plugInset: 6 });
 
 const EPS = 1e-6;
 
@@ -60,12 +71,12 @@ function tidy(p: readonly Point[]): Point[] {
  * A link starts on the boundary of the box of its source and ends on the boundary of the box of its target.
  * It goes around the boxes of the other items. Where there is space, its legs are parallel to the axes.
  */
-export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair[], options: WayOptions = {}): LevelLink[] {
+export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair[], options: LevelLinkOptions = {}): LevelLink[] {
   if (pairs.length === 0) return [];
   const nodes: Node[] = items.map((i) => ({ id: i.id, box: i.box }));
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const ways = levelWays(nodes, options);
-  const inset = Math.min(6, ways.margin);
+  const inset = Math.min(options.plugInset ?? LEVEL_LINK_DEFAULTS.plugInset, ways.margin);
   const out: LevelLink[] = [];
   for (const p of pairs) {
     const s = byId.get(p.source);
@@ -101,7 +112,7 @@ function sideWay(ways: LevelWays, s: Node, t: Node, inset: number): Point[] {
  * The buckets of the obstacles grow with the items, so a long link visits few buckets.
  * The corner graphs use `cones`, so a link goes along the corridors between the groups, not around the outer edge of the board.
  */
-function levelWays(nodes: readonly Node[], options: WayOptions): LevelWays {
+function levelWays(nodes: readonly Node[], options: LevelLinkOptions): LevelWays {
   const margin = options.margin ?? 5;
   const k = options.k ?? 8;
   let size = 0;
@@ -110,7 +121,7 @@ function levelWays(nodes: readonly Node[], options: WayOptions): LevelWays {
   const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true });
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
-  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, TIGHT_MARGIN), k, cones: true }));
+  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true }));
   return { obstacles, corners, margin, out, tight: tightGraph, free: new Map() };
 }
 

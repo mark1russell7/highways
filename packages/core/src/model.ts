@@ -20,6 +20,8 @@ export interface Node {
   readonly id: string;
   readonly box: Box;
   readonly ports?: readonly Port[];
+  /** This data is free for the grouping rules of the nodes. The rule `keys` reads the string `data.group` by default. */
+  readonly data?: Readonly<Record<string, unknown>>;
 }
 
 /** One end of an edge: a node, and optionally one plug of that node. */

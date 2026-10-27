@@ -1,14 +1,19 @@
 import { BACKTRACK_MIN, goesOutAndBack } from "../bench/links.ts";
 import { center, dist, pointSegmentDistance, polylineLength, type Box, type Point } from "../geom.ts";
-import { levelLinks, type ItemPair } from "../levels.ts";
+import { LEVEL_LINK_DEFAULTS, levelLinks, type ItemPair, type LevelLinkOptions } from "../levels.ts";
 import { nodeIndex, type Graph, type Level, type LevelItem, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
-import { allSections, buildSections, treeDepth, type Section, type SectionOptions } from "../sections.ts";
+import { allSections, buildSections, checkSections, SECTION_DEFAULTS, treeDepth, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes } from "../segments.ts";
-import { WayFinder, type WayOptions } from "../ways.ts";
+import type { Strategy } from "../strategies/model.ts";
+import { WayFinder } from "../ways.ts";
 
-/** The options of the router with sections. */
-export interface SectionsOptions extends WayOptions, SectionOptions {
+/**
+ * The options of the router with sections. Each option has a default, and the defaults give the output of version 0.1.5.
+ * The options `cap`, `maxDepth` and `collapse` are the limits of the default grouping rule, the quadtree of `buildSections`.
+ * The options `tightMargin` and `plugInset` are the limits of the level links (`levelLinks`).
+ */
+export interface SectionsOptions extends LevelLinkOptions, SectionOptions {
   /** The name in the benchmark. */
   readonly name: string;
   /**
@@ -16,19 +21,49 @@ export interface SectionsOptions extends WayOptions, SectionOptions {
    * and fewer shared ways. Without it, a way passes each hub from its node up.
    */
   readonly hubs?: number;
-  /** A way through the hubs can be at most this many times as long as the line between its plugs. Else the edge goes directly. The default is 2. */
+  /**
+   * The hub limit. A way through the hubs can be at most this many times as long as the line between its plugs, plus `stretchPad` margins.
+   * Else the edge goes directly. The default is 2. The value `Infinity` keeps each way through the hubs.
+   */
   readonly stretch?: number;
+  /** A way through the hubs can be this many margins longer than `stretch` times the line between its plugs. The default is 4. */
+  readonly stretchPad?: number;
+  /**
+   * A way skips a hub that is more than this many units farther from the target than the nearest approach of the way before it.
+   * The default is 80, two times `BACKTRACK_MIN`. The value `Infinity` keeps each hub.
+   */
+  readonly hubSlack?: number;
+  /**
+   * The grouping rule: a strategy of the step `group` that makes the tree of sections. The hubs and the zoom levels come from this tree.
+   * Without it, the router uses the quadtree of `buildSections` with the options `cap`, `maxDepth` and `collapse`.
+   */
+  readonly group?: Strategy<"group">;
+  /** The options of the strategy `group`. The strategy gets its `defaults` for each option that this object does not give. */
+  readonly groupOptions?: object;
+  /**
+   * The depths of the tree that get a zoom level with groups. The last level, with each node alone, always comes after them.
+   * The default is each depth, from 0 to the depth of the deepest section.
+   */
+  readonly levels?: readonly number[];
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
 
-const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || dist(q, p[i - 1]!) > 1e-9);
+/** The default values of the numbers of `SectionsOptions`: the limits of the hubs, of the tree and of the level links. */
+export const SECTIONS_DEFAULTS: Readonly<Required<Pick<SectionsOptions, "cap" | "maxDepth" | "collapse" | "tightMargin" | "plugInset" | "hubs" | "stretch" | "stretchPad" | "hubSlack">>> =
+  Object.freeze({
+    cap: SECTION_DEFAULTS.cap,
+    maxDepth: SECTION_DEFAULTS.maxDepth,
+    collapse: SECTION_DEFAULTS.collapse,
+    tightMargin: LEVEL_LINK_DEFAULTS.tightMargin,
+    plugInset: LEVEL_LINK_DEFAULTS.plugInset,
+    hubs: Infinity,
+    stretch: 2,
+    stretchPad: 4,
+    hubSlack: 2 * BACKTRACK_MIN,
+  });
 
-/**
- * A hub can be this many units farther from the target than the nearest approach of the way before it.
- * A hub farther away goes out and back, so the way skips it.
- */
-const HUB_SLACK = 2 * BACKTRACK_MIN;
+const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || dist(q, p[i - 1]!) > 1e-9);
 
 /**
  * This function makes a router with a tree of sections. Each section has a hub: the free corner nearest to the center of its nodes.
@@ -45,12 +80,14 @@ export function sectionsRouter(options: SectionsOptions): Router {
   const router: Router = {
     name: options.name,
     route(graph: Graph): Result {
-      const stretch = options.stretch ?? 2;
+      const stretch = options.stretch ?? SECTIONS_DEFAULTS.stretch;
+      const stretchPad = options.stretchPad ?? SECTIONS_DEFAULTS.stretchPad;
+      const hubSlack = options.hubSlack ?? SECTIONS_DEFAULTS.hubSlack;
       const byId = nodeIndex(graph);
       const indexOfNode = new Map(graph.nodes.map((n, i) => [n.id, i]));
       const ways = new WayFinder(graph.nodes, options);
       const corners = ways.corners;
-      const root = buildSections(graph.nodes, options);
+      const root = groupNodes(graph, options);
       const parent = new Map<Section, Section>();
       const leafOf: Section[] = [];
       for (const s of allSections(root)) {
@@ -82,7 +119,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         let last = from;
         for (const c of list) {
           const h = hub(c);
-          if (dist(h, to) > near + HUB_SLACK) continue;
+          if (dist(h, to) > near + hubSlack) continue;
           near = Math.min(near, pointSegmentDistance(to, last, h));
           last = h;
           kept.push(c);
@@ -132,7 +169,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         const b = up(lv);
         const common = new Set(b);
         const lca = a.find((x) => common.has(x))!;
-        const keep = options.hubs ?? Infinity;
+        const keep = options.hubs ?? SECTIONS_DEFAULTS.hubs;
         const side = (list: Section[]): Section[] => list.slice(Math.max(0, list.indexOf(lca) - keep), list.indexOf(lca));
         const end = ways.out(pt);
         const start = ways.out(ps);
@@ -151,7 +188,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         append(piece(chain[chain.length - 1]!.id, hub(chain[chain.length - 1]!), at(end), end, used));
         append([pt.point]);
         // A way through the hubs that is too long, or that goes out and back, gives way to the direct way.
-        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + 4 * ways.margin || goesOutAndBack(out)) {
+        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin || goesOutAndBack(out)) {
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
@@ -176,17 +213,28 @@ export function sectionsRouter(options: SectionsOptions): Router {
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
 }
 
+/** This function gives the tree of sections of the grouping rule. It examines the tree of a strategy (`checkSections`). */
+function groupNodes(graph: Graph, options: SectionsOptions): Section {
+  if (!options.group) return buildSections(graph.nodes, options);
+  const root = options.group.run(graph, options.groupOptions);
+  checkSections(root, graph.nodes.length);
+  return root;
+}
+
 /**
  * This function gives one zoom level for each depth of the tree, and a last level with each node alone.
+ * With the option `levels`, only those depths get a level with groups.
  * At depth d, a section of depth d is one item. A link joins two items and counts the edges between them.
  * In a level with groups, a link goes around the boxes of the other items (`levelLinks`).
  * In the last level, the points of a link are the route of its first edge.
  */
-function makeLevels(graph: Graph, root: Section, routeOf: ReadonlyMap<string, Route>, options: WayOptions): Level[] {
+function makeLevels(graph: Graph, root: Section, routeOf: ReadonlyMap<string, Route>, options: SectionsOptions): Level[] {
   const indexOfNode = new Map(graph.nodes.map((n, i) => [n.id, i]));
   const levels: Level[] = [];
   const deepest = treeDepth(root);
+  const shown = options.levels && new Set(options.levels);
   for (let d = 0; d <= deepest + 1; d++) {
+    if (shown && d <= deepest && !shown.has(d)) continue;
     const items: LevelItem[] = [];
     const itemOf: (Section | number)[] = [];
     const boxOf = (list: readonly number[]): Box => {

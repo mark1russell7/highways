@@ -122,12 +122,65 @@ On the packed board, the links are short only because they go through the boxes.
 
 The links of a gap without lanes share one line. Thus the crossings on that line do not count. With a lane for each link, the crossings show, and the order `crossings` removes 20% of them. The spacing changes the crossings less than 5%. The mean detour stays near 1.32 for each knob, because a link with legs parallel to the axes goes around the boxes.
 
+## Options of the zoom levels
+
+The router `sections` makes its hubs and its zoom levels from a tree of groups. Each rule and each limit of that tree is an option. The defaults give the output of version 0.1.5.
+
+| Option | Default | Where | What it sets |
+|---|---|---|---|
+| `group` | the quadtree | `sectionsRouter` | The grouping rule: a strategy of the step `group`. `groupOptions` gives its options. |
+| `levels` | each depth | `sectionsRouter` | The depths of the tree that get a level with groups. The level of single nodes always comes last. |
+| `stretch` | 2 | `sectionsRouter` | The hub limit. A way through the hubs is at most this many times the straight line. `Infinity` keeps each such way. |
+| `stretchPad` | 4 | `sectionsRouter` | A way through the hubs can be this many margins longer than the hub limit. |
+| `hubSlack` | 80 | `sectionsRouter` | A way skips a hub that is this many units farther from the target than the way was before. |
+| `hubs` | `Infinity` | `sectionsRouter` | The number of hubs on each side of the lowest common section that a way passes. |
+| `cap` | 8 | `buildSections` | The section limit. A section with more nodes splits in four. |
+| `maxDepth` | 16 | `buildSections` | The depth limit of the tree. |
+| `collapse` | 32 | `buildSections` | A cell shrinks to one quarter at most this many times without a split. |
+| `tightMargin` | 1 | `levelLinks` | The margin of the second corner graph of the level links. |
+| `plugInset` | 6 | `levelLinks` | A plug of a level link stays this far from the corners of its side. |
+| `routesAt`, `itemAt` | 22, 120 | `pickLevel` | The far-view thresholds, in pixels on the screen. `PICK` holds them. |
+
+`SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
+
+The built-in grouping rules are in `groupStrategies`. The rule `quadtree` splits the plane, as `buildSections` does. The rule `keys` makes one group for each key of the nodes. Its default key is the string `data.group` of a node, and a node without a key is a group alone. With the option `split`, a large group splits into a quadtree.
+
+A consumer rule groups the nodes by its own field. Then the far view shows one item for each group:
+
+```ts
+import { defineStrategy, keyedSections, sectionsRouter } from "@mark1russell7/highways";
+
+const byTeam = defineStrategy({
+  step: "group",
+  name: "team",
+  describe: "One group for each team.",
+  defaults: {},
+  run: (graph) => keyedSections(graph.nodes, { key: (node) => String(node.data?.["team"]) }),
+});
+const result = sectionsRouter({ name: "teams", group: byTeam }).route(graph);
+// result.levels[1] has one item for each team. The id of an item is "s:" and the team.
+```
+
+The router examines the tree of a consumer rule with `checkSections`. Each node must be in exactly one leaf. The children of a section split its nodes, and a child is one level deeper than its parent.
+
+The benchmark sweeps the hub limit, `hubSlack`, `cap` and the grouping rules on the case boards. Each table starts with the defaults. On `case-hub-chain`:
+
+| `stretch` | Worst detour | Routes through hubs | Shared runs | Out and back |
+|---|---:|---:|---:|---:|
+| 1.25 | 1.19 | 14 | 4 | 0 |
+| 1.5 | 1.39 | 20 | 8 | 0 |
+| 2 (default) | 1.78 | 24 | 10 | 0 |
+| 3 | 2.05 | 25 | 11 | 0 |
+
+A smaller hub limit gives shorter routes and fewer shared runs. No route goes through a box or out and back at any value. On `case-many-groups`, the rule `keys` has one key for each group of cards. It gives 32 items at the far view, and no level link goes out and back.
+
 ## Strategies
 
 The steps of the pipeline that vary have strategies. Each step has one interface, so a consumer chooses a strategy by its name or adds its own.
 
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
+| `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc` |
 | `room` | `RoomInput`: the boxes and the links of a board | `Gap[]` | `routes`, `lines` |
@@ -139,7 +192,7 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
-- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `routerStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
+- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `routerStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
 
 A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:
 
@@ -167,7 +220,7 @@ const rows = runBenchmark(routersOf(registry), FIXTURES.slice(0, 1)); // The row
 
 The built-in strategies give the same output as their functions. `curveStrategies.rounded.run({ points, space }, { radius: 8 })` gives the segments of `curveOf(points, { type: "rounded", space, radius: 8 })`. `benchCurveStrategies` and the fourth argument of `benchRoom` take a list of strategies.
 
-The plugs and the zoom levels have one strategy each, so they have no step yet.
+The plugs have one strategy, so they have no step yet. The step `group` gives the grouping rule of the zoom levels.
 
 ## License
 

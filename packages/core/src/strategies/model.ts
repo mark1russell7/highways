@@ -3,6 +3,7 @@ import type { CurveSpace } from "../curves/space.ts";
 import type { Point } from "../geom.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import type { Boxed, Gap, RoomLink } from "../room/index.ts";
+import type { Section } from "../sections.ts";
 
 /** The input of a curve strategy: one polyline and the context of its route. */
 export interface CurveInput {
@@ -25,11 +26,13 @@ export interface RoomInput {
 /**
  * The steps that have strategies, with the fixed input and output type of each step.
  *
+ * - `group`: a graph in, the tree of sections out. The router `sections` makes its hubs and its zoom levels from this tree.
  * - `router`: a graph in, the routes (and the `levels`, `bundles` and `runs`) out.
  * - `curve`: a polyline in, the segments of a curve out.
  * - `room`: the boxes and links of a board in, the gaps of the board with their need out.
  */
 export interface StepTypes {
+  readonly group: { readonly input: Graph; readonly output: Section };
   readonly router: { readonly input: Graph; readonly output: Result };
   readonly curve: { readonly input: CurveInput; readonly output: CurveSegment[] };
   readonly room: { readonly input: RoomInput; readonly output: Gap[] };
@@ -45,7 +48,7 @@ export type StepInput<S extends Step> = StepTypes[S]["input"];
 export type StepOutput<S extends Step> = StepTypes[S]["output"];
 
 /** The steps that have strategies, in the order of the pipeline. */
-export const STEPS: readonly Step[] = ["router", "curve", "room"];
+export const STEPS: readonly Step[] = ["group", "router", "curve", "room"];
 
 /**
  * A strategy: one way to do one step, with a name and a description.
@@ -105,29 +108,30 @@ export function defineStrategy<S extends Step, O extends object>(definition: Str
 /**
  * A registry: the strategies of each step, in order. A registry is data. No import changes it.
  * A consumer makes its own registry with `createRegistry`, and adds a strategy with `register`.
+ * The list `group` is optional in the type, so a registry from version 0.1.5 stays a registry. `createRegistry` always gives it.
  */
-export type Registry = { readonly [S in Step]: readonly Strategy<S>[] };
+export type Registry = { readonly [S in Exclude<Step, "group">]: readonly Strategy<S>[] } & { readonly group?: readonly Strategy<"group">[] };
 
 /** This function makes a registry from a list of strategies. It keeps their order. Two strategies with one step and one name are an error. */
 export function createRegistry(strategies: readonly AnyStrategy[]): Registry {
-  const out: { [S in Step]: Strategy<S>[] } = { router: [], curve: [], room: [] };
+  const out: { [S in Step]: Strategy<S>[] } = { group: [], router: [], curve: [], room: [] };
   for (const s of strategies) {
     const list = out[s.step] as AnyStrategy[] | undefined;
     if (!list) throw new Error(`There is no step "${String(s.step)}". The steps are ${STEPS.join(", ")}.`);
     if (list.some((t) => t.name === s.name)) throw new Error(`The step "${s.step}" has two strategies with the name "${s.name}".`);
     list.push(s);
   }
-  return Object.freeze({ router: Object.freeze(out.router), curve: Object.freeze(out.curve), room: Object.freeze(out.room) });
+  return Object.freeze({ group: Object.freeze(out.group), router: Object.freeze(out.router), curve: Object.freeze(out.curve), room: Object.freeze(out.room) });
 }
 
 /** This function gives a new registry with the strategies of `registry` and then `strategies`. It does not change `registry`. */
 export function register(registry: Registry, ...strategies: readonly AnyStrategy[]): Registry {
-  return createRegistry([...registry.router, ...registry.curve, ...registry.room, ...strategies]);
+  return createRegistry([...(registry.group ?? []), ...registry.router, ...registry.curve, ...registry.room, ...strategies]);
 }
 
 /** This function gives the strategies of one step of a registry, in order. */
 export function listStrategies<S extends Step>(registry: Registry, step: S): readonly Strategy<S>[] {
-  return registry[step];
+  return (registry[step] ?? []) as readonly Strategy<S>[];
 }
 
 /** This function gives the strategy of one step with a name, or `undefined` when the registry has no such strategy. */
