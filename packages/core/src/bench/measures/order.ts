@@ -36,11 +36,14 @@ export interface OrderFragilityOptions {
   readonly base?: Result;
 }
 
-/** This function gives `IQR / median` of the values. Values with a median of 0 give `IQR / mean`, and values that are all 0 give 0. */
+/**
+ * This function gives `IQR / median` of the values. Values with a median of 0 give `IQR / mean`, and values that are all 0 give 0.
+ * An IQR below `1e-9` of the median is rounding noise of the sums, so it gives 0.
+ */
 function spread(values: readonly number[]): number {
   const iqr = quantile(values, 0.75) - quantile(values, 0.25);
-  if (iqr === 0) return 0;
   const mid = Math.abs(quantile(values, 0.5));
+  if (iqr <= 1e-9 * Math.max(1, mid)) return 0;
   if (mid > 0) return iqr / mid;
   const mean = values.reduce((s, v) => s + Math.abs(v), 0) / values.length;
   return mean > 0 ? iqr / mean : 0;
