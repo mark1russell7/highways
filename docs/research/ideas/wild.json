@@ -1031,7 +1031,7 @@
     "placementDependent": true,
     "screen": "On shared and shared-all over case-hub-chain, case-many-groups and small-clustered, with 5 seeds: keep an order when Â12 is 0.64 or more on the q95 of R5 or on B1.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "WILD-023",
       "WILD-056",
@@ -1043,7 +1043,79 @@
       "NAT-024"
     ],
     "canonical": "NAT-024",
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+      "records": [
+        "screen-v1/*/shared@951ea19",
+        "screen-v1/*/shared-order-shortest@951ea19",
+        "screen-v1/*/shared-all@951ea19",
+        "screen-v1/*/shared-all-order-shortest@951ea19",
+        "screen-v1/*/shared-order-load@951ea19",
+        "screen-v1/*/shared-all-order-load@951ea19"
+      ],
+      "measures": {
+        "shared B1": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.186,
+            "dense-groups": 0.274,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          }
+        },
+        "shared R1": {
+          "base": {
+            "small-clustered": 647,
+            "dense-groups": 1081,
+            "hub-chain": 68,
+            "many-groups": 790
+          },
+          "new": {
+            "small-clustered": 755,
+            "dense-groups": 1229,
+            "hub-chain": 68,
+            "many-groups": 790
+          }
+        },
+        "shared-all B1": {
+          "base": {
+            "small-clustered": 0.43,
+            "dense-groups": 0.498,
+            "hub-chain": 0.709,
+            "many-groups": 0.718
+          },
+          "new": {
+            "small-clustered": 0.354,
+            "dense-groups": 0.443,
+            "hub-chain": 0.688,
+            "many-groups": 0.729
+          }
+        },
+        "shared-all R1": {
+          "base": {
+            "small-clustered": 305,
+            "dense-groups": 471,
+            "hub-chain": 18,
+            "many-groups": 111
+          },
+          "new": {
+            "small-clustered": 404,
+            "dense-groups": 641,
+            "hub-chain": 27,
+            "many-groups": 86
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The inverse order `shortest` loses B1 on 3 of 4 boards (11% to 18% with `shared-all`) and the crossings rise 14% to 50%, except on many-groups. The order `load` is near `span`. The options stay, off by default, and `span` stays the default. The stage follows the canonical NAT-024: the order axis is kept, with `span` as the default."
+    }
   },
   {
     "id": "WILD-023",

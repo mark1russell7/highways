@@ -5,7 +5,7 @@ import { makeFixture, type FixtureKind } from "../fixtures.ts";
 import type { Box } from "../geom.ts";
 import type { Graph } from "../model.ts";
 import { cornersRouter } from "./corners.ts";
-import { sharedRouter } from "./shared.ts";
+import { sharedRouter, type SharedOptions } from "./shared.ts";
 import { byCollection } from "./trunks.ts";
 
 const box = (x: number, y: number, w = 40, h = 20): Box => ({ x, y, w, h });
@@ -75,5 +75,35 @@ describe("sharedRouter", () => {
     const g = makeFixture({ name: "t", kind: "hubs", nodes: 100, edgesPerNode: 3, seed: 4 });
     const router = sharedRouter({ name: "shared" });
     expect(JSON.stringify(router.route(g))).toBe(JSON.stringify(router.route(g)));
+  });
+
+  it("keeps the hard rules with each new option, and the defaults keep the routes (BUILD-W1C)", () => {
+    const g = makeFixture({ name: "t", kind: "collections", nodes: 80, edgesPerNode: 3, seed: 2, fixedPorts: 0.2 });
+    const base = JSON.stringify(sharedRouter({ name: "shared", rule: byCollection }).route(g));
+    const same = sharedRouter({ name: "shared", rule: byCollection, cost: "fixed", alpha: 0.6, passes: 1, order: "span", merge: "corner" }).route(g);
+    expect(JSON.stringify(same)).toBe(base);
+    const settings: Omit<SharedOptions, "name">[] = [
+      { cost: "flow", alpha: 0.5 },
+      { cost: "flow", alpha: 0.8, passes: 3 },
+      { passes: 2 },
+      { order: "input" },
+      { order: "load" },
+      { order: "shortest" },
+      { merge: "snell" },
+      { cost: "flow", alpha: 0.6, merge: "snell" },
+    ];
+    for (const rule of [undefined, byCollection])
+      for (const o of settings) {
+        const result = sharedRouter({ ...o, name: "x", ...(rule ? { rule } : {}) }).route(g);
+        expect(checkProperties(g, result), JSON.stringify(o)).toEqual([]);
+        expect((result.runs ?? []).length, JSON.stringify(o)).toBeGreaterThan(0);
+      }
+  });
+
+  it("with the Snell merges, keeps the hard rules and a route for each edge on the gap board", () => {
+    const corner = sharedRouter({ name: "shared" }).route(gap);
+    const snell = sharedRouter({ name: "shared", merge: "snell" }).route(gap);
+    expect(checkProperties(gap, snell)).toEqual([]);
+    expect(snell.routes.map((r) => r.edge)).toEqual(corner.routes.map((r) => r.edge));
   });
 });

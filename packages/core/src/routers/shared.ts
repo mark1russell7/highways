@@ -1,8 +1,19 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
+import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
+import { snellMerges } from "./snell.ts";
+
+/** The cost of a link that edges of one key share: a fixed discount, or the flow cost `len * f^alpha` (EDA-029). */
+export type ShareCost = "fixed" | "flow";
+
+/** The order of the edges of one key: the longest first, the shortest first, the most load first, or the order of the input (NAT-024). */
+export type ShareOrder = "span" | "shortest" | "load" | "input";
+
+/** The place where a route joins or leaves a run: at a corner of the graph, or at the Snell angle (NAT-035). */
+export type ShareMerge = "corner" | "snell";
 
 /** The options of the router with shared ways. */
 export interface SharedOptions extends WayOptions {
@@ -14,11 +25,31 @@ export interface SharedOptions extends WayOptions {
   readonly discount?: number;
   /** The lane order of the runs. With `bundle`, the default, two edges keep one order on each run of their common stretch. With `run`, each run gets its order alone. */
   readonly laneOrder?: RunOrder;
+  /**
+   * The cost of a shared link. With `fixed`, the default, a link that the key uses already costs `discount` times its length.
+   * With `flow`, one more edge on a link with `f` edges costs `len * ((f + 1)^alpha - f^alpha)` (EDA-029).
+   */
+  readonly cost?: ShareCost;
+  /** The exponent of the flow cost, from 0.1 to 1. A smaller value gives more sharing. The default is 0.6. Only the cost `flow` uses it. */
+  readonly alpha?: number;
+  /** The number of passes. In each pass after the first, each edge leaves its links and finds its way again with the others fixed (HWY-039). The default is 1. */
+  readonly passes?: number;
+  /**
+   * The order of the edges of one key. With `span`, the default, the longest edge goes first. With `shortest`, the shortest edge goes first.
+   * With `load`, the edge with the most edges between its two sections goes first. With `input`, the edges keep the order of the graph (NAT-024).
+   */
+  readonly order?: ShareOrder;
+  /**
+   * The place where a route joins or leaves a run. With `corner`, the default, it is a corner of the graph.
+   * With `snell`, the route meets the run at the angle `acos(d)`, with `d` the cost share of the run for the route (NAT-035).
+   */
+  readonly merge?: ShareMerge;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
 
-interface Way {
+/** A way of one edge through the corner graph. */
+export interface Way {
   readonly edge: Edge;
   readonly key: string;
   readonly ps: Plug;
@@ -58,6 +89,11 @@ function turn(from: Point, base: Point, to: Point): number {
  */
 export function sharedRouter(options: SharedOptions): Router {
   const discount = Math.min(1, Math.max(0.05, options.discount ?? 0.5));
+  const flow = options.cost === "flow";
+  const alpha = Math.min(1, Math.max(0.1, options.alpha ?? 0.6));
+  // The cost share of a link for one more edge, when `f` edges of the key use it already. The share falls when `f` grows.
+  const share = (f: number): number => (f <= 0 ? 1 : flow ? (f + 1) ** alpha - f ** alpha : discount);
+  const passes = Math.max(1, Math.floor(options.passes ?? 1));
   const keyOf = (e: Edge): string => {
     if (!options.rule) return "*";
     return options.rule(e) ?? `\u0000${e.id}`;
@@ -90,17 +126,21 @@ export function sharedRouter(options: SharedOptions): Router {
         all.push({ edge: e, key: keyOf(e), ps, pt, seq: [], ids: [], found: false });
       }
 
-      // The edges of one key go one after the other, the longest first, so that the short edges join the long ways.
+      // The edges of one key go one after the other, by default the longest first, so that the short edges join the long ways.
       const discounted = new Map<string, Map<number, string[]>>();
-      const order = [...all].sort(
-        (p, q) => byText(p.key, q.key) || dist(q.ps.point, q.pt.point) - dist(p.ps.point, p.pt.point) || byText(p.edge.id, q.edge.id),
-      );
-      for (const w of order) {
+      const order = orderWays(all, options.order ?? "span", graph);
+      // The largest number of edges on one link of each key. The cost share of that number is the floor of the search.
+      const top = new Map<string, number>();
+      const route = (w: Way): void => {
         let used = discounted.get(w.key);
         if (!used) discounted.set(w.key, (used = new Map()));
         const mine = used;
-        const way = corners.path(ways.out(w.ps), ways.out(w.pt), (i, j, d) => (mine.has(link(i, j)) ? d * discount : d), discount);
-        if (!way) continue;
+        const floor = flow ? share(top.get(w.key) ?? 0) : discount;
+        const cost = flow
+          ? (i: number, j: number, d: number): number => d * share(mine.get(link(i, j))?.length ?? 0)
+          : (i: number, j: number, d: number): number => (mine.has(link(i, j)) ? d * discount : d);
+        const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
+        if (!way) return;
         w.found = true;
         w.seq = way;
         w.ids = way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!));
@@ -111,7 +151,37 @@ export function sharedRouter(options: SharedOptions): Router {
           const list = mine.get(link(a, b));
           if (list) list.push(w.edge.id);
           else mine.set(link(a, b), [w.edge.id]);
+          if (flow) top.set(w.key, Math.max(top.get(w.key) ?? 0, mine.get(link(a, b))!.length));
         }
+      };
+      for (const w of order) route(w);
+      // Each later pass takes each edge off its links and finds its way again, with the ways of the other edges fixed.
+      for (let pass = 1; pass < passes; pass++) {
+        for (const w of order) {
+          if (!w.found) continue;
+          const mine = discounted.get(w.key)!;
+          for (let i = 1; i < w.ids.length; i++) {
+            const a = w.ids[i - 1]!;
+            const b = w.ids[i]!;
+            if (a >= corners.points.length || b >= corners.points.length) continue;
+            const k = link(a, b);
+            const list = mine.get(k);
+            if (!list) continue;
+            const at = list.indexOf(w.edge.id);
+            if (at >= 0) list.splice(at, 1);
+            if (list.length === 0) mine.delete(k);
+          }
+          w.found = false;
+          w.seq = [];
+          w.ids = [];
+          route(w);
+        }
+      }
+
+      // With `merge: snell`, each route that joins or leaves a run moves its merge point along the run to the Snell angle.
+      if (options.merge === "snell") {
+        const pad = ways.margin / 2;
+        snellMerges(order, corners.points.length + ends.size, (a, b) => ways.obstacles.clear(a, b, pad), (f) => Math.min(0.95, share(f)));
       }
 
       // The users of each link, with the links to the ends. Two edges from one plug share the link from it.
@@ -183,6 +253,35 @@ export function sharedRouter(options: SharedOptions): Router {
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
+}
+
+/**
+ * This function gives the order of the ways for the router `shared`. The ways of one key stay together, in the order of the keys.
+ * In a key, the order is `order`, and the edge id breaks each tie. The order `load` counts the edges of the key between the same two sections.
+ */
+function orderWays(all: readonly Way[], order: ShareOrder, graph: Graph): Way[] {
+  const span = (w: Way): number => dist(w.ps.point, w.pt.point);
+  if (order === "input") {
+    const at = new Map(all.map((w, i) => [w, i]));
+    return [...all].sort((p, q) => byText(p.key, q.key) || at.get(p)! - at.get(q)!);
+  }
+  if (order === "shortest") return [...all].sort((p, q) => byText(p.key, q.key) || span(p) - span(q) || byText(p.edge.id, q.edge.id));
+  if (order === "span") return [...all].sort((p, q) => byText(p.key, q.key) || span(q) - span(p) || byText(p.edge.id, q.edge.id));
+  // The leaf section of each node, then the number of edges of each key between each pair of leaves.
+  const leafOf = new Map<string, string>();
+  const walk = (s: Section): void => {
+    if (s.children.length === 0) for (const i of s.nodes) leafOf.set(graph.nodes[i]!.id, s.id);
+    for (const c of s.children) walk(c);
+  };
+  walk(buildSections(graph.nodes));
+  const pair = (w: Way): string => {
+    const a = leafOf.get(w.edge.source.node) ?? "";
+    const b = leafOf.get(w.edge.target.node) ?? "";
+    return `${w.key}\u0000${a < b ? a : b}\u0000${a < b ? b : a}`;
+  };
+  const load = new Map<string, number>();
+  for (const w of all) load.set(pair(w), (load.get(pair(w)) ?? 0) + 1);
+  return [...all].sort((p, q) => byText(p.key, q.key) || load.get(pair(q))! - load.get(pair(p))! || span(q) - span(p) || byText(p.edge.id, q.edge.id));
 }
 
 /**

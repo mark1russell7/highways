@@ -142,6 +142,27 @@ The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on
 
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
 
+### Options of the cost, the order and the merges
+
+These options of `shared` and `trunks` are off by default. With the defaults, the routes do not change.
+
+- `cost: flow` of `shared` sets the cost of a link with `f` edges to `len * f^alpha`. A smaller `alpha` gives more sharing and a longer stretch (EDA-029).
+- `passes` of `shared` sets the number of passes. After the first pass, each edge finds its way again with the ways of the other edges fixed (HWY-039).
+- `order` of `shared` sets the order of the edges of a key: `span` (the default, the longest first), `shortest`, `load` or `input` (NAT-024).
+- `merge: snell` of `shared` moves each merge point to the angle `acos(d)` on the run (NAT-035). It cuts the sharp merges.
+- `splitAt: gilbert` of `trunks` puts the split point where the flow cost is least, with the exponent `alpha` (EDA-030).
+- `fan: tree` of `trunks` grows a balancing-factor tree for each group, with the factor `bf` (NAT-017). 0 gives the least ink.
+
+The screen `screen-v1` compares the options with the defaults on the boards `small-clustered`, `dense-groups`, `hub-chain` and `many-groups`.
+
+| Option | Router | Result |
+|---|---|---|
+| `passes: 3` | `shared-all` | B1 rises 1% to 8%, and the B3 q95 falls or stays, on 4 boards. Crossings fall up to 28%. |
+| `merge: snell` | `shared`, `shared-all` | The B6 max falls 8% to 27% on 6 board pairs. The ink rises 0.5% at most. Crossings rise 6% to 13%, and from 18 to 24 on `hub-chain`. |
+| `cost: flow`, `alpha` 0.5 | `shared-all` | B1 rises 1% to 32%, but the B3 q95 rises up to 67%. |
+| `fan: tree`, `bf` 0.2 | `trunks` | On `dense-groups`, B1 rises from 0.081 to 0.095 and the B3 q95 falls. |
+| `splitAt: gilbert` | `trunks` | The B6 max rises. The ink changes 0.6% at most. |
+
 ## Room for the links
 
 A host layout can pack the boxes of a far view in a grid, with no gap between them. Then the links have no channel, and they go through the boxes. The router knows the room that the links need. The room functions give that room, and they can open the gaps.

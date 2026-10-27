@@ -1756,7 +1756,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Sweep alpha in 0.2 steps. Keep if its (B1, B3) front dominates the discount sweep of shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-039",
       "HWY-047",
@@ -1768,7 +1768,69 @@
       "HWY-039"
     ],
     "canonical": "EDA-029",
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+      "records": [
+        "screen-v1/*/shared@951ea19",
+        "screen-v1/*/shared-flow-a05@951ea19",
+        "screen-v1/*/shared-flow-a06@951ea19",
+        "screen-v1/*/shared-flow-a07@951ea19",
+        "screen-v1/*/shared-flow-a08@951ea19",
+        "screen-v1/*/shared-all@951ea19",
+        "screen-v1/*/shared-all-flow-a05@951ea19",
+        "screen-v1/*/shared-all-flow-a06@951ea19",
+        "screen-v1/*/shared-all-flow-a07@951ea19",
+        "screen-v1/*/shared-all-flow-a08@951ea19"
+      ],
+      "measures": {
+        "B1": {
+          "base": {
+            "small-clustered": 0.43,
+            "dense-groups": 0.498,
+            "hub-chain": 0.709,
+            "many-groups": 0.718
+          },
+          "new": {
+            "small-clustered": 0.506,
+            "dense-groups": 0.606,
+            "hub-chain": 0.712,
+            "many-groups": 0.75
+          }
+        },
+        "B3q95": {
+          "base": {
+            "small-clustered": 1.359,
+            "dense-groups": 1.348,
+            "hub-chain": 1.055,
+            "many-groups": 1.239
+          },
+          "new": {
+            "small-clustered": 1.717,
+            "dense-groups": 1.903,
+            "hub-chain": 1.063,
+            "many-groups": 1.56
+          }
+        },
+        "R1": {
+          "base": {
+            "small-clustered": 305,
+            "dense-groups": 471,
+            "hub-chain": 18,
+            "many-groups": 111
+          },
+          "new": {
+            "small-clustered": 246,
+            "dense-groups": 377,
+            "hub-chain": 16,
+            "many-groups": 101
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "This idea is the cost of EDA-029, with the same screen. The cost `len * f^alpha` trades the stretch for the sharing. No alpha beats the fixed discount 0.5 on B1 and the B3 q95 together on 3 of the 4 boards. The option stays, off by default."
+    }
   },
   {
     "id": "HWY-039",
@@ -1817,7 +1879,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-038",
       "HWY-005",
@@ -1830,7 +1892,107 @@
       "HWY-038"
     ],
     "canonical": "EDA-029",
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+      "records": [
+        "screen-v1/*/shared@951ea19",
+        "screen-v1/*/shared-p3@951ea19",
+        "screen-v1/*/shared-flow-a06-p3@951ea19",
+        "screen-v1/*/shared-all@951ea19",
+        "screen-v1/*/shared-all-p3@951ea19",
+        "screen-v1/*/shared-all-flow-a06-p3@951ea19"
+      ],
+      "measures": {
+        "shared-all B1": {
+          "base": {
+            "small-clustered": 0.43,
+            "dense-groups": 0.498,
+            "hub-chain": 0.709,
+            "many-groups": 0.718
+          },
+          "new": {
+            "small-clustered": 0.464,
+            "dense-groups": 0.53,
+            "hub-chain": 0.716,
+            "many-groups": 0.749
+          }
+        },
+        "shared-all B3q95": {
+          "base": {
+            "small-clustered": 1.359,
+            "dense-groups": 1.348,
+            "hub-chain": 1.055,
+            "many-groups": 1.239
+          },
+          "new": {
+            "small-clustered": 1.314,
+            "dense-groups": 1.319,
+            "hub-chain": 1.055,
+            "many-groups": 1.22
+          }
+        },
+        "shared-all R1": {
+          "base": {
+            "small-clustered": 305,
+            "dense-groups": 471,
+            "hub-chain": 18,
+            "many-groups": 111
+          },
+          "new": {
+            "small-clustered": 246,
+            "dense-groups": 382,
+            "hub-chain": 18,
+            "many-groups": 80
+          }
+        },
+        "shared-all ink": {
+          "base": {
+            "small-clustered": 36844.7,
+            "dense-groups": 52612.8,
+            "hub-chain": 12293.0,
+            "many-groups": 17622.5
+          },
+          "new": {
+            "small-clustered": 33978.0,
+            "dense-groups": 49412.1,
+            "hub-chain": 12007.5,
+            "many-groups": 15260.0
+          }
+        },
+        "shared B1": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.242,
+            "dense-groups": 0.344,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          }
+        },
+        "shared B3q95": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.17,
+            "dense-groups": 1.247,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The option `passes: 3` of `shared` (rip-up and route again) is off by default. With `shared-all`, it beats one pass on B1 and the B3 q95 on all 4 boards. Crossings fall 19% to 28% on 3 boards, and the ink falls. With `shared`, B1 rises 12% to 15% and the q95 rises 2% at most. The concave cost (`cost: flow`) adds B1 but also stretch. 3 passes take about 3 times the time. Its canonical EDA-029 is not kept, so the group stays screened."
+    }
   },
   {
     "id": "HWY-040",
