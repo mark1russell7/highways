@@ -34,8 +34,22 @@ All tests use paired ratios. For each input and seed, the ratio of a measure is 
 
 - A ratio is "worse" in the direction of the measure. For a measure where less is better, a ratio of 1.02 is 2% worse. For a measure where more is better, the test uses the inverse ratio.
 - When both values are 0, the ratio is 1.
-- When only the value of the default is 0, the ratio is worse than each limit.
 - A median of a measure is the median of its ratios, not a ratio of two medians. Thus the verdict does not change with the scale of the inputs.
+
+### The floor rule
+
+Some measures have a floor: the best value that the measure can have. A measure with a floor of 0 gives no ratio when the default is at the floor. For example, a default with no merges has a largest merge angle of 0. Then each merge of the candidate is a loss without limit.
+
+- When the default is at the floor of a measure on an input, that input uses an absolute tolerance in place of the ratio.
+- The candidate is within the tolerance when its value minus the floor is at most the tolerance. Then the input is a tie, and its ratio is 1.
+- Otherwise, the ratio of the input is +Infinity. It is not a veto. It goes into the median, the tail and the sign test as each other ratio does.
+- The sign test drops each tie. The record counts the ties in the inputs where the floor rule applied.
+- A win measure at the floor cannot win on that input. The default is at its best value, so the candidate can only tie or lose.
+- Each measure has its own floor and tolerance, as two named parameters in [The floors](#the-floors). A measure that is not in that table has a tolerance of 0.
+- A count has a tolerance of 0. Thus a count above 0 is beyond the tolerance.
+- The record of the test names, for each measure, the inputs where the floor rule applied.
+
+A floor that is not 0 keeps the ratio, because the ratio has a value there. For example, `B3` has a floor of 1. A ratio of 1.09 at that floor is a real stretch of 9%, so the ratio test applies.
 
 ## The win test
 
@@ -57,7 +71,7 @@ CI does the time test, because other jobs on a local machine change the times.
 The screens test many ideas on one corpus, so some ideas pass by chance. The gain test has two guards against chance:
 
 1. **The sign test.** Count the inputs where the win measure is better and the inputs where it is worse. Ties do not count. A one-sided sign test on these counts gives a p-value below `signP`.
-2. **The paired bootstrap.** On the holdout inputs, take `bootstrapRuns` samples of the inputs, with replacement, from a fixed seed. Calculate the median ratio of each sample. The `bootstrapLevel` interval of these medians does not include 1.
+2. **The paired bootstrap.** On the holdout inputs, take `bootstrapRuns` samples of the inputs, with replacement, from a fixed seed. Calculate the median ratio of each sample. The `bootstrapLevel` interval of these medians does not include 1. The statistic is the median, not the mean, so a ratio of +Infinity does not make the interval endless. The median of the log ratios gives the same interval.
 
 The sign test replaces a fixed share of better inputs. A share of 60% of 20 inputs is not a signal, but 60% of 2000 inputs is a strong signal.
 
@@ -127,6 +141,23 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 | `cellMin` | 10 | Selector |
 | `flipRate` | 0.05 | Selector |
 | `confirmInputs` | 200 | Confirmation |
+
+## The floors
+
+Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. These values were written on 2026-10-27, before the first promotion screen.
+
+| Floor parameter | Tolerance parameter | Reason |
+|---|---|---|
+| `R1.floor` = 0 | `R1.tol` = 0 | A new crossing is a loss. |
+| `B6.floor` = 0 | `B6.tol` = 60 degrees | The default model of `shared` merges at approximately 60 degrees. A merge at that angle is not a loss. The guard is the max of `B6`. |
+| `pack.order.inversions.floor` = 0 | `pack.order.inversions.tol` = 0 | A count. `packing` asks that each new inversion fails. |
+| `pack.overflow.floor` = 0 | `pack.overflow.tol` = 0 | A count. An item outside a fixed container is a loss. |
+| `pack.stability.moved.floor` = 0 | `pack.stability.moved.tol` = 0.02 | On a small change, the default often moves no item. A move of 1 item in 100 is not a loss. |
+| `pack.stability.mean.floor` = 0 | `pack.stability.mean.tol` = 0.005 container widths | The default often moves no item. |
+| `pack.stability.q95.floor` = 0 | `pack.stability.q95.tol` = 0.01 container widths | The default often moves no item. |
+| `pack.aspectError.floor` = 0 | `pack.aspectError.tol` = 0.01 (natural log) | An exact tiling gives the default an error of 0. The tolerance is approximately 1% of the aspect. |
+
+The four tolerances of `pack.stability` and `pack.aspectError` are first values of `packing`. The records of the floor rule give the data to measure them later.
 
 ## The order of promotions
 
