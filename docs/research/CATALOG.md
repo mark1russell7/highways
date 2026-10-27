@@ -57,7 +57,7 @@ It also checks the groups: one canonical in each group, and the same stage and w
 
 The counts are for 2026-10-27. `index.json` gives the current counts.
 
-The screen of wave 1c split two pairs, because each idea of the pair got a different verdict. `HWY-039` (rip-up passes) is not the same idea as `EDA-029`. `WILD-022` (shortest first) is not the same idea as `NAT-024` (longest first). Thus the catalog now has 250 distinct ideas. The tables below keep the first counts.
+The screen of wave 1c split two pairs, because each idea of the pair got a different verdict. `HWY-039` (rip-up passes) is not the same idea as `EDA-029`. `WILD-022` (shortest first) is not the same idea as `NAT-024` (longest first). Thus the catalog has 250 distinct ideas. The tables below keep the first counts.
 
 | Family | Records | Distinct ideas |
 |---|---|---|
