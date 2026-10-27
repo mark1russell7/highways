@@ -12,6 +12,7 @@ export * from "./segments.ts";
 export * from "./sections.ts";
 export * from "./routers/index.ts";
 export * from "./room/index.ts";
+export * from "./room/lanes.ts";
 export * from "./bench/properties.ts";
 export * from "./bench/quality.ts";
 export * from "./bench/links.ts";

@@ -80,7 +80,10 @@ A host layout can pack the boxes of a far view in a grid, with no gap between th
 - With the method `lines`, the lanes of a gap are the straight lines between the centers of the boxes that cross the gap.
 - `openGaps(items, gaps)` moves each box by the growth of each gap before it. The boxes keep their size, their order and their alignment, so a grid stays a grid.
 - `makeRoom(items, links, options)` gives the gaps and the open board. `maxGrowth` limits the growth of the board on each axis, as a share of its size.
+- With `passes: 2`, `roomDemand` finds the lanes again on the open board and adds the growth that they need. `maxGrowth` limits the sum of the passes.
 - `roomLinks(graph)` gives the links of a graph, with the count of the edges of each pair.
+- `gapLanes(items, links, options)` gives each link of a far view its own lane in each gap. The lanes are `spacing` apart, around the middle of the gap.
+- The option `order` of `gapLanes` sets the lane order in a gap: `links` (the order of the list), `ends` (by the sides of the turns) or `crossings` (the default).
 
 The host layout still packs the boxes. These functions do not place a box. They only open the gaps between the boxes.
 
@@ -103,6 +106,21 @@ The benchmark measures the board `packedGridBoard`: 96 touching boxes and 132 li
 | Method `lines` | 3.80 | 0 | 382 | 1.20 | 1.47 | 5 |
 
 On the packed board, the links are short only because they go through the boxes. The method `routes` is the default, because it gives the fewest crossings for its area.
+
+`sweepRoom` changes one knob at a time on the same board. `growthSettings`, `laneSettings` and `passSettings` give the settings of the benchmark.
+
+| Knob | Setting | Area | Crossings | Mean detour | Worst detour | Lane routes through a box |
+|---|---|---:|---:|---:|---:|---:|
+| `maxGrowth` | 0.12 | 1.25 | 288 | 1.34 | 2.33 | 6 |
+| `maxGrowth` | 0.25 | 1.46 | 284 | 1.32 | 2.14 | 2 |
+| `maxGrowth` | 0.30 and more | 1.50 | 276 | 1.32 | 2.09 | 2 |
+| Lane order | `links` | 1.50 | 585 | 1.34 | 2.30 | 2 |
+| Lane order | `ends` | 1.50 | 551 | 1.33 | 2.19 | 2 |
+| Lane order | `crossings` | 1.50 | 467 | 1.33 | 2.23 | 2 |
+| Passes | 2 | 1.57 | 281 | 1.32 | 2.03 | 2 |
+| Gutter | 12 | 1.58 | 282 | 1.32 | 2.03 | 2 |
+
+The links of a gap without lanes share one line. Thus the crossings on that line do not count. With a lane for each link, the crossings show, and the order `crossings` removes 20% of them. The spacing changes the crossings less than 5%. The mean detour stays near 1.32 for each knob, because a link with legs parallel to the axes goes around the boxes.
 
 ## Strategies
 

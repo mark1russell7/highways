@@ -106,7 +106,7 @@ The steps `router`, `curve` and `room` have strategies with one interface. A con
 
 A third table compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space, and it gives the ratio of the lengths.
 
-A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens.
+A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens. Three more tables change one knob of the room at a time: `maxGrowth`, the lane order with the spacing, and the gutter with the passes.
 
 The workflow `Bench` races the routers on all the fixtures, to 100 000 nodes, in CI. It starts on each change of `packages/core` on `main`, or by hand. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 

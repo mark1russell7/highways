@@ -1,6 +1,7 @@
 import { levelLinks } from "../levels.ts";
 import type { Graph, Node, Result } from "../model.ts";
 import { makeRoom, openGaps, roomLinks, type RoomOptions } from "../room/index.ts";
+import { gapLanes, LANE_ORDERS, type LaneOrder } from "../room/lanes.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { roomStrategies } from "../strategies/builtins.ts";
@@ -52,15 +53,18 @@ function areaOf(nodes: readonly Node[]): number {
 
 /**
  * This function measures the links of one board. It measures the links of the far view, with each node of the graph as one item of a level.
- * It also measures the lane routes of the router `sections` at the lane width `spacing`.
+ * With a lane order, each link of the far view gets its own lane in each gap (`gapLanes` at the lane width `spacing`).
+ * Without it, the links of a gap share the lines of the level links.
+ * The function also measures the lane routes of the router `sections` at the lane width `spacing`.
  */
-export function measureBoard(graph: Graph, spacing: number): Omit<RoomBenchRow, "fixture" | "board" | "area" | "ms"> {
+export function measureBoard(graph: Graph, spacing: number, order?: LaneOrder): Omit<RoomBenchRow, "fixture" | "board" | "area" | "ms"> {
   const links = roomLinks(graph);
   const items = graph.nodes.map((n) => ({ id: n.id, box: n.box, nodes: [n.id] }));
-  const drawn = levelLinks(
+  const level = levelLinks(
     items,
     links.map((l) => ({ source: l.source, target: l.target, count: l.count ?? 1 })),
   );
+  const drawn = order ? gapLanes(graph.nodes, level, { spacing, order }) : level;
   const boxes = new Map(graph.nodes.map((n) => [n.id, n.box]));
   // `measureQuality` reads routes of edges, so each link of the far view stands for the first edge of its pair.
   const edgeOf = new Map<string, string>();
@@ -115,6 +119,63 @@ export function benchRoom(
     rows.push(row(s.name, nodes, now() - t1));
   }
   return rows;
+}
+
+/** One setting of a sweep of the room: the options of `makeRoom` and the lane order of the far view. */
+export interface RoomSetting {
+  /** The name of the setting in the column `board`. */
+  readonly name: string;
+  readonly options: RoomOptions;
+  /** The lane order of the far view. Without it, the links of a gap share the lines of the level links. */
+  readonly lanes?: LaneOrder;
+}
+
+/**
+ * This function measures the board that `makeRoom` opens with each setting, with the method `routes`.
+ * The first row is the fair baseline: the board with each gap open to the gutter of `baseline` only, measured at the spacing of `baseline`.
+ */
+export function sweepRoom(fixture: string, graph: Graph, settings: readonly RoomSetting[], baseline: RoomOptions = { gutter: 8, spacing: 4 }): RoomBenchRow[] {
+  const area0 = areaOf(graph.nodes);
+  const links = roomLinks(graph);
+  const row = (board: string, nodes: readonly Node[], ms: number, spacing: number, lanes?: LaneOrder): RoomBenchRow => ({
+    fixture,
+    board,
+    area: area0 > 0 ? areaOf(nodes) / area0 : 1,
+    ms,
+    ...measureBoard({ nodes, edges: graph.edges }, spacing, lanes),
+  });
+  const fair = makeRoom(graph.nodes, links, { ...baseline, spacing: 0, method: "routes", maxGrowth: Infinity, passes: 1 });
+  const rows = [row("gutter", fair.items, 0, baseline.spacing ?? 4)];
+  for (const s of settings) {
+    const t0 = now();
+    const open = makeRoom(graph.nodes, links, { ...s.options, method: "routes" });
+    rows.push(row(s.name, open.items, now() - t0, s.options.spacing ?? 4, s.lanes));
+  }
+  return rows;
+}
+
+/** The values of `maxGrowth` of the sweep of ROOM-A. */
+export const GROWTH_SWEEP: readonly number[] = [0, 0.06, 0.09, 0.12, 0.15, 0.18, 0.21, 0.25, 0.3, 0.35, 0.5, Infinity];
+
+/** This function gives the settings of ROOM-A: the area and the faults for each `maxGrowth`, at gutter 8 and spacing 4. */
+export function growthSettings(values: readonly number[] = GROWTH_SWEEP): RoomSetting[] {
+  return values.map((m) => ({ name: `maxGrowth ${m}`, options: { gutter: 8, spacing: 4, maxGrowth: m } }));
+}
+
+/**
+ * This function gives the settings of ROOM-C: each lane order of the far view at each spacing, at gutter 8.
+ * The order `shared` is the far view without lanes, as before ROOM-C.
+ */
+export function laneSettings(spacings: readonly number[] = [2, 4, 6, 8], orders: readonly LaneOrder[] = LANE_ORDERS): RoomSetting[] {
+  return spacings.flatMap((spacing) => [
+    { name: `shared spacing ${spacing}`, options: { gutter: 8, spacing } },
+    ...orders.map((lanes) => ({ name: `${lanes} spacing ${spacing}`, options: { gutter: 8, spacing }, lanes })),
+  ]);
+}
+
+/** This function gives the settings of ROOM-D: each gutter with each number of passes, at spacing 4. */
+export function passSettings(gutters: readonly number[] = [4, 8, 12, 16], passes: readonly number[] = [1, 2]): RoomSetting[] {
+  return gutters.flatMap((gutter) => passes.map((p) => ({ name: `gutter ${gutter} passes ${p}`, options: { gutter, spacing: 4, passes: p } })));
 }
 
 /** This function writes the rows of `benchRoom` as a Markdown table. */
