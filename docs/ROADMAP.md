@@ -37,6 +37,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | ER3d | The measures split level through into unavoidable and avoidable links. A link through a far box gets a second way (`throughCost`, default 8). On `mid-clustered`, avoidable level through: 114 before, 54 after. The level links take 8% more time. | 2026-10-26 | #33 |
 | HWC | `highwayCurves` bends the lanes of a bundle as one, with concentric arcs. On `shared` and `case-dense-groups`, worst lane spacing error: 13.6% before, 0.8% after, with 0 tangent breaks. | 2026-10-26 | #36 |
 | ROOM2 | `levelRoom` gives each zoom level the gaps of its own level links. On `nestedGridBoard`, level through: 6 and 36 before, 0 after. The area grows 1.35x, with 0 order changes and 0 shift. | 2026-10-26 | #37 |
+| CURV-R | Research: [curve families and their math](research/CURVES.md). The note gives 16 families with their curvature, offsets and clearance, 5 of them with exact offsets. It ranks them for 3 uses and gives an 8-step build order for CURV2. | 2026-10-27 | #41 |
 
 ## Open
 
@@ -45,7 +46,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
-| CURV-R | Research: curve families and their math. Continuity of the tangent and the curvature, clothoids, biarcs, Hobby curves, splines and the clearance to the boxes. | `later` | MEAS0 | P2 |
 | CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
 | GRP-R | Research: grouping rules and their measures. Spatial trees, clusters of positions, communities of links, mixed rules, and the stability of each. | `later` | MEAS0 | P2 |
 | GRP2 | More grouping strategies from GRP-R, each in its folder with its tests and a row in the benchmark. | `later` | GRP-R, MEAS1 | P2 |
