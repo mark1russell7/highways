@@ -62,6 +62,16 @@ Status: `done`, `active`, `blocked`, `later`.
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
+| SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
+| IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
+| HWY-R | Research: each way to decide when, where and how to make a highway. Examples are clusters of edges that overlap, edge bundling, network design and flows. | `active` | MEAS0 | P1 |
+| NAT-R | Research: ideas from nature. Examples are slime molds, ant trails, rivers, leaf veins, blood vessels and the paths that walkers make. | `active` | MEAS0 | P1 |
+| RULE-R | Research: approaches that obey rendering rules. Examples are forces, constraints, energy, fields and gradient descent on the measures. | `active` | MEAS0 | P1 |
+| EDA-R | Research: routing in other fields. Examples are chips, circuit boards, metro maps, transport and logistics networks. | `active` | MEAS0 | P1 |
+| WILD-R | Ideas of our own for each step: plugs, groups, levels, room, routes, highways and curves. The note uses analogies, inversion and combinations of options. | `active` | MEAS0 | P1 |
+| SCREEN | The screen harness: small fixed boards, the measures of MEAS1 and one JSON record for each run. Each idea gets a cheap test before a full build. | `active` | MEAS1 | P1 |
+| HWY-STEP | A strategy step `highway` that decides the highways apart from the routers, so each idea of HWY-R plugs in. | `later` | HWY-R | P1 |
+| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item
 
