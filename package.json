@@ -13,7 +13,8 @@
     "test": "pnpm -r run test && pnpm run test:ai-review",
     "test:ai-review": "node --test \"scripts/ai-review/*.test.mjs\"",
     "typecheck": "pnpm -r run typecheck",
-    "lint:ste": "ste-lint"
+    "lint:ste": "ste-lint",
+    "ideas": "pnpm --filter @mark1russell7/highways ideas"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

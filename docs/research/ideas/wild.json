@@ -27,13 +27,14 @@
     "placementDependent": true,
     "screen": "A scratch run of this note gives the first data: a pure slide of the plug straightens 9% to 13% of the bent ends. Keep the full form when the median of R3 drops by 15% or more on small-clustered and case-dense-groups, with the minimum of R11 at 0.5 or more.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-002",
       "WILD-003",
       "WILD-006",
       "EDA-022"
-    ]
+    ],
+    "wave": 1
   },
   {
     "id": "WILD-002",
@@ -76,14 +77,19 @@
     "placementDependent": true,
     "screen": "On grid-400 and small-clustered, the minimum of R11 must reach 1.0 on each side with room for its plugs. Drop it when R1 grows by more than 2%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-001",
       "WILD-003",
       "WILD-004",
       "NAT-031",
-      "EDA-022"
-    ]
+      "EDA-022",
+      "NAT-032"
+    ],
+    "same": [
+      "NAT-031"
+    ],
+    "wave": 1
   },
   {
     "id": "WILD-003",
@@ -121,13 +127,14 @@
     "placementDependent": true,
     "screen": "On case-dense-groups and small-clustered, keep it when R1 drops by 5% or more and the minimum of R11 is 1.0, with the q95 of R5 up by less than 3%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-002",
       "WILD-004",
       "WILD-024",
       "EDA-022"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-004",
@@ -163,12 +170,13 @@
     "placementDependent": true,
     "screen": "On mid-fanout (in CI) and a case board with a fan of 20 edges, count the sides with R11 below 1. Keep it when that count drops to 0 and the mean of R10 rises by less than 10°.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-002",
       "WILD-003",
       "EDA-022"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-005",
@@ -205,12 +213,17 @@
     "placementDependent": true,
     "screen": "On mid-fanout (in CI) and small-clustered, keep it when B1 rises by 0.05 or more and B4 rises by less than 0.02.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-030",
       "WILD-036",
       "HWY-015"
-    ]
+    ],
+    "same": [
+      "HWY-015"
+    ],
+    "canonical": "HWY-015",
+    "wave": 2
   },
   {
     "id": "WILD-006",
@@ -241,10 +254,11 @@
     "placementDependent": true,
     "screen": "On grid-400 and small-clustered, keep it when the mean of R4 drops by 10% or more and the tight share of R8 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-001"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-007",
@@ -275,12 +289,13 @@
     "placementDependent": true,
     "screen": "Against cut on the 10 boards of GRP-R, at the same k: keep it when G2 at the far view is lower on 6 boards or more and Z9 drops.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-012",
       "WILD-034",
       "HWY-031"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-008",
@@ -319,11 +334,12 @@
     "placementDependent": true,
     "screen": "Against kd and cut at the same k on the 10 boards of GRP-R: keep it when G2 at the far view is not worse on 8 boards and G6 is above 0.9.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-009",
       "WILD-011"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-009",
@@ -359,12 +375,13 @@
     "placementDependent": true,
     "screen": "Under the seeded moves of MEAS0: keep it when the ARI of G9 is 0.05 or more above the best single rule, with G2 not worse than the median rule.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-008",
       "WILD-010",
       "HWY-035"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-010",
@@ -408,11 +425,12 @@
     "placementDependent": true,
     "screen": "One move of u on 5 seeds of small-clustered and mid-clustered: keep it when the ARI of G9 is 0.95 or more and higher than without the bonus, with G2 up by less than 0.02.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-009",
       "WILD-050"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-011",
@@ -449,11 +467,12 @@
     "placementDependent": true,
     "screen": "On nestedGridBoard, case-many-groups and mid-clustered: keep it when the spread of log(lr) of Z5 drops by 30% or more and Z4 is 1 or less at the far view.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-008",
       "WILD-013"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-012",
@@ -489,13 +508,16 @@
     "placementDependent": true,
     "screen": "On mid-clustered and case-dense-groups: keep it when Z9 drops by 50% or more and the avoidable level through of Z3 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-027",
       "WILD-034",
       "WILD-015",
-      "HWY-052"
-    ]
+      "HWY-052",
+      "NAT-049",
+      "HWY-056"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-013",
@@ -526,12 +548,13 @@
     "placementDependent": true,
     "screen": "On mid-clustered and nestedGridBoard: keep it when each level has Z4 of 1 or less and G2 is lower than a fixed depth with the same number of items.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-011",
       "WILD-016",
       "EDA-040"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-014",
@@ -564,13 +587,15 @@
     "placementDependent": false,
     "screen": "A zoom path of 200 steps with 2% noise on case-many-groups: keep it when the level flips drop by 80% or more and Z4 stays at 1.1 or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-015",
       "WILD-016",
       "HWY-046",
-      "EDA-040"
-    ]
+      "EDA-040",
+      "RULE-053"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-015",
@@ -605,11 +630,13 @@
     "placementDependent": true,
     "screen": "On mid-clustered: keep it when the largest jump between two frames at 1% of zoom apart is less than 2u, and the through count of the blend at t = 0.5 is 0 after a clamp.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-012",
-      "WILD-014"
-    ]
+      "WILD-014",
+      "RULE-045"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-016",
@@ -637,13 +664,20 @@
     "placementDependent": false,
     "screen": "On shared-all over case-many-groups at 5 zoom scales: keep it when the lane legibility count of WILD-060 is 0 and the drawn ink drops.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-060",
       "WILD-014",
       "EDA-038",
       "EDA-042"
-    ]
+    ],
+    "same": [
+      "EDA-038"
+    ],
+    "dependsOn": [
+      "WILD-060"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-017",
@@ -683,13 +717,14 @@
     "placementDependent": true,
     "screen": "On packedGridBoard, against the maxGrowth curve of ROOM-A: keep it when M4 is lower at the areas 1.25 and 1.40.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-019",
       "WILD-018",
       "WILD-049",
       "EDA-039"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-018",
@@ -726,14 +761,15 @@
     "placementDependent": true,
     "screen": "On packedGridBoard: keep it when its points (M1, M4) lie below the curve of ROOM-A, with the q95 of R5 up by less than 5%.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-017",
       "WILD-026",
       "WILD-049",
       "EDA-051",
       "EDA-012"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-019",
@@ -761,13 +797,14 @@
     "placementDependent": true,
     "screen": "On packedGridBoard at maxGrowth 0.3: keep it when M1 drops by 10% or more, M4 does not rise, and R12 stays below 0.05.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-017",
       "WILD-043",
       "WILD-060",
       "EDA-004"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-020",
@@ -804,12 +841,13 @@
     "placementDependent": true,
     "screen": "On packedGridBoard: keep it when M4 reaches 0 at an area below 1.50 and the count of M2 stays 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-021",
       "WILD-017",
       "EDA-039"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-021",
@@ -838,12 +876,13 @@
     "placementDependent": true,
     "screen": "On packedGridBoard and nestedGridBoard: keep it when M3 drops by 30% or more at the same M4, and the count of M2 stays 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-020",
       "WILD-017",
       "EDA-039"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-022",
@@ -872,14 +911,19 @@
     "placementDependent": true,
     "screen": "On shared and shared-all over case-hub-chain, case-many-groups and small-clustered, with 5 seeds: keep an order when Â12 is 0.64 or more on the q95 of R5 or on B1.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-023",
       "WILD-056",
       "WILD-053",
       "NAT-024",
       "EDA-034"
-    ]
+    ],
+    "same": [
+      "NAT-024"
+    ],
+    "canonical": "NAT-024",
+    "wave": 1
   },
   {
     "id": "WILD-023",
@@ -912,12 +956,14 @@
     "placementDependent": true,
     "screen": "The same test as WILD-022. Keep it when it beats the best order of WILD-022 on one measure with Â12 of 0.64 or more.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-022",
       "WILD-024",
-      "EDA-010"
-    ]
+      "EDA-010",
+      "NAT-024"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-024",
@@ -966,14 +1012,19 @@
     "placementDependent": true,
     "screen": "On case-dense-groups and small-clustered: keep it when R1 drops by 15% or more against corners, with the q95 of R5 up by less than 5%. Give its price of anarchy against WILD-055 on small boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-025",
       "WILD-055",
       "WILD-056",
       "EDA-009",
-      "EDA-031"
-    ]
+      "EDA-031",
+      "EDA-010"
+    ],
+    "dependsOn": [
+      "WILD-055"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-025",
@@ -1008,12 +1059,15 @@
     "placementDependent": true,
     "screen": "On case-dense-groups and small-clustered: keep it when the mean of R2 rises by 0.05 or more and R1 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-024",
       "WILD-042",
-      "EDA-024"
-    ]
+      "EDA-024",
+      "RULE-049",
+      "RULE-029"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-026",
@@ -1050,14 +1104,16 @@
     "placementDependent": true,
     "screen": "On packedGridBoard with no room: keep it when M4 drops by 30% or more with the q95 of R5 up by less than 10%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-018",
       "WILD-019",
       "EDA-009",
       "EDA-031",
-      "EDA-051"
-    ]
+      "EDA-051",
+      "HWY-016"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-027",
@@ -1093,14 +1149,16 @@
     "placementDependent": true,
     "screen": "On mid-clustered (in CI) and small-clustered: keep it when Z9 drops by 30% and the time drops, with the q95 of R5 up by less than 5%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-012",
       "WILD-034",
       "WILD-029",
       "EDA-049",
-      "EDA-008"
-    ]
+      "EDA-008",
+      "RULE-024"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-028",
@@ -1136,12 +1194,17 @@
     "placementDependent": true,
     "screen": "On the 3 case boards: keep it when R1 drops by 20% or more against corners, at a time below 10 T_c.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-055",
       "WILD-024",
       "HWY-045"
-    ]
+    ],
+    "same": [
+      "RULE-021"
+    ],
+    "canonical": "RULE-021",
+    "wave": 4
   },
   {
     "id": "WILD-029",
@@ -1177,12 +1240,17 @@
     "placementDependent": true,
     "screen": "On mid-clustered (in CI): keep it when the time drops by 3 times or more against corners, with the median of R5 up by less than 2%.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-027",
       "WILD-050",
       "EDA-049"
-    ]
+    ],
+    "same": [
+      "EDA-049"
+    ],
+    "canonical": "EDA-049",
+    "wave": 4
   },
   {
     "id": "WILD-030",
@@ -1213,14 +1281,19 @@
     "placementDependent": true,
     "screen": "On small-clustered and case-many-groups: keep it when B1 is 0.10 or more, B4 is below 0.1 and R9 is 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-037",
       "WILD-031",
       "HWY-031",
       "HWY-025",
       "HWY-050"
-    ]
+    ],
+    "same": [
+      "HWY-031"
+    ],
+    "canonical": "HWY-031",
+    "wave": 2
   },
   {
     "id": "WILD-031",
@@ -1263,13 +1336,14 @@
     "placementDependent": true,
     "screen": "Against shared-all on case-many-groups and small-clustered: keep it when B1 rises with the q95 of B3 at 1 + ε or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-030",
       "WILD-033",
       "HWY-058",
       "HWY-048"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-032",
@@ -1307,13 +1381,18 @@
     "placementDependent": true,
     "screen": "Against sections on case-hub-chain and small-clustered: keep it when B1 is within 0.02 and R7 is lower.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-034",
       "WILD-033",
       "EDA-033",
       "HWY-041"
-    ]
+    ],
+    "same": [
+      "EDA-033"
+    ],
+    "canonical": "EDA-033",
+    "wave": 2
   },
   {
     "id": "WILD-033",
@@ -1349,14 +1428,15 @@
     "placementDependent": true,
     "screen": "Against trunks on mid-fanout (in CI) and small-clustered: keep it when B1 rises with the q95 of B3 at 1.2 or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-031",
       "WILD-030",
       "HWY-047",
       "HWY-038",
       "EDA-029"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-034",
@@ -1387,14 +1467,19 @@
     "placementDependent": true,
     "screen": "On mid-clustered (in CI) and case-dense-groups: keep it when Z9 is 0, B1 is at least the value of sections, and R7 is not higher.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-012",
       "WILD-027",
       "WILD-032",
       "HWY-056",
       "HWY-001"
-    ]
+    ],
+    "same": [
+      "HWY-056"
+    ],
+    "canonical": "HWY-056",
+    "wave": 2
   },
   {
     "id": "WILD-035",
@@ -1426,13 +1511,14 @@
     "placementDependent": true,
     "screen": "On nestedGridBoard and case-many-groups: keep it when B7 and R1 drop, with the q95 of R5 at 1.6 or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-034",
       "WILD-017",
       "HWY-058",
       "HWY-057"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-036",
@@ -1463,14 +1549,15 @@
     "placementDependent": true,
     "screen": "On mid-fanout (in CI) and a small case board with fans: keep it when B1 rises by 0.1 or more and the mean of R3 drops.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-005",
       "WILD-040",
       "HWY-017",
       "EDA-035",
       "HWY-037"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-037",
@@ -1513,11 +1600,16 @@
     "placementDependent": true,
     "screen": "On corners over small-clustered: keep it when B1 is 0.05 or more, R1 does not rise, and R9 is 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-030",
       "HWY-026"
-    ]
+    ],
+    "same": [
+      "NAT-022"
+    ],
+    "canonical": "NAT-022",
+    "wave": 2
   },
   {
     "id": "WILD-038",
@@ -1553,13 +1645,15 @@
     "placementDependent": true,
     "screen": "On shared-all over case-many-groups: keep it when B5 equals the lower bound on 90% of the highways and the body crossings sit on the straightest segments.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-039",
       "WILD-042",
       "EDA-026",
-      "HWY-016"
-    ]
+      "HWY-016",
+      "HWY-022"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-039",
@@ -1600,12 +1694,14 @@
     "placementDependent": true,
     "screen": "Against the order bundle on shared-all over case-many-groups: keep it when the end crossings drop below 687, with 0 body crossings.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-038",
       "EDA-026",
-      "HWY-016"
-    ]
+      "HWY-016",
+      "EDA-013"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-040",
@@ -1634,12 +1730,13 @@
     "placementDependent": true,
     "screen": "On trunks over case-dense-groups and shared-all over case-many-groups: keep it when the sum of the lateral shifts drops by 50% and the maximum of C2 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-041",
       "WILD-038",
       "EDA-017"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-041",
@@ -1675,11 +1772,12 @@
     "placementDependent": true,
     "screen": "On shared-all over case-many-groups: keep it when the maximum of C2 on the lane shifts drops by 50% and B5 does not rise.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-040",
       "EDA-016"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-042",
@@ -1715,11 +1813,16 @@
     "placementDependent": true,
     "screen": "On case-dense-groups with the curve smooth: keep it when the minimum of R2 rises by 15° and C7 stays 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-025",
       "WILD-038"
-    ]
+    ],
+    "same": [
+      "RULE-049"
+    ],
+    "canonical": "RULE-049",
+    "wave": 4
   },
   {
     "id": "WILD-043",
@@ -1746,11 +1849,12 @@
     "placementDependent": true,
     "screen": "Keep it only when R12 on the curves drops and the bends that need room (HWC-D) do not rise. A study with readers decides the final value of k.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-019",
       "WILD-040"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-044",
@@ -1778,10 +1882,11 @@
     "placementDependent": true,
     "screen": "On case-dense-groups and small-clustered: keep it when the median score beats the best single type by 5%, with less than 30% of the routes in a second style.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-045"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-045",
@@ -1824,13 +1929,14 @@
     "placementDependent": true,
     "screen": "On the boards of SCREEN: keep it when its score beats the best single setting on 60% of the boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-046",
       "WILD-047",
       "WILD-044",
       "NAT-045"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-046",
@@ -1879,10 +1985,14 @@
     "placementDependent": true,
     "screen": "Leave one family out: keep it when the chosen setting is within 5% of the portfolio score on 70% of the boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-045"
-    ]
+    ],
+    "dependsOn": [
+      "WILD-045"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-047",
@@ -1922,13 +2032,14 @@
     "placementDependent": true,
     "screen": "Tune on seeds 1 to 3 and test on seeds 4 and 5: keep it when the tuned setting beats the defaults with Â12 of 0.64 or more on the test seeds.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-048",
       "WILD-045",
       "NAT-044",
       "NAT-046"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-048",
@@ -1953,10 +2064,14 @@
     "placementDependent": true,
     "screen": "On mid-clustered (in CI): keep it when the Kendall tau between the window ranks and the full ranks is 0.7 or more over 10 settings.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-047"
-    ]
+    ],
+    "dependsOn": [
+      "WILD-047"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-049",
@@ -1985,12 +2100,14 @@
     "placementDependent": true,
     "screen": "On packedGridBoard: keep it when M4 is 0 at a lower M1 than one pass of ROOM.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-018",
       "WILD-017",
-      "EDA-008"
-    ]
+      "EDA-008",
+      "NAT-042"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-050",
@@ -2024,14 +2141,15 @@
     "placementDependent": true,
     "screen": "Under the seeded moves of MEAS0 on small-clustered and mid-clustered: keep it when the mean of Z10 drops by 50% and R1 and R5 stay within 2% of a full route.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-051",
       "WILD-010",
       "WILD-029",
       "EDA-023",
       "HWY-054"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-051",
@@ -2060,10 +2178,11 @@
     "placementDependent": false,
     "screen": "On small-clustered, move each box by 0.5u along its push and route again: keep it when the median of R5 drops by 3% or more with no overlap of boxes.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-050"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-052",
@@ -2096,11 +2215,12 @@
     "placementDependent": true,
     "screen": "On mid-clustered (in CI): keep it when the first picture comes in less than 50 ms and Z10 between the last two stages is below 2u.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-029",
       "WILD-050"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-053",
@@ -2124,11 +2244,15 @@
     "placementDependent": false,
     "screen": "Shuffle small-clustered 10 times: keep it when each route is equal over the shuffles, against the spread of today.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-056",
-      "WILD-022"
-    ]
+      "WILD-022",
+      "NAT-024",
+      "EDA-034",
+      "EDA-010"
+    ],
+    "wave": 1
   },
   {
     "id": "WILD-054",
@@ -2158,13 +2282,15 @@
     "placementDependent": true,
     "screen": "A test: the bound is at most the ink of each router on each board. Then the bench gives B1 / B1_max on 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-055",
       "WILD-030",
       "HWY-040",
-      "EDA-012"
-    ]
+      "EDA-012",
+      "RULE-013"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-055",
@@ -2202,14 +2328,17 @@
     "placementDependent": true,
     "screen": "It must find the optimum of a brute force on 20 boards with 6 edges. The optimum is over the candidates only, so the note gives it as an upper bound of the true optimum.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-028",
       "WILD-024",
       "WILD-054",
       "HWY-040",
-      "EDA-026"
-    ]
+      "EDA-026",
+      "RULE-013",
+      "EDA-043"
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-056",
@@ -2241,12 +2370,14 @@
     "placementDependent": true,
     "screen": "On shared and sections over 3 boards: keep the measure when two routers differ in fragility by 2 times or more.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-022",
       "WILD-053",
-      "WILD-024"
-    ]
+      "WILD-024",
+      "NAT-024"
+    ],
+    "wave": 1
   },
   {
     "id": "WILD-057",
@@ -2277,11 +2408,12 @@
     "placementDependent": true,
     "screen": "Rank the 9 routers on 3 boards: keep the measure when its ranks differ from the ranks of R1, with a Kendall tau below 0.8.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-058",
       "HWY-049"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-058",
@@ -2304,11 +2436,12 @@
     "placementDependent": true,
     "screen": "Keep the measure when it separates the routers with bundles from the routers without bundles on 3 boards, where B7 does not.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-057",
       "WILD-016"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-059",
@@ -2338,10 +2471,11 @@
     "placementDependent": true,
     "screen": "Keep the measure when its Spearman correlation with R7 over the routers and the boards is below 0.8.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-022"
-    ]
+    ],
+    "wave": 4
   },
   {
     "id": "WILD-060",
@@ -2364,10 +2498,11 @@
     "placementDependent": true,
     "screen": "Keep the measure when it is above 0 for some routers at some levels on case-many-groups.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "WILD-016",
       "WILD-019"
-    ]
+    ],
+    "wave": 4
   }
 ]

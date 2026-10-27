@@ -40,12 +40,17 @@
     "placementDependent": true,
     "screen": "case-hub-chain, case-many-groups, small-clustered at cell = margin. Keep if R14 >= 0.95, R9 = 0, the R3 median <= corners + 1 and the time <= 10x corners at 100 nodes.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-002",
       "EDA-003",
       "EDA-025"
-    ]
+    ],
+    "same": [
+      "RULE-032"
+    ],
+    "canonical": "RULE-032",
+    "wave": 5
   },
   {
     "id": "EDA-002",
@@ -82,11 +87,12 @@
     "placementDependent": true,
     "screen": "Same boards as EDA-001. Keep if the R3 median < corners, R6 <= 1.1x corners and no edge fails.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-001",
       "EDA-003"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-003",
@@ -129,12 +135,13 @@
     "placementDependent": true,
     "screen": "As EDA-001 against corners at 100 nodes. Keep if R3 <= corners, R14 = 1 and the time <= 5x corners.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-001",
       "EDA-015",
       "EDA-013"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-004",
@@ -175,13 +182,15 @@
     "placementDependent": true,
     "screen": "The scratch run of the note: lanes fall 5% to 26% at equal turn crossings. Keep if the sum of lanes falls >= 5% on 3 boards, R1 does not rise and M1 falls when roomDemand reads the track count.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-005",
       "EDA-006",
       "EDA-013",
-      "EDA-051"
-    ]
+      "EDA-051",
+      "WILD-019"
+    ],
+    "wave": 1
   },
   {
     "id": "EDA-005",
@@ -223,11 +232,15 @@
     "placementDependent": true,
     "screen": "grid-400 and case-many-groups against EDA-004. Keep if the lanes fall >= 5% more and R3 rises <= 0.2 for each route.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-004",
       "EDA-006"
-    ]
+    ],
+    "dependsOn": [
+      "EDA-004"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-006",
@@ -262,11 +275,15 @@
     "placementDependent": true,
     "screen": "Against EDA-004 on its boards. Keep only if the lanes are >= 5% fewer at an R3 rise <= 0.2.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-004",
       "EDA-005"
-    ]
+    ],
+    "dependsOn": [
+      "EDA-004"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-007",
@@ -306,12 +323,13 @@
     "placementDependent": true,
     "screen": "case-many-groups and grid-400: lane crossings inside the junction rectangles. Keep if they fall >= 20% at an R3 rise <= 0.1.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-004",
       "EDA-013",
       "EDA-026"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-008",
@@ -355,14 +373,21 @@
     "placementDependent": true,
     "screen": "packedGridBoard after openGaps, and case-many-groups. Keep if M4 = 0, R12 is better than shared and the R5 median stays within 5%.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-004",
       "EDA-009",
       "EDA-013",
       "EDA-019",
-      "EDA-051"
-    ]
+      "EDA-051",
+      "HWY-057"
+    ],
+    "dependsOn": [
+      "EDA-004",
+      "EDA-009",
+      "EDA-019"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-009",
@@ -402,14 +427,16 @@
     "placementDependent": true,
     "screen": "case-dense-groups and packedGridBoard: count the overfull gaps (lanes > width / spacing). Keep if they fall >= 50% at an R5 median rise <= 5%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-012",
       "EDA-031",
       "EDA-032",
       "EDA-048",
-      "EDA-051"
-    ]
+      "EDA-051",
+      "NAT-007"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-010",
@@ -445,12 +472,17 @@
     "placementDependent": true,
     "screen": "shared on case-hub-chain and case-many-groups with 5 seeds of the input order. Keep if the spread of R6 and R1 over the orders falls >= 50% and the medians do not rise.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-009",
       "EDA-034",
-      "EDA-047"
-    ]
+      "EDA-047",
+      "WILD-053",
+      "RULE-044",
+      "HWY-039",
+      "WILD-024"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-011",
@@ -491,11 +523,15 @@
     "placementDependent": true,
     "screen": "tiny-uniform and the 3 case boards: the max overuse against EDA-009. Keep as a MEAS2 reference if its bound is within 20%. Keep as a router only if the time <= 10x shared at 100 nodes.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-009",
       "EDA-012"
-    ]
+    ],
+    "dependsOn": [
+      "EDA-009"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-012",
@@ -535,13 +571,20 @@
     "placementDependent": true,
     "screen": "Boards of <= 30 nodes with an optimum from an ILP. Keep if the bound gap <= 15% and the routes are not worse than EDA-009.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-009",
       "EDA-011",
       "EDA-051",
       "EDA-017"
-    ]
+    ],
+    "same": [
+      "RULE-025"
+    ],
+    "dependsOn": [
+      "EDA-009"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-013",
@@ -576,12 +619,17 @@
     "placementDependent": true,
     "screen": "case-many-groups and grid-400: B5 and R1 against gapLanes with the order crossings. Keep if crossings fall >= 15% at <= 5% more lanes.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-004",
       "EDA-007",
-      "EDA-026"
-    ]
+      "EDA-026",
+      "WILD-039"
+    ],
+    "dependsOn": [
+      "EDA-004"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-014",
@@ -617,13 +665,14 @@
     "placementDependent": true,
     "screen": "nestedGridBoard and the levels of small-clustered. Keep if Z4 <= 1 at each level, Z9 is 10% better and Z1 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-036",
       "EDA-038",
       "EDA-040",
       "EDA-050"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-015",
@@ -665,12 +714,17 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout and case-dense-groups: B1 and the total trunk length against the split of today. Keep if B1 rises >= 5% with R9 = 0 after an obstacle repair.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-030",
       "EDA-035",
       "EDA-003"
-    ]
+    ],
+    "same": [
+      "HWY-036"
+    ],
+    "canonical": "HWY-036",
+    "wave": 3
   },
   {
     "id": "EDA-016",
@@ -712,12 +766,13 @@
     "placementDependent": true,
     "screen": "shared-all on case-many-groups: R12 and B9 near the merges. Keep if the lane spacing errors fall >= 50% at no rise of R1.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-021",
       "EDA-022",
       "EDA-024"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-017",
@@ -752,11 +807,13 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout. Keep if the B3 q95 falls >= 10% at a B1 loss <= 3%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-012",
-      "EDA-030"
-    ]
+      "EDA-030",
+      "HWY-048"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-018",
@@ -791,12 +848,14 @@
     "placementDependent": true,
     "screen": "The Spearman correlation of the RUDY demand and the demand of roomDemand with the method routes, on 5 boards. Keep if rho >= 0.8 at 10x less time.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-051",
       "EDA-008",
-      "EDA-039"
-    ]
+      "EDA-039",
+      "NAT-006"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-019",
@@ -831,11 +890,12 @@
     "placementDependent": true,
     "screen": "The corridor capacities against boardGaps on the packed and nested boards. Keep as the base of EDA-008 if the build time <= the corner graph time.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-008",
       "EDA-045"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-020",
@@ -883,12 +943,15 @@
     "placementDependent": true,
     "screen": "corners against topology plus rubber band on the case boards. Keep if the R5 median falls >= 3% with a better R8 and no worse R1.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-024",
       "EDA-043",
-      "EDA-021"
-    ]
+      "EDA-021",
+      "RULE-050",
+      "RULE-001"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-021",
@@ -932,12 +995,14 @@
     "placementDependent": true,
     "screen": "shared-all on case-dense-groups and on packedGridBoard with no room step. Keep if M4 falls >= 80% at an R5 median rise <= 5%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-045",
       "EDA-016",
-      "EDA-009"
-    ]
+      "EDA-009",
+      "HWY-051"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-022",
@@ -979,11 +1044,12 @@
     "placementDependent": true,
     "screen": "small-clustered and case-dense-groups: crossings within 2 u of a box. Keep if they fall >= 30%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-041",
       "EDA-016"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-023",
@@ -1018,10 +1084,11 @@
     "placementDependent": true,
     "screen": "Add one edge to small-clustered, 20 times. Keep if the mean Frechet move (Z10) falls >= 80% against a full reroute, with R9 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-034"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-024",
@@ -1063,11 +1130,13 @@
     "placementDependent": true,
     "screen": "Against the curve arc on corners. Keep if the min R8 >= clearance on each route and C7 = 0 at a length rise <= 1%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-020",
-      "EDA-043"
-    ]
+      "EDA-043",
+      "RULE-001"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-025",
@@ -1110,12 +1179,14 @@
     "placementDependent": true,
     "screen": "The case boards: R2 mean angle and R3 against corners. Keep if R3 falls >= 20% at an R5 median rise <= 8%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-001",
       "EDA-027",
-      "EDA-026"
-    ]
+      "EDA-026",
+      "NAT-027"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-026",
@@ -1160,12 +1231,17 @@
     "placementDependent": true,
     "screen": "shared-all on case-many-groups and small-clustered: lane crossings against laneOrder bundle. Keep as a MEAS2 reference in any case. Keep as a strategy if B5 falls >= 10% within 2 s at 100 nodes.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-013",
       "EDA-007",
-      "EDA-022"
-    ]
+      "EDA-022",
+      "RULE-013",
+      "WILD-055",
+      "HWY-040",
+      "WILD-039"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-027",
@@ -1208,11 +1284,12 @@
     "placementDependent": true,
     "screen": "On the routes of corners. Keep if R3 falls >= 30% with R9 = 0 and C8 max <= 2 u.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-025",
       "EDA-037"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-028",
@@ -1255,12 +1332,17 @@
     "placementDependent": true,
     "screen": "sections and sections-tree on case-hub-chain and small-clustered, and mid-clustered in CI. Keep if the R5 median falls >= 3% and R7 does not rise.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-033",
       "EDA-049",
-      "EDA-030"
-    ]
+      "EDA-030",
+      "HWY-043",
+      "HWY-041",
+      "NAT-010",
+      "NAT-040"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-029",
@@ -1302,13 +1384,22 @@
     "placementDependent": true,
     "screen": "shared-all with alpha 0.3, 0.5, 0.7, 1 on case-many-groups and small-clustered: the front of B1 against the B3 q95. Keep if one setting is better than discount 0.5 on both.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-030",
       "EDA-032",
       "EDA-046",
-      "EDA-050"
-    ]
+      "EDA-050",
+      "NAT-012",
+      "NAT-011",
+      "HWY-047",
+      "NAT-035"
+    ],
+    "same": [
+      "HWY-038",
+      "HWY-039"
+    ],
+    "wave": 1
   },
   {
     "id": "EDA-030",
@@ -1343,12 +1434,18 @@
     "placementDependent": true,
     "screen": "trunks-all on mid-fanout and case-dense-groups. Keep if B1 rises >= 3%, the B6 max falls >= 10 degrees and R9 = 0.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-029",
       "EDA-015",
-      "EDA-035"
-    ]
+      "EDA-035",
+      "NAT-012",
+      "HWY-043"
+    ],
+    "dependsOn": [
+      "EDA-029"
+    ],
+    "wave": 1
   },
   {
     "id": "EDA-031",
@@ -1398,11 +1495,12 @@
     "placementDependent": true,
     "screen": "case-dense-groups and packedGridBoard: the max overuse falls >= 50% at an R5 rise <= 5%. Compare with EDA-009.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-009",
       "EDA-032"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-032",
@@ -1446,12 +1544,18 @@
     "placementDependent": true,
     "screen": "shared-all on case-dense-groups and packedGridBoard. Keep if B1 is within 5% of EDA-029 and M4 is within 10% of EDA-031.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-029",
       "EDA-031",
+      "EDA-009",
+      "HWY-016"
+    ],
+    "dependsOn": [
+      "EDA-029",
       "EDA-009"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-033",
@@ -1489,12 +1593,16 @@
     "placementDependent": true,
     "screen": "small-clustered and case-dense-groups. Keep if B1 rises >= 10% against shared, the R5 median stays within 5% and B4 is not worse.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-028",
       "EDA-049",
       "EDA-050"
-    ]
+    ],
+    "same": [
+      "WILD-032"
+    ],
+    "wave": 2
   },
   {
     "id": "EDA-034",
@@ -1527,11 +1635,14 @@
     "placementDependent": true,
     "screen": "20 edits of one edge on small-clustered: the share of routes that change. Keep if it falls >= 50% against shared at a B1 loss <= 3%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-010",
-      "EDA-023"
-    ]
+      "EDA-023",
+      "NAT-024",
+      "WILD-053"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-035",
@@ -1580,12 +1691,17 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout and case-dense-groups. Keep if R7 = 0 for the members, the B6 max falls >= 20 degrees and B1 is not worse.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-015",
       "EDA-030",
       "EDA-046"
-    ]
+    ],
+    "same": [
+      "HWY-017"
+    ],
+    "canonical": "HWY-017",
+    "wave": 3
   },
   {
     "id": "EDA-036",
@@ -1627,12 +1743,13 @@
     "placementDependent": true,
     "screen": "The levels of sections on small-clustered and nestedGridBoard. Keep if Z4 <= 1 at each level and Z9 is not worse than today.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-014",
       "EDA-038",
       "EDA-050"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-037",
@@ -1680,11 +1797,12 @@
     "placementDependent": true,
     "screen": "The levels of small-clustered. Keep if the points fall >= 40% with no rise of the Z3 faults.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-027",
       "EDA-038"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-038",
@@ -1720,12 +1838,18 @@
     "placementDependent": false,
     "screen": "The count of drawn elements at each level against the budget. Keep if Z4 falls >= 30% at the far levels.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-014",
       "EDA-036",
-      "EDA-037"
-    ]
+      "EDA-037",
+      "HWY-010"
+    ],
+    "same": [
+      "WILD-016"
+    ],
+    "canonical": "WILD-016",
+    "wave": 4
   },
   {
     "id": "EDA-039",
@@ -1766,11 +1890,12 @@
     "placementDependent": true,
     "screen": "packedGridBoard: M1 and M3 against openGaps at M4 = 0. Keep if M3 falls >= 30% at an M1 rise <= 5%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-018",
       "EDA-051"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-040",
@@ -1810,11 +1935,12 @@
     "placementDependent": true,
     "screen": "The level sequence of nestedGridBoard. Keep if 0 items vanish and come back across the zoom, and Z4 <= 1.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-014",
       "EDA-036"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-041",
@@ -1848,10 +1974,11 @@
     "placementDependent": true,
     "screen": "As EDA-022. Keep if the crossings within 2 u of a box fall >= 30%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-022"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-042",
@@ -1882,11 +2009,12 @@
     "placementDependent": true,
     "screen": "The case boards: the badges over a box or another badge = 0, at an M1 rise <= 2%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-038",
       "EDA-018"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-043",
@@ -1920,11 +2048,15 @@
     "placementDependent": true,
     "screen": "corners against the exact graph on boards <= 400 nodes: R5 median and R6. Keep as the MEAS2 length reference in any case. Keep as a router if the gap is >= 2% on a board.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-044",
-      "EDA-020"
-    ]
+      "EDA-020",
+      "RULE-013",
+      "WILD-055",
+      "HWY-040"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-044",
@@ -1971,11 +2103,15 @@
     "placementDependent": true,
     "screen": "As EDA-043, plus the time at 1000 nodes in CI. Keep if R5 is within 0.5% of EDA-043 and the time <= corners.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-043",
       "EDA-045"
-    ]
+    ],
+    "dependsOn": [
+      "EDA-043"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-045",
@@ -2009,12 +2145,13 @@
     "placementDependent": true,
     "screen": "With EDA-021: M4 and R8 against corners. Keep if a fat way fails less often than with the grown corner graph.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-021",
       "EDA-044",
       "EDA-019"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-046",
@@ -2056,12 +2193,17 @@
     "placementDependent": true,
     "screen": "mid-hubs in CI and case-dense-groups: R1 among the edges of one target = 0, B1 above corners, and the time.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-029",
       "EDA-035",
-      "EDA-050"
-    ]
+      "EDA-050",
+      "NAT-017"
+    ],
+    "same": [
+      "HWY-037"
+    ],
+    "wave": 2
   },
   {
     "id": "EDA-047",
@@ -2096,11 +2238,12 @@
     "placementDependent": true,
     "screen": "tiny-uniform and case-hub-chain at a node limit of 1000. Keep if the conflicts fall >= 50% against shared at an R5 rise <= 3%.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-010",
       "EDA-048"
-    ]
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-048",
@@ -2136,11 +2279,16 @@
     "placementDependent": true,
     "screen": "Against EDA-009 on case-dense-groups. Keep if the overuse is within 10% of EDA-009 at <= 1/3 of its time.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-009",
-      "EDA-047"
-    ]
+      "EDA-047",
+      "HWY-016"
+    ],
+    "dependsOn": [
+      "EDA-009"
+    ],
+    "wave": 5
   },
   {
     "id": "EDA-049",
@@ -2175,12 +2323,17 @@
     "placementDependent": true,
     "screen": "sections-tree on mid-clustered in CI. Keep if Z9 falls >= 20% and the time falls >= 30% at an R5 rise <= 2%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-028",
       "EDA-050",
-      "EDA-014"
-    ]
+      "EDA-014",
+      "RULE-024"
+    ],
+    "same": [
+      "WILD-029"
+    ],
+    "wave": 4
   },
   {
     "id": "EDA-050",
@@ -2230,13 +2383,18 @@
     "placementDependent": true,
     "screen": "shared-all with the highway set from the rank, against the discount: the front of B1 and B3 on case-many-groups and small-clustered.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-029",
       "EDA-046",
       "EDA-049",
       "EDA-033"
-    ]
+    ],
+    "same": [
+      "HWY-034"
+    ],
+    "canonical": "HWY-034",
+    "wave": 2
   },
   {
     "id": "EDA-051",
@@ -2278,12 +2436,14 @@
     "placementDependent": true,
     "screen": "packedGridBoard: the area at M4 = 0 against roomDemand with passes. Keep if M1 falls >= 10% at M4 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "EDA-012",
       "EDA-009",
       "EDA-018",
-      "EDA-039"
-    ]
+      "EDA-039",
+      "NAT-042"
+    ],
+    "wave": 5
   }
 ]

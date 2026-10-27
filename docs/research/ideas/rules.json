@@ -44,13 +44,20 @@
     "placementDependent": true,
     "screen": "On `case-dense-groups` and `mid-clustered`, after `corner`: keep it if the median R8 rises by 30% with R9 = 0 and R1 up by 5% or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-005",
       "RULE-022",
       "RULE-046",
-      "HWY-002"
+      "HWY-002",
+      "EDA-020",
+      "EDA-024"
     ],
+    "same": [
+      "NAT-026"
+    ],
+    "canonical": "NAT-026",
+    "wave": 6,
     "rules": "Short routes, smooth routes, a clearance d0 from each box.",
     "hardRules": "project. The push grows near a box, and a projection step moves each point with φ < d0 out along ∇φ. The plug ends are fixed.",
     "zoom": "warm and anchor. Each level starts from the route of its parent level."
@@ -102,13 +109,18 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, against `trunks`: keep it if B1 is equal or better, B4 rises by 10% or less, and R9 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-002",
       "HWY-006",
       "RULE-047",
       "RULE-028"
     ],
+    "same": [
+      "HWY-002"
+    ],
+    "canonical": "HWY-002",
+    "wave": 3,
     "rules": "Ink, bundles, clearance from boxes, a stretch budget for each edge.",
     "hardRules": "project after each cycle, then RULE-046.",
     "zoom": "warm and anchor. The compatibility uses the level links of each level."
@@ -156,12 +168,13 @@
     "placementDependent": true,
     "screen": "On `mid-hubs` and `mid-fanout`, after `corner`: keep it if R12 rises by 25% and R1 does not rise.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-049",
       "HWY-016"
     ],
+    "wave": 7,
     "rules": "A minimum gap between routes, lane separation, wide crossing angles.",
     "hardRules": "project, then RULE-046.",
     "zoom": "anchor. The charge falls with the level, so far views keep their bundles."
@@ -202,11 +215,13 @@
     "placementDependent": true,
     "screen": "On `grid-400` and `mid-uniform`, from `straight`: keep it if R14 reaches 0.8 or more with R6 up by 10% or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-016",
-      "RULE-052"
+      "RULE-052",
+      "NAT-036"
     ],
+    "wave": 7,
     "rules": "Orthogonal or octilinear segments, a main flow direction, radial fans around hubs.",
     "hardRules": "project. The plug stubs keep SIDE_NORMAL.",
     "zoom": "The field is the same at each level, so the directions do not change between levels. anchor."
@@ -254,12 +269,17 @@
     "placementDependent": true,
     "screen": "On `case-dense-groups` and `packedGridBoard`, 100 nodes: keep it if R9 = 0, R8 rises by 40% and R6 is 1.3 times `corner` or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-006",
       "RULE-024",
       "RULE-051"
     ],
+    "same": [
+      "NAT-023"
+    ],
+    "canonical": "NAT-023",
+    "wave": 6,
     "rules": "Clearance (the potential is high near boxes), smooth routes, routes that stay in the middle of gaps.",
     "hardRules": "guard. The descent does not enter a box cell, because the potential is at its maximum there. The end snaps to the plug.",
     "zoom": "The coarse grid of the parent level starts the solve, so the field changes little between levels."
@@ -307,13 +327,14 @@
     "placementDependent": true,
     "screen": "Same boards as RULE-005, against `corner`: keep it if C7 and R8 rise by 30% at R6 of 1.2 times or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-005",
       "RULE-041",
       "RULE-046",
       "HWY-020"
     ],
+    "wave": 7,
     "rules": "Clearance, length, a cost for each area: dense regions, group interiors, margins.",
     "hardRules": "guard. F = 0 inside a box, so the time there is infinite.",
     "zoom": "warm. Each level uses its own level boxes and the coarse field of the parent."
@@ -362,12 +383,13 @@
     "placementDependent": true,
     "screen": "On `shared-all` and `case-hub-chain`, after the curve `smooth`: keep it if C3 falls by 20% with 0 faults of C7.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-022",
       "RULE-026"
     ],
+    "wave": 7,
     "rules": "Smallest radius, small curvature change, no tangent break.",
     "hardRules": "project with φ ≥ clearance. The end tangents stay on SIDE_NORMAL.",
     "zoom": "anchor. The rod of the parent level is the start."
@@ -414,12 +436,13 @@
     "placementDependent": true,
     "screen": "On `mid-clustered`, after `corner`: keep it if R6 and R4 fall by 10% and R1 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-009",
       "RULE-011",
       "RULE-050"
     ],
+    "wave": 7,
     "rules": "Target lengths, a distance to each wrapped corner, even spacing of the bends.",
     "hardRules": "project. Separation constraints keep each bend point on its side of each wrapped corner.",
     "zoom": "warm. Majorization descends from the start, so a warm start gives a near answer."
@@ -471,12 +494,13 @@
     "placementDependent": true,
     "screen": "On `mid-hubs` and `case-dense-groups`: keep it if each channel wide enough has each gap at `g` or more, with R1 unchanged.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-050",
       "RULE-052",
       "HWY-016"
     ],
+    "wave": 7,
     "rules": "A gap between lanes, centered lanes, the bounds of a channel, alignment by equal constraints.",
     "hardRules": "Exact. The channel bounds are the box walls minus the clearance. A channel too narrow for its lanes keeps the base route.",
     "zoom": "convex. The same order gives a small move for a small change."
@@ -517,12 +541,13 @@
     "placementDependent": true,
     "screen": "On `case-hub-chain` and `mid-hubs` with `sections`: keep it if B3 falls by 10% and Z7 does not rise.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-045",
       "HWY-043",
       "HWY-041"
     ],
+    "wave": 7,
     "rules": "Junction spacing, balanced hubs, distances that follow the graph.",
     "hardRules": "barrier at each junction, then the routes go through the corner graph.",
     "zoom": "anchor. Each level places its own hubs near the hubs of its parent."
@@ -573,13 +598,14 @@
     "placementDependent": true,
     "screen": "As a wrapper of RULE-001 and RULE-003: keep it if R9 and the new crossings are 0 in each run, at 2 times the time or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-003",
       "RULE-046",
       "RULE-050"
     ],
+    "wave": 7,
     "rules": "Any force rule. The limit keeps the crossing count and the side of each box.",
     "hardRules": "guard by construction. A point does not cross a box edge at any time.",
     "zoom": "The warm start fixes the topology, so the order of the routes does not change between levels."
@@ -617,12 +643,13 @@
     "placementDependent": true,
     "screen": "On `grid-400` and `mid-uniform`, orthogonal routes: keep it if the `required` rows give 0 hard faults and the aligned legs rise by 30%, with R6 unchanged.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-009",
       "RULE-017",
       "RULE-052"
     ],
+    "wave": 7,
     "rules": "Alignment, equal spacing, order, a distance to a box, centered legs.",
     "hardRules": "The required constraints hold the hard rules for the leg coordinates.",
     "zoom": "Each level solves again from the basis of its parent, so a small edit gives a small change."
@@ -671,12 +698,17 @@
     "placementDependent": true,
     "screen": "On 30 boards of 8 to 15 edges, in CI: keep it if it proves the optimum on 80% or more, in 10 s or less each.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-015",
       "RULE-043",
-      "HWY-040"
+      "HWY-040",
+      "WILD-055",
+      "EDA-026",
+      "EDA-043",
+      "WILD-054"
     ],
+    "wave": 7,
     "rules": "Any linear rule: length, bends, crossings, capacity, forbidden arcs.",
     "hardRules": "Exact. Only the free arcs exist.",
     "zoom": "A penalty Σ ‖y - y_parent‖ for a change from the parent level."
@@ -713,11 +745,12 @@
     "placementDependent": true,
     "screen": "On `grid-400`, after `corner`: keep it if R3 falls by 15% at the same topology.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-050",
       "RULE-013"
     ],
+    "wave": 7,
     "rules": "Fewest bends, fixed angles at the plugs, orthogonal segments.",
     "hardRules": "The embedding comes from a guarded route, so the shape keeps it.",
     "zoom": "The parent level fixes the embedding, so the shape is stable."
@@ -761,12 +794,13 @@
     "placementDependent": true,
     "screen": "On tight boards (`packedGridBoard`, 16 boxes): keep it if it routes each edge where `corner` with room fails, in 10 s or less.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-013",
       "RULE-037",
       "RULE-018"
     ],
+    "wave": 7,
     "rules": "Capacity, forbidden areas, parity, any Boolean rule.",
     "hardRules": "Exact.",
     "zoom": "The solution of the parent level gives the hints of the solver."
@@ -806,12 +840,14 @@
     "placementDependent": true,
     "screen": "On the skeleton of `mid-hubs` (60 trunk edges or fewer), in CI: keep it if it solves in 60 s or less with R14 = 1 and B3 up by 10% or less.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-004",
       "RULE-052",
-      "HWY-016"
+      "HWY-016",
+      "NAT-027"
     ],
+    "wave": 7,
     "rules": "Octilinear trunks, the order of the trunks, a minimum length, few bends, the relative position of the hubs.",
     "hardRules": "The boxes are fixed vertices with clearance constraints. Planarity cuts enter lazily.",
     "zoom": "Each level adds a term for the relative position to its parent."
@@ -848,12 +884,13 @@
     "placementDependent": false,
     "screen": "With RULE-019 inside, on `mid-clustered`: keep it if the first measure stays within ε of its own optimum and the second beats the weighted sum.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-012",
       "RULE-019",
       "RULE-038"
     ],
+    "wave": 7,
     "rules": "Any rule. The layers express priority, not a weight.",
     "hardRules": "Layer 0 holds the hard rules as constraints.",
     "zoom": "The same layers run at each level. An option puts the stability term of RULE-045 in the first soft layer."
@@ -899,12 +936,13 @@
     "placementDependent": true,
     "screen": "On `grid-400`: keep it if each edge connects in 3 restarts or fewer with R14 = 1.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-015",
       "RULE-032",
       "RULE-034"
     ],
+    "wave": 7,
     "rules": "Local rules of adjacency: no tee next to a box, merges only on lanes, a style of tiles.",
     "hardRules": "Box cells and plug cells are fixed. A path check for each edge adds the global rule that each edge connects.",
     "zoom": "The coarse tiles constrain the fine tiles."
@@ -951,13 +989,14 @@
     "placementDependent": true,
     "screen": "On `mid-clustered`: keep it if its front over R1, R6 and R8 has a point that `corner` with RULE-001 does not dominate.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-020",
       "RULE-027",
       "RULE-036",
       "RULE-046"
     ],
+    "wave": 7,
     "rules": "Any rule with a smooth form or a smooth substitute.",
     "hardRules": "barrier for the boxes, then RULE-046.",
     "zoom": "anchor and warm."
@@ -1010,10 +1049,14 @@
     "placementDependent": true,
     "screen": "Against RULE-019 at the same time: keep it if it reaches the energy of RULE-019 in a third of the time or less at 1000 nodes.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-019"
     ],
+    "dependsOn": [
+      "RULE-019"
+    ],
+    "wave": 7,
     "rules": "The same rules as RULE-019.",
     "hardRules": "The same as RULE-019.",
     "zoom": "anchor."
@@ -1055,13 +1098,18 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `mid-hubs`: keep it if R1 falls by 15% against the first choice, at the same R6.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-044",
       "RULE-025",
       "HWY-045",
-      "HWY-059"
+      "HWY-059",
+      "NAT-043"
     ],
+    "same": [
+      "WILD-028"
+    ],
+    "wave": 4,
     "rules": "Any rule, also discrete rules: crossing counts, highway membership, lane capacity.",
     "hardRules": "guard. Each candidate obeys the hard rules.",
     "zoom": "hysteresis. The start state is the choice of the parent level, and a change costs."
@@ -1108,13 +1156,14 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, against RULE-001: keep it if it gets the same R8 in half the time, with R9 = 0.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-023",
       "RULE-046",
       "RULE-036"
     ],
+    "wave": 7,
     "rules": "Lengths, distances, angles, alignment: each local rule.",
     "hardRules": "Compliance 0 for the boxes, a final pass, then RULE-046. The plugs have infinite mass.",
     "zoom": "anchor as a soft constraint to the place at the parent level."
@@ -1152,12 +1201,13 @@
     "placementDependent": true,
     "screen": "With the energy of RULE-019 on `mid-clustered`: keep it if R9 = 0 at each step, at 2 times the time of RULE-019 or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-019",
       "RULE-022",
       "RULE-046"
     ],
+    "wave": 7,
     "rules": "Clearance as a barrier, with any smooth energy.",
     "hardRules": "barrier. Each step is legal.",
     "zoom": "anchor."
@@ -1207,12 +1257,15 @@
     "placementDependent": true,
     "screen": "On `nestedGridBoard` and `mid-clustered`: keep it if Z10 falls by 30% against levels solved alone, at the same energy.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-045",
       "RULE-031",
-      "HWY-052"
+      "HWY-052",
+      "WILD-027",
+      "EDA-049"
     ],
+    "wave": 7,
     "rules": "The same energy at each level.",
     "hardRules": "project at each level.",
     "zoom": "Native. The coarse-to-fine order gives agreement between levels."
@@ -1258,12 +1311,17 @@
     "placementDependent": true,
     "screen": "On `case-dense-groups` and `packedGridBoard`: keep it if the lanes over capacity fall to 0 in 10 rounds or fewer, with R6 up by 10% or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-044",
       "HWY-044",
       "HWY-039"
     ],
+    "same": [
+      "EDA-012"
+    ],
+    "canonical": "EDA-012",
+    "wave": 5,
     "rules": "Capacity, crowding, each rule that couples edges.",
     "hardRules": "guard. The search of each edge uses the corner graph.",
     "zoom": "warm. The prices of the parent level start each level."
@@ -1309,12 +1367,13 @@
     "placementDependent": true,
     "screen": "Against RULE-001 on the same boards: keep it if C3 is 20% lower at the same R8.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-007",
       "RULE-023"
     ],
+    "wave": 7,
     "rules": "Smoothness, clearance, length.",
     "hardRules": "The TrajOpt penalty rises until each point is legal, then RULE-046.",
     "zoom": "anchor."
@@ -1355,13 +1414,14 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `large-clustered`: keep it if the peak density falls by 30% with R6 up by 10% or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-028",
       "RULE-029",
       "RULE-031",
       "HWY-006"
     ],
+    "wave": 7,
     "rules": "Density, clutter, ink over boxes, white space, any rule that reads an image.",
     "hardRules": "The box term is soft, so project and RULE-046.",
     "zoom": "Each level renders at its own scale, so each zoom gets its own loss."
@@ -1408,12 +1468,16 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` against `shared`: keep it if B1 is equal or better with R9 = 0 after the projection.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-006",
       "HWY-007",
       "RULE-027"
     ],
+    "same": [
+      "HWY-006"
+    ],
+    "wave": 3,
     "rules": "Ink, bundles, free space.",
     "hardRules": "project, then RULE-046.",
     "zoom": "The kernel width h grows with the level, so the ridges nest."
@@ -1458,11 +1522,13 @@
     "placementDependent": true,
     "screen": "On `mid-uniform` and `mid-clustered`: keep it if the clutter falls by 20% and R2 rises.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-027",
-      "RULE-049"
+      "RULE-049",
+      "WILD-025"
     ],
+    "wave": 7,
     "rules": "Visual order, alignment to the flow, right-angle crossings.",
     "hardRules": "project, then RULE-046.",
     "zoom": "Each level has its own resolution."
@@ -1507,12 +1573,17 @@
     "placementDependent": true,
     "screen": "On `packedGridBoard` and `case-dense-groups`: keep it if the trunk R8 doubles with B3 up by 10% or less.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-009",
       "RULE-047",
       "RULE-006"
     ],
+    "same": [
+      "NAT-034"
+    ],
+    "canonical": "NAT-034",
+    "wave": 6,
     "rules": "Clearance, lanes in the middle of gaps, highways in the gaps.",
     "hardRules": "The axis is in the free space by definition.",
     "zoom": "The prune length grows with the level, so the skeletons nest."
@@ -1549,11 +1620,15 @@
     "placementDependent": true,
     "screen": "On `nestedGridBoard`: keep it if the worst level loss falls by 20% and Z10 is better than levels solved alone.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-027",
       "RULE-024"
     ],
+    "dependsOn": [
+      "RULE-027"
+    ],
+    "wave": 7,
     "rules": "Legibility at each zoom.",
     "hardRules": "project, then RULE-046.",
     "zoom": "Native. One geometry serves all levels."
@@ -1594,12 +1669,16 @@
     "placementDependent": true,
     "screen": "On `grid-400`: keep it if R3 is equal to `corner` or lower, with R9 = 0, in 2 times the time or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-033",
       "RULE-044",
       "RULE-006"
     ],
+    "same": [
+      "EDA-001"
+    ],
+    "wave": 5,
     "rules": "Bends, clearance, highway preference, forbidden cells, rules of direction.",
     "hardRules": "guard. A box cell does not enter the wave.",
     "zoom": "The route of the coarse grid limits the fine search to a corridor."
@@ -1637,12 +1716,13 @@
     "placementDependent": true,
     "screen": "On the gaps of `case-dense-groups`: keep it if each cell holds its capacity or less and R12 rises by 20%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-025",
       "RULE-009",
       "HWY-051"
     ],
+    "wave": 7,
     "rules": "Capacity of a gap, an even spread of crowded lanes.",
     "hardRules": "Box cells are walls, so no lane goes into a box. The routes then follow the cells that they get.",
     "zoom": "Each level has its own capacity. The state of the parent level adds as grains."
@@ -1682,12 +1762,13 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` after `corner`: keep it if R3 plus R7 falls by 10% with 0 hard faults.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-036",
       "RULE-046",
       "RULE-018"
     ],
+    "wave": 7,
     "rules": "Local style rules and simplifications.",
     "hardRules": "guard. Each rewrite checks its result.",
     "zoom": "A grammar for each level. The coarse levels use the merge rules more."
@@ -1727,11 +1808,12 @@
     "placementDependent": true,
     "screen": "On `mid-fanout`: keep it if B6 is in its target band with R6 up by 15% or less against `trunks`.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-017",
       "HWY-037"
     ],
+    "wave": 7,
     "rules": "Branch angles, branch spacing, symmetry.",
     "hardRules": "The query of the environment stops growth at a box. RULE-046 repairs the last legs.",
     "zoom": "Depth d of the derivation is level d, so the trees nest."
@@ -1780,13 +1862,14 @@
     "placementDependent": true,
     "screen": "Write RULE-001, RULE-003 and RULE-049 as rule files: keep it if each compiled run matches the hand-written run within 1% on 3 boards.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-019",
       "RULE-022",
       "RULE-017",
       "RULE-037"
     ],
+    "wave": 7,
     "rules": "Each term of the library. A user adds rules without code.",
     "hardRules": "Hard rules compile to constraints, then RULE-046.",
     "zoom": "The rule set applies at each level. A rule can name a level."
@@ -1823,13 +1906,14 @@
     "placementDependent": true,
     "screen": "On `mid-hubs`: keep it if it finds the best membership in 5 s or less and B3 falls against the rule of `trunks`.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-036",
       "RULE-015",
       "HWY-045",
       "HWY-048"
     ],
+    "wave": 7,
     "rules": "Highway membership, capacity, exclusion, derived rules in the style of Datalog.",
     "hardRules": "Integrity constraints.",
     "zoom": "A rule says that each fine highway sits in its parent highway."
@@ -1872,11 +1956,12 @@
     "placementDependent": false,
     "screen": "200 pairs from a panel on made-up boards: keep it if it agrees with 75% or more of the held-out pairs.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-017",
       "RULE-039"
     ],
+    "wave": 7,
     "rules": "The weights of any rule set.",
     "hardRules": "No change. The solver keeps them.",
     "zoom": "One weight vector for each level, from views of that level."
@@ -1920,11 +2005,15 @@
     "placementDependent": true,
     "screen": "Keep it if the critic score rises and no MEAS0 measure gets worse by more than 5%.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-027",
       "RULE-038"
     ],
+    "dependsOn": [
+      "RULE-027"
+    ],
+    "wave": 7,
     "rules": "A learned taste.",
     "hardRules": "project, then RULE-046.",
     "zoom": "A render for each level."
@@ -1968,11 +2057,12 @@
     "placementDependent": true,
     "screen": "Keep it if it cuts the solver steps by 50% to reach the same energy on held-out fixtures.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-019",
       "RULE-043"
     ],
+    "wave": 7,
     "rules": "The rules of the training loss.",
     "hardRules": "RULE-046 after the pass.",
     "zoom": "A pass for each level, with the place at the parent level as a feature."
@@ -2009,10 +2099,11 @@
     "placementDependent": true,
     "screen": "Keep it if one field trained for a board routes 1000 edges faster than RULE-006 at the same R8.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-006"
     ],
+    "wave": 7,
     "rules": "Clearance through the speed, length.",
     "hardRules": "RULE-046 after the descent.",
     "zoom": "One field for each level."
@@ -2055,11 +2146,12 @@
     "placementDependent": true,
     "screen": "Keep it if the distilled score beats RULE-021 at the same time on 3 families.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-021",
       "RULE-043"
     ],
+    "wave": 7,
     "rules": "Each rule of the reward.",
     "hardRules": "guard. Each candidate is legal.",
     "zoom": "The state holds the choice of the parent level."
@@ -2096,12 +2188,16 @@
     "placementDependent": true,
     "screen": "Keep it if the gap to the optimum on held-out small boards falls by 30% against the first candidate.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-013",
       "RULE-042",
       "RULE-021"
     ],
+    "dependsOn": [
+      "RULE-013"
+    ],
+    "wave": 7,
     "rules": "The rules of the exact objective.",
     "hardRules": "guard. Each candidate is legal.",
     "zoom": "A feature for the choice of the parent level."
@@ -2147,14 +2243,16 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, against `corner`: keep it if R1 and R3 fall by 10% with R6 up by 5% or less and 0 hard faults.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-025",
       "RULE-021",
       "RULE-032",
       "HWY-005",
-      "HWY-039"
+      "HWY-039",
+      "EDA-010"
     ],
+    "wave": 7,
     "rules": "Bends, clearance, crowding, highway preference, each rule on an arc.",
     "hardRules": "guard. Only free arcs exist. The plugs are fixed.",
     "zoom": "A discount on the arcs of the routes of the parent level."
@@ -2192,13 +2290,15 @@
     "placementDependent": true,
     "screen": "On `nestedGridBoard` and `mid-clustered`: keep it if Z10 falls by 40% with the energy of each level up by 5% or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-024",
       "RULE-031",
       "RULE-053",
-      "HWY-052"
+      "HWY-052",
+      "WILD-015"
     ],
+    "wave": 7,
     "rules": "Stability between levels.",
     "hardRules": "The same as the base solver.",
     "zoom": "Native."
@@ -2243,13 +2343,14 @@
     "placementDependent": true,
     "screen": "After each soft method: keep it if the hard faults are 0 on 9 fixtures with 5 seeds, and it changes 5% of the points or fewer.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-001",
       "RULE-019",
       "RULE-022",
       "RULE-027"
     ],
+    "wave": 1,
     "rules": "The hard rules no-pass-through, ends-at-plugs, link-ends and complete.",
     "hardRules": "Exact, because of the fallback to the base route.",
     "zoom": "It changes only the parts with a fault, so it adds little change between levels."
@@ -2288,13 +2389,14 @@
     "placementDependent": true,
     "screen": "With the trunks of HWY-001 on `mid-clustered`: keep it if B2 rises by 15% with B3 up by 5% or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-001",
       "HWY-009",
       "RULE-030",
       "RULE-002"
     ],
+    "wave": 7,
     "rules": "Bundles with a lane order.",
     "hardRules": "project, then RULE-046.",
     "zoom": "One skeleton for each level. The skeletons nest."
@@ -2331,11 +2433,15 @@
     "placementDependent": false,
     "screen": "On `mid-clustered` with 5 seeds: keep it if the final energy falls by 5% against the full energy at once, at the same number of steps.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-019",
       "RULE-017"
     ],
+    "dependsOn": [
+      "RULE-019"
+    ],
+    "wave": 7,
     "rules": "Any rule.",
     "hardRules": "The same as the solver.",
     "zoom": "The stages can follow the levels."
@@ -2372,11 +2478,16 @@
     "placementDependent": true,
     "screen": "On `mid-uniform` and `mid-clustered`: keep it if the median R2 rises by 15 degrees with R6 up by 3% or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-003",
-      "RULE-029"
+      "RULE-029",
+      "WILD-025"
     ],
+    "same": [
+      "WILD-042"
+    ],
+    "wave": 4,
     "rules": "Crossing angle.",
     "hardRules": "project, then RULE-046.",
     "zoom": "anchor."
@@ -2421,13 +2532,15 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, after `shared`: keep it if each channel with room has gaps of g or more and Z10 falls by 30%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-009",
       "RULE-011",
       "RULE-008",
-      "HWY-016"
+      "HWY-016",
+      "EDA-020"
     ],
+    "wave": 7,
     "rules": "Each convex quadratic rule: length, centered lanes, gaps, alignment.",
     "hardRules": "Exact. The constraints hold the hard rules.",
     "zoom": "convex. The same topology at each level gives a near geometry."
@@ -2472,11 +2585,13 @@
     "placementDependent": true,
     "screen": "On `mid-clustered`: keep it if B1 is equal to `shared` or better with R7 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-005",
-      "HWY-021"
+      "HWY-021",
+      "NAT-037"
     ],
+    "wave": 7,
     "rules": "Bundles by flow, clearance (σ = 0 in boxes).",
     "hardRules": "No current enters an insulator, so the streamlines stay out of the boxes up to the error of the grid. Then RULE-046.",
     "zoom": "The coarse grid of the parent level starts the solve."
@@ -2519,12 +2634,13 @@
     "placementDependent": true,
     "screen": "On `grid-400` and `mid-uniform`: keep it if the count of distinct leg coordinates falls by 30% with R12 unchanged.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-009",
       "RULE-012",
       "RULE-004"
     ],
+    "wave": 7,
     "rules": "Alignment, a snap grid, equal spacing.",
     "hardRules": "The bounds of the solver hold the hard rules.",
     "zoom": "The pitch doubles at each coarser level, so the alignment nests."
@@ -2561,12 +2677,14 @@
     "placementDependent": false,
     "screen": "On `nestedGridBoard` with one box moved by 1 u: keep it if the route flips fall by 50% with the energy up by h or less.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "RULE-045",
       "HWY-046",
-      "HWY-054"
+      "HWY-054",
+      "WILD-014"
     ],
+    "wave": 7,
     "rules": "Stability of discrete choices.",
     "hardRules": "No change.",
     "zoom": "Native."
