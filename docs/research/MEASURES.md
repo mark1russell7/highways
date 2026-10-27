@@ -83,7 +83,7 @@ MEAS1 measures fixtures with up to 100 000 nodes. The cost class tells the large
 
 ### The values of today
 
-The bench gives these values. Each value comes from one seed of each fixture, so the bench gives no spread.
+The bench gives these values. The tables of these values use one seed of each fixture. Since MEAS1, the measure suite examines several seeds of each fixture family and gives the spread.
 
 | Values | Function | File |
 |---|---|---|
@@ -95,6 +95,7 @@ The bench gives these values. Each value comes from one seed of each fixture, so
 | `hubRoutes`, `runs`, `levels`, `farItems` | `sweepSections` | [`sections.ts`](../../packages/core/src/bench/sections.ts) |
 | `mean`, `max` and `moved` of the Fréchet distance | `measureStability` | [`quality.ts`](../../packages/core/src/bench/quality.ts). No table of the bench uses it. |
 | `ms`, `deterministic`, `violations` | `benchOne` | [`run.ts`](../../packages/core/src/bench/run.ts) |
+| The short list below, the counts of the proposed hard rules, the spread over the seeds and the Pareto fronts (MEAS1) | `runSuite` | [`suite.ts`](../../packages/core/src/bench/suite.ts) and [`measures/`](../../packages/core/src/bench/measures/) |
 
 ### The gaps of today
 
@@ -110,17 +111,17 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| R1 | Crossings | Few crossings | `c = count(X)`, and `c / m` for each edge | count, `↓` | `n log n`, sampled above 20 000 segments | score | yes, `crossings` | [Purchase 1997][purchase97], [Purchase 2002][purchase02] |
-| R2 | Crossing angle | Crossings near a right angle | `ca = mean_x(θ_x) / 90` and `ca_min = min_x(θ_x)` | 0..1 and degrees, `↑` | `n log n`, the same pass as R1 | score | no | [Huang 2014][huang14], [Huang 2008][huang08], [Dunne 2009][dunne09] |
+| R1 | Crossings | Few crossings | `c = count(X)`, and `c / m` for each edge | count, `↓` | `n log n`, sampled above 20 000 segments | score | yes, `crossings`, and `R1.perEdge` of the suite | [Purchase 1997][purchase97], [Purchase 2002][purchase02] |
+| R2 | Crossing angle | Crossings near a right angle | `ca = mean_x(θ_x) / 90` and `ca_min = min_x(θ_x)` | 0..1 and degrees, `↑` | `n log n`, the same pass as R1 | score | yes, `R2.angle` and `R2.min` of the suite | [Huang 2014][huang14], [Huang 2008][huang08], [Dunne 2009][dunne09] |
 | R3 | Bends | Few real turns | `b(r) = count(i : abs(φ_i) > 1°)`, mean over routes | count for each route, `↓` | `linear` | score | part, `bends` counts each vertex | [Purchase 1997][purchase97], [Wybrow 2009][wybrow09] |
-| R4 | Total turn | Paths that go straight on | `T(r) = Σ_i abs(φ_i) / π`, and `max_i abs(φ_i)` | half turns for each route, `↓` | `linear` | score | no | [Ware 2002][ware02] |
-| R5 | Detour spread | Short routes, with no bad tail | `δ(e) = L(r_e) / span(e)`. Report `q_0.5(δ)`, `q_0.95(δ)` and the mean. | ratio `≥ 1`, `↓` | `linear` | score | part, `detour` is the mean only | [Ware 2002][ware02], [Wybrow 2009][wybrow09] |
+| R4 | Total turn | Paths that go straight on | `T(r) = Σ_i abs(φ_i) / π`, and `max_i abs(φ_i)` | half turns for each route, `↓` | `linear` | score | yes, `R4.turn` and `R4.max` of the suite | [Ware 2002][ware02] |
+| R5 | Detour spread | Short routes, with no bad tail | `δ(e) = L(r_e) / span(e)`. Report `q_0.5(δ)`, `q_0.95(δ)` and the mean. | ratio `≥ 1`, `↓` | `linear` | score | yes, `R5.median`, `R5.q95` and `R5.mean` of the suite | [Ware 2002][ware02], [Wybrow 2009][wybrow09] |
 | R6 | Worst detour | No very long route | `max_e δ(e)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `worstDetour` | Own (QFIX), [Ware 2002][ware02] |
 | R7 | Out and back | Routes that go toward their target | `count(e : backtrackOf(r_e) > max(40, 0.25 span(e))) / m` | share 0..1, `↓` | `linear` | fault | yes, `backtrack` | Own (QFIX, ER3b) |
 | R8 | Clearance | Space between a route and the other boxes | `cl(r) = min(40, min_v dist(r, box(v)))` for each node `v` that is not an end. Report the mean of `cl / u`, and `tight = share(cl < 4)`. | units, `↑`, and share, `↓` | `n log n` | score | yes, `clearance` and `tight` | [Wybrow 2009][wybrow09], [Marriott 2014][marriott14] |
 | R9 | Through | No route through a box | `count(e : r_e cuts the inside of a box that is not an end)` | count, `↓` | `n log n` | rule for routes, fault for level links | yes, `through` and `no-pass-through` | [Dunne 2009][dunne09] (edge tunnels) |
 | R10 | Plug angle | Routes that leave along the normal of the side | `mean(angle(p_1 - p_0, normal))` at each end | degrees 0..180, `↓` | `linear` | score | yes, `plugAngle` | Own (H1) |
-| R11 | Plug spacing | Plugs that are far apart on each side | For a side with `k` plugs, `ps = min gap / (side / (k + 1))`. Report `min` and `q_0.05` over the sides. | 0..1, `↑`. A value of 1 is even spacing. | `n log n`, a sort for each side | score | no | [Formann 1993][formann93], [Dunne 2009][dunne09] |
+| R11 | Plug spacing | Plugs that are far apart on each side | For a side with `k` plugs, `ps = min gap / (side / (k + 1))`. Report `min` and `q_0.05` over the sides. | 0..1, `↑`. A value of 1 is even spacing. | `n log n`, a sort for each side | score | yes, `R11.min` and `R11.q05` of the suite | [Formann 1993][formann93], [Dunne 2009][dunne09] |
 | R12 | Lane separation | Parallel legs of two edges with space between them | For the legs of two edges within 5° of parallel, with an overlap of their projections: `ns = Σ overlap(dist < s_min) / ink(S)` | share 0..1, `↓` | `n log n` | score | no | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
 | R13 | Outside | Routes in the bounding box of the board | `count(e : a point of r_e is more than 24 units outside the bounding box)` | count, `↓` | `linear` | fault | yes, `outside` | Own (QFIX, ER3c) |
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | no | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
@@ -139,10 +140,10 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| B1 | Ink saved | Less ink for the same edges | `inkSaved = 1 - ink(S) / Σ_e L(r_e)` | 0..1, `↑` | `n log n`, a hash of the segments | score | part, `ink` without the ratio | [Gansner 2011][gansner11], [Lhuillier 2017][lhuillier17] |
+| B1 | Ink saved | Less ink for the same edges | `inkSaved = 1 - ink(S) / Σ_e L(r_e)` | 0..1, `↑` | `n log n`, a hash of the segments | score | yes, `B1.inkSaved` of the suite | [Gansner 2011][gansner11], [Lhuillier 2017][lhuillier17] |
 | B2 | Bundled share | Edges that share their ways | `count(e : e is in a run or a bundle) / m` | 0..1, `↑` in context | `linear` | score | no | [Holten 2006][holten06] |
 | B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | no, the README gives it by hand | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
-| B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | no | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
+| B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.ambiguity` of the suite, sampled above 1000 nodes | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
 | B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | part, ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
 | B6 | Merge angle | Smooth merges and splits | `ma = max angle of the turn of a lane where it joins or leaves a run` | degrees, `↓` | `linear` | score | no | [Gansner 2011][gansner11] (a limit of 40° on the turn) |
 | B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | no | [Saga 2016][saga16] |
@@ -163,16 +164,16 @@ A curve must stay near its route, keep clear of the boxes and look smooth. G0 co
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| C1 | G1 defect | Tangents that agree at each joint | `g1 = max_j angle(T_j^-, T_j^+)` at each joint `j` of two segments | degrees, `↓`. G1 when `g1 ≤ 0.5°`. | `linear` | rule candidate | no | [Levien 2009][levien09], [Hobby 1986][hobby86] |
-| C2 | G2 defect | Curvature with no jump | `g2 = max_j abs(κ_j^- - κ_j^+) · u` | no unit, `↓` | `linear` | score | no | [Levien 2009][levien09], [Moreton 1993][moreton93] |
-| C3 | Bending energy | Curves that bend little | `E = L · ∫ κ(s)^2 ds` | no unit, `↓`. A full circle gives `4π^2`. | `linear` on the samples | score | no | [Horn 1983][horn83], [Levien 2009][levien09] |
+| C1 | G1 defect | Tangents that agree at each joint | `g1 = max_j angle(T_j^-, T_j^+)` at each joint `j` of two segments | degrees, `↓`. G1 when `g1 ≤ 0.5°`. | `linear` | rule candidate | yes, `C1.max` and `C1.share` of the suite, and the count `curve-g1` | [Levien 2009][levien09], [Hobby 1986][hobby86] |
+| C2 | G2 defect | Curvature with no jump | `g2 = max_j abs(κ_j^- - κ_j^+) · u` | no unit, `↓` | `linear` | score | yes, `C2.median` and `C2.max` of the suite | [Levien 2009][levien09], [Moreton 1993][moreton93] |
+| C3 | Bending energy | Curves that bend little | `E = L · ∫ κ(s)^2 ds` | no unit, `↓`. A full circle gives `4π^2`. | `linear` on the samples | score | yes, `C3.median` and `C3.q95` of the suite | [Horn 1983][horn83], [Levien 2009][levien09] |
 | C4 | Curvature variation | Even change of the curvature | `V = L^3 · ∫ (dκ/ds)^2 ds` | no unit, `↓`. A circle gives 0. | `linear` on the samples | score | no | [Moreton 1993][moreton93] |
 | C5 | Smallest radius | No tight kink | `rmin = 1 / max_s κ(s)`. Report `rmin / radius` and `rmin / u`. | ratio, `↑` | `linear` | score | no | [Gansner 2011][gansner11] (a limit on the curvature) |
-| C6 | Length ratio | Curves that stay short | `Σ L(curve) / Σ L(polyline)` | ratio near 1, `↓` | `linear` | score | yes, `length` | Own (CURVE) |
-| C7 | Curve clearance | Curves clear of the boxes | R8 on the output of `sampleCurve`, and `count(curves through a box that the polyline avoids)` | units, `↑`, and count, `↓` | `n log n` | rule candidate for the count | part, `clamped` | Own (CURVE), [Wybrow 2009][wybrow09] |
+| C6 | Length ratio | Curves that stay short | `Σ L(curve) / Σ L(polyline)` | ratio near 1, `↓` | `linear` | score | yes, `length`, and `C6.length` of the suite | Own (CURVE) |
+| C7 | Curve clearance | Curves clear of the boxes | R8 on the output of `sampleCurve`, and `count(curves through a box that the polyline avoids)` | units, `↑`, and count, `↓` | `n log n` | rule candidate for the count | part, `clamped`, and the count `curve-clear` of the suite | Own (CURVE), [Wybrow 2009][wybrow09] |
 | C8 | Deviation | Curves near their routes | `dev(e) = frechet(sampleCurve(c_e), r_e) / u`. Report `q_0.5` and `max`. | no unit, `↓` | `quadratic` for each route | score | no | [Eiter 1994][eiter94], [Yuksel 2011][yuksel11] |
-| C9 | Loops and cusps | Curves with no loop | `count(curves that cross themselves, or have a point of zero speed, where the polyline does not cross itself)` | count, `↓` | `n log n` for each curve | rule candidate | no | [Yuksel 2011][yuksel11] |
-| C10 | End tangent | Curves that leave and enter along the plug normal | `angle(T(0), normal)` and `angle(-T(L), normal)` | degrees, `↓` | `linear` | rule candidate for `spline` with normals | no, `plugAngle` measures the polyline only | Own (CURVE), [Hobby 1986][hobby86] |
+| C9 | Loops and cusps | Curves with no loop | `count(curves that cross themselves, or have a point of zero speed, where the polyline does not cross itself)` | count, `↓` | `n log n` for each curve | rule candidate | yes, the count `curve-simple` of the suite | [Yuksel 2011][yuksel11] |
+| C10 | End tangent | Curves that leave and enter along the plug normal | `angle(T(0), normal)` and `angle(-T(L), normal)` | degrees, `↓` | `linear` | rule candidate for `spline` with normals | yes, the count `curve-ends` of the suite | Own (CURVE), [Hobby 1986][hobby86] |
 | C11 | Curvature extrema | Few changes in the bend | `count(local extrema of κ) + count(sign changes of κ)` for each curve | count, `↓` | `linear` | score | no | [Levien 2009][levien09], [Moreton 1993][moreton93] |
 
 ### Notes on the curves
@@ -187,15 +188,15 @@ A group of the far view stands for its nodes. A good group holds many edges insi
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| G1 | Modularity | Many edges inside the groups | `Q = Σ_c (e_c / m - (d_c / (2m))^2)`, with `e_c` the edges inside `c` and `d_c` the sum of the degrees in `c` | -0.5..1, `↑` | `linear` | score | no | [Newman 2004][newman04] |
-| G2 | Cut share | Few edges between the groups | `cut_d = Σ counts of the links of level d / m` | 0..1, `↓` | `linear` | score | part, the counts of the links | [Kannan 2004][kannan04] |
+| G1 | Modularity | Many edges inside the groups | `Q = Σ_c (e_c / m - (d_c / (2m))^2)`, with `e_c` the edges inside `c` and `d_c` the sum of the degrees in `c` | -0.5..1, `↑` | `linear` | score | yes, `G1.modularity` of the suite, on the far level | [Newman 2004][newman04] |
+| G2 | Cut share | Few edges between the groups | `cut_d = Σ counts of the links of level d / m` | 0..1, `↓` | `linear` | score | yes, `G2.cut` of the suite, on the far level | [Kannan 2004][kannan04] |
 | G3 | Conductance | No group that leaks | `φ(c) = cut(c) / min(vol(c), vol(V) - vol(c))`, with `vol` the sum of the degrees. Report `max` and `q_0.5`. | 0..1, `↓` | `linear` | score | no | [Kannan 2004][kannan04] |
 | G4 | Fill | Compact groups | `fill(c) = Σ_(v in c) area(box(v)) / area(box(c))` | 0..1, `↑` | `linear` | score | no | Own (ER3), [Elmqvist 2010][elmqvist10] |
 | G5 | Overlaps | Groups that do not cover each other | `count(pairs of items whose boxes overlap by more than TOLERANCE)` | count, `↓` | `n log n` | fault | yes, `overlaps` | [Misue 1995][misue95] |
 | G6 | Balance | Groups of similar size | `bal = H(s) / log(k)`, with `s` the shares of the nodes of the `k` groups and `H` the entropy | 0..1, `↑` | `linear` | score | no | [Dasgupta 2016][dasgupta16] |
 | G7 | Silhouette | Groups that are near on the board | `s(v) = (b_v - a_v) / max(a_v, b_v)`, with `a_v` the mean distance to the centers of its group and `b_v` the smallest mean distance to another group | -1..1, `↑` | `quadratic`, sampled | score | no | [Rousseeuw 1987][rousseeuw87] |
-| G8 | Tree cost | Edges that close low in the tree | `D = Σ_((u,v) in E) leaves(lca(u, v)) / (m n)` | 0..1, `↓` | `linear` times the depth | score | no | [Dasgupta 2016][dasgupta16] |
-| G9 | Group stability | The same groups after a small change | `ARI(groups(G), groups(G'))`, with `G'` the graph after one node moves by `u`, or after one edge is added or removed | -1..1, `↑`. A value of 1 is the same grouping. | `extra run`, then `linear` | score | no | [Hubert 1985][hubert85], [von Luxburg 2010][luxburg10] |
+| G8 | Tree cost | Edges that close low in the tree | `D = Σ_((u,v) in E) leaves(lca(u, v)) / (m n)` | 0..1, `↓` | `linear` times the depth | score | yes, `G8.treeCost` of the suite | [Dasgupta 2016][dasgupta16] |
+| G9 | Group stability | The same groups after a small change | `ARI(groups(G), groups(G'))`, with `G'` the graph after one node moves by `u`, or after one edge is added or removed | -1..1, `↑`. A value of 1 is the same grouping. | `extra run`, then `linear` | score | yes, `G9.ari` of the suite, after `changeGraph` | [Hubert 1985][hubert85], [von Luxburg 2010][luxburg10] |
 
 ### Notes on the groups
 
@@ -215,11 +216,11 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Z3 | Level link faults | Level links with no fault | R6, R7, R9 and R13 on the links of each level | counts and ratio, `↓` | `n log n` | fault | yes, the level columns | Own (ER3a, ER3b, ER3c) |
 | Z4 | Item budget | Few shown elements at each level | `eb = max_d (items_d + links_d) / B`, with `B` the budget of the host | ratio, `≤ 1` is correct, `↓` | `linear` | score | part, `farItems` and `levels` | [Nachmanson 2015][nachmanson15] |
 | Z5 | Level ratio | Even steps from level to level | `lr_d = items_(d+1) / items_d`. Report `max` and the spread of `log(lr_d)`. | ratio, `↓` for the spread | `linear` | score | no | [Mondal 2018][mondal18] |
-| Z6 | Nesting | Levels that refine each other | `count(items of level d+1 whose nodes are in more than one item of level d)` | count, `↓` | `linear` | rule candidate | no, `checkSections` checks the tree but not the levels | [Elmqvist 2010][elmqvist10] |
-| Z7 | Position stability | Items that stay near their parts | `ps = mean_(v,d) dist(center(item_d(v)), center(item_(d+1)(v))) / size(item_d(v))` | no unit, `↓` | `linear` | score | no | [Bridgeman 2000][bridgeman00] |
-| Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | no | [Misue 1995][misue95], [Kendall 1938][kendall38] |
+| Z6 | Nesting | Levels that refine each other | `count(items of level d+1 whose nodes are in more than one item of level d)` | count, `↓` | `linear` | rule candidate | yes, the count `level-nesting` of the suite | [Elmqvist 2010][elmqvist10] |
+| Z7 | Position stability | Items that stay near their parts | `ps = mean_(v,d) dist(center(item_d(v)), center(item_(d+1)(v))) / size(item_d(v))` | no unit, `↓` | `linear` | score | yes, `Z7.position` of the suite | [Bridgeman 2000][bridgeman00] |
+| Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | yes, `Z8.order` of the suite, sampled above 1500 items | [Misue 1995][misue95], [Kendall 1938][kendall38] |
 | Z9 | Link agreement | Level links that follow the routes of their edges | `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u` | no unit, `↓` | `quadratic` for each link, sampled | score | no | [Elmqvist 2010][elmqvist10], [Perlin 1993][perlin93] |
-| Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | part, the function exists | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
+| Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z10.mean`, `Z10.max` and `Z10.moved` of the suite, up to 1000 nodes | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
 
 ### Notes on the zoom levels
 
@@ -233,10 +234,10 @@ A zoom level shows a group as one item, and the edges between two items as one l
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| M1 | Area | Little growth of the board | `area(open) / area(packed)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `area` | Own (ROOM) |
-| M2 | Order kept | The same rows, columns and order | `count(pairs of boxes whose order or alignment on an axis changes)` | count, `↓` | `n log n` | rule candidate | no, the unit tests check it | [Misue 1995][misue95] |
+| M1 | Area | Little growth of the board | `area(open) / area(packed)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `area`, and `M1.area` of the suite | Own (ROOM) |
+| M2 | Order kept | The same rows, columns and order | `count(pairs of boxes whose order or alignment on an axis changes)` | count, `↓` | `n log n` | rule candidate | yes, the count `room-order` of the suite | [Misue 1995][misue95] |
 | M3 | Displacement | Boxes that move little | `mean_v dist(box_open(v), box_packed(v)) / u` | no unit, `↓` | `linear` | score | no | [Bridgeman 2000][bridgeman00] |
-| M4 | Lane routes through boxes | Room for each lane | `count(lane routes of laneRoutes that go through a box)` | count, `↓` | `n log n` | fault | yes, `laneThrough` | Own (ROOM) |
+| M4 | Lane routes through boxes | Room for each lane | `count(lane routes of laneRoutes that go through a box)` | count, `↓` | `n log n` | fault | yes, `laneThrough`, and `M4.laneThrough` of the suite | Own (ROOM) |
 | M5 | Distance distortion | Distances that keep their ratios | Kruskal stress of the centers: `σ = sqrt(Σ (α d'_ij - d_ij)^2 / Σ d_ij^2)`, with `α` the best scale and the pairs of neighbour boxes only | 0..1, `↓` | `n log n` | score | no | [Ahmed 2024][ahmed24], [Gansner 2004][gansner04] |
 
 ## The layout of the host
@@ -300,7 +301,7 @@ Each candidate starts as a count in MEAS1. When each built-in strategy gives 0 o
 
 ## The short list for MEAS1
 
-MEAS1 first adds the seeds and the spread of the method section. Then it adds the measures in this order. The order puts strong evidence and a low cost first.
+MEAS1 first adds the seeds and the spread of the method section. Then it adds the measures in this order. MEAS1 added each of them to the bench. The order puts strong evidence and a low cost first.
 
 | Order | Measures | Why first |
 |---|---|---|

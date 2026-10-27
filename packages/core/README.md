@@ -396,6 +396,44 @@ A test examines each built-in strategy with `checkSchema`. Thus an option of `de
 
 The plugs have one strategy, so they have no step yet. The step `group` gives the grouping rule of the zoom levels.
 
+## Measures and the report
+
+The [note on the measures](https://github.com/mark1russell7/highways/blob/main/docs/research/MEASURES.md) gives an id, a formula and a scale to each measure. Each measure is a pure function, and its TSDoc names its id.
+
+| Ids | Functions |
+|---|---|
+| R1, R2 | `crossingAngles`: the crossings and their angles |
+| R4, R5 | `totalTurn`, `detourSpread` |
+| R11 | `plugSpacing`: the gaps between the plugs of each side |
+| B1, B4 | `inkSaved`, `ambiguity` |
+| C1, C2, C3 | `g1Defect`, `g2Defect`, `bendingEnergy` |
+| Z6, Z7, Z8 | `nestingFaults`, `positionStability`, `orderStability` |
+| Z10 | `changeGraph` makes a seeded small change, and `routeStability` compares the routes |
+| G1, G2, G8, G9 | `modularity`, `cutShare`, `treeCost`, `groupStability` |
+| M2 | `roomOrderFaults` |
+
+A quadratic measure examines a seeded sample above its limit, so the values of a large board are estimates.
+
+`runSuite` measures several seeds of each fixture family, for the steps `router`, `curve`, `room` and `group`. The first seed of a family is the fixture itself. The report has these parts:
+
+- `rows`: one row for each step, fixture, seed and strategy.
+- `summaries`: the median, the interquartile range, the minimum and the maximum of each measure over the seeds.
+- `fronts`: the Pareto front of each step on each fixture family, on the axes of `FRONT_OBJECTIVES`.
+- `rules`: the counts of the six proposed hard rules of MEAS0 for each strategy.
+
+A strategy with a violation of a hard rule of today does not enter the front.
+
+```ts
+import { formatFronts, runSuite } from "@mark1russell7/highways";
+
+const { report } = runSuite({ max: 1000, seeds: 5 });
+console.log(formatFronts(report.fronts));
+```
+
+The script `bench` takes `--seeds <n>` and `--report <file>`. A family with more nodes than `--seeds-max-nodes` (default 1 000) gets one seed only. `--suite-steps <a,b>` runs only these steps of the suite. The workflow `Bench` keeps `report.json` and `bench.json` as an artifact. The tables of today do not change.
+
+The workflow `Bench` runs the suite in parts. Each part writes its report, and `joinReports` joins the reports into the report of one run.
+
 ## License
 
 MIT
