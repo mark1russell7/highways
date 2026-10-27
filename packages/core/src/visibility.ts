@@ -620,7 +620,7 @@ export class SoftGraph {
 
   /**
    * This method gives a path of least cost from `from` to `to` (A*), with the two points as its ends.
-   * The cost of a path is its length, plus `cost(n)` for each link of the path and each node `n` whose box that link goes through.
+   * The cost of a path is its length, plus `cost(n)` for each link of the path and each box `n` of that link.
    * Each cost must be 0 or more. The straight line from `from` to `to` is a path too, so the method always gives a path.
    */
   path(from: Point, to: Point, cost: (n: Node) => number): Point[] {

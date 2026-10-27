@@ -124,7 +124,7 @@ The links of a gap without lanes share one line. Thus the crossings on that line
 
 ## Options of the zoom levels
 
-The router `sections` makes its hubs and its zoom levels from a tree of groups. Each rule and each limit of that tree is an option. The defaults give the output of version 0.1.5.
+The router `sections` makes its hubs and its zoom levels from a tree of groups. Each rule and each limit of that tree is an option. The defaults give the output of version 0.1.5, but `throughCost` changes the links of a walled-in level.
 
 | Option | Default | Where | What it sets |
 |---|---|---|---|
@@ -139,6 +139,7 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 | `collapse` | 32 | `buildSections` | A cell shrinks to one quarter at most this many times without a split. |
 | `tightMargin` | 1 | `levelLinks` | The margin of the second corner graph of the level links. |
 | `plugInset` | 6 | `levelLinks` | A plug of a level link stays this far from the corners of its side. |
+| `throughCost` | 8 | `levelLinks` | The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5. |
 | `routesAt`, `itemAt` | 22, 120 | `pickLevel` | The far-view thresholds, in pixels on the screen. `PICK` holds them. |
 
 `SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
@@ -173,6 +174,25 @@ The benchmark sweeps the hub limit, `hubSlack`, `cap` and the grouping rules on 
 | 3 | 2.05 | 25 | 11 | 0 |
 
 A smaller hub limit gives shorter routes and fewer shared runs. No route goes through a box or out and back at any value. On `case-many-groups`, the rule `keys` has one key for each group of cards. It gives 32 items at the far view, and no level link goes out and back.
+
+### Links through a walled-in level
+
+On a walled-in level, each group overlaps its neighbours, so some level links find no way around the groups. The measures split the level links through a box in two:
+
+- An unavoidable link goes only through boxes that overlap its source or its target.
+- An avoidable link also goes through a far box. A far box overlaps neither end of the link.
+
+A level link through a far box gets a second way. That way can go through boxes, and each far box costs `throughCost` mean box sizes. The link keeps the way with fewer far boxes. The benchmark sweeps `throughCost`. On `mid-clustered`, at depth 3, in CI:
+
+| `throughCost` | Through | Unavoidable | Avoidable | Out and back | Worst detour |
+|---|---:|---:|---:|---:|---:|
+| 0 (version 0.1.5) | 208 | 94 | 114 | 124 | 5.88 |
+| 2 | 208 | 123 | 85 | 124 | 5.88 |
+| 4 | 208 | 141 | 67 | 124 | 5.88 |
+| 8 (default) | 208 | 154 | 54 | 124 | 5.88 |
+| 16 | 208 | 157 | 51 | 124 | 5.88 |
+
+The second way does not change the number of links through a box. It moves them from far boxes to the boxes next to their ends.
 
 ## Strategies
 

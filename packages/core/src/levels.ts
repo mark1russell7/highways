@@ -45,7 +45,7 @@ export interface LevelLinkOptions extends WayOptions {
   /**
    * The cost of a level link through a far box, in units of the mean box size. A far box overlaps neither end of the link.
    * A link through a far box gets a second way that can go through boxes (`SoftGraph`). The link keeps the way with fewer far boxes.
-   * The value 0 turns the second way off. The default is 0.
+   * The value 0 turns the second way off and gives the links of version 0.1.5. The default is 8.
    */
   readonly throughCost?: number;
 }
@@ -54,7 +54,7 @@ export interface LevelLinkOptions extends WayOptions {
 export const LEVEL_LINK_DEFAULTS: Readonly<Required<Pick<LevelLinkOptions, "tightMargin" | "plugInset" | "throughCost">>> = Object.freeze({
   tightMargin: 1,
   plugInset: 6,
-  throughCost: 0,
+  throughCost: 8,
 });
 
 /** The values of `throughCost` of the sweep of ER3d in the benchmark. The value 0 gives the links of version 0.1.5. */
@@ -106,10 +106,18 @@ export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair
     let points = isFree(ways, s, fs) && isFree(ways, t, ft) ? quickWay(ways, ends(ways, s, fs, t, ft)) : undefined;
     // Else the link goes from the middle of a side. Each item has at most four such plugs, so the corner graph finds their ends one time.
     points ??= sideWay(ways, s, t, inset);
-    if (throughCost > 0) points = fewerFar(ways, s, t, points, throughCost);
     out.push({ source: p.source, target: p.target, count: p.count, points });
   }
-  return out;
+  if (throughCost <= 0) return out;
+  // The second way never makes the worst detour of the level longer.
+  const limit = out.reduce((m, l) => Math.max(m, detour(l.points)), 1);
+  return out.map((l) => ({ ...l, points: fewerFar(ways, byId.get(l.source)!, byId.get(l.target)!, l.points, throughCost, limit) }));
+}
+
+/** This function gives the length of the polyline divided by the distance between its ends, as the measure `worstDetour` gives it. */
+function detour(p: readonly Point[]): number {
+  const span = p.length > 1 ? dist(p[0]!, p[p.length - 1]!) : 0;
+  return span > 1 ? polylineLength(p) / span : 1;
 }
 
 /**
@@ -173,11 +181,14 @@ function nearBoxes(ways: Ways, s: Node, t: Node): Set<Node> {
 /**
  * This function gives a way with fewer far boxes than `way`, or `way`. A far box overlaps neither end of the link.
  * On a walled-in level, each box overlaps its neighbours, so a link can find no way around the boxes.
- * Then a search of `SoftGraph` goes from the center of `s` to the center of `t`. A far box costs `cost` mean box sizes, and a near box one mean box size.
- * The way starts where the path leaves the box of `s` for the last time, and it ends where the path first enters the box of `t`.
+ * Then a search of `SoftGraph` goes from the center of `s` to the center of `t`.
+ *
+ * In the search, a far box costs `cost` mean box sizes, and a near box costs one mean box size.
+ * The way starts where the path leaves the box of `s` for the last time. It ends where the path then first enters the box of `t`.
  * The link keeps `way` when the new way goes out and back and `way` does not.
+ * It also keeps `way` when the detour of the new way is longer than `limit`.
  */
-function fewerFar(ways: LevelWays, s: Node, t: Node, way: Point[], cost: number): Point[] {
+function fewerFar(ways: LevelWays, s: Node, t: Node, way: readonly Point[], cost: number, limit: number): readonly Point[] {
   const near = nearBoxes(ways, s, t);
   const before = boxesThrough(ways, way, s, t, near);
   if (before.far === 0) return way;
@@ -188,6 +199,7 @@ function fewerFar(ways: LevelWays, s: Node, t: Node, way: Point[], cost: number)
   const soft = tidy(pullThrough(ways, clipped, s, t));
   // A way that goes out and back is a new fault, so the link keeps the old way.
   if (goesOutAndBack(soft) && !goesOutAndBack(way)) return way;
+  if (detour(soft) > limit) return way;
   return boxesThrough(ways, soft, s, t, near).far < before.far ? soft : way;
 }
 
