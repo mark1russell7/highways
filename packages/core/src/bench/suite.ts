@@ -352,6 +352,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
       const graph = makeFixture({ ...spec, seed });
       const change = changeGraph(graph, seed);
       log(`${spec.name} seed ${k}: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
+      const first = rows.length;
       // The step `router`: the hard rules and the measures of today, then the new measures.
       for (const strategy of routers) {
         if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) continue;
@@ -402,6 +403,13 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
         const extraMs = now() - t2;
         rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations: 0, ms, measureMs, extraMs, values });
       }
+      // The time of each row, in milliseconds: the step, the new measures and the extra routes.
+      log(
+        `  ${rows
+          .slice(first)
+          .map((r) => `${r.step}/${r.strategy} ${r.ms.toFixed(0)}+${r.measureMs.toFixed(0)}+${r.extraMs.toFixed(0)}`)
+          .join(", ")}`,
+      );
     }
   }
 

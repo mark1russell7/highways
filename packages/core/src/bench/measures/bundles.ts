@@ -40,56 +40,80 @@ export interface AmbiguityOptions {
  * `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))`. The cost is quadratic, so a seeded sample serves above `exact` nodes.
  */
 export function ambiguity(graph: Graph, routes: readonly Route[], options: AmbiguityOptions = {}): Ambiguity {
-  const edges = new Map(graph.edges.map((e) => [e.id, e]));
-  // The keys of the drawn segments of each route, and the edges of each key.
-  const keysOf = new Map<string, string[]>();
-  const edgesOf = new Map<string, string[]>();
+  const n = graph.nodes.length;
+  const index = new Map(graph.nodes.map((v, i) => [v.id, i] as const));
+  const ends = new Map<string, readonly [number, number]>();
+  for (const e of graph.edges) {
+    const s = index.get(e.source.node);
+    const t = index.get(e.target.node);
+    if (s !== undefined && t !== undefined) ends.set(e.id, [s, t]);
+  }
+  // Each drawn segment gets a number. `keysOf` holds the segments of each edge, and `nodesOf` the distinct end nodes of the edges of each segment.
+  const keyIds = new Map<string, number>();
+  const nodesOf: number[][] = [];
+  const keysOf = new Map<string, number[]>();
   for (const r of routes) {
-    if (!edges.has(r.edge)) continue;
-    const own = new Set<string>();
+    const end = ends.get(r.edge);
+    if (!end) continue;
+    const own: number[] = [];
     for (let i = 1; i < r.points.length; i++) {
       const k = segmentKey(r.points[i - 1]!, r.points[i]!);
-      if (k === undefined || own.has(k)) continue;
-      own.add(k);
-      const list = edgesOf.get(k);
-      if (list) list.push(r.edge);
-      else edgesOf.set(k, [r.edge]);
+      if (k === undefined) continue;
+      let id = keyIds.get(k);
+      if (id === undefined) {
+        id = nodesOf.length;
+        keyIds.set(k, id);
+        nodesOf.push([]);
+      }
+      if (own.includes(id)) continue;
+      own.push(id);
+      nodesOf[id]!.push(end[0], end[1]);
     }
-    keysOf.set(r.edge, [...own]);
+    keysOf.set(r.edge, own);
   }
-  const incident = new Map<string, string[]>();
-  const linked = new Set<string>();
+  const mark = new Int32Array(n).fill(-1);
+  nodesOf.forEach((list, k) => {
+    let j = 0;
+    for (const v of list)
+      if (mark[v] !== k) {
+        mark[v] = k;
+        list[j++] = v;
+      }
+    list.length = j;
+  });
+  const incident: string[][] = Array.from({ length: n }, () => []);
+  const adjacent: number[][] = Array.from({ length: n }, () => []);
   for (const e of graph.edges) {
-    for (const v of [e.source.node, e.target.node]) {
-      const list = incident.get(v);
-      if (list) list.push(e.id);
-      else incident.set(v, [e.id]);
-    }
-    linked.add(`${e.source.node}\u0000${e.target.node}`);
-    linked.add(`${e.target.node}\u0000${e.source.node}`);
+    const end = ends.get(e.id);
+    if (!end) continue;
+    incident[end[0]]!.push(e.id);
+    incident[end[1]]!.push(e.id);
+    adjacent[end[0]]!.push(end[1]);
+    adjacent[end[1]]!.push(end[0]);
   }
-  const exact = graph.nodes.length <= (options.exact ?? 1000);
+  const exact = n <= (options.exact ?? 1000);
   const R = rng(options.seed ?? 1);
-  const ids = graph.nodes.map((n) => n.id);
-  const pick = exact ? ids : Array.from({ length: options.sample ?? 2000 }, () => ids[Math.floor(R() * ids.length)]!);
+  const pick = exact ? Array.from({ length: n }, (_, i) => i) : Array.from({ length: options.sample ?? 2000 }, () => Math.floor(R() * n));
+  // The stamps mark the segments, the near nodes and the neighbours of the current node, with no new set for each node.
+  const keyStamp = new Int32Array(nodesOf.length).fill(-1);
+  const nearStamp = new Int32Array(n).fill(-1);
+  const linkStamp = new Int32Array(n).fill(-1);
   let all = 0;
   let wrong = 0;
-  for (const v of pick) {
-    const near = new Set<string>();
-    const keys = new Set<string>();
-    for (const e of incident.get(v) ?? []) {
+  pick.forEach((v, step) => {
+    for (const w of adjacent[v]!) linkStamp[w] = step;
+    nearStamp[v] = step;
+    for (const e of incident[v]!)
       for (const k of keysOf.get(e) ?? []) {
-        if (keys.has(k)) continue;
-        keys.add(k);
-        for (const f of edgesOf.get(k)!) {
-          const g = edges.get(f)!;
-          if (g.source.node !== v) near.add(g.source.node);
-          if (g.target.node !== v) near.add(g.target.node);
+        if (keyStamp[k] === step) continue;
+        keyStamp[k] = step;
+        for (const w of nodesOf[k]!) {
+          if (nearStamp[w] === step) continue;
+          nearStamp[w] = step;
+          all++;
+          if (linkStamp[w] !== step) wrong++;
         }
       }
-    }
-    all += near.size;
-    for (const w of near) if (!linked.has(`${v}\u0000${w}`)) wrong++;
-  }
+  });
   return { value: all ? wrong / all : 0, estimated: !exact };
 }
