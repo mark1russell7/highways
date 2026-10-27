@@ -1,5 +1,5 @@
 import { boardUnit } from "../../bench/measures/routes.ts";
-import { dist, polylineLength, type Point } from "../../geom.ts";
+import { dist, pointSegmentDistance, polylineLength, type Point } from "../../geom.ts";
 import { orderLanes } from "../../segments.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import { firstRoutes, nearestPlace, orderAlongRoutes, tidyPlan } from "../base.ts";
@@ -195,12 +195,24 @@ export function representative(cluster: readonly RouteSegment[], minLns: number,
   return out;
 }
 
+/** This function gives the distance of the point `p` to the polyline `line`. */
+function lineDistance(line: readonly Point[], p: Point): number {
+  let best = Infinity;
+  for (let i = 1; i < line.length; i++) best = Math.min(best, pointSegmentDistance(p, line[i - 1]!, line[i]!));
+  return best;
+}
+
+/** The largest ratio of the length along the spine of a member to the length of its own route between the same ends. */
+const DETOUR = 1.25;
+
 /**
  * This function gives the highways of TRACLUS (HWY-025). Each first route breaks into a few long segments by the rule of MDL.
  * DBSCAN puts the segments that are near in distance and angle into clusters. Each cluster with segments of `minLns` edges or more is one highway.
  * The spine is the representative line of the cluster, or a way through the corner graph between its ends when the line hits a box.
  * Each edge of the cluster joins the spine nearest to the first end of its segments. It leaves the spine nearest to the last end.
- * One edge can ride several highways. They go in the order along its route.
+ * An edge rides only when both ends of its part are within `eps` of the spine.
+ * Its length on the spine is also at most 1.25 times the length of its own route there.
+ * Each edge rides one highway at most: the highway where it rides the longest length.
  */
 export function traclusPlan(input: HighwayInput, o: Readonly<TraclusOptions>): HighwayPlan {
   const graph = input.graph;
@@ -209,16 +221,20 @@ export function traclusPlan(input: HighwayInput, o: Readonly<TraclusOptions>): H
   const pad = finder.margin / 2;
   const routes = firstRoutes(input);
   const segments: RouteSegment[] = [];
+  const corners = new Map<string, Point[]>();
   for (const e of graph.edges) {
     const route = routes.get(e.id);
     if (!route || route.length < 2) continue;
     const cps = characteristicPoints(route, unit, o.mdl);
+    corners.set(e.id, cps);
     for (let i = 1; i < cps.length; i++) if (dist(cps[i - 1]!, cps[i]!) > 1e-9) segments.push({ edge: e.id, index: i - 1, a: cps[i - 1]!, b: cps[i]! });
   }
   const minLns = Math.max(2, Math.round(o.minLns));
   const w = { perp: o.wPerp, par: o.wPar, theta: o.wTheta };
-  const clusters = segmentClusters(segments, o.eps * unit, minLns, w);
-  const highways: Highway[] = [];
+  const eps = o.eps * unit;
+  const clusters = segmentClusters(segments, eps, minLns, w);
+  type Placed = { edge: string; on: number; off: number; ride: number };
+  const found: { spine: Point[]; placed: Placed[] }[] = [];
   for (const cluster of clusters) {
     const line = representative(cluster, minLns, finder.margin);
     if (line.length < 2 || polylineLength(line) <= finder.margin) continue;
@@ -240,16 +256,29 @@ export function traclusPlan(input: HighwayInput, o: Readonly<TraclusOptions>): H
         if (s.index > p.last.index) p.last = s;
       }
     }
-    const placed: { edge: string; on: number; off: number }[] = [];
+    const placed: Placed[] = [];
     for (const [edge, p] of parts) {
+      if (lineDistance(spine, p.first.a) > eps || lineDistance(spine, p.last.b) > eps) continue;
       const on = nearestPlace(spine, p.first.a);
       const off = nearestPlace(spine, p.last.b);
-      if (lengthBetween(spine, Math.min(on, off), Math.max(on, off)) > finder.margin) placed.push({ edge, on, off });
+      const ride = lengthBetween(spine, Math.min(on, off), Math.max(on, off));
+      const own = polylineLength(corners.get(edge)!.slice(p.first.index, p.last.index + 2));
+      if (ride > finder.margin && ride <= DETOUR * own + finder.margin) placed.push({ edge, on, off, ride });
     }
-    if (placed.length < 2) continue;
-    const route = spine;
+    if (placed.length >= 2) found.push({ spine, placed });
+  }
+  // Each edge keeps the highway where it rides the longest length. The first highway wins a tie.
+  const best = new Map<string, { at: number; ride: number }>();
+  found.forEach((f, at) => {
+    for (const x of f.placed) if ((best.get(x.edge)?.ride ?? -1) < x.ride) best.set(x.edge, { at, ride: x.ride });
+  });
+  const highways: Highway[] = [];
+  found.forEach((f, at) => {
+    const placed = f.placed.filter((x) => best.get(x.edge)!.at === at);
+    if (placed.length < 2) return;
+    const route = f.spine;
     // The lane order reads the plugs of each edge on each side of the spine.
-    const trip = (x: { edge: string; on: number; off: number }): Point[] => {
+    const trip = (x: Placed): Point[] => {
       const own = routes.get(x.edge)!;
       const [from, to] = [own[0]!, own[own.length - 1]!];
       return x.on <= x.off ? [from, ...route, to] : [to, ...route, from];
@@ -262,6 +291,6 @@ export function traclusPlan(input: HighwayInput, o: Readonly<TraclusOptions>): H
     const byEdge = new Map(placed.map((x) => [x.edge, x]));
     const members: HighwayMember[] = lanes.map((edge) => memberAt(route, edge, byEdge.get(edge)!.on, byEdge.get(edge)!.off));
     highways.push({ id: `h${highways.length}`, key: `t${highways.length}`, spine: route, lanes, members });
-  }
+  });
   return tidyPlan(orderAlongRoutes({ highways }, routes));
 }
