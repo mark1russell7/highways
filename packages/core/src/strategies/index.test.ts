@@ -43,6 +43,15 @@ const elbow = defineStrategy({
   },
 });
 
+// A test curve for the registry of version 0.1.5: the polyline as lines.
+const zigzagLike = defineStrategy({
+  step: "curve",
+  name: "zigzag-like",
+  describe: "A test curve: the polyline as lines.",
+  defaults: {},
+  run: (input) => [{ kind: "move" as const, to: input.points[0]! }, ...input.points.slice(1).map((to) => ({ kind: "line" as const, to }))],
+});
+
 const tiny = makeFixture(FIXTURES.find((f) => f.name === "tiny-uniform")!);
 const small = FIXTURES.filter((f) => f.nodes <= 100);
 const withoutTime = (rows: readonly BenchRow[]): unknown[] => rows.map(({ ms: _ms, ...rest }) => rest);
@@ -144,6 +153,13 @@ describe("a consumer strategy", () => {
     expect(listStrategies(more, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "zigzag"]);
     expect(listStrategies(STRATEGIES, "curve")).toHaveLength(CURVE_TYPES.length);
     expect(benchCurveStrategies(ROUTERS[0]!, "tiny-uniform", tiny, listStrategies(more, "curve")).map((r) => r.type)).toEqual([...CURVE_TYPES, "zigzag"]);
+  });
+
+  it("works with a registry of version 0.1.5, which has no list group", () => {
+    const old = { router: STRATEGIES.router, curve: STRATEGIES.curve, room: STRATEGIES.room };
+    expect(listStrategies(old, "group")).toEqual([]);
+    expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "zigzag-like"]);
+    expect(STEPS).toEqual(["group", "router", "curve", "room"]);
   });
 
   it("must have a name that no other strategy of its step has", () => {

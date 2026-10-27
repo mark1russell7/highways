@@ -5,7 +5,9 @@ import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
 import { benchOne, formatFaults, formatTable, runBenchmark } from "../src/bench/run.ts";
 import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
+import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
+import type { Node } from "../src/model.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, routersOf } from "../src/strategies/model.ts";
 
@@ -45,6 +47,19 @@ console.log(formatRoom(benchRoom("packed-grid", packedGridBoard(), { gutter: 8, 
 for (const settings of [growthSettings(), laneSettings(), passSettings()]) {
   console.log();
   console.log(formatRoom(sweepRoom("packed-grid", packedGridBoard(), settings)));
+}
+// The sweeps of the options of the levels (CUSTOM). The first row of each table is the fair baseline: the router `sections` with the defaults.
+const board = (name: string) => CASES.find((c) => c.name === name)!.make();
+const groupKey = (n: Node): string => n.id.slice(0, n.id.lastIndexOf("-"));
+for (const [fixture, settings] of [
+  ["case-hub-chain", stretchSettings()],
+  ["case-hub-chain", slackSettings()],
+  ["case-dense-groups", capSettings()],
+  ["case-many-groups", capSettings()],
+  ["case-many-groups", groupSettings(listStrategies(STRATEGIES, "group"), { keys: { key: groupKey } })],
+] as const) {
+  console.log();
+  console.log(formatSections(sweepSections(fixture, board(fixture), settings)));
 }
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
