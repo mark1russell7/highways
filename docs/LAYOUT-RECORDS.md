@@ -34,7 +34,7 @@ The corpus is a folder of input files and a manifest `corpus.json`. Each input i
 | `generator` | The generator of the input: `name`, `version`, `params` and `seed`. A hand-made input has `null`. Refer to [The generators](#the-generators-layout-corpus1). |
 | `cell` | The cell of the input in the taxonomy. Refer to [The cells](#the-cells). |
 | `hash` | The first 16 hex characters of the SHA-256 of the canonical file. Refer to [The hash](#the-hash). |
-| `container` | The outer rectangle: `w`, `h`, `fixed`, `aspect` and `shape`. `fixed` is `none`, `width` or `size`. `aspect` is the target `w / h`. The router ignores it. |
+| `container` | The outer rectangle: `w`, `h`, `fixed`, `aspect` and `shape`. `fixed` is `none`, `width`, `height` or `size`. `aspect` is the target `w / h`. The router ignores it. |
 | `gap` | The space between two boxes. The router ignores it. |
 | `obstacles` | The areas that the boxes and the routes must not use. Each one has an `id`, a `region` and a `move` with a `cost`. Refer to [Regions](#regions). |
 | `boxes[].w`, `boxes[].h` | The size of a box. The packer reads them. The router uses them as the bounding box of the box. |
@@ -169,6 +169,8 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 | `router` | `complete`, `ends-at-plugs`, `fixed-plugs`, `no-pass-through`, `counts-sum`, `link-ends`, `bundle-trunk`, `run-shared`, `same-twice` |
 | `group` | `sections`, `counts-sum`, `link-ends`, `same-twice` |
 | `curve` | `same-twice` |
+
+The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
 The [measure note](research/MEASURES.md) tells each rule. The rule `sections` counts a tree that the router refuses. The proposed rules of MEAS0 are measures: `route.curve.rule.*` and `route.level.nesting`.
 
