@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { makeFixture } from "./fixtures.ts";
+import { measureLinks } from "./bench/links.ts";
+import { sameData } from "./bench/run.ts";
+import { CASES } from "./cases.ts";
+import { makeFixture, rng } from "./fixtures.ts";
 import { inflate, pointBoxDistance, segmentHitsBox, type Box, type Point } from "./geom.ts";
-import { facingPlugs, levelLinks } from "./levels.ts";
+import { facingPlugs, levelLinks, type ItemPair } from "./levels.ts";
 import type { Edge, Graph, Level, LevelItem, Node } from "./model.ts";
 import { sectionsRouter } from "./routers/sections.ts";
 
@@ -111,5 +114,61 @@ describe("levelLinks", () => {
       { x: 100, y: 45 },
       { x: 200, y: 45 },
     ]);
+  });
+});
+
+/**
+ * This function makes a walled-in level of made-up data: a grid of `n` × `n` groups.
+ * Each group overlaps its neighbours on all sides, and random links join two groups.
+ */
+function walledLevel(n: number, seed: number): { items: LevelItem[]; pairs: ItemPair[] } {
+  const R = rng(seed);
+  const items: LevelItem[] = [];
+  for (let r = 0; r < n; r++)
+    for (let c = 0; c < n; c++)
+      items.push({
+        id: `g${r}-${c}`,
+        box: { x: c * 90 + Math.floor(R() * 10), y: r * 90 + Math.floor(R() * 10), w: 100 + Math.floor(R() * 30), h: 100 + Math.floor(R() * 30) },
+        nodes: [`g${r}-${c}-a`, `g${r}-${c}-b`],
+      });
+  const pairs: ItemPair[] = [];
+  for (let i = 0; i < 3 * items.length; i++) {
+    const source = items[Math.floor(R() * items.length)]!.id;
+    const target = items[Math.floor(R() * items.length)]!.id;
+    if (source !== target) pairs.push({ source, target, count: 1 });
+  }
+  return { items, pairs };
+}
+
+describe("the soft way on a walled-in level (ER3d)", () => {
+  const { items, pairs } = walledLevel(6, 1);
+  const boxes = new Map(items.map((i) => [i.id, i.box]));
+
+  it("uses throughCost 8 when the option is not set", () => {
+    expect(sameData(levelLinks(items, pairs, { margin: 20, throughCost: 8 }), levelLinks(items, pairs, { margin: 20 }))).toBe(true);
+  });
+
+  it("keeps most links out of the far boxes, with no new out and back and no longer worst detour", () => {
+    const before = measureLinks(boxes, levelLinks(items, pairs, { margin: 20, throughCost: 0 }));
+    const links = levelLinks(items, pairs, { margin: 20, throughCost: 8 });
+    const after = measureLinks(boxes, links);
+    // Each group overlaps its neighbours, so a link can find no way around the groups.
+    expect(before.avoidable).toBe(19);
+    expect(after.avoidable).toBe(2);
+    expect(after.through).toBe(before.through);
+    expect(after.backtrack).toBeLessThanOrEqual(before.backtrack);
+    expect(after.worstDetour).toBeLessThanOrEqual(before.worstDetour);
+    expect(after.outside).toBe(0);
+    for (const l of links) {
+      expect(onBoundary(l.points[0]!, boxes.get(l.source)!), `${l.source} to ${l.target}`).toBe(true);
+      expect(onBoundary(l.points[l.points.length - 1]!, boxes.get(l.target)!), `${l.source} to ${l.target}`).toBe(true);
+    }
+  });
+
+  it("does not change the links of a level without far boxes in the way", () => {
+    for (const c of CASES) {
+      const g = c.make();
+      expect(sameData(sectionsRouter({ name: "s", throughCost: 0 }).route(g).levels, sectionsRouter({ name: "s" }).route(g).levels), c.name).toBe(true);
+    }
   });
 });

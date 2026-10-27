@@ -20,13 +20,14 @@ describe("the options of the levels (CUSTOM)", () => {
       collapse: 32,
       tightMargin: 1,
       plugInset: 6,
+      throughCost: 8,
       hubs: Infinity,
       stretch: 2,
       stretchPad: 4,
       hubSlack: 80,
     });
     expect(SECTION_DEFAULTS).toEqual({ cap: 8, maxDepth: 16, collapse: 32 });
-    expect(LEVEL_LINK_DEFAULTS).toEqual({ tightMargin: 1, plugInset: 6 });
+    expect(LEVEL_LINK_DEFAULTS).toEqual({ tightMargin: 1, plugInset: 6, throughCost: 8 });
     // The far-view thresholds of `pickLevel`.
     expect(PICK).toEqual({ routesAt: 22, itemAt: 120 });
     expect(groupStrategies.quadtree.defaults).toEqual(SECTION_DEFAULTS);

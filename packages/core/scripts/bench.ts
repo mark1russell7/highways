@@ -3,11 +3,14 @@ import { writeFileSync } from "node:fs";
 import { CASES, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
-import { benchOne, formatFaults, formatTable, runBenchmark } from "../src/bench/run.ts";
+import { measureLevelFaults } from "../src/bench/links.ts";
+import { benchOne, formatFaults, formatLevels, formatTable, runBenchmark, type LevelRow } from "../src/bench/run.ts";
 import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
-import type { Node } from "../src/model.ts";
+import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
+import type { Graph, Node } from "../src/model.ts";
+import { sectionsRouter } from "../src/routers/sections.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, routersOf } from "../src/strategies/model.ts";
 
@@ -32,6 +35,9 @@ for (const c of CASES) {
 console.log(formatTable(rows));
 console.log();
 console.log(formatFaults(rows));
+// The faults of each zoom level with groups, with the split of level through into unavoidable and avoidable links (ER3d).
+console.log();
+console.log(formatLevels(rows.filter((r) => r.levelFaults.length > 0)));
 // The curve types change only the drawing of the routes, so the small fixtures are enough.
 const curves: CurveBenchRow<string>[] = [];
 for (const spec of FIXTURES.filter((f) => f.nodes <= 100)) {
@@ -61,6 +67,34 @@ for (const [fixture, settings] of [
   console.log();
   console.log(formatSections(sweepSections(fixture, board(fixture), settings)));
 }
+// The sweep of the cost of a level link through a far box (ER3d). It gives the faults of each level, and the time of the level links alone.
+// The faults come from the router `sections` with its defaults. The times come from the router of the example boards, as `pnpm run levels` times them.
+const SITE = { margin: 20, stretch: 3, cap: 6 };
+const throughBoards: [string, Graph][] = [
+  ...FIXTURES.filter((f) => f.name === "mid-clustered" && f.nodes <= max).map((f): [string, Graph] => [f.name, makeFixture(f)]),
+  ...CASES.map((c): [string, Graph] => [c.name, c.make()]),
+];
+const throughRows: LevelRow[] = [];
+const throughTimes: string[] = [];
+for (const [fixture, graph] of throughBoards) {
+  const site = (sectionsRouter({ name: "site", ...SITE }).route(graph).levels ?? []).slice(0, -1);
+  for (const throughCost of THROUGH_COST_SWEEP) {
+    const setting = `throughCost ${throughCost}`;
+    throughRows.push({ router: setting, fixture, levelFaults: measureLevelFaults(sectionsRouter({ name: setting, throughCost }).route(graph)) });
+    const times: number[] = [];
+    for (let r = 0; r < Number(opt("--repeat") ?? 3); r++) {
+      const t0 = performance.now();
+      for (const level of site) levelLinks(level.items, level.links.map(({ source, target, count }) => ({ source, target, count })), { ...SITE, throughCost });
+      times.push(performance.now() - t0);
+    }
+    times.sort((x, y) => x - y);
+    throughTimes.push(`| ${fixture} | ${setting} | ${times[Math.floor(times.length / 2)]!.toFixed(1)} |`);
+  }
+}
+console.log();
+console.log(formatLevels(throughRows));
+console.log();
+console.log(["| fixture | setting | level links ms (example boards) |", "|---|---|---:|", ...throughTimes].join("\n"));
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
 if (rows.some((r) => !r.deterministic)) process.exitCode = 1;

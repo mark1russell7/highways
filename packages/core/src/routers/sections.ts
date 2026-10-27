@@ -11,7 +11,7 @@ import { WayFinder } from "../ways.ts";
 /**
  * The options of the router with sections. Each option has a default, and the defaults give the output of version 0.1.5.
  * The options `cap`, `maxDepth` and `collapse` are the limits of the default grouping rule, the quadtree of `buildSections`.
- * The options `tightMargin` and `plugInset` are the limits of the level links (`levelLinks`).
+ * The options `tightMargin`, `plugInset` and `throughCost` are the limits of the level links (`levelLinks`).
  */
 export interface SectionsOptions extends LevelLinkOptions, SectionOptions {
   /** The name in the benchmark. */
@@ -50,13 +50,14 @@ export interface SectionsOptions extends LevelLinkOptions, SectionOptions {
 }
 
 /** The default values of the numbers of `SectionsOptions`: the limits of the hubs, of the tree and of the level links. */
-export const SECTIONS_DEFAULTS: Readonly<Required<Pick<SectionsOptions, "cap" | "maxDepth" | "collapse" | "tightMargin" | "plugInset" | "hubs" | "stretch" | "stretchPad" | "hubSlack">>> =
+export const SECTIONS_DEFAULTS: Readonly<Required<Pick<SectionsOptions, "cap" | "maxDepth" | "collapse" | "tightMargin" | "plugInset" | "throughCost" | "hubs" | "stretch" | "stretchPad" | "hubSlack">>> =
   Object.freeze({
     cap: SECTION_DEFAULTS.cap,
     maxDepth: SECTION_DEFAULTS.maxDepth,
     collapse: SECTION_DEFAULTS.collapse,
     tightMargin: LEVEL_LINK_DEFAULTS.tightMargin,
     plugInset: LEVEL_LINK_DEFAULTS.plugInset,
+    throughCost: LEVEL_LINK_DEFAULTS.throughCost,
     hubs: Infinity,
     stretch: 2,
     stretchPad: 4,

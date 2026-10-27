@@ -115,17 +115,36 @@ export function formatTable(rows: readonly BenchRow[]): string {
  */
 export function formatFaults(rows: readonly BenchRow[]): string {
   const head =
-    "| router | fixture | through | out and back | worst detour | outside | level links | level overlaps | level through | level out and back | level worst detour | level outside |";
-  const line = "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+    "| router | fixture | through | out and back | worst detour | outside | level links | level overlaps | level through | level unavoidable | level avoidable | level out and back | level worst detour | level outside |";
+  const line = "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
   const body = rows.map((r) => {
     const f = r.faults;
     const cells = [r.router, r.fixture, f.through, f.backtrack, f.worstDetour.toFixed(2), f.outside];
-    if (r.levelFaults.length === 0) cells.push("-", "-", "-", "-", "-", "-");
+    if (r.levelFaults.length === 0) cells.push("-", "-", "-", "-", "-", "-", "-", "-");
     else {
       const l = sumFaults(r.levelFaults);
-      cells.push(l.links, r.levelFaults.reduce((s, x) => s + x.overlaps, 0), l.through, l.backtrack, l.worstDetour.toFixed(2), l.outside);
+      cells.push(l.links, r.levelFaults.reduce((s, x) => s + x.overlaps, 0), l.through, l.unavoidable, l.avoidable, l.backtrack, l.worstDetour.toFixed(2), l.outside);
     }
     return `| ${cells.join(" | ")} |`;
   });
   return [head, line, ...body].join("\n");
+}
+
+/** A row with the faults of each zoom level, as `formatLevels` reads it: a router or a setting on one fixture. */
+export interface LevelRow {
+  readonly router: string;
+  readonly fixture: string;
+  readonly levelFaults: readonly LevelFaults[];
+}
+
+/** This function writes the faults of each zoom level with groups as a Markdown table, one line for each level. */
+export function formatLevels(rows: readonly LevelRow[]): string {
+  const head = "| router | fixture | depth | items | groups | overlaps | links | through | unavoidable | avoidable | out and back | worst detour | outside |";
+  const line = "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+  const body = rows.flatMap((r) =>
+    r.levelFaults.map((l) =>
+      [r.router, r.fixture, l.depth, l.items, l.groups, l.overlaps, l.links, l.through, l.unavoidable, l.avoidable, l.backtrack, l.worstDetour.toFixed(2), l.outside].join(" | "),
+    ),
+  );
+  return [head, line, ...body.map((b) => `| ${b} |`)].join("\n");
 }

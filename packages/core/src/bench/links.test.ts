@@ -23,6 +23,19 @@ describe("the link measures", () => {
     expect(f.through).toBe(1);
   });
 
+  it("splits the links through a box into unavoidable and avoidable links (ER3d)", () => {
+    // The box `cover` overlaps the source `a`. The box `wall` overlaps neither end.
+    const walled = new Map<string, Box>([...boxes, ["cover", { x: 15, y: 0, w: 15, h: 20 }]]);
+    const f = measureLinks(walled, [
+      { source: "a", target: "b", points: pts(20, 10, 40, 10, 40, -60, 100, -60, 100, 0) },
+      { source: "a", target: "b", points: pts(20, 10, 100, 10) },
+      { source: "a", target: "b", points: pts(10, 0, 10, -60, 110, -60, 110, 0) },
+    ]);
+    expect(f.through).toBe(2);
+    expect(f.unavoidable).toBe(1);
+    expect(f.avoidable).toBe(1);
+  });
+
   it("counts a link that goes farther than the slack outside the bounding box of the boxes", () => {
     const out = { source: "a", target: "b", points: pts(20, 10, 30, 10, 30, 100, 90, 100, 90, 10, 100, 10) };
     expect(measureLinks(boxes, [out]).outside).toBe(1);
@@ -41,7 +54,7 @@ describe("the link measures", () => {
   it("gives the worst detour and sums the faults of several levels", () => {
     const f = measureLinks(boxes, [{ source: "a", target: "b", points: pts(20, 10, 20, 70, 100, 70, 100, 10) }]);
     expect(f.worstDetour).toBeCloseTo(200 / 80);
-    expect(sumFaults([f, f])).toEqual({ links: 2, through: 0, backtrack: 0, worstDetour: f.worstDetour, outside: 0 });
+    expect(sumFaults([f, f])).toEqual({ links: 2, through: 0, unavoidable: 0, avoidable: 0, backtrack: 0, worstDetour: f.worstDetour, outside: 0 });
   });
 
   it("counts the pairs of boxes that overlap", () => {

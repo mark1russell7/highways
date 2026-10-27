@@ -16,7 +16,9 @@ describe("benchRoom on the packed grid (ROOM)", () => {
 
   it("packed: the links of the far view go through the boxes, because the boxes leave no channel", () => {
     const packed = row("packed");
-    expect(packed.faults.through).toBe(62);
+    // ER3d: the soft way of the level links moves 6 links out of the boxes. Before ER3d, the value was 62.
+    expect(packed.faults.through).toBe(56);
+    expect(packed.faults.worstDetour).toBeCloseTo(1.48, 2);
     expect(packed.laneThrough).toBe(94);
   });
 

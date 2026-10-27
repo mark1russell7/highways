@@ -1,4 +1,5 @@
-import { dist, inflate, segmentHitsRect, type Box, type Point } from "./geom.ts";
+import { TOLERANCE } from "./bench/properties.ts";
+import { dist, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
 
@@ -35,6 +36,17 @@ export class Obstacles {
   clearPath(p: readonly Point[], pad: number, skip?: ReadonlySet<Node>): boolean {
     for (let i = 1; i < p.length; i++) if (!this.clear(p[i - 1]!, p[i]!, pad, skip)) return false;
     return true;
+  }
+
+  /**
+   * This method gives each node whose box the segment `ab` goes through to `visit`, one time each.
+   * The segment goes through a box when a part of it longer than `TOLERANCE` is inside the box made smaller by `TOLERANCE`.
+   * The link measures (`measureLinks`) use the same test.
+   */
+  through(a: Point, b: Point, visit: (n: Node) => void): void {
+    this.#grid.querySegment(a, b, 0, (n) => {
+      if (segmentHitsBox(a, b, inflate(n.box, -TOLERANCE), TOLERANCE)) visit(n);
+    });
   }
 
   /** This method gives each node whose bucket the box touches to `visit`. A node can be outside the box. */
@@ -490,6 +502,183 @@ export class CornerGraph {
       i = j;
     }
     return out;
+  }
+}
+
+/** The options of the soft graph. */
+export interface SoftGraphOptions {
+  /** The distance from a box to its corners. */
+  readonly margin: number;
+  /** The number of nearest neighbours of each vertex. */
+  readonly k: number;
+  /**
+   * The spacing of a lattice of points in the bounding box of the boxes, in units of the mean node size. The default is 3, and 0 turns it off.
+   * The lattice links groups of boxes across empty space.
+   */
+  readonly lattice?: number;
+}
+
+/**
+ * A graph whose links can go through the boxes. Its vertices are the corners of the boxes, made larger by `margin`,
+ * and a lattice of points in the bounding box of the boxes. Each vertex links to its `k` nearest vertices, in view or not.
+ * The graph keeps the boxes that each link goes through (`Obstacles.through`).
+ * A search gives each box a cost, so a path goes through few boxes, and only through boxes of a low cost.
+ */
+export class SoftGraph {
+  readonly points: Point[] = [];
+  readonly #nodes: readonly Node[];
+  readonly #obstacles: Obstacles;
+  readonly #adj: number[][] = [];
+  readonly #len: number[][] = [];
+  // The indices of the nodes that each link goes through, in the order of #adj.
+  readonly #through: (readonly number[])[][] = [];
+  readonly #grid: Grid<number>;
+  readonly #cell: number;
+  readonly #k: number;
+
+  /** This constructor makes the graph of the nodes. */
+  constructor(nodes: readonly Node[], obstacles: Obstacles, options: SoftGraphOptions) {
+    this.#nodes = nodes;
+    this.#obstacles = obstacles;
+    this.#k = options.k;
+    let size = 0;
+    for (const n of nodes) size += (n.box.w + n.box.h) / 2;
+    this.#cell = Math.max(1, size / Math.max(1, nodes.length) + 2 * options.margin);
+    this.#grid = new Grid<number>(this.#cell);
+    let x0 = Infinity;
+    let y0 = Infinity;
+    let x1 = -Infinity;
+    let y1 = -Infinity;
+    for (const n of nodes) {
+      const b = inflate(n.box, options.margin);
+      for (const c of [
+        { x: b.x, y: b.y },
+        { x: b.x + b.w, y: b.y },
+        { x: b.x + b.w, y: b.y + b.h },
+        { x: b.x, y: b.y + b.h },
+      ])
+        this.#add(c);
+      x0 = Math.min(x0, n.box.x);
+      y0 = Math.min(y0, n.box.y);
+      x1 = Math.max(x1, n.box.x + n.box.w);
+      y1 = Math.max(y1, n.box.y + n.box.h);
+    }
+    // The lattice stays in the bounding box of the boxes, so a path does not go around the outer edge of the board.
+    const spacing = (options.lattice ?? 3) * this.#cell;
+    if (spacing > 0) for (let x = x0 + spacing / 2; x < x1; x += spacing) for (let y = y0 + spacing / 2; y < y1; y += spacing) this.#add({ x, y });
+    const links: Set<number>[] = this.points.map(() => new Set<number>());
+    for (let i = 0; i < this.points.length; i++)
+      for (const j of this.#nearest(this.points[i]!, this.#k, i)) {
+        links[i]!.add(j);
+        links[j]!.add(i);
+      }
+    const index = new Map(nodes.map((n, i) => [n, i]));
+    // The boxes of each link, found one time for the two directions of the link.
+    const known = new Map<number, readonly number[]>();
+    const count = this.points.length;
+    links.forEach((set, i) => {
+      const adj = [...set].sort((a, b) => a - b);
+      this.#adj.push(adj);
+      this.#len.push(adj.map((j) => dist(this.points[i]!, this.points[j]!)));
+      this.#through.push(
+        adj.map((j) => {
+          const key = Math.min(i, j) * count + Math.max(i, j);
+          let list = known.get(key);
+          if (list === undefined) {
+            const found: number[] = [];
+            obstacles.through(this.points[i]!, this.points[j]!, (n) => found.push(index.get(n)!));
+            list = found;
+            known.set(key, list);
+          }
+          return list;
+        }),
+      );
+    });
+  }
+
+  #add(c: Point): void {
+    this.#grid.add(this.points.length, { x: c.x, y: c.y, w: 0, h: 0 });
+    this.points.push(c);
+  }
+
+  /** This method gives at most `k` vertices nearest to `p`, in view or not, nearest first, and equal distances by index. The vertex `self` does not count. */
+  #nearest(p: Point, k: number, self = -1): number[] {
+    const all = this.points.length - (self >= 0 ? 1 : 0);
+    const want = Math.min(k, all);
+    if (want <= 0) return [];
+    for (let r = this.#cell; ; r *= 2) {
+      const found: number[] = [];
+      this.#grid.query({ x: p.x - r, y: p.y - r, w: 2 * r, h: 2 * r }, (j) => {
+        if (j !== self && dist(p, this.points[j]!) <= r) found.push(j);
+      });
+      if (found.length >= want) {
+        const d = (j: number): number => dist(p, this.points[j]!);
+        return found.sort((a, b) => d(a) - d(b) || a - b).slice(0, want);
+      }
+    }
+  }
+
+  /**
+   * This method gives a path of least cost from `from` to `to` (A*), with the two points as its ends.
+   * The cost of a path is its length, plus `cost(n)` for each link of the path and each box `n` of that link.
+   * Each cost must be 0 or more. The straight line from `from` to `to` is a path too, so the method always gives a path.
+   */
+  path(from: Point, to: Point, cost: (n: Node) => number): Point[] {
+    const points = this.points;
+    const nodes = this.#nodes;
+    const extra = (a: Point, b: Point): number => {
+      let c = 0;
+      this.#obstacles.through(a, b, (m) => {
+        c += cost(m);
+      });
+      return c;
+    };
+    let best = dist(from, to) + extra(from, to);
+    let bestEnd = -1;
+    const goal = new Map<number, number>();
+    for (const j of this.#nearest(to, 2 * this.#k)) goal.set(j, dist(points[j]!, to) + extra(points[j]!, to));
+    const n = points.length;
+    const g = new Float64Array(n).fill(Infinity);
+    const parent = new Int32Array(n).fill(-1);
+    const closed = new Uint8Array(n);
+    const heap = new MinHeap();
+    for (const j of this.#nearest(from, 2 * this.#k)) {
+      const c = dist(from, points[j]!) + extra(from, points[j]!);
+      if (c < g[j]!) {
+        g[j] = c;
+        heap.push(c + dist(points[j]!, to), j);
+      }
+    }
+    while (heap.size > 0) {
+      if (heap.topKey >= best) break;
+      const i = heap.pop();
+      if (closed[i] === 1) continue;
+      closed[i] = 1;
+      const gi = g[i]!;
+      const tail = goal.get(i);
+      if (tail !== undefined && gi + tail < best) {
+        best = gi + tail;
+        bestEnd = i;
+      }
+      const adj = this.#adj[i]!;
+      const len = this.#len[i]!;
+      const through = this.#through[i]!;
+      for (let m = 0; m < adj.length; m++) {
+        const j = adj[m]!;
+        if (closed[j] === 1) continue;
+        let c = gi + len[m]!;
+        for (const b of through[m]!) c += cost(nodes[b]!);
+        if (c < g[j]!) {
+          g[j] = c;
+          parent[j] = i;
+          heap.push(c + dist(points[j]!, to), j);
+        }
+      }
+    }
+    const out: Point[] = [to];
+    for (let i = bestEnd; i >= 0; i = parent[i]!) out.push(points[i]!);
+    out.push(from);
+    return out.reverse();
   }
 }
 

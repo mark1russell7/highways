@@ -1,7 +1,8 @@
+import { boxesOverlap, goesOutAndBack } from "./bench/links.ts";
 import { center, dist, polylineLength, type Box, type Point } from "./geom.ts";
 import type { LevelItem, LevelLink, Node, Side } from "./model.ts";
 import { pointOnSide, SIDE_NORMAL, sideToward, type Plug } from "./plugs.ts";
-import { CornerGraph, Obstacles } from "./visibility.ts";
+import { CornerGraph, Obstacles, SoftGraph } from "./visibility.ts";
 import type { WayFinder, WayOptions } from "./ways.ts";
 
 /** Two items of a level that a link joins, and the count of the edges between them. */
@@ -26,6 +27,10 @@ interface LevelWays extends Ways {
   readonly tight: () => CornerGraph;
   /** The free plugs of each node that a link needed. */
   readonly free: Map<Node, FreePlugs>;
+  /** This function gives the graph of `SoftGraph`. The first link that needs it makes it. */
+  readonly soft: () => SoftGraph;
+  /** The mean size of the boxes: the mean of the larger side of each box. */
+  readonly size: number;
 }
 
 /** The options of the links of a level: the options of the ways, and two limits of the level links. */
@@ -37,10 +42,23 @@ export interface LevelLinkOptions extends WayOptions {
   readonly tightMargin?: number;
   /** A plug stays at least this far from the corners of its side. The level links use the smaller of this value and `margin`. The default is 6. */
   readonly plugInset?: number;
+  /**
+   * The cost of a level link through a far box, in units of the mean box size. A far box overlaps neither end of the link.
+   * A link through a far box gets a second way that can go through boxes (`SoftGraph`). The link keeps the way with fewer far boxes.
+   * The value 0 turns the second way off and gives the links of version 0.1.5. The default is 8.
+   */
+  readonly throughCost?: number;
 }
 
-/** The default values of the two limits of `LevelLinkOptions`. */
-export const LEVEL_LINK_DEFAULTS: Readonly<Required<Pick<LevelLinkOptions, "tightMargin" | "plugInset">>> = Object.freeze({ tightMargin: 1, plugInset: 6 });
+/** The default values of the three limits of `LevelLinkOptions`. */
+export const LEVEL_LINK_DEFAULTS: Readonly<Required<Pick<LevelLinkOptions, "tightMargin" | "plugInset" | "throughCost">>> = Object.freeze({
+  tightMargin: 1,
+  plugInset: 6,
+  throughCost: 8,
+});
+
+/** The values of `throughCost` of the sweep of ER3d in the benchmark. The value 0 gives the links of version 0.1.5. */
+export const THROUGH_COST_SWEEP: readonly number[] = [0, 2, 4, 8, 16];
 
 const EPS = 1e-6;
 
@@ -77,6 +95,7 @@ export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const ways = levelWays(nodes, options);
   const inset = Math.min(options.plugInset ?? LEVEL_LINK_DEFAULTS.plugInset, ways.margin);
+  const throughCost = options.throughCost ?? LEVEL_LINK_DEFAULTS.throughCost;
   const out: LevelLink[] = [];
   for (const p of pairs) {
     const s = byId.get(p.source);
@@ -89,7 +108,16 @@ export function levelLinks(items: readonly LevelItem[], pairs: readonly ItemPair
     points ??= sideWay(ways, s, t, inset);
     out.push({ source: p.source, target: p.target, count: p.count, points });
   }
-  return out;
+  if (throughCost <= 0) return out;
+  // The second way never makes the worst detour of the level longer.
+  const limit = out.reduce((m, l) => Math.max(m, detour(l.points)), 1);
+  return out.map((l) => ({ ...l, points: fewerFar(ways, byId.get(l.source)!, byId.get(l.target)!, l.points, throughCost, limit) }));
+}
+
+/** This function gives the length of the polyline divided by the distance between its ends, as the measure `worstDetour` gives it. */
+function detour(p: readonly Point[]): number {
+  const span = p.length > 1 ? dist(p[0]!, p[p.length - 1]!) : 0;
+  return span > 1 ? polylineLength(p) / span : 1;
 }
 
 /**
@@ -122,7 +150,129 @@ function levelWays(nodes: readonly Node[], options: LevelLinkOptions): LevelWays
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
   const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true }));
-  return { obstacles, corners, margin, out, tight: tightGraph, free: new Map() };
+  let soft: SoftGraph | undefined;
+  const softGraph = (): SoftGraph => (soft ??= new SoftGraph(nodes, obstacles, { margin, k }));
+  return { obstacles, corners, margin, out, tight: tightGraph, free: new Map(), soft: softGraph, size: size / Math.max(1, nodes.length) };
+}
+
+/** This function gives the boxes that the polyline goes through, without the boxes of `s` and `t`, and the number of far boxes among them. */
+function boxesThrough(ways: Ways, p: readonly Point[], s: Node, t: Node, near: ReadonlySet<Node>): { boxes: Set<Node>; far: number } {
+  const boxes = new Set<Node>();
+  let far = 0;
+  for (let i = 1; i < p.length; i++)
+    ways.obstacles.through(p[i - 1]!, p[i]!, (n) => {
+      if (n === s || n === t || boxes.has(n)) return;
+      boxes.add(n);
+      if (!near.has(n)) far++;
+    });
+  return { boxes, far };
+}
+
+/** This function gives the nodes whose boxes overlap the box of `s` or the box of `t`, as `boxesOverlap` sees it. */
+function nearBoxes(ways: Ways, s: Node, t: Node): Set<Node> {
+  const near = new Set<Node>();
+  for (const end of [s, t])
+    ways.obstacles.query(end.box, (n) => {
+      if (n !== s && n !== t && boxesOverlap(n.box, end.box)) near.add(n);
+    });
+  return near;
+}
+
+/**
+ * This function gives a way with fewer far boxes than `way`, or `way`. A far box overlaps neither end of the link.
+ * On a walled-in level, each box overlaps its neighbours, so a link can find no way around the boxes.
+ * Then a search of `SoftGraph` goes from the center of `s` to the center of `t`.
+ *
+ * In the search, a far box costs `cost` mean box sizes, and a near box costs one mean box size.
+ * The way starts where the path leaves the box of `s` for the last time. It ends where the path then first enters the box of `t`.
+ * The link keeps `way` when the new way goes out and back and `way` does not.
+ * It also keeps `way` when the detour of the new way is longer than `limit`.
+ */
+function fewerFar(ways: LevelWays, s: Node, t: Node, way: readonly Point[], cost: number, limit: number): readonly Point[] {
+  const near = nearBoxes(ways, s, t);
+  const before = boxesThrough(ways, way, s, t, near);
+  if (before.far === 0) return way;
+  const far = cost * ways.size;
+  const path = ways.soft().path(center(s.box), center(t.box), (n) => (n === s || n === t ? 0 : near.has(n) ? ways.size : far));
+  const clipped = clip(path, s.box, t.box);
+  if (!clipped) return way;
+  const soft = tidy(pullThrough(ways, clipped, s, t));
+  // A way that goes out and back is a new fault, so the link keeps the old way.
+  if (goesOutAndBack(soft) && !goesOutAndBack(way)) return way;
+  if (detour(soft) > limit) return way;
+  return boxesThrough(ways, soft, s, t, near).far < before.far ? soft : way;
+}
+
+/** This function tells if the point is inside the box, not on its boundary. */
+const within = (p: Point, b: Box): boolean => p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h;
+
+/** This function gives the point where the segment from `a`, inside the box, to `b` leaves the box. */
+function exitPoint(a: Point, b: Point, box: Box): Point {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  let u = 1;
+  if (dx > 0) u = Math.min(u, (box.x + box.w - a.x) / dx);
+  if (dx < 0) u = Math.min(u, (box.x - a.x) / dx);
+  if (dy > 0) u = Math.min(u, (box.y + box.h - a.y) / dy);
+  if (dy < 0) u = Math.min(u, (box.y - a.y) / dy);
+  u = Math.max(0, u);
+  return { x: a.x + u * dx, y: a.y + u * dy };
+}
+
+/**
+ * This function cuts a path from the inside of the box `a` to the inside of the box `b`. The cut path starts where the path leaves `a` for the last time.
+ * It ends where the path then first enters `b`. It gives `undefined` when no such part is left.
+ */
+function clip(p: readonly Point[], a: Box, b: Box): Point[] | undefined {
+  let i = -1;
+  for (let k = 0; k < p.length; k++) if (within(p[k]!, a)) i = k;
+  if (i < 0 || i === p.length - 1) return undefined;
+  let j = -1;
+  for (let k = i + 1; k < p.length && j < 0; k++) if (within(p[k]!, b)) j = k;
+  if (j < 0) return undefined;
+  const start = exitPoint(p[i]!, p[i + 1]!, a);
+  const end = exitPoint(p[j]!, p[j - 1]!, b);
+  if (within(start, b) || within(end, a)) return undefined;
+  return [start, ...p.slice(i + 1, j), end];
+}
+
+/**
+ * This function pulls a soft path tight. From each vertex, it goes to the farthest vertex of the next 16 vertices with a straight line.
+ * The line can go only through the boxes that the path between the two vertices goes through.
+ */
+function pullThrough(ways: Ways, p: readonly Point[], s: Node, t: Node, lookahead = 16): Point[] {
+  if (p.length < 3) return [...p];
+  const boxesOf = (a: Point, b: Point): Node[] => {
+    const out: Node[] = [];
+    ways.obstacles.through(a, b, (n) => {
+      if (n !== s && n !== t) out.push(n);
+    });
+    return out;
+  };
+  // The boxes of each leg of the path, found one time.
+  const legs = p.map((q, m) => (m === 0 ? [] : boxesOf(p[m - 1]!, q)));
+  const out: Point[] = [p[0]!];
+  let i = 0;
+  while (i < p.length - 1) {
+    let next = i + 1;
+    const last = Math.min(p.length - 1, i + lookahead);
+    // The boxes of the path from vertex i to each vertex j.
+    const along: Set<Node>[] = [];
+    let seen = new Set<Node>();
+    for (let j = i + 1; j <= last; j++) {
+      seen = new Set([...seen, ...legs[j]!]);
+      along[j] = seen;
+    }
+    for (let j = last; j > i + 1; j--) {
+      if (boxesOf(p[i]!, p[j]!).every((n) => along[j]!.has(n))) {
+        next = j;
+        break;
+      }
+    }
+    out.push(p[next]!);
+    i = next;
+  }
+  return out;
 }
 
 /**
