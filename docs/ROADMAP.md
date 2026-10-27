@@ -42,6 +42,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | GRP-R | Research: [grouping rules for the zoom levels](research/GROUPING.md). The note gives 19 rules in four kinds and a build order of 5 rules for GRP2. A guillotine cut that reads the links cuts fewer links than the quadtree at the far view on 8 of 10 boards. | 2026-10-26 | #39 |
 | HWC-C | `leave: "part"` lets each lane of a trunk leave where its way parts, so few branches turn back. On `trunks-all` and `case-dense-groups`, worst lane spacing error: 133.2% before, 0.8% after. Body crossings: 3 before, 0 after. | 2026-10-27 | #44 |
 | BENCH-CI | The workflow `Bench` races the routers in parts that run at the same time, with a time limit for each cell. Before, no push run on `main` finished: 0 of 25 since `fa1dd82`, each over 60 min. After, a run to 10 000 nodes finishes in 12.4 min. | 2026-10-27 | #45 |
+| MEAS1 | `runSuite` puts the 10 measures of the short list of MEAS0 and the 6 proposed rules in the bench. The suite measures 5 seeds of each family to 1 000 nodes and 1 seed above. Each step gets the median, the IQR and a Pareto front. Up to 100 nodes, each of the 6 rule counts is 0 for each built-in strategy. | 2026-10-27 | #35 |
 
 ## Open
 
@@ -49,7 +50,6 @@ Status: `done`, `active`, `blocked`, `later`.
 |---|---|---|---|---|
 | HWC-D | Room for the bends of wide bundles: the gaps grow so that the concentric arcs of a bundle fit. | `later` | HWC, ROOM2 | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
-| MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
 | GRP2 | More grouping strategies from GRP-R, each in its folder with its tests and a row in the benchmark. | `later` | GRP-R, MEAS1 | P2 |
