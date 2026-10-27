@@ -23,12 +23,12 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL2 | Version 0.1.3 on npm: PERF1, ER3a, ER3b and the measures of QFIX. | 2026-10-26 | #17 |
 | ER3c | On a level with many groups, the level links go through the groups, not around the outer edge. Level outside on `case-many-groups`: 4 before, 0 after. | 2026-10-26 | #19 |
 | CURVE | Curve types for the routes: straight, rounded, spline and arc, as segments for any renderer. With the free space, no curve goes through a box. | 2026-10-26 | #21 |
+| ROOM | `roomDemand` gives the room that each gap needs, and `openGaps` opens it. On `packedGridBoard`, links through boxes: 62 before, 0 after, for 50% more area. | 2026-10-26 | #22 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| ROOM | Room for the links between boxes. The router gives the room that each gap needs, from the links that cross it, the line spacing and a minimum gutter. A layout opens the gaps to that room before it places the boxes. Measure: a dense board with touching boxes, before and after. | `later` | | P1 |
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
 | CUSTOM | Options for the generalizations: the grouping rule, the levels and their limits. | `later` | STRAT | P2 |
