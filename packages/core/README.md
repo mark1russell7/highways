@@ -70,6 +70,40 @@ Each type has its own function too: `straightCurve`, `roundedCurve`, `splineCurv
 
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
 
+## Room for the links
+
+A host layout can pack the boxes of a far view in a grid, with no gap between them. Then the links have no channel, and they go through the boxes. The router knows the room that the links need. The room functions give that room, and they can open the gaps.
+
+- `roomDemand(items, links, options)` gives the gaps of the board. A gap is a boundary between two columns (`axis: "x"`) or two rows (`axis: "y"`). Each gap has its current `width`, its `lanes` and its `need`.
+- The need of a gap is `gutter + lanes × spacing`, and not less than its current width. The default gutter is 8, and the default spacing is 4.
+- With the method `routes`, the default, the function opens each gap to the gutter and routes the links one time. The lanes of a gap are the most routes that go along it side by side.
+- With the method `lines`, the lanes of a gap are the straight lines between the centers of the boxes that cross the gap.
+- `openGaps(items, gaps)` moves each box by the growth of each gap before it. The boxes keep their size, their order and their alignment, so a grid stays a grid.
+- `makeRoom(items, links, options)` gives the gaps and the open board. `maxGrowth` limits the growth of the board on each axis, as a share of its size.
+- `roomLinks(graph)` gives the links of a graph, with the count of the edges of each pair.
+
+The host layout still packs the boxes. These functions do not place a box. They only open the gaps between the boxes.
+
+```ts
+import { cornersRouter, makeRoom, roomLinks } from "@mark1russell7/highways";
+
+const room = makeRoom(graph.nodes, roomLinks(graph), { gutter: 8, spacing: 4 });
+// Each gap tells its axis, its place `at`, its `width`, its `lanes` and its `need`.
+const open = { nodes: room.items, edges: graph.edges };
+const result = cornersRouter({ name: "corners" }).route(open);
+```
+
+The benchmark measures the board `packedGridBoard`: 96 touching boxes and 132 links, at gutter 8 and spacing 4. The links are the links of the far view. A lane route of the router `sections` gets a lane of 4 units for each edge of a shared segment.
+
+| Board | Area | Through | Crossings | Mean detour | Worst detour | Lane routes through a box |
+|---|---:|---:|---:|---:|---:|---:|
+| Packed | 1.00 | 62 | 162 | 1.12 | 1.48 | 94 |
+| Gutter only | 1.13 | 0 | 345 | 1.34 | 2.38 | 10 |
+| Method `routes` | 1.50 | 0 | 276 | 1.32 | 2.09 | 2 |
+| Method `lines` | 3.80 | 0 | 382 | 1.20 | 1.47 | 5 |
+
+On the packed board, the links are short only because they go through the boxes. The method `routes` is the default, because it gives the fewest crossings for its area.
+
 ## License
 
 MIT

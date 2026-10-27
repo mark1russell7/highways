@@ -1,10 +1,11 @@
 // The command line of the benchmark: `pnpm bench [--max <nodes>] [--json <file>]`.
 import { writeFileSync } from "node:fs";
-import { CASES } from "../src/cases.ts";
+import { CASES, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { ROUTERS } from "../src/routers/index.ts";
 import { benchCurves, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
 import { benchOne, formatFaults, formatTable, runBenchmark } from "../src/bench/run.ts";
+import { benchRoom, formatRoom } from "../src/bench/room.ts";
 import { makeFixture } from "../src/fixtures.ts";
 
 const args = process.argv.slice(2);
@@ -34,6 +35,9 @@ for (const spec of FIXTURES.filter((f) => f.nodes <= 100)) {
 }
 console.log();
 console.log(formatCurves(curves));
+// The room of the links: a packed board of touching boxes, before and after `makeRoom` at gutter 8 and spacing 4.
+console.log();
+console.log(formatRoom(benchRoom("packed-grid", packedGridBoard(), { gutter: 8, spacing: 4 })));
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
 if (rows.some((r) => !r.deterministic)) process.exitCode = 1;
