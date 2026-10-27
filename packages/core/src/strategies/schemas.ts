@@ -6,10 +6,13 @@ import type { CorridorOptions } from "../highways/corridors/index.ts";
 import type { DiffusionOptions } from "../highways/diffusion/index.ts";
 import type { FlowClusterOptions } from "../highways/flow-clusters/index.ts";
 import type { FlowFieldOptions } from "../highways/flow-field/index.ts";
+import type { GrowthOptions } from "../highways/growth/index.ts";
 import type { GroupSpine } from "../highways/grouped.ts";
+import type { LanesOptions } from "../highways/lanes/index.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
 import type { MingleOptions } from "../highways/mingle/index.ts";
+import type { NestedOptions } from "../highways/nested/index.ts";
 import type { OdCellOptions } from "../highways/od-cells/index.ts";
 import type { QuickBundlesOptions } from "../highways/quickbundles/index.ts";
 import type { RoadClassOptions } from "../highways/road-classes/index.ts";
@@ -126,6 +129,24 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     default: "span",
     describe: "The order of the edges of a key: the longest first, the shortest first, the most edges between two sections first, or the input order (NAT-024).",
   },
+  reuse: {
+    type: "number",
+    min: 0,
+    max: 2,
+    step: 0.25,
+    default: 0,
+    describe: "With a value above 0, each later pass routes the edges again, and the busy links of the pass before cost less (HWY-005).",
+  },
+  reuseExponent: { type: "number", min: 0.5, max: 2, step: 0.25, default: 1, describe: "The exponent of the pull of the busy links of the option `reuse`." },
+  capacity: {
+    type: "number",
+    min: 0,
+    max: 10,
+    step: 0.5,
+    default: 0,
+    describe: "With a value above 0, a link costs more for each lane that does not fit in the free space across it (HWY-016).",
+  },
+  laneWidth: { type: "number", min: 2, max: 8, step: 1, default: 4, describe: "The width of one lane, for the option `capacity`." },
   merge: {
     type: "enum",
     values: ["corner", "snell"],
@@ -458,4 +479,39 @@ export const DIFFUSION_SCHEMA: OptionSchema<DiffusionOptions> = {
   lambda: { type: "number", min: 0, max: 2, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the density in the cost of a link." },
   gamma: { type: "number", min: 0.5, max: 2, step: 0.25, default: 1, describe: "The power of the discount of a dense link." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `nested` (HWY-052). */
+export const NESTED_SCHEMA: OptionSchema<NestedOptions> = {
+  theta: QUICKBUNDLES_SCHEMA.theta,
+  ratio: { type: "number", min: 1.5, max: 4, step: 0.5, default: 2, describe: "The scale of each level is this value times the scale of the next closer level." },
+  levels: { type: "integer", min: 1, max: 6, step: 1, default: 3, describe: "The number of levels." },
+  level: { type: "integer", min: 0, max: 5, step: 1, default: 0, describe: "The level of the plan. Level 0 is the closest level." },
+  points: QUICKBUNDLES_SCHEMA.points,
+  line: QUICKBUNDLES_SCHEMA.line,
+  order: QUICKBUNDLES_SCHEMA.order,
+  minSize: QUICKBUNDLES_SCHEMA.minSize,
+  spine: GROUP_SPINE,
+};
+
+/** The declarations of the options of the highway strategy `lanes` (HWY-051). */
+export const LANES_SCHEMA: OptionSchema<LanesOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  from: HIGHWAY_BASE,
+  laneGap: { type: "number", min: 2, max: 8, step: 1, default: 4, describe: "The gap between two lanes." },
+  maxWidth: { type: "number", min: 8, max: 64, step: 4, default: 32, describe: "The largest width of a highway." },
+  depth: { type: "integer", min: 0, max: 5, step: 1, default: 3, describe: "The number of times that a highway can split, one half after the other." },
+};
+
+/** The declarations of the options of the highway strategy `growth` (HWY-055). */
+export const GROWTH_SCHEMA: OptionSchema<GrowthOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  order: { type: "enum", values: ["length", "input"], default: "length", describe: "The order of the edges: the longest first route first, or the order of the graph." },
+  share: { type: "number", min: 0.1, max: 1, step: 0.05, marks: [0.5], default: 0.5, describe: "The cost of the part on a spine, as a share of its length." },
+  stretch: { type: "number", min: 1, max: 2, step: 0.05, marks: [1.3], default: 1.3, describe: "An edge joins a highway only when its way along it is this value times its first route or shorter." },
+  extendLanes: { type: "integer", min: 2, max: 8, step: 1, default: 3, describe: "A spine end extends when this number of its lanes or more go on together." },
+  extendRadius: { type: "number", min: 0.5, max: 6, step: 0.5, default: 2, describe: "The lanes go on together when their ends are this distance from their center or nearer, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway with this number of edges or more stays in the plan." },
 };

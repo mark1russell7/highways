@@ -7,6 +7,7 @@ export * from "./plugs.ts";
 export * from "./curves.ts";
 export * from "./curves/index.ts";
 export * from "./visibility.ts";
+export * from "./channels.ts";
 export * from "./ways.ts";
 export * from "./segments.ts";
 export * from "./sections.ts";

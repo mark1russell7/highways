@@ -205,6 +205,9 @@ importers:
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.5
+      highs:
+        specifier: ^1.15.4
+        version: 1.15.4
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -943,6 +946,10 @@ packages:
 
   highlight.js@10.7.3:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
+
+  highs@1.15.4:
+    resolution: {integrity: sha512-vsC03XHDqWAVrEFUt22h8e4CDDMb+LAFa0bycjPUq2kadRigK5pNLVIlwspKvMxxVtrr4NAucZHP/CAgigxiDQ==}
+    engines: {node: '>=18'}
 
   hookable@6.1.2:
     resolution: {integrity: sha512-+abwxtiEA52GCVIsQqut3S/uKTbUwYIp4Pe/vv+6py5XiXBCqMZHg6pA6Y5qhgLSEys0/cYuPbO0z1QFj5ZCmg==}
@@ -1860,6 +1867,8 @@ snapshots:
   has-flag@4.0.0: {}
 
   highlight.js@10.7.3: {}
+
+  highs@1.15.4: {}
 
   hookable@6.1.2: {}
 
