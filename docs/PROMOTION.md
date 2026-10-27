@@ -159,6 +159,8 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 The four tolerances of `pack.stability` and `pack.aspectError` are first values of `packing`. The records of the floor rule give the data to measure them later.
 
+The floor and the tolerance of each `joint.*` measure are in `JOINT_MEASURES` of `@mark1russell7/layout-contract`. Its table is in `docs/JOINT-MEASURES.md`. This file does not copy them.
+
 ## The order of promotions
 
 - Promote one option at a time. After each promotion, the screen compares the next candidate with the new default.

@@ -156,14 +156,16 @@ describe("the fit of highways to layout-contract", () => {
     expect(inputGraph(open)).toEqual(inputGraph(tiny));
   });
 
-  it("gives the joint measures with a floor of 0 the floor and the tolerance of `docs/PROMOTION.md`", () => {
+  it("takes the joint floors from the contract and matches their packer twins in `docs/PROMOTION.md`", () => {
     const floors = promotionFloors();
     expect(floors.size).toBeGreaterThan(0);
+    // `JOINT_MEASURES` is the one source of each joint floor, so `docs/PROMOTION.md` has no `joint.*` row.
+    expect([...floors.keys()].filter((id) => id.startsWith("joint."))).toEqual([]);
     let matched = 0;
     for (const spec of C.JOINT_MEASURES) {
       if (spec.floor !== 0) continue;
-      // A joint measure without its own row uses the row of its packer twin, for example `pack.aspectError` for `joint.aspectError`.
-      const row = floors.get(spec.id) ?? floors.get(spec.id.replace(/^joint\./, "pack."));
+      // A joint measure with a packer twin, for example `joint.aspectError` and `pack.aspectError`, has the floor and the tolerance of the twin.
+      const row = floors.get(spec.id.replace(/^joint./, "pack."));
       if (row === undefined) continue;
       expect({ id: spec.id, floor: spec.floor, tol: spec.tol }).toEqual({ id: spec.id, floor: row.floor, tol: row.tol });
       matched++;
