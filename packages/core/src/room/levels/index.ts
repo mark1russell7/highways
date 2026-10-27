@@ -1,7 +1,7 @@
 import type { ItemPair } from "../../levels.ts";
 import type { LevelItem } from "../../model.ts";
 import { levelCut, treeDepth, type Section } from "../../sections.ts";
-import { boardGaps, openGaps, roomDemand, type Boxed, type Gap, type RoomLink, type RoomOptions } from "../index.ts";
+import { boardGaps, openGaps, roomDemand, withBends, type Boxed, type Gap, type RoomLink, type RoomOptions } from "../index.ts";
 
 /**
  * The boards of the zoom levels of `levelRoom`.
@@ -84,15 +84,24 @@ export function levelRoom<T extends Boxed>(nodes: readonly T[], links: readonly 
   const indexOf = new Map(nodes.map((n, i) => [n.id, i]));
   const levels: RoomLevel<T>[] = [];
   let current: T[] = [...nodes];
+  // The edges of the bends join nodes, not the items of a level. So the bends get room on the board of the nodes, at the last level.
+  const { bends, ...room } = options;
   for (let d = 0; d <= deepest + 1; d++) {
     let gaps: Gap[] = [];
     let cut = levelCut(current, root, d);
     const pairs = levelPairs(cut.items, cut.owner, indexOf, links);
     if (depths.has(d) && pairs.length > 0) {
-      gaps = roomDemand(cut.items, pairs, options);
+      gaps = roomDemand(cut.items, pairs, room);
       // The shift of each gap applies to the nodes, so a node moves with its item, and the items of a far level stay apart.
       if (gaps.some((g) => g.need > g.width)) {
         current = openGaps(current, gaps, snap);
+        cut = levelCut(current, root, d);
+      }
+    }
+    if (bends && d === deepest + 1) {
+      const bent = withBends(current, links, boardGaps(current, snap), bends, snap);
+      if (bent.some((g) => g.need > g.width)) {
+        current = openGaps(current, bent, snap);
         cut = levelCut(current, root, d);
       }
     }

@@ -9,7 +9,7 @@ import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, benchHighways, formatCurves, formatHighways, type CurveBenchRow, type HighwayBenchRow } from "../src/bench/curves.ts";
 import { measureLevelFaults } from "../src/bench/links.ts";
 import { benchOne, formatFaults, formatLevels, formatTable, type LevelRow } from "../src/bench/run.ts";
-import { benchLevelRoom, benchRoom, formatLevelRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
+import { benchBendRoom, benchLevelRoom, benchRoom, formatBendRoom, type BendRoomRow, formatLevelRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
 import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
@@ -137,6 +137,13 @@ function sideTables(): void {
     for (const router of bundlers) highways.push(...benchHighways(router, name, graph, { jogs: ["biarc", "cubic", "quintic"] }));
   }
   show(formatHighways(highways));
+  // The room for the bends of the bundles (HWC-D): each case board opened by `makeRoom` without and with the option `bends`.
+  const bendRows: BendRoomRow[] = [];
+  for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {
+    const graph = CASES.find((c) => c.name === name)!.make();
+    for (const router of bundlers.slice(0, 4)) bendRows.push(...benchBendRoom(router, name, graph));
+  }
+  show(formatBendRoom(bendRows));
   // The room of the links: a packed board of touching boxes, before and after `makeRoom` at gutter 8 and spacing 4.
   show(formatRoom(benchRoom("packed-grid", packedGridBoard(), { gutter: 8, spacing: 4 }, listStrategies(STRATEGIES, "room"))));
   // The sweeps of the knobs of the room: maxGrowth (ROOM-A), the lane order and the spacing (ROOM-C), the gutter and the passes (ROOM-D).

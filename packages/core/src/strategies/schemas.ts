@@ -176,6 +176,10 @@ export const ROOM_SCHEMA: OptionSchema<RoomPreset> = {
   lanes: { type: "enum", values: ["link", "count"], default: "link", describe: "With `count`, a link takes one lane for each of its edges. With `link`, a link takes one lane." },
   snap: { type: "number", min: 0, max: 4, step: 0.25, default: 0.5, describe: "Two box edges nearer than this distance make one boundary of the sweep." },
   passes: { type: "integer", min: 1, max: 4, step: 1, marks: [1, 2], default: 1, describe: "The number of passes of the demand. Each pass after the first finds the lanes on the open board." },
+  bends: {
+    type: "object",
+    describe: "The room for the bends of the bundles: a router that bundles, and the lane options of `highwayCurves`. Without it, the bends get no room.",
+  },
 };
 
 /** The declarations of the options of the room strategy `levels`. They are the options of the room, the levels with room and the limits of the quadtree. */

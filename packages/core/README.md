@@ -153,6 +153,8 @@ A host layout can pack the boxes of a far view in a grid, with no gap between th
 - `openGaps(items, gaps)` moves each box by the growth of each gap before it. The boxes keep their size, their order and their alignment, so a grid stays a grid.
 - `makeRoom(items, links, options)` gives the gaps and the open board. `maxGrowth` limits the growth of the board on each axis, as a share of its size.
 - With `passes: 2`, `roomDemand` finds the lanes again on the open board and adds the growth that they need. `maxGrowth` limits the sum of the passes.
+- The option `bends` gives room to the bends of the bundles (HWC-D). It is off by default. Its router routes the open board, and each segment with two or more edges is a bundle.
+- With `bends`, a leg of a bundle that is too short for its arcs grows by one gap between its ends. A bend of the width `W` needs the radius `W/2 + minRadius` on its center line.
 - `roomLinks(graph)` gives the links of a graph, with the count of the edges of each pair.
 - `gapLanes(items, links, options)` gives each link of a far view its own lane in each gap. The lanes are `spacing` apart, around the middle of the gap.
 - The option `order` of `gapLanes` sets the lane order in a gap: `links` (the order of the list), `ends` (by the sides of the turns) or `crossings` (the default).
