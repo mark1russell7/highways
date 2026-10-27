@@ -62,6 +62,11 @@ export interface ScreenStrategySummary {
   readonly hard: Readonly<Record<string, number>>;
   /** The sum of `hard`. */
   readonly hardTotal: number;
+  /**
+   * The breaks over the floor of each input. The floor is the counts of the built-in strategy with the fewest breaks on that input.
+   * Each built-in breaks a rule on some boards, for example on a board where the boxes touch. Without built-ins, the floor is 0.
+   */
+  readonly hardOverFloor: number;
   /** The median of each measure over the runs, by the names of a record. */
   readonly medians: Readonly<Record<string, number>>;
   /** The median time of a run, in milliseconds. */
@@ -91,7 +96,7 @@ export interface ScreenSummary {
   readonly strategies: readonly ScreenStrategySummary[];
   /** The strategies on the Pareto front of the medians over the set. */
   readonly front: readonly string[];
-  /** The strategies with a break of a hard rule, without a run or with two different outputs of one input. They do not enter the front. */
+  /** The strategies with a break over the floor, without a run or with two different outputs of one input. They do not enter the front. */
   readonly excluded: readonly string[];
   readonly predictions: readonly PredictionCheck[];
 }
@@ -266,6 +271,16 @@ function summarizeScreen(
 ): ScreenSummary {
   const objectives = namedObjectives(FRONT_OBJECTIVES[at.step]);
   const names = [...new Set(records.map((r) => r.strategy))];
+  const total = (r: LayoutRecord): number => Object.values(r.hard).reduce((n, v) => n + v, 0);
+  const floor = new Map<string, Readonly<Record<string, number>>>();
+  const best = new Map<string, number>();
+  for (const r of records) {
+    if (r.skipped !== undefined || at.candidates.has(r.strategy)) continue;
+    if (total(r) >= (best.get(r.input) ?? Number.POSITIVE_INFINITY)) continue;
+    best.set(r.input, total(r));
+    floor.set(r.input, r.hard);
+  }
+  const overFloor = (r: LayoutRecord): number => Object.entries(r.hard).reduce((n, [k, v]) => n + Math.max(0, v - (floor.get(r.input)?.[k] ?? 0)), 0);
   const strategies = names.map((strategy): ScreenStrategySummary => {
     const all = records.filter((r) => r.strategy === strategy);
     const ran = all.filter((r) => r.skipped === undefined);
@@ -281,12 +296,13 @@ function summarizeScreen(
       deterministic: ran.every((r) => r.deterministic),
       hard,
       hardTotal: Object.values(hard).reduce((s, v) => s + v, 0),
+      hardOverFloor: ran.reduce((n, r) => n + overFloor(r), 0),
       medians,
       ms: median(ran.map((r) => r.ms)),
       onFront: comparisons.filter((c) => c.front.includes(strategy)).length,
     };
   });
-  const fair = strategies.filter((s) => s.runs > 0 && s.hardTotal === 0 && s.deterministic);
+  const fair = strategies.filter((s) => s.runs > 0 && s.hardOverFloor === 0 && s.deterministic);
   const front = paretoFront(fair, (s) => Object.fromEntries(objectives.map((o) => [o.key, s.medians[o.key] ?? Number.NaN])), objectives).map((s) => s.strategy);
   const predictions = (at.predictions ?? []).map((p): PredictionCheck => {
     const op = p.op ?? (measureByName(p.measure)?.better === "higher" ? ">=" : "<=");
@@ -316,16 +332,17 @@ export function formatScreen(summary: ScreenSummary): string {
     `## Screen of the step \`${summary.step}\` on \`${summary.set}\``,
     "",
     `${summary.inputs} inputs, ${summary.strategies.length} strategies. Each cell of a measure is the median over the inputs.`,
+    "The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input.",
     "",
-    `| strategy | new | runs | skipped | hard | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
-    `|---|---|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
+    `| strategy | new | runs | skipped | hard | over the floor | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
+    `|---|---|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
     ...summary.strategies.map(
       (s) =>
-        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
+        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
     ),
     "",
     `Pareto front over the medians: ${summary.front.join(", ") || "-"}.`,
-    `Not on the front because of a hard rule, no run or two different outputs: ${summary.excluded.join(", ") || "-"}.`,
+    `Not on the front because of a break over the floor, no run or two different outputs: ${summary.excluded.join(", ") || "-"}.`,
   ];
   if (summary.predictions.length > 0) {
     lines.push("", "| prediction | strategy | input | measure | expected | measured | met | reason |", "|---|---|---|---|---:|---:|---|---|");

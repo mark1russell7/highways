@@ -226,6 +226,22 @@ describe("screen", () => {
     expect(formatScreen(summary)).toContain("| proto-straight | yes |");
   });
 
+  it("keeps the breaks that each built-in has on a board out of the gate of the front", () => {
+    // On the packed grid, the boxes touch, so each router goes through boxes.
+    const packed = inputs.find((i) => i.id === "screen-v1/packed-grid/s0")!;
+    const { summary } = screen("router", ["corners", "straight"], { inputs: [packed], baseline: false });
+    const corners = summary.strategies.find((s) => s.strategy === "corners")!;
+    expect(corners.hardTotal).toBeGreaterThan(0);
+    expect(corners.hardOverFloor).toBe(corners.hardTotal);
+    const all = screen("router", [], { inputs: [packed] }).summary;
+    const base = all.strategies.find((s) => s.strategy === "corners")!;
+    expect(base.hardTotal).toBe(corners.hardTotal);
+    expect(base.hardOverFloor).toBe(0);
+    // Each built-in breaks no-pass-through on this board, so the front is not empty. plugs breaks the rule more often than the floor.
+    expect(all.front.length).toBeGreaterThan(0);
+    expect(all.excluded).toEqual(["plugs"]);
+  });
+
   it("screens a curve and a grouping rule, and checks that each runs the same two times", () => {
     const curve = screen("curve", ["rounded"], { inputs: [tiny], baseline: false }).records[0]!;
     expect(curve.deterministic).toBe(true);

@@ -257,7 +257,8 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 
 - A strategy is a name of the registry or a strategy object. Thus a prototype file can export a strategy, and the registry does not change.
 - By default, the screen also runs the built-in strategies of the step. The summary gives the median of each measure, the sum of each hard rule and the Pareto front over the medians.
-- A strategy with a break of a hard rule, or with two different outputs of one input, does not enter the front.
+- The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
+- A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
 
 The script `packages/core/scripts/screen.ts` writes `screen.jsonl` and `screen.md`:
 
