@@ -7,6 +7,7 @@ import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
+import type { WayOptions } from "../ways.ts";
 import type { RunOrder } from "../segments.ts";
 import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
 import type { EnumOption, OptionSchema } from "./options.ts";
@@ -15,7 +16,7 @@ import type { EnumOption, OptionSchema } from "./options.ts";
 // The test of the defaults runs each strategy with `optionDefaults` and with no option, and compares the output.
 
 /** The options of the way finder (`WayOptions`), for each router that goes around the nodes. */
-const WAY_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
+const WAY_SCHEMA: OptionSchema<WayOptions> = {
   margin: { type: "number", min: 1, max: 20, step: 1, default: 5, describe: "The distance from a box to the corners of the graph." },
   k: { type: "integer", min: 2, max: 16, step: 1, default: 8, describe: "The number of visible neighbours of each corner." },
   smooth: { type: "boolean", default: false, describe: "With `true`, a way in clear view uses the inflection rule, and the other ways get round corners." },
@@ -33,7 +34,23 @@ const LANE_ORDER: EnumOption<RunOrder> = {
 const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
 
 /** The declarations of the options of the routers `corners` and `corners-smooth`. */
-export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = WAY_SCHEMA;
+export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
+  ...WAY_SCHEMA,
+  plugs: {
+    type: "enum",
+    values: ["facing", "side"],
+    default: "facing",
+    describe: "With `facing`, a free plug faces the other end. With `side`, the search starts from the whole free side, and the plug goes where the way leaves (WILD-001).",
+  },
+  plugGap: {
+    type: "number",
+    min: 0,
+    max: 24,
+    step: 1,
+    default: 0,
+    describe: "With a gap above 0, the free plugs of a side keep their order and at least this gap (WILD-002). 0 keeps each plug where it is.",
+  },
+};
 
 /** The declarations of the options of the router `trunks`. */
 export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
