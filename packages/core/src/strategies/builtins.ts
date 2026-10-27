@@ -13,8 +13,13 @@ import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts
 import { quadtreeGroups } from "../groups/quadtree/index.ts";
 import { CORRIDOR_DEFAULTS, corridorPlan, type CorridorOptions } from "../highways/corridors/index.ts";
 import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
+import { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "../highways/level-links/index.ts";
+import { MEET_DEFAULTS, meetPlan, type MeetOptions } from "../highways/meet/index.ts";
 import type { HighwayInput } from "../highways/model.ts";
 import { sharedWaysPlan, type SharedWaysOptions } from "../highways/shared-ways/index.ts";
+import { STUB_DEFAULTS, stubPlan, type StubOptions } from "../highways/stubs/index.ts";
+import { WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
+import { ZIPPER_DEFAULTS, zipperPlan, type ZipperOptions } from "../highways/zipper/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
 import { levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
@@ -27,7 +32,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -348,6 +353,11 @@ export const highwayStrategies: {
   readonly keys: Strategy<"highway", KeysOptions>;
   readonly "shared-ways": Strategy<"highway", SharedWaysOptions>;
   readonly corridors: Strategy<"highway", CorridorOptions>;
+  readonly meet: Strategy<"highway", MeetOptions>;
+  readonly weiszfeld: Strategy<"highway", WeiszfeldOptions>;
+  readonly stubs: Strategy<"highway", StubOptions>;
+  readonly zipper: Strategy<"highway", ZipperOptions>;
+  readonly "level-links": Strategy<"highway", LevelHighwayOptions>;
 } = Object.freeze({
   keys: defineStrategy({
     step: "highway",
@@ -375,6 +385,51 @@ export const highwayStrategies: {
     schema: CORRIDOR_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<CorridorOptions>) => corridorPlan(input, o),
+  }),
+  meet: defineStrategy({
+    step: "highway",
+    name: "meet",
+    describe: "Meet points (HWY-050). Each member of the plan `from` joins its spine where its first route meets the spine, and leaves where they part.",
+    defaults: { ...MEET_DEFAULTS } as MeetOptions,
+    schema: MEET_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<MeetOptions>) => meetPlan(input, o),
+  }),
+  weiszfeld: defineStrategy({
+    step: "highway",
+    name: "weiszfeld",
+    describe: "Weiszfeld meeting points (HWY-043). Each highway of the plan `from` gets the merge and split points with the least ink, with a weighted trunk.",
+    defaults: { ...WEISZFELD_DEFAULTS } as WeiszfeldOptions,
+    schema: WEISZFELD_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<WeiszfeldOptions>) => weiszfeldPlan(input, o),
+  }),
+  stubs: defineStrategy({
+    step: "highway",
+    name: "stubs",
+    describe: "Stubs (HWY-015, WILD-005). The ends on one side of a box that go in near directions share one plug and one short stub.",
+    defaults: { ...STUB_DEFAULTS } as StubOptions,
+    schema: STUB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<StubOptions>) => stubPlan(input, o),
+  }),
+  zipper: defineStrategy({
+    step: "highway",
+    name: "zipper",
+    describe: "The axon zipper (NAT-022, WILD-037). Two near, nearly parallel legs zip into one line when the shared length is more than the jogs.",
+    defaults: { ...ZIPPER_DEFAULTS } as ZipperOptions,
+    schema: ZIPPER_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ZipperOptions>) => zipperPlan(input, o),
+  }),
+  "level-links": defineStrategy({
+    step: "highway",
+    name: "level-links",
+    describe: "Level links as highways (HWY-056, WILD-034). The edges between two items of a zoom level ride the link of the level.",
+    defaults: { ...LEVEL_HIGHWAY_DEFAULTS } as LevelHighwayOptions,
+    schema: LEVEL_HIGHWAY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<LevelHighwayOptions>) => levelHighwayPlan(input, o),
   }),
 });
 

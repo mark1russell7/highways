@@ -344,7 +344,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, and optionally the first routes of a router | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors` |
+| `highway` | `HighwayInput`: the graph, and optionally the first routes of a router | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -373,8 +373,14 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `keys` | The trunks and the runs of the router `trunks`. `planOfResult` reads them. The router does not change. |
 | `shared-ways` | The runs of the router `shared`. `planOfResult` reads them. The router does not change. |
 | `corridors` | The corridor signatures of HWY-031. The links of the first routes get a MinHash signature, and each cluster of ways gives a highway. |
+| `meet` | The merge points and split points of HWY-050. Each member joins its spine where its first route meets the spine, and leaves where they part. |
+| `weiszfeld` | The meeting points of HWY-043. Each highway gets the merge and split points with the least ink, with the weight `k^alpha` on the trunk. |
+| `stubs` | The stubs of HWY-015. The ends on one side of a box that go in near directions share one plug and one short stub. |
+| `zipper` | The axon zipper of NAT-022. Two near, nearly parallel legs zip into one line when the shared length pays for the jogs. |
+| `level-links` | The level links of HWY-056. The edges between two items of a zoom level ride the link of the level. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper` and `level-links` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:

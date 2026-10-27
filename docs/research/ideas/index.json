@@ -26,11 +26,11 @@
       "whole": 29
     },
     "byStage": {
-      "cataloged": 256,
-      "screened": 3,
+      "cataloged": 248,
+      "screened": 10,
       "prototyped": 2,
       "built": 0,
-      "kept": 6,
+      "kept": 7,
       "dropped": 6
     },
     "byWave": {
@@ -3409,7 +3409,7 @@
       "placementDependent": true,
       "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B4 <= trunks and B1 >= trunks on 3 of 5 boards with the stubs at both ends.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "HWY-037",
         "HWY-050"
@@ -3417,7 +3417,137 @@
       "same": [
         "WILD-005"
       ],
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/stubs@e9dd594",
+          "screen-v1/*/stubs-source@e9dd594",
+          "screen-v1/*/stubs-w15@e9dd594",
+          "screen-v1/*/stubs-none@e9dd594",
+          "screen-v1/*/stubs-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.259,
+              "dense-groups": 0.35,
+              "hub-chain": 0.075,
+              "many-groups": 0.095
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.162,
+              "dense-groups": 1.22,
+              "hub-chain": 1.009,
+              "many-groups": 1.007
+            }
+          },
+          "R11": {
+            "base": {
+              "small-clustered": 0.118,
+              "dense-groups": 0.119,
+              "hub-chain": 0.122,
+              "many-groups": 0.246
+            },
+            "new": {
+              "small-clustered": 0.128,
+              "dense-groups": 0.135,
+              "hub-chain": 1,
+              "many-groups": 0.248
+            }
+          },
+          "B2": {
+            "base": {
+              "small-clustered": 0.535,
+              "dense-groups": 0.483,
+              "hub-chain": 0.084,
+              "many-groups": 0.364
+            },
+            "new": {
+              "small-clustered": 0.68,
+              "dense-groups": 0.663,
+              "hub-chain": 0.538,
+              "many-groups": 0.396
+            }
+          },
+          "B4": {
+            "base": {
+              "small-clustered": 0.671,
+              "dense-groups": 0.765,
+              "hub-chain": 0.063,
+              "many-groups": 0.339
+            },
+            "new": {
+              "small-clustered": 0.688,
+              "dense-groups": 0.773,
+              "hub-chain": 0.357,
+              "many-groups": 0.366
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 600,
+              "dense-groups": 1006,
+              "hub-chain": 88,
+              "many-groups": 808
+            }
+          },
+          "source only B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.242,
+              "dense-groups": 0.342,
+              "hub-chain": 0.045,
+              "many-groups": 0.092
+            }
+          },
+          "source only B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.215,
+              "hub-chain": 1.005,
+              "many-groups": 1.001
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `stubs` beats `shared` on 1 of the 4 boards, and `ends: source` on 2. The q95 rises above 1 on hub-chain and many-groups, and B1 falls on hub-chain. B2 and R11 rise on all 4 boards. B2 rises 9% to 37% on 3 of them. B4 is worse on all 4 boards. R1 changes by 3% or less, but rises 29% on hub-chain."
+      }
     },
     {
       "id": "HWY-016",
@@ -4899,7 +5029,7 @@
       "placementDependent": true,
       "screen": "Use the groups of HWY-023 on 3 boards. Keep if B1 rises by 3% over the split rule of trunks (split 0.5) at equal B3.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "kept",
       "related": [
         "HWY-003",
         "HWY-038",
@@ -4908,7 +5038,124 @@
         "NAT-012",
         "EDA-028"
       ],
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/meet@e9dd594",
+          "screen-v1/*/weiszfeld@e9dd594",
+          "screen-v1/*/weiszfeld-a0@e9dd594",
+          "screen-v1/*/weiszfeld-a1@e9dd594",
+          "screen-v1/*/weiszfeld-corridors@e9dd594",
+          "screen-v1/*/meet-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.229,
+              "dense-groups": 0.325,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.229,
+              "dense-groups": 0.325,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 122.7,
+              "dense-groups": 126.8,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 653,
+              "dense-groups": 1113,
+              "hub-chain": 68,
+              "many-groups": 792
+            }
+          },
+          "B1 against meet": {
+            "base": {
+              "small-clustered": 0.189,
+              "dense-groups": 0.279,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.229,
+              "dense-groups": 0.325,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "corridors B1 against meet": {
+            "base": {
+              "small-clustered": 0.065,
+              "dense-groups": 0.091,
+              "hub-chain": 0.43,
+              "many-groups": 0.219
+            },
+            "new": {
+              "small-clustered": 0.071,
+              "dense-groups": 0.098,
+              "hub-chain": 0.416,
+              "many-groups": 0.226
+            }
+          }
+        },
+        "verdict": "kept",
+        "note": "The strategy `weiszfeld` beats `shared` on all 4 boards: on 2 it is better and on 2 it is equal. Most of this comes from its base `shared-ways`. Against `shared-ways`, B1 stays within 1%, and B6 falls 3% and 20% on small-clustered and dense-groups. R1 rises 9% to 10% there. On hub-chain and many-groups, `shared-ways` has no highways, so nothing changes. With `alpha: 1`, the q95 falls, but B1 falls 11% to 16% on those 2 boards."
+      }
     },
     {
       "id": "HWY-044",
@@ -5193,14 +5440,143 @@
       "placementDependent": true,
       "screen": "Use the clusters of corridor signatures on 3 boards. Keep if B6 and B3 q95 drop at a B1 loss < 3%.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "HWY-031",
         "HWY-043",
         "HWY-009",
         "NAT-035"
       ],
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/meet@e9dd594",
+          "screen-v1/*/meet-near4@e9dd594",
+          "screen-v1/*/meet-near16@e9dd594",
+          "screen-v1/*/meet-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.189,
+              "dense-groups": 0.279,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.19,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 122.8,
+              "dense-groups": 137.8,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.19,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "R4": {
+            "base": {
+              "small-clustered": 0.757,
+              "dense-groups": 0.821,
+              "hub-chain": 0.157,
+              "many-groups": 0.938
+            },
+            "new": {
+              "small-clustered": 0.741,
+              "dense-groups": 0.799,
+              "hub-chain": 0.157,
+              "many-groups": 0.938
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.189,
+              "dense-groups": 0.279,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "near 16 B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 111,
+              "dense-groups": 137.8,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          },
+          "corridors B1": {
+            "base": {
+              "small-clustered": 0.071,
+              "dense-groups": 0.1,
+              "hub-chain": 0.467,
+              "many-groups": 0.235
+            },
+            "new": {
+              "small-clustered": 0.065,
+              "dense-groups": 0.091,
+              "hub-chain": 0.43,
+              "many-groups": 0.219
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `meet` beats `shared` on 2 of the 4 boards only, and on those 2 it is equal. On small-clustered and dense-groups, B1 falls 18% and 14% against `shared-ways`. B6 falls 3% and 13% there, and 12% to 13% with `near: 16`. B6 does not change on hub-chain and many-groups. The q95 and R4 fall a little. The strategy stays in the registry, but it is not a default."
+      }
     },
     {
       "id": "HWY-051",
@@ -5443,7 +5819,7 @@
       "placementDependent": true,
       "screen": "Boards: case-many-groups, nestedGridBoard, mid-clustered. Keep if Z9 drops by 50% with R7 <= sections.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "HWY-001",
         "HWY-052",
@@ -5453,7 +5829,122 @@
       "same": [
         "WILD-034"
       ],
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/level-links@e9dd594",
+          "screen-v1/*/level-links-d2@e9dd594",
+          "screen-v1/*/level-links-none@e9dd594",
+          "screen-v1/*/level-links-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.198,
+              "many-groups": 0.334
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.165,
+              "dense-groups": 1.197,
+              "hub-chain": 1.047,
+              "many-groups": 1.148
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.198,
+              "many-groups": 0.334
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.165,
+              "dense-groups": 1.197,
+              "hub-chain": 1.047,
+              "many-groups": 1.148
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 122.8,
+              "dense-groups": 158.2,
+              "hub-chain": 180,
+              "many-groups": 180
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 596,
+              "dense-groups": 1023,
+              "hub-chain": 32,
+              "many-groups": 413
+            }
+          },
+          "depth 2 B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.253,
+              "dense-groups": 0.324,
+              "hub-chain": 0.229,
+              "many-groups": 0.268
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `level-links` beats `shared` on 1 of the 4 boards. B1 rises 154% on hub-chain and 293% on many-groups, and R1 falls 48% to 53% there. But the q95 rises 5% and 15%, and B6 is 180 degrees. The screen of the step `highway` has no level measure, so Z9 and B8 are not measured."
+      }
     },
     {
       "id": "HWY-057",
@@ -6865,7 +7356,7 @@
       "placementDependent": true,
       "screen": "A post step on corners and on plugs routes, case-dense-groups and small-clustered. Keep if B1 rises by 0.05, B4 rises by 0.03 at most and R9 stays 0.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "NAT-038",
         "NAT-024",
@@ -6875,7 +7366,166 @@
       "same": [
         "WILD-037"
       ],
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/zipper@e9dd594",
+          "screen-v1/*/zipper-a1@e9dd594",
+          "screen-v1/*/zipper-near2@e9dd594",
+          "screen-v1/*/zipper-p2@e9dd594",
+          "screen-v1/*/zipper-none@e9dd594",
+          "screen-v1/*/zipper-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.288,
+              "dense-groups": 0.366,
+              "hub-chain": 0.229,
+              "many-groups": 0.254
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.164,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1.007
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.288,
+              "dense-groups": 0.366,
+              "hub-chain": 0.229,
+              "many-groups": 0.254
+            }
+          },
+          "B2": {
+            "base": {
+              "small-clustered": 0.535,
+              "dense-groups": 0.483,
+              "hub-chain": 0.084,
+              "many-groups": 0.364
+            },
+            "new": {
+              "small-clustered": 0.64,
+              "dense-groups": 0.573,
+              "hub-chain": 0.202,
+              "many-groups": 0.503
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.164,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1.007
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 156.1,
+              "dense-groups": 168.8,
+              "hub-chain": 109.9,
+              "many-groups": 114.3
+            }
+          },
+          "R4": {
+            "base": {
+              "small-clustered": 0.757,
+              "dense-groups": 0.821,
+              "hub-chain": 0.157,
+              "many-groups": 0.938
+            },
+            "new": {
+              "small-clustered": 0.969,
+              "dense-groups": 1.065,
+              "hub-chain": 0.223,
+              "many-groups": 1.021
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 540,
+              "dense-groups": 924,
+              "hub-chain": 79,
+              "many-groups": 635
+            }
+          },
+          "adhesion 1 B1": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.297,
+              "dense-groups": 0.374,
+              "hub-chain": 0.229,
+              "many-groups": 0.251
+            }
+          },
+          "adhesion 1 B3q95": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.215,
+              "hub-chain": 1.001,
+              "many-groups": 1.015
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `zipper` beats `shared` on 2 of the 4 boards, and `adhesion: 1` also on 2. It fails only on the q95, by 0.1% to 1.5%. Against `shared-ways`, B1 rises 12% to 199% on all 4 boards, B2 rises, and R1 falls on 3 boards. B6 and R4 rise. The screen has no measure of B7 or R12. A stretch gate can make it pass. The strategy stays in the registry."
+      }
     },
     {
       "id": "NAT-023",
@@ -11561,7 +12211,7 @@
       "placementDependent": true,
       "screen": "On mid-fanout (in CI) and small-clustered, keep it when B1 rises by 0.05 or more and B4 rises by less than 0.02.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "WILD-030",
         "WILD-036",
@@ -11571,7 +12221,137 @@
         "HWY-015"
       ],
       "canonical": "HWY-015",
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/stubs@e9dd594",
+          "screen-v1/*/stubs-source@e9dd594",
+          "screen-v1/*/stubs-w15@e9dd594",
+          "screen-v1/*/stubs-none@e9dd594",
+          "screen-v1/*/stubs-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.259,
+              "dense-groups": 0.35,
+              "hub-chain": 0.075,
+              "many-groups": 0.095
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.162,
+              "dense-groups": 1.22,
+              "hub-chain": 1.009,
+              "many-groups": 1.007
+            }
+          },
+          "R11": {
+            "base": {
+              "small-clustered": 0.118,
+              "dense-groups": 0.119,
+              "hub-chain": 0.122,
+              "many-groups": 0.246
+            },
+            "new": {
+              "small-clustered": 0.128,
+              "dense-groups": 0.135,
+              "hub-chain": 1,
+              "many-groups": 0.248
+            }
+          },
+          "B2": {
+            "base": {
+              "small-clustered": 0.535,
+              "dense-groups": 0.483,
+              "hub-chain": 0.084,
+              "many-groups": 0.364
+            },
+            "new": {
+              "small-clustered": 0.68,
+              "dense-groups": 0.663,
+              "hub-chain": 0.538,
+              "many-groups": 0.396
+            }
+          },
+          "B4": {
+            "base": {
+              "small-clustered": 0.671,
+              "dense-groups": 0.765,
+              "hub-chain": 0.063,
+              "many-groups": 0.339
+            },
+            "new": {
+              "small-clustered": 0.688,
+              "dense-groups": 0.773,
+              "hub-chain": 0.357,
+              "many-groups": 0.366
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 600,
+              "dense-groups": 1006,
+              "hub-chain": 88,
+              "many-groups": 808
+            }
+          },
+          "source only B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.242,
+              "dense-groups": 0.342,
+              "hub-chain": 0.045,
+              "many-groups": 0.092
+            }
+          },
+          "source only B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.215,
+              "hub-chain": 1.005,
+              "many-groups": 1.001
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `stubs` beats `shared` on 1 of the 4 boards, and `ends: source` on 2. The q95 rises above 1 on hub-chain and many-groups, and B1 falls on hub-chain. B2 and R11 rise on all 4 boards. B2 rises 9% to 37% on 3 of them. B4 is worse on all 4 boards. R1 changes by 3% or less, but rises 29% on hub-chain."
+      }
     },
     {
       "id": "WILD-006",
@@ -12884,7 +13664,7 @@
       "placementDependent": true,
       "screen": "On mid-clustered (in CI) and case-dense-groups: keep it when Z9 is 0, B1 is at least the value of sections, and R7 is not higher.",
       "prototype": "M",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "WILD-012",
         "WILD-027",
@@ -12896,7 +13676,122 @@
         "HWY-056"
       ],
       "canonical": "HWY-056",
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/level-links@e9dd594",
+          "screen-v1/*/level-links-d2@e9dd594",
+          "screen-v1/*/level-links-none@e9dd594",
+          "screen-v1/*/level-links-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.198,
+              "many-groups": 0.334
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.165,
+              "dense-groups": 1.197,
+              "hub-chain": 1.047,
+              "many-groups": 1.148
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.198,
+              "many-groups": 0.334
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.165,
+              "dense-groups": 1.197,
+              "hub-chain": 1.047,
+              "many-groups": 1.148
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 122.8,
+              "dense-groups": 158.2,
+              "hub-chain": 180,
+              "many-groups": 180
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 596,
+              "dense-groups": 1023,
+              "hub-chain": 32,
+              "many-groups": 413
+            }
+          },
+          "depth 2 B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.253,
+              "dense-groups": 0.324,
+              "hub-chain": 0.229,
+              "many-groups": 0.268
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `level-links` beats `shared` on 1 of the 4 boards. B1 rises 154% on hub-chain and 293% on many-groups, and R1 falls 48% to 53% there. But the q95 rises 5% and 15%, and B6 is 180 degrees. The screen of the step `highway` has no level measure, so Z9 and B8 are not measured."
+      }
     },
     {
       "id": "WILD-035",
@@ -13017,7 +13912,7 @@
       "placementDependent": true,
       "screen": "On corners over small-clustered: keep it when B1 is 0.05 or more, R1 does not rise, and R9 is 0.",
       "prototype": "M",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "WILD-030",
         "HWY-026"
@@ -13026,7 +13921,166 @@
         "NAT-022"
       ],
       "canonical": "NAT-022",
-      "wave": 2
+      "wave": 2,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40573715593",
+        "records": [
+          "screen-v1/*/shared@e9dd594",
+          "screen-v1/*/shared-ways@e9dd594",
+          "screen-v1/*/corridors@e9dd594",
+          "screen-v1/*/zipper@e9dd594",
+          "screen-v1/*/zipper-a1@e9dd594",
+          "screen-v1/*/zipper-near2@e9dd594",
+          "screen-v1/*/zipper-p2@e9dd594",
+          "screen-v1/*/zipper-none@e9dd594",
+          "screen-v1/*/zipper-corridors@e9dd594"
+        ],
+        "measures": {
+          "B1 against shared": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.288,
+              "dense-groups": 0.366,
+              "hub-chain": 0.229,
+              "many-groups": 0.254
+            }
+          },
+          "B3q95 against shared": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.164,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1.007
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.231,
+              "dense-groups": 0.326,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.288,
+              "dense-groups": 0.366,
+              "hub-chain": 0.229,
+              "many-groups": 0.254
+            }
+          },
+          "B2": {
+            "base": {
+              "small-clustered": 0.535,
+              "dense-groups": 0.483,
+              "hub-chain": 0.084,
+              "many-groups": 0.364
+            },
+            "new": {
+              "small-clustered": 0.64,
+              "dense-groups": 0.573,
+              "hub-chain": 0.202,
+              "many-groups": 0.503
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.164,
+              "dense-groups": 1.197,
+              "hub-chain": 1,
+              "many-groups": 1.007
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 126.4,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 156.1,
+              "dense-groups": 168.8,
+              "hub-chain": 109.9,
+              "many-groups": 114.3
+            }
+          },
+          "R4": {
+            "base": {
+              "small-clustered": 0.757,
+              "dense-groups": 0.821,
+              "hub-chain": 0.157,
+              "many-groups": 0.938
+            },
+            "new": {
+              "small-clustered": 0.969,
+              "dense-groups": 1.065,
+              "hub-chain": 0.223,
+              "many-groups": 1.021
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 596,
+              "dense-groups": 1022,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 540,
+              "dense-groups": 924,
+              "hub-chain": 79,
+              "many-groups": 635
+            }
+          },
+          "adhesion 1 B1": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.297,
+              "dense-groups": 0.374,
+              "hub-chain": 0.229,
+              "many-groups": 0.251
+            }
+          },
+          "adhesion 1 B3q95": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.147,
+              "dense-groups": 1.215,
+              "hub-chain": 1.001,
+              "many-groups": 1.015
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The strategy `zipper` beats `shared` on 2 of the 4 boards, and `adhesion: 1` also on 2. It fails only on the q95, by 0.1% to 1.5%. Against `shared-ways`, B1 rises 12% to 199% on all 4 boards, B2 rises, and R1 falls on 3 boards. B6 and R4 rise. The screen has no measure of B7 or R12. A stretch gate can make it pass. The strategy stays in the registry."
+      }
     },
     {
       "id": "WILD-038",
