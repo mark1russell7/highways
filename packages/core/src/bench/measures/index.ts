@@ -8,3 +8,4 @@ export * from "./stability.ts";
 export * from "./room.ts";
 export * from "./pareto.ts";
 export * from "./order.ts";
+export * from "./highways.ts";

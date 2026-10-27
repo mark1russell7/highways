@@ -12,6 +12,12 @@ import { KD_DEFAULTS, kdGroups, type KdOptions } from "../groups/kd/index.ts";
 import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts";
 import { quadtreeGroups } from "../groups/quadtree/index.ts";
 import { CORRIDOR_DEFAULTS, corridorPlan, type CorridorOptions } from "../highways/corridors/index.ts";
+import { ambiguityGate, type AmbiguityGuardOptions } from "../highways/gates/ambiguity/index.ts";
+import { breakEvenGate, type BreakEvenOptions } from "../highways/gates/breakeven/index.ts";
+import { hysteresisGate, type HysteresisOptions } from "../highways/gates/hysteresis/index.ts";
+import { stableIdGate, type StableIdOptions } from "../highways/gates/ids/index.ts";
+import { gateStrategy } from "../highways/gates/model.ts";
+import { stretchGate, type StretchOptions } from "../highways/gates/stretch/index.ts";
 import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
 import { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "../highways/level-links/index.ts";
 import { MEET_DEFAULTS, meetPlan, type MeetOptions } from "../highways/meet/index.ts";
@@ -345,8 +351,21 @@ export const groupStrategies: {
   }),
 });
 
+/** The highway strategy `corridors` (HWY-031): the base of the built-in gates. */
+const corridors: Strategy<"highway", CorridorOptions> = defineStrategy({
+  step: "highway",
+  name: "corridors",
+  describe: "Corridor signatures. Edges whose first ways share long links make a cluster, found with MinHash. The longest common run of each cluster is its highway.",
+  defaults: { ...CORRIDOR_DEFAULTS } as CorridorOptions,
+  schema: CORRIDOR_SCHEMA,
+  maxNodes: 10_000,
+  run: (input: HighwayInput, o: Readonly<CorridorOptions>) => corridorPlan(input, o),
+});
+
 /**
  * The built-in highway strategies: the decisions of the routers `trunks` and `shared` as plans, and corridor signatures (HWY-031).
+ * The strategies `corridors+<gate>` put a gate of BUILD-W2A after `corridors`: `breakeven` (HWY-047), `stretch` (HWY-048), `ambiguity` (HWY-049),
+ * `hysteresis` (HWY-046) and `ids` (HWY-054). `gateStrategy` puts a gate after any other plan.
  * `follow` routes the edges along a plan, and `highwayRouter` gives a router that does both.
  */
 export const highwayStrategies: {
@@ -358,6 +377,11 @@ export const highwayStrategies: {
   readonly stubs: Strategy<"highway", StubOptions>;
   readonly zipper: Strategy<"highway", ZipperOptions>;
   readonly "level-links": Strategy<"highway", LevelHighwayOptions>;
+  readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
+  readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
+  readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
+  readonly "corridors+hysteresis": Strategy<"highway", CorridorOptions & HysteresisOptions>;
+  readonly "corridors+ids": Strategy<"highway", CorridorOptions & StableIdOptions>;
 } = Object.freeze({
   keys: defineStrategy({
     step: "highway",
@@ -377,15 +401,7 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SharedWaysOptions>) => sharedWaysPlan(input, o),
   }),
-  corridors: defineStrategy({
-    step: "highway",
-    name: "corridors",
-    describe: "Corridor signatures. Edges whose first ways share long links make a cluster, found with MinHash. The longest common run of each cluster is its highway.",
-    defaults: { ...CORRIDOR_DEFAULTS } as CorridorOptions,
-    schema: CORRIDOR_SCHEMA,
-    maxNodes: 10_000,
-    run: (input: HighwayInput, o: Readonly<CorridorOptions>) => corridorPlan(input, o),
-  }),
+  corridors,
   meet: defineStrategy({
     step: "highway",
     name: "meet",
@@ -431,6 +447,11 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<LevelHighwayOptions>) => levelHighwayPlan(input, o),
   }),
+  "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
+  "corridors+stretch": gateStrategy(corridors, stretchGate),
+  "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
+  "corridors+hysteresis": gateStrategy(corridors, hysteresisGate),
+  "corridors+ids": gateStrategy(corridors, stableIdGate),
 });
 
 /** The built-in strategies of each step, in order. A consumer adds its own: `createRegistry([...BUILT_IN_STRATEGIES, mine])`. */

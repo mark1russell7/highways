@@ -94,5 +94,6 @@ describe("runSuite in parts (BENCH-CI)", () => {
     expect(joined.rules).toEqual(one.rules);
     const medians = (s: (typeof one.summaries)[number]) => [s.step, s.fixture, s.strategy, s.seeds, s.violations, Object.keys(s.measures)];
     expect(joined.summaries.map(medians)).toEqual(one.summaries.map(medians));
-  });
+    // The parts run the whole suite again, and each built-in strategy adds rows. Thus the test gets more time than the default.
+  }, 30_000);
 });

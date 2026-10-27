@@ -26,6 +26,9 @@ on:
       shuffles:
         description: "The number of random orders of the edges for the order fragility (W3). 0: no measure."
         default: "0"
+      edits:
+        description: "The number of seeded edits of each highway strategy, for the stability of its highways. 0: no edits."
+        default: "0"
       minutes:
         description: "The time limit of the job, in minutes."
         default: "15"
@@ -34,7 +37,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}
+  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}
   cancel-in-progress: true
 
 jobs:
@@ -48,6 +51,7 @@ jobs:
       FAMILIES: ${{ inputs.families || '' }}
       WRAP: ${{ inputs.wrap || '' }}
       SHUFFLES: ${{ inputs.shuffles || '0' }}
+      EDITS: ${{ inputs.edits || '0' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -72,6 +76,7 @@ jobs:
           [ -n "$FAMILIES" ] && args+=(--families "$FAMILIES")
           [ -n "$WRAP" ] && args+=(--wrap "$WRAP")
           [ "$SHUFFLES" != "0" ] && args+=(--shuffles "$SHUFFLES")
+          [ "$EDITS" != "0" ] && args+=(--edits "$EDITS")
           start=$SECONDS
           pnpm --filter @mark1russell7/highways screen "${args[@]}"
           {
@@ -82,7 +87,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: screen-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ github.sha }}
+          name: screen-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
           path: |
             screen.jsonl
             screen.md

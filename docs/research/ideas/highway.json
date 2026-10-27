@@ -2545,14 +2545,128 @@
     "placementDependent": false,
     "screen": "Use the seeded edits of Z10 on the 5 screen boards. Keep if Z10 moved share drops by 20% at a B1 loss < 3%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "HWY-054",
       "HWY-047",
       "RULE-053",
       "WILD-014"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40573673912",
+      "records": [
+        "screen-v1/*/corridors@b514431",
+        "screen-v1/*/shared-ways@b514431",
+        "screen-v1/*/shared@b514431",
+        "screen-v1/*/corridors+hysteresis@b514431",
+        "screen-v1/*/corridors-min3@b514431",
+        "screen-v1/*/shared-ways+hysteresis@b514431"
+      ],
+      "measures": {
+        "Z10": {
+          "base": {
+            "small-clustered": 0.052,
+            "dense-groups": 0.043,
+            "hub-chain": 0.102,
+            "many-groups": 0.097
+          },
+          "new": {
+            "small-clustered": 0.053,
+            "dense-groups": 0.039,
+            "hub-chain": 0.102,
+            "many-groups": 0.089
+          }
+        },
+        "Z10 churn": {
+          "base": {
+            "small-clustered": 0.139,
+            "dense-groups": 0.119,
+            "hub-chain": 0.224,
+            "many-groups": 0.309
+          },
+          "new": {
+            "small-clustered": 0.245,
+            "dense-groups": 0.106,
+            "hub-chain": 0.224,
+            "many-groups": 0.331
+          }
+        },
+        "Z10 churn control": {
+          "base": {
+            "small-clustered": 0.229,
+            "dense-groups": 0.106,
+            "hub-chain": 0.224,
+            "many-groups": 0.354
+          },
+          "new": {
+            "small-clustered": 0.245,
+            "dense-groups": 0.106,
+            "hub-chain": 0.224,
+            "many-groups": 0.331
+          }
+        },
+        "B1": {
+          "base": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          },
+          "new": {
+            "small-clustered": 0.053,
+            "dense-groups": 0.079,
+            "hub-chain": 0.452,
+            "many-groups": 0.185
+          }
+        },
+        "Z10 shared-ways": {
+          "base": {
+            "small-clustered": 0.072,
+            "dense-groups": 0.07,
+            "hub-chain": 0.073,
+            "many-groups": 0.056
+          },
+          "new": {
+            "small-clustered": 0.072,
+            "dense-groups": 0.071,
+            "hub-chain": 0.073,
+            "many-groups": 0.056
+          }
+        },
+        "Z10 churn shared-ways": {
+          "base": {
+            "small-clustered": 0.062,
+            "dense-groups": 0.053,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 0.061,
+            "dense-groups": 0.057,
+            "hub-chain": 0,
+            "many-groups": 0
+          }
+        },
+        "B1 shared-ways": {
+          "base": {
+            "small-clustered": 0.231,
+            "dense-groups": 0.326,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          },
+          "new": {
+            "small-clustered": 0.196,
+            "dense-groups": 0.29,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The gate `hysteresis` (kOn 3, kOff 2) screens after `corridors` and after `shared-ways`. screen-v1 has no change sequences, so each input gets 5 seeded edits of `changeGraph` (screen option `edits`). After `corridors`, the moved share of Z10 drops by 9% at most (0.043 to 0.039, 0.097 to 0.089), not by 20%. The highway churn goes up on small-clustered (0.139 to 0.245) and on many-groups (0.309 to 0.331). It drops by 11% on dense-groups, and it does not change on hub-chain. B1 drops by 3% to 25%. Against the control `corridors-min3` (kOn 3 without memory), the memory changes the churn by 7% or less. The gate only removes highways, so it cannot keep a highway that the next plan does not give. Most churn comes from the clusters of `corridors`, not from the limit. After `shared-ways`, the churn changes by 0.004 or less, and B1 drops by 15% and 11% on 2 boards. 0 hard breaks."
+    }
   },
   {
     "id": "HWY-047",
@@ -2592,7 +2706,7 @@
     "placementDependent": true,
     "screen": "Apply it as a filter to corridor signatures and QuickBundles. Keep if B1 does not drop and B3 q95 drops on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "HWY-038",
       "HWY-031",
@@ -2602,7 +2716,90 @@
       "NAT-048",
       "WILD-033"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40573673912",
+      "records": [
+        "screen-v1/*/corridors@b514431",
+        "screen-v1/*/shared-ways@b514431",
+        "screen-v1/*/shared@b514431",
+        "screen-v1/*/corridors+breakeven@b514431",
+        "screen-v1/*/shared-ways+breakeven@b514431"
+      ],
+      "measures": {
+        "B1": {
+          "base": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          },
+          "new": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          }
+        },
+        "B3": {
+          "base": {
+            "small-clustered": 1.001,
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.036
+          },
+          "new": {
+            "small-clustered": 1.001,
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.036
+          }
+        },
+        "B1 shared-ways": {
+          "base": {
+            "small-clustered": 0.231,
+            "dense-groups": 0.326,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          },
+          "new": {
+            "small-clustered": 0.222,
+            "dense-groups": 0.324,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        },
+        "B3 shared-ways": {
+          "base": {
+            "small-clustered": 1.147,
+            "dense-groups": 1.197,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.147,
+            "dense-groups": 1.186,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "B1 shared": {
+          "small-clustered": 0.21,
+          "dense-groups": 0.307,
+          "hub-chain": 0.078,
+          "many-groups": 0.083
+        },
+        "B3 shared": {
+          "small-clustered": 1.152,
+          "dense-groups": 1.224,
+          "hub-chain": 1,
+          "many-groups": 1
+        }
+      },
+      "verdict": "dropped",
+      "note": "The gate `breakeven` screens the law after `corridors` and after `shared-ways`, on 4 boards. screen-v1 has no `mid-fanout` board, so the wave rule is 3 of 4 boards. After `corridors`, the gate removes no edge, because `corridors` joins two ways only above `BREAK_EVEN`. B1 and the B3 q95 do not change. After `shared-ways`, B1 drops on 2 boards (0.231 to 0.222, 0.326 to 0.324), and the B3 q95 drops on 1 board only (1.197 to 1.186). With `shareAlpha` 0, the gate removes no edge. Against `shared`, `corridors+breakeven` is better on 1 of 4 boards (hub-chain). On many-groups, its B3 q95 is 1.036 and the q95 of `shared` is 1.000. 0 hard breaks."
+    }
   },
   {
     "id": "HWY-048",
@@ -2631,13 +2828,112 @@
     "placementDependent": true,
     "screen": "Apply it to 3 generators on the 5 screen boards. Keep if R6 drops by 20% at a B1 loss < 5%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "HWY-045",
       "HWY-047",
       "EDA-017"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40573673912",
+      "records": [
+        "screen-v1/*/corridors@b514431",
+        "screen-v1/*/shared-ways@b514431",
+        "screen-v1/*/shared@b514431",
+        "screen-v1/*/corridors+stretch@b514431",
+        "screen-v1/*/shared-ways+stretch@b514431"
+      ],
+      "measures": {
+        "B3": {
+          "base": {
+            "small-clustered": 1.001,
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.036
+          },
+          "new": {
+            "small-clustered": 1.001,
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.036
+          }
+        },
+        "B1": {
+          "base": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          },
+          "new": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          }
+        },
+        "R6": {
+          "base": {
+            "small-clustered": 1.648,
+            "dense-groups": 1.331,
+            "hub-chain": 1.032,
+            "many-groups": 1.459
+          },
+          "new": {
+            "small-clustered": 1.648,
+            "dense-groups": 1.331,
+            "hub-chain": 1.032,
+            "many-groups": 1.459
+          }
+        },
+        "B3 shared-ways": {
+          "base": {
+            "small-clustered": 1.147,
+            "dense-groups": 1.197,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.116,
+            "dense-groups": 1.139,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "B1 shared-ways": {
+          "base": {
+            "small-clustered": 0.231,
+            "dense-groups": 0.326,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          },
+          "new": {
+            "small-clustered": 0.212,
+            "dense-groups": 0.263,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        },
+        "R6 shared-ways": {
+          "base": {
+            "small-clustered": 1.648,
+            "dense-groups": 1.584,
+            "hub-chain": 1.032,
+            "many-groups": 1.459
+          },
+          "new": {
+            "small-clustered": 1.648,
+            "dense-groups": 1.266,
+            "hub-chain": 1.032,
+            "many-groups": 1.459
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The gate `stretch` (budget 1.2) screens after `corridors` and after `shared-ways`, on 4 boards. After `corridors`, the gate removes no edge, because the B3 q95 of `corridors` is 1.036 or less. After `shared-ways`, the B3 q95 drops on 2 boards (1.147 to 1.116, 1.197 to 1.139), and R6 drops by 20% on dense-groups (1.584 to 1.266). But B1 drops by 8% and 19% on those boards, over the limit of 5%. The B3 q95 stays under the budget on each board. 0 hard breaks."
+    }
   },
   {
     "id": "HWY-049",
@@ -2670,13 +2966,85 @@
     "placementDependent": false,
     "screen": "Apply it to MINGLE and corridor signatures. Keep if B4 drops by 30% at a B1 loss < 10% on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "HWY-012",
       "HWY-021",
       "HWY-030"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40573673912",
+      "records": [
+        "screen-v1/*/corridors@b514431",
+        "screen-v1/*/shared-ways@b514431",
+        "screen-v1/*/shared@b514431",
+        "screen-v1/*/corridors+ambiguity@b514431",
+        "screen-v1/*/corridors+ambiguity-any@b514431",
+        "screen-v1/*/shared-ways+ambiguity@b514431"
+      ],
+      "measures": {
+        "B4": {
+          "base": {
+            "small-clustered": 0.353,
+            "dense-groups": 0.47,
+            "hub-chain": 0.65,
+            "many-groups": 0.691
+          },
+          "new": {
+            "small-clustered": 0.327,
+            "dense-groups": 0.415,
+            "hub-chain": 0.092,
+            "many-groups": 0.479
+          }
+        },
+        "B1": {
+          "base": {
+            "small-clustered": 0.071,
+            "dense-groups": 0.1,
+            "hub-chain": 0.467,
+            "many-groups": 0.235
+          },
+          "new": {
+            "small-clustered": 0.061,
+            "dense-groups": 0.068,
+            "hub-chain": 0.141,
+            "many-groups": 0.133
+          }
+        },
+        "B4 shared-ways": {
+          "base": {
+            "small-clustered": 0.671,
+            "dense-groups": 0.765,
+            "hub-chain": 0.063,
+            "many-groups": 0.339
+          },
+          "new": {
+            "small-clustered": 0.455,
+            "dense-groups": 0.431,
+            "hub-chain": 0.063,
+            "many-groups": 0.339
+          }
+        },
+        "B1 shared-ways": {
+          "base": {
+            "small-clustered": 0.231,
+            "dense-groups": 0.326,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          },
+          "new": {
+            "small-clustered": 0.135,
+            "dense-groups": 0.144,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The gate `ambiguity` (maxAmbiguity 0.5, a common node) screens after `corridors` and after `shared-ways`, on 4 boards. After `corridors`, B4 drops by 86% on hub-chain and by 31% on many-groups, but by 7% and 12% on the other 2 boards. B1 drops by 14% to 70%, over the limit of 10%. Without the node rule (`link` any), B4 drops by 19% at most. After `shared-ways`, B4 drops by 32% and 44% on 2 boards, and B1 drops by 42% and 56%. 0 hard breaks."
+    }
   },
   {
     "id": "HWY-050",
@@ -3013,13 +3381,80 @@
     "placementDependent": false,
     "screen": "The seeded edits of Z10 on the 5 screen boards. Keep if Z10 mean and moved share drop by 20%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-046",
       "HWY-026",
       "HWY-035"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40573673912",
+      "records": [
+        "screen-v1/*/corridors@b514431",
+        "screen-v1/*/shared-ways@b514431",
+        "screen-v1/*/shared@b514431",
+        "screen-v1/*/corridors+ids@b514431",
+        "screen-v1/*/shared-ways+ids@b514431"
+      ],
+      "measures": {
+        "Z10 ids": {
+          "base": {
+            "small-clustered": 0.692,
+            "dense-groups": 0.594,
+            "hub-chain": 0.6,
+            "many-groups": 0.087
+          },
+          "new": {
+            "small-clustered": 1,
+            "dense-groups": 1,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "Z10": {
+          "base": {
+            "small-clustered": 0.131,
+            "dense-groups": 0.133,
+            "hub-chain": 0.438,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.131,
+            "dense-groups": 0.133,
+            "hub-chain": 0.438,
+            "many-groups": 0.353
+          }
+        },
+        "Z10 moved": {
+          "base": {
+            "small-clustered": 0.052,
+            "dense-groups": 0.043,
+            "hub-chain": 0.102,
+            "many-groups": 0.097
+          },
+          "new": {
+            "small-clustered": 0.052,
+            "dense-groups": 0.043,
+            "hub-chain": 0.102,
+            "many-groups": 0.097
+          }
+        },
+        "Z10 ids shared-ways": {
+          "base": {
+            "small-clustered": 0.524,
+            "dense-groups": 0.393
+          },
+          "new": {
+            "small-clustered": 1,
+            "dense-groups": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The gate `ids` gives each highway the id of its old highway after each of 5 seeded edits (greedy match, Jaccard 0.5). Each matched highway keeps its id: 1.000 on the 4 boards, against 0.087 to 0.692 for `corridors` and 0.393 to 0.524 for `shared-ways`. The measure uses the same match, so this value checks the code. The gate does not change the routes, so the Z10 mean and the moved share do not change. The warm start is not built, and only the warm start can lower Z10. Thus the stage is `screened`, not `kept`."
+    }
   },
   {
     "id": "HWY-055",

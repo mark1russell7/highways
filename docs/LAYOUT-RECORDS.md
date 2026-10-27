@@ -245,6 +245,10 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.stability.base.mean` | Z10 | `Z10.base.mean` | units of the board | lower | no |
 | `route.stability.base.max` | Z10 | `Z10.base.max` | units of the board | lower | no |
 | `route.stability.base.moved` | Z10 | `Z10.base.moved` | 0 to 1 | lower | no |
+| `route.stability.edits.mean` | Z10 | `Z10.edits.mean` | units of the board | lower | no |
+| `route.stability.edits.moved` | Z10 | `Z10.edits.moved` | 0 to 1 | lower | no |
+| `route.stability.highway-churn` | Z10 | `Z10.churn` | 0 to 1 | lower | no |
+| `route.stability.highway-ids` | Z10 | `Z10.ids` | 0 to 1 | higher | no |
 | `route.level.nesting` | Z6 | `level-nesting` | count | lower | no |
 | `route.level.through` | Z3 | `Z3.through` | count | lower | yes |
 | `route.level.link-length` | Z3 | `Z3.length` | units | lower | yes |
@@ -284,6 +288,13 @@ The screen adds the bundle measures for each router record:
 - `route.order.changed` is the share of the orders that change one route or more.
 - `route.order.poa` is the crossings of the input order divided by the fewest crossings of the random orders.
 
+`route.stability.edits.*` and `route.stability.highway-*` measure a highway strategy over a sequence of edits (BUILD-W2A). The screen writes them only with the option `edits`.
+
+- `highwayEdits` makes `edits` seeded small changes of `changeGraph`, one after the other. The strategy gets the graph and its plan before each edit as `previous`.
+- `route.stability.edits.mean` and `route.stability.edits.moved` are the mean Z10 over the edits.
+- `route.stability.highway-churn` is the share of the pairs of edges on one highway that come or go over one edit. Only the edges of both graphs count.
+- `route.stability.highway-ids` is the share of the matched highways that keep their id over one edit. Two highways match when the Jaccard index of their edges is 0.5 or more.
+
 ## The screen
 
 `screen(step, strategies, options)` runs strategies of one step on each input of a screen set. It gives the records and a summary.
@@ -295,6 +306,7 @@ The screen adds the bundle measures for each router record:
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
+- The option `edits` measures each highway strategy over `edits` seeded edits of each input. The base routers do not get these measures.
 
 The script `packages/core/scripts/screen.ts` writes `screen.jsonl` and `screen.md`:
 
@@ -303,7 +315,7 @@ pnpm --filter @mark1russell7/highways screen --step router --module ./proto/my-r
 ```
 
 The workflow `Screen` runs the screen in CI and keeps the two files as an artifact. Start it from the Actions tab with a step, names or prototype files.
-The inputs `wrap`, `shuffles` and `minutes` set the wrappers, the number of random orders and the time limit of the job.
+The inputs `wrap`, `shuffles` and `edits` set the wrappers, the number of random orders and the number of edits. The input `minutes` sets the time limit of the job.
 
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f wrap=stable -f shuffles=20 -f minutes=60

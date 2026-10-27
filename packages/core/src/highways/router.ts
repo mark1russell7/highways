@@ -4,7 +4,7 @@ import type { WayOptions } from "../ways.ts";
 import { follow, type FollowOptions } from "./follow.ts";
 
 /** This function gives the options of the way finder in the options of a strategy: `margin` and `k`, when they are present. */
-function wayOptionsOf(options: object): WayOptions {
+export function wayOptionsOf(options: object): WayOptions {
   const o = options as { margin?: unknown; k?: unknown };
   return { ...(typeof o.margin === "number" ? { margin: o.margin } : {}), ...(typeof o.k === "number" ? { k: o.k } : {}) };
 }
