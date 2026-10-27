@@ -47,8 +47,8 @@ export interface LayoutBox {
   readonly parent?: string;
   /** The group of the box. */
   readonly group?: string;
-  /** This value is `true` when the box is an obstacle: the packer keeps its `x` and `y`. The router ignores it. */
-  readonly locked?: true;
+  /** This value is `true` when the box is an obstacle: the packer keeps its `x` and `y`. `false` is the same as no value. The router ignores it. */
+  readonly locked?: boolean;
   /** The reading order that the caller wants. The router ignores it. */
   readonly rank?: number;
   readonly ports?: readonly LayoutPort[];
@@ -87,7 +87,7 @@ export interface LayoutGenerator {
  * The packer reads the first six dimensions. The router reads the last four.
  */
 export interface LayoutCell {
-  readonly containerSize?: "fixed" | "freeWidth" | "freeAspect";
+  readonly containerSize?: "fixed" | "freeHeight" | "freeWidth" | "freeAspect" | "freeArea";
   readonly containerShape?: "rect" | "convex" | "polygon" | "circle" | "ellipse" | "holes";
   readonly obstacles?: "none" | "center" | "scattered" | "wall" | "corridors" | "touching" | "edge";
   readonly sizes?: "identical" | "uniform" | "heavyTail" | "bimodal" | "extremeAspect" | "nearIdentical";
@@ -292,18 +292,24 @@ export function regionBounds(region: Region): { x: number; y: number; w: number;
 }
 
 /**
+ * The fields of an input that `inputGraph` reads. A contract input, for example the result of `applyPack`, has these fields.
+ * Without `edges`, the input has no edges.
+ */
+export type RouteInput = Pick<LayoutInput, "id" | "boxes" | "obstacles"> & { readonly edges?: LayoutInput["edges"] };
+
+/**
  * This function reads the graph of the router from an input file. The router reads the positions, the ports, the edges and the data.
  * Each obstacle becomes a node without edges, with the bounding box of its region, after the boxes.
  * The router ignores the other fields of the packer: `container`, `gap`, `locked`, `rank`, the `shape` of a box and the `move` of an obstacle.
  * A box without `x` and `y` is an error.
  */
-export function inputGraph(input: LayoutInput): Graph {
+export function inputGraph(input: RouteInput): Graph {
   const nodes = input.boxes.map((b): Node => {
     if (b.x === undefined || b.y === undefined) throw new Error(`The box "${b.id}" of the input "${input.id}" has no position. The router needs a placed input.`);
     return { id: b.id, box: { x: b.x, y: b.y, w: b.w, h: b.h }, ...(b.ports ? { ports: b.ports.map(portToModel) } : {}), ...(b.data ? { data: b.data } : {}) };
   });
   for (const o of input.obstacles ?? []) nodes.push({ id: o.id, box: regionBounds(o.region) });
-  const edges = input.edges.map(
+  const edges = (input.edges ?? []).map(
     (e): Edge => ({
       id: e.id,
       source: { node: e.source, ...(e.sourcePort !== undefined ? { port: e.sourcePort } : {}) },

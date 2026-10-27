@@ -6,10 +6,25 @@
  * Then remove the directive, and the gap from the list in `docs/LAYOUT-RECORDS.md`.
  */
 import * as C from "@mark1russell7/layout-contract";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { countOverlaps } from "../links.ts";
 import { TOLERANCE } from "../properties.ts";
-import { inputGraph, type LayoutBox, type LayoutContainer, type LayoutEdge, type LayoutInput, type LayoutObstacle, type LayoutPort, type LayoutRecord, type LayoutSide, type Region } from "./forms.ts";
+import {
+  inputGraph,
+  type LayoutBox,
+  type LayoutCell,
+  type LayoutContainer,
+  type LayoutEdge,
+  type LayoutGenerator,
+  type LayoutInput,
+  type LayoutObstacle,
+  type LayoutPort,
+  type LayoutRecord,
+  type LayoutSide,
+  type Region,
+  type RouteInput,
+} from "./forms.ts";
 import { round3 } from "./hash.ts";
 import { screen } from "./screen.ts";
 import { screenInputs } from "./set.ts";
@@ -37,28 +52,36 @@ holds<Fits<C.LayoutEdge, LayoutEdge>>();
 holds<Fits<LayoutContainer, C.LayoutContainer>>();
 holds<Fits<C.LayoutContainer, LayoutContainer>>();
 holds<Fits<C.Port, LayoutPort>>();
+holds<Fits<LayoutPort, C.Port>>();
+holds<Fits<LayoutCell, C.LayoutCell>>();
+holds<Fits<C.LayoutCell, LayoutCell>>();
+holds<Fits<LayoutGenerator, C.LayoutGenerator>>();
+holds<Fits<C.LayoutGenerator, LayoutGenerator>>();
+holds<Fits<LayoutBox["locked"], C.LayoutBox["locked"]>>();
+holds<Fits<C.LayoutBox["locked"], LayoutBox["locked"]>>();
 holds<Fits<LayoutRecord["tolerance"], C.LayoutRecord["tolerance"]>>();
 holds<Fits<C.LayoutRecord["tolerance"], LayoutRecord["tolerance"]>>();
 
 // From highways to the contract: a file of highways, read with the contract types.
 holds<Fits<LayoutRecord, C.LayoutRecord>>();
-holds<Fits<LayoutPort & { readonly side: LayoutSide }, C.Port>>();
-holds<Fits<Omit<LayoutBox, "ports">, C.LayoutBox>>();
-// @ts-expect-error G1: the `side` of a port is optional in highways, because the router picks a side. The contract needs it.
-holds<Fits<LayoutPort, C.Port>>();
-// @ts-expect-error G2: highways has no `container` in a router input. The contract needs one.
+holds<Fits<LayoutBox, C.LayoutBox>>();
+holds<Fits<LayoutInput, C.LayoutInput>>();
+// G1 is closed: the `side` of a port is optional in the two packages.
+holds<Fits<LayoutPort["side"], C.Port["side"]>>();
+// G2 is closed: a contract input without a container is correct.
 holds<Fits<LayoutInput["container"], C.LayoutInput["container"]>>();
-// @ts-expect-error G3: highways has the change `packed`. The contract does not.
+// G3 is closed: the contract has the change `packed`.
 holds<Fits<LayoutInput["change"], C.LayoutInput["change"]>>();
 
 // From the contract to highways: a file of the contract, for example the result of `applyPack`, read by highways.
-holds<Fits<Omit<C.LayoutBox, "locked">, LayoutBox>>();
-holds<Fits<Omit<C.LayoutRecord, "ms"> & { readonly ms: number }, LayoutRecord>>();
-// @ts-expect-error G4: `locked` is a boolean in the contract and only `true` in highways.
+holds<Fits<C.LayoutBox, LayoutBox>>();
+holds<Fits<C.LayoutRecord, LayoutRecord>>();
+// G4 is closed: `locked` is a boolean in the two packages.
 holds<Fits<C.LayoutBox["locked"], LayoutBox["locked"]>>();
-// @ts-expect-error G5: `set`, `family`, `seed`, `source`, `hash` and `edges` are optional in the contract and necessary in highways.
-holds<Fits<Pick<C.LayoutInput, "set" | "family" | "seed" | "source" | "hash" | "edges">, Pick<LayoutInput, "set" | "family" | "seed" | "source" | "hash" | "edges">>>();
-// @ts-expect-error G6: `ms` is optional in the contract and necessary in highways.
+// G5 is closed: `inputGraph` reads only the fields of `RouteInput`. A contract input and the result of `applyPack` fit it.
+holds<Fits<C.LayoutInput, RouteInput>>();
+holds<Fits<ReturnType<typeof C.applyPack>, Parameters<typeof inputGraph>[0]>>();
+// G6 is closed: `ms` is necessary in the two packages.
 holds<Fits<C.LayoutRecord["ms"], LayoutRecord["ms"]>>();
 
 // The fields that only one side has. An assignment keeps them, but the other side does not read them.
@@ -70,40 +93,19 @@ holds<Has<LayoutBox, "turnable">>();
 holds<Has<LayoutContainer, "inset">>();
 // @ts-expect-error G7: highways has no `aspectWeight` on a container.
 holds<Has<LayoutContainer, "aspectWeight">>();
-// @ts-expect-error G8: the contract has no `data` on a box.
+// G8 is closed: the contract has `data` on a box, `generator`, `cell` and `step` on an input, and `skipped` on a record.
 holds<Has<C.LayoutBox, "data">>();
-// @ts-expect-error G8: the contract has no `generator` on an input.
 holds<Has<C.LayoutInput, "generator">>();
-// @ts-expect-error G8: the contract has no `cell` on an input.
 holds<Has<C.LayoutInput, "cell">>();
-// @ts-expect-error G8: the contract has no `step` on an input.
 holds<Has<C.LayoutInput, "step">>();
-// @ts-expect-error G8: the contract has no `skipped` on a record.
 holds<Has<C.LayoutRecord, "skipped">>();
 
-/** This function gives the boxes of an input as contract boxes. A port without a side (G1) is an error. */
-function contractBoxes(input: LayoutInput): C.LayoutBox[] {
-  return input.boxes.map(({ ports, ...box }) => ({
-    ...box,
-    ...(ports
-      ? {
-          ports: ports.map(({ side, ...p }) => {
-            if (side === undefined) throw new Error(`The port "${p.id}" of the input "${input.id}" has no side.`);
-            return { ...p, side };
-          }),
-        }
-      : {}),
-  }));
-}
-
-/**
- * This function gives an input as a contract input, with a free container (G2).
- * The change `packed` (G3) is an error.
- */
-function contractInput(input: LayoutInput): C.LayoutInput {
-  const { change, ...rest } = input;
-  if (change === "packed") throw new Error(`The input "${input.id}" has the change "packed".`);
-  return { ...rest, ...(change === undefined ? {} : { change }), boxes: contractBoxes(input), container: input.container ?? { fixed: "none" } };
+/** The floor and the tolerance of each row of the table "The floors" in `docs/PROMOTION.md`, by the name of the measure. */
+function promotionFloors(): Map<string, { floor: number; tol: number }> {
+  const text = readFileSync(new URL("../../../../../docs/PROMOTION.md", import.meta.url), "utf8");
+  const rows = new Map<string, { floor: number; tol: number }>();
+  for (const m of text.matchAll(/^\| `([\w.]+)\.floor` = ([\d.]+) \| `\1\.tol` = ([\d.]+)/gm)) rows.set(m[1]!, { floor: Number(m[2]), tol: Number(m[3]) });
+  return rows;
 }
 
 const inputs = screenInputs();
@@ -123,18 +125,50 @@ describe("the fit of highways to layout-contract", () => {
   it("gives screen-v1 inputs that pass the rules of the contract", () => {
     expect(inputs.length).toBeGreaterThan(0);
     for (const input of inputs) {
-      const boxes = contractBoxes(input);
+      const own: C.LayoutInput = input;
+      const boxes = own.boxes;
       expect(boxes.every((b) => C.placedRect(b) !== undefined)).toBe(true);
       expect(C.countPortsOffBorder(boxes)).toBe(0);
       // The two counts of the overlaps agree at the same tolerance.
       expect(C.countOverlaps(boxes, TOLERANCE)).toBe(countOverlaps(inputGraph(input).nodes.map((n) => n.box)));
-      const own = contractInput(input);
+      // G2: an input without a container gets a free container.
+      expect(C.toPackInput(own).container).toEqual(input.container ?? { fixed: "none" });
       expect(C.toPackInput(own).items.map((b) => b.id)).toEqual(input.boxes.map((b) => b.id));
       // A pack that keeps each position gives the same boxes.
       const placements = boxes.map((b) => ({ id: b.id, x: b.x!, y: b.y! }));
       const packed = C.applyPack(own, { placements, overflow: [], size: { w: 0, h: 0 }, moved: [] });
       expect(packed.boxes).toEqual(boxes);
+      // G5: the router reads the result of `applyPack` as the same graph.
+      expect(inputGraph(packed)).toEqual(inputGraph(input));
     }
+  });
+
+  it("reads a contract input without edges as a graph without edges", () => {
+    const tiny = inputs.find((i) => i.id === "screen-v1/tiny-uniform/s0")!;
+    const own: C.LayoutInput = { schema: "layout-input/1", id: tiny.id, boxes: tiny.boxes };
+    expect(inputGraph(own).edges).toEqual([]);
+    expect(inputGraph(own).nodes).toEqual(inputGraph(tiny).nodes);
+  });
+
+  it("keeps a box with `locked: false` as a box of the graph", () => {
+    const tiny = inputs.find((i) => i.id === "screen-v1/tiny-uniform/s0")!;
+    const open = { ...tiny, boxes: tiny.boxes.map((b) => ({ ...b, locked: false })) };
+    expect(inputGraph(open)).toEqual(inputGraph(tiny));
+  });
+
+  it("gives the joint measures with a floor of 0 the floor and the tolerance of `docs/PROMOTION.md`", () => {
+    const floors = promotionFloors();
+    expect(floors.size).toBeGreaterThan(0);
+    let matched = 0;
+    for (const spec of C.JOINT_MEASURES) {
+      if (spec.floor !== 0) continue;
+      // A joint measure without its own row uses the row of its packer twin, for example `pack.aspectError` for `joint.aspectError`.
+      const row = floors.get(spec.id) ?? floors.get(spec.id.replace(/^joint\./, "pack."));
+      if (row === undefined) continue;
+      expect({ id: spec.id, floor: spec.floor, tol: spec.tol }).toEqual({ id: spec.id, floor: row.floor, tol: row.tol });
+      matched++;
+    }
+    expect(matched).toBeGreaterThanOrEqual(3);
   });
 
   it("gives a record of screen-v1 that is a contract record", () => {
