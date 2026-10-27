@@ -103,8 +103,8 @@ export interface LayoutCell {
 export interface LayoutContainer {
   readonly w?: number;
   readonly h?: number;
-  /** `none`: the packer picks the size. `width`: the width stays. `size`: the width and the height stay. */
-  readonly fixed: "none" | "width" | "size";
+  /** `none`: the packer picks the size. `width`: the width stays. `height`: the height stays. `size`: the width and the height stay. */
+  readonly fixed: "none" | "width" | "height" | "size";
   /** The ratio `w / h` that the packer aims for. */
   readonly aspect?: number;
   /** The shape of the container. */
