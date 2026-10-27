@@ -43,6 +43,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWC-C | `leave: "part"` lets each lane of a trunk leave where its way parts, so few branches turn back. On `trunks-all` and `case-dense-groups`, worst lane spacing error: 133.2% before, 0.8% after. Body crossings: 3 before, 0 after. | 2026-10-27 | #44 |
 | BENCH-CI | The workflow `Bench` races the routers in parts that run at the same time, with a time limit for each cell. Before, no push run on `main` finished: 0 of 25 since `fa1dd82`, each over 60 min. After, a run to 10 000 nodes finishes in 12.4 min. | 2026-10-27 | #45 |
 | MEAS1 | `runSuite` puts the 10 measures of the short list of MEAS0 and the 6 proposed rules in the bench. The suite measures 5 seeds of each family to 1 000 nodes and 1 seed above. Each step gets the median, the IQR and a Pareto front. Up to 100 nodes, each of the 6 rule counts is 0 for each built-in strategy. | 2026-10-27 | #35 |
+| SEC-V | A level link between two items that touch keeps two points, so it obeys the rule `link-ends`. On `mid-clustered` seed 4, the violations of `sections` and of `sections-tree` are 2 each before, 0 after. | 2026-10-27 | #46 |
 
 ## Open
 
