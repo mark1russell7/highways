@@ -54,6 +54,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SCREEN | The screen gives one JSON record for each run on the 14 boards of `screen-v1`, and its summary. In CI, the 9 routers give 126 records in 8.3 s. | 2026-10-27 | #59 |
 | EDA-R | Research: [routing from other fields](research/FIELDS.md). The note gives 51 ideas from six fields, 20 of them `ours` or hybrids. A constrained left-edge track rule gives up to 26% fewer gap lanes at the same crossings. | 2026-10-27 | #61 |
 | WILD-R | Research: [new ideas for each step](research/IDEAS.md). The note gives 60 ideas, 47 of them new to the note and 10 hybrids, from 16 far fields. It gives a build order of 14 steps for BUILD-W. | 2026-10-27 | #60 |
+| NAT-R | Research: [ideas from nature](research/NATURE.md). The note gives 49 ideas, 7 of them ours and 25 hybrids, in [a catalog](research/ideas/nature.json). It gives a build order of 14 ideas for BUILD-W. | 2026-10-27 | #62 |
 
 ## Open
 
@@ -68,7 +69,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
 | IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
-| NAT-R | Research: ideas from nature. Examples are slime molds, ant trails, rivers, leaf veins, blood vessels and the paths that walkers make. | `active` | MEAS0 | P1 |
 | RULE-R | Research: approaches that obey rendering rules. Examples are forces, constraints, energy, fields and gradient descent on the measures. | `active` | MEAS0 | P1 |
 | HWY-STEP | A strategy step `highway` that decides the highways apart from the routers, so each idea of HWY-R plugs in. | `later` | HWY-R | P1 |
 | BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
