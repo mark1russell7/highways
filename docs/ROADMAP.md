@@ -38,6 +38,19 @@ Status: `done`, `active`, `blocked`, `later`.
 |---|---|---|---|---|
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
+| MEAS0 | Research: the measures of a good route, curve, group and level. A note gives each measure, its formula, its scale and the studies behind it. | `later` | | P1 |
+| OPTS | Each strategy declares its options: the type, the range, the step and the meaning. Tools then make controls and sweeps from the registry. | `later` | STRAT | P1 |
+| MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
+| HWC | Curved highways: a bundle bends as one. Its lanes stay parallel at the lane spacing through each bend, and merge and split on smooth curves. | `later` | CURVE | P1 |
+| ROOM2 | Room at each zoom level: each level of the tree gets the gaps that its level links need. The boxes stay stable from level to level. | `later` | ROOM, CUSTOM | P1 |
+| MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
+| CURV-R | Research: curve families and their math. Continuity of the tangent and the curvature, clothoids, biarcs, Hobby curves, splines and the clearance to the boxes. | `later` | MEAS0 | P2 |
+| CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
+| GRP-R | Research: grouping rules and their measures. Spatial trees, clusters of positions, communities of links, mixed rules, and the stability of each. | `later` | MEAS0 | P2 |
+| GRP2 | More grouping strategies from GRP-R, each in its folder with its tests and a row in the benchmark. | `later` | GRP-R, MEAS1 | P2 |
+| TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
+| PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
+| EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 
 ## Rules for each item
 
