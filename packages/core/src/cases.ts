@@ -131,6 +131,28 @@ export function packedGridBoard(): Graph {
   return b.graph();
 }
 
+/**
+ * This function makes a packed board with three zoom levels of groups. The board has 256 touching boxes in a grid of 16 columns and 16 rows.
+ * The quadtree of `buildSections` splits it into 4, 16 and 64 groups. Each box links to a box near it, and 64 long links join boxes far apart.
+ * At each level, the boxes of the groups touch, so the level links have no channel. The roadmap item ROOM2 measures this board.
+ *
+ * The board is not in `CASES`, because the digests of the router fix the output on each board of `CASES`.
+ */
+export function nestedGridBoard(): Graph {
+  const R = rng(13);
+  const b = new Board();
+  const side = 16;
+  const w = 120;
+  const h = 80;
+  const id = (r: number, c: number): string => `n${r}-${c}`;
+  for (let r = 0; r < side; r++) for (let c = 0; c < side; c++) b.node(id(r, c), c * w, r * h, w, h);
+  const step = (): number => Math.floor(R() * 5) - 2;
+  const clamp = (v: number): number => Math.max(0, Math.min(side - 1, v));
+  for (let r = 0; r < side; r++) for (let c = 0; c < side; c++) b.link(id(r, c), id(clamp(r + step()), clamp(c + step())));
+  for (let n = 0; n < 64; n++) b.link(id(Math.floor(R() * side), Math.floor(R() * side)), id(Math.floor(R() * side), Math.floor(R() * side)));
+  return b.graph();
+}
+
 /** The case boards of the benchmark. Each board has a few hundred nodes at most, so the benchmark races them on each run. */
 export const CASES: readonly CaseBoard[] = [
   { name: "case-dense-groups", defect: "Groups overlap at the far view, and level links go through other groups.", make: denseGroupsBoard },

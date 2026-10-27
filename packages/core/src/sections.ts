@@ -1,5 +1,5 @@
 import { center, type Box } from "./geom.ts";
-import type { Node } from "./model.ts";
+import type { LevelItem, Node } from "./model.ts";
 
 /** A section of the plane: a cell of a quadtree, with the nodes whose centers are in it. */
 export interface Section {
@@ -122,4 +122,50 @@ export function checkSections(root: Section, count: number): void {
   walk(root);
   const lost = seen.findIndex((n) => n !== 1);
   if (lost >= 0) fail(root, `the node index ${lost} is in ${seen[lost]} leaves, not in one`);
+}
+
+/** The items of one zoom level of a tree of sections, and the item of each node. */
+export interface LevelCut {
+  /** The items of the level: a section of the depth of the level, or one node of a leaf above that depth. */
+  readonly items: LevelItem[];
+  /** The index in `items` of the item of each node, in the order of the nodes. */
+  readonly owner: readonly number[];
+}
+
+/**
+ * This function gives the items of the zoom level at `depth`. A section of that depth is one item, with the bounding box of its nodes.
+ * A node of a leaf above that depth is an item alone. The items come in the order of the walk of the tree, parents before children.
+ * A depth past the depth of the deepest section gives each node alone.
+ */
+export function levelCut(nodes: readonly Pick<Node, "id" | "box">[], root: Section, depth: number): LevelCut {
+  const items: LevelItem[] = [];
+  const owner: number[] = [];
+  const boxOf = (list: readonly number[]): Box => {
+    let x0 = Infinity;
+    let y0 = Infinity;
+    let x1 = -Infinity;
+    let y1 = -Infinity;
+    for (const i of list) {
+      const b = nodes[i]!.box;
+      x0 = Math.min(x0, b.x);
+      y0 = Math.min(y0, b.y);
+      x1 = Math.max(x1, b.x + b.w);
+      y1 = Math.max(y1, b.y + b.h);
+    }
+    return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  };
+  const visit = (s: Section): void => {
+    if (s.depth >= depth) {
+      for (const i of s.nodes) owner[i] = items.length;
+      items.push({ id: s.id, box: boxOf(s.nodes), nodes: s.nodes.map((i) => nodes[i]!.id) });
+    } else if (s.children.length > 0) for (const c of s.children) visit(c);
+    else
+      for (const i of s.nodes) {
+        const n = nodes[i]!;
+        owner[i] = items.length;
+        items.push({ id: n.id, box: n.box, nodes: [n.id] });
+      }
+  };
+  if (nodes.length > 0) visit(root);
+  return { items, owner };
 }

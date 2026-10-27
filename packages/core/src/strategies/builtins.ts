@@ -7,16 +7,17 @@ import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts
 import { quadtreeGroups } from "../groups/quadtree/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
+import { levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
 import { cornersRouter, type CornersOptions } from "../routers/corners.ts";
 import { plugsRouter } from "../routers/plugs.ts";
 import { sectionsRouter, type SectionsOptions } from "../routers/sections.ts";
 import { sharedRouter, type SharedOptions } from "../routers/shared.ts";
 import { straightRouter } from "../routers/straight.ts";
 import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
-import { SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
+import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CORNERS_SCHEMA, HIGHWAY_SCHEMA, KEY_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CORNERS_SCHEMA, HIGHWAY_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -185,13 +186,29 @@ export type RoomPreset = Omit<RoomOptions, "method">;
 const roomStrategy = (method: RoomMethod, describe: string): Strategy<"room", RoomPreset> =>
   defineStrategy<"room", RoomPreset>({ step: "room", name: method, describe, defaults: {}, schema: ROOM_SCHEMA, run: (input, o) => roomDemand(input.items, input.links, { ...o, method }) });
 
-/** The built-in room strategies: the methods of `roomDemand`. */
+/** The options of the room strategy `levels`: the options of `levelRoom` without the method, and the limits of the quadtree. */
+export type LevelRoomPreset = Omit<LevelRoomOptions, "method"> & SectionOptions;
+
+/** The built-in room strategies: the methods of `roomDemand`, and the room of each zoom level (`levelRoom`). */
 export const roomStrategies: {
   readonly routes: Strategy<"room", RoomPreset>;
   readonly lines: Strategy<"room", RoomPreset>;
+  readonly levels: Strategy<"room", LevelRoomPreset>;
 } = Object.freeze({
   routes: roomStrategy("routes", "The lanes of a gap are the most routes that run along it side by side, with each gap open to the gutter."),
   lines: roomStrategy("lines", "The lanes of a gap are the straight lines between the centers of the boxes that cross the gap."),
+  levels: defineStrategy<"room", LevelRoomPreset>({
+    step: "room",
+    name: "levels",
+    describe: "Each zoom level gets the gaps that its links need. The far levels open first, and a box moves with its parent.",
+    defaults: {},
+    schema: LEVEL_ROOM_SCHEMA,
+    run: (input, o) => {
+      const { cap, maxDepth, collapse, ...room } = o;
+      const root = input.sections ?? buildSections(input.items, { cap: cap ?? SECTION_DEFAULTS.cap, maxDepth: maxDepth ?? SECTION_DEFAULTS.maxDepth, collapse: collapse ?? SECTION_DEFAULTS.collapse });
+      return levelRoom(input.items, input.links, root, room).gaps;
+    },
+  }),
 });
 
 /** The built-in grouping rules: the strategies of the step `group`. The router `sections` makes its hubs and its zoom levels from their tree. */

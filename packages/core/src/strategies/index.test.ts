@@ -97,7 +97,7 @@ describe("the built-in registry", () => {
   it("holds each method of roomDemand", () => {
     const board = packedGridBoard();
     const links = roomLinks(board);
-    expect(listStrategies(STRATEGIES, "room").map((s) => s.name)).toEqual(["routes", "lines"]);
+    expect(listStrategies(STRATEGIES, "room").map((s) => s.name)).toEqual(["routes", "lines", "levels"]);
     for (const method of ["routes", "lines"] as const)
       expect(getStrategy(STRATEGIES, "room", method).run({ items: board.nodes, links }, { gutter: 8 })).toEqual(roomDemand(board.nodes, links, { gutter: 8, method }));
   });

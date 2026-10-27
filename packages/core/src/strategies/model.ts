@@ -22,6 +22,11 @@ export interface CurveInput {
 export interface RoomInput {
   readonly items: readonly Boxed[];
   readonly links: readonly RoomLink[];
+  /**
+   * The tree of sections of the items, for a strategy that gives room to each zoom level. The indices of its nodes are the indices of `items`.
+   * Without it, such a strategy makes the quadtree of `buildSections`. The other strategies do not read it.
+   */
+  readonly sections?: Section;
 }
 
 /**
