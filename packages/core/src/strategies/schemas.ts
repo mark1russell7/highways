@@ -4,8 +4,9 @@ import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
+import type { RunOrder } from "../segments.ts";
 import type { HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
-import type { OptionSchema } from "./options.ts";
+import type { EnumOption, OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
 // The test of the defaults runs each strategy with `optionDefaults` and with no option, and compares the output.
@@ -17,6 +18,17 @@ const WAY_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   smooth: { type: "boolean", default: false, describe: "With `true`, a way in clear view uses the inflection rule, and the other ways get round corners." },
 };
 
+/** The declaration of the lane order of the shared ways of the routers `trunks` and `shared`. */
+const LANE_ORDER: EnumOption<RunOrder> = {
+  type: "enum",
+  values: ["bundle", "run"],
+  default: "bundle",
+  describe: "With `bundle`, two edges keep one lane order on each shared way of their common stretch. With `run`, each shared way gets its order alone.",
+};
+
+/** The declaration of the lane order of the runs of the router `sections`. The default keeps the lane order of version 0.2.0. */
+const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
+
 /** The declarations of the options of the routers `corners` and `corners-smooth`. */
 export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = WAY_SCHEMA;
 
@@ -26,6 +38,7 @@ export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
   rule: { type: "function", describe: "The grouping rule. The edges from one plug with one key share a trunk." },
   split: { type: "number", min: 0.1, max: 0.9, step: 0.05, default: 0.5, describe: "The split point is at this share of the way to the center of the targets." },
   minSize: { type: "integer", min: 1, max: 8, step: 1, default: 2, describe: "A group with fewer edges stays unbundled." },
+  laneOrder: LANE_ORDER,
 };
 
 /** The declarations of the options of the routers `shared` and `shared-all`. */
@@ -40,6 +53,7 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     default: 0.5,
     describe: "The cost of a link that an edge with the same key uses already, as a share of its length.",
   },
+  laneOrder: LANE_ORDER,
 };
 
 /** The declarations of the limits of the tree of sections (`SectionOptions`). */
@@ -97,6 +111,7 @@ export const SECTIONS_SCHEMA: OptionSchema<RouterPreset<SectionsOptions>> = {
   group: { type: "strategy", step: "group", describe: "The grouping rule: a strategy of the step `group`. Without it, the router uses the quadtree." },
   groupOptions: { type: "object", describe: "The options of the strategy `group`." },
   levels: { type: "list", describe: "The depths of the tree that get a level with groups. Without it, each depth gets a level." },
+  laneOrder: RUN_LANE_ORDER,
 };
 
 /** The declarations of the option of the curves `rounded` and `arc`. */

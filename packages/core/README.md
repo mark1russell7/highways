@@ -91,6 +91,28 @@ for (const lane of highwayCurves(graph, open, 4, { maxWidth: 16, radius: 12, min
 
 The curve strategy `highway` is in the registry. For one polyline, it gives the curve of `arc`. `benchHighways` compares each lane curved alone with `rounded` to the lanes of `highwayCurves`. It gives the error of the lane spacing and the crossings in a bundle. It also gives the breaks of the tangent, the smallest radius and the curves through a box.
 
+### Lane order through a bundle
+
+Two edges can go along several runs one after the other. The option `laneOrder` of the routers `trunks`, `shared` and `sections` sets their lane order on these runs.
+
+- With `bundle`, two edges keep one side on each run of their common stretch. Where they part, the edge that turns more to the left gets the left lane.
+- Two edges can part on the left at one end and on the right at the other end. Then they must cross. The end with the smaller x, then the smaller y, sets the side. The crossing is where they part, not between two runs.
+- With `run`, each run gets its order alone. Two edges can change sides between two runs.
+- The default of `trunks` and `shared` is `bundle`. The default of `sections` is `run`, so its runs keep the lane order of version 0.2.0.
+- `orderLanes(run, routes, order)` gives the order of one run. Its default order is `run`.
+- The option changes only the lane order. The routes, the runs and their keys stay the same.
+
+The benchmark measures the lanes of `highwayCurves` on the case boards, with each lane order. A crossing in the body is between the middles of the first and the last leg of a bundle. An end crossing is near a merge or a split.
+
+| Router | Board | Body crossings, `run` → `bundle` | End crossings, `run` → `bundle` |
+|---|---|---:|---:|
+| `shared` | `case-dense-groups` | 10 → 0 | 366 → 162 |
+| `shared-all` | `case-dense-groups` | 0 → 0 | 1586 → 838 |
+| `shared-all` | `case-hub-chain` | 2 → 3 | 603 → 73 |
+| `shared-all` | `case-many-groups` | 12 → 0 | 2301 → 687 |
+
+With `bundle`, 90% or more of the end crossings that stay are necessary. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
+
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
 
 ## Room for the links

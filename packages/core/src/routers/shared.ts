@@ -1,6 +1,7 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
+import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 
 /** The options of the router with shared ways. */
@@ -11,6 +12,8 @@ export interface SharedOptions extends WayOptions {
   readonly rule?: GroupRule;
   /** The cost of a link that an edge with the same key uses already, as a share of its length. The default is 0.5. */
   readonly discount?: number;
+  /** The lane order of the runs. With `bundle`, the default, two edges keep one order on each run of their common stretch. With `run`, each run gets its order alone. */
+  readonly laneOrder?: RunOrder;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
@@ -171,8 +174,10 @@ export function sharedRouter(options: SharedOptions): Router {
       const routes: Route[] = [];
       for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? [w.ps.point, w.pt.point] });
       const shared: SharedRun[] = [];
+      const routeOf = new Map(routes.map((r) => [r.edge, r]));
       for (const run of runs.values()) {
-        shared.push({ id: `r${shared.length}`, key: run.key, points: run.points, edges: laneOrderOfRun(run) });
+        const edges = options.laneOrder === "run" ? laneOrderOfRun(run) : orderLanes(run.points, run.ways.map((w) => routeOf.get(w.edge.id)!), "bundle");
+        shared.push({ id: `r${shared.length}`, key: run.key, points: run.points, edges });
       }
       return { routes, runs: shared };
     },
@@ -181,7 +186,7 @@ export function sharedRouter(options: SharedOptions): Router {
 }
 
 /**
- * This function gives the lane order of a run (metro-line order). Two edges of the run go together past its last corner
+ * This function gives the lane order of a run with the option `laneOrder: "run"` (metro-line order). Two edges of the run go together past its last corner
  * until they part. The edge that turns more to the left there gets the lane more to the left.
  * Two edges can part only before the first corner. Then the edge that comes from more to the left gets the lane more to the left.
  */
