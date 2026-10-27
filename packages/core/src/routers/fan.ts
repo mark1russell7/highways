@@ -3,7 +3,8 @@ import { dist, type Point } from "../geom.ts";
 /**
  * This function gives the Gilbert split point of a trunk with `targets.length` edges (EDA-030). The point makes the flow cost least:
  * `len(start, s) * k^alpha + Σ_j len(s, t_j)`, with `k` the number of targets. Weighted Weiszfeld steps find it.
- * The distance from `start` stays from `lo` to `hi` times the distance to the center of the targets, and at most half of the distance to the nearest target.
+ * The distance from `start` stays from `lo` to `hi` times the distance to the center of the targets.
+ * It is also at most half of the distance to the nearest target.
  * The point moves back toward `start` out of the boxes, in steps of `step`.
  */
 export function gilbertPoint(
@@ -69,7 +70,8 @@ export interface Fan {
 
 /**
  * This function grows a balancing-factor tree from `root` to the targets (NAT-017, after Cuntz and others, 2010).
- * At each step, the target `t` and the place `v` of the tree with the least `|v - goal(t)| + bf * PL(v)` join, with `PL(v)` the length of the tree from the root to `v`.
+ * At each step, the target `t` joins the place `v` of the tree with the least `|v - goal(t)| + bf * PL(v)`.
+ * `PL(v)` is the length of the tree from the root to `v`.
  * A place is a point of the tree, or the foot of `goal(t)` on a link of the tree. `bf` 0 gives the least ink, and a large `bf` gives direct routes.
  * `branch(v, t)` gives the way from `v` to the plug of the target `t`: its first point is `v`, and its last point is the plug.
  */

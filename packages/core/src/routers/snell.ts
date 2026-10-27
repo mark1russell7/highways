@@ -2,7 +2,8 @@ import { dist, type Point } from "../geom.ts";
 import type { Way } from "./shared.ts";
 
 /**
- * This function gives the Snell merge point of a route that comes from `from`, reaches a run at `at` and goes on along the run to `next` (NAT-035).
+ * This function gives the Snell merge point of a route (NAT-035).
+ * The route comes from `from`, reaches a run at `at` and goes on along the run to `next`.
  * A unit of length on the run costs `d` against 1 off it. The cheapest route meets the run at the angle `acos(d)`.
  * The function gives the distance from `at` toward `next` of that merge point. A value of 0 or less tells that the turn at `at` is already at most `acos(d)`.
  */
@@ -32,8 +33,10 @@ function turnAt(a: Point, b: Point, c: Point): number {
 /**
  * This function moves the merge points of the ways of the router `shared` to the Snell angle (NAT-035). It changes the ways in place.
  *
- * A way joins a run at a corner `J` when it comes alone from the corner before, and the link from `J` to the next corner has other edges of its key.
- * When the way turns at `J` by more than `acos(d)`, it goes directly to a new point `J*` on that link, where it meets the link at that angle.
+ * A way joins a run at a corner `J` when it comes alone from the corner before.
+ * The link from `J` to the next corner has other edges of its key.
+ * When the way turns at `J` by more than `acos(d)`, it goes directly to a new point `J*` on that link.
+ * At `J*`, the way meets the link at the angle `acos(d)`.
  * Each way on the link gets `J*` as a new corner, so the run keeps the same points in each route. Then the same rule moves the exits, on the reversed ways.
  *
  * `firstId` is the first free id of a corner. `clear` tells if a line keeps out of the boxes. `delta` gives the cost share `d` of a link with `f` other edges.

@@ -26,12 +26,12 @@
       "whole": 29
     },
     "byStage": {
-      "cataloged": 264,
-      "screened": 0,
+      "cataloged": 256,
+      "screened": 4,
       "prototyped": 2,
       "built": 0,
-      "kept": 3,
-      "dropped": 4
+      "kept": 6,
+      "dropped": 5
     },
     "byWave": {
       "1": 11,
@@ -1513,7 +1513,7 @@
       "placementDependent": true,
       "screen": "shared-all with alpha 0.3, 0.5, 0.7, 1 on case-many-groups and small-clustered: the front of B1 against the B3 q95. Keep if one setting is better than discount 0.5 on both.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "EDA-030",
         "EDA-032",
@@ -1528,7 +1528,97 @@
         "HWY-038",
         "HWY-039"
       ],
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-flow-a05@951ea19",
+          "screen-v1/*/shared-flow-a06@951ea19",
+          "screen-v1/*/shared-flow-a07@951ea19",
+          "screen-v1/*/shared-flow-a08@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-all-flow-a05@951ea19",
+          "screen-v1/*/shared-all-flow-a06@951ea19",
+          "screen-v1/*/shared-all-flow-a07@951ea19",
+          "screen-v1/*/shared-all-flow-a08@951ea19"
+        ],
+        "measures": {
+          "shared a0.6 B1": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.224,
+              "dense-groups": 0.349,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "shared a0.6 B3q95": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.213,
+              "dense-groups": 1.365,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "shared a0.6 R1": {
+            "base": {
+              "small-clustered": 647,
+              "dense-groups": 1081,
+              "hub-chain": 68,
+              "many-groups": 790
+            },
+            "new": {
+              "small-clustered": 628,
+              "dense-groups": 986,
+              "hub-chain": 68,
+              "many-groups": 792
+            }
+          },
+          "shared-all a0.7 B1": {
+            "base": {
+              "small-clustered": 0.43,
+              "dense-groups": 0.498,
+              "hub-chain": 0.709,
+              "many-groups": 0.718
+            },
+            "new": {
+              "small-clustered": 0.438,
+              "dense-groups": 0.536,
+              "hub-chain": 0.708,
+              "many-groups": 0.724
+            }
+          },
+          "shared-all a0.7 B3q95": {
+            "base": {
+              "small-clustered": 1.359,
+              "dense-groups": 1.348,
+              "hub-chain": 1.055,
+              "many-groups": 1.239
+            },
+            "new": {
+              "small-clustered": 1.423,
+              "dense-groups": 1.551,
+              "hub-chain": 1.055,
+              "many-groups": 1.479
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The option `cost: flow` of `shared` is off by default. No alpha from 0.5 to 0.8 beats `discount` 0.5 on B1 and the B3 q95 on more than 1 of the 4 boards. A smaller alpha gives more B1 and fewer crossings, but a longer stretch. For example, `shared-all` alpha 0.5 on small-clustered: B1 0.430 to 0.558, R1 305 to 209, B3 q95 1.359 to 2.218. An alpha of 0.8 gives the inverse. The only win is many-groups with `shared` (B1 0.083 to 0.085, q95 1.000 both). hub-chain does not change. The group stays screened, because its rider HWY-039 (the rip-up) is a win."
+      }
     },
     {
       "id": "EDA-030",
@@ -1563,7 +1653,7 @@
       "placementDependent": true,
       "screen": "trunks-all on mid-fanout and case-dense-groups. Keep if B1 rises >= 3%, the B6 max falls >= 10 degrees and R9 = 0.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "dropped",
       "related": [
         "EDA-029",
         "EDA-015",
@@ -1574,7 +1664,77 @@
       "dependsOn": [
         "EDA-029"
       ],
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/trunks@951ea19",
+          "screen-v1/*/trunks-gilbert-a03@951ea19",
+          "screen-v1/*/trunks-gilbert-a05@951ea19",
+          "screen-v1/*/trunks-gilbert-a07@951ea19"
+        ],
+        "measures": {
+          "B6": {
+            "base": {
+              "small-clustered": 97.7,
+              "dense-groups": 110.3,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 99.9,
+              "dense-groups": 118.9,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          },
+          "ink": {
+            "base": {
+              "small-clustered": 53227.2,
+              "dense-groups": 89756.3,
+              "hub-chain": 37578.2,
+              "many-groups": 50036.9
+            },
+            "new": {
+              "small-clustered": 53236.9,
+              "dense-groups": 89247.9,
+              "hub-chain": 37578.2,
+              "many-groups": 50036.9
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.381,
+              "dense-groups": 1.317,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.212,
+              "dense-groups": 1.228,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "B1": {
+            "base": {
+              "small-clustered": 0.081,
+              "dense-groups": 0.081,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.073,
+              "dense-groups": 0.081,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The option `splitAt: gilbert` of `trunks` is off by default. The B6 max rises with each alpha: small-clustered 97.7 to 99.9, dense-groups 110.3 to 118.9. The ink changes 0.6% at most, and hub-chain and many-groups do not change, because they have no group that `trunks` splits. The B3 q95 falls 8% to 12%."
+      }
     },
     {
       "id": "EDA-031",
@@ -4332,7 +4492,7 @@
       "placementDependent": true,
       "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Sweep alpha in 0.2 steps. Keep if its (B1, B3) front dominates the discount sweep of shared on 3 of 5 boards.",
       "prototype": "M",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "HWY-039",
         "HWY-047",
@@ -4344,7 +4504,69 @@
         "HWY-039"
       ],
       "canonical": "EDA-029",
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-flow-a05@951ea19",
+          "screen-v1/*/shared-flow-a06@951ea19",
+          "screen-v1/*/shared-flow-a07@951ea19",
+          "screen-v1/*/shared-flow-a08@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-all-flow-a05@951ea19",
+          "screen-v1/*/shared-all-flow-a06@951ea19",
+          "screen-v1/*/shared-all-flow-a07@951ea19",
+          "screen-v1/*/shared-all-flow-a08@951ea19"
+        ],
+        "measures": {
+          "B1": {
+            "base": {
+              "small-clustered": 0.43,
+              "dense-groups": 0.498,
+              "hub-chain": 0.709,
+              "many-groups": 0.718
+            },
+            "new": {
+              "small-clustered": 0.506,
+              "dense-groups": 0.606,
+              "hub-chain": 0.712,
+              "many-groups": 0.75
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.359,
+              "dense-groups": 1.348,
+              "hub-chain": 1.055,
+              "many-groups": 1.239
+            },
+            "new": {
+              "small-clustered": 1.717,
+              "dense-groups": 1.903,
+              "hub-chain": 1.063,
+              "many-groups": 1.56
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 305,
+              "dense-groups": 471,
+              "hub-chain": 18,
+              "many-groups": 111
+            },
+            "new": {
+              "small-clustered": 246,
+              "dense-groups": 377,
+              "hub-chain": 16,
+              "many-groups": 101
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "This idea is the cost of EDA-029, with the same screen. The cost `len * f^alpha` trades the stretch for the sharing. No alpha beats the fixed discount 0.5 on B1 and the B3 q95 together on 3 of the 4 boards. The option stays, off by default."
+      }
     },
     {
       "id": "HWY-039",
@@ -4393,7 +4615,7 @@
       "placementDependent": true,
       "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "HWY-038",
         "HWY-005",
@@ -4406,7 +4628,107 @@
         "HWY-038"
       ],
       "canonical": "EDA-029",
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-p3@951ea19",
+          "screen-v1/*/shared-flow-a06-p3@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-all-p3@951ea19",
+          "screen-v1/*/shared-all-flow-a06-p3@951ea19"
+        ],
+        "measures": {
+          "shared-all B1": {
+            "base": {
+              "small-clustered": 0.43,
+              "dense-groups": 0.498,
+              "hub-chain": 0.709,
+              "many-groups": 0.718
+            },
+            "new": {
+              "small-clustered": 0.464,
+              "dense-groups": 0.53,
+              "hub-chain": 0.716,
+              "many-groups": 0.749
+            }
+          },
+          "shared-all B3q95": {
+            "base": {
+              "small-clustered": 1.359,
+              "dense-groups": 1.348,
+              "hub-chain": 1.055,
+              "many-groups": 1.239
+            },
+            "new": {
+              "small-clustered": 1.314,
+              "dense-groups": 1.319,
+              "hub-chain": 1.055,
+              "many-groups": 1.22
+            }
+          },
+          "shared-all R1": {
+            "base": {
+              "small-clustered": 305,
+              "dense-groups": 471,
+              "hub-chain": 18,
+              "many-groups": 111
+            },
+            "new": {
+              "small-clustered": 246,
+              "dense-groups": 382,
+              "hub-chain": 18,
+              "many-groups": 80
+            }
+          },
+          "shared-all ink": {
+            "base": {
+              "small-clustered": 36844.7,
+              "dense-groups": 52612.8,
+              "hub-chain": 12293,
+              "many-groups": 17622.5
+            },
+            "new": {
+              "small-clustered": 33978,
+              "dense-groups": 49412.1,
+              "hub-chain": 12007.5,
+              "many-groups": 15260
+            }
+          },
+          "shared B1": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.242,
+              "dense-groups": 0.344,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            }
+          },
+          "shared B3q95": {
+            "base": {
+              "small-clustered": 1.152,
+              "dense-groups": 1.224,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.17,
+              "dense-groups": 1.247,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          }
+        },
+        "verdict": "kept",
+        "note": "The option `passes: 3` of `shared` (rip-up and route again) is off by default. With `shared-all`, it beats one pass on B1 and the B3 q95 on all 4 boards. Crossings fall 19% to 28% on 3 boards, and the ink falls. With `shared`, B1 rises 12% to 15% and the q95 rises 2% at most. The concave cost (`cost: flow`) adds B1 but also stretch. 3 passes take about 3 times the time. Its canonical EDA-029 is not kept, so the group stays screened."
+      }
     },
     {
       "id": "HWY-040",
@@ -6200,7 +6522,7 @@
       "placementDependent": true,
       "screen": "Sweep bf over 0, 0.2, 0.4, 0.7 and 1 on mid-fanout and small-clustered. Keep if one bf dominates the default point of trunks on (B1, B3 q95).",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "screened",
       "related": [
         "NAT-018",
         "NAT-012",
@@ -6209,7 +6531,92 @@
         "HWY-037",
         "EDA-046"
       ],
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/trunks@951ea19",
+          "screen-v1/*/trunks-tree-bf02@951ea19",
+          "screen-v1/*/trunks-tree-bf04@951ea19",
+          "screen-v1/*/trunks-tree-bf06@951ea19",
+          "screen-v1/*/trunks-tree-bf08@951ea19"
+        ],
+        "measures": {
+          "B1": {
+            "base": {
+              "small-clustered": 0.081,
+              "dense-groups": 0.081,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            },
+            "new": {
+              "small-clustered": 0.078,
+              "dense-groups": 0.095,
+              "hub-chain": 0.078,
+              "many-groups": 0.085
+            }
+          },
+          "B3q95": {
+            "base": {
+              "small-clustered": 1.381,
+              "dense-groups": 1.317,
+              "hub-chain": 1,
+              "many-groups": 1
+            },
+            "new": {
+              "small-clustered": 1.243,
+              "dense-groups": 1.241,
+              "hub-chain": 1,
+              "many-groups": 1
+            }
+          },
+          "ink": {
+            "base": {
+              "small-clustered": 53227.2,
+              "dense-groups": 89756.3,
+              "hub-chain": 37578.2,
+              "many-groups": 50036.9
+            },
+            "new": {
+              "small-clustered": 52649.2,
+              "dense-groups": 88627.9,
+              "hub-chain": 37578.2,
+              "many-groups": 50036.9
+            }
+          },
+          "R1": {
+            "base": {
+              "small-clustered": 1093,
+              "dense-groups": 2135,
+              "hub-chain": 68,
+              "many-groups": 792
+            },
+            "new": {
+              "small-clustered": 1053,
+              "dense-groups": 2126,
+              "hub-chain": 68,
+              "many-groups": 792
+            }
+          },
+          "B6": {
+            "base": {
+              "small-clustered": 97.7,
+              "dense-groups": 110.3,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 131.3,
+              "dense-groups": 135.8,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          }
+        },
+        "verdict": "screened",
+        "note": "The option `fan: tree` of `trunks` is off by default. bf 0.2 and 0.4 beat `trunks` on B1 and the B3 q95 on dense-groups (B1 0.081 to 0.095 with bf 0.2). On small-clustered, the q95 falls but B1 falls 4%. hub-chain and many-groups do not change. A smaller bf gives more B1, so a screen of bf 0 and 0.1 is next."
+      }
     },
     {
       "id": "NAT-018",
@@ -6567,7 +6974,7 @@
       "placementDependent": true,
       "screen": "shared-all with the 4 orders on 5 boards, 5 seeds each. Keep an order if A12 >= 0.64 on B1 against the input order, with R5 q95 not worse.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "kept",
       "related": [
         "NAT-005",
         "NAT-022",
@@ -6580,7 +6987,93 @@
       "same": [
         "WILD-022"
       ],
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared-order-input@951ea19",
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-all-order-input@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-order-load@951ea19",
+          "screen-v1/*/shared-all-order-load@951ea19"
+        ],
+        "measures": {
+          "shared-all B1": {
+            "base": {
+              "small-clustered": 0.405,
+              "dense-groups": 0.473,
+              "hub-chain": 0.7,
+              "many-groups": 0.722
+            },
+            "new": {
+              "small-clustered": 0.43,
+              "dense-groups": 0.498,
+              "hub-chain": 0.709,
+              "many-groups": 0.718
+            }
+          },
+          "shared-all B2": {
+            "base": {
+              "small-clustered": 0.58,
+              "dense-groups": 0.557,
+              "hub-chain": 0.218,
+              "many-groups": 0.567
+            },
+            "new": {
+              "small-clustered": 0.615,
+              "dense-groups": 0.583,
+              "hub-chain": 0.218,
+              "many-groups": 0.567
+            }
+          },
+          "shared-all R1": {
+            "base": {
+              "small-clustered": 378,
+              "dense-groups": 522,
+              "hub-chain": 24,
+              "many-groups": 104
+            },
+            "new": {
+              "small-clustered": 305,
+              "dense-groups": 471,
+              "hub-chain": 18,
+              "many-groups": 111
+            }
+          },
+          "shared B1": {
+            "base": {
+              "small-clustered": 0.209,
+              "dense-groups": 0.289,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            }
+          },
+          "shared R1": {
+            "base": {
+              "small-clustered": 685,
+              "dense-groups": 1089,
+              "hub-chain": 68,
+              "many-groups": 790
+            },
+            "new": {
+              "small-clustered": 647,
+              "dense-groups": 1081,
+              "hub-chain": 68,
+              "many-groups": 790
+            }
+          }
+        },
+        "verdict": "kept",
+        "note": "The default order `span` (the longest first) is the pioneer order. The base is `order: input`. With `shared-all`, B1 rises 6.2% and 5.3% on small-clustered and dense-groups, and R1 falls 19% and 10%. With `shared`, B1 rises 6.2% on dense-groups and R1 falls 0.7%. On many-groups with `shared-all`, R1 rises 7%. The order `load` does not beat `span`."
+      }
     },
     {
       "id": "NAT-025",
@@ -7180,7 +7673,7 @@
       "placementDependent": true,
       "screen": "shared and trunks on case-many-groups and mid-fanout. Needs B6 in the suite. Keep if B6 max <= 75 degrees and R9 stays 0.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "kept",
       "related": [
         "NAT-012",
         "NAT-013",
@@ -7188,7 +7681,107 @@
         "EDA-029",
         "HWY-050"
       ],
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-snell@951ea19",
+          "screen-v1/*/shared-flow-a06-snell@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-all-snell@951ea19",
+          "screen-v1/*/shared-all-flow-a06-snell@951ea19"
+        ],
+        "measures": {
+          "shared B6": {
+            "base": {
+              "small-clustered": 134.2,
+              "dense-groups": 158.2,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            },
+            "new": {
+              "small-clustered": 98.3,
+              "dense-groups": 129,
+              "hub-chain": 50.4,
+              "many-groups": 90
+            }
+          },
+          "shared ink": {
+            "base": {
+              "small-clustered": 45826.5,
+              "dense-groups": 72887.5,
+              "hub-chain": 37578.2,
+              "many-groups": 50157.6
+            },
+            "new": {
+              "small-clustered": 46047.5,
+              "dense-groups": 73193.3,
+              "hub-chain": 37578.2,
+              "many-groups": 50157.6
+            }
+          },
+          "shared R1": {
+            "base": {
+              "small-clustered": 647,
+              "dense-groups": 1081,
+              "hub-chain": 68,
+              "many-groups": 790
+            },
+            "new": {
+              "small-clustered": 700,
+              "dense-groups": 1150,
+              "hub-chain": 68,
+              "many-groups": 790
+            }
+          },
+          "shared-all B6": {
+            "base": {
+              "small-clustered": 166.7,
+              "dense-groups": 159.9,
+              "hub-chain": 90,
+              "many-groups": 132.3
+            },
+            "new": {
+              "small-clustered": 147.5,
+              "dense-groups": 145.3,
+              "hub-chain": 68.8,
+              "many-groups": 121.3
+            }
+          },
+          "shared-all ink": {
+            "base": {
+              "small-clustered": 36844.7,
+              "dense-groups": 52612.8,
+              "hub-chain": 12293,
+              "many-groups": 17622.5
+            },
+            "new": {
+              "small-clustered": 36942.3,
+              "dense-groups": 52776,
+              "hub-chain": 12348,
+              "many-groups": 17649.5
+            }
+          },
+          "shared-all R1": {
+            "base": {
+              "small-clustered": 305,
+              "dense-groups": 471,
+              "hub-chain": 18,
+              "many-groups": 111
+            },
+            "new": {
+              "small-clustered": 342,
+              "dense-groups": 525,
+              "hub-chain": 24,
+              "many-groups": 125
+            }
+          }
+        },
+        "verdict": "kept",
+        "note": "The option `merge: snell` of `shared` is off by default. The B6 max falls on each board with merges: 8% to 27%. The ink rises 0.5% at most. The crossings rise 6% to 13% (18 to 24 on hub-chain), because the new merge lines cut across other routes. The option is only in `shared`, not in `trunks`."
+      }
     },
     {
       "id": "NAT-036",
@@ -11671,7 +12264,7 @@
       "placementDependent": true,
       "screen": "On shared and shared-all over case-hub-chain, case-many-groups and small-clustered, with 5 seeds: keep an order when Â12 is 0.64 or more on the q95 of R5 or on B1.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "kept",
       "related": [
         "WILD-023",
         "WILD-056",
@@ -11683,7 +12276,79 @@
         "NAT-024"
       ],
       "canonical": "NAT-024",
-      "wave": 1
+      "wave": 1,
+      "result": {
+        "date": "2026-10-27",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40569076052",
+        "records": [
+          "screen-v1/*/shared@951ea19",
+          "screen-v1/*/shared-order-shortest@951ea19",
+          "screen-v1/*/shared-all@951ea19",
+          "screen-v1/*/shared-all-order-shortest@951ea19",
+          "screen-v1/*/shared-order-load@951ea19",
+          "screen-v1/*/shared-all-order-load@951ea19"
+        ],
+        "measures": {
+          "shared B1": {
+            "base": {
+              "small-clustered": 0.21,
+              "dense-groups": 0.307,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            },
+            "new": {
+              "small-clustered": 0.186,
+              "dense-groups": 0.274,
+              "hub-chain": 0.078,
+              "many-groups": 0.083
+            }
+          },
+          "shared R1": {
+            "base": {
+              "small-clustered": 647,
+              "dense-groups": 1081,
+              "hub-chain": 68,
+              "many-groups": 790
+            },
+            "new": {
+              "small-clustered": 755,
+              "dense-groups": 1229,
+              "hub-chain": 68,
+              "many-groups": 790
+            }
+          },
+          "shared-all B1": {
+            "base": {
+              "small-clustered": 0.43,
+              "dense-groups": 0.498,
+              "hub-chain": 0.709,
+              "many-groups": 0.718
+            },
+            "new": {
+              "small-clustered": 0.354,
+              "dense-groups": 0.443,
+              "hub-chain": 0.688,
+              "many-groups": 0.729
+            }
+          },
+          "shared-all R1": {
+            "base": {
+              "small-clustered": 305,
+              "dense-groups": 471,
+              "hub-chain": 18,
+              "many-groups": 111
+            },
+            "new": {
+              "small-clustered": 404,
+              "dense-groups": 641,
+              "hub-chain": 27,
+              "many-groups": 86
+            }
+          }
+        },
+        "verdict": "dropped",
+        "note": "The inverse order `shortest` loses B1 on 3 of 4 boards (11% to 18% with `shared-all`) and the crossings rise 14% to 50%, except on many-groups. The order `load` is near `span`. The options stay, off by default, and `span` stays the default. The stage follows the canonical NAT-024: the order axis is kept, with `span` as the default."
+      }
     },
     {
       "id": "WILD-023",
