@@ -165,6 +165,27 @@ describe("the soft way on a walled-in level (ER3d)", () => {
     }
   });
 
+  it("gives a link of two points between two items that touch (SEC-V)", () => {
+    // The soft way leaves `a` and enters `b` at the same point of their common side. Before SEC-V, the link had one point only.
+    const touching: LevelItem[] = [
+      { id: "a", box: { x: 12, y: 487, w: 287, h: 262 } },
+      { id: "b", box: { x: 259, y: 273, w: 236, h: 214 } },
+      { id: "c", box: { x: 48, y: 250, w: 226, h: 237 } },
+      { id: "d", box: { x: 263, y: 3, w: 285, h: 261 } },
+      { id: "e", box: { x: 511, y: 243, w: 242, h: 259 } },
+      { id: "f", box: { x: 299, y: 506, w: 248, h: 207 } },
+      { id: "g", box: { x: 546, y: 484, w: 224, h: 271 } },
+    ].map((i) => ({ ...i, nodes: [i.id] }));
+    const boxOf = new Map(touching.map((i) => [i.id, i.box]));
+    for (const [source, target] of [["a", "b"], ["b", "a"]] as const) {
+      const [link] = levelLinks(touching, [{ source, target, count: 1 }]);
+      const p = link!.points;
+      expect(p.length, `${source} to ${target}`).toBe(2);
+      expect(onBoundary(p[0]!, boxOf.get(source)!), `${source} to ${target}`).toBe(true);
+      expect(onBoundary(p[1]!, boxOf.get(target)!), `${source} to ${target}`).toBe(true);
+    }
+  });
+
   it("does not change the links of a level without far boxes in the way", () => {
     for (const c of CASES) {
       const g = c.make();

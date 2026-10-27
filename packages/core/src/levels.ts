@@ -65,8 +65,16 @@ const EPS = 1e-6;
 /**
  * This function removes the repeated points, the points in the middle of a straight run,
  * and the points where the way turns back on itself.
+ * A way of two points or more keeps two points: its first point and its last point.
+ * Two items that touch can get a link of zero length, and such a link keeps an end on each item.
  */
 function tidy(p: readonly Point[]): Point[] {
+  const out = tidyPoints(p);
+  return out.length === 1 && p.length > 1 ? [p[0]!, p[p.length - 1]!] : out;
+}
+
+/** This function does the work of `tidy`. It can give one point only. */
+function tidyPoints(p: readonly Point[]): Point[] {
   const out: Point[] = [];
   for (const q of p) {
     if (out.length > 0 && dist(q, out[out.length - 1]!) <= EPS) continue;
