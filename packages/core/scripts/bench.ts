@@ -12,7 +12,7 @@ import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
 import type { Graph, Node } from "../src/model.ts";
 import { sectionsRouter } from "../src/routers/sections.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
-import { trunksRouter } from "../src/routers/trunks.ts";
+import { byCollection, trunksRouter } from "../src/routers/trunks.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, routersOf } from "../src/strategies/model.ts";
 
@@ -55,6 +55,10 @@ const bundlers = [
   ...ROUTERS.filter((r) => r.name === "trunks" || r.name === "shared"),
   trunksRouter({ name: "trunks-all", rule: all }),
   sharedRouter({ name: "shared-all", rule: all }),
+  // The lane order of each run alone (HWC-B): the old default, for the comparison.
+  trunksRouter({ name: "trunks-all (run order)", rule: all, laneOrder: "run" }),
+  sharedRouter({ name: "shared (run order)", rule: byCollection, laneOrder: "run" }),
+  sharedRouter({ name: "shared-all (run order)", rule: all, laneOrder: "run" }),
 ];
 const highways: HighwayBenchRow[] = [];
 for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {

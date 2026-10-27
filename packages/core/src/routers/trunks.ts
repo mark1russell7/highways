@@ -1,6 +1,7 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Bundle, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
+import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 
 /** The options of the trunk router. */
@@ -13,6 +14,8 @@ export interface TrunksOptions extends WayOptions {
   readonly split?: number;
   /** A group with fewer edges stays unbundled. The default is 2. */
   readonly minSize?: number;
+  /** The lane order of a trunk. With `bundle`, the default, the branches part in lane order. With `run`, the first leg of each branch tells the order. */
+  readonly laneOrder?: RunOrder;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
@@ -105,13 +108,17 @@ export function trunksRouter(options: TrunksOptions): Router {
         const len = dist(prev, end);
         const dir = len > 0 ? { x: (end.x - prev.x) / len, y: (end.y - prev.y) / len } : plug.normal;
         const branches: { edge: string; next: Point }[] = [];
+        const own: Route[] = [];
         group.forEach((e, i) => {
           const pt = placePlug(targets[i]!, e.target, end);
           const branch = dedupe(ways.toPlug(end, pt) ?? [end, pt.point]);
-          points.set(e.id, dedupe([...trunk, ...branch.slice(1)]));
+          const p = dedupe([...trunk, ...branch.slice(1)]);
+          points.set(e.id, p);
+          own.push({ edge: e.id, points: p });
           branches.push({ edge: e.id, next: branch[1] ?? pt.point });
         });
-        bundles.push({ id: `b${bundles.length}`, key: id.split("\u0000")[2]!, node: s.id, edges: laneOrder(dir, end, branches), trunk });
+        const edges = options.laneOrder === "run" || trunk.length < 2 ? laneOrder(dir, end, branches) : orderLanes(trunk, own, "bundle");
+        bundles.push({ id: `b${bundles.length}`, key: id.split("\u0000")[2]!, node: s.id, edges, trunk });
       }
       const routes: Route[] = [];
       for (const e of graph.edges) {

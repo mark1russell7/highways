@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { checkProperties } from "./bench/properties.ts";
+import { CASES } from "./cases.ts";
 import { makeFixture, type FixtureKind } from "./fixtures.ts";
 import { dist, segmentsCross } from "./geom.ts";
 import type { Graph, Router } from "./model.ts";
 import { sharedRouter } from "./routers/shared.ts";
 import { sectionsRouter } from "./routers/sections.ts";
 import { byCollection, trunksRouter } from "./routers/trunks.ts";
-import { laneRoutes, offsetPolyline, orderLanes, pathPoints, pullApart, runKey, segmentsOf } from "./segments.ts";
+import { laneRoutes, offsetPolyline, orderLanes, pathPoints, pullApart, runKey, segmentsOf, type SegmentGraph } from "./segments.ts";
 
 const routers: Router[] = [
   sharedRouter({ name: "shared-all" }),
@@ -109,6 +110,89 @@ describe("orderLanes", () => {
     const p = { edge: "p", points: [{ x: -100, y: -100 }, ...run] };
     const q = { edge: "q", points: [{ x: -100, y: 100 }, ...run] };
     expect(orderLanes(run, [q, p])).toEqual(["p", "q"]);
+  });
+
+  // Two runs of one stretch in opposite directions. The edge p comes from above and goes down. The edge q does the reverse.
+  const east = [
+    { x: 0, y: 0 },
+    { x: 100, y: 0 },
+  ];
+  const west = [
+    { x: 200, y: 0 },
+    { x: 100, y: 0 },
+  ];
+  const stretch = (edge: string, from: number, to: number) => ({
+    edge,
+    points: [{ x: -100, y: from }, { x: 0, y: 0 }, { x: 100, y: 0 }, { x: 200, y: 0 }, { x: 300, y: to }],
+  });
+  const p = stretch("p", -100, 100);
+  const q = stretch("q", 100, -100);
+
+  it("with the order `run`, can give two runs of one stretch opposite orders", () => {
+    // Each run looks first at its own last point. The edge p goes to the right of q in both directions, so it changes sides.
+    expect(orderLanes(east, [p, q], "run")).toEqual(["q", "p"]);
+    expect(orderLanes(west, [p, q], "run")).toEqual(["q", "p"]);
+  });
+
+  it("with the order `bundle`, gives two runs of one stretch the same order, and the routes cross where they part", () => {
+    // The end at x = 0 tells the side: p comes from above, so it stays above on both runs.
+    expect(orderLanes(east, [p, q], "bundle")).toEqual(["p", "q"]);
+    expect(orderLanes(west, [q, p], "bundle")).toEqual(["q", "p"]);
+    // Without a conflict, the two orders agree.
+    const r = stretch("r", -100, -100);
+    const t = stretch("t", 100, 100);
+    expect(orderLanes(east, [t, r], "bundle")).toEqual(orderLanes(east, [t, r], "run"));
+    expect(orderLanes(west, [t, r], "bundle")).toEqual(orderLanes(west, [t, r], "run"));
+  });
+});
+
+/** This function counts the pairs of edges that change sides from one shared segment to the next shared segment of both paths. */
+function swaps(graph: SegmentGraph): number {
+  const at = new Map<string, { index: number; reverse: boolean }>();
+  for (const path of graph.paths) path.segments.forEach((ref, index) => at.set(`${path.edge}|${ref.segment}`, { index, reverse: ref.reverse }));
+  // For each pair, the side of the first edge on each shared segment, in the direction of its own route: 1 left, -1 right.
+  const sides = new Map<string, { a: number; b: number; side: number }[]>();
+  for (const s of graph.segments) {
+    if (s.count < 2) continue;
+    for (let i = 0; i < s.edges.length; i++)
+      for (let j = i + 1; j < s.edges.length; j++) {
+        const [a, b, side] = s.edges[i]! < s.edges[j]! ? [s.edges[i]!, s.edges[j]!, 1] : [s.edges[j]!, s.edges[i]!, -1];
+        const A = at.get(`${a}|${s.id}`)!;
+        const list = sides.get(`${a}|${b}`) ?? [];
+        list.push({ a: A.index, b: at.get(`${b}|${s.id}`)!.index, side: A.reverse ? -side : side });
+        sides.set(`${a}|${b}`, list);
+      }
+  }
+  let count = 0;
+  for (const list of sides.values()) {
+    list.sort((x, y) => x.a - y.a);
+    for (let k = 1; k < list.length; k++) if (list[k]!.a === list[k - 1]!.a + 1 && Math.abs(list[k]!.b - list[k - 1]!.b) === 1 && list[k]!.side !== list[k - 1]!.side) count++;
+  }
+  return count;
+}
+
+describe("the lane order of the routers", () => {
+  it("keeps two edges on one side through their stretch with the order `bundle` (HWC-B)", () => {
+    const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
+    const bundle = segmentsOf(sharedRouter({ name: "shared-all" }).route(graph));
+    const run = segmentsOf(sharedRouter({ name: "shared-all", laneOrder: "run" }).route(graph));
+    expect(swaps(run)).toBeGreaterThan(0);
+    expect(swaps(bundle)).toBe(0);
+  });
+
+  it("changes only the lane order, not the routes", () => {
+    const graph = CASES.find((c) => c.name === "case-dense-groups")!.make();
+    for (const [a, b] of [
+      [sharedRouter({ name: "shared" }), sharedRouter({ name: "shared", laneOrder: "run" })],
+      [trunksRouter({ name: "trunks", rule: () => "all" }), trunksRouter({ name: "trunks", rule: () => "all", laneOrder: "run" })],
+      [sectionsRouter({ name: "sections", laneOrder: "bundle" }), sectionsRouter({ name: "sections" })],
+    ] as const) {
+      const x = a.route(graph);
+      const y = b.route(graph);
+      expect(x.routes).toEqual(y.routes);
+      const shared = (r: typeof x) => [...(r.runs ?? []).map((u) => u.edges), ...(r.bundles ?? []).map((u) => u.edges)];
+      expect(shared(x).map((e) => runKey(e))).toEqual(shared(y).map((e) => runKey(e)));
+    }
   });
 });
 

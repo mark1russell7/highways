@@ -3,6 +3,7 @@ import { CURVE_TYPES } from "../curves/index.ts";
 import { CASES } from "../cases.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { ROUTERS } from "../routers/index.ts";
+import { sharedRouter } from "../routers/shared.ts";
 import { benchCurves, benchHighways, formatCurves, formatHighways, SPACING_LIMIT } from "./curves.ts";
 
 describe("benchCurves", () => {
@@ -31,5 +32,14 @@ describe("benchHighways", () => {
     expect(together.breaks).toBe(0);
     expect(together.through).toBe(0);
     expect(formatHighways(rows).split("\n")).toHaveLength(4);
+  });
+
+  it("counts fewer crossings in a bundle when two edges keep one lane order through it (HWC-B)", () => {
+    const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
+    const [, run] = benchHighways(sharedRouter({ name: "shared-all", laneOrder: "run" }), "case-many-groups", graph);
+    const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
+    expect(run!.crossings).toBeGreaterThan(0);
+    expect(bundle!.crossings).toBe(0);
+    expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);
   });
 });

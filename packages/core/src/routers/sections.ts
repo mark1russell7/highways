@@ -4,7 +4,7 @@ import { LEVEL_LINK_DEFAULTS, levelLinks, type ItemPair, type LevelLinkOptions }
 import { nodeIndex, type Graph, type Level, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 import { allSections, buildSections, checkSections, levelCut, SECTION_DEFAULTS, treeDepth, type Section, type SectionOptions } from "../sections.ts";
-import { orderLanes } from "../segments.ts";
+import { orderLanes, type RunOrder } from "../segments.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { WayFinder } from "../ways.ts";
 
@@ -45,6 +45,8 @@ export interface SectionsOptions extends LevelLinkOptions, SectionOptions {
    * The default is each depth, from 0 to the depth of the deepest section.
    */
   readonly levels?: readonly number[];
+  /** The lane order of the runs. With `run`, the default, each run gets its order alone. With `bundle`, two edges keep one order on each run of their common stretch. */
+  readonly laneOrder?: RunOrder;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
@@ -206,7 +208,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
       for (const [key, p] of pieces) {
         const list = users.get(key) ?? [];
         if (list.length < 2 || p.length < 2) continue;
-        runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!)) });
+        runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!), options.laneOrder) });
       }
       return { routes, runs, levels: makeLevels(graph, root, routeOf, options) };
     },

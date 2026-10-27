@@ -203,13 +203,77 @@ function turn(from: Point, base: Point, to: Point): number {
 }
 
 /**
- * This function gives the lane order of the edges on a shared way `run` (metro-line order). Two routes go on together
- * past the last point of the run until they part. The route that turns more to the left there gets the lane more to the left.
- * Two routes can part only before the first point. Then the route that comes from more to the left gets the lane more to the left.
- * A route that does not hold the run goes last.
+ * The lane order of the shared ways of a router.
+ * With `bundle`, two edges keep one order on all the shared ways of their common stretch.
+ * With `run`, each shared way gets its order alone. Two edges can change sides from one shared way to the next.
  */
-export function orderLanes(run: readonly Point[], routes: readonly Route[]): string[] {
-  const placed: { edge: string; p: readonly Point[]; s: number; e: number }[] = [];
+export type RunOrder = "bundle" | "run";
+
+/** The place of a route on a run. The points go in the direction of the run. `s` and `e` are the indexes of the ends of the run. */
+interface Placed {
+  readonly edge: string;
+  readonly p: readonly Point[];
+  readonly s: number;
+  readonly e: number;
+}
+
+/** The place where two routes part past one end of their common stretch, and the side of the first route there. */
+interface Parting {
+  /** The last common point. */
+  readonly at: Point;
+  /** This value is below 0 when the first route goes to the left of the second route. It is above 0 when it goes to the right. */
+  readonly side: number;
+}
+
+/** This function gives the place where the routes `P` and `Q` part after the last point of the run, or nothing. */
+function partAfter(P: Placed, Q: Placed): Parting | undefined {
+  for (let j = 1; ; j++) {
+    const a = P.p[P.e + j];
+    const b = Q.p[Q.e + j];
+    if (a === undefined || b === undefined) return undefined;
+    if (dist(a, b) > SAME) {
+      const from = P.p[P.e + j - 2]!;
+      const at = P.p[P.e + j - 1]!;
+      const side = turn(from, at, a) - turn(from, at, b);
+      return side === 0 ? undefined : { at, side };
+    }
+  }
+}
+
+/** This function gives the place where the routes `P` and `Q` part before the first point of the run, or nothing. */
+function partBefore(P: Placed, Q: Placed): Parting | undefined {
+  for (let j = 1; ; j++) {
+    const a = P.p[P.s - j];
+    const b = Q.p[Q.s - j];
+    if (a === undefined || b === undefined) return undefined;
+    if (dist(a, b) > SAME) {
+      const from = P.p[P.s - j + 2]!;
+      const at = P.p[P.s - j + 1]!;
+      // Seen backward, the left side is the right side. Thus the order turns around.
+      const side = turn(from, at, b) - turn(from, at, a);
+      return side === 0 ? undefined : { at, side };
+    }
+  }
+}
+
+const byEdge = (P: Placed, Q: Placed): number => (P.edge < Q.edge ? -1 : P.edge > Q.edge ? 1 : 0);
+
+/** This function puts the point `a` before the point `b`: the smaller x first, then the smaller y. */
+const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.abs(a.x - b.x) <= SAME && a.y < b.y);
+
+/**
+ * This function gives the lane order of the edges on a shared way `run` (metro-line order).
+ * The routes are polylines that hold the points of the run in a row, in either direction. A route that does not hold the run goes last.
+ *
+ * Two routes go on together past each end of the run until they part. The route that turns more to the left there gets the lane more to the left.
+ *
+ * With the order `run`, the default, the end after the last point of the run tells the side first.
+ * With the order `bundle`, two routes that part on one side at both ends keep that side.
+ * When the two ends disagree, the two routes must cross. The end with the smaller x, then the smaller y, tells the side.
+ * Thus each shared way of a common stretch gives two routes the same order, and the crossing is where they part.
+ */
+export function orderLanes(run: readonly Point[], routes: readonly Route[], order: RunOrder = "run"): string[] {
+  const placed: Placed[] = [];
   const lost: string[] = [];
   for (const r of routes) {
     let at = indexOf(r.points, run, 0);
@@ -221,30 +285,16 @@ export function orderLanes(run: readonly Point[], routes: readonly Route[]): str
       else lost.push(r.edge);
     }
   }
-  const same = (a: Point, b: Point): boolean => dist(a, b) <= SAME;
-  placed.sort((P, Q) => {
-    for (let j = 1; ; j++) {
-      const a = P.p[P.e + j];
-      const b = Q.p[Q.e + j];
-      if (a === undefined || b === undefined) break;
-      if (!same(a, b)) {
-        const d = turn(P.p[P.e + j - 2]!, P.p[P.e + j - 1]!, a) - turn(P.p[P.e + j - 2]!, P.p[P.e + j - 1]!, b);
-        if (d !== 0) return d;
-        break;
-      }
-    }
-    for (let j = 1; ; j++) {
-      const a = P.p[P.s - j];
-      const b = Q.p[Q.s - j];
-      if (a === undefined || b === undefined) break;
-      if (!same(a, b)) {
-        // Seen backward, the left side is the right side. Thus the order turns around.
-        const d = turn(P.p[P.s - j + 2]!, P.p[P.s - j + 1]!, b) - turn(P.p[P.s - j + 2]!, P.p[P.s - j + 1]!, a);
-        if (d !== 0) return d;
-        break;
-      }
-    }
-    return P.edge < Q.edge ? -1 : P.edge > Q.edge ? 1 : 0;
-  });
+  if (order === "run") placed.sort((P, Q) => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q));
+  else {
+    // The sort starts from the order of the edges, so that each run sorts the same edges the same way.
+    placed.sort(byEdge);
+    placed.sort((P, Q) => {
+      const after = partAfter(P, Q);
+      const before = partBefore(P, Q);
+      if (after && before && Math.sign(after.side) !== Math.sign(before.side)) return firstPoint(after.at, before.at) ? after.side : before.side;
+      return after?.side ?? before?.side ?? byEdge(P, Q);
+    });
+  }
   return [...placed.map((x) => x.edge), ...lost.sort()];
 }
