@@ -44,6 +44,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BENCH-CI | The workflow `Bench` races the routers in parts that run at the same time, with a time limit for each cell. Before, no push run on `main` finished: 0 of 25 since `fa1dd82`, each over 60 min. After, a run to 10 000 nodes finishes in 12.4 min. | 2026-10-27 | #45 |
 | MEAS1 | `runSuite` puts the 10 measures of the short list of MEAS0 and the 6 proposed rules in the bench. The suite measures 5 seeds of each family to 1 000 nodes and 1 seed above. Each step gets the median, the IQR and a Pareto front. Up to 100 nodes, each of the 6 rule counts is 0 for each built-in strategy. | 2026-10-27 | #35 |
 | SEC-V | A level link between two items that touch keeps two points, so it obeys the rule `link-ends`. On `mid-clustered` seed 4, the violations of `sections` and of `sections-tree` are 2 each before, 0 after. | 2026-10-27 | #46 |
+| CURV2 | The curves `smooth` and `clothoid` have no jump of the curvature at a corner. The option `jog` gives quintic S curves: on `shared-all` and `case-hub-chain`, 251 of 267 have no jump of the curvature, with 0 tangent breaks. | 2026-10-27 | #50 |
 
 ## Open
 | GRP2 | The grouping rules `kd` and `cut` are strategies of the step `group`. At the far view, `cut` cuts fewer links than the quadtree on 8 of 10 boards and more on none. On `case-dense-groups`, its cut share is 0.370 against 0.430. | 2026-10-27 | #48 |
@@ -53,7 +54,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWC-D | Room for the bends of wide bundles: the gaps grow so that the concentric arcs of a bundle fit. | `later` | HWC, ROOM2 | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
-| CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
+| CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
 | GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |

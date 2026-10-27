@@ -1,6 +1,8 @@
 import { arcCurve, type ArcOptions } from "../curves/arc/index.ts";
-import { highwayCurve } from "../curves/highway/index.ts";
+import { clothoidCurve, type ClothoidOptions } from "../curves/clothoid/index.ts";
+import { highwayCurve, type JogStyle } from "../curves/highway/index.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
+import { smoothCurve, type SmoothOptions } from "../curves/smooth/index.ts";
 import { splineCurve, type SplineOptions } from "../curves/spline/index.ts";
 import { straightCurve } from "../curves/straight/index.ts";
 import { CUT_DEFAULTS, cutGroups, type CutOptions } from "../groups/cut/index.ts";
@@ -19,7 +21,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CORNERS_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -134,10 +136,32 @@ export interface HighwayStrategyOptions {
   readonly radius: number;
   /** The smallest radius of a lane at a bend of a bundle. The default is 4. */
   readonly minRadius: number;
+  /** The shape of the S curve where a lane changes its offset. The default is `biarc`. */
+  readonly jog: JogStyle;
+  /** The number of cubic pieces of a `quintic` S curve. The default is 4. */
+  readonly jogPieces: number;
+}
+
+/** The options of the curve strategy `smooth`. */
+export interface SmoothStrategyOptions {
+  /** The radius of the arc of each corner. The default is 12. */
+  readonly radius: number;
+  /** The share of the turn of a corner in its two spirals, from 0 to 1. The default is 0.6. */
+  readonly smoothing: number;
+}
+
+/** The options of the curve strategy `clothoid`. */
+export interface ClothoidStrategyOptions {
+  /** The radius of the arc of each corner. The default is 12. */
+  readonly radius: number;
+  /** The share of the turn of a corner in its two clothoids, from 0 to 1. The default is 0.5. */
+  readonly spiral: number;
+  /** The largest distance from the cubic pieces to the true clothoid. The default is 0.25. */
+  readonly tolerance: number;
 }
 
 /**
- * The built-in curve strategies. The first four are in the order of `CURVE_TYPES`, and each one gives the same segments as `curveOf` with its type.
+ * The built-in curve strategies. The first six are in the order of `CURVE_TYPES`, and each one gives the same segments as `curveOf` with its type.
  * The strategy `highway` gives the curve of `arc` for one polyline. `highwayCurves` bends the lanes of a bundle as one.
  */
 export const curveStrategies: {
@@ -145,6 +169,8 @@ export const curveStrategies: {
   readonly rounded: Strategy<"curve", RadiusOptions>;
   readonly spline: Strategy<"curve", TensionOptions>;
   readonly arc: Strategy<"curve", RadiusOptions>;
+  readonly smooth: Strategy<"curve", SmoothStrategyOptions>;
+  readonly clothoid: Strategy<"curve", ClothoidStrategyOptions>;
   readonly highway: Strategy<"curve", HighwayStrategyOptions>;
 } = Object.freeze({
   straight: defineStrategy({ step: "curve", name: "straight", describe: "The polyline as it is.", defaults: {}, schema: {}, run: (input: CurveInput) => straightCurve(input.points) }),
@@ -172,11 +198,34 @@ export const curveStrategies: {
     schema: RADIUS_SCHEMA,
     run: (input: CurveInput, o: Readonly<RadiusOptions>) => arcCurve(input.points, { ...contextOf(input), radius: o.radius } satisfies ArcOptions),
   }),
+  smooth: defineStrategy({
+    step: "curve",
+    name: "smooth",
+    describe: "A cubic spiral, an arc and a second cubic spiral at each corner, as the corner smoothing of Figma. The curvature has no jump.",
+    defaults: { radius: 12, smoothing: 0.6 },
+    schema: SMOOTH_SCHEMA,
+    run: (input: CurveInput, o: Readonly<SmoothStrategyOptions>) =>
+      smoothCurve(input.points, { ...(input.space ? { space: input.space } : {}), radius: o.radius, smoothing: o.smoothing } satisfies SmoothOptions),
+  }),
+  clothoid: defineStrategy({
+    step: "curve",
+    name: "clothoid",
+    describe: "A clothoid, an arc and a second clothoid at each corner, as a transition curve of a road. Cubic pieces draw each clothoid.",
+    defaults: { radius: 12, spiral: 0.5, tolerance: 0.25 },
+    schema: CLOTHOID_SCHEMA,
+    run: (input: CurveInput, o: Readonly<ClothoidStrategyOptions>) =>
+      clothoidCurve(input.points, {
+        ...(input.space ? { space: input.space } : {}),
+        radius: o.radius,
+        spiral: o.spiral,
+        tolerance: o.tolerance,
+      } satisfies ClothoidOptions),
+  }),
   highway: defineStrategy({
     step: "curve",
     name: "highway",
     describe: "The lanes of a bundle bend as one, with concentric arcs at the lane spacing. One lane alone gets the curve of `arc`.",
-    defaults: { radius: 12, minRadius: 4 },
+    defaults: { radius: 12, minRadius: 4, jog: "biarc" as JogStyle, jogPieces: 4 },
     schema: HIGHWAY_SCHEMA,
     run: (input: CurveInput, o: Readonly<HighwayStrategyOptions>) => highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) }),
   }),

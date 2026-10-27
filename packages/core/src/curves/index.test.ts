@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pointSegmentDistance, type Point } from "../geom.ts";
-import { CURVE_TYPES, curveOf, cubicAt, sampleCurve, toSvgPath, type CurveSegment } from "./index.ts";
+import { CURVE_TYPES, curveOf, cubicAt, curveSpace, sampleCurve, toSvgPath, type CurveSegment } from "./index.ts";
+import { triangleOverlapsBox } from "./space.ts";
 
 const zig: Point[] = [{ x: 0, y: 0 }, { x: 40, y: 0 }, { x: 40, y: 40 }, { x: 80, y: 40 }];
 
@@ -44,5 +45,27 @@ describe("toSvgPath", () => {
       { kind: "arc", center: { x: 24, y: 4 }, radius: 10, start: Math.PI, sweep: -Math.PI / 2, to: { x: 24, y: -6 } },
     ];
     expect(toSvgPath(c)).toBe("M 0 0 L 10.12 0 C 12 0 14 2 14 4 A 10 10 0 0 0 24 -6");
+  });
+});
+
+describe("triangleOverlapsBox", () => {
+  const [a, b, c] = [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }];
+  it("finds a box inside the triangle and a box across one side", () => {
+    expect(triangleOverlapsBox(a, b, c, { x: 1, y: 1, w: 2, h: 2 })).toBe(true);
+    expect(triangleOverlapsBox(a, b, c, { x: 4, y: 4, w: 4, h: 4 })).toBe(true);
+  });
+  it("finds no overlap for a box past the long side or a box that only touches", () => {
+    expect(triangleOverlapsBox(a, b, c, { x: 6, y: 6, w: 4, h: 4 })).toBe(false);
+    expect(triangleOverlapsBox(a, b, c, { x: -5, y: 0, w: 5, h: 5 })).toBe(false);
+  });
+});
+
+describe("curveSpace", () => {
+  it("tests a corner triangle against the boxes that its polyline does not go through", () => {
+    const space = curveSpace([{ x: 6, y: 1, w: 3, h: 3 }, { x: 20, y: -5, w: 4, h: 10 }]);
+    expect(space.addsHitTriangle!({ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 })).toBe(true);
+    expect(space.addsHitTriangle!({ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: -10 })).toBe(false);
+    // The polyline goes through the second box, so the triangle can overlap it.
+    expect(space.addsHitTriangle!({ x: 15, y: 0 }, { x: 30, y: 0 }, { x: 30, y: 10 })).toBe(false);
   });
 });

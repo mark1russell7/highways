@@ -7,11 +7,13 @@ import type { Point } from "../geom.ts";
  * - `rounded`: a quadratic Bezier curve at each corner, as `roundCorners` draws it.
  * - `spline`: a centripetal Catmull-Rom spline through the points. It does not overshoot or make loops.
  * - `arc`: a circular arc at each corner, tangent to the two legs.
+ * - `smooth`: a cubic spiral, an arc and a second cubic spiral at each corner, as the corner smoothing of Figma.
+ * - `clothoid`: a clothoid, an arc and a second clothoid at each corner, as a transition curve of a road.
  */
-export type CurveType = "straight" | "rounded" | "spline" | "arc";
+export type CurveType = "straight" | "rounded" | "spline" | "arc" | "smooth" | "clothoid";
 
 /** The curve types, in the order of the benchmark. */
-export const CURVE_TYPES: readonly CurveType[] = ["straight", "rounded", "spline", "arc"];
+export const CURVE_TYPES: readonly CurveType[] = ["straight", "rounded", "spline", "arc", "smooth", "clothoid"];
 
 /** The start of a curve: the pen goes to `to` and draws nothing. */
 export interface MoveSegment {

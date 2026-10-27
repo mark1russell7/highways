@@ -36,6 +36,10 @@ A router gives polylines. The curve layer turns a polyline into a curve of a typ
 | `rounded` | A quadratic Bezier curve at each corner, as `roundCorners` draws it. The `radius` sets the size of the corners. | The first and the last legs stay. |
 | `spline` | A centripetal Catmull-Rom spline through each point. It does not overshoot or make loops in a piece. The `tension` goes from 0 (the spline) to 1 (the polyline). | With `startNormal` and `endNormal`, the curve leaves and enters each plug along its normal. |
 | `arc` | A circular arc at each corner, tangent to the two legs. On horizontal and vertical legs, each arc is a quarter circle. | The first and the last legs stay. |
+| `smooth` | A cubic spiral, an arc and a second cubic spiral at each corner, as the corner smoothing of Figma. The `smoothing` goes from 0 (the curve `arc`) to 1 (no arc). | The first and the last legs stay. |
+| `clothoid` | A clothoid, an arc and a second clothoid at each corner, as a transition curve of a road. The `spiral` goes from 0 (the curve `arc`) to 1 (no arc). Cubic pieces draw each clothoid within the `tolerance`. | The first and the last legs stay. |
+
+The curves `smooth` and `clothoid` have no jump of the curvature. The curvature grows from 0 on a leg to `1 / radius` on the arc. A cubic spiral turns by 1 radian or less, so a sharp corner keeps a part of its arc. The free space tests the triangle of each corner of these curves: the start of the corner, the vertex and the end of the corner. The curve stays in this triangle, so the test needs no samples.
 
 The output is a list of segments: `move`, `line`, `cubic` and `arc`. A renderer maps them to SVG path data, to canvas calls or to the vertices of a mesh.
 
@@ -66,7 +70,7 @@ for (const route of result.routes) {
 
 A canvas draws an `arc` segment with `ctx.arc(center.x, center.y, radius, start, start + sweep, sweep < 0)`.
 
-Each type has its own function too: `straightCurve`, `roundedCurve`, `splineCurve` and `arcCurve`.
+Each type has its own function too: `straightCurve`, `roundedCurve`, `splineCurve`, `arcCurve`, `smoothCurve` and `clothoidCurve`.
 
 ### Curved highways
 
@@ -74,7 +78,9 @@ A curve of one lane does not know the other lanes of its bundle. So the lanes of
 
 - At each bend of a bundle, the lanes are arcs with one center. The radius of a lane is the radius of the center line plus or minus its offset.
 - The bend grows to keep the inner lane at `minRadius`. It shrinks to fit on its legs and in the free space.
-- A lane joins or leaves a bundle on an S of two arcs on the leg with fewer lanes. The tangent has no break there.
+- A lane joins or leaves a bundle on an S curve on the leg with fewer lanes. The tangent has no break there.
+- The option `jog` sets the shape of the S curve. A `biarc` (the default) is two arcs. A `cubic` S curve is one cubic Bezier curve. A `quintic` S curve has no jump of the curvature, in `jogPieces` cubic pieces.
+- The curvature of each S curve is `1 / radius` or less. So a `cubic` or a `quintic` S curve is longer than a biarc. Where it does not fit on its leg, the lane gets a biarc.
 - A lane in no open bundle gets the curve of `arcCurve`.
 
 ```ts
@@ -315,7 +321,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc` |
+| `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
 A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.

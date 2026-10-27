@@ -18,6 +18,12 @@ export interface CurveSpace {
    * A polyline goes through a box when a part of it longer than `TOLERANCE` is inside the box made smaller by `TOLERANCE`.
    */
   addsHit(q: readonly Point[], p: readonly Point[]): boolean;
+  /**
+   * This method tells if the triangle `(a, v, b)` overlaps a box that the polyline `(a, v, b)` does not go through.
+   * A convex corner from `a` to `b` stays in this triangle, so a clear triangle proves a clear corner with no samples.
+   * The method is optional. Without it, a corner samples its curve.
+   */
+  addsHitTriangle?(a: Point, v: Point, b: Point): boolean;
 }
 
 /**
@@ -59,7 +65,77 @@ export function curveSpace(boxes: readonly Box[], tolerance = 0.25): CurveSpace 
       }
       return false;
     },
+    addsHitTriangle(a: Point, v: Point, b: Point): boolean {
+      const x0 = Math.min(a.x, v.x, b.x);
+      const y0 = Math.min(a.y, v.y, b.y);
+      let before: Set<number> | undefined;
+      let hit = false;
+      grid.query({ x: x0, y: y0, w: Math.max(a.x, v.x, b.x) - x0, h: Math.max(a.y, v.y, b.y) - y0 }, (id) => {
+        if (hit || !triangleOverlapsBox(a, v, b, inner[id]!)) return;
+        before ??= hits([a, v, b]);
+        if (!before.has(id)) hit = true;
+      });
+      return hit;
+    },
   };
+}
+
+/**
+ * This function tells if the triangle `(a, b, c)` and the box overlap by more than `eps`. It is the test of the separating axes:
+ * the two axes of the box and the normal of each side of the triangle.
+ */
+export function triangleOverlapsBox(a: Point, b: Point, c: Point, box: Box, eps = 1e-9): boolean {
+  if (Math.max(a.x, b.x, c.x) <= box.x + eps || Math.min(a.x, b.x, c.x) >= box.x + box.w - eps) return false;
+  if (Math.max(a.y, b.y, c.y) <= box.y + eps || Math.min(a.y, b.y, c.y) >= box.y + box.h - eps) return false;
+  const corners: readonly Point[] = [
+    { x: box.x, y: box.y },
+    { x: box.x + box.w, y: box.y },
+    { x: box.x, y: box.y + box.h },
+    { x: box.x + box.w, y: box.y + box.h },
+  ];
+  const tri = [a, b, c];
+  for (let i = 0; i < 3; i++) {
+    const p = tri[i]!;
+    const q = tri[(i + 1) % 3]!;
+    const n = { x: q.y - p.y, y: p.x - q.x };
+    const len = Math.hypot(n.x, n.y);
+    if (len < 1e-12) continue;
+    const proj = (r: Point): number => ((r.x - p.x) * n.x + (r.y - p.y) * n.y) / len;
+    // The triangle is on one side of its side pq: the side of the third vertex.
+    const side = proj(tri[(i + 2) % 3]!);
+    if (Math.abs(side) < 1e-12) continue;
+    const toward = corners.map(proj).map((x) => (side > 0 ? x : -x));
+    if (Math.max(...toward) <= eps) return false;
+  }
+  return true;
+}
+
+/**
+ * This function finds the largest size from `max` down to 0 that keeps a convex corner clear, with the test of its triangle.
+ * The function `triangle` gives the start of the corner, the vertex and the end of the corner at a size.
+ * Without `addsHitTriangle` in the space, the function samples the segments of `piece`, as `fitSize` does.
+ * The function tries `max` first, then it halves the interval `steps` times.
+ */
+export function fitCorner(
+  space: CurveSpace | undefined,
+  max: number,
+  triangle: (size: number) => readonly [Point, Point, Point],
+  piece: (size: number) => readonly CurveSegment[],
+  steps = 8,
+): number {
+  if (space === undefined || max <= 0) return Math.max(0, max);
+  const test = space.addsHitTriangle?.bind(space);
+  if (!test) return fitSize(space, max, triangle, piece, steps);
+  const clear = (size: number): boolean => !test(...triangle(size));
+  if (clear(max)) return max;
+  let lo = 0;
+  let hi = max;
+  for (let i = 0; i < steps; i++) {
+    const mid = (lo + hi) / 2;
+    if (clear(mid)) lo = mid;
+    else hi = mid;
+  }
+  return lo;
 }
 
 /**

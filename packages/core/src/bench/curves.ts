@@ -1,4 +1,4 @@
-import { highwayCurves, type LaneCurve } from "../curves/highway/index.ts";
+import { tracedHighwayCurves, type JogStyle, type JogTrace, type LaneCurve } from "../curves/highway/index.ts";
 import { CURVE_TYPES, curveSpace, distinctPoints, sampleCurve, type CubicSegment, type CurveSegment, type CurveSpace, type CurveType } from "../curves/index.ts";
 import { polylineLength, segmentsCross, type Point } from "../geom.ts";
 import { nodeIndex, type Graph, type Router } from "../model.ts";
@@ -453,8 +453,107 @@ export interface HighwayBenchRow extends HighwayMeasures {
   readonly fixture: string;
   /** The way to curve the lanes: `rounded` curves each lane alone, and `highway` curves the lanes of a bundle together. */
   readonly curve: "rounded" | "highway";
+  /** The shape of the S curves of a row `highway`. */
+  readonly jog?: JogStyle;
+  /** The measures of the S curves of a row `highway`. */
+  readonly jogs?: JogMeasures;
   /** The time to make all curves, in milliseconds. */
   readonly ms: number;
+}
+
+/** The measures of the S curves where the lanes join or leave a bundle. Each curvature is in 1 / units. */
+export interface JogMeasures {
+  /** The number of S curves. */
+  readonly count: number;
+  /** The number of S curves that are a biarc. A polynomial S curve that does not fit on its leg is a biarc. */
+  readonly biarcs: number;
+  /** The median and the largest of the peak curvature of each S curve with the shape of the row. */
+  readonly peakMedian: number;
+  readonly peakMax: number;
+  /** The median ratio of the peak curvature of each S curve of the row to the peak curvature of the same biarc S curve. */
+  readonly peakRatio?: number;
+  /** The largest curvature at an end of an S curve with the shape of the row. The straight leg next to it has the curvature 0, so it is the jump at the end. */
+  readonly endJump: number;
+  /** The largest jump of the curvature at a joint inside an S curve with the shape of the row. */
+  readonly innerJump: number;
+}
+
+/** This function gives the median of the values, or 0 when there are none. */
+function medianOf(values: number[]): number {
+  values.sort((a, b) => a - b);
+  const n = values.length;
+  return n === 0 ? 0 : n % 2 === 1 ? values[(n - 1) / 2]! : (values[n / 2 - 1]! + values[n / 2]!) / 2;
+}
+
+/** This function gives the curvature of the cubic `(p0, c1, c2, p3)` at `t`. */
+function cubicCurvature(p0: Point, s: CubicSegment, t: number): number {
+  const u = 1 - t;
+  const [c1, c2, p3] = [s.c1, s.c2, s.to];
+  const dx = 3 * u * u * (c1.x - p0.x) + 6 * u * t * (c2.x - c1.x) + 3 * t * t * (p3.x - c2.x);
+  const dy = 3 * u * u * (c1.y - p0.y) + 6 * u * t * (c2.y - c1.y) + 3 * t * t * (p3.y - c2.y);
+  const ddx = 6 * u * (c2.x - 2 * c1.x + p0.x) + 6 * t * (p3.x - 2 * c2.x + c1.x);
+  const ddy = 6 * u * (c2.y - 2 * c1.y + p0.y) + 6 * t * (p3.y - 2 * c2.y + c1.y);
+  const speed = Math.hypot(dx, dy);
+  return speed > 1e-12 ? (dx * ddy - dy * ddx) / speed ** 3 : 0;
+}
+
+/** This function gives the signed curvature at the start (`t = 0`) and at the end (`t = 1`) of a segment, and its largest absolute curvature. */
+function curvatureOf(from: Point, s: CurveSegment): { readonly start: number; readonly end: number; readonly peak: number } {
+  if (s.kind === "arc") {
+    const k = s.radius > 0 ? Math.sign(s.sweep) / s.radius : 0;
+    return { start: k, end: k, peak: Math.abs(k) };
+  }
+  if (s.kind !== "cubic") return { start: 0, end: 0, peak: 0 };
+  let peak = 0;
+  for (let i = 0; i <= 64; i++) peak = Math.max(peak, Math.abs(cubicCurvature(from, s, i / 64)));
+  return { start: cubicCurvature(from, s, 0), end: cubicCurvature(from, s, 1), peak };
+}
+
+/** This function gives the peak curvature of each S curve, by lane. `jogs` has the first and the last index of each S curve in the segments of its lane. */
+export function jogPeaks(curves: readonly LaneCurve[], jogs: JogTrace): number[][] {
+  return curves.map((c, i) =>
+    (jogs[i] ?? []).map(([first, last]) => {
+      let peak = 0;
+      for (let k = first; k <= last; k++) peak = Math.max(peak, curvatureOf(c.segments[k - 1]?.to ?? c.segments[k]!.to, c.segments[k]!).peak);
+      return peak;
+    }),
+  );
+}
+
+/**
+ * This function measures the S curves of the lanes that have the shape `style`. `jogs` has the first and the last index of each S curve in the segments of its lane.
+ * With `biarcPeaks`, the peak curvatures of the same S curves as biarcs, it also gives the median ratio of the peaks.
+ */
+export function measureJogs(curves: readonly LaneCurve[], jogs: JogTrace, style: JogStyle = "biarc", biarcPeaks?: readonly (readonly number[])[]): JogMeasures {
+  const peaks: number[] = [];
+  const ratios: number[] = [];
+  let endJump = 0;
+  let innerJump = 0;
+  let biarcs = 0;
+  let count = 0;
+  curves.forEach((c, i) => {
+    (jogs[i] ?? []).forEach(([first, last, shape], n) => {
+      count++;
+      if (shape === "biarc") biarcs++;
+      if (shape !== style) return;
+      let peak = 0;
+      let before: number | undefined;
+      for (let k = first; k <= last; k++) {
+        const s = c.segments[k]!;
+        const m = curvatureOf(c.segments[k - 1]?.to ?? s.to, s);
+        peak = Math.max(peak, m.peak);
+        if (k === first) endJump = Math.max(endJump, Math.abs(m.start));
+        if (k === last) endJump = Math.max(endJump, Math.abs(m.end));
+        if (before !== undefined) innerJump = Math.max(innerJump, Math.abs(before - m.start));
+        before = m.end;
+      }
+      peaks.push(peak);
+      const b = biarcPeaks?.[i]?.[n];
+      if (b !== undefined && b > 0) ratios.push(peak / b);
+    });
+  });
+  const peakMax = peaks.reduce((a, b) => Math.max(a, b), 0);
+  return { count, biarcs, peakMedian: medianOf(peaks), peakMax, ...(biarcPeaks ? { peakRatio: medianOf(ratios) } : {}), endJump, innerJump };
 }
 
 /** The options of `benchHighways`. */
@@ -467,11 +566,15 @@ export interface HighwayBenchOptions {
   readonly radius?: number;
   /** The smallest radius of `highwayCurves`, and the limit of `underMin`. The default is 4. */
   readonly minRadius?: number;
+  /** The shapes of the S curves. Each shape gives one row `highway`. The default is `["biarc"]`. */
+  readonly jogs?: readonly JogStyle[];
+  /** The number of cubic pieces of a `quintic` S curve. The default is 4. */
+  readonly jogPieces?: number;
 }
 
 /**
  * This function routes a graph, opens each shared segment, and curves the lanes in two ways.
- * The row `rounded` curves each lane of `laneRoutes` alone with the curve `rounded`. The row `highway` curves them with `highwayCurves`.
+ * The row `rounded` curves each lane of `laneRoutes` alone with the curve `rounded`. Each row `highway` curves them with `highwayCurves` and one shape of S curve.
  * Both ways get the free space of the nodes.
  */
 export function benchHighways(router: Router, fixture: string, graph: Graph, options: HighwayBenchOptions = {}): HighwayBenchRow[] {
@@ -486,22 +589,37 @@ export function benchHighways(router: Router, fixture: string, graph: Graph, opt
   const t0 = now();
   const alone = laneRoutes(segments, open, spacing, maxWidth).map((r) => ({ edge: r.edge, segments: curveStrategies.rounded.run({ points: r.points, space }, { radius }) }));
   const t1 = now();
-  const together = highwayCurves(segments, open, spacing, { maxWidth, radius, minRadius, space });
-  const t2 = now();
-  return [
-    { router: router.name, fixture, curve: "rounded", ...measureHighways(segments, open, spacing, alone, measure), ms: t1 - t0 },
-    { router: router.name, fixture, curve: "highway", ...measureHighways(segments, open, spacing, together, measure), ms: t2 - t1 },
-  ];
+  const rows: HighwayBenchRow[] = [{ router: router.name, fixture, curve: "rounded", ...measureHighways(segments, open, spacing, alone, measure), ms: t1 - t0 }];
+  // The rows of the other shapes compare their peaks with the S curves of the row `biarc` before them.
+  let biarcPeaks: number[][] | undefined;
+  for (const jog of options.jogs ?? ["biarc"]) {
+    const t2 = now();
+    const together = tracedHighwayCurves(segments, open, spacing, { maxWidth, radius, minRadius, space, jog, jogPieces: options.jogPieces ?? 4 });
+    const t3 = now();
+    if (jog === "biarc") biarcPeaks = jogPeaks(together.curves, together.jogs);
+    rows.push({
+      router: router.name,
+      fixture,
+      curve: "highway",
+      jog,
+      jogs: measureJogs(together.curves, together.jogs, jog, jog === "biarc" ? undefined : biarcPeaks),
+      ...measureHighways(segments, open, spacing, together.curves, measure),
+      ms: t3 - t2,
+    });
+  }
+  return rows;
 }
 
 /** This function writes the rows of `benchHighways` as a Markdown table. The spacing errors are percents of the spacing. */
 export function formatHighways(rows: readonly HighwayBenchRow[]): string {
-  const head = "| router | fixture | curve | bundles | lanes | worst spacing | mean spacing | over 5% | crossings | end crossings | tangent breaks | min radius | under min | through | ms |";
-  const line = "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+  const head =
+    "| router | fixture | curve | jog | bundles | lanes | worst spacing | mean spacing | over 5% | crossings | end crossings | tangent breaks | min radius | under min | through | S curves | S biarcs | S peak κ median | S peak κ max | S peak ratio | S end κ | S inner jump | ms |";
+  const line = "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
   const pct = (v: number): string => `${(v * 100).toFixed(1)}%`;
+  const k = (v: number | undefined): string => (v === undefined ? "-" : v.toFixed(4));
   const body = rows.map(
     (r) =>
-      `| ${r.router} | ${r.fixture} | ${r.curve} | ${r.bundles} | ${r.lanes} | ${pct(r.worstSpacing)} | ${pct(r.meanSpacing)} | ${pct(r.overLimit)} | ${r.crossings} | ${r.endCrossings} | ${r.breaks} | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} | ${r.ms.toFixed(1)} |`,
+      `| ${r.router} | ${r.fixture} | ${r.curve} | ${r.jog ?? "-"} | ${r.bundles} | ${r.lanes} | ${pct(r.worstSpacing)} | ${pct(r.meanSpacing)} | ${pct(r.overLimit)} | ${r.crossings} | ${r.endCrossings} | ${r.breaks} | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} | ${r.jogs?.count ?? "-"} | ${r.jogs?.biarcs ?? "-"} | ${k(r.jogs?.peakMedian)} | ${k(r.jogs?.peakMax)} | ${k(r.jogs?.peakRatio)} | ${k(r.jogs?.endJump)} | ${k(r.jogs?.innerJump)} | ${r.ms.toFixed(1)} |`,
   );
   return [head, line, ...body].join("\n");
 }
