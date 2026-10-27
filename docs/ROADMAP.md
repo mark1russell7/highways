@@ -70,8 +70,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
 | IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
-| EDA-R | Research: routing in other fields. Examples are chips, circuit boards, metro maps, transport and logistics networks. | `active` | MEAS0 | P1 |
-| WILD-R | Ideas of our own for each step: plugs, groups, levels, room, routes, highways and curves. The note uses analogies, inversion and combinations of options. | `active` | MEAS0 | P1 |
 | HWY-STEP | A strategy step `highway` that decides the highways apart from the routers, so each idea of HWY-R plugs in. | `later` | HWY-R | P1 |
 | BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
