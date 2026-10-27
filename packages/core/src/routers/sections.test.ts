@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { measureRouteFaults } from "../bench/links.ts";
 import { checkProperties } from "../bench/properties.ts";
 import { measureQuality } from "../bench/quality.ts";
 import { makeFixture, type FixtureKind } from "../fixtures.ts";
@@ -39,7 +40,7 @@ describe("sectionsRouter", () => {
     expect([...(widest?.edges ?? [])].sort()).toEqual(["e00", "e01", "e10", "e11"]);
   });
 
-  it("keeps the hard rules on generated graphs (property, 5 kinds × 3 seeds)", () => {
+  it("keeps the hard rules on generated graphs, without routes that go out and back (property, 5 kinds × 3 seeds)", () => {
     const kinds: FixtureKind[] = ["uniform", "clustered", "grid", "hubs", "collections"];
     for (const stretch of [2, Infinity]) {
       for (const kind of kinds) {
@@ -48,6 +49,7 @@ describe("sectionsRouter", () => {
           const result = sectionsRouter({ name: "sections", stretch }).route(g);
           const tag = `${stretch} ${kind} ${seed}`;
           expect(checkProperties(g, result), tag).toEqual([]);
+          expect(measureRouteFaults(g, result).backtrack, tag).toBe(0);
           const levels = result.levels ?? [];
           expect(levels).toHaveLength(treeDepth(buildSections(g.nodes)) + 2);
           // The first level is one item with all the nodes. The last level shows each node alone.

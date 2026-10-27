@@ -50,7 +50,7 @@ describe("the link measures", () => {
   });
 });
 
-// The router of the benchmark. These numbers are the values before the fixes of the defects. A fix lowers them.
+// The router of the benchmark. These numbers are the values before the fixes of the defects, except for a fixed defect. A fix lowers them.
 const router = sectionsRouter({ name: "sections" });
 const level = (g: Graph) => sumFaults(measureLevelFaults(router.route(g)));
 
@@ -71,13 +71,13 @@ describe("the case boards", () => {
     expect(sumFaults(levels).through).toBe(0);
   });
 
-  it("hub chain: some routes go away from their target and come back", () => {
+  it("hub chain: no route goes away from its target and comes back (ER3b)", () => {
     const g = hubChainBoard();
     const f = measureRouteFaults(g, router.route(g));
     expect(f.through).toBe(0);
-    expect(f.backtrack).toBe(6);
-    // Without the limit of the stretch, the chain of hubs gives more such routes.
-    expect(measureRouteFaults(g, sectionsRouter({ name: "tree", stretch: Infinity }).route(g)).backtrack).toBe(25);
+    // Before ER3b, this value was 6, and 25 without the limit of the stretch.
+    expect(f.backtrack).toBe(0);
+    expect(measureRouteFaults(g, sectionsRouter({ name: "tree", stretch: Infinity }).route(g)).backtrack).toBe(0);
   });
 
   it("many groups: some level links go around the outer edge of the board", () => {

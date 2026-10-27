@@ -11,16 +11,17 @@ import { sectionsRouter, type SectionsOptions } from "./sections.ts";
  * keeps each digest. A digest covers the routes, the shared runs, the levels with their links, the run keys and the lane routes.
  * ER3a changed the level links of three digests: `case-dense-groups` with both options, and `small-clustered` with the options `site`.
  * Those links went through other groups before. The routes, the runs, the run keys and the lane routes did not change.
+ * ER3b changed the routes of the boards whose edges took the hubs out and back.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  "case-dense-groups/site": "be45da15914caec7798d79ea02990bfdd2faad1bbc530d1e19ba2faeb36ffcd1",
-  "case-dense-groups/sections": "46cfe03cadc36918ea398c5d48e837bb1849886962d63e23450f1259a2b1c66b",
-  "case-hub-chain/site": "deb11cf3634910091de5fb0df89f3b5655bc3d04634ae383f9a1ce9197dbcceb",
-  "case-hub-chain/sections": "a59d89aed79d831b94422188cf72860fa90806f3d5f68a613ba2accda1824cf0",
-  "case-many-groups/site": "4f2a017a055c32bdbe25eb4017c0aefa2325f44f75deebfda543f15d4413bd99",
-  "case-many-groups/sections": "09af86e040e4afe5c45d699c1f080b2fa860b849a7d526af5be2ac5bbedc2b52",
-  "small-clustered/site": "b5a84fd134b05cfa5a5a43f7d828b0b1420d048cf90cbae9b52b0be124f7fcfc",
-  "small-clustered/sections": "d280bf3dfc399028eff366405019a052ec4fbf5c3cc5f6d8606692001b1d2e11",
+  "case-dense-groups/site": "68ca69c53fc5a65cc829439c1be5704db97e682d694f02a1e663cfac23218a13",
+  "case-dense-groups/sections": "e48e1fbe9bbe8fe28793c4da80b924ddc243c0dc986f0f7c52eb5e6038703fc2",
+  "case-hub-chain/site": "9b57f4d77521ab1a89e7eb5051d1961f83cbeaf60c0e4c0b916a62e76c7b5ca7",
+  "case-hub-chain/sections": "7c0c3388a8ed0510aba4d8bea9d4b46848c2533b592a10e792db6ef802ee2e8b",
+  "case-many-groups/site": "6586e7682f3bf4691121fc937da7ac82df5459fb2e964a2a39fd96b87ef1a9d7",
+  "case-many-groups/sections": "35108adacf5948cbc90d25fb127eb0fe1a170ce70de2e1983d9f51629c75166e",
+  "small-clustered/site": "6be966b0b4b9aa74fab2e4d75a0183fba159d29410e5ab5d6ad6ee9cfb111b51",
+  "small-clustered/sections": "abd394589bd0bf68a4f5b64fa34ed5a2ce48b1a7995b5f1c10d451779fd8299f",
 };
 
 /** The options of the router of the example boards of the site, and the defaults. */
