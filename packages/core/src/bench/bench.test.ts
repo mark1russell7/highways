@@ -4,7 +4,7 @@ import type { Graph, Result, Router } from "../model.ts";
 import { straightRouter } from "../routers/straight.ts";
 import { checkProperties } from "./properties.ts";
 import { countCrossings, measureQuality, measureStability, sideAngle } from "./quality.ts";
-import { benchOne, formatTable, runBenchmark, sameData } from "./run.ts";
+import { benchOne, formatTable, orderRows, runBenchmark, sameData } from "./run.ts";
 
 // Three nodes in a row: a straight edge from a to c goes through b.
 const row: Graph = {
@@ -118,6 +118,42 @@ describe("runBenchmark", () => {
     let n = 0;
     const flaky: Router = { name: "flaky", route: (g) => ({ routes: straightRouter.route(g).routes.map((r) => ({ ...r, points: r.points.map((p) => ({ x: p.x + n++, y: p.y })) })) }) };
     expect(benchOne(flaky, "x", makeFixture(FIXTURES[0]!), 2).deterministic).toBe(false);
+  });
+  it("stops a cell after its routes pass the cell limit, and marks the row", () => {
+    let routes = 0;
+    // This router waits 3 ms in each route, so one route passes a limit of 1 ms.
+    const slow: Router = {
+      name: "slow",
+      route: (g) => {
+        routes++;
+        const t0 = performance.now();
+        while (performance.now() - t0 < 3);
+        return straightRouter.route(g);
+      },
+    };
+    const graph = makeFixture(FIXTURES[0]!);
+    const over = benchOne(slow, "x", graph, 3, 1);
+    expect(routes).toBe(1);
+    expect(over.overLimit).toEqual({ limit: 1, runs: 1 });
+    expect(over.deterministic).toBe(true);
+    const line = formatTable([over]).split("\n")[2]!;
+    expect(line).toContain("over the limit");
+    expect(line.split("|")[6]!.trim()).toBe("-");
+    routes = 0;
+    const within = runBenchmark([slow], [FIXTURES[0]!], { repeat: 3, cellLimit: 60_000 })[0]!;
+    expect(routes).toBe(3);
+    expect(within.overLimit).toBeUndefined();
+    expect(formatTable([within])).not.toContain("over the limit");
+  });
+});
+
+describe("orderRows", () => {
+  it("puts the rows of the parts in the order of one run", () => {
+    const graph = makeFixture(FIXTURES[0]!);
+    const row = (router: string, fixture: string) => ({ ...benchOne(straightRouter, fixture, graph, 2), router });
+    const parts = [row("b", "large"), row("a", "large"), row("b", "case"), row("x", "small"), row("a", "small"), row("b", "small")];
+    const ordered = orderRows(parts, ["a", "b"], ["small", "large", "case"]);
+    expect(ordered.map((r) => `${r.fixture}/${r.router}`)).toEqual(["small/a", "small/b", "small/x", "large/a", "large/b", "case/b"]);
   });
 });
 

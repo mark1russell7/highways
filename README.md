@@ -102,13 +102,18 @@ The steps `router`, `curve` and `room` have strategies with one interface. A con
 `pnpm --filter @mark1russell7/highways bench` races the routers on the fixtures and writes a Markdown table.
 
 - `--max <nodes>` sets the largest fixture. The default is 1 000. The fixtures go from 10 to 100 000 nodes.
-- `--json <file>` also writes the rows as JSON.
+- `--min <nodes>` sets the smallest fixture. The default is 0.
+- `--repeat <n>` sets the timed routes of each cell. The table gives the median. The default is 3.
+- `--routers <a,b>` races only these routers. `--skip-routers <a,b>` races all the routers except these.
+- `--cell-limit <ms>` sets the time limit of each cell. After the routes of a cell pass the limit, the cell starts no more routes. Its row shows "over the limit". A route that runs does not stop.
+- `--rows-only` races only the fixtures. It does not race the case boards, and it does not print the side tables.
+- `--json <file>` also writes the rows as JSON. `--side-tables <file>` also writes the side tables to a file.
 
 A third table compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space, and it gives the ratio of the lengths.
 
 A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens. Three more tables change one knob of the room at a time: `maxGrowth`, the lane order with the spacing, and the gutter with the passes.
 
-The workflow `Bench` races the routers on all the fixtures, to 100 000 nodes, in CI. It starts on each change of `packages/core` on `main`, or by hand. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
+The workflow `Bench` races the routers in CI, in parts that run at the same time. A change of `packages/core` on `main` races the fixtures to 10 000 nodes. Each night, the workflow races all the fixtures, to 100 000 nodes. A run by hand with `max` 100000 does the same. The last job joins the parts with `pnpm bench:join`. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 
 Each router must obey the hard rules. A broken rule is a violation:
 

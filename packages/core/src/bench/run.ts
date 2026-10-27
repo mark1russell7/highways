@@ -25,12 +25,28 @@ export interface BenchRow {
   readonly faults: LinkFaults;
   /** The faults of each zoom level with groups (`measureLevelFaults`). The list is empty for a router without levels. */
   readonly levelFaults: readonly LevelFaults[];
+  /** The routes of this cell took longer than the cell limit. The cell did not start more routes. A row within the limit has no such field. */
+  readonly overLimit?: OverLimit;
+}
+
+/** The record of a cell over its time limit. */
+export interface OverLimit {
+  /** The cell limit, in milliseconds. */
+  readonly limit: number;
+  /** The number of routes that the cell finished. With one route, the cell did not check "same twice". */
+  readonly runs: number;
 }
 
 /** The options of a benchmark run. */
 export interface BenchOptions {
   /** The number of timed routes of each fixture by each router. The default is 3. */
   readonly repeat?: number;
+  /**
+   * The time limit of one cell (one router on one fixture), in milliseconds. The default is no limit.
+   * After the routes of a cell pass the limit, the cell starts no more routes, and its row gets `overLimit`.
+   * A route that runs does not stop.
+   */
+  readonly cellLimit?: number;
 }
 
 /** This function routes each fixture with each router, checks the hard rules and measures the quality. */
@@ -38,7 +54,7 @@ export function runBenchmark(routers: readonly Router[], fixtures: readonly Fixt
   const rows: BenchRow[] = [];
   for (const spec of fixtures) {
     const graph = makeFixture(spec);
-    for (const router of routers) if (graph.nodes.length <= (router.maxNodes ?? Infinity)) rows.push(benchOne(router, spec.name, graph, options.repeat ?? 3));
+    for (const router of routers) if (graph.nodes.length <= (router.maxNodes ?? Infinity)) rows.push(benchOne(router, spec.name, graph, options.repeat ?? 3, options.cellLimit));
   }
   return rows;
 }
@@ -67,18 +83,26 @@ export function sameData(a: unknown, b: unknown): boolean {
   return true;
 }
 
-/** This function routes one graph with one router and measures the result. */
-export function benchOne(router: Router, fixture: string, graph: Graph, repeat = 3): BenchRow {
+/**
+ * This function routes one graph with one router and measures the result. It routes at least two times, for the rule "same twice".
+ * After the routes pass `cellLimit` milliseconds, it starts no more routes and marks the row with `overLimit`.
+ */
+export function benchOne(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity): BenchRow {
   const times: number[] = [];
   let first: Result | undefined;
   let deterministic = true;
+  let spent = 0;
   for (let i = 0; i < Math.max(2, repeat); i++) {
     const t0 = now();
     const r = router.route(graph);
-    times.push(now() - t0);
+    const t = now() - t0;
+    times.push(t);
+    spent += t;
     if (!first) first = r;
     else if (i === 1 && !sameData(r, first)) deterministic = false;
+    if (spent > cellLimit) break;
   }
+  const runs = times.length;
   times.sort((a, b) => a - b);
   const result = first!;
   const all = checkProperties(graph, result, 1_000_000);
@@ -94,17 +118,37 @@ export function benchOne(router: Router, fixture: string, graph: Graph, repeat =
     quality: measureQuality(graph, result),
     faults: measureRouteFaults(graph, result),
     levelFaults: measureLevelFaults(result),
+    ...(spent > cellLimit ? { overLimit: { limit: cellLimit, runs } } : {}),
   };
 }
 
-/** This function writes the rows as a Markdown table. */
+/**
+ * This function puts rows in the order of one benchmark run: by fixture, then by router, each in the order of its list.
+ * A name that is not in its list goes after the names of the list. Rows with the same place keep their order.
+ * The workflow `Bench` uses it to join the rows of its parts.
+ */
+export function orderRows(rows: readonly BenchRow[], routers: readonly string[], fixtures: readonly string[]): BenchRow[] {
+  const place = (list: readonly string[], name: string): number => {
+    const i = list.indexOf(name);
+    return i < 0 ? list.length : i;
+  };
+  return rows
+    .map((row, i) => ({ row, i, f: place(fixtures, row.fixture), r: place(routers, row.router) }))
+    .sort((a, b) => a.f - b.f || a.r - b.r || a.i - b.i)
+    .map((x) => x.row);
+}
+
+/** This function writes the rows as a Markdown table. A cell over its limit shows "over the limit" after its time, and a dash for "same twice" when it did not check it. */
 export function formatTable(rows: readonly BenchRow[]): string {
   const head = "| router | fixture | nodes | edges | ms | same twice | violations | ink | crossings | bends | inflections | clearance | tight | detour | plug angle |";
   const line = "|---|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
   const f = (v: number, d = 2): string => (Number.isInteger(v) ? String(v) : v.toFixed(d));
   const body = rows.map((r) => {
     const q = r.quality;
-    return `| ${r.router} | ${r.fixture} | ${r.nodes} | ${r.edges} | ${f(r.ms, 1)} | ${r.deterministic ? "yes" : "NO"} | ${r.violations} | ${Math.round(q.ink)} | ${q.crossingsEstimated ? "≈" : ""}${q.crossings} | ${f(q.bends)} | ${f(q.inflections)} | ${f(q.clearance, 1)} | ${f(q.tight)} | ${f(q.detour)} | ${f(q.plugAngle, 1)} |`;
+    const over = r.overLimit;
+    const ms = over ? `${f(r.ms, 1)} over the limit` : f(r.ms, 1);
+    const same = over && over.runs < 2 ? "-" : r.deterministic ? "yes" : "NO";
+    return `| ${r.router} | ${r.fixture} | ${r.nodes} | ${r.edges} | ${ms} | ${same} | ${r.violations} | ${Math.round(q.ink)} | ${q.crossingsEstimated ? "≈" : ""}${q.crossings} | ${f(q.bends)} | ${f(q.inflections)} | ${f(q.clearance, 1)} | ${f(q.tight)} | ${f(q.detour)} | ${f(q.plugAngle, 1)} |`;
   });
   return [head, line, ...body].join("\n");
 }
