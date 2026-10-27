@@ -187,7 +187,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 
 A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.
 
-- `defineStrategy({ step, name, describe, defaults, run, maxNodes? })` makes a strategy. The function `run` gets each option.
+- `defineStrategy({ step, name, describe, defaults, schema?, run, maxNodes? })` makes a strategy. The function `run` gets each option.
 - `createRegistry(strategies)` makes a registry. Two strategies with one step and one name are an error.
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
@@ -204,6 +204,7 @@ const elbow = defineStrategy({
   name: "elbow",
   describe: "Each edge goes along one axis, then along the other, from center to center.",
   defaults: { turn: "x" as "x" | "y" },
+  schema: { turn: { type: "enum", values: ["x", "y"], describe: "The axis of the first leg." } },
   run(graph, o) {
     const box = new Map(graph.nodes.map((n) => [n.id, n.box]));
     const routes = graph.edges.map((e) => {
@@ -219,6 +220,50 @@ const rows = runBenchmark(routersOf(registry), FIXTURES.slice(0, 1)); // The row
 ```
 
 The built-in strategies give the same output as their functions. `curveStrategies.rounded.run({ points, space }, { radius: 8 })` gives the segments of `curveOf(points, { type: "rounded", space, radius: 8 })`. `benchCurveStrategies` and the fourth argument of `benchRoom` take a list of strategies.
+
+### Declarations of the options
+
+Each strategy declares its options in `schema`. A declaration tells the type, the range, the step and the meaning of one option. Tools make controls and sweeps from these declarations, with no other data.
+
+| Type | Fields | Values |
+|---|---|---|
+| `number`, `integer` | `min`, `max`, `step`, `scale`, `special`, `marks` | A number. An `integer` takes only whole numbers. |
+| `boolean` | | `false` or `true`. |
+| `enum` | `values` | One of `values`. |
+| `function`, `strategy`, `list`, `object` | `step` (for `strategy`) | A rule, a strategy, an array or an object. A sweep cannot set them. |
+
+Each declaration has a `describe` sentence and an optional `default`.
+
+- The range from `min` to `max` is the range of a control and of a sweep. The strategy can take a value outside it.
+- The `scale` is `linear` or `log`. A sweep on the scale `log` gives values with equal ratios.
+- The `special` values are valid outside the range. `Infinity` sets no limit.
+- The `marks` are the notable values: the default and the values of the sweeps of the benchmark.
+- The `default` is the value that the strategy uses when the caller and `defaults` give no value. A value of `defaults` comes first.
+
+The type `OptionSchema<O>` needs one declaration for each key of the options, and no other key. A number option needs a number declaration, and an enum declaration takes only the values of its type.
+
+The helpers read the declarations:
+
+- `optionDefaults(strategy)` gives the effective default of each option. The strategy gives the same output with this object as with no options.
+- `listOptions(strategy)` gives each option with its key, its declaration and its default, in the order of the schema.
+- `checkOptions(strategy, options)` reports each value without a declaration, of the wrong type, out of the range or not a whole number. It changes no value.
+- `clampOptions(strategy, options)` moves each number into its range, for a control. A special value stays.
+- `checkSchema(strategy)` reports each option of `defaults` without a declaration, and each bad declaration.
+- `sweepValues(declaration, { count, special })` gives the values of a sweep. Without `count`, a number option gives its `marks`.
+- `sweepOf(strategy, key, options)` gives one setting for each value of a sweep. The name of a setting is the key and the value.
+- `sweepGrid(strategy, keys, options)` gives one setting for each combination of the values of the keys.
+
+The benchmark functions take these settings. A sweep from the declarations gives the same table as the hub-limit sweep of CUSTOM:
+
+```ts
+import { CASES, routerStrategies, sweepOf, sweepSections } from "@mark1russell7/highways";
+
+const graph = CASES.find((c) => c.name === "case-hub-chain")!.make();
+const rows = sweepSections("case-hub-chain", graph, sweepOf(routerStrategies.sections, "stretch"));
+// The settings are "stretch 1.25", "stretch 1.5", "stretch 2", "stretch 3" and "stretch Infinity".
+```
+
+A test examines each built-in strategy with `checkSchema`. Thus an option of `defaults` without a declaration makes the test fail.
 
 The plugs have one strategy, so they have no step yet. The step `group` gives the grouping rule of the zoom levels.
 

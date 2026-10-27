@@ -32,6 +32,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL4 | Version 0.1.5 on npm: STRAT and the options of ROOM-A, ROOM-C and ROOM-D. The routes do not change. | 2026-10-26 | #27 |
 | CUSTOM | Options for the grouping rule (the step `group`), the levels, the hub limit, the far-view thresholds and the limits of the tree. With the defaults, the output does not change. On `case-hub-chain`, hub limit 1.5 gives a worst detour of 1.39, not 1.78. | 2026-10-26 | #28 |
 | REL5 | Version 0.2.0 on npm: CUSTOM. MINOR, because the type `Step` gains the step `group`. The routes do not change. | 2026-10-26 | #29 |
+| OPTS | Each strategy declares its options in `schema`: 74 declarations on 17 built-in strategies. A sweep from the declarations gives the hub-limit table of CUSTOM. The defaults do not change. | 2026-10-26 | #31 |
 
 ## Open
 
@@ -40,7 +41,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS0 | Research: the measures of a good route, curve, group and level. A note gives each measure, its formula, its scale and the studies behind it. | `later` | | P1 |
-| OPTS | Each strategy declares its options: the type, the range, the step and the meaning. Tools then make controls and sweeps from the registry. | `later` | STRAT | P1 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | HWC | Curved highways: a bundle bends as one. Its lanes stay parallel at the lane spacing through each bend, and merge and split on smooth curves. | `later` | CURVE | P1 |
 | ROOM2 | Room at each zoom level: each level of the tree gets the gaps that its level links need. The boxes stay stable from level to level. | `later` | ROOM, CUSTOM | P1 |

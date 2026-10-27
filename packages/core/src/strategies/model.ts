@@ -4,6 +4,7 @@ import type { Point } from "../geom.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import type { Boxed, Gap, RoomLink } from "../room/index.ts";
 import type { Section } from "../sections.ts";
+import type { OptionSchema } from "./options.ts";
 
 /** The input of a curve strategy: one polyline and the context of its route. */
 export interface CurveInput {
@@ -63,6 +64,8 @@ export interface Strategy<S extends Step = Step, O extends object = object> {
   readonly describe: string;
   /** The values of the options when the caller gives no value. */
   readonly defaults: Readonly<O>;
+  /** The declarations of the options: the type, the range, the step and the meaning of each one. A strategy without it declares nothing. */
+  readonly schema?: OptionSchema<O>;
   /** The benchmark skips an input with more nodes than this. Without it, the strategy takes each input. */
   readonly maxNodes?: number;
   /** This method does the step. Each option that `options` does not give gets its value from `defaults`. */
@@ -79,9 +82,18 @@ export interface StrategyDefinition<S extends Step, O extends object> {
   readonly describe: string;
   /** These values are the options when the caller gives no value. Give `{}` for a strategy without options. */
   readonly defaults: O;
+  /** These declarations tell the type, the range, the step and the meaning of each option. `checkSchema` examines them. */
+  readonly schema?: NoInfer<OptionSchema<O>>;
   readonly maxNodes?: number;
   /** This function does the step. It gets each option, from the caller or from `defaults`. */
   run(input: StepInput<S>, options: Readonly<O>): StepOutput<S>;
+}
+
+/** This function gives a frozen copy of a schema, with each declaration frozen. */
+function freezeSchema<O>(schema: OptionSchema<O>): OptionSchema<O> {
+  const out: Record<string, unknown> = {};
+  for (const [key, d] of Object.entries(schema)) out[key] = Object.freeze({ ...(d as object) });
+  return Object.freeze(out) as OptionSchema<O>;
 }
 
 /**
@@ -89,13 +101,14 @@ export interface StrategyDefinition<S extends Step, O extends object> {
  * When the caller gives no option, the definition gets the `defaults` object itself.
  */
 export function defineStrategy<S extends Step, O extends object>(definition: StrategyDefinition<S, O>): Strategy<S, O> {
-  const { step, name, describe, defaults, maxNodes } = definition;
+  const { step, name, describe, defaults, schema, maxNodes } = definition;
   if (name.length === 0) throw new Error(`A strategy of the step "${step}" has no name.`);
   const strategy: Strategy<S, O> = {
     step,
     name,
     describe,
     defaults: Object.freeze({ ...defaults }),
+    ...(schema === undefined ? {} : { schema: freezeSchema(schema) }),
     ...(maxNodes === undefined ? {} : { maxNodes }),
     run(input: StepInput<S>, options?: Partial<O>): StepOutput<S> {
       const all = options === undefined || Object.keys(options).length === 0 ? strategy.defaults : { ...strategy.defaults, ...options };
