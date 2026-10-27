@@ -16,6 +16,13 @@ export interface LinkFaults {
    */
   readonly through: number;
   /**
+   * The number of links of `through` that no route can keep out of the other boxes.
+   * Each box that such a link goes through overlaps the box of its source or of its target, as `countOverlaps` sees it.
+   */
+  readonly unavoidable: number;
+  /** The number of links of `through` that go through at least one box that overlaps neither end. `through` is `unavoidable` plus `avoidable`. */
+  readonly avoidable: number;
+  /**
    * The number of links that go out and back. The distance from a point of the link to its last point grows after the nearest approach.
    * A link goes out and back when this growth is more than `BACKTRACK_SHARE` of the distance between its ends, and more than `BACKTRACK_MIN` units.
    */
@@ -105,27 +112,41 @@ export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly Me
   const grid = new Grid<string>(Math.max(180, (2 * size) / Math.max(1, boxes.size)));
   for (const [id, b] of boxes) grid.add(id, b);
   let through = 0;
+  let avoidable = 0;
   let backtrack = 0;
   let worstDetour = 0;
   let outside = 0;
   for (const l of links) {
     const p = l.points;
     if (p.length === 0) continue;
+    // The test stops at the first box that overlaps neither end. Before it, a box that overlaps an end only marks the link.
     let hit = false;
-    for (let i = 1; i < p.length && !hit; i++) {
+    let far = false;
+    const ends = [boxes.get(l.source), boxes.get(l.target)].filter((b): b is Box => b !== undefined);
+    for (let i = 1; i < p.length && !far; i++) {
       const a = p[i - 1]!;
       const b = p[i]!;
       grid.querySegment(a, b, 0, (id) => {
-        if (!hit && id !== l.source && id !== l.target && segmentHitsBox(a, b, inflate(boxes.get(id)!, -TOLERANCE), TOLERANCE)) hit = true;
+        if (far || id === l.source || id === l.target) return;
+        const box = boxes.get(id)!;
+        if (!segmentHitsBox(a, b, inflate(box, -TOLERANCE), TOLERANCE)) return;
+        hit = true;
+        if (!ends.some((e) => boxesOverlap(e, box))) far = true;
       });
     }
     if (hit) through++;
+    if (far) avoidable++;
     if (goesOutAndBack(p)) backtrack++;
     const span = dist(p[0]!, p[p.length - 1]!);
     if (span > 1) worstDetour = Math.max(worstDetour, polylineLength(p) / span);
     if (p.some((q) => q.x < x0 - slack || q.x > x1 + slack || q.y < y0 - slack || q.y > y1 + slack)) outside++;
   }
-  return { links: links.length, through, backtrack, worstDetour, outside };
+  return { links: links.length, through, unavoidable: through - avoidable, avoidable, backtrack, worstDetour, outside };
+}
+
+/** This function tells if two boxes overlap by more than `TOLERANCE` on each axis, as `countOverlaps` counts them. */
+export function boxesOverlap(a: Box, b: Box): boolean {
+  return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > TOLERANCE && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > TOLERANCE;
 }
 
 /** This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge. */
@@ -149,8 +170,7 @@ export function countOverlaps(boxes: readonly Box[]): number {
   let n = 0;
   boxes.forEach((a, i) => {
     grid.query(a, (j) => {
-      const b = boxes[j]!;
-      if (j > i && Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > TOLERANCE && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > TOLERANCE) n++;
+      if (j > i && boxesOverlap(a, boxes[j]!)) n++;
     });
   });
   return n;
@@ -182,10 +202,12 @@ export function sumFaults(list: readonly LinkFaults[]): LinkFaults {
     (s, f) => ({
       links: s.links + f.links,
       through: s.through + f.through,
+      unavoidable: s.unavoidable + f.unavoidable,
+      avoidable: s.avoidable + f.avoidable,
       backtrack: s.backtrack + f.backtrack,
       worstDetour: Math.max(s.worstDetour, f.worstDetour),
       outside: s.outside + f.outside,
     }),
-    { links: 0, through: 0, backtrack: 0, worstDetour: 0, outside: 0 },
+    { links: 0, through: 0, unavoidable: 0, avoidable: 0, backtrack: 0, worstDetour: 0, outside: 0 },
   );
 }

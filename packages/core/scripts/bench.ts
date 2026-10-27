@@ -3,7 +3,7 @@ import { writeFileSync } from "node:fs";
 import { CASES, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
-import { benchOne, formatFaults, formatTable, runBenchmark } from "../src/bench/run.ts";
+import { benchOne, formatFaults, formatLevels, formatTable, runBenchmark } from "../src/bench/run.ts";
 import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
@@ -32,6 +32,9 @@ for (const c of CASES) {
 console.log(formatTable(rows));
 console.log();
 console.log(formatFaults(rows));
+// The faults of each zoom level with groups, with the split of level through into unavoidable and avoidable links (ER3d).
+console.log();
+console.log(formatLevels(rows.filter((r) => r.levelFaults.length > 0)));
 // The curve types change only the drawing of the routes, so the small fixtures are enough.
 const curves: CurveBenchRow<string>[] = [];
 for (const spec of FIXTURES.filter((f) => f.nodes <= 100)) {
