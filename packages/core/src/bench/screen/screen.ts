@@ -1,6 +1,7 @@
+import { highwayRouterStrategy } from "../../highways/router.ts";
 import type { Graph, Result } from "../../model.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
-import { createRegistry, listStrategies, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
+import { createRegistry, getStrategy, listStrategies, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
 import { compareStep, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { routeStability } from "../measures/stability.ts";
@@ -13,9 +14,25 @@ import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type Lay
 import { measureByName, measureName, namedObjectives } from "./measures.ts";
 import { SCREEN_V1, screenInputs, type ScreenSet } from "./set.ts";
 
+/**
+ * The steps of the screen: the steps of `compareStep` and the step `highway`.
+ * The screen of the step `highway` routes the plan of each strategy with `follow`, and measures the routes as the routes of a router.
+ */
+export type ScreenStep = CompareStep | "highway";
+
+/** The steps of the screen, in the order of the pipeline. */
+export const SCREEN_STEPS: readonly ScreenStep[] = ["group", "router", "highway", "curve"];
+
+/** The routers that the screen of the step `highway` also runs by default. They are the baselines of the note on highways. */
+export const HIGHWAY_BASE_ROUTERS: readonly string[] = ["corners", "shared", "trunks"];
+
+/** The hard rules of the routes of a router, or of a plan after `follow`. */
+const ROUTE_RULES: readonly string[] = ["complete", "ends-at-plugs", "fixed-plugs", "no-pass-through", "counts-sum", "link-ends", "bundle-trunk", "run-shared", "same-twice"];
+
 /** The hard rules of each step of the screen, in the order of the records. A good run has 0 for each rule. */
-export const SCREEN_RULES: Readonly<Record<CompareStep, readonly string[]>> = {
-  router: ["complete", "ends-at-plugs", "fixed-plugs", "no-pass-through", "counts-sum", "link-ends", "bundle-trunk", "run-shared", "same-twice"],
+export const SCREEN_RULES: Readonly<Record<ScreenStep, readonly string[]>> = {
+  router: ROUTE_RULES,
+  highway: ROUTE_RULES,
   group: ["sections", "counts-sum", "link-ends", "same-twice"],
   curve: ["same-twice"],
 };
@@ -37,6 +54,11 @@ export interface ScreenOptions {
   readonly options?: Readonly<Record<string, object>>;
   /** The router whose routes the step `curve` draws. The default is `corners`. */
   readonly curveRouter?: string;
+  /**
+   * The routers that the screen of the step `highway` also runs. Their records have the step `router`.
+   * The default is `HIGHWAY_BASE_ROUTERS`. The other steps do not read it.
+   */
+  readonly baseRouters?: readonly string[];
   /** The seed of the small change of the stability measures. The default is 1. */
   readonly seed?: number;
   /** The commit of the code, for the records. */
@@ -87,7 +109,7 @@ export interface PredictionCheck extends LayoutPrediction {
 /** The summary of a screen. */
 export interface ScreenSummary {
   readonly set: string;
-  readonly step: CompareStep;
+  readonly step: ScreenStep;
   /** The number of inputs. */
   readonly inputs: number;
   /** The axes of the Pareto front, by the names of a record. */
@@ -129,9 +151,9 @@ function meets(value: number, op: PredictionOp, expected: number): boolean {
 }
 
 /** This function makes the registry of a screen. It refuses a strategy of another step, and a new strategy with the name of a built-in strategy. */
-function screenRegistry(step: CompareStep, strategies: readonly (Strategy<CompareStep> | string)[], baseline: boolean): { registry: Registry; candidates: Set<string> } {
-  const builtins = listStrategies(STRATEGIES, step) as readonly Strategy<CompareStep>[];
-  const chosen: Strategy<CompareStep>[] = [];
+function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenStep> | string)[], baseline: boolean): { registry: Registry; candidates: Set<string> } {
+  const builtins = listStrategies(STRATEGIES, step) as readonly Strategy<ScreenStep>[];
+  const chosen: Strategy<ScreenStep>[] = [];
   for (const s of strategies) {
     if (typeof s === "string") {
       const known = builtins.find((b) => b.name === s);
@@ -150,11 +172,14 @@ function screenRegistry(step: CompareStep, strategies: readonly (Strategy<Compar
   return { registry: createRegistry([...others, ...(own as readonly AnyStrategy[])]), candidates };
 }
 
+/** This function tells if a step of the screen gives routes. The step `router` gives routes, and the step `highway` gives routes after `follow`. */
+const givesRoutes = (step: ScreenStep): step is "router" | "highway" => step === "router" || step === "highway";
+
 /** This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router. */
-function rowValues(step: CompareStep, graph: Graph, row: CompareRow): Record<string, number> {
+function rowValues(step: ScreenStep, graph: Graph, row: CompareRow): Record<string, number> {
   const values: Record<string, number> = { ...row.values };
   delete values["ms"];
-  if (step === "router" && row.result) {
+  if (givesRoutes(step) && row.result) {
     const q = measureQuality(graph, row.result);
     values["R3.bends"] = q.bends;
     values["R8.clearance"] = q.clearance;
@@ -166,9 +191,9 @@ function rowValues(step: CompareStep, graph: Graph, row: CompareRow): Record<str
 }
 
 /** This function gives the hard rules of a row of `compareStep`, and tells if the row gave the same output two times. */
-function rowRules(step: CompareStep, graph: Graph, row: CompareRow, again: CompareRow | undefined): { hard: Record<string, number>; deterministic: boolean } {
+function rowRules(step: ScreenStep, graph: Graph, row: CompareRow, again: CompareRow | undefined): { hard: Record<string, number>; deterministic: boolean } {
   const rules = SCREEN_RULES[step];
-  if (step === "router") {
+  if (givesRoutes(step)) {
     const all = row.result ? checkProperties(graph, row.result, 1_000_000) : [];
     // `compareStep` adds one violation when two routes of the input differ.
     const deterministic = row.violations === all.length;
@@ -196,19 +221,31 @@ function named(values: Readonly<Record<string, number>>): Record<string, number>
  * A strategy can be a name of the registry or a strategy object, for example from a prototype file. The registry does not change.
  *
  * The step `router` routes each input two times for the rule "same twice". The steps `group` and `curve` run each input two times for the same rule.
+ *
+ * The step `highway` makes the plan of each strategy and routes it with `follow`, two times. It also runs the routers of `baseRouters`.
  * An input with a `base` in the inputs also gets the measures `route.stability.base.*`: the routes on the variant against the routes on its base.
  * The same inputs and the same options give the same records. Only the times change.
  */
-export function screen(step: CompareStep, strategies: readonly (Strategy<CompareStep> | string)[] = [], options: ScreenOptions = {}): ScreenReport {
+export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenStep> | string)[] = [], options: ScreenOptions = {}): ScreenReport {
   const set = options.set ?? SCREEN_V1;
-  const { registry, candidates } = screenRegistry(step, strategies, options.baseline ?? true);
+  const screened = screenRegistry(step, strategies, options.baseline ?? true);
+  const candidates = screened.candidates;
+  // The step `highway` runs as the step `router`. Each highway strategy with `follow` is a router, after the base routers.
+  const base = step === "highway" ? (options.baseRouters ?? HIGHWAY_BASE_ROUTERS).map((name) => getStrategy(STRATEGIES, "router", name)) : [];
+  const registry =
+    step === "highway"
+      ? createRegistry([...base, ...listStrategies(screened.registry, "highway").map((s) => highwayRouterStrategy(s))] as readonly AnyStrategy[])
+      : screened.registry;
+  const compareAs: CompareStep = step === "highway" ? "router" : step;
+  const baseNames = new Set(base.map((s) => s.name));
+  const stepOf = (name: string): ScreenStep => (baseNames.has(name) ? "router" : step);
   const own = options.options ?? {};
   const seed = options.seed ?? 1;
   const log = options.log ?? ((): void => {});
   const families = options.families;
   const inputs = (options.inputs ?? screenInputs(set)).filter((i) => families?.includes(i.family) ?? true);
   const bases = new Set(inputs.flatMap((i) => (i.base !== undefined ? [i.base] : [])));
-  const byName = new Map(listStrategies(registry, step).map((s) => [s.name, s as Strategy<CompareStep>]));
+  const byName = new Map(listStrategies(registry, compareAs).map((s) => [s.name, s as Strategy<CompareStep>]));
   const records: (LayoutRecord & { measures: Record<string, number> })[] = [];
   const comparisons: StepComparison[] = [];
   const kept = new Map<string, { graph: Graph; results: Map<string, Result> }>();
@@ -217,8 +254,8 @@ export function screen(step: CompareStep, strategies: readonly (Strategy<Compare
   for (const input of inputs) {
     const graph = inputGraph(input);
     const compare = { registry, options: own, seed, name: input.id, ...(options.curveRouter ? { curveRouter: options.curveRouter } : {}) };
-    const cmp = compareStep(step, graph, compare);
-    const again = step === "router" ? undefined : compareStep(step, graph, compare);
+    const cmp = compareStep(compareAs, graph, compare);
+    const again = givesRoutes(step) ? undefined : compareStep(compareAs, graph, compare);
     comparisons.push(cmp);
     log(`${input.id}: ${graph.nodes.length} nodes, ${graph.edges.length} edges, ${cmp.rows.map((r) => `${r.strategy} ${r.ms.toFixed(0)}`).join(", ")}`);
     if (bases.has(input.id)) kept.set(input.id, { graph, results: new Map(cmp.rows.flatMap((r) => (r.result ? [[r.strategy, r.result] as const] : []))) });
@@ -227,7 +264,7 @@ export function screen(step: CompareStep, strategies: readonly (Strategy<Compare
       const head = {
         schema: "layout-record/1" as const,
         stage: "route" as const,
-        step,
+        step: stepOf(row.strategy),
         strategy: row.strategy,
         options: jsonSafe({ ...strategy.defaults, ...own[row.strategy] }) as Record<string, unknown>,
         corpus: input.set,
@@ -247,7 +284,7 @@ export function screen(step: CompareStep, strategies: readonly (Strategy<Compare
       const { hard, deterministic } = rowRules(step, graph, row, again?.rows[i]);
       const record = { ...head, measures: named(rowValues(step, graph, row)), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
       records.push(record);
-      if (step === "router" && input.base !== undefined && row.result) variants.push({ record, base: input.base, result: row.result });
+      if (givesRoutes(step) && input.base !== undefined && row.result) variants.push({ record, base: input.base, result: row.result });
     });
   }
 
@@ -267,7 +304,7 @@ export function screen(step: CompareStep, strategies: readonly (Strategy<Compare
 function summarizeScreen(
   records: readonly LayoutRecord[],
   comparisons: readonly StepComparison[],
-  at: { set: string; step: CompareStep; candidates: ReadonlySet<string>; predictions?: readonly LayoutPrediction[] },
+  at: { set: string; step: ScreenStep; candidates: ReadonlySet<string>; predictions?: readonly LayoutPrediction[] },
 ): ScreenSummary {
   const objectives = namedObjectives(FRONT_OBJECTIVES[at.step]);
   const names = [...new Set(records.map((r) => r.strategy))];

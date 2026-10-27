@@ -42,8 +42,11 @@ function laneBoard(result: Result, lanes: { readonly width: number; readonly max
   return { graph, open, width: lanes.width, ...(lanes.maxWidth === undefined ? {} : { maxWidth: lanes.maxWidth }) };
 }
 
-/** The steps that `compareStep` compares. The step `room` takes a packed board, not a graph, so it is not in the list. */
-export type CompareStep = Exclude<Step, "room">;
+/**
+ * The steps that `compareStep` compares. The step `room` takes a packed board, not a graph, so it is not in the list.
+ * The step `highway` gives a plan, not routes. The screen routes each plan with `follow` and compares it as a router.
+ */
+export type CompareStep = Exclude<Step, "room" | "highway">;
 
 /** The steps that `compareStep` compares, in the order of the pipeline. */
 export const COMPARE_STEPS: readonly CompareStep[] = ["group", "router", "curve"];

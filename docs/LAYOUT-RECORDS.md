@@ -156,7 +156,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 ```
 
 - `stage` is `pack`, `route` or `joint`. The screen of `highways` writes `route`.
-- `step` is the step of the strategy: `router`, `curve` or `group`.
+- `step` is the step of the strategy: `router`, `highway`, `curve` or `group`. The screen of the step `highway` also writes the records of the base routers, with the step `router`.
 - `options` holds the defaults of the strategy with the options of the call. A function is the text `function:<name>`.
 - `corpus` and `set` name the screen set. `inputHash` is the `hash` of the input file. Thus a result stays comparable after the corpus grows.
 - `nodes` counts the boxes and the obstacles of the input.
@@ -172,6 +172,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 | Step | Rules |
 |---|---|
 | `router` | `complete`, `ends-at-plugs`, `fixed-plugs`, `no-pass-through`, `counts-sum`, `link-ends`, `bundle-trunk`, `run-shared`, `same-twice` |
+| `highway` | The rules of `router`, on the routes of `follow` |
 | `group` | `sections`, `counts-sum`, `link-ends`, `same-twice` |
 | `curve` | `same-twice` |
 
@@ -268,6 +269,7 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 - By default, the screen also runs the built-in strategies of the step. The summary gives the median of each measure, the sum of each hard rule and the Pareto front over the medians.
 - The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
 - A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
+- The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 
 The script `packages/core/scripts/screen.ts` writes `screen.jsonl` and `screen.md`:
 

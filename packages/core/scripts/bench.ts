@@ -92,7 +92,7 @@ if (sideFile && side.length > 0) writeFileSync(sideFile, side.join("\n\n") + "\n
 // The measure suite: the spread over the seeds, the Pareto front of each step, the counts of the proposed hard rules and the time of the measures.
 // The script `bench-join.ts` prints the same tables for the joined report.
 const report = suite.report;
-for (const step of ["router", "curve", "room", "group"] as const) {
+for (const step of ["router", "highway", "curve", "room", "group"] as const) {
   console.log();
   console.log(formatSummaries(report.summaries, step));
 }

@@ -11,6 +11,10 @@ import { CUT_DEFAULTS, cutGroups, type CutOptions } from "../groups/cut/index.ts
 import { KD_DEFAULTS, kdGroups, type KdOptions } from "../groups/kd/index.ts";
 import { byDataGroup, keyGroups, type KeyOptions } from "../groups/keys/index.ts";
 import { quadtreeGroups } from "../groups/quadtree/index.ts";
+import { CORRIDOR_DEFAULTS, corridorPlan, type CorridorOptions } from "../highways/corridors/index.ts";
+import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
+import type { HighwayInput } from "../highways/model.ts";
+import { sharedWaysPlan, type SharedWaysOptions } from "../highways/shared-ways/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
 import { levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
@@ -23,7 +27,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -336,10 +340,49 @@ export const groupStrategies: {
   }),
 });
 
+/**
+ * The built-in highway strategies: the decisions of the routers `trunks` and `shared` as plans, and corridor signatures (HWY-031).
+ * `follow` routes the edges along a plan, and `highwayRouter` gives a router that does both.
+ */
+export const highwayStrategies: {
+  readonly keys: Strategy<"highway", KeysOptions>;
+  readonly "shared-ways": Strategy<"highway", SharedWaysOptions>;
+  readonly corridors: Strategy<"highway", CorridorOptions>;
+} = Object.freeze({
+  keys: defineStrategy({
+    step: "highway",
+    name: "keys",
+    describe: "The highways of the router `trunks`. The edges from one plug with one key share a trunk, and the edges that go on together share a run past it.",
+    defaults: { rule: byCollection } as KeysOptions,
+    schema: TRUNKS_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<KeysOptions>) => keysPlan(input, o),
+  }),
+  "shared-ways": defineStrategy({
+    step: "highway",
+    name: "shared-ways",
+    describe: "The highways of the router `shared`. The edges of one key share their ways through the corner graph, and each shared stretch is a highway.",
+    defaults: { rule: byCollection } as SharedWaysOptions,
+    schema: SHARED_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SharedWaysOptions>) => sharedWaysPlan(input, o),
+  }),
+  corridors: defineStrategy({
+    step: "highway",
+    name: "corridors",
+    describe: "Corridor signatures. Edges whose first ways share long links make a cluster, found with MinHash. The longest common run of each cluster is its highway.",
+    defaults: { ...CORRIDOR_DEFAULTS } as CorridorOptions,
+    schema: CORRIDOR_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CorridorOptions>) => corridorPlan(input, o),
+  }),
+});
+
 /** The built-in strategies of each step, in order. A consumer adds its own: `createRegistry([...BUILT_IN_STRATEGIES, mine])`. */
 export const BUILT_IN_STRATEGIES: readonly AnyStrategy[] = Object.freeze([
   ...Object.values(groupStrategies),
   ...Object.values(routerStrategies),
+  ...Object.values(highwayStrategies),
   ...Object.values(curveStrategies),
   ...Object.values(roomStrategies),
 ]);

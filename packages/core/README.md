@@ -323,6 +323,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
+| `highway` | `HighwayInput`: the graph, and optionally the first routes of a router | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -333,7 +334,27 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
-- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `routerStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
+- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `routerStrategies`, `highwayStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
+
+### The step `highway`
+
+The step `highway` decides which edges share a way. It gives a plan, not routes. `follow` routes the plan.
+
+- A `Highway` has an `id`, a `key`, a `spine`, its `lanes` and its `members`. Lane 0 is on the left of the spine.
+- A `HighwayMember` is an edge with its merge point and its split point. `on` and `off` give their places on the spine.
+- `checkPlan(graph, plan)` lists the problems of a plan. A good plan gives an empty list.
+- `follow(graph, plan, options?)` routes each member from its plug to its merge point, along the spine, and from its split point to its target.
+- `follow` routes an edge that is not a member with its first route, or with the way finder. It gives one run for each stretch that two members or more share.
+- `highwayRouter(strategy)` and `highwayRouterStrategy(strategy)` give a router that makes the plan and then calls `follow`.
+
+| Strategy | Decision |
+|---|---|
+| `keys` | The trunks and the runs of the router `trunks`. `planOfResult` reads them. The router does not change. |
+| `shared-ways` | The runs of the router `shared`. `planOfResult` reads them. The router does not change. |
+| `corridors` | The corridor signatures of HWY-031. The links of the first routes get a MinHash signature, and each cluster of ways gives a highway. |
+
+The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
+The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:
 

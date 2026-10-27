@@ -8,8 +8,7 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { COMPARE_STEPS, type CompareStep } from "../src/bench/compare.ts";
-import { formatScreen, parseLines, recordLines, screen, type LayoutInput, type LayoutPrediction } from "../src/bench/screen/index.ts";
+import { formatScreen, parseLines, recordLines, screen, SCREEN_STEPS, type LayoutInput, type LayoutPrediction, type ScreenStep } from "../src/bench/screen/index.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 
 const args = process.argv.slice(2);
@@ -23,19 +22,19 @@ const list = (name: string): string[] | undefined =>
     .map((x) => x.trim())
     .filter((x) => x.length > 0);
 
-const step = (opt("--step") ?? "router") as CompareStep;
-if (!COMPARE_STEPS.includes(step)) throw new Error(`The screen has no step "${step}". The steps are ${COMPARE_STEPS.join(", ")}.`);
+const step = (opt("--step") ?? "router") as ScreenStep;
+if (!SCREEN_STEPS.includes(step)) throw new Error(`The screen has no step "${step}". The steps are ${SCREEN_STEPS.join(", ")}.`);
 
-const isStrategy = (x: unknown): x is Strategy<CompareStep> =>
+const isStrategy = (x: unknown): x is Strategy<ScreenStep> =>
   typeof x === "object" && x !== null && (x as { step?: unknown }).step === step && typeof (x as { name?: unknown }).name === "string" && typeof (x as { run?: unknown }).run === "function";
 
-const strategies: (Strategy<CompareStep> | string)[] = [...(list("--strategy") ?? [])];
+const strategies: (Strategy<ScreenStep> | string)[] = [...(list("--strategy") ?? [])];
 const only = list("--export");
 for (const file of list("--module") ?? []) {
   const mod = (await import(pathToFileURL(resolve(file)).href)) as Record<string, unknown>;
   const found = Object.entries(mod).filter(([name, value]) => isStrategy(value) && (only?.includes(name) ?? true));
   if (found.length === 0) throw new Error(`The file "${file}" exports no strategy of the step "${step}".`);
-  for (const [, value] of found) if (!strategies.includes(value as Strategy<CompareStep>)) strategies.push(value as Strategy<CompareStep>);
+  for (const [, value] of found) if (!strategies.includes(value as Strategy<ScreenStep>)) strategies.push(value as Strategy<ScreenStep>);
 }
 
 const optionsFile = opt("--options");

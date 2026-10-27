@@ -253,6 +253,35 @@ describe("screen", () => {
     expect(Object.keys(group.measures).filter((k) => k.startsWith("route.other."))).toEqual([]);
   });
 
+  it("screens the highway strategies with follow, after the base routers (HWY-STEP)", () => {
+    const { records, summary } = screen("highway", [], { inputs: [tiny] });
+    expect(records.map((r) => [r.step, r.strategy])).toEqual([
+      ["router", "corners"],
+      ["router", "shared"],
+      ["router", "trunks"],
+      ["highway", "keys"],
+      ["highway", "shared-ways"],
+      ["highway", "corridors"],
+    ]);
+    for (const r of records.filter((x) => x.step === "highway")) {
+      expect(Object.keys(r.hard), r.strategy).toEqual([...SCREEN_RULES.highway]);
+      expect(r.deterministic, r.strategy).toBe(true);
+      for (const name of ["route.ink", "route.crossings", "route.bends"]) expect(typeof r.measures[name], `${r.strategy} ${name}`).toBe("number");
+    }
+    expect(summary.step).toBe("highway");
+    expect(summary.strategies.filter((s) => s.candidate)).toEqual([]);
+    expect(formatScreen(summary)).toContain("## Screen of the step `highway`");
+  });
+
+  it("screens a new highway strategy alone, without base routers", () => {
+    const corridors = getStrategy(STRATEGIES, "highway", "corridors");
+    const proto = defineStrategy({ step: "highway", name: "proto-corridors", describe: "A copy of corridors.", defaults: corridors.defaults, run: (input, o) => corridors.run(input, o) });
+    const { records, summary } = screen("highway", [proto], { inputs: [tiny], baseline: false, baseRouters: [] });
+    expect(records.map((r) => r.strategy)).toEqual(["proto-corridors"]);
+    expect(summary.strategies[0]!.candidate).toBe(true);
+    expect(findStrategy(STRATEGIES, "highway", "proto-corridors")).toBeUndefined();
+  });
+
   it("compares a variant with its base", () => {
     const variant: LayoutInput = { ...tiny, id: "screen-v1/tiny-uniform/s0-same", base: tiny.id, change: "reorder", hash: "" };
     const records = screen("router", ["corners"], { inputs: [tiny, { ...variant, hash: documentHash(variant) }], baseline: false }).records;

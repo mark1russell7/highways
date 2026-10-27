@@ -7,6 +7,7 @@ import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, openGaps, roomLinks } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { byDataGroup } from "../groups/keys/index.ts";
+import { highwayRouterStrategy } from "../highways/router.ts";
 import { checkSections, type Section } from "../sections.ts";
 import { laneRoutes } from "../segments.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
@@ -173,6 +174,12 @@ export const FRONT_OBJECTIVES: Readonly<Record<Step, readonly Objective[]>> = {
     { key: "C2.median", better: "min" },
     { key: "C3.median", better: "min" },
     { key: "C6.length", better: "min" },
+  ],
+  highway: [
+    { key: "R1.perEdge", better: "min" },
+    { key: "R5.median", better: "min" },
+    { key: "B1.inkSaved", better: "max" },
+    { key: "R4.turn", better: "min" },
   ],
   room: [
     { key: "M1.area", better: "min" },
@@ -438,10 +445,12 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "smooth", "clothoid", "highway"]);
   const normals = new Set(options.normalCurves ?? ["spline"]);
   const log = options.log ?? ((): void => {});
-  const fixtures = steps.has("router") || steps.has("group") ? (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max) : [];
+  const fixtures = steps.has("router") || steps.has("group") || steps.has("highway") ? (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max) : [];
   const routers = steps.has("router") ? listStrategies(registry, "router").filter((s) => options.routers?.includes(s.name) ?? true) : [];
   const curves = steps.has("curve") ? listStrategies(registry, "curve") : [];
   const groups = steps.has("group") ? listStrategies(registry, "group") : [];
+  // The step `highway`: each highway strategy, then `follow`, as one router.
+  const highways = steps.has("highway") ? listStrategies(registry, "highway").map((s) => highwayRouterStrategy(s)) : [];
   const rooms = listStrategies(registry, "room");
   const rows: SuiteRow[] = [];
   const bench: BenchRow[] = [];
@@ -488,6 +497,39 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
         });
         if (strategy.name === curveRouter && curves.length > 0 && graph.nodes.length <= curveMax)
           rows.push(...curveRuns(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }).map((c) => c.row));
+      }
+      // The step `highway`: the plan of each strategy, routed with `follow`. The measures are the measures of the step `router`.
+      for (const strategy of highways) {
+        if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) continue;
+        const router = asRouter(strategy);
+        const t0 = now();
+        const { row, result } = benchRun(router, spec.name, graph, 2, cellLimit);
+        const ms = now() - t0;
+        const t1 = now();
+        const values: Record<string, number> = routeMeasures(graph, result, row);
+        const measureMs = now() - t1;
+        let extraMs = 0;
+        if (graph.nodes.length <= stabilityMax) {
+          const t2 = now();
+          const s = routeStability(graph, result, router.route(change.graph), { seed });
+          extraMs = now() - t2;
+          values["Z10.mean"] = s.mean;
+          values["Z10.max"] = s.max;
+          values["Z10.moved"] = s.moved;
+        }
+        rows.push({
+          step: "highway",
+          fixture: spec.name,
+          seed: k,
+          strategy: strategy.name,
+          nodes: row.nodes,
+          edges: row.edges,
+          violations: row.violations + (row.deterministic ? 0 : 1),
+          ms,
+          measureMs,
+          extraMs,
+          values,
+        });
       }
       // The step `group`: the router `sections` with each grouping rule, and the grouping of the changed graph (G9).
       for (const strategy of groups) {
@@ -564,7 +606,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
 
 /**
  * This function puts the rows of the suite in the order of one run. It sorts them by fixture family, then by seed.
- * In one seed, the routers come first, and the curves come after the router of the curves. The grouping rules and the room come last.
+ * In one seed, the routers come first, and the curves come after the router of the curves. Then the highway strategies come, and the grouping rules and the room come last.
  * A name that is not in its list goes after the names of the list.
  * The workflow `Bench` uses it to join the reports of its parts.
  */
@@ -586,8 +628,9 @@ export function orderSuiteRows(
   const rank = (r: SuiteRow): [number, number] => {
     if (r.step === "router") return [0, 2 * place(routers, r.strategy) * (curves.length + 1)];
     if (r.step === "curve") return [0, 2 * after * (curves.length + 1) + 1 + place(curves, r.strategy)];
-    if (r.step === "group") return [1, place(names("group"), r.strategy)];
-    return [2, r.strategy === "gutter" ? -1 : place(names("room"), r.strategy)];
+    if (r.step === "highway") return [1, place(names("highway"), r.strategy)];
+    if (r.step === "group") return [2, place(names("group"), r.strategy)];
+    return [3, r.strategy === "gutter" ? -1 : place(names("room"), r.strategy)];
   };
   return rows
     .map((row, i) => ({ row, i, f: place(families, row.fixture), rank: rank(row) }))
@@ -715,6 +758,7 @@ const fmt = (v: number | undefined, d = 3): string => (v === undefined || Number
 /** The columns of the tables of `formatSuite`: the keys of the measures of each step. */
 export const SUITE_COLUMNS: Readonly<Record<Step, readonly string[]>> = {
   router: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved", "Z8.order", "Z7.position", "G8.treeCost"],
+  highway: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved"],
   curve: ["C1.share", "C1.max", "C2.median", "C3.median", "C3.q95", "C6.length"],
   room: ["M1.area", "M4.laneThrough", "crossings", "through", "room-order"],
   group: ["Z4.farItems", "G1.modularity", "G2.cut", "G6.balance", "G8.treeCost", "G9.ari", "Z7.position", "Z8.order", "Z3.through", "treeMs"],
