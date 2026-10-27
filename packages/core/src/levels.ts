@@ -99,6 +99,7 @@ function sideWay(ways: LevelWays, s: Node, t: Node, inset: number): Point[] {
 /**
  * This function makes the obstacles and the corner graph of the items of a level.
  * The buckets of the obstacles grow with the items, so a long link visits few buckets.
+ * The corner graphs use `cones`, so a link goes along the corridors between the groups, not around the outer edge of the board.
  */
 function levelWays(nodes: readonly Node[], options: WayOptions): LevelWays {
   const margin = options.margin ?? 5;
