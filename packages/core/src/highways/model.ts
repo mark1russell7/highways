@@ -9,6 +9,11 @@ export interface HighwayInput {
    * The strategy `corridors` makes the ways of the corner graph, as the router `corners` finds them.
    */
   readonly routes?: Result;
+  /**
+   * This value is the graph before an edit and the plan of the same strategy on it. A strategy that keeps its highways stable over edits reads it.
+   * The gates `hysteresis` (HWY-046) and `ids` (HWY-054) read it. The other strategies ignore it.
+   */
+  readonly previous?: { readonly graph: Graph; readonly plan: HighwayPlan };
 }
 
 /**

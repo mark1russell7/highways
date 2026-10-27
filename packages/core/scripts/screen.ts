@@ -1,6 +1,7 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
 // [--options <file.json>] [--families <a,b>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
-// [--wrap <stable,repair>] [--shuffles <n>] [--out screen.jsonl] [--summary screen.md]`.
+// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--out screen.jsonl] [--summary screen.md]`.
+// `--edits` runs each highway strategy over this number of seeded edits, with its plan before each edit (BUILD-W2A).
 // `--wrap` adds the router `<name>+<w>` for each router and each wrapper. `--shuffles` measures the order fragility (W3) over this number of random orders.
 // `--strategy` names strategies of the registry. `--module` loads a prototype file and screens each export that is a strategy of the step,
 // or only the exports of `--export`. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
@@ -66,6 +67,9 @@ for (const w of wrap) if (!SCREEN_WRAPS.includes(w as ScreenWrap)) throw new Err
 const shuffles = Number(opt("--shuffles") ?? "0");
 if (!Number.isInteger(shuffles) || shuffles < 0) throw new Error(`The value of --shuffles is not a whole number of 0 or more.`);
 
+const edits = Number(opt("--edits") ?? "0");
+if (!Number.isInteger(edits) || edits < 0) throw new Error(`The value of --edits is not a whole number of 0 or more.`);
+
 const start = performance.now();
 const report = screen(step, strategies, {
   ...(inputs ? { inputs } : {}),
@@ -76,6 +80,7 @@ const report = screen(step, strategies, {
   ...(commit ? { commit } : {}),
   ...(wrap.length > 0 ? { wrap: wrap as ScreenWrap[] } : {}),
   ...(shuffles > 0 ? { shuffles } : {}),
+  ...(edits > 0 ? { edits } : {}),
   log: (line) => process.stderr.write(line + "\n"),
 });
 const seconds = (performance.now() - start) / 1000;

@@ -344,7 +344,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, and optionally the first routes of a router | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -382,6 +382,20 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper` and `level-links` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
+
+A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
+The new strategy has the options of both. The keys of the options of a gate are not keys of the strategy before it. Gates can follow gates.
+
+| Gate | Rule |
+|---|---|
+| `breakeven` (HWY-047) | An edge stays on its highways only when its share of the shared ink is larger than its detour. The option `shareAlpha` sets the cost `n^shareAlpha` of a stretch for `n` edges. |
+| `stretch` (HWY-048) | An edge stays only when its route is at most `budget` times its route alone, plus `pad`. |
+| `ambiguity` (HWY-049) | Each highway keeps its largest group of edges whose end nodes have an ambiguity of `maxAmbiguity` or less. The ambiguity is the share of the pairs of end nodes without an edge. |
+| `hysteresis` (HWY-046) | A new highway needs `kOn` edges. A highway of the plan before the edit stays while it has `kOff` edges. |
+| `ids` (HWY-054) | Each highway takes the id of the highway of the plan before the edit with the most common edges. The routes do not change. |
+
+The gates `hysteresis` and `ids` read `HighwayInput.previous`: the graph and the plan before an edit. Without it, `hysteresis` uses the limit `kOn` and `ids` changes nothing.
+The functions `keepMembers`, `edgeLengths`, `matchHighways`, `jaccard` and `commonEdges` help a new gate.
 
 A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:
 

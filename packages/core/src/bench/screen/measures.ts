@@ -68,6 +68,11 @@ const ROWS: readonly Row[] = [
   ["Z10.base.mean", "Z10", "route.stability.base.mean", "units of the board", "lower", false],
   ["Z10.base.max", "Z10", "route.stability.base.max", "units of the board", "lower", false],
   ["Z10.base.moved", "Z10", "route.stability.base.moved", "0 to 1", "lower", false],
+  // The stability of a highway strategy over a sequence of seeded edits, with its plan before each edit (the screen option `edits`).
+  ["Z10.edits.mean", "Z10", "route.stability.edits.mean", "units of the board", "lower", false],
+  ["Z10.edits.moved", "Z10", "route.stability.edits.moved", "0 to 1", "lower", false],
+  ["Z10.churn", "Z10", "route.stability.highway-churn", "0 to 1", "lower", false],
+  ["Z10.ids", "Z10", "route.stability.highway-ids", "0 to 1", "higher", false],
   // The zoom levels and the groups. The default grouping rule reads the positions, so most of these measures depend on the placement.
   ["level-nesting", "Z6", "route.level.nesting", "count", "lower", false],
   ["Z3.through", "Z3", "route.level.through", "count", "lower", true],

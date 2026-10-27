@@ -6,6 +6,7 @@ import { STRATEGIES } from "../../strategies/builtins.ts";
 import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
 import { compareStep, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
+import { highwayEdits } from "../measures/highways.ts";
 import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { routeStability } from "../measures/stability.ts";
@@ -84,6 +85,12 @@ export interface ScreenOptions {
    * The default is 0: no measure of the order fragility. The steps `group` and `curve` do not read it.
    */
   readonly shuffles?: number;
+  /**
+   * The number of seeded edits of the step `highway` (BUILD-W2A). Each highway strategy runs again after each edit of `highwayEdits`, with its plan before the edit.
+   * The records then get `Z10.edits.*`, the churn of the highways and the share of the highways that keep their id.
+   * The default is 0: no edits. The other steps and the base routers do not read it.
+   */
+  readonly edits?: number;
   /** The commit of the code, for the records. */
   readonly commit?: string;
   /** The predictions of the run. Each record names the first prediction with its strategy, its set and its input. */
@@ -295,6 +302,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   }
   const shuffles = givesRoutes(step) ? Math.max(0, Math.floor(options.shuffles ?? 0)) : 0;
   const seed = options.seed ?? 1;
+  const edits = step === "highway" ? Math.max(0, Math.floor(options.edits ?? 0)) : 0;
+  const plans = new Map(listStrategies(screened.registry, "highway").map((s) => [s.name, s]));
   const log = options.log ?? ((): void => {});
   const families = options.families;
   const inputs = (options.inputs ?? screenInputs(set)).filter((i) => families?.includes(i.family) ?? true);
@@ -345,6 +354,11 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
         const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);
         const f = orderFragility(graph, (g) => router.route(g), { orders: shuffles, seed, base: row.result });
         Object.assign(values, { "W3.crossings": f.crossings, "W3.detour": f.detour, "W3.inkSaved": f.inkSaved, "W3.ink": f.ink, "W3.changed": f.changed, "W3.poa": f.poa });
+      }
+      const plan = edits > 0 && row.result ? plans.get(row.strategy) : undefined;
+      if (plan) {
+        const z = highwayEdits(graph, plan, own[row.strategy], edits, seed);
+        Object.assign(values, { "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids });
       }
       const record = { ...head, measures: named(values), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
       records.push(record);

@@ -11,3 +11,4 @@ export { meetingPoints, WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions
 export { STUB_DEFAULTS, stubPlan, type StubEnds, type StubOptions } from "./stubs/index.ts";
 export { ZIPPER_DEFAULTS, zipLegs, zipperPlan, type Zip, type ZipLimits, type ZipperOptions } from "./zipper/index.ts";
 export { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "./level-links/index.ts";
+export * from "./gates/index.ts";

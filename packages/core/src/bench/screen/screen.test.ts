@@ -286,6 +286,11 @@ describe("screen", () => {
       ["highway", "stubs"],
       ["highway", "zipper"],
       ["highway", "level-links"],
+      ["highway", "corridors+breakeven"],
+      ["highway", "corridors+stretch"],
+      ["highway", "corridors+ambiguity"],
+      ["highway", "corridors+hysteresis"],
+      ["highway", "corridors+ids"],
     ]);
     for (const r of records.filter((x) => x.step === "highway")) {
       expect(Object.keys(r.hard), r.strategy).toEqual([...SCREEN_RULES.highway]);
@@ -295,6 +300,19 @@ describe("screen", () => {
     expect(summary.step).toBe("highway");
     expect(summary.strategies.filter((s) => s.candidate)).toEqual([]);
     expect(formatScreen(summary)).toContain("## Screen of the step `highway`");
+  });
+
+  it("measures the highway strategies over a sequence of seeded edits, only with the option edits (HWY-046, HWY-054)", () => {
+    const plain = screen("highway", ["corridors"], { inputs: [tiny], baseline: false, baseRouters: [] }).records[0]!;
+    expect(plain.measures["route.stability.highway-churn"]).toBeUndefined();
+    const { records } = screen("highway", ["corridors", "corridors+ids"], { inputs: [tiny], baseline: false, baseRouters: [], edits: 2 });
+    for (const r of records) {
+      for (const name of ["route.stability.edits.mean", "route.stability.edits.moved", "route.stability.highway-churn"]) expect(typeof r.measures[name], `${r.strategy} ${name}`).toBe("number");
+    }
+    const [corridors, ids] = records;
+    // The gate ids changes only the ids, so the routes and the pairs of edges do not change.
+    expect(ids!.measures["route.stability.edits.mean"]).toBe(corridors!.measures["route.stability.edits.mean"]);
+    expect(ids!.measures["route.stability.highway-churn"]).toBe(corridors!.measures["route.stability.highway-churn"]);
   });
 
   it("screens a new highway strategy alone, without base routers", () => {

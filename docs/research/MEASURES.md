@@ -227,6 +227,7 @@ A zoom level shows a group as one item, and the edges between two items as one l
 - Z7 and Z8 compare two levels of one result. Z10 compares two results of two inputs. Both kinds are stability, and the bench has neither today.
 - Z8 uses the order and not the distance, because a reader keeps the order better ([Misue 1995][misue95]).
 - The input change of Z10 and G9 is seeded: one node moves by `u`, one edge is added, or one edge is removed. The change is the same for each strategy.
+- For the step `highway`, the screen option `edits` gives Z10 over a sequence of seeded changes, with the plan before each change. It also gives the churn of the highways and the share of the highways that keep their id (BUILD-W2A).
 
 ## Room
 
