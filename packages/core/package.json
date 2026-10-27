@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue",
+    "@mark1russell7/layout-contract": "github:mark1russell7/layout-contract#52fefbb81922dd7fc4244e116f466c818d7a26dc&path:/packages/layout-contract",
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"

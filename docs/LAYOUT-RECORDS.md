@@ -182,6 +182,24 @@ The packer is exact, so the shared rule `no-overlap` uses the smaller tolerance 
 
 The [measure note](research/MEASURES.md) tells each rule. The rule `sections` counts a tree that the router refuses. The proposed rules of MEAS0 are measures: `route.curve.rule.*` and `route.level.nesting`.
 
+## The shared contract
+
+The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has it as a development dependency at commit `52fefbb`, until it is on npm. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+
+Each known gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typecheck` fails. Then remove the directive and the row of the gap.
+
+| Id | Gap | Direction |
+|---|---|---|
+| G1 | The `side` of a port is optional in `highways`, because the router picks a side. The contract needs a `side`. | `highways` to the contract |
+| G2 | A router input has no `container`. The contract needs one. | `highways` to the contract |
+| G3 | The change `packed` is not in the contract. | `highways` to the contract |
+| G4 | `locked` is a boolean in the contract and only `true` in `highways`. | The contract to `highways` |
+| G5 | `set`, `family`, `seed`, `source`, `hash` and `edges` are optional in the contract. `inputGraph` needs them. | The contract to `highways` |
+| G6 | `ms` is optional in a contract record. `highways` needs it. | The contract to `highways` |
+| G7 | `highways` has no `margin` or `turnable` on a box, and no `inset` or `aspectWeight` on a container. | The contract to `highways` |
+| G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract |
+| G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both |
+
 ## The predictions
 
 Each prediction is written before its run. The predictions are a JSON Lines file, and a commit adds it before the run starts.
