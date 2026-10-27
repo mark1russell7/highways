@@ -12,8 +12,9 @@ export const STABLE_ID_DEFAULTS: Readonly<StableIdOptions> = Object.freeze({ min
 
 /** This function gives the number at the end of an id, or -1 for an id without a number at its end. */
 function numberOf(id: string): number {
-  const m = /(\d+)$/.exec(id);
-  return m ? Number(m[1]) : -1;
+  let start = id.length;
+  while (start > 0 && id.charCodeAt(start - 1) >= 48 && id.charCodeAt(start - 1) <= 57) start--;
+  return start === id.length ? -1 : Number(id.slice(start));
 }
 
 /**
