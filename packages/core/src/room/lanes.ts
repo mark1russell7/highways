@@ -79,7 +79,7 @@ export function gapLanes(items: readonly Boxed[], links: readonly LevelLink[], o
   return laneGaps(items, links, options).links;
 }
 
-/** This function gives the lanes of each gap that a link runs along, with the options of `gapLanes`. A gap without a piece is not in the list. */
+/** This function gives the lanes of each gap that holds a piece of a link, with the options of `gapLanes`. A gap without a piece is not in the list. */
 export function gapLaneCounts(items: readonly Boxed[], links: readonly LevelLink[], options: GapLaneOptions = {}): GapLaneCount[] {
   return laneGaps(items, links, options).counts;
 }

@@ -434,7 +434,8 @@ export interface TrackBenchRow {
 }
 
 /**
- * This function gives R12 (lane separation) of the links: the length along which legs of two links run parallel and nearer than `near`, as a share of the ink.
+ * This function gives R12 (lane separation) of the links. Two legs of two links are near when they are parallel and nearer than `near`.
+ * R12 is the length of the near legs, as a share of the ink.
  * It reads only the legs on an axis. The links of the far view have no other legs.
  */
 export function laneSeparation(links: readonly LevelLink[], near: number): number {

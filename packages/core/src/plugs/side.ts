@@ -18,7 +18,7 @@ export interface SidePlugOptions {
   readonly most?: number;
 }
 
-/** A free side of one end: its node, its side, its range on the axis along the side and the plug that faces the other end. */
+/** A free side of one end: its node, its side and its range on the axis along the side. It also has the plug that faces the other end. */
 interface FreeSide {
   readonly node: Node;
   readonly side: Side;
@@ -58,8 +58,8 @@ function footAt(f: FreeSide, v: number): Point {
 }
 
 /**
- * This function gives the places that the search tries on one free side. Each place is the out point of a plug on the side,
- * or a corner in front of the side with the foot of the leg to it as the plug.
+ * This function gives the places that the search tries on one free side. A place is the out point of a plug on the side.
+ * A place is also a corner in front of the side. The plug of a corner is the foot of the leg to it.
  */
 function startsOf(ways: WayFinder, f: FreeSide, others: readonly number[], bend: number, most: number): Start[] {
   const margin = ways.margin;
@@ -105,7 +105,7 @@ function startsOf(ways: WayFinder, f: FreeSide, others: readonly number[], bend:
 
 /**
  * This function places the two plugs of an edge with a free side. A fixed plug stays at its point.
- * The search (A*) starts from each place of the free side of the source and ends at each place of the free side of the target.
+ * The search (A*) starts from each place of the free side of the source. It ends at each place of the free side of the target.
  * The plugs are the places of the shortest way. Without a way, the plugs face the other end, as `placePlug` places them.
  */
 export function sidePlugs(ways: WayFinder, s: Node, es: End, t: Node, et: End, options: SidePlugOptions = {}): [Plug, Plug] {

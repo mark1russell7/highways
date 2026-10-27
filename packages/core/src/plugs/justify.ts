@@ -7,6 +7,7 @@
  * This function places `ideal.length` points on the segment from `lo` to `hi` of one side.
  * The points keep the order of their ideal places. Two neighbours are at least `gap` apart, or the side divided evenly when it is too short.
  * The sum of the squares of the moves is the least. The answer is exact: a fit by pool adjacent violators.
+ *
  * The function `tie` orders two points with the same ideal place. The result is in the order of `ideal`.
  */
 export function justifyPlugs(ideal: readonly number[], lo: number, hi: number, gap: number, tie?: (i: number) => number): number[] {
