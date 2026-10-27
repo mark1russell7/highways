@@ -4,7 +4,7 @@ import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
-import type { RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
+import type { HighwayStrategyOptions, RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
 import type { OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
@@ -102,6 +102,12 @@ export const SECTIONS_SCHEMA: OptionSchema<RouterPreset<SectionsOptions>> = {
 /** The declarations of the option of the curves `rounded` and `arc`. */
 export const RADIUS_SCHEMA: OptionSchema<RadiusOptions> = {
   radius: { type: "number", min: 0, max: 48, step: 1, describe: "The radius of the corners." },
+};
+
+/** The declarations of the options of the curve `highway`. */
+export const HIGHWAY_SCHEMA: OptionSchema<HighwayStrategyOptions> = {
+  ...RADIUS_SCHEMA,
+  minRadius: { type: "number", min: 0, max: 24, step: 1, describe: "The smallest radius of a lane at a bend of a bundle." },
 };
 
 /** The declarations of the option of the curve `spline`. */

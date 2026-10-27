@@ -2,7 +2,7 @@
 import { writeFileSync } from "node:fs";
 import { CASES, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
-import { benchCurveStrategies, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
+import { benchCurveStrategies, benchHighways, formatCurves, formatHighways, type CurveBenchRow, type HighwayBenchRow } from "../src/bench/curves.ts";
 import { measureLevelFaults } from "../src/bench/links.ts";
 import { benchOne, formatFaults, formatLevels, formatTable, runBenchmark, type LevelRow } from "../src/bench/run.ts";
 import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
@@ -11,6 +11,8 @@ import { makeFixture } from "../src/fixtures.ts";
 import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
 import type { Graph, Node } from "../src/model.ts";
 import { sectionsRouter } from "../src/routers/sections.ts";
+import { sharedRouter } from "../src/routers/shared.ts";
+import { trunksRouter } from "../src/routers/trunks.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, routersOf } from "../src/strategies/model.ts";
 
@@ -46,6 +48,21 @@ for (const spec of FIXTURES.filter((f) => f.nodes <= 100)) {
 }
 console.log();
 console.log(formatCurves(curves));
+// The curves of the bundles (HWC): each lane curved alone with `rounded`, then the lanes of each bundle bent as one with `highway`.
+// The routers with the rule "all" make the bundles that the defaults do not make on these boards.
+const all = (): "all" => "all";
+const bundlers = [
+  ...ROUTERS.filter((r) => r.name === "trunks" || r.name === "shared"),
+  trunksRouter({ name: "trunks-all", rule: all }),
+  sharedRouter({ name: "shared-all", rule: all }),
+];
+const highways: HighwayBenchRow[] = [];
+for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {
+  const graph = CASES.find((c) => c.name === name)!.make();
+  for (const router of bundlers) highways.push(...benchHighways(router, name, graph));
+}
+console.log();
+console.log(formatHighways(highways));
 // The room of the links: a packed board of touching boxes, before and after `makeRoom` at gutter 8 and spacing 4.
 console.log();
 console.log(formatRoom(benchRoom("packed-grid", packedGridBoard(), { gutter: 8, spacing: 4 }, listStrategies(STRATEGIES, "room"))));
