@@ -3,10 +3,17 @@ import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
+import type { FlowFieldOptions } from "../highways/flow-field/index.ts";
+import type { GroupSpine } from "../highways/grouped.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
+import type { OdCellOptions } from "../highways/od-cells/index.ts";
+import type { QuickBundlesOptions } from "../highways/quickbundles/index.ts";
+import type { RoadClassOptions } from "../highways/road-classes/index.ts";
+import type { SelectOptions } from "../highways/select/index.ts";
 import type { StubOptions } from "../highways/stubs/index.ts";
 import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
+import type { WspdOptions } from "../highways/wspd/index.ts";
 import type { ZipperOptions } from "../highways/zipper/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
@@ -338,4 +345,61 @@ export const LEVEL_HIGHWAY_SCHEMA: OptionSchema<LevelHighwayOptions> = {
   depth: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "The depth of the level in the tree of sections." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A level link becomes a highway when this number of edges or more ride it." },
   stretch: { type: "number", min: 1.2, max: 2, step: 0.1, default: 1.5, describe: "An edge rides the link only when its way along the link is this many times its first route, or shorter." },
+};
+
+/** The declaration of the spine of a group of edges: the shared ways of the group, or one trunk between two terminals. */
+const GROUP_SPINE: EnumOption<GroupSpine> = {
+  type: "enum",
+  values: ["shared", "trunk"],
+  default: "shared",
+  describe: "With `shared`, the edges of a group share their ways through the corner graph. With `trunk`, a group gets one trunk between two terminals.",
+};
+
+/** The declarations of the options of the highway strategy `quickbundles` (HWY-026). */
+export const QUICKBUNDLES_SCHEMA: OptionSchema<QuickBundlesOptions> = {
+  theta: { type: "number", min: 1, max: 10, step: 0.5, marks: [1.5, 3, 6], default: 3, describe: "An edge joins a cluster when its distance to the centroid is this value or less, in units of the board." },
+  points: { type: "integer", min: 6, max: 24, step: 2, default: 12, describe: "The number of points of each line after the resampling." },
+  line: { type: "enum", values: ["routes", "lines"], default: "routes", describe: "The line of each edge: its first route, or the straight line between its plugs." },
+  order: { type: "enum", values: ["input", "length"], default: "input", describe: "The order of the edges in the pass: the order of the graph, or the longest line first." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: GROUP_SPINE,
+};
+
+/** The declarations of the options of the highway strategy `road-classes` (HWY-034 with EDA-050). */
+export const ROAD_CLASS_SCHEMA: OptionSchema<RoadClassOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  quantile: { type: "number", min: 0.5, max: 0.99, step: 0.05, marks: [0.8, 0.9, 0.95], default: 0.9, describe: "A link is a highway link when its use is at this quantile of the use of the links, or higher." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway link and a highway have this number of edges or more." },
+  discount: { type: "number", min: 0.1, max: 0.8, step: 0.1, default: 0.5, describe: "The second pass gives each highway link this discount, as a share of its length." },
+};
+
+/** The declarations of the options of the highway strategy `flow-field` (EDA-046 with HWY-037). */
+export const FLOW_FIELD_SCHEMA: OptionSchema<FlowFieldOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  minFanIn: { type: "integer", min: 2, max: 10, step: 1, default: 2, describe: "An end with this number of edges or more on one side of its box gets a field." },
+  end: { type: "enum", values: ["target", "source"], default: "target", describe: "The end that gets a field: the target of a fan-in, or the source of a fan-out." },
+};
+
+/** The declarations of the options of the highway strategy `wspd` (HWY-018). */
+export const WSPD_SCHEMA: OptionSchema<WspdOptions> = {
+  separation: { type: "number", min: 1, max: 8, step: 0.5, marks: [1, 2, 4], default: 2, describe: "The gap between the two sets of a pair is at least this value times the radius of the larger set." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 3, describe: "A pair with this number of edges or more gets a highway." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `od-cells` (EDA-033 with WILD-032). */
+export const OD_CELL_SCHEMA: OptionSchema<OdCellOptions> = {
+  level: { type: "integer", min: 1, max: 4, step: 1, default: 2, describe: "The depth of the cells in the tree of sections." },
+  minGroup: { type: "integer", min: 2, max: 8, step: 1, default: 3, describe: "A pair of cells with this number of edges or more gets a trunk." },
+  legMax: { type: "number", min: 0.1, max: 1, step: 0.05, marks: [0.2, 0.3, 0.4], default: 0.3, describe: "An edge rides the trunk only when each of its legs is this share of the span or shorter." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `select` (HWY-045). */
+export const SELECT_SCHEMA: OptionSchema<SelectOptions> = {
+  generators: { type: "list", default: ["corridors", "quickbundles", "wspd", "road-classes"], describe: "The highway strategies that propose the candidates." },
+  lambda: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the added length of the edges against the ink that a highway saves." },
+  swaps: { type: "integer", min: 0, max: 5, step: 1, default: 2, describe: "The number of passes of the local search with one swap." },
 };

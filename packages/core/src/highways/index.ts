@@ -11,4 +11,12 @@ export { meetingPoints, WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions
 export { STUB_DEFAULTS, stubPlan, type StubEnds, type StubOptions } from "./stubs/index.ts";
 export { ZIPPER_DEFAULTS, zipLegs, zipperPlan, type Zip, type ZipLimits, type ZipperOptions } from "./zipper/index.ts";
 export { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "./level-links/index.ts";
+export { edgePlugs, sharedStretches, type EdgePlugs, type KeyedWay, type SharedStretchOptions } from "./stretches.ts";
+export { GROUP_SPINES, groupedPlan, weberPoint, type EdgeGroup, type GroupedOptions, type GroupSpine } from "./grouped.ts";
+export { mdf, QUICKBUNDLES_DEFAULTS, quickBundles, quickBundlesPlan, resample, type BundleLine, type BundleOrder, type QuickBundlesOptions } from "./quickbundles/index.ts";
+export { ROAD_CLASS_DEFAULTS, roadClassPlan, type RoadClassOptions } from "./road-classes/index.ts";
+export { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FieldEnd, type FlowFieldOptions } from "./flow-field/index.ts";
+export { SplitTree, WSPD_DEFAULTS, wspdGroups, wspdPlan, type SplitCell, type WspdOptions } from "./wspd/index.ts";
+export { OD_CELL_DEFAULTS, odCellPlan, odGroups, type OdCellOptions } from "./od-cells/index.ts";
+export { CANDIDATE_SOURCES, candidatePlan, candidateScore, SELECT_DEFAULTS, selectPlan, type CandidateSource, type SelectOptions } from "./select/index.ts";
 export * from "./gates/index.ts";
