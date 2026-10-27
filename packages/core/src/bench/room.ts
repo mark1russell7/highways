@@ -1,6 +1,6 @@
 import type { Box } from "../geom.ts";
 import { levelLinks } from "../levels.ts";
-import type { Graph, LevelLink, Node, Result } from "../model.ts";
+import type { Graph, LevelLink, Node, Result, Router } from "../model.ts";
 import { makeRoom, openGaps, roomLinks, type RoomOptions } from "../room/index.ts";
 import { gapLanes, LANE_ORDERS, type LaneOrder } from "../room/lanes.ts";
 import { levelPairs, levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
@@ -9,6 +9,7 @@ import { sectionsRouter } from "../routers/sections.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { roomStrategies } from "../strategies/builtins.ts";
 import type { Strategy } from "../strategies/model.ts";
+import { benchHighways, type HighwayMeasures } from "./curves.ts";
 import { measureLinks, measureRouteFaults, type LinkFaults } from "./links.ts";
 import { measureQuality } from "./quality.ts";
 
@@ -351,6 +352,46 @@ export function formatLevelRoom(rows: readonly LevelRoomRow[]): string {
   const body = rows.map(
     (r) =>
       `| ${r.fixture} | ${r.board} | ${r.depth} | ${r.items} | ${r.links} | ${r.area.toFixed(3)} | ${r.through} | ${r.crossings} | ${r.sharedCrossings} | ${r.detour.toFixed(3)} | ${r.worstDetour.toFixed(2)} | ${r.order} | ${r.levelOrder} | ${r.shift.toFixed(2)} | ${r.worstShift.toFixed(2)} | ${r.ms.toFixed(1)} |`,
+  );
+  return [head, line, ...body].join("\n");
+}
+
+/** One row of `benchBendRoom`: the lanes of the bundles of one router on one open board, after `highwayCurves`. */
+export interface BendRoomRow extends HighwayMeasures {
+  readonly router: string;
+  readonly fixture: string;
+  /** The board: `room` opens the gaps for the links only, and `room + bends` also opens them for the bends of the bundles. */
+  readonly board: "room" | "room + bends";
+  /** The area of the bounding box of the boxes, as a share of the area of the board before the room. */
+  readonly area: number;
+}
+
+/**
+ * This function measures the room for the bends of the bundles (HWC-D). It opens the board two times with `makeRoom`, without and with the option `bends`.
+ * The option `bends` gets the router and the lane options of the curves. Then the router routes each open board, and `benchHighways` curves its bundles with `highway`.
+ */
+export function benchBendRoom(router: Router, fixture: string, graph: Graph, options: RoomOptions = { gutter: 8, spacing: 4 }): BendRoomRow[] {
+  const lanes = { spacing: 4, maxWidth: 16, minRadius: 4 };
+  const links = roomLinks(graph);
+  const area0 = areaOf(graph.nodes);
+  const boards = [
+    ["room", makeRoom(graph.nodes, links, options).items],
+    ["room + bends", makeRoom(graph.nodes, links, { ...options, bends: { router, edges: graph.edges, ...lanes } }).items],
+  ] as const;
+  return boards.map(([board, nodes]) => {
+    const [, highway] = benchHighways(router, fixture, { nodes, edges: graph.edges }, { spacing: lanes.spacing, maxWidth: lanes.maxWidth, minRadius: lanes.minRadius });
+    const { router: name, fixture: _f, curve: _c, ms: _ms, ...measures } = highway!;
+    return { router: name, fixture, board, area: area0 > 0 ? areaOf(nodes) / area0 : 1, ...measures };
+  });
+}
+
+/** This function writes the rows of `benchBendRoom` as a Markdown table. The spacing error is a percent of the spacing. */
+export function formatBendRoom(rows: readonly BendRoomRow[]): string {
+  const head = "| router | fixture | board | area | bundles | worst spacing | min radius | under min | through |";
+  const line = "|---|---|---|---:|---:|---:|---:|---:|---:|";
+  const body = rows.map(
+    (r) =>
+      `| ${r.router} | ${r.fixture} | ${r.board} | ${r.area.toFixed(3)} | ${r.bundles} | ${(r.worstSpacing * 100).toFixed(1)}% | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} |`,
   );
   return [head, line, ...body].join("\n");
 }

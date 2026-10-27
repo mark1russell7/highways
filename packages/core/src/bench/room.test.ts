@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { packedGridBoard } from "../cases.ts";
-import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom, type RoomBenchRow } from "./room.ts";
+import { CASES, packedGridBoard } from "../cases.ts";
+import { sharedRouter } from "../routers/shared.ts";
+import { benchBendRoom, benchRoom, formatBendRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom, type RoomBenchRow } from "./room.ts";
 
 describe("benchRoom on the packed grid (ROOM)", () => {
   const graph = packedGridBoard();
@@ -88,5 +89,19 @@ describe("the sweeps of the room on the packed grid (ROOM-A, ROOM-C, ROOM-D)", (
     const [g8, g12] = [row("gutter 8 passes 1"), row("gutter 12 passes 1")];
     expect(Math.abs(g12.detour - g8.detour) / g8.detour).toBeLessThan(0.05);
     for (const r of rows) expect(hard(r)).toEqual([0, 0, 0]);
+  });
+});
+
+describe("benchBendRoom (HWC-D)", () => {
+  it("on case-many-groups with shared-all: the room for the bends lowers the lane arcs under the smallest radius, for less than 25% more area", () => {
+    const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
+    const [room, bends] = benchBendRoom(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
+    expect(room!.board).toBe("room");
+    expect(bends!.board).toBe("room + bends");
+    expect(bends!.underMin).toBeLessThan(room!.underMin);
+    expect(bends!.area / room!.area).toBeLessThanOrEqual(1.25);
+    expect(bends!.area).toBeGreaterThan(room!.area);
+    expect(bends!.through).toBe(0);
+    expect(formatBendRoom([room!, bends!]).split("\n")).toHaveLength(4);
   });
 });

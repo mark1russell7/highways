@@ -1,6 +1,9 @@
 import { center, type Box, type Point } from "../geom.ts";
 import { levelLinks } from "../levels.ts";
 import type { Edge, Graph, Router } from "../model.ts";
+import { bendGrowth, type RoomBends } from "./bends.ts";
+
+export type { RoomBends } from "./bends.ts";
 
 /** An item with a box: a node of a graph, an item of a level or a box of a host layout. */
 export interface Boxed {
@@ -70,6 +73,12 @@ export interface RoomOptions {
    * The limit `maxGrowth` applies to the sum of the passes.
    */
   readonly passes?: number;
+  /**
+   * The room for the bends of the bundles (HWC-D). Without it, the default, the demand counts only the lanes of the links.
+   * With it, the router of `bends` routes the open board. Each leg of a bundle that is too short for its arcs grows by a gap.
+   * The limit `maxGrowth` applies to the sum of the growth of the links and of the bends.
+   */
+  readonly bends?: RoomBends;
 }
 
 /** The demand of a board and the board with its gaps open. */
@@ -163,7 +172,26 @@ export function roomDemand(items: readonly Boxed[], links: readonly RoomLink[], 
     if (next.length !== total.length || next.some((g, i) => g.axis !== total[i]!.axis)) break;
     total = total.map((g, i) => ({ ...g, lanes: Math.max(g.lanes, next[i]!.lanes), need: g.need + Math.max(0, next[i]!.need - next[i]!.width) }));
   }
+  if (options.bends) total = withBends(items, links, total, options.bends, snap);
   return capGrowth(items, total, gutter, options.maxGrowth ?? Infinity);
+}
+
+/**
+ * This function adds the growth for the bends of the bundles to the need of each gap. Each pass routes the board with each gap open to its need.
+ * The open board has the same gaps in the same order. So the growth of each gap adds to the need of that gap.
+ */
+export function withBends(items: readonly Boxed[], links: readonly RoomLink[], gaps: readonly Gap[], bends: RoomBends, snap: number = DEFAULT_SNAP): Gap[] {
+  let total = [...gaps];
+  const passes = Math.max(1, Math.floor(bends.passes ?? 1));
+  for (let p = 0; p < passes; p++) {
+    const board = openGaps(items, total, snap);
+    const open = boardGaps(board, snap);
+    if (open.length !== total.length || open.some((g, i) => g.axis !== total[i]!.axis)) break;
+    const grow = bendGrowth(board, links, open, bends, snap);
+    if (grow.every((g) => g <= 0)) break;
+    total = total.map((g, i) => (grow[i]! > 0 ? { ...g, need: g.need + grow[i]! } : g));
+  }
+  return total;
 }
 
 /** This function gives the demand of one pass, without the limit `maxGrowth`. */
