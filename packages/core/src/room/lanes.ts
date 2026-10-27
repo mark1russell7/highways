@@ -15,6 +15,19 @@ export type LaneOrder = "links" | "ends" | "crossings";
 /** The lane orders of `gapLanes`, in the order of the benchmark. */
 export const LANE_ORDERS: readonly LaneOrder[] = ["links", "ends", "crossings"];
 
+/**
+ * The rule that gives each piece of a gap its lane (its track), after the lane order.
+ *
+ * - `stack`: a piece goes one lane past each piece before it in the order that it overlaps. Thus two pieces that overlap keep their order.
+ * - `left-edge`: the constrained left-edge rule of chip routing (EDA-004). Two pieces that overlap keep their order only where a swap adds crossings.
+ *   The rule fills the lowest lane first, with the pieces sorted by their start. Two pieces that do not overlap can share a lane.
+ * - `free`: the left-edge rule without the order. It gives the fewest lanes, but it can add crossings.
+ */
+export type LaneTracks = "stack" | "left-edge" | "free";
+
+/** The lane rules of `gapLanes`, in the order of the benchmark. */
+export const LANE_TRACKS: readonly LaneTracks[] = ["stack", "left-edge", "free"];
+
 /** The options of `gapLanes`. */
 export interface GapLaneOptions {
   /** The largest distance between two lanes. A narrow gap puts its lanes nearer. The default is 4. */
@@ -23,6 +36,22 @@ export interface GapLaneOptions {
   readonly order?: LaneOrder;
   /** Two box edges nearer than this distance make one boundary of the sweep, as in `boardGaps`. The default is 0.5. */
   readonly snap?: number;
+  /** The rule that gives each piece its lane. The default is `stack`. */
+  readonly tracks?: LaneTracks;
+}
+
+/** The lanes of one gap: the axis and the place of the gap, and the number of lanes that its pieces use. */
+export interface GapLaneCount {
+  readonly axis: "x" | "y";
+  readonly at: number;
+  /** The width of the gap. */
+  readonly width: number;
+  /** The number of lanes of the gap. */
+  readonly lanes: number;
+  /** The number of pieces in the gap: the legs of the links that run along it. */
+  readonly pieces: number;
+  /** The largest number of pieces that overlap at one place of the gap. No rule gives fewer lanes. */
+  readonly density: number;
 }
 
 /** A piece of a link: a leg of the link that runs along a gap. */
@@ -47,9 +76,21 @@ const ROUNDS = 8;
  * When a move puts a link through more boxes than before, the link keeps its points.
  */
 export function gapLanes(items: readonly Boxed[], links: readonly LevelLink[], options: GapLaneOptions = {}): LevelLink[] {
+  return laneGaps(items, links, options).links;
+}
+
+/** This function gives the lanes of each gap that holds a piece of a link, with the options of `gapLanes`. A gap without a piece is not in the list. */
+export function gapLaneCounts(items: readonly Boxed[], links: readonly LevelLink[], options: GapLaneOptions = {}): GapLaneCount[] {
+  return laneGaps(items, links, options).counts;
+}
+
+/** This function does the work of `gapLanes` and `gapLaneCounts`. It gives the moved links and the lanes of each gap. */
+function laneGaps(items: readonly Boxed[], links: readonly LevelLink[], options: GapLaneOptions): { links: LevelLink[]; counts: GapLaneCount[] } {
   const spacing = Math.max(0, options.spacing ?? 4);
   const order = options.order ?? "crossings";
+  const tracks = options.tracks ?? "stack";
   const moved = links.map((l) => l.points.map((p) => ({ x: p.x, y: p.y })));
+  const counts: GapLaneCount[] = [];
   for (const g of boardGaps(items, options.snap)) {
     if (g.width <= EPS) continue;
     const across = g.axis;
@@ -80,15 +121,9 @@ export function gapLanes(items: readonly Boxed[], links: readonly LevelLink[], o
     });
     if (pieces.length === 0) continue;
     const list = orderPieces(pieces, order);
-    // A piece goes one lane past each piece before it in the order that it overlaps. Thus two pieces that overlap keep their order.
-    const lane: number[] = [];
-    let n = 0;
-    list.forEach((P, i) => {
-      let k = 0;
-      for (let j = 0; j < i; j++) if (overlaps(list[j]!, P)) k = Math.max(k, lane[j]! + 1);
-      lane.push(k);
-      n = Math.max(n, k + 1);
-    });
+    const lane = tracks === "stack" ? stackLanes(list) : leftEdgeLanes(list, tracks === "left-edge");
+    const n = lane.reduce((m, k) => Math.max(m, k + 1), 0);
+    counts.push({ axis: g.axis, at: g.at, width: g.width, lanes: n, pieces: list.length, density: density(list) });
     const step = Math.min(spacing, g.width / (n + 1));
     const mid = (lo + hi) / 2;
     list.forEach((P, i) => {
@@ -99,7 +134,71 @@ export function gapLanes(items: readonly Boxed[], links: readonly LevelLink[], o
   }
   const boxes = new Grid<Box>(Math.max(20, meanSide(items)));
   for (const i of items) boxes.add(i.box, i.box);
-  return links.map((l, i) => (hits(boxes, moved[i]!) > hits(boxes, l.points) ? l : { ...l, points: moved[i]! }));
+  return { links: links.map((l, i) => (hits(boxes, moved[i]!) > hits(boxes, l.points) ? l : { ...l, points: moved[i]! })), counts };
+}
+
+/** This function gives the lanes of the rule `stack`. A piece goes one lane past each piece before it in the order that it overlaps. */
+function stackLanes(list: readonly Piece[]): number[] {
+  const lane: number[] = [];
+  list.forEach((P, i) => {
+    let k = 0;
+    for (let j = 0; j < i; j++) if (overlaps(list[j]!, P)) k = Math.max(k, lane[j]! + 1);
+    lane.push(k);
+  });
+  return lane;
+}
+
+/**
+ * This function gives the lanes of the left-edge rule (Hashimoto and Stevens, 1971) for the pieces in lane order.
+ * With `constrained`, a piece stays below a later piece that it overlaps when the swap of the two adds crossings (`cost`).
+ * These constraints follow the lane order, so they have no cycle. Each pass fills one lane, from the near side.
+ * A pass takes the free pieces whose constraints are met, in the order of their start. It puts each piece that does not overlap the last piece of the lane.
+ */
+function leftEdgeLanes(list: readonly Piece[], constrained: boolean): number[] {
+  const n = list.length;
+  const below: number[][] = list.map(() => []);
+  const wait = new Array<number>(n).fill(0);
+  if (constrained)
+    for (let i = 0; i < n; i++)
+      for (let j = i + 1; j < n; j++) {
+        const P = list[i]!;
+        const Q = list[j]!;
+        if (overlaps(P, Q) && cost(Q, P) > cost(P, Q)) {
+          below[i]!.push(j);
+          wait[j]!++;
+        }
+      }
+  const byStart = list.map((_, i) => i).sort((a, b) => list[a]!.lo - list[b]!.lo || a - b);
+  const lane = new Array<number>(n).fill(-1);
+  let placed = 0;
+  for (let track = 0; placed < n; track++) {
+    const now: number[] = [];
+    let end = -Infinity;
+    for (const i of byStart) {
+      if (lane[i]! >= 0 || wait[i]! > 0 || list[i]!.lo < end - EPS) continue;
+      now.push(i);
+      end = list[i]!.hi;
+    }
+    for (const i of now) lane[i] = track;
+    for (const i of now) for (const j of below[i]!) wait[j]!--;
+    placed += now.length;
+  }
+  return lane;
+}
+
+/** This function gives the largest number of pieces that overlap at one place. Pieces that only touch do not overlap. */
+function density(list: readonly Piece[]): number {
+  const events: [number, number][] = [];
+  for (const P of list) events.push([P.lo, 1], [P.hi, -1]);
+  // At one place, an end comes before a start, so pieces that only touch do not overlap.
+  events.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  let open = 0;
+  let most = 0;
+  for (const [, d] of events) {
+    open += d;
+    most = Math.max(most, open);
+  }
+  return most;
 }
 
 const overlaps = (P: Piece, Q: Piece): boolean => Math.min(P.hi, Q.hi) - Math.max(P.lo, Q.lo) > EPS;

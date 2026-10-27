@@ -9,7 +9,7 @@ import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, benchHighways, formatCurves, formatHighways, type CurveBenchRow, type HighwayBenchRow } from "../src/bench/curves.ts";
 import { measureLevelFaults } from "../src/bench/links.ts";
 import { benchOne, formatFaults, formatLevels, formatTable, type LevelRow } from "../src/bench/run.ts";
-import { benchBendRoom, benchLevelRoom, benchRoom, formatBendRoom, type BendRoomRow, formatLevelRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
+import { benchBendRoom, benchLevelRoom, benchRoom, benchTracks, formatBendRoom, type BendRoomRow, formatLevelRoom, formatRoom, formatTracks, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
 import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
@@ -150,6 +150,15 @@ function sideTables(): void {
   for (const settings of [growthSettings(), laneSettings(), passSettings()]) {
     show(formatRoom(sweepRoom("packed-grid", packedGridBoard(), settings)));
   }
+  // The lane rules of the gaps (EDA-004): the lanes, the crossings and R12 of each rule, on the case boards and the fixtures to 400 nodes.
+  show(
+    formatTracks([
+      ...CASES.flatMap((c) => benchTracks(c.name, c.make())),
+      ...benchTracks("packed-grid", packedGridBoard()),
+      ...benchTracks("nested-grid", nestedGridBoard()),
+      ...FIXTURES.filter((f) => f.nodes <= Math.min(400, max)).flatMap((f) => benchTracks(f.name, makeFixture(f))),
+    ]),
+  );
   // The room of each zoom level (ROOM2): each level with groups of two packed boards, before and after `levelRoom` at gutter 8 and spacing 4.
   show(formatLevelRoom([...benchLevelRoom("packed-grid", packedGridBoard(), { gutter: 8, spacing: 4 }), ...benchLevelRoom("nested-grid", nestedGridBoard(), { gutter: 8, spacing: 4 })]));
   // The sweeps of the options of the levels (CUSTOM). The first row of each table is the fair baseline: the router `sections` with the defaults.

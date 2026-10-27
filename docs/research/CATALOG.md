@@ -34,6 +34,8 @@ This note joins the ideas of the five research notes into one catalog (IDEA0). B
 - `dependsOn` holds the ideas that BUILD-W must build first. `wave` is the wave of the build order.
 - `stage` is one of `cataloged`, `screened`, `prototyped`, `built`, `kept` and `dropped`.
 - `result` holds the screen result: the ids of the screen records, the measures that decided and the date. A `dropped` record must have a `result`.
+  - `measures` gives each measure that decided as `{ base, new }`. A value is a number, or the numbers by board.
+  - `run` links the CI run of the screen. `verdict` is `kept`, `dropped` or `screened`. `note` tells the reason.
 
 ### How to change the catalog
 

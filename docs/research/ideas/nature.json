@@ -1628,7 +1628,7 @@
     "placementDependent": false,
     "screen": "small-clustered and mid-hubs. Keep if R11 q05 rises by 0.2 with R1 not worse. Fixed plugs do not move.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "NAT-032",
       "NAT-009"
@@ -1637,7 +1637,55 @@
       "WILD-002"
     ],
     "canonical": "WILD-002",
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40561088475",
+      "records": [
+        "screen-v1/*/corners-gap8@a14fa76",
+        "screen-v1/*/corners@a14fa76"
+      ],
+      "measures": {
+        "R11": {
+          "base": {
+            "dense-groups": 0.031,
+            "small-clustered": 0.059,
+            "hub-chain": 0.084,
+            "many-groups": 0.094
+          },
+          "new": {
+            "dense-groups": 0.407,
+            "small-clustered": 0.26,
+            "hub-chain": 0.667,
+            "many-groups": 0.4
+          }
+        },
+        "R11.q05": {
+          "base": {
+            "small-clustered": 0.107,
+            "dense-groups": 0.12,
+            "many-groups": 0.246
+          },
+          "new": {
+            "small-clustered": 0.428,
+            "dense-groups": 0.462,
+            "many-groups": 0.8
+          }
+        },
+        "R1": {
+          "base": {
+            "dense-groups": 2206,
+            "small-clustered": 1090
+          },
+          "new": {
+            "dense-groups": 2275,
+            "small-clustered": 1142
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "This rider of WILD-002 is the option `plugGap: 8`. The R11 q05 rises by more than 0.2, but R1 grows 3% to 5% on dense-groups and small-clustered."
+    }
   },
   {
     "id": "NAT-032",

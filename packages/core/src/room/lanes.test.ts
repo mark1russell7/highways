@@ -6,7 +6,7 @@ import type { Point } from "../geom.ts";
 import { levelLinks } from "../levels.ts";
 import type { LevelLink } from "../model.ts";
 import { makeRoom, roomLinks, type Boxed } from "./index.ts";
-import { gapLanes, LANE_ORDERS } from "./lanes.ts";
+import { gapLaneCounts, gapLanes, LANE_ORDERS, LANE_TRACKS } from "./lanes.ts";
 
 /** Two columns of three boxes, 100 wide and 40 high, with a gap of 20 between the columns and between the rows. */
 const boxes: Boxed[] = [];
@@ -88,6 +88,62 @@ describe("gapLanes (ROOM-C)", () => {
     const boxes = new Map(room.items.map((n) => [n.id, n.box]));
     for (const order of LANE_ORDERS) {
       const f = measureLinks(boxes, gapLanes(room.items, level, { order, spacing: 8 }));
+      expect([f.through, f.outside, f.backtrack]).toEqual([0, 0, 0]);
+    }
+  });
+});
+
+describe("gapLanes with the option tracks (EDA-004)", () => {
+  // Three links in the column gap. A and B overlap, B and C overlap, A and C do not.
+  // Each order of an overlapping pair costs one crossing, so the left-edge rule is free to put A and C in one lane.
+  const three = [along(110, 5, 35, "right"), along(110, 85, 25, "right"), along(110, 75, 145, "right")];
+  const lanesOf = (tracks: (typeof LANE_TRACKS)[number]) => gapLaneCounts(boxes, three, { order: "links", tracks }).find((c) => c.axis === "x")!;
+
+  it("the rule `stack` is the default", () => {
+    expect(gapLanes(boxes, three, { order: "links", tracks: "stack" })).toEqual(gapLanes(boxes, three, { order: "links" }));
+  });
+
+  it("the left-edge rule puts two pieces that do not overlap in one lane, at the same crossings", () => {
+    expect(lanesOf("stack")).toMatchObject({ lanes: 3, pieces: 3, density: 2 });
+    expect(lanesOf("left-edge").lanes).toBe(2);
+    expect(lanesOf("free").lanes).toBe(2);
+    const crossings = (tracks: (typeof LANE_TRACKS)[number]): number => countCrossings(segs(gapLanes(boxes, three, { order: "links", tracks })))[0];
+    expect(crossings("left-edge")).toBeLessThanOrEqual(crossings("stack"));
+    const xs = gapLanes(boxes, three, { order: "links", tracks: "left-edge" }).map((l) => l.points[1]!.x);
+    expect(xs[0]).toBe(xs[2]);
+    for (const x of xs) expect(x > 100 && x < 120).toBe(true);
+  });
+
+  it("keeps the order of two pieces that overlap where the swap adds crossings", () => {
+    // The turn of the short link at y 80 is inside the span of the long link, so the long link stays on the far side.
+    const pair = [along(110, 20, 80, "right"), along(110, 20, 140, "right")];
+    for (const tracks of LANE_TRACKS.slice(0, 2)) {
+      expect(countCrossings(segs(gapLanes(boxes, pair, { order: "crossings", tracks })))[0]).toBe(0);
+    }
+  });
+
+  it("on packedGridBoard: each rule gives at least the density, the left edge gives fewer lanes than the stack, and no more crossings", () => {
+    const board = packedGridBoard();
+    const links = roomLinks(board);
+    const room = makeRoom(board.nodes, links, { gutter: 8, spacing: 4 });
+    const level = levelLinks(
+      room.items.map((n) => ({ id: n.id, box: n.box, nodes: [n.id] })),
+      links.map((l) => ({ source: l.source, target: l.target, count: l.count ?? 1 })),
+    );
+    const sum = (tracks: (typeof LANE_TRACKS)[number]): number => {
+      const counts = gapLaneCounts(room.items, level, { tracks });
+      for (const c of counts) expect(c.lanes).toBeGreaterThanOrEqual(c.density);
+      return counts.reduce((s, c) => s + c.lanes, 0);
+    };
+    const [stack, left, free] = LANE_TRACKS.map(sum) as [number, number, number];
+    expect(left).toBeLessThan(stack);
+    expect(free).toBeLessThanOrEqual(left);
+    expect(gapLaneCounts(room.items, level, { tracks: "free" }).every((c) => c.lanes === c.density)).toBe(true);
+    const crossings = (tracks: (typeof LANE_TRACKS)[number]): number => countCrossings(segs(gapLanes(room.items, level, { tracks })))[0];
+    expect(crossings("left-edge")).toBeLessThanOrEqual(crossings("stack"));
+    const boxes = new Map(room.items.map((n) => [n.id, n.box]));
+    for (const tracks of LANE_TRACKS) {
+      const f = measureLinks(boxes, gapLanes(room.items, level, { tracks, spacing: 8 }));
       expect([f.through, f.outside, f.backtrack]).toEqual([0, 0, 0]);
     }
   });

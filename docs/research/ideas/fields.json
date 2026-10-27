@@ -182,7 +182,7 @@
     "placementDependent": true,
     "screen": "The scratch run of the note: lanes fall 5% to 26% at equal turn crossings. Keep if the sum of lanes falls >= 5% on 3 boards, R1 does not rise and M1 falls when roomDemand reads the track count.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "EDA-005",
       "EDA-006",
@@ -190,7 +190,66 @@
       "EDA-051",
       "WILD-019"
     ],
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40561172285",
+      "records": [
+        "bench-small/side-small.txt#lane-tracks@a14fa76"
+      ],
+      "measures": {
+        "lanes": {
+          "base": {
+            "grid-400 given": 5212,
+            "grid-400 open": 2780,
+            "case-many-groups given": 170,
+            "nested-grid open": 219,
+            "packed-grid open": 118,
+            "case-hub-chain": 69,
+            "case-dense-groups given": 375
+          },
+          "new": {
+            "grid-400 given": 3850,
+            "grid-400 open": 2242,
+            "case-many-groups given": 145,
+            "nested-grid open": 171,
+            "packed-grid open": 105,
+            "case-hub-chain": 65,
+            "case-dense-groups given": 356
+          }
+        },
+        "R1": {
+          "base": {
+            "grid-400 given": 17708,
+            "case-many-groups given": 1229,
+            "nested-grid open": 1303,
+            "packed-grid open": 467,
+            "case-hub-chain": 136
+          },
+          "new": {
+            "grid-400 given": 17725,
+            "case-many-groups given": 1224,
+            "nested-grid open": 1269,
+            "packed-grid open": 444,
+            "case-hub-chain": 136
+          }
+        },
+        "R12": {
+          "base": {
+            "grid-400 given": 0.512,
+            "nested-grid open": 0.288,
+            "packed-grid open": 0.296
+          },
+          "new": {
+            "grid-400 given": 0.474,
+            "nested-grid open": 0.148,
+            "packed-grid open": 0.242
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The option `tracks: left-edge` of `gapLanes` is off by default. The sum of lanes falls 5% to 26% on 7 boards. Crossings stay the same or fall, except +0.1% on grid-400. R12 falls. M1 and M4 do not change, because `roomDemand` already reads the density. The screen has no room step, so the side table of the bench measured it."
+    }
   },
   {
     "id": "EDA-005",

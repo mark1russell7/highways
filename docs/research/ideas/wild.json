@@ -27,14 +27,80 @@
     "placementDependent": true,
     "screen": "A scratch run of this note gives the first data: a pure slide of the plug straightens 9% to 13% of the bent ends. Keep the full form when the median of R3 drops by 15% or more on small-clustered and case-dense-groups, with the minimum of R11 at 0.5 or more.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "WILD-002",
       "WILD-003",
       "WILD-006",
       "EDA-022"
     ],
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40561088475",
+      "records": [
+        "screen-v1/*/corners-side@a14fa76",
+        "screen-v1/*/corners@a14fa76"
+      ],
+      "measures": {
+        "R3": {
+          "base": {
+            "small-clustered": 3.305,
+            "dense-groups": 3.47,
+            "tiny-uniform": 2.4,
+            "many-groups": 2.995,
+            "hub-chain": 1.008
+          },
+          "new": {
+            "small-clustered": 2.92,
+            "dense-groups": 3.073,
+            "tiny-uniform": 1.6,
+            "many-groups": 2.979,
+            "hub-chain": 1.059
+          }
+        },
+        "R4": {
+          "base": {
+            "small-clustered": 0.607,
+            "dense-groups": 0.574,
+            "tiny-uniform": 0.499
+          },
+          "new": {
+            "small-clustered": 0.54,
+            "dense-groups": 0.493,
+            "tiny-uniform": 0.346
+          }
+        },
+        "R1": {
+          "base": {
+            "small-clustered": 1090,
+            "dense-groups": 2206,
+            "hub-chain": 68
+          },
+          "new": {
+            "small-clustered": 1030,
+            "dense-groups": 2153,
+            "hub-chain": 40
+          }
+        },
+        "R11": {
+          "base": {
+            "small-clustered": 0.059,
+            "dense-groups": 0.031,
+            "many-groups": 0.094,
+            "hub-chain": 0.084
+          },
+          "new": {
+            "small-clustered": 0.091,
+            "dense-groups": 0.073,
+            "many-groups": 0.9,
+            "hub-chain": 1.0
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The option `plugs: side` of the router `corners` is off by default. The median R3 falls 11% to 33% and R4 falls 11% to 31%, with 0 new hard breaks. The bar of 15% on small-clustered and dense-groups is not met. R10 is 0 against 0. The values of `bend` and `most` do not change the records."
+    }
   },
   {
     "id": "WILD-002",
@@ -77,7 +143,7 @@
     "placementDependent": true,
     "screen": "On grid-400 and small-clustered, the minimum of R11 must reach 1.0 on each side with room for its plugs. Drop it when R1 grows by more than 2%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "WILD-001",
       "WILD-003",
@@ -89,7 +155,61 @@
     "same": [
       "NAT-031"
     ],
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40561088475",
+      "records": [
+        "screen-v1/*/corners-gap6@a14fa76",
+        "screen-v1/*/corners@a14fa76"
+      ],
+      "measures": {
+        "R11": {
+          "base": {
+            "dense-groups": 0.031,
+            "small-clustered": 0.059,
+            "hub-chain": 0.084,
+            "many-groups": 0.094,
+            "tiny-uniform": 0.131,
+            "packed-grid": 0.05
+          },
+          "new": {
+            "dense-groups": 0.31,
+            "small-clustered": 0.154,
+            "hub-chain": 0.5,
+            "many-groups": 0.3,
+            "tiny-uniform": 0.36,
+            "packed-grid": 0.129
+          }
+        },
+        "R1": {
+          "base": {
+            "dense-groups": 2206,
+            "small-clustered": 1090,
+            "many-groups": 792,
+            "hub-chain": 68,
+            "packed-grid": 281
+          },
+          "new": {
+            "dense-groups": 2276,
+            "small-clustered": 1141,
+            "many-groups": 832,
+            "hub-chain": 66,
+            "packed-grid": 283
+          }
+        },
+        "R10": {
+          "base": {
+            "packed-grid": 26.3
+          },
+          "new": {
+            "packed-grid": 32.5
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The option `plugGap: 6` of the router `corners` raises the R11 minimum on all 6 families, but R11 does not reach 1.0. R1 grows more than 2% on dense-groups, small-clustered and many-groups. The option stays in the code, off by default. The board grid-400 is not in screen-v1."
+    }
   },
   {
     "id": "WILD-003",

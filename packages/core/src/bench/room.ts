@@ -2,7 +2,7 @@ import type { Box } from "../geom.ts";
 import { levelLinks } from "../levels.ts";
 import type { Graph, LevelLink, Node, Result, Router } from "../model.ts";
 import { makeRoom, openGaps, roomLinks, type RoomOptions } from "../room/index.ts";
-import { gapLanes, LANE_ORDERS, type LaneOrder } from "../room/lanes.ts";
+import { gapLaneCounts, gapLanes, LANE_ORDERS, LANE_TRACKS, type LaneOrder, type LaneTracks } from "../room/lanes.ts";
 import { levelPairs, levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
 import { buildSections, levelCut, treeDepth, type SectionOptions } from "../sections.ts";
 import { sectionsRouter } from "../routers/sections.ts";
@@ -70,14 +70,7 @@ export function measureBoard(graph: Graph, spacing: number, order?: LaneOrder): 
   );
   const drawn = order ? gapLanes(graph.nodes, level, { spacing, order }) : level;
   const boxes = new Map(graph.nodes.map((n) => [n.id, n.box]));
-  // `measureQuality` reads routes of edges, so each link of the far view stands for the first edge of its pair.
-  const edgeOf = new Map<string, string>();
-  for (const e of graph.edges) {
-    const key = `${e.source.node}\u0000${e.target.node}`;
-    if (!edgeOf.has(key)) edgeOf.set(key, e.id);
-  }
-  const asRoutes: Result = { routes: drawn.map((l) => ({ edge: edgeOf.get(`${l.source}\u0000${l.target}`)!, points: l.points })) };
-  const q = measureQuality(graph, asRoutes);
+  const q = farQuality(graph, drawn);
   const routed = sectionsRouter({ name: "sections" }).route(graph);
   const segments = segmentsOf(routed);
   const open = new Set(segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
@@ -89,6 +82,26 @@ export function measureBoard(graph: Graph, spacing: number, order?: LaneOrder): 
     detour: q.detour,
     laneThrough: measureRouteFaults(graph, { routes: lanes }).through,
   };
+}
+
+/** This function gives the links of the far view of a board: `levelLinks` with each node as one item. */
+function farLinks(graph: Graph): LevelLink[] {
+  const items = graph.nodes.map((n) => ({ id: n.id, box: n.box, nodes: [n.id] }));
+  return levelLinks(
+    items,
+    roomLinks(graph).map((l) => ({ source: l.source, target: l.target, count: l.count ?? 1 })),
+  );
+}
+
+/** This function measures the links of the far view with `measureQuality`. Each link stands for the first edge of its pair, because `measureQuality` reads routes of edges. */
+function farQuality(graph: Graph, drawn: readonly LevelLink[]): ReturnType<typeof measureQuality> {
+  const edgeOf = new Map<string, string>();
+  for (const e of graph.edges) {
+    const key = `${e.source.node}\u0000${e.target.node}`;
+    if (!edgeOf.has(key)) edgeOf.set(key, e.id);
+  }
+  const asRoutes: Result = { routes: drawn.map((l) => ({ edge: edgeOf.get(`${l.source}\u0000${l.target}`)!, points: l.points })) };
+  return measureQuality(graph, asRoutes);
 }
 
 /**
@@ -392,6 +405,110 @@ export function formatBendRoom(rows: readonly BendRoomRow[]): string {
   const body = rows.map(
     (r) =>
       `| ${r.router} | ${r.fixture} | ${r.board} | ${r.area.toFixed(3)} | ${r.bundles} | ${(r.worstSpacing * 100).toFixed(1)}% | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} |`,
+  );
+  return [head, line, ...body].join("\n");
+}
+
+/** One row of `benchTracks` (EDA-004): the lanes of the far view of one board with one lane rule of `gapLanes`. */
+export interface TrackBenchRow {
+  readonly fixture: string;
+  /** The board: `given` (the board as it is) or `open` (the board that `makeRoom` opens at gutter 8 and spacing 4). */
+  readonly board: string;
+  readonly tracks: LaneTracks;
+  /** The number of gaps with at least one piece. */
+  readonly gaps: number;
+  /** The sum of the lanes of the gaps. */
+  readonly lanes: number;
+  /** The sum of the densities of the gaps: the most pieces that overlap at one place. No rule gives fewer lanes. */
+  readonly density: number;
+  /** The number of gaps whose lanes are nearer than `spacing`, because the gap is too narrow for its lanes. */
+  readonly squeezed: number;
+  /** The crossings of the links of the far view (`measureQuality`). */
+  readonly crossings: number;
+  /** The ink of the links of the far view. */
+  readonly ink: number;
+  /** R12: the length of parallel legs of two links nearer than `spacing`, as a share of the ink. */
+  readonly separation: number;
+  /** The number of links of the far view that go through a box. */
+  readonly through: number;
+}
+
+/**
+ * This function gives R12 (lane separation) of the links. Two legs of two links are near when they are parallel and nearer than `near`.
+ * R12 is the length of the near legs, as a share of the ink.
+ * It reads only the legs on an axis. The links of the far view have no other legs.
+ */
+export function laneSeparation(links: readonly LevelLink[], near: number): number {
+  let ink = 0;
+  let close = 0;
+  for (const across of ["x", "y"] as const) {
+    const along = across === "x" ? "y" : "x";
+    const legs: { link: number; at: number; lo: number; hi: number }[] = [];
+    links.forEach((l, li) => {
+      for (let i = 1; i < l.points.length; i++) {
+        const a = l.points[i - 1]!;
+        const b = l.points[i]!;
+        if (Math.abs(a[across] - b[across]) > 1e-6 || Math.abs(a[along] - b[along]) <= 1e-6) continue;
+        legs.push({ link: li, at: a[across], lo: Math.min(a[along], b[along]), hi: Math.max(a[along], b[along]) });
+      }
+    });
+    legs.sort((p, q) => p.at - q.at);
+    for (let i = 0; i < legs.length; i++) {
+      const P = legs[i]!;
+      ink += P.hi - P.lo;
+      for (let j = i + 1; j < legs.length && legs[j]!.at - P.at < near; j++) {
+        const Q = legs[j]!;
+        if (Q.link !== P.link) close += Math.max(0, Math.min(P.hi, Q.hi) - Math.max(P.lo, Q.lo));
+      }
+    }
+  }
+  return ink > 0 ? close / ink : 0;
+}
+
+/**
+ * This function measures each lane rule of `gapLanes` (EDA-004) on the board as it is, and on the board that `makeRoom` opens.
+ * The lane order is `crossings` for each rule. The lanes are `spacing` apart where the gap has room.
+ */
+export function benchTracks(fixture: string, graph: Graph, spacing: number = 4, rules: readonly LaneTracks[] = LANE_TRACKS): TrackBenchRow[] {
+  const open = makeRoom(graph.nodes, roomLinks(graph), { gutter: 8, spacing, method: "routes" }).items;
+  const rows: TrackBenchRow[] = [];
+  for (const [board, nodes] of [
+    ["given", graph.nodes],
+    ["open", open],
+  ] as const) {
+    const g: Graph = { nodes, edges: graph.edges };
+    const level = farLinks(g);
+    const boxes = new Map(nodes.map((n) => [n.id, n.box]));
+    for (const tracks of rules) {
+      const options = { spacing, order: "crossings" as const, tracks };
+      const counts = gapLaneCounts(nodes, level, options);
+      const drawn = gapLanes(nodes, level, options);
+      const q = farQuality(g, drawn);
+      rows.push({
+        fixture,
+        board,
+        tracks,
+        gaps: counts.length,
+        lanes: counts.reduce((s, c) => s + c.lanes, 0),
+        density: counts.reduce((s, c) => s + c.density, 0),
+        squeezed: counts.filter((c) => c.width / (c.lanes + 1) < spacing - 1e-9).length,
+        crossings: q.crossings,
+        ink: q.ink,
+        separation: laneSeparation(drawn, spacing),
+        through: measureLinks(boxes, drawn).through,
+      });
+    }
+  }
+  return rows;
+}
+
+/** This function writes the rows of `benchTracks` as a Markdown table. */
+export function formatTracks(rows: readonly TrackBenchRow[]): string {
+  const head = "| fixture | board | tracks | gaps | lanes | density | squeezed | crossings | ink | R12 | through |";
+  const line = "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|";
+  const body = rows.map(
+    (r) =>
+      `| ${r.fixture} | ${r.board} | ${r.tracks} | ${r.gaps} | ${r.lanes} | ${r.density} | ${r.squeezed} | ${r.crossings} | ${Math.round(r.ink)} | ${r.separation.toFixed(4)} | ${r.through} |`,
   );
   return [head, line, ...body].join("\n");
 }
