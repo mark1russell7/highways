@@ -65,6 +65,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL8 | Version 0.4.1 on npm: the kept ideas of wave 1 (free plugs, lane tracks, the repair step, rip-up passes, Snell merges, pioneer order) and the bundle measures. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | #74 |
 | BUILD-W2B | Five highway strategies on the plans of `shared-ways` and `corridors`. HWY-043 (`weiszfeld`) is kept: the B6 max falls 20% on dense-groups. The zipper (NAT-022) adds B1 on 4 boards but fails the q95. HWY-050, HWY-015 and HWY-056 are dropped. | 2026-10-27 | #76 |
 | BUILD-W2A | Gates after a highway plan: `gateStrategy` and the strategies `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis` and `corridors+ids`. The screen option `edits` measures Z10 over seeded edits. HWY-046, HWY-047, HWY-048 and HWY-049 are dropped: B1 falls, or the gate removes no edge. HWY-054 is screened: each matched highway keeps its id, and the warm start is open. | 2026-10-27 | #75 |
+| BUILD-W2C | Six highway finders: `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells` and `select`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `road-classes` has the largest B1, and it wins on 2 boards. HWY-026, HWY-034, EDA-046, HWY-018, HWY-045 and EDA-033 are dropped. `zipper+stretch` and `level-links+stretch` stay dropped. | 2026-10-27 | #78 |
 
 ## Open
 
