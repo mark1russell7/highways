@@ -1,0 +1,2574 @@
+[
+  {
+    "id": "RULE-001",
+    "family": "rules",
+    "name": "Elastic band: springs along the route and a push from the boxes",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Elastic bands: connecting path planning and control",
+        "authors": "Quinlan and Khatib",
+        "year": 1993,
+        "url": "https://doi.org/10.1109/ROBOT.1993.291936"
+      },
+      {
+        "title": "Real-time obstacle avoidance for manipulators and mobile robots",
+        "authors": "Khatib",
+        "year": 1986,
+        "url": "https://doi.org/10.1177/027836498600500106"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The base router gives a route. The route becomes a chain of points with a spring between each pair of neighbors. Each point gets a push away from the boxes from the distance field. The chain relaxes for a fixed number of steps. The ends stay on their plugs.",
+    "math": "F_i = k_s (x_{i-1} + x_{i+1} - 2 x_i) + k_r max(0, d0 - φ(x_i)) ∇φ(x_i)",
+    "cost": "O(I·V) for I steps and V route points. 100 nodes: 5 ms. 1000 nodes: 60 ms.",
+    "params": [
+      "k_s spring stiffness 0.1 to 1",
+      "k_r push strength 0.5 to 5",
+      "d0 clearance 2 to 16 px",
+      "steps 20 to 200",
+      "point spacing 4 to 16 px"
+    ],
+    "wins": [
+      "R8",
+      "C3",
+      "C7",
+      "R4"
+    ],
+    "risks": [
+      "R1",
+      "R3",
+      "R14",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `case-dense-groups` and `mid-clustered`, after `corner`: keep it if the median R8 rises by 30% with R9 = 0 and R1 up by 5% or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-005",
+      "RULE-022",
+      "RULE-046",
+      "HWY-002"
+    ],
+    "rules": "Short routes, smooth routes, a clearance d0 from each box.",
+    "hardRules": "project. The push grows near a box, and a projection step moves each point with φ < d0 out along ∇φ. The plug ends are fixed.",
+    "zoom": "warm and anchor. Each level starts from the route of its parent level."
+  },
+  {
+    "id": "RULE-002",
+    "family": "rules",
+    "name": "Rule-energy edge bundling with a box field",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Force-directed edge bundling for graph visualization",
+        "authors": "Holten and van Wijk",
+        "year": 2009,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01450.x"
+      },
+      {
+        "title": "Real-time obstacle avoidance for manipulators and mobile robots",
+        "authors": "Khatib",
+        "year": 1986,
+        "url": "https://doi.org/10.1177/027836498600500106"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Force-directed edge bundling pulls the points of compatible edges together. This variant adds the box distance field as a second force and a hard projection. A stretch budget limits the pull on each edge. So bundles form only in free space, not through a box.",
+    "math": "F_i = k_s Δx_i + Σ_{q ∈ C(e)} c(e,q) (x_{q,i} - x_i) / ‖x_{q,i} - x_i‖ + k_b ∇φ(x_i), stop the pull when length(e) > s_max · length0(e)",
+    "cost": "O(C·m·P·I) for C candidate partners, P points per edge and I steps. 100 nodes: 40 ms. 1000 nodes: 1.5 s with a grid of neighbors.",
+    "params": [
+      "compatibility threshold 0.4 to 0.8",
+      "cycles 4 to 6",
+      "points per edge 1 to 64 (doubles each cycle)",
+      "step 0.04, halves each cycle",
+      "k_b 0.5 to 5",
+      "s_max stretch budget 1.1 to 1.5"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B7",
+      "R12"
+    ],
+    "risks": [
+      "B4",
+      "R6",
+      "R3",
+      "C9",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `case-dense-groups`, against `trunks`: keep it if B1 is equal or better, B4 rises by 10% or less, and R9 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-002",
+      "HWY-006",
+      "RULE-047",
+      "RULE-028"
+    ],
+    "rules": "Ink, bundles, clearance from boxes, a stretch budget for each edge.",
+    "hardRules": "project after each cycle, then RULE-046.",
+    "zoom": "warm and anchor. The compatibility uses the level links of each level."
+  },
+  {
+    "id": "RULE-003",
+    "family": "rules",
+    "name": "Route-to-route repulsion with a cutoff",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Graph drawing by force-directed placement",
+        "authors": "Fruchterman and Reingold",
+        "year": 1991,
+        "url": "https://doi.org/10.1002/spe.4380211102"
+      },
+      {
+        "title": "Efficient, high-quality force-directed graph drawing",
+        "authors": "Hu",
+        "year": 2005,
+        "url": "https://yifanhu.net/PUB/graph_draw_small.pdf"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Each route point carries a like charge. Points of other routes push it away inside a cutoff radius. The push spreads parallel routes into lanes and opens narrow crossing angles. Edges of one bundle do not push each other, so the bundles stay.",
+    "math": "F_i = Σ_{j ∉ e, ‖x_i - x_j‖ < r_c} q² (x_i - x_j) / ‖x_i - x_j‖³, neighbors from a grid hash",
+    "cost": "O(I·V·k) for k neighbors in the cutoff. 100 nodes: 8 ms. 1000 nodes: 120 ms.",
+    "params": [
+      "q charge 0.5 to 4",
+      "r_c cutoff 4 to 24 px",
+      "steps 20 to 100",
+      "same-bundle exemption on or off"
+    ],
+    "wins": [
+      "R12",
+      "R2",
+      "R8"
+    ],
+    "risks": [
+      "R6",
+      "R3",
+      "B1",
+      "C8"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-hubs` and `mid-fanout`, after `corner`: keep it if R12 rises by 25% and R1 does not rise.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-049",
+      "HWY-016"
+    ],
+    "rules": "A minimum gap between routes, lane separation, wide crossing angles.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "anchor. The charge falls with the level, so far views keep their bundles."
+  },
+  {
+    "id": "RULE-004",
+    "family": "rules",
+    "name": "Magnetic springs: a field that turns segments to a direction",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Graph drawing by the magnetic spring model",
+        "authors": "Sugiyama and Misue",
+        "year": 1995,
+        "url": "https://doi.org/10.1006/jvlc.1995.1013"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A magnetic field turns each segment toward the nearest field direction. The field can be orthogonal, octilinear, radial from a hub or parallel to the main flow. The torque gives the drawing a style rule without a grid.",
+    "math": "τ = k_m ‖s‖^α θ^β, θ = angle from the nearest field direction, two equal forces at the ends of s, at right angles to s",
+    "cost": "O(I·V). 100 nodes: 5 ms. 1000 nodes: 60 ms.",
+    "params": [
+      "field: orthogonal, octilinear, radial or flow",
+      "k_m 0.1 to 2",
+      "α 1",
+      "β 1 to 2"
+    ],
+    "wins": [
+      "R14",
+      "R10",
+      "C10"
+    ],
+    "risks": [
+      "R6",
+      "R1",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400` and `mid-uniform`, from `straight`: keep it if R14 reaches 0.8 or more with R6 up by 10% or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-016",
+      "RULE-052"
+    ],
+    "rules": "Orthogonal or octilinear segments, a main flow direction, radial fans around hubs.",
+    "hardRules": "project. The plug stubs keep SIDE_NORMAL.",
+    "zoom": "The field is the same at each level, so the directions do not change between levels. anchor."
+  },
+  {
+    "id": "RULE-005",
+    "family": "rules",
+    "name": "Harmonic potential field router",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Path planning using Laplace's equation",
+        "authors": "Connolly, Burns and Weiss",
+        "year": 1990,
+        "url": "https://doi.org/10.1109/ROBOT.1990.126315"
+      },
+      {
+        "title": "Real-time obstacle avoidance for manipulators and mobile robots",
+        "authors": "Khatib",
+        "year": 1986,
+        "url": "https://doi.org/10.1177/027836498600500106"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The router solves the Laplace equation on a grid. The boxes hold the highest potential, and the target plug holds zero. The route follows the steepest descent. A harmonic function has no local minimum in the free space, so each descent reaches its target.",
+    "math": "∇²u = 0 in free cells, u = 1 on boxes, u = 0 at the target, solved by SOR or multigrid. Route: dx/dt = -∇u",
+    "cost": "O(G) per target with multigrid, for G cells. 100 nodes: 0.4 s (one solve per target box). 1000 nodes: 30 s or more, so only the far levels or one solve per group.",
+    "params": [
+      "cell 2 to 8 px",
+      "SOR factor 1.5 to 1.9",
+      "sweeps 20 to 200",
+      "potential of the border 0 or 1"
+    ],
+    "wins": [
+      "R8",
+      "C7",
+      "R9",
+      "C3"
+    ],
+    "risks": [
+      "R6",
+      "R5",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "On `case-dense-groups` and `packedGridBoard`, 100 nodes: keep it if R9 = 0, R8 rises by 40% and R6 is 1.3 times `corner` or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-006",
+      "RULE-024",
+      "RULE-051"
+    ],
+    "rules": "Clearance (the potential is high near boxes), smooth routes, routes that stay in the middle of gaps.",
+    "hardRules": "guard. The descent does not enter a box cell, because the potential is at its maximum there. The end snaps to the plug.",
+    "zoom": "The coarse grid of the parent level starts the solve, so the field changes little between levels."
+  },
+  {
+    "id": "RULE-006",
+    "family": "rules",
+    "name": "Distance field and fast marching: the geodesic router",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A fast marching level set method for monotonically advancing fronts",
+        "authors": "Sethian",
+        "year": 1996,
+        "url": "https://doi.org/10.1073/pnas.93.4.1591"
+      },
+      {
+        "title": "Distance transforms of sampled functions",
+        "authors": "Felzenszwalb and Huttenlocher",
+        "year": 2012,
+        "url": "https://doi.org/10.4086/toc.2012.v008a019"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A distance transform gives the signed distance φ to the nearest box. The speed falls near the boxes. Fast marching gives the travel time from the target, and the route descends it. The speed function writes clearance and area costs as one rule.",
+    "math": "‖∇T‖ = 1/F(x), F = clamp(φ/d0, ε, 1)^p, φ by the exact distance transform in O(G)",
+    "cost": "O(G) for the transform, O(G log G) for each target. 100 nodes: 0.6 s. 1000 nodes: 30 s, so targets share one solve per group.",
+    "params": [
+      "cell 2 to 8 px",
+      "d0 4 to 24 px",
+      "p 1 to 3",
+      "ε 0.01 to 0.2"
+    ],
+    "wins": [
+      "R8",
+      "C7",
+      "R4",
+      "C3"
+    ],
+    "risks": [
+      "R6",
+      "R12",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "Same boards as RULE-005, against `corner`: keep it if C7 and R8 rise by 30% at R6 of 1.2 times or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-005",
+      "RULE-041",
+      "RULE-046",
+      "HWY-020"
+    ],
+    "rules": "Clearance, length, a cost for each area: dense regions, group interiors, margins.",
+    "hardRules": "guard. F = 0 inside a box, so the time there is infinite.",
+    "zoom": "warm. Each level uses its own level boxes and the coarse field of the parent."
+  },
+  {
+    "id": "RULE-007",
+    "family": "rules",
+    "name": "Elastic rod: curvature forces on the curve",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Discrete elastic rods",
+        "authors": "Bergou, Wardetzky, Robinson, Audoly and Grinspun",
+        "year": 2008,
+        "url": "https://doi.org/10.1145/1360612.1360662"
+      },
+      {
+        "title": "The curve of least energy",
+        "authors": "Horn",
+        "year": 1983,
+        "url": "https://dspace.mit.edu/handle/1721.1/5697"
+      }
+    ],
+    "step": "curve",
+    "mechanism": "The curve step treats a route as a discrete elastic rod. The bending energy is the sum of the squared turns over the local lengths. The descent lowers it while a projection keeps the clearance. The result has no sharp corner.",
+    "math": "E_b = Σ_i (2 tan(θ_i/2))² / ℓ_i, ℓ_i = half the sum of the two neighbor segment lengths, plus a stretch term Σ (‖e‖ - ‖e0‖)²",
+    "cost": "O(I·V). 100 nodes: 6 ms. 1000 nodes: 80 ms.",
+    "params": [
+      "k_b 0.1 to 10",
+      "point spacing 2 to 8 px",
+      "steps 20 to 200",
+      "smallest radius 4 to 24 px"
+    ],
+    "wins": [
+      "C3",
+      "C4",
+      "C5",
+      "C2"
+    ],
+    "risks": [
+      "C7",
+      "C8",
+      "R8",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "On `shared-all` and `case-hub-chain`, after the curve `smooth`: keep it if C3 falls by 20% with 0 faults of C7.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-022",
+      "RULE-026"
+    ],
+    "rules": "Smallest radius, small curvature change, no tangent break.",
+    "hardRules": "project with φ ≥ clearance. The end tangents stay on SIDE_NORMAL.",
+    "zoom": "anchor. The rod of the parent level is the start."
+  },
+  {
+    "id": "RULE-008",
+    "family": "rules",
+    "name": "Stress majorization of the bend points",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Integrating edge routing into force-directed layout",
+        "authors": "Dwyer, Marriott and Wybrow",
+        "year": 2006,
+        "url": "https://doi.org/10.1007/978-3-540-70904-6_3"
+      },
+      {
+        "title": "Graph drawing by stress majorization",
+        "authors": "Gansner, Koren and North",
+        "year": 2004,
+        "url": "https://www.graphviz.org/documentation/GKN04.pdf"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Dwyer, Marriott and Wybrow put the bend points of the routes into a stress layout as extra nodes. Each bend point has a target distance to its neighbors and to the box corners that it wraps. Each step of stress majorization is one convex solve.",
+    "math": "stress = Σ w_ij (‖x_i - x_j‖ - d_ij)², w_ij = d_ij^-2, each step solves L_w X = L_Z X0 by conjugate gradients",
+    "cost": "O(I·V·k) with a sparse solve. 100 nodes: 30 ms. 1000 nodes: 600 ms.",
+    "params": [
+      "weight exponent -2 to 0",
+      "steps 10 to 50",
+      "corner gap 2 to 16 px"
+    ],
+    "wins": [
+      "R4",
+      "R8",
+      "R6",
+      "R5"
+    ],
+    "risks": [
+      "R1",
+      "R3",
+      "R14"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered`, after `corner`: keep it if R6 and R4 fall by 10% and R1 does not rise.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-009",
+      "RULE-011",
+      "RULE-050"
+    ],
+    "rules": "Target lengths, a distance to each wrapped corner, even spacing of the bends.",
+    "hardRules": "project. Separation constraints keep each bend point on its side of each wrapped corner.",
+    "zoom": "warm. Majorization descends from the start, so a warm start gives a near answer."
+  },
+  {
+    "id": "RULE-009",
+    "family": "rules",
+    "name": "Separation constraints: the QP that nudges parallel segments",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "IPSep-CoLa: an incremental procedure for separation constraint layout of graphs",
+        "authors": "Dwyer, Koren and Marriott",
+        "year": 2006,
+        "url": "https://doi.org/10.1109/TVCG.2006.156"
+      },
+      {
+        "title": "WebCoLa: constraint-based layout in the browser",
+        "authors": "Dwyer and others",
+        "year": 2014,
+        "url": "https://ialab.it.monash.edu/webcola/"
+      },
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "Wybrow, Marriott and Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The router keeps the order of the parallel segments in a channel. A quadratic program then places them. It keeps each segment near the channel middle and each pair at least a gap apart. VPSC solves each axis. The fixed order makes the problem convex.",
+    "math": "min Σ w_i (x_i - c_i)² subject to x_j - x_i ≥ g for each ordered pair, lo ≤ x_i ≤ hi. VPSC in O(s log s) for each axis",
+    "cost": "O(s log s) for each channel of s segments. 100 nodes: 3 ms. 1000 nodes: 40 ms.",
+    "params": [
+      "gap 2 to 12 px",
+      "weight of the middle against the plug side 0 to 1",
+      "equal spacing on or off"
+    ],
+    "wins": [
+      "R12",
+      "R8",
+      "B9",
+      "R11"
+    ],
+    "risks": [
+      "R6",
+      "M1"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-hubs` and `case-dense-groups`: keep it if each channel wide enough has each gap at `g` or more, with R1 unchanged.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-050",
+      "RULE-052",
+      "HWY-016"
+    ],
+    "rules": "A gap between lanes, centered lanes, the bounds of a channel, alignment by equal constraints.",
+    "hardRules": "Exact. The channel bounds are the box walls minus the clearance. A channel too narrow for its lanes keeps the base route.",
+    "zoom": "convex. The same order gives a small move for a small change."
+  },
+  {
+    "id": "RULE-010",
+    "family": "rules",
+    "name": "Kamada-Kawai on the skeleton of the hubs",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "An algorithm for drawing general undirected graphs",
+        "authors": "Kamada and Kawai",
+        "year": 1989,
+        "url": "https://doi.org/10.1016/0020-0190(89)90102-6"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The highways form a small graph, with the hubs and the junctions as its nodes. Kamada-Kawai places the free junctions so that their distances match the path lengths of the box graph. The boxes stay fixed and push the junctions out by a barrier.",
+    "math": "E = Σ_{i<j} ½ k_ij (‖p_i - p_j‖ - ℓ d_ij)², k_ij = K / d_ij², Newton steps on one node at a time, barrier -ln(φ(p_i))",
+    "cost": "O(I·h²) for h hubs. 100 nodes: 1 ms. 1000 nodes: 30 ms.",
+    "params": [
+      "K 1",
+      "ℓ unit length 0.5 to 2 u",
+      "steps 20 to 200",
+      "anchor weight μ 0 to 10"
+    ],
+    "wins": [
+      "B6",
+      "B3",
+      "R5",
+      "Z7"
+    ],
+    "risks": [
+      "B7",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `case-hub-chain` and `mid-hubs` with `sections`: keep it if B3 falls by 10% and Z7 does not rise.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-045",
+      "HWY-043",
+      "HWY-041"
+    ],
+    "rules": "Junction spacing, balanced hubs, distances that follow the graph.",
+    "hardRules": "barrier at each junction, then the routes go through the corner graph.",
+    "zoom": "anchor. Each level places its own hubs near the hubs of its parent."
+  },
+  {
+    "id": "RULE-011",
+    "family": "rules",
+    "name": "Moves that keep the topology (PrEd, ImPrEd)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A force-directed algorithm that preserves edge-crossing properties",
+        "authors": "Bertault",
+        "year": 2000,
+        "url": "https://doi.org/10.1016/S0020-0190(00)00042-9"
+      },
+      {
+        "title": "ImPrEd: an improved force-directed algorithm that prevents nodes from crossing edges",
+        "authors": "Simonetto, Archambault, Auber and Bourqui",
+        "year": 2011,
+        "url": "https://doi.org/10.1111/j.1467-8659.2011.01956.x"
+      },
+      {
+        "title": "Topology preserving constrained graph layout",
+        "authors": "Dwyer, Marriott and Wybrow",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-00219-9_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "PrEd and ImPrEd move the points with any forces, but they limit each move so that no point crosses a segment. A route then keeps its way around the boxes and its crossings. Any force rule becomes safe: no move adds a box crossing or a route crossing.",
+    "math": "For each point and each of 8 direction sectors: max move = ½ · distance to the nearest segment in that sector. Move = force clipped to that bound",
+    "cost": "O(I·V·k). 100 nodes: 15 ms. 1000 nodes: 250 ms.",
+    "params": [
+      "sectors 8",
+      "steps 20 to 200",
+      "the set of forces"
+    ],
+    "wins": [
+      "R9",
+      "R1",
+      "Z8",
+      "R8"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "As a wrapper of RULE-001 and RULE-003: keep it if R9 and the new crossings are 0 in each run, at 2 times the time or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-003",
+      "RULE-046",
+      "RULE-050"
+    ],
+    "rules": "Any force rule. The limit keeps the crossing count and the side of each box.",
+    "hardRules": "guard by construction. A point does not cross a box edge at any time.",
+    "zoom": "The warm start fixes the topology, so the order of the routes does not change between levels."
+  },
+  {
+    "id": "RULE-012",
+    "family": "rules",
+    "name": "Cassowary: rules with strengths",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "The Cassowary linear arithmetic constraint solving algorithm",
+        "authors": "Badros, Borning and Stuckey",
+        "year": 2001,
+        "url": "https://doi.org/10.1145/504704.504705"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Cassowary solves linear equations and inequalities with strengths: required, strong, medium and weak. The router writes the coordinate of each leg as a variable. A stronger rule wins over all weaker rules together. A small edit solves again fast.",
+    "math": "Simplex with a lexicographic objective over the strengths. Examples: x_leg ≥ box.right + gap (required), x_leg = x_other (strong), x_leg = mid (weak)",
+    "cost": "O(c) for an incremental edit, O(c²) at worst for c constraints. 100 nodes: 10 ms. 1000 nodes: 300 ms.",
+    "params": [
+      "a strength for each rule",
+      "gap 2 to 12 px"
+    ],
+    "wins": [
+      "R14",
+      "R12",
+      "R11",
+      "Z10"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400` and `mid-uniform`, orthogonal routes: keep it if the `required` rows give 0 hard faults and the aligned legs rise by 30%, with R6 unchanged.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-009",
+      "RULE-017",
+      "RULE-052"
+    ],
+    "rules": "Alignment, equal spacing, order, a distance to a box, centered legs.",
+    "hardRules": "The required constraints hold the hard rules for the leg coordinates.",
+    "zoom": "Each level solves again from the basis of its parent, so a small edit gives a small change."
+  },
+  {
+    "id": "RULE-013",
+    "family": "rules",
+    "name": "Integer program for orthogonal routing: the exact reference",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "Wybrow, Marriott and Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      },
+      {
+        "title": "Seeing around corners: fast orthogonal connector routing",
+        "authors": "Marriott, Stuckey and Wybrow",
+        "year": 2014,
+        "url": "https://doi.org/10.1007/978-3-662-44043-8_4"
+      },
+      {
+        "title": "CP-SAT solver of OR-Tools",
+        "authors": "Perron and Didier, Google",
+        "year": 2024,
+        "url": "https://developers.google.com/optimization/cp/cp_solver"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The orthogonal visibility graph holds the candidate segments. A multi-commodity flow program picks one path for each edge. The objective sums length, bends and crossings with weights. On small boards the solver proves the best answer, which MEAS2 needs.",
+    "math": "min Σ_e Σ_a c_a y_ea + β Σ bends + γ Σ z, flow conservation for each edge, z ≥ y_ea + y_fb - 1 for each crossing pair of arcs",
+    "cost": "NP-hard. Boards of 20 edges or fewer take seconds. Not for 1000 nodes.",
+    "params": [
+      "weights β, γ",
+      "time limit 1 to 60 s",
+      "optimality gap 0 to 5%"
+    ],
+    "wins": [
+      "R1",
+      "R3",
+      "R4",
+      "R6"
+    ],
+    "risks": [],
+    "placementDependent": true,
+    "screen": "On 30 boards of 8 to 15 edges, in CI: keep it if it proves the optimum on 80% or more, in 10 s or less each.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-015",
+      "RULE-043",
+      "HWY-040"
+    ],
+    "rules": "Any linear rule: length, bends, crossings, capacity, forbidden arcs.",
+    "hardRules": "Exact. Only the free arcs exist.",
+    "zoom": "A penalty Σ ‖y - y_parent‖ for a change from the parent level."
+  },
+  {
+    "id": "RULE-014",
+    "family": "rules",
+    "name": "Minimum cost flow for the fewest bends",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "On embedding a graph in the grid with the minimum number of bends",
+        "authors": "Tamassia",
+        "year": 1987,
+        "url": "https://doi.org/10.1137/0216030"
+      }
+    ],
+    "step": "router",
+    "mechanism": "For a fixed embedding, Tamassia gets the bends of an orthogonal drawing from a minimum cost flow. Each unit of flow is a turn of 90 degrees. The flow gives the fewest bends that the angles permit. For routes among boxes, the faces come from the fixed boxes and the route order.",
+    "math": "Network: each vertex supplies 4, each inner face takes 2·deg(f) - 4, the outer face takes 2·deg(f) + 4. Each arc costs 1 for each bend",
+    "cost": "O(n^1.75 √log n). 100 nodes: 10 ms. 1000 nodes: 400 ms, plus the planarization of the routes.",
+    "params": [
+      "bend cost 1",
+      "the angles that are fixed"
+    ],
+    "wins": [
+      "R3",
+      "R14"
+    ],
+    "risks": [
+      "R6",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400`, after `corner`: keep it if R3 falls by 15% at the same topology.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-050",
+      "RULE-013"
+    ],
+    "rules": "Fewest bends, fixed angles at the plugs, orthogonal segments.",
+    "hardRules": "The embedding comes from a guarded route, so the shape keeps it.",
+    "zoom": "The parent level fixes the embedding, so the shape is stable."
+  },
+  {
+    "id": "RULE-015",
+    "family": "rules",
+    "name": "SAT and CP-SAT on a grid of cells",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A new FPGA detailed routing approach via search-based Boolean satisfiability",
+        "authors": "Nam, Sakallah and Rutenbar",
+        "year": 2002,
+        "url": "https://doi.org/10.1109/TCAD.2002.1004311"
+      },
+      {
+        "title": "CP-SAT solver of OR-Tools",
+        "authors": "Perron and Didier, Google",
+        "year": 2024,
+        "url": "https://developers.google.com/optimization/cp/cp_solver"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Each pair of a grid cell and an edge has a Boolean variable. The clauses say that each edge forms one connected path, each cell holds at most c lanes, and a box cell holds none. A SAT or CP-SAT solver finds a legal set, then lowers length and bends.",
+    "math": "x_ec ∈ {0,1}, Σ_e x_ec ≤ cap(c), a path cell has 2 neighbors on the path and an end cell has 1, connectivity by lazy cuts",
+    "cost": "NP-hard. A grid of 100 by 100 cells with 20 edges solves in seconds.",
+    "params": [
+      "cell 4 to 16 px",
+      "capacity 1 to 4",
+      "time limit 1 to 60 s"
+    ],
+    "wins": [
+      "R9",
+      "R12",
+      "R1"
+    ],
+    "risks": [
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "On tight boards (`packedGridBoard`, 16 boxes): keep it if it routes each edge where `corner` with room fails, in 10 s or less.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-013",
+      "RULE-037",
+      "RULE-018"
+    ],
+    "rules": "Capacity, forbidden areas, parity, any Boolean rule.",
+    "hardRules": "Exact.",
+    "zoom": "The solution of the parent level gives the hints of the solver."
+  },
+  {
+    "id": "RULE-016",
+    "family": "rules",
+    "name": "Octilinear highways by a mixed integer program",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Drawing and labeling high-quality metro maps by mixed-integer programming",
+        "authors": "Nöllenburg and Wolff",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2010.81"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Nöllenburg and Wolff draw metro maps with a mixed integer program. Each edge takes one of eight directions, keeps its order at each station and has a minimum length. Bends cost. On the skeleton of the highways, the trunks become octilinear lines, as on a transit map.",
+    "math": "A binary for each edge and each of 8 sectors, big-M relations between x_v - x_u and the sector, circular order constraints. Objective: bends + relative position + length",
+    "cost": "MIP. A skeleton of 100 edges or fewer takes minutes.",
+    "params": [
+      "weights of the three terms",
+      "minimum length 1 to 4 u",
+      "time limit"
+    ],
+    "wins": [
+      "R14",
+      "B6",
+      "R3",
+      "M2"
+    ],
+    "risks": [
+      "R6",
+      "M3"
+    ],
+    "placementDependent": true,
+    "screen": "On the skeleton of `mid-hubs` (60 trunk edges or fewer), in CI: keep it if it solves in 60 s or less with R14 = 1 and B3 up by 10% or less.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-004",
+      "RULE-052",
+      "HWY-016"
+    ],
+    "rules": "Octilinear trunks, the order of the trunks, a minimum length, few bends, the relative position of the hubs.",
+    "hardRules": "The boxes are fixed vertices with clearance constraints. Planarity cuts enter lazily.",
+    "zoom": "Each level adds a term for the relative position to its parent."
+  },
+  {
+    "id": "RULE-017",
+    "family": "rules",
+    "name": "Layers of rules in priority order",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Survey of multi-objective optimization methods for engineering",
+        "authors": "Marler and Arora",
+        "year": 2004,
+        "url": "https://doi.org/10.1007/s00158-003-0368-6"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "The rules sit in layers: the hard rules first, then each group of soft rules in priority order. Each layer optimizes its terms, then holds its value within a slack while the next layers run. The user orders the rules and gives no weights.",
+    "math": "For k = 1..L: f_k* = min f_k(x) subject to f_j(x) ≤ (1 + ε_j) f_j* for each j < k, with the hard rules as layer 0",
+    "cost": "L times the inner solver.",
+    "params": [
+      "the order of the layers",
+      "slack ε 0 to 0.2"
+    ],
+    "wins": [
+      "R1",
+      "R6"
+    ],
+    "risks": [
+      "R8",
+      "C3"
+    ],
+    "placementDependent": false,
+    "screen": "With RULE-019 inside, on `mid-clustered`: keep it if the first measure stays within ε of its own optimum and the second beats the weighted sum.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-012",
+      "RULE-019",
+      "RULE-038"
+    ],
+    "rules": "Any rule. The layers express priority, not a weight.",
+    "hardRules": "Layer 0 holds the hard rules as constraints.",
+    "zoom": "The same layers run at each level. An option puts the stability term of RULE-045 in the first soft layer."
+  },
+  {
+    "id": "RULE-018",
+    "family": "rules",
+    "name": "Wave function collapse with tiles of routes",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "WaveFunctionCollapse",
+        "authors": "Gumin",
+        "year": 2016,
+        "url": "https://github.com/mxgmn/WaveFunctionCollapse"
+      },
+      {
+        "title": "WaveFunctionCollapse is constraint solving in the wild",
+        "authors": "Karth and Smith",
+        "year": 2017,
+        "url": "https://doi.org/10.1145/3102071.3110566"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The board becomes a grid of tiles: empty, straight, corner, cross, merge and box. Adjacency rules tell which tiles can touch. The solver fixes the cell with the least entropy and spreads the rules. Routes and highways appear as a pattern of tiles that obeys the rules.",
+    "math": "Arc consistency over the cells, each with a domain of tiles. Pick the cell of least entropy with a seeded random number generator. Backtrack on a contradiction",
+    "cost": "O(G·T) for each spread, plus restarts. 100 nodes: 50 ms. 1000 nodes: 2 s.",
+    "params": [
+      "the tile set",
+      "tile weights",
+      "seed",
+      "backtrack limit 100 to 10 000"
+    ],
+    "wins": [
+      "R14",
+      "R3"
+    ],
+    "risks": [
+      "R6",
+      "R7",
+      "Z1"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400`: keep it if each edge connects in 3 restarts or fewer with R14 = 1.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-015",
+      "RULE-032",
+      "RULE-034"
+    ],
+    "rules": "Local rules of adjacency: no tee next to a box, merges only on lanes, a style of tiles.",
+    "hardRules": "Box cells and plug cells are fixed. A path check for each edge adds the global rule that each edge connects.",
+    "zoom": "The coarse tiles constrain the fine tiles."
+  },
+  {
+    "id": "RULE-019",
+    "family": "rules",
+    "name": "Energy as a sum of rule terms, by gradient descent",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Graph drawing via gradient descent, (GD)^2",
+        "authors": "Ahmed, De Luca, Devkota, Kobourov and Li",
+        "year": 2020,
+        "url": "https://arxiv.org/abs/2008.05584"
+      },
+      {
+        "title": "Penrose: from mathematical notation to beautiful diagrams",
+        "authors": "Ye, Ni, Krieger, Ma'ayan, Wise, Aldrich, Sunshine and Crane",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3386569.3392375"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Each rule becomes a smooth term: a crossing angle, a clearance or a length. The energy is the weighted sum. Gradient descent moves all route points at once. (GD)² showed this for node layouts. Here the variables are the route points, and the boxes are fixed.",
+    "math": "E(x) = Σ_r w_r E_r(x), x ← x - η ∇E. Smooth forms: clearance softplus(d0 - φ)², crossing angle cos²θ, length Σ ‖x_{i+1} - x_i‖²",
+    "cost": "O(I·(V + P)) for P pairs. 100 nodes: 50 ms. 1000 nodes: 1 s with a grid for the pairs.",
+    "params": [
+      "a weight for each rule",
+      "step η",
+      "steps 100 to 1000",
+      "sharpness of the smooth forms"
+    ],
+    "wins": [
+      "R1",
+      "R2",
+      "R8",
+      "C3"
+    ],
+    "risks": [
+      "R9",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered`: keep it if its front over R1, R6 and R8 has a point that `corner` with RULE-001 does not dominate.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-020",
+      "RULE-027",
+      "RULE-036",
+      "RULE-046"
+    ],
+    "rules": "Any rule with a smooth form or a smooth substitute.",
+    "hardRules": "barrier for the boxes, then RULE-046.",
+    "zoom": "anchor and warm."
+  },
+  {
+    "id": "RULE-020",
+    "family": "rules",
+    "name": "Adam with a seeded sample of pairs",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Adam: a method for stochastic optimization",
+        "authors": "Kingma and Ba",
+        "year": 2015,
+        "url": "https://arxiv.org/abs/1412.6980"
+      },
+      {
+        "title": "Multicriteria scalable graph drawing via stochastic gradient descent, (SGD)^2",
+        "authors": "Ahmed, De Luca, Devkota, Kobourov and Li",
+        "year": 2022,
+        "url": "https://arxiv.org/abs/2112.01571"
+      },
+      {
+        "title": "Graph drawing by stochastic gradient descent",
+        "authors": "Zheng, Pawar and Goodman",
+        "year": 2019,
+        "url": "https://arxiv.org/abs/1710.04626"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Pair terms of route against route cost O(V²). Adam with a seeded sample of pairs makes each step O(V). The step size falls on a schedule, as in the SGD layouts of stress. A fixed seed and a fixed order keep the result the same each time.",
+    "math": "m ← β1 m + (1 - β1) g, v ← β2 v + (1 - β2) g², x ← x - η_t m̂ / (√v̂ + ε), η_t = η0 e^{-λt}, g from a seeded sample of pairs",
+    "cost": "O(I·V·s) for s samples of each point. 100 nodes: 30 ms. 1000 nodes: 400 ms.",
+    "params": [
+      "η0 0.01 to 1",
+      "β1 0.9, β2 0.999",
+      "samples 4 to 32",
+      "seed",
+      "steps 100 to 2000"
+    ],
+    "wins": [
+      "R1",
+      "R2",
+      "R8"
+    ],
+    "risks": [
+      "Z10",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "Against RULE-019 at the same time: keep it if it reaches the energy of RULE-019 in a third of the time or less at 1000 nodes.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-019"
+    ],
+    "rules": "The same rules as RULE-019.",
+    "hardRules": "The same as RULE-019.",
+    "zoom": "anchor."
+  },
+  {
+    "id": "RULE-021",
+    "family": "rules",
+    "name": "Simulated annealing over candidate routes",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Drawing graphs nicely using simulated annealing",
+        "authors": "Davidson and Harel",
+        "year": 1996,
+        "url": "https://doi.org/10.1145/234535.234538"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Each edge gets k candidate routes from the base router: the shortest, a detour on each side and a route along each near highway. Annealing changes the choice of one edge at a time. It accepts a worse total with a probability that falls with the temperature.",
+    "math": "P(accept) = exp(-ΔE / T), T_k = T0 α^k. ΔE is local: the crossings of one edge come from a grid of segments",
+    "cost": "O(S·k_n) for S changes and k_n segments near an edge. 100 nodes: 100 ms. 1000 nodes: 2 s.",
+    "params": [
+      "k candidates 3 to 8",
+      "T0",
+      "α 0.9 to 0.99",
+      "changes per edge 20 to 200",
+      "seed"
+    ],
+    "wins": [
+      "R1",
+      "R12",
+      "B1",
+      "R5"
+    ],
+    "risks": [
+      "R6",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `mid-hubs`: keep it if R1 falls by 15% against the first choice, at the same R6.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-044",
+      "RULE-025",
+      "HWY-045",
+      "HWY-059"
+    ],
+    "rules": "Any rule, also discrete rules: crossing counts, highway membership, lane capacity.",
+    "hardRules": "guard. Each candidate obeys the hard rules.",
+    "zoom": "hysteresis. The start state is the choice of the parent level, and a change costs."
+  },
+  {
+    "id": "RULE-022",
+    "family": "rules",
+    "name": "Position-based dynamics: one rule at a time (XPBD)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Position based dynamics",
+        "authors": "Müller, Heidelberger, Hennix and Ratcliff",
+        "year": 2007,
+        "url": "https://doi.org/10.1016/j.jvcir.2007.01.005"
+      },
+      {
+        "title": "XPBD: position-based simulation of compliant constrained dynamics",
+        "authors": "Macklin, Müller and Chentanez",
+        "year": 2016,
+        "url": "https://doi.org/10.1145/2994258.2994272"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Position-based dynamics treats each rule as a constraint. Gauss-Seidel moves the points onto one constraint at a time. XPBD gives each rule a compliance, so a soft rule gives way and a hard rule does not. Games use it because it is stable at any step size.",
+    "math": "Δλ = (-C(x) - α̃ λ) / (∇C M⁻¹ ∇Cᵀ + α̃), Δx = M⁻¹ ∇Cᵀ Δλ, α̃ = α / Δt². Constraints: segment length, φ(x) ≥ d0 with α = 0, bend angle, lane gap",
+    "cost": "O(I·C) for C constraints. 100 nodes: 10 ms. 1000 nodes: 150 ms.",
+    "params": [
+      "iterations 5 to 50",
+      "substeps 1 to 8",
+      "compliance of each rule 0 to 0.01",
+      "a fixed order of the constraints"
+    ],
+    "wins": [
+      "R8",
+      "R12",
+      "C5",
+      "R14"
+    ],
+    "risks": [
+      "R6",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `case-dense-groups`, against RULE-001: keep it if it gets the same R8 in half the time, with R9 = 0.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-023",
+      "RULE-046",
+      "RULE-036"
+    ],
+    "rules": "Lengths, distances, angles, alignment: each local rule.",
+    "hardRules": "Compliance 0 for the boxes, a final pass, then RULE-046. The plugs have infinite mass.",
+    "zoom": "anchor as a soft constraint to the place at the parent level."
+  },
+  {
+    "id": "RULE-023",
+    "family": "rules",
+    "name": "Barrier and continuous collision checks (IPC)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Incremental potential contact: intersection- and inversion-free, large-deformation dynamics",
+        "authors": "Li, Ferguson, Schneider, Langlois, Zorin, Panozzo, Jiang and Kaufman",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3386569.3392425"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Incremental potential contact adds a log barrier that goes to infinity when a route point nears a box. A continuous collision check limits each line search. So each step stays free of boxes, not only the last step.",
+    "math": "b(d) = -(d - d̂)² ln(d / d̂) for d < d̂, else 0. Step ≤ 0.8 · the time of first contact from the collision check",
+    "cost": "O(I·V·k) plus the collision checks. 100 nodes: 40 ms. 1000 nodes: 800 ms.",
+    "params": [
+      "d̂ 1 to 8 px",
+      "barrier weight κ",
+      "Newton steps 5 to 30"
+    ],
+    "wins": [
+      "R9",
+      "R8",
+      "C7"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "With the energy of RULE-019 on `mid-clustered`: keep it if R9 = 0 at each step, at 2 times the time of RULE-019 or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-019",
+      "RULE-022",
+      "RULE-046"
+    ],
+    "rules": "Clearance as a barrier, with any smooth energy.",
+    "hardRules": "barrier. Each step is legal.",
+    "zoom": "anchor."
+  },
+  {
+    "id": "RULE-024",
+    "family": "rules",
+    "name": "Multigrid over the zoom levels",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A multigrid tutorial, second edition",
+        "authors": "Briggs, Henson and McCormick",
+        "year": 2000,
+        "url": "https://doi.org/10.1137/1.9780898719505"
+      },
+      {
+        "title": "A multilevel algorithm for force-directed graph-drawing",
+        "authors": "Walshaw",
+        "year": 2003,
+        "url": "https://doi.org/10.7155/jgaa.00070"
+      },
+      {
+        "title": "Efficient, high-quality force-directed graph drawing",
+        "authors": "Hu",
+        "year": 2005,
+        "url": "https://yifanhu.net/PUB/graph_draw_small.pdf"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "The zoom levels form a hierarchy of grids. The far level solves the rule energy on its few links first. Each finer level starts from the coarse answer and smooths it. A V-cycle sends the fine errors back up, so the levels agree.",
+    "math": "Restriction R and prolongation P. V-cycle: ν1 smooth steps on the fine level, restrict the residual, solve the coarse level, x_f ← x_f + P e_c, ν2 smooth steps",
+    "cost": "O(V) for each cycle. 100 nodes: 20 ms. 1000 nodes: 200 ms.",
+    "params": [
+      "ν1, ν2 1 to 3",
+      "cycles 1 to 5",
+      "prolongation: linear or along the lanes"
+    ],
+    "wins": [
+      "Z9",
+      "Z10",
+      "Z7"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `nestedGridBoard` and `mid-clustered`: keep it if Z10 falls by 30% against levels solved alone, at the same energy.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-045",
+      "RULE-031",
+      "HWY-052"
+    ],
+    "rules": "The same energy at each level.",
+    "hardRules": "project at each level.",
+    "zoom": "Native. The coarse-to-fine order gives agreement between levels."
+  },
+  {
+    "id": "RULE-025",
+    "family": "rules",
+    "name": "Prices for rules that couple edges (dual ascent, ADMM)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Distributed optimization and statistical learning via the alternating direction method of multipliers",
+        "authors": "Boyd, Parikh, Chu, Peleato and Eckstein",
+        "year": 2011,
+        "url": "https://doi.org/10.1561/2200000016"
+      },
+      {
+        "title": "PathFinder: a negotiation-based performance-driven router for FPGAs",
+        "authors": "McMurchie and Ebeling",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/201310.201328"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A hard rule that couples edges gets a price, for example the capacity of a gap. Each edge routes alone with the prices as costs. A price rises where its rule fails and falls where it holds. This is negotiated routing, written as dual ascent.",
+    "math": "L = Σ_e c(P_e) + Σ_g λ_g (use_g - cap_g), λ_g ← max(0, λ_g + ρ (use_g - cap_g))",
+    "cost": "O(K·m·A) for K rounds and the A* time A. 100 nodes: 200 ms. 1000 nodes: 5 s.",
+    "params": [
+      "ρ 0.1 to 2",
+      "rounds 5 to 30",
+      "history factor 0 to 1"
+    ],
+    "wins": [
+      "R12",
+      "R1",
+      "R8",
+      "M4"
+    ],
+    "risks": [
+      "R6",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "On `case-dense-groups` and `packedGridBoard`: keep it if the lanes over capacity fall to 0 in 10 rounds or fewer, with R6 up by 10% or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-044",
+      "HWY-044",
+      "HWY-039"
+    ],
+    "rules": "Capacity, crowding, each rule that couples edges.",
+    "hardRules": "guard. The search of each edge uses the corner graph.",
+    "zoom": "warm. The prices of the parent level start each level."
+  },
+  {
+    "id": "RULE-026",
+    "family": "rules",
+    "name": "Motion planners: CHOMP and TrajOpt",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "CHOMP: gradient optimization techniques for efficient motion planning",
+        "authors": "Ratliff, Zucker, Bagnell and Srinivasa",
+        "year": 2009,
+        "url": "https://doi.org/10.1109/ROBOT.2009.5152817"
+      },
+      {
+        "title": "Motion planning with sequential convex optimization and convex collision checking",
+        "authors": "Schulman, Duan, Ho, Lee, Awwal, Bradlow, Pan, Patil, Goldberg and Abbeel",
+        "year": 2014,
+        "url": "https://doi.org/10.1177/0278364914528132"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Robot motion planners treat a path as one vector. CHOMP descends a smoothness term and an obstacle term with a gradient that spreads each update along the path. TrajOpt solves a series of convex programs with a hinge on the signed distance.",
+    "math": "CHOMP: x ← x - η A⁻¹ ∇U, A = KᵀK the finite difference metric. TrajOpt: Σ max(0, d0 - sd(x_i)) inside a trust region",
+    "cost": "CHOMP O(I·V) with a banded solve. 100 nodes: 30 ms. 1000 nodes: 500 ms.",
+    "params": [
+      "η",
+      "smoothness weight",
+      "d0",
+      "trust region"
+    ],
+    "wins": [
+      "C3",
+      "C4",
+      "R8"
+    ],
+    "risks": [
+      "R6",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "Against RULE-001 on the same boards: keep it if C3 is 20% lower at the same R8.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-007",
+      "RULE-023"
+    ],
+    "rules": "Smoothness, clearance, length.",
+    "hardRules": "The TrajOpt penalty rises until each point is legal, then RULE-046.",
+    "zoom": "anchor."
+  },
+  {
+    "id": "RULE-027",
+    "family": "rules",
+    "name": "Differentiable raster loss",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Differentiable vector graphics rasterization for editing and learning",
+        "authors": "Li, Lukáč, Gharbi and Ragan-Kelley",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3414685.3417871"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "A differentiable rasterizer draws the routes into an image of R by R pixels. The losses read the image: ink over a cap, ink over boxes and gaps under a minimum width. Their gradients flow back to the route points. One pass costs the same for 10 edges or 10 000.",
+    "math": "I(p) = Σ_s k(dist(p, s) / w), L = Σ_p max(0, I(p) - ρ_max)² + λ Σ_p I(p) M_box(p), gradients by DiffVG or a soft kernel",
+    "cost": "O(R² + V·k). 100 nodes: 30 ms at 256². 1000 nodes: 80 ms.",
+    "params": [
+      "R 128 to 512",
+      "kernel width 1 to 4 px",
+      "ρ_max",
+      "λ"
+    ],
+    "wins": [
+      "R12",
+      "B7",
+      "R8",
+      "R9"
+    ],
+    "risks": [
+      "R1",
+      "C9"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `large-clustered`: keep it if the peak density falls by 30% with R6 up by 10% or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-028",
+      "RULE-029",
+      "RULE-031",
+      "HWY-006"
+    ],
+    "rules": "Density, clutter, ink over boxes, white space, any rule that reads an image.",
+    "hardRules": "The box term is soft, so project and RULE-046.",
+    "zoom": "Each level renders at its own scale, so each zoom gets its own loss."
+  },
+  {
+    "id": "RULE-028",
+    "family": "rules",
+    "name": "Density bundling with a mask of the free space",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Graph bundling by kernel density estimation",
+        "authors": "Hurter, Ersoy and Telea",
+        "year": 2012,
+        "url": "https://doi.org/10.1111/j.1467-8659.2012.03079.x"
+      },
+      {
+        "title": "CUBu: universal real-time bundling for large graphs",
+        "authors": "van der Zwan, Codreanu and Telea",
+        "year": 2016,
+        "url": "https://doi.org/10.1109/TVCG.2016.2515611"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "KDEEB moves each route point up the gradient of the density of all routes. Routes gather into ridges, and the ridges become highways. The rule version multiplies the density by a mask of the free space, so no ridge forms over a box.",
+    "math": "ρ = K_h * Σ δ(x_i) by splat and blur, x_i ← x_i + η ∇ρ / ‖∇ρ‖, mask ρ · [φ > d0], then smooth along the route",
+    "cost": "O(I·(R² + V)). 100 nodes: 40 ms. 1000 nodes: 150 ms.",
+    "params": [
+      "h 8 to 64 px",
+      "steps 5 to 20",
+      "R 128 to 512",
+      "η"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B7"
+    ],
+    "risks": [
+      "B4",
+      "R6",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` against `shared`: keep it if B1 is equal or better with R9 = 0 after the projection.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-006",
+      "HWY-007",
+      "RULE-027"
+    ],
+    "rules": "Ink, bundles, free space.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "The kernel width h grows with the level, so the ridges nest."
+  },
+  {
+    "id": "RULE-029",
+    "family": "rules",
+    "name": "Clutter measure as a loss",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Measuring visual clutter",
+        "authors": "Rosenholtz, Li and Nakano",
+        "year": 2007,
+        "url": "https://doi.org/10.1167/7.2.17"
+      },
+      {
+        "title": "Differentiable vector graphics rasterization for editing and learning",
+        "authors": "Li, Lukáč, Gharbi and Ragan-Kelley",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3414685.3417871"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "Feature congestion measures clutter from the local spread of color, direction and contrast. This rule takes the direction part: many route directions in one area show as clutter. The loss lowers that spread, so near routes turn parallel or cross at right angles.",
+    "math": "T(p) = K * Σ_s w_s (cos 2θ_s, sin 2θ_s), clutter(p) = 1 - ‖T(p)‖ / Σ w_s, L = Σ_p clutter(p), gradients through the soft raster",
+    "cost": "The same as RULE-027.",
+    "params": [
+      "window 8 to 32 px",
+      "R",
+      "weight"
+    ],
+    "wins": [
+      "R2",
+      "R12",
+      "R5"
+    ],
+    "risks": [
+      "R6",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-uniform` and `mid-clustered`: keep it if the clutter falls by 20% and R2 rises.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-027",
+      "RULE-049"
+    ],
+    "rules": "Visual order, alignment to the flow, right-angle crossings.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "Each level has its own resolution."
+  },
+  {
+    "id": "RULE-030",
+    "family": "rules",
+    "name": "Medial axis of the free space as the highway line",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Skeleton-based edge bundling for graph visualization",
+        "authors": "Ersoy, Hurter, Paulovich, Cantareiro and Telea",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2011.233"
+      },
+      {
+        "title": "Distance transforms of sampled functions",
+        "authors": "Felzenszwalb and Huttenlocher",
+        "year": 2012,
+        "url": "https://doi.org/10.4086/toc.2012.v008a019"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The medial axis of the free space holds the points at equal distance from two boxes. It is the line of the most clearance. This rule pulls the trunks of the highways onto the axis and prunes its short branches. Skeleton bundling does the same with the density of the routes.",
+    "math": "Skeleton from the ridges of the distance transform, pruned by branch length. Pull k ∇dist(x, axis) on the trunk points",
+    "cost": "O(G) for the transform and the skeleton. 100 nodes: 20 ms. 1000 nodes: 100 ms.",
+    "params": [
+      "prune length 1 to 4 u",
+      "cell 2 to 8 px",
+      "pull k"
+    ],
+    "wins": [
+      "R8",
+      "C7",
+      "B7"
+    ],
+    "risks": [
+      "R6",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "On `packedGridBoard` and `case-dense-groups`: keep it if the trunk R8 doubles with B3 up by 10% or less.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-009",
+      "RULE-047",
+      "RULE-006"
+    ],
+    "rules": "Clearance, lanes in the middle of gaps, highways in the gaps.",
+    "hardRules": "The axis is in the free space by definition.",
+    "zoom": "The prune length grows with the level, so the skeletons nest."
+  },
+  {
+    "id": "RULE-031",
+    "family": "rules",
+    "name": "One render loss summed over the zoom levels",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Differentiable vector graphics rasterization for editing and learning",
+        "authors": "Li, Lukáč, Gharbi and Ragan-Kelley",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3414685.3417871"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "One route set serves each zoom level. This loss renders the drawing at the scale of each level and sums the image losses with weights. A route that reads well near and far wins. One trade replaces a separate tune for each level.",
+    "math": "L = Σ_ℓ ω_ℓ L_img(render(x, s_ℓ)), with s_ℓ the scale of level ℓ and the line width fixed in screen pixels",
+    "cost": "The number of levels times RULE-027. 100 nodes: 100 ms. 1000 nodes: 250 ms.",
+    "params": [
+      "a weight ω for each level",
+      "the scales"
+    ],
+    "wins": [
+      "Z10",
+      "Z9",
+      "R12"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `nestedGridBoard`: keep it if the worst level loss falls by 20% and Z10 is better than levels solved alone.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-027",
+      "RULE-024"
+    ],
+    "rules": "Legibility at each zoom.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "Native. One geometry serves all levels."
+  },
+  {
+    "id": "RULE-032",
+    "family": "rules",
+    "name": "Wavefront automaton with rule costs (Lee)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "An algorithm for path connections and its applications",
+        "authors": "Lee",
+        "year": 1961,
+        "url": "https://doi.org/10.1109/TEC.1961.5219222"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A cellular automaton spreads a wave from the source cell. Each cell takes the minimum of its neighbors plus a cost. The cost table holds the rules: a turn costs, a cell near a box costs, a cell on a highway costs less. The trace back gives the route.",
+    "math": "T(c, d) = min over neighbors n of T(n, d') + w(c) + τ [d ≠ d'], state = cell and direction, buckets for small integer costs",
+    "cost": "O(4G) for each edge. 100 nodes: 0.3 s. 1000 nodes: 5 s, so a corridor is necessary.",
+    "params": [
+      "cell 2 to 8 px",
+      "turn cost τ",
+      "near-box cost",
+      "highway discount"
+    ],
+    "wins": [
+      "R3",
+      "R8",
+      "R14",
+      "B2"
+    ],
+    "risks": [
+      "R6",
+      "R12"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400`: keep it if R3 is equal to `corner` or lower, with R9 = 0, in 2 times the time or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-033",
+      "RULE-044",
+      "RULE-006"
+    ],
+    "rules": "Bends, clearance, highway preference, forbidden cells, rules of direction.",
+    "hardRules": "guard. A box cell does not enter the wave.",
+    "zoom": "The route of the coarse grid limits the fine search to a corridor."
+  },
+  {
+    "id": "RULE-033",
+    "family": "rules",
+    "name": "Sandpile automaton for the capacity of gaps",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Self-organized critical state of sandpile automaton models",
+        "authors": "Dhar",
+        "year": 1990,
+        "url": "https://doi.org/10.1103/PhysRevLett.64.1613"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Each cell of a gap holds lanes like grains of sand. A cell over its capacity topples and sends one lane to each free neighbor. The abelian property makes the final state the same for each order of topples. So the spread of the lanes needs no seed.",
+    "math": "If h(c) ≥ cap(c): h(c) -= deg(c), and h(n) += 1 for each free neighbor n. The stable state is unique (Dhar)",
+    "cost": "O(G·t) for t topples. 100 nodes: 5 ms. 1000 nodes: 50 ms.",
+    "params": [
+      "capacity of each cell 1 to 4",
+      "neighbors 4 or 8"
+    ],
+    "wins": [
+      "R12",
+      "M4",
+      "R8"
+    ],
+    "risks": [
+      "R6",
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "On the gaps of `case-dense-groups`: keep it if each cell holds its capacity or less and R12 rises by 20%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-025",
+      "RULE-009",
+      "HWY-051"
+    ],
+    "rules": "Capacity of a gap, an even spread of crowded lanes.",
+    "hardRules": "Box cells are walls, so no lane goes into a box. The routes then follow the cells that they get.",
+    "zoom": "Each level has its own capacity. The state of the parent level adds as grains."
+  },
+  {
+    "id": "RULE-034",
+    "family": "rules",
+    "name": "Shape grammar: rewrite rules on parts of routes",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Shape grammars and the generative specification of painting and sculpture",
+        "authors": "Stiny and Gips",
+        "year": 1972,
+        "url": "http://www.shapegrammar.org/ifip/SGBestPapers72.pdf"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A shape grammar holds rewrite rules on parts of routes. A jog of two short legs becomes one leg. A turn back becomes a detour around a corner. Two parallel routes become a lane pair. A rule applies only when its result obeys the hard rules.",
+    "math": "Rules L → R with a guard g(R), applied in a fixed priority order to a fixed point. Critical pairs check that the order does not change the result",
+    "cost": "O(V·r·p) for r rules and p passes. 100 nodes: 5 ms. 1000 nodes: 60 ms.",
+    "params": [
+      "the rule set",
+      "priority",
+      "passes 1 to 10"
+    ],
+    "wins": [
+      "R3",
+      "R7",
+      "R15",
+      "B2"
+    ],
+    "risks": [
+      "R1",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` after `corner`: keep it if R3 plus R7 falls by 10% with 0 hard faults.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-036",
+      "RULE-046",
+      "RULE-018"
+    ],
+    "rules": "Local style rules and simplifications.",
+    "hardRules": "guard. Each rewrite checks its result.",
+    "zoom": "A grammar for each level. The coarse levels use the merge rules more."
+  },
+  {
+    "id": "RULE-035",
+    "family": "rules",
+    "name": "L-system trees for a fan-out",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "The algorithmic beauty of plants",
+        "authors": "Prusinkiewicz and Lindenmayer",
+        "year": 1990,
+        "url": "http://algorithmicbotany.org/papers/#abop"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "An L-system grows a highway from a hub like a branch. Each step rewrites a trunk symbol into a trunk and branches, with angles and lengths from the rules. A branch stops at its targets or at a box. The grammar fixes the style of a fan-out.",
+    "math": "T → F [+B] F [-B] T with angle δ and length factor r. An open L-system asks φ at each step and stops at a box",
+    "cost": "O(b) for b branches. 100 nodes: 1 ms. 1000 nodes: 10 ms.",
+    "params": [
+      "δ 15 to 60 degrees",
+      "r 0.5 to 0.9",
+      "depth 2 to 6"
+    ],
+    "wins": [
+      "B6",
+      "H3",
+      "R11"
+    ],
+    "risks": [
+      "R6",
+      "B3",
+      "Z1"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-fanout`: keep it if B6 is in its target band with R6 up by 15% or less against `trunks`.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-017",
+      "HWY-037"
+    ],
+    "rules": "Branch angles, branch spacing, symmetry.",
+    "hardRules": "The query of the environment stops growth at a box. RULE-046 repairs the last legs.",
+    "zoom": "Depth d of the derivation is level d, so the trees nest."
+  },
+  {
+    "id": "RULE-036",
+    "family": "rules",
+    "name": "A rule language that compiles to energy and constraints",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Penrose: from mathematical notation to beautiful diagrams",
+        "authors": "Ye, Ni, Krieger, Ma'ayan, Wise, Aldrich, Sunshine and Crane",
+        "year": 2020,
+        "url": "https://doi.org/10.1145/3386569.3392375"
+      },
+      {
+        "title": "SetCoLa: high-level constraints for graph layout",
+        "authors": "Hoffswell, Borning and Heer",
+        "year": 2018,
+        "url": "https://doi.org/10.1111/cgf.13440"
+      },
+      {
+        "title": "Bluefish: composing diagrams with declarative relations",
+        "authors": "Pollock, Mei, Huang, Evans, Jackson and Satyanarayan",
+        "year": 2024,
+        "url": "https://doi.org/10.1145/3654777.3676465"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "A user writes rules as data: a selector of routes, segments or boxes, and a term, for example a minimum gap or an equal angle. A compiler turns each rule into an energy term or a constraint. Penrose does this for diagrams. One solver then solves all rules.",
+    "math": "Rule = {select, term, weight or hard}. E = Σ_r w_r Σ_{t ∈ sel_r} f_r(t). Hard rules go to the constraint solver (RULE-022 or RULE-023)",
+    "cost": "The cost of the solver, plus O(t) to evaluate t terms.",
+    "params": [
+      "the rule file",
+      "the solver"
+    ],
+    "wins": [
+      "R1",
+      "R8",
+      "R12"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "Write RULE-001, RULE-003 and RULE-049 as rule files: keep it if each compiled run matches the hand-written run within 1% on 3 boards.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-019",
+      "RULE-022",
+      "RULE-017",
+      "RULE-037"
+    ],
+    "rules": "Each term of the library. A user adds rules without code.",
+    "hardRules": "Hard rules compile to constraints, then RULE-046.",
+    "zoom": "The rule set applies at each level. A rule can name a level."
+  },
+  {
+    "id": "RULE-037",
+    "family": "rules",
+    "name": "Answer set programs for the discrete choices",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Multi-shot ASP solving with clingo",
+        "authors": "Gebser, Kaminski, Kaufmann and Schaub",
+        "year": 2019,
+        "url": "https://arxiv.org/abs/1705.09811"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Answer set programming writes discrete rules as logic. An edge joins a highway if its stretch stays under a budget. No gap holds more than c lanes. The clingo solver finds the stable models and lowers the weak constraints. The geometry comes after.",
+    "math": "{ on(E,H) : cand(E,H) } 1 :- edge(E).  :- cap(G,C), #count{E : use(E,G)} > C.  #minimize { W,E : cost(E,W) }.",
+    "cost": "Exponential at worst. Small for 200 edges or fewer in practice.",
+    "params": [
+      "the program",
+      "time limit"
+    ],
+    "wins": [
+      "B2",
+      "B4",
+      "B3"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-hubs`: keep it if it finds the best membership in 5 s or less and B3 falls against the rule of `trunks`.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-036",
+      "RULE-015",
+      "HWY-045",
+      "HWY-048"
+    ],
+    "rules": "Highway membership, capacity, exclusion, derived rules in the style of Datalog.",
+    "hardRules": "Integrity constraints.",
+    "zoom": "A rule says that each fine highway sits in its parent highway."
+  },
+  {
+    "id": "RULE-038",
+    "family": "rules",
+    "name": "Rule weights from preferences",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Aesthetic discrimination of graph layouts",
+        "authors": "Klammler, Mchedlidze and Pak",
+        "year": 2018,
+        "url": "https://arxiv.org/abs/1809.01017"
+      },
+      {
+        "title": "Rank analysis of incomplete block designs: I. The method of paired comparisons",
+        "authors": "Bradley and Terry",
+        "year": 1952,
+        "url": "https://doi.org/10.2307/2334029"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "People pick the better drawing of each pair. A Bradley-Terry model fits the weights of the rule terms so that the energy ranks the drawings in the same order. The weights then drive the solver. The fit is offline, so the routes stay the same for each run.",
+    "math": "P(a ≻ b) = σ(w · (m_b - m_a)), maximize the log likelihood with an L2 term. m = the vector of MEAS0 values",
+    "cost": "A logistic fit, under 1 s. No cost at run time.",
+    "params": [
+      "L2 weight",
+      "the set of pairs"
+    ],
+    "wins": [
+      "R1",
+      "R2",
+      "B1"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": false,
+    "screen": "200 pairs from a panel on made-up boards: keep it if it agrees with 75% or more of the held-out pairs.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-017",
+      "RULE-039"
+    ],
+    "rules": "The weights of any rule set.",
+    "hardRules": "No change. The solver keeps them.",
+    "zoom": "One weight vector for each level, from views of that level."
+  },
+  {
+    "id": "RULE-039",
+    "family": "rules",
+    "name": "A frozen critic network as a loss",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Evaluating the readability of force directed graph layouts: a deep learning approach",
+        "authors": "Haleem, Wang, Puri, Wadhwa and Qu",
+        "year": 2019,
+        "url": "https://arxiv.org/abs/1808.00703"
+      },
+      {
+        "title": "Aesthetic discrimination of graph layouts",
+        "authors": "Klammler, Mchedlidze and Pak",
+        "year": 2018,
+        "url": "https://arxiv.org/abs/1809.01017"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "A small network learns to score drawings from images and pairs of preferences. Then its weights freeze. The critic becomes one term of the energy, and its gradient flows through the raster. A fixed network gives a fixed answer.",
+    "math": "L = L_rules + λ (-critic(render(x))), a small CNN on images of 64² to 256², gradients through DiffVG",
+    "cost": "5 ms for each pass on the CPU at 128². 100 nodes: 300 ms. 1000 nodes: 400 ms.",
+    "params": [
+      "λ",
+      "the size of the network"
+    ],
+    "wins": [
+      "R2",
+      "R12"
+    ],
+    "risks": [
+      "R1",
+      "R6",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "Keep it if the critic score rises and no MEAS0 measure gets worse by more than 5%.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-027",
+      "RULE-038"
+    ],
+    "rules": "A learned taste.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "A render for each level."
+  },
+  {
+    "id": "RULE-040",
+    "family": "rules",
+    "name": "A graph network that gives a warm start",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "DeepGD: a deep learning framework for graph drawing using GNN",
+        "authors": "Wang, Yen, Hu and Shen",
+        "year": 2021,
+        "url": "https://arxiv.org/abs/2106.15347"
+      },
+      {
+        "title": "Graph neural networks for graph drawing",
+        "authors": "Tiezzi, Ciravegna and Gori",
+        "year": 2024,
+        "url": "https://arxiv.org/abs/2109.10061"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A graph neural network reads the route points, the boxes and the links between them. It gives a move for each point in one pass. It trains on the rule energy as its loss, as DeepGD trains on stress. At run time it gives the warm start of an exact solver.",
+    "math": "h_i' = φ(h_i, Σ_j ψ(h_i, h_j, e_ij)), output Δx_i, loss E_rules(x + Δx)",
+    "cost": "O(L·E) for L layers. 100 nodes: 20 ms. 1000 nodes: 100 ms. Training in CI only.",
+    "params": [
+      "layers 4 to 12",
+      "width 32 to 128",
+      "the training boards"
+    ],
+    "wins": [
+      "R1",
+      "R8"
+    ],
+    "risks": [
+      "R6",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "Keep it if it cuts the solver steps by 50% to reach the same energy on held-out fixtures.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-019",
+      "RULE-043"
+    ],
+    "rules": "The rules of the training loss.",
+    "hardRules": "RULE-046 after the pass.",
+    "zoom": "A pass for each level, with the place at the parent level as a feature."
+  },
+  {
+    "id": "RULE-041",
+    "family": "rules",
+    "name": "A neural time field (NTFields)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "NTFields: neural time fields for physics-informed robot motion planning",
+        "authors": "Ni and Qureshi",
+        "year": 2023,
+        "url": "https://arxiv.org/abs/2210.00120"
+      }
+    ],
+    "step": "router",
+    "mechanism": "NTFields trains a network to give the travel time between two points. The time solves the eikonal equation with a speed that falls near the obstacles. A route is the descent of the time. The network takes the place of a grid solve for each target.",
+    "math": "‖∇_x T(x_s, x)‖ = 1 / S(x), the loss is the residual of this equation, S from φ",
+    "cost": "Training for each board takes seconds to minutes. Queries take 1 ms.",
+    "params": [
+      "the size of the network",
+      "training steps"
+    ],
+    "wins": [
+      "R8",
+      "C7"
+    ],
+    "risks": [
+      "R9",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "Keep it if one field trained for a board routes 1000 edges faster than RULE-006 at the same R8.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-006"
+    ],
+    "rules": "Clearance through the speed, length.",
+    "hardRules": "RULE-046 after the descent.",
+    "zoom": "One field for each level."
+  },
+  {
+    "id": "RULE-042",
+    "family": "rules",
+    "name": "Reinforcement learning distilled into a fixed scorer",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A deep reinforcement learning approach for global routing",
+        "authors": "Liao, Zhang, Dong, Poczos, Shimada and Kara",
+        "year": 2019,
+        "url": "https://arxiv.org/abs/1906.08809"
+      },
+      {
+        "title": "A graph placement methodology for fast chip design",
+        "authors": "Mirhoseini and others",
+        "year": 2021,
+        "url": "https://doi.org/10.1038/s41586-021-03544-w"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A policy learns to order the edges and to choose their candidates. Its reward is the rule energy at the end. A policy that samples gives a new answer each run. So the trained policy distills into a fixed score, and the router takes its best candidate in a fixed order.",
+    "math": "Policy gradient with the reward -E, then a regression fit of the score s(e, cand), then the maximum with a fixed tie break",
+    "cost": "Training is large, in CI only. Inference O(m·k). 1000 nodes: 50 ms.",
+    "params": [
+      "reward weights",
+      "candidates 3 to 8"
+    ],
+    "wins": [
+      "R1",
+      "B1"
+    ],
+    "risks": [
+      "R6",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Keep it if the distilled score beats RULE-021 at the same time on 3 families.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "RULE-021",
+      "RULE-043"
+    ],
+    "rules": "Each rule of the reward.",
+    "hardRules": "guard. Each candidate is legal.",
+    "zoom": "The state holds the choice of the parent level."
+  },
+  {
+    "id": "RULE-043",
+    "family": "rules",
+    "name": "Imitation of the exact solver",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "Wybrow, Marriott and Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "On small boards, the exact program of RULE-013 gives the best routes. A ranker learns which candidate the solver chose for each edge, from features, for example length, bends and crossings. The router then ranks the candidates on large boards.",
+    "math": "Features f(e, cand), a linear or tree ranker with a pairwise loss, the best candidate of each edge in a fixed order",
+    "cost": "Inference O(m·k). 1000 nodes: 50 ms.",
+    "params": [
+      "the features",
+      "the model"
+    ],
+    "wins": [
+      "R1",
+      "R3",
+      "R6"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Keep it if the gap to the optimum on held-out small boards falls by 30% against the first candidate.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-013",
+      "RULE-042",
+      "RULE-021"
+    ],
+    "rules": "The rules of the exact objective.",
+    "hardRules": "guard. Each candidate is legal.",
+    "zoom": "A feature for the choice of the parent level."
+  },
+  {
+    "id": "RULE-044",
+    "family": "rules",
+    "name": "Corner graph with rule prices, then rip-up and reroute",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "PathFinder: a negotiation-based performance-driven router for FPGAs",
+        "authors": "McMurchie and Ebeling",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/201310.201328"
+      },
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "Wybrow, Marriott and Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The corner graph of today prices each arc by its length. This router adds rule prices: a turn, an arc near a box, an arc on a used lane and an arc along a highway. A* routes each edge. Then the worst edges route again with the prices of the others.",
+    "math": "c(a) = ℓ(a) (1 + α [near box] + β use(a) - γ [on highway]) + τ turn(a). Rounds: route all, rank by E_e, remove the top q%, route them again",
+    "cost": "O(R·q·m·A) for R rounds. 100 nodes: 50 ms. 1000 nodes: 1.5 s.",
+    "params": [
+      "α, β, γ, τ 0 to 2",
+      "rounds 1 to 5",
+      "q 5% to 30%"
+    ],
+    "wins": [
+      "R1",
+      "R3",
+      "R12",
+      "B2"
+    ],
+    "risks": [
+      "R6",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `case-dense-groups`, against `corner`: keep it if R1 and R3 fall by 10% with R6 up by 5% or less and 0 hard faults.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-025",
+      "RULE-021",
+      "RULE-032",
+      "HWY-005",
+      "HWY-039"
+    ],
+    "rules": "Bends, clearance, crowding, highway preference, each rule on an arc.",
+    "hardRules": "guard. Only free arcs exist. The plugs are fixed.",
+    "zoom": "A discount on the arcs of the routes of the parent level."
+  },
+  {
+    "id": "RULE-045",
+    "family": "rules",
+    "name": "Continuation anchor between the zoom levels",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "A multigrid tutorial, second edition",
+        "authors": "Briggs, Henson and McCormick",
+        "year": 2000,
+        "url": "https://doi.org/10.1137/1.9780898719505"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Each level solves its rules with one more term: the squared distance of each shared route point from its place at the parent level. The weight falls as the levels get finer. Routes then move little between levels. A convex energy gives a bounded move.",
+    "math": "E_ℓ(x) = E_rules(x) + μ_ℓ Σ_i ‖x_i - P(x_{ℓ-1})_i‖², μ_ℓ = μ0 κ^ℓ. For an m-convex E: ‖x*_ℓ - P x*_{ℓ-1}‖ ≤ ‖∇E_rules(P x*_{ℓ-1})‖ / (μ_ℓ + m)",
+    "cost": "No extra cost.",
+    "params": [
+      "μ0 0 to 10",
+      "κ 0.3 to 1"
+    ],
+    "wins": [
+      "Z10",
+      "Z9",
+      "Z7"
+    ],
+    "risks": [
+      "R6",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "On `nestedGridBoard` and `mid-clustered`: keep it if Z10 falls by 40% with the energy of each level up by 5% or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-024",
+      "RULE-031",
+      "RULE-053",
+      "HWY-052"
+    ],
+    "rules": "Stability between levels.",
+    "hardRules": "The same as the base solver.",
+    "zoom": "Native."
+  },
+  {
+    "id": "RULE-046",
+    "family": "rules",
+    "name": "One repair step for the hard rules after any method",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Distance transforms of sampled functions",
+        "authors": "Felzenszwalb and Huttenlocher",
+        "year": 2012,
+        "url": "https://doi.org/10.4086/toc.2012.v008a019"
+      },
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "Wybrow, Marriott and Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Any soft method can leave a fault. This step repairs each route. It pushes points out of boxes along the distance gradient, snaps the ends to the plug side and tests each segment. A segment that still fails gets a corner graph detour. A route that still fails keeps its base route.",
+    "math": "x ← x + max(0, d0 - φ(x)) ∇φ(x) for k passes. Exact segment-box test. Fallback: local A* between the last good points, then the base route",
+    "cost": "O(V + f·A) for f faults. 100 nodes: 2 ms. 1000 nodes: 20 ms.",
+    "params": [
+      "passes 1 to 5",
+      "d0",
+      "the fallback: detour or base route"
+    ],
+    "wins": [
+      "R9",
+      "Z2",
+      "Z3"
+    ],
+    "risks": [
+      "R3",
+      "C9"
+    ],
+    "placementDependent": true,
+    "screen": "After each soft method: keep it if the hard faults are 0 on 9 fixtures with 5 seeds, and it changes 5% of the points or fewer.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-001",
+      "RULE-019",
+      "RULE-022",
+      "RULE-027"
+    ],
+    "rules": "The hard rules no-pass-through, ends-at-plugs, link-ends and complete.",
+    "hardRules": "Exact, because of the fallback to the base route.",
+    "zoom": "It changes only the parts with a fault, so it adds little change between levels."
+  },
+  {
+    "id": "RULE-047",
+    "family": "rules",
+    "name": "Pull toward the lane slots of the highway skeleton",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Force-directed edge bundling for graph visualization",
+        "authors": "Holten and van Wijk",
+        "year": 2009,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01450.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The highway step gives a skeleton of trunks. Each route point near a trunk gets a pull toward its nearest lane slot. The pull is one rule term, so the solver trades it against detour and clearance. An edge that does not fit stays off the trunk.",
+    "math": "E_h = k Σ_i w(d_i) ‖x_i - slot_i‖², w(d) = max(0, 1 - d / r), slot = trunk point + lane offset",
+    "cost": "O(V log T) for T trunk segments. 100 nodes: 3 ms. 1000 nodes: 30 ms.",
+    "params": [
+      "k",
+      "reach r 8 to 64 px",
+      "lane spacing"
+    ],
+    "wins": [
+      "B2",
+      "B1",
+      "B9"
+    ],
+    "risks": [
+      "B3",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "With the trunks of HWY-001 on `mid-clustered`: keep it if B2 rises by 15% with B3 up by 5% or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-001",
+      "HWY-009",
+      "RULE-030",
+      "RULE-002"
+    ],
+    "rules": "Bundles with a lane order.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "One skeleton for each level. The skeletons nest."
+  },
+  {
+    "id": "RULE-048",
+    "family": "rules",
+    "name": "A curriculum that adds the rules one at a time",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Graph drawing via gradient descent, (GD)^2",
+        "authors": "Ahmed, De Luca, Devkota, Kobourov and Li",
+        "year": 2020,
+        "url": "https://arxiv.org/abs/2008.05584"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "The solver starts with only the coarse rules: length and clearance from the boxes. It adds the fine rules one at a time: lane gaps, crossing angles and curvature. Each new rule starts from the last answer. This order avoids the poor local minima of the full energy from a raw start.",
+    "math": "E_t = Σ_r s_r(t) w_r E_r, with s_r(t) going from 0 to 1 in stage r",
+    "cost": "The same as the solver.",
+    "params": [
+      "the order of the rules",
+      "the length of each stage"
+    ],
+    "wins": [
+      "R1",
+      "R2",
+      "R12"
+    ],
+    "risks": [
+      "R6"
+    ],
+    "placementDependent": false,
+    "screen": "On `mid-clustered` with 5 seeds: keep it if the final energy falls by 5% against the full energy at once, at the same number of steps.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-019",
+      "RULE-017"
+    ],
+    "rules": "Any rule.",
+    "hardRules": "The same as the solver.",
+    "zoom": "The stages can follow the levels."
+  },
+  {
+    "id": "RULE-049",
+    "family": "rules",
+    "name": "Torque to a right angle at each crossing",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Graph drawing via gradient descent, (GD)^2",
+        "authors": "Ahmed, De Luca, Devkota, Kobourov and Li",
+        "year": 2020,
+        "url": "https://arxiv.org/abs/2008.05584"
+      }
+    ],
+    "step": "router",
+    "mechanism": "At each crossing of two routes, a torque turns both segments toward a right angle. The torque acts only near the crossing, so the rest of each route keeps its shape. The rule makes crossings easy to read, without fewer crossings.",
+    "math": "E = k cos²θ at a crossing of angle θ. The gradient goes to the four ends of the two segments and to a window of w points with a falloff",
+    "cost": "O(X·w) for X crossings. 100 nodes: 2 ms. 1000 nodes: 30 ms.",
+    "params": [
+      "k",
+      "window 2 to 6 points"
+    ],
+    "wins": [
+      "R2"
+    ],
+    "risks": [
+      "R6",
+      "R3",
+      "R15"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-uniform` and `mid-clustered`: keep it if the median R2 rises by 15 degrees with R6 up by 3% or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-003",
+      "RULE-029"
+    ],
+    "rules": "Crossing angle.",
+    "hardRules": "project, then RULE-046.",
+    "zoom": "anchor."
+  },
+  {
+    "id": "RULE-050",
+    "family": "rules",
+    "name": "Topology first, then one convex program for the geometry",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Edge routing with ordered bundles",
+        "authors": "Pupyrev, Nachmanson, Bereg and Holroyd",
+        "year": 2016,
+        "url": "https://arxiv.org/abs/1209.4227"
+      },
+      {
+        "title": "Topology preserving constrained graph layout",
+        "authors": "Dwyer, Marriott and Wybrow",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-00219-9_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A discrete step fixes the way of each route around the boxes and the order of the routes in each channel. With those fixed, the free space of each segment is convex. One convex program then places all points. It has one answer, so it is the same each run and moves little for a small change.",
+    "math": "Variables: the bend points. Linear constraints: the side of each wrapped corner, x_j - x_i ≥ g in each channel. Objective: Σ ‖x_{k+1} - x_k‖² + λ Σ ‖x_k - x_k0‖². Solved by ADMM",
+    "cost": "O(I·V) by ADMM. 100 nodes: 20 ms. 1000 nodes: 300 ms.",
+    "params": [
+      "gap g 2 to 12 px",
+      "λ 0 to 1",
+      "ADMM steps 50 to 500"
+    ],
+    "wins": [
+      "R12",
+      "R8",
+      "Z10",
+      "R5"
+    ],
+    "risks": [
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered` and `case-dense-groups`, after `shared`: keep it if each channel with room has gaps of g or more and Z10 falls by 30%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-009",
+      "RULE-011",
+      "RULE-008",
+      "HWY-016"
+    ],
+    "rules": "Each convex quadratic rule: length, centered lanes, gaps, alignment.",
+    "hardRules": "Exact. The constraints hold the hard rules.",
+    "zoom": "convex. The same topology at each level gives a near geometry."
+  },
+  {
+    "id": "RULE-051",
+    "family": "rules",
+    "name": "Streamlines of a summed current",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Path planning using Laplace's equation",
+        "authors": "Connolly, Burns and Weiss",
+        "year": 1990,
+        "url": "https://doi.org/10.1109/ROBOT.1990.126315"
+      },
+      {
+        "title": "Rules for biologically inspired adaptive network design",
+        "authors": "Tero, Takagi, Saigusa, Ito, Bebber, Fricker, Yumiki, Kobayashi and Nakagaki",
+        "year": 2010,
+        "url": "https://doi.org/10.1126/science.1177894"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge drives one unit of current from its source plug to its target plug through a sheet that conducts. The boxes insulate. The currents of the edges of one direction class add. Each route follows a streamline of its own current plus the total, so routes of one direction share channels.",
+    "math": "∇·(σ ∇u_e) = δ_s - δ_t for each edge, J = Σ σ ∇u_e for each direction class, the route traces J_e + β J by RK4",
+    "cost": "One Poisson solve for each class, O(G) by multigrid. 100 nodes: 0.3 s. 1000 nodes: 3 s.",
+    "params": [
+      "β 0 to 2",
+      "cell 2 to 8 px",
+      "the direction classes"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "R8"
+    ],
+    "risks": [
+      "R6",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "On `mid-clustered`: keep it if B1 is equal to `shared` or better with R7 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "RULE-005",
+      "HWY-021"
+    ],
+    "rules": "Bundles by flow, clearance (σ = 0 in boxes).",
+    "hardRules": "No current enters an insulator, so the streamlines stay out of the boxes up to the error of the grid. Then RULE-046.",
+    "zoom": "The coarse grid of the parent level starts the solve."
+  },
+  {
+    "id": "RULE-052",
+    "family": "rules",
+    "name": "Rules that align and snap the legs",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "The Cassowary linear arithmetic constraint solving algorithm",
+        "authors": "Badros, Borning and Stuckey",
+        "year": 2001,
+        "url": "https://doi.org/10.1145/504704.504705"
+      },
+      {
+        "title": "SetCoLa: high-level constraints for graph layout",
+        "authors": "Hoffswell, Borning and Heer",
+        "year": 2018,
+        "url": "https://doi.org/10.1111/cgf.13440"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A reader sees aligned legs as one line. This rule finds legs of different routes with nearly equal coordinates and adds an equal constraint. It also snaps the leg coordinates to a grid of fixed pitch. A QP or XPBD pass meets them where the boxes permit.",
+    "math": "Cluster the leg coordinates within ε by a sorted sweep. Constraints x_a = x_b (strong) and x = k · pitch (weak), solved by RULE-009 or RULE-022",
+    "cost": "O(L log L) for L legs. 100 nodes: 2 ms. 1000 nodes: 20 ms.",
+    "params": [
+      "ε 1 to 6 px",
+      "pitch 4 to 16 px"
+    ],
+    "wins": [
+      "R14"
+    ],
+    "risks": [
+      "R12",
+      "R8",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "On `grid-400` and `mid-uniform`: keep it if the count of distinct leg coordinates falls by 30% with R12 unchanged.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-009",
+      "RULE-012",
+      "RULE-004"
+    ],
+    "rules": "Alignment, a snap grid, equal spacing.",
+    "hardRules": "The bounds of the solver hold the hard rules.",
+    "zoom": "The pitch doubles at each coarser level, so the alignment nests."
+  },
+  {
+    "id": "RULE-053",
+    "family": "rules",
+    "name": "A hysteresis gate for discrete choices",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Drawing graphs nicely using simulated annealing",
+        "authors": "Davidson and Harel",
+        "year": 1996,
+        "url": "https://doi.org/10.1145/234535.234538"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "A discrete choice flips when its score margin changes sign. An example is the highway that an edge takes. This gate keeps the choice of the parent level unless the new choice wins by a margin h. A small change of the input then flips few routes.",
+    "math": "Take c_new only if S(c_new) < S(c_parent) - h. The same test applies to an edit over time",
+    "cost": "O(1) for each choice.",
+    "params": [
+      "h 0% to 20% of the score"
+    ],
+    "wins": [
+      "Z10",
+      "Z8",
+      "Z9"
+    ],
+    "risks": [
+      "R1",
+      "R6"
+    ],
+    "placementDependent": false,
+    "screen": "On `nestedGridBoard` with one box moved by 1 u: keep it if the route flips fall by 50% with the energy up by h or less.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "RULE-045",
+      "HWY-046",
+      "HWY-054"
+    ],
+    "rules": "Stability of discrete choices.",
+    "hardRules": "No change.",
+    "zoom": "Native."
+  }
+]
