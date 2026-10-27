@@ -1,8 +1,8 @@
 {
   "counts": {
     "records": 273,
-    "distinct": 248,
-    "duplicateGroups": 24,
+    "distinct": 250,
+    "duplicateGroups": 26,
     "byFamily": {
       "fields": 51,
       "highway": 60,
@@ -12,8 +12,8 @@
     },
     "byKind": {
       "hybrid": 76,
-      "literature": 89,
-      "ours": 83
+      "literature": 90,
+      "ours": 84
     },
     "byStep": {
       "curve": 8,
@@ -22,19 +22,19 @@
       "levels": 20,
       "plugs": 8,
       "room": 17,
-      "router": 62,
+      "router": 64,
       "whole": 29
     },
     "byStage": {
       "cataloged": 256,
-      "screened": 4,
+      "screened": 3,
       "prototyped": 2,
       "built": 0,
       "kept": 6,
-      "dropped": 5
+      "dropped": 6
     },
     "byWave": {
-      "1": 11,
+      "1": 13,
       "2": 17,
       "3": 43,
       "4": 50,
@@ -45,7 +45,7 @@
     "meas3": {
       "B5": 17,
       "B7": 24,
-      "B8": 23,
+      "B8": 24,
       "B9": 22,
       "C4": 4,
       "C8": 4,
@@ -1519,14 +1519,14 @@
         "EDA-032",
         "EDA-046",
         "EDA-050",
-        "NAT-012",
-        "NAT-011",
+        "HWY-039",
         "HWY-047",
+        "NAT-011",
+        "NAT-012",
         "NAT-035"
       ],
       "same": [
-        "HWY-038",
-        "HWY-039"
+        "HWY-038"
       ],
       "wave": 1,
       "result": {
@@ -4495,13 +4495,12 @@
       "stage": "screened",
       "related": [
         "HWY-039",
-        "HWY-047",
         "HWY-043",
+        "HWY-047",
         "HWY-051"
       ],
       "same": [
-        "EDA-029",
-        "HWY-039"
+        "EDA-029"
       ],
       "canonical": "EDA-029",
       "wave": 1,
@@ -4615,19 +4614,16 @@
       "placementDependent": true,
       "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
       "prototype": "S",
-      "stage": "screened",
+      "stage": "kept",
       "related": [
-        "HWY-038",
-        "HWY-005",
-        "HWY-044",
-        "HWY-016",
-        "EDA-010"
-      ],
-      "same": [
+        "EDA-010",
         "EDA-029",
-        "HWY-038"
+        "HWY-005",
+        "HWY-016",
+        "HWY-038",
+        "HWY-044"
       ],
-      "canonical": "EDA-029",
+      "same": [],
       "wave": 1,
       "result": {
         "date": "2026-10-27",
@@ -6976,17 +6972,16 @@
       "prototype": "S",
       "stage": "kept",
       "related": [
+        "EDA-034",
         "NAT-005",
-        "NAT-022",
         "NAT-009",
-        "WILD-053",
+        "NAT-022",
+        "WILD-022",
         "WILD-023",
-        "WILD-056",
-        "EDA-034"
+        "WILD-053",
+        "WILD-056"
       ],
-      "same": [
-        "WILD-022"
-      ],
+      "same": [],
       "wave": 1,
       "result": {
         "date": "2026-10-27",
@@ -12264,18 +12259,15 @@
       "placementDependent": true,
       "screen": "On shared and shared-all over case-hub-chain, case-many-groups and small-clustered, with 5 seeds: keep an order when Â12 is 0.64 or more on the q95 of R5 or on B1.",
       "prototype": "S",
-      "stage": "kept",
+      "stage": "dropped",
       "related": [
-        "WILD-023",
-        "WILD-056",
-        "WILD-053",
+        "EDA-034",
         "NAT-024",
-        "EDA-034"
+        "WILD-023",
+        "WILD-053",
+        "WILD-056"
       ],
-      "same": [
-        "NAT-024"
-      ],
-      "canonical": "NAT-024",
+      "same": [],
       "wave": 1,
       "result": {
         "date": "2026-10-27",

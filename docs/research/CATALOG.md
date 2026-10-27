@@ -57,6 +57,8 @@ It also checks the groups: one canonical in each group, and the same stage and w
 
 The counts are for 2026-10-27. `index.json` gives the current counts.
 
+The screen of wave 1c split two pairs, because each idea of the pair got a different verdict. `HWY-039` (rip-up passes) is not the same idea as `EDA-029`. `WILD-022` (shortest first) is not the same idea as `NAT-024` (longest first). Thus the catalog has 250 distinct ideas. The tables below keep the first counts.
+
 | Family | Records | Distinct ideas |
 |---|---|---|
 | `highway` | 60 | 56 |
@@ -99,9 +101,8 @@ Each note was written without the others. Thus some ideas are in two or three no
 
 | Canonical | Same idea | Wave | Why it is one idea |
 |---|---|---|---|
-| `EDA-029` | `HWY-038`, `HWY-039` | 1 | The cost `f^α` on shared links. `HWY-039` is the same concave cost with rip-up. |
+| `EDA-029` | `HWY-038` | 1 | The cost `f^α` on shared links. |
 | `WILD-002` | `NAT-031` | 1 | Even spacing of the plugs on a side. |
-| `NAT-024` | `WILD-022` | 1 | The order in which the routes go. |
 | `HWY-031` | `WILD-030` | 2 | Highways from the overlap of first routes. |
 | `HWY-034` | `EDA-050` | 2 | Road classes from the use of the corner graph. |
 | `HWY-015` | `WILD-005` | 2 | Edges that leave a box in the same direction share one stub. |
@@ -260,12 +261,12 @@ Wave 7 holds the other ideas of the note of rules, in the build order of that no
 |---|---|---|---|---|---|
 | 1 | WILD-053 | Input in any order | `whole` | Z10, G9 | S |
 | 2 | WILD-056 | Order fragility and the price of anarchy | `whole` | R1, R5, B1 | S |
-| 3 | NAT-024 (with WILD-022) | Pioneer and follower order | `router` | B1, B2, R5 | S |
+| 3 | NAT-024 | Pioneer and follower order | `router` | B1, B2, R5 | S |
 | 4 | WILD-001 | Free plugs on a side | `plugs` | R3, R4, R10 | M |
 | 5 | WILD-002 (with NAT-031) | Plug justification | `plugs` | R11, R1, R10 | S |
 | 6 | EDA-004 | Constrained left-edge tracks in each gap | `room` | M1, M4, R12 | S |
 | 7 | RULE-046 | One repair step for the hard rules after any method | `router` | R9, Z2, Z3 | S |
-| 8 | EDA-029 (with HWY-038, HWY-039) | Branched transport cost (Gilbert flow cost) | `highway` | B1, B2, B7 | S |
+| 8 | EDA-029 (with HWY-038) | Branched transport cost (Gilbert flow cost) | `highway` | B1, B2, B7 | S |
 | 9 | EDA-030 | Gilbert split point for trunks | `highway` | B1, B6, R5 | S |
 | 10 | NAT-035 | Snell merges | `highway` | B6, R4, C3, R5 | S |
 | 11 | NAT-017 | Balancing-factor trees | `highway` | B1, B2, B3, R5 | S |

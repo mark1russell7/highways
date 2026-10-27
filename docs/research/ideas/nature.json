@@ -1345,17 +1345,16 @@
     "prototype": "S",
     "stage": "kept",
     "related": [
+      "EDA-034",
       "NAT-005",
-      "NAT-022",
       "NAT-009",
-      "WILD-053",
+      "NAT-022",
+      "WILD-022",
       "WILD-023",
-      "WILD-056",
-      "EDA-034"
+      "WILD-053",
+      "WILD-056"
     ],
-    "same": [
-      "WILD-022"
-    ],
+    "same": [],
     "wave": 1,
     "result": {
       "date": "2026-10-27",
