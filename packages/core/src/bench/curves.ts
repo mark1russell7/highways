@@ -7,6 +7,7 @@ import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.t
 import { curveStrategies } from "../strategies/builtins.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { measureLinks, type MeasuredLink } from "./links.ts";
+import { g1Defect } from "./measures/curves.ts";
 
 // The core runs in any host, so it reads the clock without the types of Node or the browser.
 const now = (): number => (globalThis as { performance?: { now(): number } }).performance?.now() ?? Date.now();
@@ -518,6 +519,17 @@ export function jogPeaks(curves: readonly LaneCurve[], jogs: JogTrace): number[]
       return peak;
     }),
   );
+}
+
+/**
+ * This function gives the peak curvature of one curve, in 1 / units: the largest curvature of its lines, cubic pieces and arcs (C5 of MEAS0 as `1 / rmin`).
+ * A joint with a tangent break of more than 0.5 degrees is a sharp corner, so such a curve gets `Infinity`. A curve of lines only gives 0.
+ */
+export function peakCurvature(segments: readonly CurveSegment[]): number {
+  if (g1Defect(segments) > 0.5) return Infinity;
+  let peak = 0;
+  for (let k = 1; k < segments.length; k++) peak = Math.max(peak, curvatureOf(segments[k - 1]!.to, segments[k]!).peak);
+  return peak;
 }
 
 /**

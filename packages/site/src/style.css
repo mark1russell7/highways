@@ -961,3 +961,319 @@ pre code {
     padding: 0.2rem 0.5rem 0.1rem;
   }
 }
+
+/* The compare page: the controls, a table of the measures, and a grid of one panel for each strategy. */
+.compare .router-row {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+.cmp-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 12px 20px;
+  align-items: start;
+  margin-top: 6px;
+}
+
+.cmp-options {
+  min-width: 0;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+
+.cmp-options summary {
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cmp-count {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.cmp-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.cmp-option-set {
+  min-width: 0;
+  margin: 0;
+  padding: 8px 10px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.cmp-option-set legend {
+  padding: 0 4px;
+  font-weight: 800;
+  font-family: "Cascadia Code", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+}
+
+.cmp-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 7rem);
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.92rem;
+}
+
+.cmp-option.check {
+  display: flex;
+}
+
+.cmp-option input[type="number"],
+.cmp-option select {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  padding: 0.3rem 0.4rem 0.2rem;
+  color: var(--ink);
+  background: var(--map);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.cmp-option input[type="checkbox"] {
+  accent-color: var(--sign);
+}
+
+.link:disabled {
+  color: var(--muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.cmp-status {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.cmp-summary {
+  margin-top: 18px;
+}
+
+.cmp-summary h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.cmp-front {
+  margin: 0.3rem 0 0.6rem;
+}
+
+.cmp-table {
+  font-size: 0.9rem;
+}
+
+.cmp-table th,
+.cmp-table td {
+  padding: 0.45rem 0.6rem 0.35rem;
+}
+
+.cmp-table thead th {
+  white-space: nowrap;
+  cursor: help;
+}
+
+.cmp-table tbody th {
+  white-space: nowrap;
+}
+
+.cmp-table tr.faulty th code {
+  text-decoration: line-through;
+  text-decoration-color: var(--bad);
+}
+
+.cmp-table .bar {
+  display: block;
+  height: 3px;
+  margin: 3px 0 0 auto;
+  width: calc(var(--f, 0) * 100%);
+  min-width: 2px;
+  background: var(--rule);
+  border-radius: 2px;
+}
+
+.cmp-table td.best .bar {
+  background: var(--good);
+}
+
+.star {
+  color: var(--good);
+}
+
+.dot {
+  color: var(--sign);
+}
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.cmp-grid.stale {
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+
+.cmp-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  scroll-margin-top: 16px;
+}
+
+.cmp-panel.front {
+  border: 2px solid var(--good);
+  padding: 13px;
+}
+
+.cmp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+.cmp-head h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--sign);
+  overflow-wrap: anywhere;
+}
+
+.cmp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.12rem 0.5rem 0.02rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.tag.front {
+  color: var(--sign-ink);
+  background: var(--sign-bg);
+  border-color: var(--sign-bg);
+}
+
+.tag.bad {
+  color: var(--bad);
+  border-color: currentColor;
+}
+
+.cmp-describe {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.cmp-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  background: var(--map);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.cmp-boxes rect {
+  fill: var(--node);
+  stroke: var(--node-line);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cmp-groups rect {
+  fill: var(--group);
+  stroke: var(--sign);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.cmp-routes path {
+  fill: none;
+  stroke: var(--route);
+  stroke-width: 1.1px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.cmp-measures {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 136px), 1fr));
+  gap: 2px 14px;
+  font-size: 0.9rem;
+}
+
+.cmp-measures div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0 1px;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.cmp-measures dt {
+  color: var(--muted);
+}
+
+.cmp-measures dd {
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cmp-measures .best dd {
+  color: var(--good);
+  font-weight: 900;
+}
+
+/* Below 640 pixels, the controls and the panels go to one column. */
+@media (max-width: 640px) {
+  .cmp-controls,
+  .cmp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compare .sign-links a {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem 0.1rem;
+  }
+
+  .compare .router-row .exit {
+    font-size: 0.95rem;
+  }
+}

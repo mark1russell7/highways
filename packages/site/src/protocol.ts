@@ -1,4 +1,5 @@
 import type { Quality, Result, Route, SegmentGraph } from "@mark1russell7/highways";
+import type { ComparePanels, CompareState } from "./compare-data.ts";
 
 /** A request to the worker: route one fixture with one router. */
 export interface RouteRequest {
@@ -32,3 +33,12 @@ export interface RouteFailed {
 
 /** A reply of the worker. */
 export type RouteReply = RouteDone | RouteFailed;
+
+/** A request to the worker of the compare page: run each strategy of one step on one board. */
+export interface CompareRequest {
+  readonly id: number;
+  readonly state: CompareState;
+}
+
+/** The reply of the worker of the compare page: the panels, or the error. */
+export type CompareReply = { readonly id: number; readonly ok: true; readonly panels: ComparePanels } | { readonly id: number; readonly ok: false; readonly error: string };

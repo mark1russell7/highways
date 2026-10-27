@@ -446,6 +446,14 @@ The script `bench` takes `--seeds <n>` and `--report <file>`. A family with more
 
 The workflow `Bench` runs the suite in parts. Each part writes its report, and `joinReports` joins the reports into the report of one run.
 
+`compareStep` runs each strategy of one step on one board, with the measures of the suite. It gives one row for each strategy and the Pareto front of the step. The options give each strategy its own options. The compare page of the site uses it.
+
+```ts
+import { compareStep } from "@mark1russell7/highways";
+
+const { rows, front } = compareStep("curve", graph, { options: { arc: { radius: 20 } } });
+```
+
 ## License
 
 MIT
