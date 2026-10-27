@@ -56,6 +56,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | WILD-R | Research: [new ideas for each step](research/IDEAS.md). The note gives 60 ideas, 47 of them new to the note and 10 hybrids, from 16 far fields. It gives a build order of 14 steps for BUILD-W. | 2026-10-27 | #60 |
 | NAT-R | Research: [ideas from nature](research/NATURE.md). The note gives 49 ideas, 7 of them ours and 25 hybrids, in [a catalog](research/ideas/nature.json). It gives a build order of 14 ideas for BUILD-W. | 2026-10-27 | #62 |
 | RULE-R | Research: [rules, forces and constraints for the routes](research/RULES.md). The note gives 53 ideas in seven areas, 13 of them ours and 25 hybrids. It gives a build order of 15 steps for BUILD-W. | 2026-10-27 | #63 |
+| HWY-STEP | The step `highway` gives a plan as data, and `follow` routes it. `keys`, `shared-ways` and `corridors` plug in, and the 16 digests of the routers stay the same. | 2026-10-27 | #67 |
 
 ## Open
 
@@ -70,7 +71,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
 | IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
-| HWY-STEP | A strategy step `highway` that decides the highways apart from the routers, so each idea of HWY-R plugs in. | `later` | HWY-R | P1 |
 | BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item

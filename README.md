@@ -99,7 +99,7 @@ A host layout can pack boxes with no gap between them. Then the links have no ch
 
 ## Strategies
 
-The steps `router`, `curve` and `room` have strategies with one interface. A consumer chooses a strategy by its name, or adds its own with `defineStrategy`. The registry `STRATEGIES` gives the lists of the benchmark and of the site. The [package README](packages/core/README.md) tells the API.
+The steps `group`, `router`, `highway`, `curve` and `room` have strategies with one interface. A consumer chooses a strategy by its name, or adds its own with `defineStrategy`. The registry `STRATEGIES` gives the lists of the benchmark and of the site. The [package README](packages/core/README.md) tells the API.
 
 ## The benchmark
 

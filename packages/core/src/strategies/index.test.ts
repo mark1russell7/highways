@@ -193,8 +193,9 @@ describe("a consumer strategy", () => {
   it("works with a registry of version 0.1.5, which has no list group", () => {
     const old = { router: STRATEGIES.router, curve: STRATEGIES.curve, room: STRATEGIES.room };
     expect(listStrategies(old, "group")).toEqual([]);
+    expect(listStrategies(old, "highway")).toEqual([]);
     expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag-like"]);
-    expect(STEPS).toEqual(["group", "router", "curve", "room"]);
+    expect(STEPS).toEqual(["group", "router", "highway", "curve", "room"]);
   });
 
   it("must have a name that no other strategy of its step has", () => {

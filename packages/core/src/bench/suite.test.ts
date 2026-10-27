@@ -44,7 +44,7 @@ describe("runSuite (MEAS1)", () => {
   });
 
   it("gives a Pareto front for each step, without the strategies that break a hard rule", () => {
-    expect(report.fronts.map((f) => f.step).sort()).toEqual(["curve", "group", "room", "router"]);
+    expect(report.fronts.map((f) => f.step).sort()).toEqual(["curve", "group", "highway", "room", "router"]);
     const router = report.fronts.find((f) => f.step === "router")!;
     expect(router.front.length).toBeGreaterThan(0);
     for (const s of router.excluded) expect(router.front).not.toContain(s);
@@ -85,8 +85,9 @@ describe("runSuite in parts (BENCH-CI)", () => {
       runSuite({ ...base, fixtures: [tiny] }).report,
       runSuite({ ...base, fixtures: [small], steps: ["router", "curve"], routers: routers.slice(0, 3) }).report,
       runSuite({ ...base, fixtures: [small], steps: ["router", "group"], routers: routers.slice(3) }).report,
+      runSuite({ ...base, fixtures: [small], steps: ["highway"] }).report,
     ];
-    const joined = joinReports([parts[2]!, parts[0]!, parts[1]!], { roomFamilies: [family] });
+    const joined = joinReports([parts[2]!, parts[3]!, parts[0]!, parts[1]!], { roomFamilies: [family] });
     const key = (r: (typeof one.rows)[number]) => [r.step, r.fixture, r.seed, r.strategy, r.values];
     expect(joined.rows.map(key)).toEqual(one.rows.map(key));
     expect(joined.fronts).toEqual(one.fronts);

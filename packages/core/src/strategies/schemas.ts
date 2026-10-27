@@ -1,6 +1,7 @@
 import type { CutOptions } from "../groups/cut/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
+import type { CorridorOptions } from "../highways/corridors/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
@@ -62,6 +63,18 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     describe: "The cost of a link that an edge with the same key uses already, as a share of its length.",
   },
   laneOrder: LANE_ORDER,
+};
+
+/** The declarations of the options of the highway strategy `corridors` (HWY-031). */
+export const CORRIDOR_SCHEMA: OptionSchema<CorridorOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  rho: { type: "number", min: 0.1, max: 0.8, step: 0.05, default: 0.3, describe: "Two edges join when their common links are this share of the shorter way, or longer." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+  hashes: { type: "integer", min: 16, max: 128, step: 16, scale: "log", marks: [16, 32, 64, 128], default: 64, describe: "The number of hash functions of the signature of a way." },
+  bands: { type: "integer", min: 4, max: 32, step: 4, scale: "log", marks: [4, 8, 16, 32], default: 32, describe: "The number of bands of the signature. Two ways with one equal band are a candidate pair." },
+  near: { type: "number", min: 0, max: 8, step: 1, default: 0, describe: "Two link ends nearer than this grid size are one point. With 0, only equal points are one point." },
+  lane: { type: "number", min: 1, max: 16, step: 1, default: 4, describe: "The gap between two lanes. A common stretch shorter than the break-even overlap for this gap does not join two edges." },
 };
 
 /** The declarations of the limits of the tree of sections (`SectionOptions`). */

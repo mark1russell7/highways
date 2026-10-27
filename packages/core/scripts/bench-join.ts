@@ -39,7 +39,7 @@ for (const file of files.filter((f) => /^side-.+\.txt$/.test(f))) {
 // The measure suite: the same tables as `pnpm bench` prints, for the report of all the parts.
 const reports = files.filter((f) => /^report-.+\.json$/.test(f)).map((f) => JSON.parse(readFileSync(join(folder, f), "utf8")) as SuiteReport);
 const report = joinReports(reports);
-for (const step of ["router", "curve", "room", "group"] as const) {
+for (const step of ["router", "highway", "curve", "room", "group"] as const) {
   console.log();
   console.log(formatSummaries(report.summaries, step));
 }

@@ -36,6 +36,8 @@ function runOn(s: AnyStrategy, options?: object): unknown[] {
       return [tiny, board("case-many-groups")].map((g) => s.run(g, options));
     case "router":
       return [tiny, board("case-hub-chain")].map((g) => s.run(g, options));
+    case "highway":
+      return [tiny, board("case-hub-chain")].map((graph) => s.run({ graph }, options));
     case "curve": {
       const space = curveSpace(tiny.nodes.map((n) => n.box));
       const routes = ROUTERS.find((r) => r.name === "corners")!.route(tiny).routes;
