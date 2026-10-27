@@ -80,9 +80,11 @@ describe("the case boards", () => {
     expect(measureRouteFaults(g, sectionsRouter({ name: "tree", stretch: Infinity }).route(g)).backtrack).toBe(0);
   });
 
-  it("many groups: some level links go around the outer edge of the board", () => {
+  it("many groups: no level link goes around the outer edge of the board (ER3c)", () => {
     const f = level(manyGroupsBoard());
     expect(f.through).toBe(0);
-    expect(f.outside).toBe(4);
+    expect(f.backtrack).toBe(3);
+    // Before ER3c, 4 level links went around the outer edge of the board.
+    expect(f.outside).toBe(0);
   });
 });

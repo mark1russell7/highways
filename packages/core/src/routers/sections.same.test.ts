@@ -12,16 +12,18 @@ import { sectionsRouter, type SectionsOptions } from "./sections.ts";
  * ER3a changed the level links of three digests: `case-dense-groups` with both options, and `small-clustered` with the options `site`.
  * Those links went through other groups before. The routes, the runs, the run keys and the lane routes did not change.
  * ER3b changed the routes of the boards whose edges took the hubs out and back.
+ * ER3c changed only the points of the level links of each digest except `small-clustered` with the options `site`.
+ * Those links go through the groups now, not around the outer edge.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  "case-dense-groups/site": "68ca69c53fc5a65cc829439c1be5704db97e682d694f02a1e663cfac23218a13",
-  "case-dense-groups/sections": "e48e1fbe9bbe8fe28793c4da80b924ddc243c0dc986f0f7c52eb5e6038703fc2",
-  "case-hub-chain/site": "9b57f4d77521ab1a89e7eb5051d1961f83cbeaf60c0e4c0b916a62e76c7b5ca7",
-  "case-hub-chain/sections": "7c0c3388a8ed0510aba4d8bea9d4b46848c2533b592a10e792db6ef802ee2e8b",
-  "case-many-groups/site": "6586e7682f3bf4691121fc937da7ac82df5459fb2e964a2a39fd96b87ef1a9d7",
-  "case-many-groups/sections": "35108adacf5948cbc90d25fb127eb0fe1a170ce70de2e1983d9f51629c75166e",
+  "case-dense-groups/site": "c7dad0bc5c890c06d4d2c318d94209b5afaafc3a66f1278dd298b68a3659c654",
+  "case-dense-groups/sections": "a638f60af7058efa5987786dab7801ffeeab99025de4798a41320e6305e607e9",
+  "case-hub-chain/site": "92941d1b3c12943b6594e57b4dca3702a16feb6bdf3a61176ba4d0e2e957fbd1",
+  "case-hub-chain/sections": "3e2d3a656488a21d0aadc0edd5a932e2fcdfdd29be9d891794b005306f0ca696",
+  "case-many-groups/site": "da54d7c45c647ac070c24692f1d82e372dae17efcc044ee378f0a5278197f418",
+  "case-many-groups/sections": "ea75b3af84bf1bf7aff23040a79660b423c5ac47d7cf3ee5c6940dba4576cb02",
   "small-clustered/site": "6be966b0b4b9aa74fab2e4d75a0183fba159d29410e5ab5d6ad6ee9cfb111b51",
-  "small-clustered/sections": "abd394589bd0bf68a4f5b64fa34ed5a2ce48b1a7995b5f1c10d451779fd8299f",
+  "small-clustered/sections": "e9a0ee8fb9ba1785b0fb1aa5f60d3cc3af989f9b096be81e35c44e7febf654ba",
 };
 
 /** The options of the router of the example boards of the site, and the defaults. */

@@ -86,6 +86,11 @@ export interface CornerGraphOptions {
    * The lattice links groups of nodes across empty space. Without it, the nearest corners of a group are all in that group.
    */
   readonly lattice?: number;
+  /**
+   * With `cones`, each corner also links to the nearest corner that it can see in each of four cones around the axes.
+   * Then a path can go along a long corridor between rows or columns of boxes. The default is false.
+   */
+  readonly cones?: boolean;
 }
 
 /**
@@ -164,7 +169,8 @@ export class CornerGraph {
     }
     const links: Set<number>[] = this.points.map(() => new Set<number>());
     for (let i = 0; i < this.points.length; i++) {
-      for (const j of this.nearestVisible(this.points[i]!, this.#k, i)) {
+      // The k nearest corners of a corner in a long corridor are often all on one side. The cones add a link along the corridor.
+      for (const j of this.#nearestVisible(this.points[i]!, this.#k, i, this.#pad, options.cones ?? false)) {
         links[i]!.add(j);
         links[j]!.add(i);
       }
@@ -221,13 +227,17 @@ export class CornerGraph {
    * within `r` that an earlier ring did not test, nearest first, and equal distances by index.
    * The ring of `r` takes the corners of the buckets that the square of side `2r` around `p` touches.
    * A corner of these buckets beyond `r` waits for the next ring. So the method visits each bucket one time.
+   * With `cones`, the method also gives the nearest visible corner of each of four cones around the axes that the `k` nearest corners leave empty.
    */
-  #nearestVisible(p: Point, k: number, self: number, pad: number): number[] {
+  #nearestVisible(p: Point, k: number, self: number, pad: number, cones = false): number[] {
     const out: number[] = [];
+    // The bits of the full cones: 1 is +x, 2 is +y, 4 is -x and 8 is -y.
+    let full = 0;
     if (this.#dist.length < this.points.length) this.#dist = new Float64Array(this.points.length);
     const dd = this.#dist;
     const points = this.points;
     const cell = this.#cell;
+    const reach = CONE_CELLS * cell;
     const blockers: Node[] = [];
     const now = this.#near;
     // The corners that the rings found beyond their radius. The next ring takes them.
@@ -238,6 +248,8 @@ export class CornerGraph {
     let pj0 = 1;
     let pj1 = 0;
     for (let r = cell; r <= cell * 8; r *= 2) {
+      // The ring of `r` holds the corners beyond `r / 2`. With the k nearest corners, the cones take no corner beyond `reach`.
+      if (out.length >= k && r / 2 >= reach) return out;
       // These bounds are the bounds of a query of the box at (p.x - r, p.y - r) with the side 2r.
       const x0 = p.x - r;
       const y0 = p.y - r;
@@ -273,6 +285,12 @@ export class CornerGraph {
         // A node that stopped an earlier segment often stops this segment too, so the test takes these nodes first.
         // The order of the nodes does not change the result.
         const q = points[j]!;
+        const cone = cones ? coneOf(q.x - p.x, q.y - p.y) : 0;
+        if (out.length >= k) {
+          // After the k nearest corners, only a corner of an empty cone counts, up to `CONE_CELLS` cells from `p`.
+          if (dd[j]! > reach) return out;
+          if ((full & cone) !== 0) continue;
+        }
         let blocked = false;
         for (let b = 0; b < blockers.length && !blocked; b++) blocked = hits(p, q, blockers[b]!, pad);
         if (blocked) continue;
@@ -280,7 +298,8 @@ export class CornerGraph {
         if (hit !== undefined) blockers.push(hit);
         else {
           out.push(j);
-          if (out.length >= k) return out;
+          full |= cone;
+          if (out.length >= k && (!cones || full === 15)) return out;
         }
       }
       wait = later;
@@ -473,6 +492,12 @@ export class CornerGraph {
     return out;
   }
 }
+
+/** A link of a cone is at most this number of cells long. A longer search costs time on a dense level and finds few new links. */
+const CONE_CELLS = 3;
+
+/** This function gives the bit of the cone of the offset (`dx`, `dy`): 1 is +x, 2 is +y, 4 is -x and 8 is -y. A diagonal offset is in a cone of the x axis. */
+const coneOf = (dx: number, dy: number): number => (Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 1 : 4) : dy > 0 ? 2 : 8);
 
 /** This function packs the two indices of a bucket into one number. Each index stays within ±2^20. */
 const bucketKey = (i: number, j: number): number => (i + 1_048_576) * 2_097_152 + (j + 1_048_576);
