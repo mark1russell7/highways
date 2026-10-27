@@ -1,9 +1,12 @@
 import type { CurveSegment } from "../curves/model.ts";
+import { polylineLength } from "../geom.ts";
 import type { Graph, Result } from "../model.ts";
 import type { Section } from "../sections.ts";
+import { runKey, segmentsOf } from "../segments.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { asRouter, getStrategy, listStrategies, type Registry, type Step } from "../strategies/model.ts";
+import { asRouter, getStrategy, listStrategies, type LaneBoard, type Registry, type Step } from "../strategies/model.ts";
 import { peakCurvature } from "./curves.ts";
+import { measureLevelFaults, sumFaults } from "./links.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
 import { boardUnit } from "./measures/routes.ts";
 import { changeGraph, routeStability } from "./measures/stability.ts";
@@ -20,6 +23,25 @@ function medianOf(values: readonly number[]): number {
   return a === b ? a : (a + b) / 2;
 }
 
+/**
+ * This function gives the measures of the level links of a result: the links through a box (`Z3.through`) and the length of all links (`Z3.length`).
+ * A result without a level with groups gives no measure.
+ */
+function levelLinkMeasures(result: Result): Record<string, number> {
+  const levels = (result.levels ?? []).filter((l) => l.items.some((i) => i.nodes.length > 1));
+  if (levels.length === 0) return {};
+  const length = levels.reduce((sum, l) => sum + l.links.reduce((s, k) => s + polylineLength(k.points), 0), 0);
+  return { "Z3.through": sumFaults(measureLevelFaults(result)).through, "Z3.length": length };
+}
+
+/** This function gives the lanes of a result with each shared segment open. A result without shared segments gives `undefined`. */
+function laneBoard(result: Result, lanes: { readonly width: number; readonly maxWidth?: number }): LaneBoard | undefined {
+  const graph = segmentsOf(result);
+  const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+  if (open.size === 0) return undefined;
+  return { graph, open, width: lanes.width, ...(lanes.maxWidth === undefined ? {} : { maxWidth: lanes.maxWidth }) };
+}
+
 /** The steps that `compareStep` compares. The step `room` takes a packed board, not a graph, so it is not in the list. */
 export type CompareStep = Exclude<Step, "room">;
 
@@ -34,6 +56,11 @@ export interface CompareOptions {
   readonly options?: Readonly<Record<string, object>>;
   /** The router whose routes the step `curve` draws. The default is `corners`, as in `runSuite`. */
   readonly curveRouter?: string;
+  /**
+   * With this value, the step `curve` opens each shared segment of the routes of `curveRouter`, and each curve draws the lanes of `laneRoutes`.
+   * So the curve `highway` bends the lanes of a bundle as one. Without it, each curve draws the routes. A router without shared segments gives the routes in both cases.
+   */
+  readonly lanes?: { readonly width: number; readonly maxWidth?: number };
   /** The seed of the small change of the graph for the stability measures (Z10 and G9). The default is 1. */
   readonly seed?: number;
   /** The route stability (Z10) routes a changed graph again, so the function measures it only up to this number of nodes. The default is 1000. */
@@ -50,7 +77,10 @@ export interface CompareRow {
   readonly violations: number;
   /** The time of the step, in milliseconds. For the step `router`, it is the median of two routes. */
   readonly ms: number;
-  /** The measures, by the keys of `runSuite`, and `ms`. The step `router` adds `ink`, and the step `curve` adds `C5.peak`. */
+  /**
+   * The measures, by the keys of `runSuite`, and `ms`. The step `router` adds `ink`, and the step `curve` adds `C5.peak`.
+   * A router with zoom levels also gets `Z3.through` and `Z3.length`, the measures of its level links.
+   */
   readonly values: Readonly<Record<string, number>>;
   /** The reason when the strategy did not run, for example a graph over its `maxNodes`. */
   readonly skipped?: string;
@@ -79,7 +109,7 @@ export interface StepComparison {
 
 /**
  * This function runs each strategy of one step on one graph and measures it with the measures of `runSuite`. Then it gives the Pareto front.
- * The step `router` routes the graph with each router. The step `curve` draws the routes of `curveRouter` with each curve.
+ * The step `router` routes the graph with each router. The step `curve` draws the routes of `curveRouter` with each curve, or their lanes with the option `lanes`.
  * The step `group` routes the graph with `sections` on the tree of each grouping rule.
  *
  * The same graph and the same options give the same measures. Only the times change.
@@ -98,7 +128,7 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
       if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) return { step, strategy: strategy.name, violations: 0, ms: 0, values: {}, skipped: `over ${strategy.maxNodes} nodes` };
       const router = asRouter(strategy, own[strategy.name]);
       const { row, result } = benchRun(router, name, graph, 2);
-      const values: Record<string, number> = { ...routeMeasures(graph, result, row), ink: row.quality.ink, ms: row.ms };
+      const values: Record<string, number> = { ...routeMeasures(graph, result, row), ...levelLinkMeasures(result), ink: row.quality.ink, ms: row.ms };
       if (change) {
         const s = routeStability(graph, result, router.route(change.graph), { seed });
         values["Z10.mean"] = s.mean;
@@ -111,11 +141,13 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
     const router = asRouter(getStrategy(registry, "router", options.curveRouter ?? "corners"));
     const result = router.route(graph);
     const u = boardUnit(graph);
+    const lanes = options.lanes && laneBoard(result, options.lanes);
     const runs = curveRuns(graph, result, listStrategies(registry, "curve"), {
       ...at,
       smooth: new Set(["rounded", "arc", "spline", "smooth", "clothoid", "highway"]),
       normals: new Set(["spline"]),
       curveOptions: own,
+      ...(lanes ? { lanes } : {}),
     });
     rows = runs.map(({ row, drawn, edges }): CompareRow => {
       const peaks = drawn.map((d) => peakCurvature(d) * u);

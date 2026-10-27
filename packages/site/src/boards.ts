@@ -40,9 +40,15 @@ class Builder {
   readonly edges: Edge[] = [];
   readonly cards = new Map<string, Card>();
   readonly #pairs = new Set<string>();
+  readonly #kinds = new Map<string, string>();
 
-  card(id: string, x: number, y: number, w: number, h: number, card: Card): string {
-    this.nodes.push({ id, box: { x, y, w, h } });
+  /**
+   * This method adds a card. The string `group` goes in `data.group`, so the grouping rule `keys` puts the cards with one group together.
+   * Each edge into the card gets the string `kind` in `data.collection`, so the routers `trunks` and `shared` bundle the edges of one kind.
+   */
+  card(id: string, x: number, y: number, w: number, h: number, card: Card, group: string, kind: string = group): string {
+    this.nodes.push({ id, box: { x, y, w, h }, data: { group } });
+    this.#kinds.set(id, kind);
     this.cards.set(id, card);
     return id;
   }
@@ -52,7 +58,8 @@ class Builder {
     const key = source < target ? `${source}|${target}` : `${target}|${source}`;
     if (source === target || this.#pairs.has(key)) return false;
     this.#pairs.add(key);
-    this.edges.push({ id: `e${this.edges.length}`, source: { node: source }, target: { node: target } });
+    const collection = this.#kinds.get(target);
+    this.edges.push({ id: `e${this.edges.length}`, source: { node: source }, target: { node: target }, ...(collection === undefined ? {} : { data: { collection } }) });
     return true;
   }
 
@@ -66,11 +73,13 @@ const pick = <T>(rnd: () => number, list: readonly T[]): T => list[Math.floor(rn
 /**
  * This function makes the delivery board: 4 depots, 24 shops and 48 orders in 4 districts.
  * A depot supplies the shops of its district and some shops of other districts. A shop fills orders.
+ * The group of a card is the supply (the depot and the shops) or the orders of its district. The kind of a card is depot, shop or order.
  */
 export function deliveryBoard(): Board {
   const rnd = seeded(4817);
   const b = new Builder();
   const depots = ["North depot", "Harbor depot", "Valley depot", "Old Mill depot"];
+  const districts = ["North", "Harbor", "Valley", "Old Mill"];
   const shopNames = [
     "Corner Grocer", "Daily Bread", "Green Basket", "Pine St Market", "Blue Door Deli", "Sunrise Foods",
     "Hilltop Pantry", "Canal Kiosk", "Market Hall", "Oak Lane Shop", "The Larder", "Fresh Fields",
@@ -91,13 +100,13 @@ export function deliveryBoard(): Board {
   for (let d = 0; d < 4; d++) {
     const ox = (d % 2) * (width + 2 * GAP);
     const oy = Math.floor(d / 2) * (height + 2 * GAP);
-    depotIds.push(b.card(`depot${d}`, ox + (width - 176) / 2, oy, 176, 52, { title: depots[d]!, sub: "Depot", strong: true }));
+    depotIds.push(b.card(`depot${d}`, ox + (width - 176) / 2, oy, 176, 52, { title: depots[d]!, sub: "Depot", strong: true }, `${districts[d]!} supply`, "depots"));
     const shops: string[] = [];
     const span = 3 * col + 2 * GAP;
     for (let i = 0; i < 6; i++) {
       const x = ox + (width - span) / 2 + (i % 3) * (col + GAP);
       const y = oy + 52 + GAP + Math.floor(i / 3) * (44 + GAP);
-      shops.push(b.card(`shop${shopNo}`, x, y, col, 44, { title: shopNames[shopNo]!, sub: "Shop" }));
+      shops.push(b.card(`shop${shopNo}`, x, y, col, 44, { title: shopNames[shopNo]!, sub: "Shop" }, `${districts[d]!} supply`, "shops"));
       shopNo++;
     }
     shopsOf.push(shops);
@@ -107,7 +116,7 @@ export function deliveryBoard(): Board {
       const y = oy + 52 + GAP + 2 * (44 + GAP) + Math.floor(i / 4) * (40 + GAP);
       orderNo += 1 + Math.floor(rnd() * 40);
       const sub = `${2 + Math.floor(rnd() * 11)} ${pick(rnd, goods)}, ${pick(rnd, days)}`;
-      orders.push(b.card(`order${orderNo}`, x, y, 116, 40, { title: `Order ${orderNo}`, sub }));
+      orders.push(b.card(`order${orderNo}`, x, y, 116, 40, { title: `Order ${orderNo}`, sub }, `${districts[d]!} orders`, "orders"));
     }
     ordersOf.push(orders);
   }
@@ -209,7 +218,7 @@ payments billing, payments bus, payments ordersdb, shipping bus, shipping orders
 notify bus, notify usersdb, billing ordersdb, billing usersdb, media files, profile usersdb, profile files
 `;
 
-/** This function makes the service map: 31 services in five layers, and the calls between them. */
+/** This function makes the service map: 31 services in five layers, and the calls between them. The group and the kind of a service are its layer. */
 export function servicesBoard(): Board {
   const b = new Builder();
   const w = 140;
@@ -221,7 +230,7 @@ export function servicesBoard(): Board {
     row.forEach(([id, title], i) => {
       const x = (full - span) / 2 + i * (w + GAP);
       const y = r * (h + 2 * GAP);
-      b.card(id, x, y, w, h, { title, sub: SERVICE_LAYER[r]!, strong: id === "gateway" || id === "bus" });
+      b.card(id, x, y, w, h, { title, sub: SERVICE_LAYER[r]!, strong: id === "gateway" || id === "bus" }, SERVICE_LAYER[r]!);
     });
   });
   for (const pair of SERVICE_CALLS.split(",")) {
@@ -262,7 +271,7 @@ const COURSES: readonly [string, string, number, number, string][] = [
   ["DS499", "Research project", 5, 4, "DS301 DS401 EN101 DS201"],
 ];
 
-/** This function makes the course plan: 27 courses in five rows, and the courses that each course needs first. */
+/** This function makes the course plan: 27 courses in five rows, and the courses that each course needs first. The group and the kind of a course are its year. */
 export function coursesBoard(): Board {
   const b = new Builder();
   const w = 150;
@@ -272,7 +281,7 @@ export function coursesBoard(): Board {
     const x = column * (w + GAP) + (year === 5 ? (w + GAP) / 2 : 0);
     const y = (year - 1) * (h + 2 * GAP);
     const label = year === 5 ? "Final term" : `Year ${year}`;
-    b.card(id, x, y, w, h, { title, sub: `${id}, ${label}, ${3 + Math.floor(credits() * 3)} credits`, strong: year === 5 });
+    b.card(id, x, y, w, h, { title, sub: `${id}, ${label}, ${3 + Math.floor(credits() * 3)} credits`, strong: year === 5 }, label);
   }
   for (const [id, , , , needs] of COURSES) for (const first of needs.split(" ").filter(Boolean)) b.link(first, id);
   return b.board("courses", "Course plan", "courses", "prerequisites", "CS302");

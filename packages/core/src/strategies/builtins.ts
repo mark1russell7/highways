@@ -1,7 +1,9 @@
 import { arcCurve, type ArcOptions } from "../curves/arc/index.ts";
 import { clothoidCurve, type ClothoidOptions } from "../curves/clothoid/index.ts";
-import { highwayCurve, type JogStyle } from "../curves/highway/index.ts";
+import { highwayCurve, highwayCurves, type JogStyle, type LaneCurve } from "../curves/highway/index.ts";
+import type { CurveSegment } from "../curves/model.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
+import type { CurveSpace } from "../curves/space.ts";
 import { smoothCurve, type SmoothOptions } from "../curves/smooth/index.ts";
 import { splineCurve, type SplineOptions } from "../curves/spline/index.ts";
 import { straightCurve } from "../curves/straight/index.ts";
@@ -19,7 +21,7 @@ import { sharedRouter, type SharedOptions } from "../routers/shared.ts";
 import { straightRouter } from "../routers/straight.ts";
 import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
-import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
+import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_ROOM_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
@@ -130,7 +132,10 @@ export interface TensionOptions {
   readonly tension: number;
 }
 
-/** The options of the curve strategy `highway`. */
+/**
+ * The options of the curve strategy `highway`. The options `minRadius`, `jog` and `jogPieces` change only the lanes of a bundle.
+ * So they change the curve only when the input has a `lane` on a board with open segments.
+ */
 export interface HighwayStrategyOptions {
   /** The radius of the center line of a bundle at a bend, and of each lone corner. The default is 12. */
   readonly radius: number;
@@ -140,6 +145,33 @@ export interface HighwayStrategyOptions {
   readonly jog: JogStyle;
   /** The number of cubic pieces of a `quintic` S curve. The default is 4. */
   readonly jogPieces: number;
+}
+
+/** The curves of the lanes of each board, for the last options and the last free space. The strategy `highway` draws one lane in each call. */
+const laneCurves = new WeakMap<LaneBoard, { readonly key: string; readonly space: CurveSpace | undefined; readonly curves: LaneCurve[] }>();
+
+/**
+ * This function gives the curve of one lane of a board with `highwayCurves` and each option of the strategy `highway`.
+ * The lanes of a bundle bend as one. So the function draws all the lanes of the board one time, and keeps them for the next lane.
+ */
+function highwayLane(input: CurveInput & Required<Pick<CurveInput, "lane">>, o: Readonly<HighwayStrategyOptions>): CurveSegment[] {
+  const { board, index } = input.lane;
+  const key = JSON.stringify([o.radius, o.minRadius, o.jog, o.jogPieces]);
+  let hit = laneCurves.get(board);
+  if (!hit || hit.key !== key || hit.space !== input.space) {
+    const curves = highwayCurves(board.graph, board.open, board.width, {
+      radius: o.radius,
+      minRadius: o.minRadius,
+      jog: o.jog,
+      jogPieces: o.jogPieces,
+      ...(board.maxWidth === undefined ? {} : { maxWidth: board.maxWidth }),
+      ...(input.space ? { space: input.space } : {}),
+    });
+    hit = { key, space: input.space, curves };
+    laneCurves.set(board, hit);
+  }
+  const lane = hit.curves[index];
+  return lane ? [...lane.segments] : highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) });
 }
 
 /** The options of the curve strategy `smooth`. */
@@ -162,7 +194,7 @@ export interface ClothoidStrategyOptions {
 
 /**
  * The built-in curve strategies. The first six are in the order of `CURVE_TYPES`, and each one gives the same segments as `curveOf` with its type.
- * The strategy `highway` gives the curve of `arc` for one polyline. `highwayCurves` bends the lanes of a bundle as one.
+ * The strategy `highway` gives the curve of `arc` for one polyline. For a polyline with a `lane`, it bends the lanes of each bundle as one with `highwayCurves`.
  */
 export const curveStrategies: {
   readonly straight: Strategy<"curve", object>;
@@ -227,7 +259,8 @@ export const curveStrategies: {
     describe: "The lanes of a bundle bend as one, with concentric arcs at the lane spacing. One lane alone gets the curve of `arc`.",
     defaults: { radius: 12, minRadius: 4, jog: "biarc" as JogStyle, jogPieces: 4 },
     schema: HIGHWAY_SCHEMA,
-    run: (input: CurveInput, o: Readonly<HighwayStrategyOptions>) => highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) }),
+    run: (input: CurveInput, o: Readonly<HighwayStrategyOptions>) =>
+      input.lane ? highwayLane({ ...input, lane: input.lane }, o) : highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) }),
   }),
 });
 

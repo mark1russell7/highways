@@ -323,7 +323,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid` |
+| `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
 A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.
@@ -448,10 +448,13 @@ The workflow `Bench` runs the suite in parts. Each part writes its report, and `
 
 `compareStep` runs each strategy of one step on one board, with the measures of the suite. It gives one row for each strategy and the Pareto front of the step. The options give each strategy its own options. The compare page of the site uses it.
 
+With the option `lanes`, the step `curve` opens each shared way of the routes of `curveRouter` into lanes, and each curve draws the lanes. Each input then has its `lane`, so the curve `highway` bends the lanes of a bundle as one with each of its options.
+
 ```ts
 import { compareStep } from "@mark1russell7/highways";
 
 const { rows, front } = compareStep("curve", graph, { options: { arc: { radius: 20 } } });
+const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { width: 5, maxWidth: 30 }, options: { highway: { jog: "quintic" } } });
 ```
 
 ## License

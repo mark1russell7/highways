@@ -5,9 +5,12 @@ import {
   COMPARE_STEPS,
   farLevel,
   FIXTURES,
+  laneRoutes,
   listOptions,
   listStrategies,
   makeFixture,
+  runKey,
+  segmentsOf,
   STRATEGIES,
   toSvgPath,
   type AnyOption,
@@ -18,6 +21,8 @@ import {
   type Objective,
   type Point,
   type Registry,
+  type Result,
+  type Route,
   type Strategy,
 } from "@mark1russell7/highways";
 import { BOARDS } from "./boards.ts";
@@ -41,6 +46,16 @@ export const COMPARE_BOARDS: readonly CompareBoard[] = [
 ]
   .filter((b) => b.graph.nodes.length <= COMPARE_MAX_NODES)
   .map((b) => ({ ...b, nodes: b.graph.nodes.length, edges: b.graph.edges.length }));
+
+/** The router whose routes the step `curve` draws. It shares the ways of the edges, so the board has bundles for the curve `highway`. */
+export const CURVE_ROUTER = "shared";
+
+/**
+ * The lanes of a shared way, in units of the board: the distance between two lanes and the largest width of a bundle.
+ * The live demo uses the same values.
+ * The panels of the steps `router` and `curve` open each shared way into one lane for each edge.
+ */
+export const LANES = { width: 5, maxWidth: 30 } as const;
 
 /** The names of the steps on the page. */
 export const STEP_NAMES: Readonly<Record<CompareStep, string>> = { group: "Grouping", router: "Router", curve: "Curve" };
@@ -73,6 +88,8 @@ export const COLUMNS: Readonly<Record<CompareStep, readonly MeasureColumn[]>> = 
     { key: "R5.median", label: "Median detour", describe: "The median route length, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
     { key: "R4.turn", label: "Mean turn", describe: "The mean total turn of a route, in half turns.", better: "min", kind: "number", digits: 2 },
     { key: "B1.inkSaved", label: "Ink saved", describe: "The share of the length that the shared parts save.", better: "max", kind: "share" },
+    { key: "Z3.through", label: "Level through", describe: "Links of the zoom levels that go through a box. Only a router with zoom levels has them.", better: "min", kind: "count" },
+    { key: "Z3.length", label: "Level length", describe: "The length of all links of the zoom levels. Only a router with zoom levels has them.", better: "min", kind: "number", digits: 0 },
     TIME,
   ],
   curve: [
@@ -251,12 +268,19 @@ function viewOf(boxes: readonly Box[]): Box {
   return { x: x0 - m, y: y0 - m, w: x1 - x0 + 2 * m, h: y1 - y0 + 2 * m };
 }
 
+/** This function gives the routes of a result, with one lane for each edge of a shared way. A result without shared ways gives its routes. */
+function lanesOf(result: Result): readonly Route[] {
+  const graph = segmentsOf(result);
+  const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+  return open.size === 0 ? result.routes : laneRoutes(graph, open, LANES.width, LANES.maxWidth);
+}
+
 /** This function gives the drawing of one row: the routes, the curves, or the groups and the links of the far view. */
 function drawingOf(graph: Graph, row: CompareRow): Drawing {
   const boxes = graph.nodes.map((n) => n.box);
   const view = viewOf(boxes);
   if (row.step === "curve") return { view, boxes, groups: [], paths: (row.curves ?? []).map((c) => ({ d: toSvgPath(c, 1), width: 1 })) };
-  if (row.step === "router") return { view, boxes, groups: [], paths: (row.result?.routes ?? []).map((r) => ({ d: polylinePath(r.points), width: 1 })) };
+  if (row.step === "router") return { view, boxes, groups: [], paths: (row.result ? lanesOf(row.result) : []).map((r) => ({ d: polylinePath(r.points), width: 1 })) };
   const far = farLevel(row.result?.levels ?? []);
   const groups = (far?.items ?? []).filter((i) => i.nodes.length > 1).map((i) => i.box);
   const paths = (far?.links ?? []).map((l) => ({ d: polylinePath(l.points), width: Math.min(6, 1 + Math.log2(l.count)) }));
@@ -299,7 +323,7 @@ export function computePanels(state: CompareState, options: PanelOptions = {}): 
   const board = COMPARE_BOARDS.find((b) => b.id === state.board) ?? COMPARE_BOARDS[0]!;
   const own = cleanOptions(state.step, state.options, registry);
   const t0 = performance.now();
-  const result = compareStep(state.step, board.graph, { registry, options: own, name: board.id });
+  const result = compareStep(state.step, board.graph, { registry, options: own, name: board.id, curveRouter: CURVE_ROUTER, lanes: LANES });
   const ms = performance.now() - t0;
   const best = bestValues(state.step, result.rows);
   const describe = new Map(listStrategies(registry, state.step).map((s) => [s.name, s.describe]));

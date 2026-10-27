@@ -4,6 +4,7 @@ import type { Point } from "../geom.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import type { Boxed, Gap, RoomLink } from "../room/index.ts";
 import type { Section } from "../sections.ts";
+import type { SegmentGraph } from "../segments.ts";
 import type { OptionSchema } from "./options.ts";
 
 /** The input of a curve strategy: one polyline and the context of its route. */
@@ -16,6 +17,23 @@ export interface CurveInput {
   readonly endNormal?: Point;
   /** The boxes that the curve must not go through, from `curveSpace`. */
   readonly space?: CurveSpace;
+  /**
+   * The lane of the polyline on its board, for a strategy that bends the lanes of a bundle as one. Then `points` is the route of `laneRoutes` with the index `index`.
+   * The other strategies do not read it.
+   */
+  readonly lane?: { readonly board: LaneBoard; readonly index: number };
+}
+
+/** The lanes of the bundles of one board: the input of `laneRoutes` and `highwayCurves`. */
+export interface LaneBoard {
+  /** The shared segments and the paths of the routes, from `segmentsOf`. */
+  readonly graph: SegmentGraph;
+  /** The keys of the open segments, from `runKey`. Each edge of an open segment gets its own lane. */
+  readonly open: ReadonlySet<string>;
+  /** The distance between two lanes of an open segment. */
+  readonly width: number;
+  /** The largest width of an open segment, from its outer lane to its outer lane. The default is `Infinity`. */
+  readonly maxWidth?: number;
 }
 
 /** The input of a room strategy: the boxes of a board and the links between them. */

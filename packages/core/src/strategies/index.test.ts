@@ -3,13 +3,16 @@ import { benchCurves, benchCurveStrategies } from "../bench/curves.ts";
 import { benchRoom, measureBoard } from "../bench/room.ts";
 import { runBenchmark, sameData, type BenchRow } from "../bench/run.ts";
 import { CASES, packedGridBoard } from "../cases.ts";
-import { curveOf, CURVE_TYPES, curveSpace } from "../curves/index.ts";
+import { curveOf, CURVE_TYPES, curveSpace, highwayCurves } from "../curves/index.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { center } from "../geom.ts";
 import { nodeIndex } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, roomDemand, roomLinks } from "../room/index.ts";
 import { ROUTERS } from "../routers/index.ts";
+import { sharedRouter } from "../routers/shared.ts";
+import { byCollection } from "../routers/trunks.ts";
+import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import {
   BUILT_IN_STRATEGIES,
   checkSchema,
@@ -92,6 +95,26 @@ describe("the built-in registry", () => {
       expect(curveStrategies.highway.run({ points: p, space })).toEqual(curveOf(p, { type: "arc", space }));
       expect(curveStrategies.highway.run({ points: p }, { radius: 6, minRadius: 2 })).toEqual(curveOf(p, { type: "arc", radius: 6 }));
     }
+  });
+
+  it("gives each option of the curve highway to highwayCurves for a lane of a board (EX2-FIX)", () => {
+    const graph = makeFixture(FIXTURES.find((f) => f.name === "small-clustered")!);
+    const result = sharedRouter({ name: "shared", rule: byCollection }).route(graph);
+    const segments = segmentsOf(result);
+    const open = new Set(segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+    expect(open.size).toBeGreaterThan(0);
+    const board = { graph: segments, open, width: 5, maxWidth: 30 };
+    const lanes = laneRoutes(segments, open, 5, 30);
+    const space = curveSpace(
+      graph.nodes.map((n) => n.box),
+      0.25,
+    );
+    const drawn = (options?: object) => lanes.map((r, index) => curveStrategies.highway.run({ points: r.points, space, lane: { board, index } }, options));
+    for (const options of [undefined, { jog: "quintic" as const, jogPieces: 2 }, { minRadius: 20, radius: 30 }]) {
+      const expected = highwayCurves(segments, open, 5, { maxWidth: 30, space, ...options }).map((c) => c.segments);
+      expect(drawn(options), JSON.stringify(options)).toEqual(expected);
+    }
+    expect(drawn({ jog: "quintic" })).not.toEqual(drawn());
   });
 
   it("holds each method of roomDemand", () => {
