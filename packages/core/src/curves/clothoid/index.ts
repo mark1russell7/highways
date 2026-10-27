@@ -51,13 +51,16 @@ interface ClothoidFit {
   readonly error: number;
 }
 
-/** The fits of the clothoids of recent corners, by the turn and the spiral share. The cache empties when it gets large. */
-const fits = new Map<string, ClothoidFit[]>();
+/** The fits of the clothoids of recent corners, by the turn and the spiral share. Each fit comes when a corner first needs it. The cache empties when it gets large. */
+const fits = new Map<string, (n: number) => ClothoidFit>();
 
-/** This function gives the distance from the point `q` to the polyline `p`. */
-function distanceTo(q: Point, p: readonly Point[]): number {
+/** The number of points of the dense polyline that measures the error of a fit. */
+const DENSE = 256;
+
+/** This function gives the distance from the point `q` to the part of the polyline `p` from the index `from` to the index `to`. */
+function distanceTo(q: Point, p: readonly Point[], from: number, to: number): number {
   let best = Infinity;
-  for (let i = 1; i < p.length; i++) {
+  for (let i = Math.max(1, from); i <= Math.min(p.length - 1, to); i++) {
     const a = p[i - 1]!;
     const b = p[i]!;
     const dx = b.x - a.x;
@@ -72,8 +75,9 @@ function distanceTo(q: Point, p: readonly Point[]): number {
 /**
  * This function gives the fits of the clothoid that turns by `theta` and ends with the curvature 1, with 1 to `MAX_CLOTHOID_PIECES` pieces.
  * Each piece is G2 with its neighbours. The error of a fit is the largest distance from 16 samples of each piece to a dense polyline of the clothoid.
+ * A sample looks only at the part of the polyline near its arc length. A smaller part gives a larger distance, so the error does not get smaller.
  */
-function clothoidFits(theta: number): ClothoidFit[] {
+function clothoidFits(theta: number): (n: number) => ClothoidFit {
   const length = 2 * theta;
   const a2 = length;
   const at = (t: number): { p: Point; d: Point; dd: Point } => {
@@ -84,19 +88,26 @@ function clothoidFits(theta: number): ClothoidFit[] {
     return { p: clothoidPoint(s, a2), d, dd: { x: -d.y * length * k, y: d.x * length * k } };
   };
   const dense: Point[] = [];
-  for (let i = 0; i <= 256; i++) dense.push(clothoidPoint((i / 256) * length, a2));
-  const out: ClothoidFit[] = [];
-  for (let n = 1; n <= MAX_CLOTHOID_PIECES; n++) {
+  for (let i = 0; i <= DENSE; i++) dense.push(clothoidPoint((i / DENSE) * length, a2));
+  const done: ClothoidFit[] = [];
+  return (n) => {
+    const known = done[n];
+    if (known) return known;
     const pieces = fitPieces(at, n);
+    const window = Math.ceil(DENSE / n / 2) + 8;
     let error = 0;
     let from: Point = { x: 0, y: 0 };
-    for (const q of pieces) {
-      for (let i = 1; i < 16; i++) error = Math.max(error, distanceTo(cubicAt(from, q.c1, q.c2, q.to, i / 16), dense));
+    pieces.forEach((q, k) => {
+      for (let i = 1; i < 16; i++) {
+        const mid = Math.round(((k + i / 16) / n) * DENSE);
+        error = Math.max(error, distanceTo(cubicAt(from, q.c1, q.c2, q.to, i / 16), dense, mid - window, mid + window));
+      }
       from = q.to;
-    }
-    out.push({ pieces, error });
-  }
-  return out;
+    });
+    const fit = { pieces, error };
+    done[n] = fit;
+    return fit;
+  };
 }
 
 /** This function gives the shape of a corner of `clothoidCurve` with the turn `turn` at the radius 1. */
@@ -110,14 +121,17 @@ export function clothoidShape(turn: number, spiral: number, tolerance: number): 
     all = clothoidFits(theta);
     fits.set(key, all);
   }
-  const found = all;
+  const fit = all;
   const end = clothoidPoint(2 * theta, 2 * theta);
   return {
     tangent: cornerTangent(turn, theta, end),
     theta,
     end,
     // The error of a fit scales with the radius. The corner takes the fewest pieces that keep the error within the tolerance.
-    pieces: (radius) => (found.find((f) => f.error * radius <= tolerance) ?? found[found.length - 1]!).pieces,
+    pieces: (radius) => {
+      for (let n = 1; n < MAX_CLOTHOID_PIECES; n++) if (fit(n).error * radius <= tolerance) return fit(n).pieces;
+      return fit(MAX_CLOTHOID_PIECES).pieces;
+    },
   };
 }
 
