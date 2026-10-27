@@ -73,6 +73,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
 | GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
+| PROMO | The promotion rule: a kept option becomes the default, or a rule of the selector, only after a measured win on the whole corpus and on fresh seeds. Shared with packing and the joint selector. | `active` | packing agrees | P1 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |

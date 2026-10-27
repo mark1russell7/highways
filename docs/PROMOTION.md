@@ -66,6 +66,7 @@ The program screens approximately 250 ideas. At a p-value of 0.05, approximately
 
 - The generators make a fresh set of inputs after the win test passes. No screen used these seeds before.
 - The fresh set has `confirmInputs` or more inputs, in the same cells as the corpus.
+- For a rule of the selector, the fresh set has `cellMin` or more inputs in each cell of the rule.
 - The candidate passes the full win test on the fresh set, with the same parameters.
 - The record of the promotion names the fresh seeds. A later screen does not use them for a decision.
 
