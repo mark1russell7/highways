@@ -27,3 +27,4 @@ export * from "./bench/measures/index.ts";
 export * from "./bench/suite.ts";
 export * from "./strategies/index.ts";
 export * from "./bench/compare.ts";
+export * from "./bench/screen/index.ts";
