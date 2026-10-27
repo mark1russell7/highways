@@ -38,12 +38,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= sections at the same B3 q95 on 3 of 5 boards with R7 = 0. Drop if B4 > 1.2 x sections.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-052",
       "HWY-056",
       "HWY-041"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-002",
@@ -85,12 +86,16 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if R9 = 0 after snapping and B1 > shared at B3 q95 within 10% on 3 of 5 boards. Drop if 1000 nodes takes > 5x shared.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-006",
       "HWY-028",
       "HWY-019"
-    ]
+    ],
+    "same": [
+      "RULE-002"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-003",
@@ -135,12 +140,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B3 q95 <= shared on 3 of 5 boards. Drop if B4 > 1.2 x shared.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-043",
       "HWY-047",
       "HWY-045"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-004",
@@ -177,11 +183,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Use the corner graph as the mesh. Keep if B1 > shared on 3 of 5 boards at R9 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-020",
       "HWY-057"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-005",
@@ -220,12 +227,17 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Run it on the corner graph. Keep if 2 passes beat shared (1 pass) on B1 at equal B3 q95 on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-039",
       "HWY-044",
-      "HWY-034"
-    ]
+      "HWY-034",
+      "NAT-030"
+    ],
+    "same": [
+      "NAT-005"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-006",
@@ -265,12 +277,17 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared and R9 = 0 after the mask on 3 of 5 boards. Drop if the ridges need > 1 s at 1000 nodes in CI.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-007",
       "HWY-032",
       "HWY-053"
-    ]
+    ],
+    "same": [
+      "RULE-028"
+    ],
+    "canonical": "RULE-028",
+    "wave": 3
   },
   {
     "id": "HWY-007",
@@ -312,11 +329,12 @@
     "placementDependent": true,
     "screen": "Same as KDEEB. Keep only if KDEEB is kept and the FFT form gives the same B1 within 2% at 3x less time.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-006",
       "HWY-053"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-008",
@@ -354,11 +372,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= KDEEB at lower C3 on 3 of 5 boards. It is a second choice behind KDEEB.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-006",
       "HWY-009"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-009",
@@ -396,12 +415,14 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Compare the skeleton spine against the mean polyline of each cluster. Keep if B6 is lower at equal B1 on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-026",
       "HWY-025",
-      "HWY-050"
-    ]
+      "HWY-050",
+      "NAT-034"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-010",
@@ -436,11 +457,13 @@
     "placementDependent": true,
     "screen": "A renderer test, not a measure test. Keep as an output option if B7 drops by 20% on the far view of 3 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-009",
-      "HWY-052"
-    ]
+      "HWY-052",
+      "EDA-038"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-011",
@@ -474,11 +497,13 @@
     "placementDependent": false,
     "screen": "Boards with edges in both directions: case-many-groups, small-clustered. Keep if B5 drops by 20% at a B1 loss < 5%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-051",
-      "HWY-016"
-    ]
+      "HWY-016",
+      "NAT-009"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-012",
@@ -521,12 +546,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B4 < 0.5 x shared at B1 >= 0.8 x shared on 3 of 5 boards, with R9 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-049",
       "HWY-021",
       "HWY-030"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-013",
@@ -562,12 +588,13 @@
     "placementDependent": false,
     "screen": "Boards with dense key groups: case-dense-groups, mid-fanout. Keep if R1 drops by 15% with B4 = 0 for the confluent tracks.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-014",
       "HWY-030",
       "HWY-049"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-014",
@@ -603,12 +630,13 @@
     "placementDependent": false,
     "screen": "Boards with real modules: mid-fanout, case-dense-groups. Keep if the edges in power edges are > 20% with B4 = 0 on 2 of 2 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-013",
       "HWY-030",
       "HWY-049"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-015",
@@ -645,11 +673,15 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B4 <= trunks and B1 >= trunks on 3 of 5 boards with the stubs at both ends.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-037",
       "HWY-050"
-    ]
+    ],
+    "same": [
+      "WILD-005"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-016",
@@ -685,12 +717,16 @@
     "placementDependent": true,
     "screen": "Boards: packedGridBoard and case-dense-groups. Keep if M4 drops by 50% at a B1 loss < 10% against shared.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-051",
       "HWY-057",
-      "HWY-039"
-    ]
+      "HWY-039",
+      "EDA-032",
+      "EDA-048",
+      "WILD-026"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-017",
@@ -734,12 +770,17 @@
     "placementDependent": true,
     "screen": "Boards: mid-fanout and case-hub-chain. Keep if B1 > trunks by 10% at a lower B6 with R9 = 0.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-037",
       "HWY-036",
-      "HWY-015"
-    ]
+      "HWY-015",
+      "NAT-015"
+    ],
+    "same": [
+      "EDA-035"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-018",
@@ -782,12 +823,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared at B3 q95 <= shared on 3 of 5 boards. Check Z10 against shared.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-023",
       "HWY-056",
       "HWY-045"
-    ]
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-019",
@@ -820,11 +862,12 @@
     "placementDependent": true,
     "screen": "Boards with keys: mid-fanout, case-dense-groups. Sweep lambda. Keep if a finite lambda gives a Pareto point of (B1, B4) that the hard key does not give.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-028",
       "HWY-049"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-020",
@@ -861,12 +904,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared at the same B3 q95 on 3 of 5 boards, with R9 = 0 by design.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-034",
       "HWY-005",
       "HWY-006"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-021",
@@ -906,12 +950,14 @@
     "placementDependent": false,
     "screen": "Boards: small-clustered, case-dense-groups, mid-clustered. Keep if B4 drops by 20% at a B1 loss < 10% with any base clusterer.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-012",
       "HWY-049",
-      "HWY-030"
-    ]
+      "HWY-030",
+      "NAT-037"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-022",
@@ -952,11 +998,13 @@
     "placementDependent": true,
     "screen": "Boards with crossing highways: case-many-groups, mid-uniform. Measure the count of crossing blocks. Keep if the blocks drop by 30% at an R5 rise < 3%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-016",
-      "HWY-051"
-    ]
+      "HWY-051",
+      "WILD-038"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-023",
@@ -998,12 +1046,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= trunks and B4 <= shared on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-018",
       "HWY-026",
       "HWY-028"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-024",
@@ -1041,11 +1090,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > 0.8 x shared at 1/10 of its time on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-058",
       "HWY-023"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-025",
@@ -1084,12 +1134,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B3 q95 <= shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-031",
       "HWY-050",
       "HWY-027"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-026",
@@ -1126,12 +1177,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at 1/5 of its time on 3 of 5 boards. The Z10 moved share must also be below shared.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-025",
       "HWY-009",
       "HWY-054"
-    ]
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-027",
@@ -1166,12 +1218,13 @@
     "placementDependent": true,
     "screen": "Small boards only: the case boards and small-clustered. Use it as a reference for TRACLUS and corridor signatures. Keep as a reference if its B1 is > 1.1 x theirs.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-025",
       "HWY-031",
       "HWY-040"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-028",
@@ -1213,12 +1266,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B4 <= shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-023",
       "HWY-002",
       "HWY-053"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-029",
@@ -1258,11 +1312,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > HDBSCAN on 3 of 5 boards. It is a second choice behind HDBSCAN.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-028",
       "HWY-021"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-030",
@@ -1303,12 +1358,13 @@
     "placementDependent": false,
     "screen": "Boards: small-clustered, mid-clustered, case-dense-groups. Keep if B4 < 0.6 x shared at B1 >= 0.7 x shared.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-012",
       "HWY-013",
       "HWY-014"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-031",
@@ -1347,13 +1403,17 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at B3 q95 <= 0.95 x shared on 3 of 5 boards. This is the first idea to screen.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "prototyped",
     "related": [
       "HWY-025",
       "HWY-034",
       "HWY-047",
       "HWY-050"
-    ]
+    ],
+    "same": [
+      "WILD-030"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-032",
@@ -1395,11 +1455,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x KDEEB at 1/5 of its time on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-006",
       "HWY-053"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-033",
@@ -1435,12 +1496,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Also run it at 3 radii as 3 zoom levels. Keep if Z9 improves with B1 >= shared.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-052",
       "HWY-060",
       "HWY-056"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-034",
@@ -1484,13 +1546,18 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared at B3 q95 <= shared on 3 of 5 boards, and Z10 moved share <= shared.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-005",
       "HWY-020",
       "HWY-031",
-      "HWY-044"
-    ]
+      "HWY-044",
+      "NAT-005"
+    ],
+    "same": [
+      "EDA-050"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-035",
@@ -1530,11 +1597,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if Z10 moved share drops by 30% against the best member at a B1 loss < 5%.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-054",
       "HWY-045"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-036",
@@ -1583,12 +1651,17 @@
     "placementDependent": true,
     "screen": "Boards: mid-fanout, case-hub-chain. Keep if B1 > trunks by 10% with R7 = 0 and B3 q95 < 1.5.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-037",
       "HWY-017",
-      "HWY-058"
-    ]
+      "HWY-058",
+      "NAT-025"
+    ],
+    "same": [
+      "EDA-015"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-037",
@@ -1624,12 +1697,18 @@
     "placementDependent": true,
     "screen": "Boards: mid-fanout, small-clustered. Keep if B3 q95 <= 1.05 with B1 >= trunks on 2 of 2 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-017",
       "HWY-036",
-      "HWY-015"
-    ]
+      "HWY-015",
+      "NAT-017"
+    ],
+    "same": [
+      "EDA-046"
+    ],
+    "canonical": "EDA-046",
+    "wave": 2
   },
   {
     "id": "HWY-038",
@@ -1677,13 +1756,19 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Sweep alpha in 0.2 steps. Keep if its (B1, B3) front dominates the discount sweep of shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-039",
       "HWY-047",
       "HWY-043",
       "HWY-051"
-    ]
+    ],
+    "same": [
+      "EDA-029",
+      "HWY-039"
+    ],
+    "canonical": "EDA-029",
+    "wave": 1
   },
   {
     "id": "HWY-039",
@@ -1732,13 +1817,20 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-038",
       "HWY-005",
       "HWY-044",
-      "HWY-016"
-    ]
+      "HWY-016",
+      "EDA-010"
+    ],
+    "same": [
+      "EDA-029",
+      "HWY-038"
+    ],
+    "canonical": "EDA-029",
+    "wave": 1
   },
   {
     "id": "HWY-040",
@@ -1769,12 +1861,17 @@
     "placementDependent": true,
     "screen": "MEAS2 boards of 10 to 20 nodes. Keep as the reference if it solves 10 boards in CI within 10 min. It does not enter the build of strategies.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-038",
       "HWY-045",
-      "HWY-027"
-    ]
+      "HWY-027",
+      "RULE-013",
+      "WILD-055",
+      "EDA-026",
+      "EDA-043"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-041",
@@ -1818,12 +1915,14 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > sections at a lower R7 and B3 q95 on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-042",
       "HWY-001",
-      "HWY-060"
-    ]
+      "HWY-060",
+      "EDA-028"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-042",
@@ -1859,12 +1958,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the greedy q curve reaches 80% of its B1 with q < 10 highways on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-041",
       "HWY-045",
       "HWY-031"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-043",
@@ -1905,12 +2005,16 @@
     "placementDependent": true,
     "screen": "Use the groups of HWY-023 on 3 boards. Keep if B1 rises by 3% over the split rule of trunks (split 0.5) at equal B3.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-003",
       "HWY-038",
-      "HWY-050"
-    ]
+      "HWY-050",
+      "EDA-030",
+      "NAT-012",
+      "EDA-028"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-044",
@@ -1948,13 +2052,15 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared by 5% with M4 <= shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-039",
       "HWY-005",
       "HWY-034",
-      "HWY-016"
-    ]
+      "HWY-016",
+      "NAT-005"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-045",
@@ -1989,12 +2095,19 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the selection over 3 generators dominates each generator alone on (B1, B3, B4) on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-042",
       "HWY-059",
       "HWY-035"
-    ]
+    ],
+    "dependsOn": [
+      "HWY-031",
+      "HWY-026",
+      "HWY-018",
+      "HWY-034"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-046",
@@ -2027,11 +2140,14 @@
     "placementDependent": false,
     "screen": "Use the seeded edits of Z10 on the 5 screen boards. Keep if Z10 moved share drops by 20% at a B1 loss < 3%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-054",
-      "HWY-047"
-    ]
+      "HWY-047",
+      "RULE-053",
+      "WILD-014"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-047",
@@ -2071,12 +2187,17 @@
     "placementDependent": true,
     "screen": "Apply it as a filter to corridor signatures and QuickBundles. Keep if B1 does not drop and B3 q95 drops on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-038",
       "HWY-031",
-      "HWY-026"
-    ]
+      "HWY-026",
+      "EDA-029",
+      "NAT-022",
+      "NAT-048",
+      "WILD-033"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-048",
@@ -2105,11 +2226,13 @@
     "placementDependent": true,
     "screen": "Apply it to 3 generators on the 5 screen boards. Keep if R6 drops by 20% at a B1 loss < 5%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-045",
-      "HWY-047"
-    ]
+      "HWY-047",
+      "EDA-017"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-049",
@@ -2142,12 +2265,13 @@
     "placementDependent": false,
     "screen": "Apply it to MINGLE and corridor signatures. Keep if B4 drops by 30% at a B1 loss < 10% on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-012",
       "HWY-021",
       "HWY-030"
-    ]
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-050",
@@ -2175,12 +2299,14 @@
     "placementDependent": true,
     "screen": "Use the clusters of corridor signatures on 3 boards. Keep if B6 and B3 q95 drop at a B1 loss < 3%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-031",
       "HWY-043",
-      "HWY-009"
-    ]
+      "HWY-009",
+      "NAT-035"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-051",
@@ -2217,12 +2343,15 @@
     "placementDependent": true,
     "screen": "Boards: packedGridBoard, case-dense-groups. Keep if M4 reaches 0 at an M1 rise < 10% or a B1 loss < 10%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-016",
       "HWY-057",
-      "HWY-011"
-    ]
+      "HWY-011",
+      "NAT-013",
+      "EDA-021"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-052",
@@ -2258,12 +2387,14 @@
     "placementDependent": true,
     "screen": "Boards: nestedGridBoard, mid-clustered. Keep if Z9 drops by 20% with 0 nesting violations.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-053",
       "HWY-056",
-      "HWY-001"
-    ]
+      "HWY-001",
+      "NAT-049"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-053",
@@ -2304,12 +2435,13 @@
     "placementDependent": true,
     "screen": "Boards: mid-clustered, small-clustered. Keep if Z10 moved share drops by 20% against one scale.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-052",
       "HWY-032",
       "HWY-028"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-054",
@@ -2347,12 +2479,13 @@
     "placementDependent": false,
     "screen": "The seeded edits of Z10 on the 5 screen boards. Keep if Z10 mean and moved share drop by 20%.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-046",
       "HWY-026",
       "HWY-035"
-    ]
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-055",
@@ -2381,12 +2514,13 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at 1/3 of its time on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-026",
       "HWY-045",
       "HWY-047"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-056",
@@ -2415,12 +2549,17 @@
     "placementDependent": true,
     "screen": "Boards: case-many-groups, nestedGridBoard, mid-clustered. Keep if Z9 drops by 50% with R7 <= sections.",
     "prototype": "S",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-001",
       "HWY-052",
-      "HWY-018"
-    ]
+      "HWY-018",
+      "WILD-012"
+    ],
+    "same": [
+      "WILD-034"
+    ],
+    "wave": 2
   },
   {
     "id": "HWY-057",
@@ -2449,12 +2588,15 @@
     "placementDependent": true,
     "screen": "Boards: packedGridBoard, grid-400, nestedGridBoard. Keep if B1 >= shared and M4 = 0 on 2 of 3 boards.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-016",
       "HWY-051",
-      "HWY-058"
-    ]
+      "HWY-058",
+      "NAT-034",
+      "EDA-008"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-058",
@@ -2496,12 +2638,13 @@
     "placementDependent": true,
     "screen": "Boards: grid-400, packedGridBoard. Keep if R14 > 0.9 and B1 >= shared at B3 q95 <= 1.3.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-024",
       "HWY-057",
       "HWY-036"
-    ]
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-059",
@@ -2538,11 +2681,13 @@
     "placementDependent": true,
     "screen": "Boards: the 3 case boards. Keep if it gains 5% on the score over its start set. It also gives an upper bound for the fast rules.",
     "prototype": "M",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-045",
-      "HWY-040"
-    ]
+      "HWY-040",
+      "NAT-043"
+    ],
+    "wave": 3
   },
   {
     "id": "HWY-060",
@@ -2579,11 +2724,12 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > the best single-highway rule by 5% at B3 q95 within 5% on 3 of 5 boards.",
     "prototype": "L",
-    "stage": "catalogued",
+    "stage": "cataloged",
     "related": [
       "HWY-041",
       "HWY-033",
       "HWY-042"
-    ]
+    ],
+    "wave": 3
   }
 ]
