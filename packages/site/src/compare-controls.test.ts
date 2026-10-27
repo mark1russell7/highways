@@ -29,6 +29,12 @@ const WITH: Readonly<Record<string, Readonly<Record<string, number | boolean | s
   "clothoid.tolerance": { radius: 48, spiral: 1 },
   // The router `sections-tree` has no hub limit (`stretch` is `Infinity`), so the pad of the hub limit acts only with a finite `stretch`.
   "sections-tree.stretchPad": { stretch: 2 },
+  // The exponent of the flow cost acts only with the cost `flow` (EDA-029).
+  "shared.alpha": { cost: "flow" },
+  "shared-all.alpha": { cost: "flow" },
+  // The exponent of the trunks acts only with the Gilbert split (EDA-030), and the balancing factor only with the fan `tree` (NAT-017).
+  "trunks.alpha": { splitAt: "gilbert" },
+  "trunks.bf": { fan: "tree" },
 };
 
 /** This function gives the values off the default that the test tries: the other values of a list, or the ends of a range. */

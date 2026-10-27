@@ -65,6 +65,20 @@ export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
     default: "part",
     describe: "With `part`, a lane leaves the trunk where its way parts from the other ways. With `split`, each lane leaves at the split point.",
   },
+  splitAt: {
+    type: "enum",
+    values: ["share", "gilbert"],
+    default: "share",
+    describe: "With `share`, the split point is at `split` of the way. With `gilbert`, it is where the flow cost is least (EDA-030).",
+  },
+  alpha: { type: "number", min: 0, max: 1, step: 0.05, default: 0.5, describe: "The exponent of the flow cost of the split `gilbert`. A smaller value moves the split toward the targets." },
+  fan: {
+    type: "enum",
+    values: ["split", "tree"],
+    default: "split",
+    describe: "With `split`, the edges of a group share a trunk to a split point. With `tree`, they grow a balancing-factor tree (NAT-017).",
+  },
+  bf: { type: "number", min: 0, max: 1, step: 0.05, default: 0.4, describe: "The balancing factor of the fan `tree`. 0 gives the least ink, and a larger factor gives more direct routes." },
 };
 
 /** The declarations of the options of the routers `shared` and `shared-all`. */
@@ -80,6 +94,26 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     describe: "The cost of a link that an edge with the same key uses already, as a share of its length.",
   },
   laneOrder: LANE_ORDER,
+  cost: {
+    type: "enum",
+    values: ["fixed", "flow"],
+    default: "fixed",
+    describe: "With `fixed`, a shared link costs `discount` of its length. With `flow`, a link with `f` edges costs `len * f^alpha` (EDA-029).",
+  },
+  alpha: { type: "number", min: 0.1, max: 1, step: 0.05, default: 0.6, describe: "The exponent of the cost `flow`. A smaller value gives more sharing." },
+  passes: { type: "integer", min: 1, max: 5, step: 1, default: 1, describe: "In each pass after the first, each edge finds its way again with the ways of the other edges fixed (HWY-039)." },
+  order: {
+    type: "enum",
+    values: ["span", "shortest", "load", "input"],
+    default: "span",
+    describe: "The order of the edges of a key: the longest first, the shortest first, the most edges between two sections first, or the input order (NAT-024).",
+  },
+  merge: {
+    type: "enum",
+    values: ["corner", "snell"],
+    default: "corner",
+    describe: "With `corner`, a route joins a run at a corner of the graph. With `snell`, it joins at the angle `acos(d)` (NAT-035).",
+  },
 };
 
 /** The declarations of the options of the highway strategy `corridors` (HWY-031). */

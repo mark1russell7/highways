@@ -3,6 +3,7 @@ import { nodeIndex, type Bundle, type Edge, type Graph, type GroupRule, type Nod
 import { placePlug, type Plug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
+import { balancedFan, fanPath, gilbertPoint } from "./fan.ts";
 
 /** The options of the trunk router. */
 export interface TrunksOptions extends WayOptions {
@@ -21,12 +22,32 @@ export interface TrunksOptions extends WayOptions {
    * A lane that turns back over the trunk leaves at an earlier point of the trunk. With `split`, each lane leaves at the split point, as in version 0.2.0.
    */
   readonly leave?: TrunkLeave;
+  /**
+   * The place of the split point. With `share`, the default, it is at `split` of the way to the center of the targets.
+   * With `gilbert`, it is where the flow cost of the trunk and its branches is least, with the exponent `alpha` (EDA-030).
+   */
+  readonly splitAt?: TrunkSplit;
+  /** The exponent of the flow cost of the split `gilbert`, from 0 to 1. The default is 0.5. */
+  readonly alpha?: number;
+  /**
+   * The shape of each group. With `split`, the default, the edges share a trunk to a split point.
+   * With `tree`, the edges grow a balancing-factor tree from the plug, with the factor `bf` (NAT-017).
+   */
+  readonly fan?: TrunkFan;
+  /** The balancing factor of the fan `tree`, from 0 to 1. 0 gives the least ink, and a larger factor gives more direct routes. The default is 0.4. */
+  readonly bf?: number;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
 
 /** The place where the lanes of a trunk leave it: where their ways part, or at the split point. */
 export type TrunkLeave = "part" | "split";
+
+/** The place of the split point of a trunk: at a share of the way, or at the Gilbert point of the flow cost (EDA-030). */
+export type TrunkSplit = "share" | "gilbert";
+
+/** The shape of a group of the router `trunks`: a trunk and a split point, or a balancing-factor tree (NAT-017). */
+export type TrunkFan = "split" | "tree";
 
 /** The rule that groups the edges by the collection of their target, in `data.collection`. */
 export const byCollection: GroupRule = (e) => {
@@ -188,7 +209,28 @@ export function trunksRouter(options: TrunksOptions): Router {
         const c = { x: centers.reduce((a, p) => a + p.x, 0) / centers.length, y: centers.reduce((a, p) => a + p.y, 0) / centers.length };
         const plug: Plug = placePlug(s, first.source, c);
         const start = ways.out(plug);
-        const split = splitPoint(start, centers, options.split ?? 0.5, (p) => !ways.obstacles.inside(p, ways.margin), ways.margin);
+        const key = id.split("\u0000")[2]!;
+        if (options.fan === "tree") {
+          // Each edge follows the tree from the plug to its target. The routes share the points of the tree.
+          const pts = group.map((e, i) => placePlug(targets[i]!, e.target, start));
+          const bf = Math.min(1, Math.max(0, options.bf ?? 0.4));
+          const fan = balancedFan(start, pts.map((pt) => ways.out(pt)), bf, (from, t) => ways.toPlug(from, pts[t]!) ?? [from, pts[t]!.point]);
+          const own: Route[] = group.map((e, i) => ({ edge: e.id, points: dedupe([plug.point, ...fanPath(fan, fan.leaf[i]!)]) }));
+          for (const r of own) points.set(r.edge, r.points);
+          const order = options.laneOrder ?? "bundle";
+          const common = own[0]!.points.slice(0, commonStart(own, 0));
+          bundles.push({ id: `b${bundles.length}`, key, node: s.id, edges: orderLanes(common, own, order), trunk: common });
+          for (const way of sharedWays(own, common.length)) {
+            const users = own.filter((r) => way.edges.includes(r.edge));
+            runs.push({ id: `r${runs.length}`, key, points: way.points, edges: orderLanes(way.points, users, order) });
+          }
+          continue;
+        }
+        const free = (p: Point): boolean => !ways.obstacles.inside(p, ways.margin);
+        const split =
+          options.splitAt === "gilbert"
+            ? gilbertPoint(start, centers, options.alpha ?? 0.5, free, ways.margin)
+            : splitPoint(start, centers, options.split ?? 0.5, free, ways.margin);
         const way = ways.fromPlug(plug, split);
         if (!way) continue;
         const trunk = dedupe(way);
@@ -211,7 +253,6 @@ export function trunksRouter(options: TrunksOptions): Router {
           const exit = leaveTrunk(trunk, branch, clear, 2 * ways.margin);
           if (exit) exits.push({ edge: e.id, exit });
         });
-        const key = id.split("\u0000")[2]!;
         if (!part) {
           for (const r of own) points.set(r.edge, r.points);
           const edges = options.laneOrder === "run" || trunk.length < 2 ? laneOrder(dir, end, branches) : orderLanes(trunk, own, "bundle");

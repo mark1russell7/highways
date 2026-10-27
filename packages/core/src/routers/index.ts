@@ -9,9 +9,9 @@ import { byCollection, trunksRouter } from "./trunks.ts";
 export { boxExit, straightRouter } from "./straight.ts";
 export { plugsRouter } from "./plugs.ts";
 export { cornersRouter, type CornersOptions } from "./corners.ts";
-export { sharedRouter, type SharedOptions } from "./shared.ts";
+export { sharedRouter, type ShareCost, type SharedOptions, type ShareMerge, type ShareOrder } from "./shared.ts";
 export { sectionsRouter, type SectionsOptions } from "./sections.ts";
-export { byCollection, groupEdges, laneOrder, splitPoint, trunksRouter, type TrunksOptions } from "./trunks.ts";
+export { byCollection, groupEdges, laneOrder, splitPoint, trunksRouter, type TrunkFan, type TrunkSplit, type TrunksOptions } from "./trunks.ts";
 
 /** The built-in routers. The registry `STRATEGIES` holds the same routers as strategies, and the benchmark races the routers of the registry. */
 export const ROUTERS: readonly Router[] = [

@@ -6,7 +6,7 @@ import type { Graph, Result } from "../model.ts";
 import { CASES } from "../cases.ts";
 import type { Point } from "../geom.ts";
 import { cornersRouter } from "./corners.ts";
-import { byCollection, groupEdges, laneOrder, leaveTrunk, sharedWays, splitPoint, trunksRouter } from "./trunks.ts";
+import { byCollection, groupEdges, laneOrder, leaveTrunk, sharedWays, splitPoint, trunksRouter, type TrunksOptions } from "./trunks.ts";
 
 const trunks = trunksRouter({ name: "trunks", rule: byCollection });
 
@@ -176,3 +176,22 @@ describe("trunksRouter", () => {
     expect(JSON.stringify(trunks.route(g))).toBe(JSON.stringify(trunks.route(g)));
   });
 });
+
+describe("trunksRouter with the options of BUILD-W1C", () => {
+  it("keeps the hard rules with the Gilbert split and the balancing-factor trees", () => {
+    const kinds: FixtureKind[] = ["clustered", "hubs", "collections"];
+    const settings: Omit<TrunksOptions, "name" | "rule">[] = [{ splitAt: "gilbert", alpha: 0.3 }, { fan: "tree", bf: 0 }, { fan: "tree", bf: 0.6 }];
+    for (const kind of kinds)
+      for (const options of settings) {
+        const g = makeFixture({ name: "t", kind, nodes: 80, edgesPerNode: 3, seed: 5, fixedPorts: 0.2 });
+        const result = trunksRouter({ name: "x", rule: byCollection, ...options }).route(g);
+        expect(checkProperties(g, result), `${kind} ${JSON.stringify(options)}`).toEqual([]);
+      }
+  });
+
+  it("with a tree of bf 0, uses no more ink on the star than with bf 1", () => {
+    const ink = (bf: number): number => measureQuality(star, trunksRouter({ name: "x", rule: byCollection, fan: "tree", bf }).route(star)).ink;
+    expect(ink(0)).toBeLessThanOrEqual(ink(1) + 1e-6);
+  });
+});
+
