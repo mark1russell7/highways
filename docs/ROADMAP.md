@@ -41,6 +41,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWC-B | `laneOrder: "bundle"` keeps two edges on one side through their common stretch. On `shared-all` and `case-many-groups`, end crossings: 2301 before, 687 after. Body crossings: 12 before, 0 after. | 2026-10-26 | #40 |
 | GRP-R | Research: [grouping rules for the zoom levels](research/GROUPING.md). The note gives 19 rules in four kinds and a build order of 5 rules for GRP2. A guillotine cut that reads the links cuts fewer links than the quadtree at the far view on 8 of 10 boards. | 2026-10-26 | #39 |
 | HWC-C | `leave: "part"` lets each lane of a trunk leave where its way parts, so few branches turn back. On `trunks-all` and `case-dense-groups`, worst lane spacing error: 133.2% before, 0.8% after. Body crossings: 3 before, 0 after. | 2026-10-27 | #44 |
+| BENCH-CI | The workflow `Bench` races the routers in parts that run at the same time, with a time limit for each cell. Before, no push run on `main` finished: 0 of 25 since `fa1dd82`, each over 60 min. After, a run to 10 000 nodes finishes in 12.4 min. | 2026-10-27 | #45 |
 
 ## Open
 
