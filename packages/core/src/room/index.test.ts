@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { packedGridBoard } from "../cases.ts";
 import type { Box } from "../geom.ts";
 import type { Graph, Router } from "../model.ts";
 import { boardGaps, makeRoom, openGaps, roomDemand, roomLinks, type Boxed } from "./index.ts";
@@ -152,5 +153,37 @@ describe("makeRoom", () => {
       { source: "a", target: "b", count: 2 },
       { source: "a", target: "c", count: 1 },
     ]);
+  });
+});
+
+describe("the option passes (ROOM-D)", () => {
+  const board = packedGridBoard();
+  const links = roomLinks(board);
+  const one = roomDemand(board.nodes, links);
+  const two = roomDemand(board.nodes, links, { passes: 2 });
+
+  it("gives the demand of one pass by default, and with `passes: 1`", () => {
+    expect(roomDemand(board.nodes, links, { passes: 1 })).toEqual(one);
+    expect(roomDemand(board.nodes, links, { passes: 0 })).toEqual(one);
+  });
+
+  it("adds the growth that a second demand finds on the open board", () => {
+    const first = openGaps(board.nodes, one);
+    const again = roomDemand(first, links);
+    const twice = openGaps(first, again);
+    // The two passes open the board as the second demand opens the board of the first.
+    expect(openGaps(board.nodes, two).map((n) => n.box)).toEqual(twice.map((n) => n.box));
+    two.forEach((g, i) => {
+      expect(g.need).toBeGreaterThanOrEqual(one[i]!.need);
+      expect(g.lanes).toBeGreaterThanOrEqual(one[i]!.lanes);
+    });
+    expect(two.some((g, i) => g.need > one[i]!.need)).toBe(true);
+  });
+
+  it("keeps the sum of the passes in `maxGrowth`", () => {
+    const capped = roomDemand(board.nodes, links, { passes: 2, maxGrowth: 0.1 });
+    const width = 12 * 140;
+    const growth = capped.filter((g) => g.axis === "x").reduce((s, g) => s + g.need - g.width, 0);
+    expect(growth).toBeLessThanOrEqual(0.1 * width + 1e-6);
   });
 });

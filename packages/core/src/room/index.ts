@@ -64,6 +64,12 @@ export interface RoomOptions {
   readonly lanes?: "link" | "count";
   /** Two box edges nearer than this distance make one boundary of the sweep. The default is 0.5. */
   readonly snap?: number;
+  /**
+   * The number of passes of the demand. The default is 1.
+   * Each pass after the first finds the lanes again on the board that the passes before it opened, and adds the growth that it needs.
+   * The limit `maxGrowth` applies to the sum of the passes.
+   */
+  readonly passes?: number;
 }
 
 /** The demand of a board and the board with its gaps open. */
@@ -148,13 +154,27 @@ export function openGaps<T extends Boxed>(items: readonly T[], gaps: readonly Ga
  */
 export function roomDemand(items: readonly Boxed[], links: readonly RoomLink[], options: RoomOptions = {}): Gap[] {
   const gutter = options.gutter ?? DEFAULT_GUTTER;
+  const snap = options.snap ?? DEFAULT_SNAP;
+  const passes = Math.max(1, Math.floor(options.passes ?? 1));
+  let total = demandOnce(items, links, options);
+  for (let p = 1; p < passes; p++) {
+    // The next pass measures the board that the passes before it opened. Its gaps are the same gaps, in the same order.
+    const next = demandOnce(openGaps(items, total, snap), links, options);
+    if (next.length !== total.length || next.some((g, i) => g.axis !== total[i]!.axis)) break;
+    total = total.map((g, i) => ({ ...g, lanes: Math.max(g.lanes, next[i]!.lanes), need: g.need + Math.max(0, next[i]!.need - next[i]!.width) }));
+  }
+  return capGrowth(items, total, gutter, options.maxGrowth ?? Infinity);
+}
+
+/** This function gives the demand of one pass, without the limit `maxGrowth`. */
+function demandOnce(items: readonly Boxed[], links: readonly RoomLink[], options: RoomOptions): Gap[] {
+  const gutter = options.gutter ?? DEFAULT_GUTTER;
   const spacing = options.spacing ?? DEFAULT_SPACING;
   const snap = options.snap ?? DEFAULT_SNAP;
   const weight = (l: RoomLink): number => (options.lanes === "count" ? Math.max(1, l.count ?? 1) : 1);
   const gaps = boardGaps(items, snap);
   const lanes = (options.method ?? "routes") === "lines" ? lineLanes(items, links, gaps, weight) : routeLanes(items, links, gaps, gutter, snap, weight, options.router);
-  const raw = gaps.map((g, i) => ({ ...g, lanes: lanes[i]!, need: Math.max(g.width, gutter + lanes[i]! * spacing) }));
-  return capGrowth(items, raw, gutter, options.maxGrowth ?? Infinity);
+  return gaps.map((g, i) => ({ ...g, lanes: lanes[i]!, need: Math.max(g.width, gutter + lanes[i]! * spacing) }));
 }
 
 /** This function gives the demand of the board and the board with each gap open to its need. */
