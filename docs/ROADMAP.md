@@ -52,6 +52,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX2-FIX | On the 5 boards of the compare page, 68 of 78 controls change the drawing or the measures. A test lists the other 10 with their reason. | 2026-10-27 | #55 |
 | HWY-R | Research: [ways to make highways](research/HIGHWAYS.md). The note gives 60 ideas in four groups, 17 of them ours and 11 hybrids. It gives a build order of 14 steps for BUILD-W. | 2026-10-27 | #58 |
 | SCREEN | The screen gives one JSON record for each run on the 14 boards of `screen-v1`, and its summary. In CI, the 9 routers give 126 records in 8.3 s. | 2026-10-27 | #59 |
+| EDA-R | Research: [routing from other fields](research/FIELDS.md). The note gives 51 ideas from six fields, 20 of them `ours` or hybrids. A constrained left-edge track rule gives up to 26% fewer gap lanes at the same crossings. | 2026-10-27 | #61 |
 
 ## Open
 
@@ -68,7 +69,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
 | NAT-R | Research: ideas from nature. Examples are slime molds, ant trails, rivers, leaf veins, blood vessels and the paths that walkers make. | `active` | MEAS0 | P1 |
 | RULE-R | Research: approaches that obey rendering rules. Examples are forces, constraints, energy, fields and gradient descent on the measures. | `active` | MEAS0 | P1 |
-| EDA-R | Research: routing in other fields. Examples are chips, circuit boards, metro maps, transport and logistics networks. | `active` | MEAS0 | P1 |
 | WILD-R | Ideas of our own for each step: plugs, groups, levels, room, routes, highways and curves. The note uses analogies, inversion and combinations of options. | `active` | MEAS0 | P1 |
 | HWY-STEP | A strategy step `highway` that decides the highways apart from the routers, so each idea of HWY-R plugs in. | `later` | HWY-R | P1 |
 | BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
