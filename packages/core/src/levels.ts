@@ -106,10 +106,10 @@ function levelWays(nodes: readonly Node[], options: WayOptions): LevelWays {
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
-  const corners = new CornerGraph(nodes, obstacles, { margin, k });
+  const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true });
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
-  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, TIGHT_MARGIN), k }));
+  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, TIGHT_MARGIN), k, cones: true }));
   return { obstacles, corners, margin, out, tight: tightGraph, free: new Map() };
 }
 
