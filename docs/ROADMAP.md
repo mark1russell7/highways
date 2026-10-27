@@ -66,6 +66,8 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W2B | Five highway strategies on the plans of `shared-ways` and `corridors`. HWY-043 (`weiszfeld`) is kept: the B6 max falls 20% on dense-groups. The zipper (NAT-022) adds B1 on 4 boards but fails the q95. HWY-050, HWY-015 and HWY-056 are dropped. | 2026-10-27 | #76 |
 | BUILD-W2A | Gates after a highway plan: `gateStrategy` and the strategies `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis` and `corridors+ids`. The screen option `edits` measures Z10 over seeded edits. HWY-046, HWY-047, HWY-048 and HWY-049 are dropped: B1 falls, or the gate removes no edge. HWY-054 is screened: each matched highway keeps its id, and the warm start is open. | 2026-10-27 | #75 |
 | BUILD-W2C | Six highway finders: `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells` and `select`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `road-classes` has the largest B1, and it wins on 2 boards. HWY-026, HWY-034, EDA-046, HWY-018, HWY-045 and EDA-033 are dropped. `zipper+stretch` and `level-links+stretch` stay dropped. | 2026-10-27 | #78 |
+| PROMO | The promotion rule (`docs/PROMOTION.md`): a kept option becomes the default, or a rule of the selector, only after a measured win on the whole corpus and on fresh seeds. Shared with packing and the joint selector. | 2026-10-27 | #77, #79 |
+| REL9 | Version 0.4.2 on npm: the highway strategies and gates of wave 2, Weiszfeld meeting points and the edit screen. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | this PR |
 
 ## Open
 
@@ -75,7 +77,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
 | GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
-| PROMO | The promotion rule: a kept option becomes the default, or a rule of the selector, only after a measured win on the whole corpus and on fresh seeds. Shared with packing and the joint selector. | `active` | packing agrees | P1 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
