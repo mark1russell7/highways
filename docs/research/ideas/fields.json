@@ -1,0 +1,2289 @@
+[
+  {
+    "id": "EDA-001",
+    "family": "fields",
+    "name": "Grid maze router (Lee, Hadlock, A*)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "An algorithm for path connections and its applications",
+        "authors": "C. Y. Lee",
+        "year": 1961,
+        "url": "https://doi.org/10.1109/TEC.1961.5219222"
+      },
+      {
+        "title": "A shortest path algorithm for grid graphs",
+        "authors": "F. O. Hadlock",
+        "year": 1977,
+        "url": "https://doi.org/10.1002/net.3230070404"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Lay a uniform grid over the free space, with a cell of one margin. Route each edge by A* over the free cells, with a cost for each bend and a cost (or a discount) for each cell that other routes use. Lee's wave is the breadth-first form. Hadlock orders the search by the number of detours.",
+    "math": "Lee: breadth-first wave, path = grid distance. Hadlock: key d(P), length = manhattan(s,t) + 2 d(P). A*: f = g + h, h = manhattan, g = sum(len + beta * bend + gamma * used).",
+    "cost": "O(G log G) per edge for G grid cells. 100 nodes: 1e4 to 1e5 cells, near 1 s for all edges. 1000 nodes: 1e6 cells, near 100 s without a coarse grid. CI only above 400 nodes.",
+    "params": [
+      "cell: 2 to 20 units",
+      "bendCost: 0 to 10 cells",
+      "usedCost: -0.5 to 5 (negative bundles, positive spreads)"
+    ],
+    "wins": [
+      "R14",
+      "R3",
+      "R8",
+      "R9"
+    ],
+    "risks": [
+      "R4",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "case-hub-chain, case-many-groups, small-clustered at cell = margin. Keep if R14 >= 0.95, R9 = 0, the R3 median <= corners + 1 and the time <= 10x corners at 100 nodes.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-002",
+      "EDA-003",
+      "EDA-025"
+    ]
+  },
+  {
+    "id": "EDA-002",
+    "family": "fields",
+    "name": "Line probe router (Hightower, Mikami-Tabuchi)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A solution to line-routing problems on the continuous plane",
+        "authors": "D. W. Hightower",
+        "year": 1969,
+        "url": "https://doi.org/10.1145/800260.809014"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Shoot horizontal and vertical probe lines from both plugs. A probe stops at a box. Points on a probe start new probes at the next level. When a probe of the source meets a probe of the target, the way has few bends. The memory is the probes, not a grid.",
+    "math": "Mikami-Tabuchi: level-k probes start from each point of the level k-1 probes. It finds a way when one exists, with the fewest bends among the probe levels. Hightower: one escape point per probe, fast, and it can fail.",
+    "cost": "O(L n) per edge for L levels. 100 nodes: under 1 ms per edge. 1000 nodes: a few ms per edge.",
+    "params": [
+      "maxLevel: 2 to 8",
+      "escape: hightower | mikami",
+      "margin: 2 to 10 units"
+    ],
+    "wins": [
+      "R3",
+      "R14",
+      "R9"
+    ],
+    "risks": [
+      "R5",
+      "R6",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "Same boards as EDA-001. Keep if the R3 median < corners, R6 <= 1.1x corners and no edge fails.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-001",
+      "EDA-003"
+    ]
+  },
+  {
+    "id": "EDA-003",
+    "family": "fields",
+    "name": "Hanan grid and orthogonal visibility graph router",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "On Steiner's problem with rectilinear distance",
+        "authors": "M. Hanan",
+        "year": 1966,
+        "url": "https://doi.org/10.1137/0114025"
+      },
+      {
+        "title": "Orthogonal connector routing",
+        "authors": "M. Wybrow, K. Marriott, P. J. Stuckey",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-642-11805-0_22"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Build the orthogonal visibility graph: the lines through each box side and each plug, cut at the boxes. Route each edge by A* with a cost of length plus a penalty for each bend. Then nudge the parallel legs of different edges apart in each channel.",
+    "math": "cost = L + beta * bends. The graph holds an optimal orthogonal route for this cost. Hanan: a rectilinear Steiner minimal tree exists on the Hanan grid.",
+    "cost": "Build O(n log n + V), V up to O(n^2). Route O(V log V) per edge. 100 nodes: near 10 ms per edge. 1000 nodes: V near 1e5 to 1e6, slow without a sparse form.",
+    "params": [
+      "bendPenalty: 0 to 200 units",
+      "nudgeSpacing: 2 to 8 units",
+      "sparse: boolean"
+    ],
+    "wins": [
+      "R14",
+      "R3",
+      "R9",
+      "R12"
+    ],
+    "risks": [
+      "R5",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "As EDA-001 against corners at 100 nodes. Keep if R3 <= corners, R14 = 1 and the time <= 5x corners.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-001",
+      "EDA-015",
+      "EDA-013"
+    ]
+  },
+  {
+    "id": "EDA-004",
+    "family": "fields",
+    "name": "Constrained left-edge tracks in each gap",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Wire routing by optimizing channel assignment within large apertures",
+        "authors": "A. Hashimoto, J. Stevens",
+        "year": 1971,
+        "url": "https://doi.org/10.1145/800158.805069"
+      },
+      {
+        "title": "Efficient algorithms for channel routing",
+        "authors": "T. Yoshimura, E. S. Kuh",
+        "year": 1982,
+        "url": "https://doi.org/10.1109/TCAD.1982.1269993"
+      }
+    ],
+    "step": "room",
+    "mechanism": "In each gap, give each link piece a track by the left-edge rule: sort by start, fill the lowest track first. Keep the order of two overlapping pieces only where a swap adds crossings. Two pieces that do not overlap share a track. Fewer tracks need less room.",
+    "math": "Left edge: tracks = density d = max overlap, optimal for an interval graph with no constraint. With a constraint graph: tracks >= max(d, longest chain). Constraint i below j iff overlap(i, j) and cost(j, i) > cost(i, j).",
+    "cost": "O(p^2) per gap for the constraint graph and O(p log p) per track. Under 5 ms at 100 nodes, near 100 ms at 1000 nodes.",
+    "params": [
+      "constraints: all | binding | none",
+      "tieBreak: start | length"
+    ],
+    "wins": [
+      "M1",
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "B5",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "The scratch run of the note: lanes fall 5% to 26% at equal turn crossings. Keep if the sum of lanes falls >= 5% on 3 boards, R1 does not rise and M1 falls when roomDemand reads the track count.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-005",
+      "EDA-006",
+      "EDA-013",
+      "EDA-051"
+    ]
+  },
+  {
+    "id": "EDA-005",
+    "family": "fields",
+    "name": "Dogleg channel routing",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A dogleg channel router",
+        "authors": "D. N. Deutsch",
+        "year": 1976,
+        "url": "https://doi.org/10.1145/800146.804807"
+      },
+      {
+        "title": "Dogleg channel routing is NP-complete",
+        "authors": "T. G. Szymanski",
+        "year": 1985,
+        "url": "https://doi.org/10.1109/TCAD.1985.1270096"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Let a long piece change its track inside a gap, at a place where another link turns (a dogleg). The split breaks long chains and cycles of the order constraints, so the gap needs fewer tracks.",
+    "math": "Split each piece at the turn positions of the other pieces into sub-pieces. Assign the sub-pieces by the constrained left edge. Tracks >= density.",
+    "cost": "As EDA-004 with up to two times the pieces.",
+    "params": [
+      "maxDoglegs: 0 to 3 per piece",
+      "minStep: 1 to 4 spacings"
+    ],
+    "wins": [
+      "M1",
+      "M4"
+    ],
+    "risks": [
+      "R3",
+      "R4",
+      "R15",
+      "C2"
+    ],
+    "placementDependent": true,
+    "screen": "grid-400 and case-many-groups against EDA-004. Keep if the lanes fall >= 5% more and R3 rises <= 0.2 for each route.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-004",
+      "EDA-006"
+    ]
+  },
+  {
+    "id": "EDA-006",
+    "family": "fields",
+    "name": "Greedy channel router",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A greedy channel router",
+        "authors": "R. L. Rivest, C. M. Fiduccia",
+        "year": 1982,
+        "url": "https://doi.org/10.1145/800263.809170"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Sweep each gap from one end to the other, column by column. At each column, bring the turning links to their side, join split tracks, and move tracks toward their next turn. It completes any gap and adds a track only where it must.",
+    "math": "A column sweep with local rules. In practice the tracks are density + 0 to 2.",
+    "cost": "O(columns x tracks) per gap.",
+    "params": [
+      "initialTracks: density to density + 2",
+      "minJog: 1 to 4 spacings"
+    ],
+    "wins": [
+      "M1",
+      "M4"
+    ],
+    "risks": [
+      "R3",
+      "R15",
+      "B5"
+    ],
+    "placementDependent": true,
+    "screen": "Against EDA-004 on its boards. Keep only if the lanes are >= 5% fewer at an R3 rise <= 0.2.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-004",
+      "EDA-005"
+    ]
+  },
+  {
+    "id": "EDA-007",
+    "family": "fields",
+    "name": "Switchbox routing at gap junctions",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A greedy switch-box router",
+        "authors": "W. K. Luk",
+        "year": 1985,
+        "url": "https://doi.org/10.1016/0167-9260(85)90029-X"
+      },
+      {
+        "title": "Detour: a fast, accurate switchbox router",
+        "authors": "G. T. Hamachi, J. K. Ousterhout",
+        "year": 1984,
+        "url": "https://doi.org/10.1145/800033.800861"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Treat each place where a row gap meets a column gap as a switchbox, with fixed lane ends on its four sides. Connect the lanes that turn there so that their order agrees with the tracks of both gaps. Lane crossings at junctions fall.",
+    "math": "A channel with terminals on four sides. Greedy column sweep (Luk) or maze search (Detour). Objective: completion, then the fewest crossings of turning lanes.",
+    "cost": "O(t^2) per junction for t lanes.",
+    "params": [
+      "order: gaps-first | junctions-first",
+      "maxJogs: 0 to 2"
+    ],
+    "wins": [
+      "B5",
+      "R1"
+    ],
+    "risks": [
+      "R3",
+      "R15"
+    ],
+    "placementDependent": true,
+    "screen": "case-many-groups and grid-400: lane crossings inside the junction rectangles. Keep if they fall >= 20% at an R3 rise <= 0.1.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-004",
+      "EDA-013",
+      "EDA-026"
+    ]
+  },
+  {
+    "id": "EDA-008",
+    "family": "fields",
+    "name": "Global routing on the gap graph, then tracks, then points",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Track assignment: a desirable intermediate step between global routing and detailed routing",
+        "authors": "S. Batterywala, N. Shenoy, W. Nicholls, H. Zhou",
+        "year": 2002,
+        "url": "https://doi.org/10.1145/774572.774581"
+      },
+      {
+        "title": "NTHU-Route 2.0: a robust global router for modern designs",
+        "authors": "Y.-J. Chang, Y.-T. Lee, J.-R. Gao, P.-C. Wu, T.-C. Wang",
+        "year": 2010,
+        "url": "https://doi.org/10.1109/TCAD.2010.2061590"
+      }
+    ],
+    "step": "whole",
+    "mechanism": "Make a coarse graph of the gaps and their junctions (the g-cells of a chip). Each g-cell has a capacity: its width over the lane spacing. First route each edge as a chain of g-cells, then give tracks in each gap (EDA-004), then make the points. Each stage sees the room.",
+    "math": "Global: min sum_e cost(path_e) with sum usage(g) <= cap(g) as a soft limit. Tracks: constrained left edge per gap. Points: offsets of the track lines.",
+    "cost": "O(n) g-cells. Global O(m G log G). 100 nodes: near 20 ms. 1000 nodes: near 1 s.",
+    "params": [
+      "spacing: 2 to 8 units",
+      "overflowCost: 1 to 100",
+      "stages: global | global+tracks | all"
+    ],
+    "wins": [
+      "M4",
+      "R12",
+      "R9",
+      "M1"
+    ],
+    "risks": [
+      "R5",
+      "R6",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "packedGridBoard after openGaps, and case-many-groups. Keep if M4 = 0, R12 is better than shared and the R5 median stays within 5%.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "EDA-004",
+      "EDA-009",
+      "EDA-013",
+      "EDA-019",
+      "EDA-051"
+    ]
+  },
+  {
+    "id": "EDA-009",
+    "family": "fields",
+    "name": "Negotiated congestion (PathFinder)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "PathFinder: a negotiation-based performance-driven router for FPGAs",
+        "authors": "L. McMurchie, C. Ebeling",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/201310.201328"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Route all edges and let them overuse corridors, then repeat. Each pass raises the price of each overused corridor link, by its present overuse and by a history of past overuse. Edges with another good way leave. Stop when no corridor holds more lanes than its capacity.",
+    "math": "c(a) = (b(a) + h(a)) * p(a). p(a) = 1 + pf * max(0, occ + 1 - cap). After each pass h(a) += hf * max(0, occ - cap), and pf grows by 1.3 to 2.",
+    "cost": "5 to 30 passes of the router. 100 nodes: 0.5 to 2 s. 1000 nodes: 20 to 60 s, CI only.",
+    "params": [
+      "pf0: 0.2 to 1",
+      "pfGrowth: 1.3 to 2",
+      "hf: 0.1 to 1",
+      "passes: 5 to 50",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "M4",
+      "R12",
+      "B9",
+      "R9"
+    ],
+    "risks": [
+      "R5",
+      "R6",
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "case-dense-groups and packedGridBoard: count the overfull gaps (lanes > width / spacing). Keep if they fall >= 50% at an R5 median rise <= 5%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-012",
+      "EDA-031",
+      "EDA-032",
+      "EDA-048",
+      "EDA-051"
+    ]
+  },
+  {
+    "id": "EDA-010",
+    "family": "fields",
+    "name": "Rip-up and reroute",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A simple yet effective technique for global wiring",
+        "authors": "R. Nair",
+        "year": 1987,
+        "url": "https://doi.org/10.1109/TCAD.1987.1270264"
+      }
+    ],
+    "step": "router",
+    "mechanism": "After one pass of `shared`, find the edges with a fault: through a box, out and back, or a bad lane crossing. Remove them and the edges in conflict with them. Route them again, with the other routes fixed, in a new order. A few rounds remove the effect of the first order.",
+    "math": "Loop: F = edges with a fault. Unroute F and its neighbours, reroute by fault weight, and accept the round only when the total cost falls.",
+    "cost": "Rounds x faulty edges. Near +30% time at 100 nodes and +50% at 1000 nodes.",
+    "params": [
+      "rounds: 1 to 5",
+      "scope: fault | neighbours",
+      "order: fault | seed"
+    ],
+    "wins": [
+      "R7",
+      "R6",
+      "R1",
+      "B5"
+    ],
+    "risks": [
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "shared on case-hub-chain and case-many-groups with 5 seeds of the input order. Keep if the spread of R6 and R1 over the orders falls >= 50% and the medians do not rise.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-009",
+      "EDA-034",
+      "EDA-047"
+    ]
+  },
+  {
+    "id": "EDA-011",
+    "family": "fields",
+    "name": "Multicommodity flow with randomized rounding",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Randomized rounding: a technique for provably good algorithms and algorithmic proofs",
+        "authors": "P. Raghavan, C. D. Thompson",
+        "year": 1987,
+        "url": "https://doi.org/10.1007/BF02579324"
+      },
+      {
+        "title": "Faster min-max resource sharing in theory and practice",
+        "authors": "D. Muller, K. Radke, J. Vygen",
+        "year": 2011,
+        "url": "https://doi.org/10.1007/s12532-011-0023-y"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Write the routing as a flow problem on the corner graph: each edge is a commodity, each link has a capacity. Solve the fractional problem, where an edge splits over several ways, with multiplicative weights. Then pick one way per edge at random by its fractional weight.",
+    "math": "min lambda with sum_e x_e(a) <= lambda * cap(a). Resource sharing gives a (1 + eps) fractional optimum. Rounding gives a congestion of O(log G / log log G) times the optimum, with high probability.",
+    "cost": "eps^-2 m log(links) shortest paths. eps = 0.1: near 100x the router. 100 nodes: near 10 s. 1000 nodes: CI only.",
+    "params": [
+      "eps: 0.05 to 0.3",
+      "roundings: 1 to 20 seeds, keep the best",
+      "objective: congestion | length+congestion"
+    ],
+    "wins": [
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R5",
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "tiny-uniform and the 3 case boards: the max overuse against EDA-009. Keep as a MEAS2 reference if its bound is within 20%. Keep as a router only if the time <= 10x shared at 100 nodes.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "EDA-009",
+      "EDA-012"
+    ]
+  },
+  {
+    "id": "EDA-012",
+    "family": "fields",
+    "name": "Lagrangian prices with a lower bound",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Archer: a history-based global routing algorithm",
+        "authors": "M. M. Ozdal, M. D. F. Wong",
+        "year": 2009,
+        "url": "https://doi.org/10.1109/TCAD.2009.2013991"
+      },
+      {
+        "title": "The Lagrangian relaxation method for solving integer programming problems",
+        "authors": "M. L. Fisher",
+        "year": 1981,
+        "url": "https://doi.org/10.1287/mnsc.27.1.1"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Give each capacity a price. Route each edge alone by its shortest way at the current prices, then raise each price by its overuse (a subgradient step). The routes approach a good solution, and the dual value is a lower bound on the best cost, so MEAS2 gets a gap to the optimum.",
+    "math": "L(lambda) = sum_e min_p [len(p) + sum_{a in p} lambda_a] - sum_a lambda_a cap_a <= OPT. lambda_a <- max(0, lambda_a + t_k (use_a - cap_a)), t_k = theta (UB - L) / |g|^2.",
+    "cost": "20 to 200 iterations of m shortest paths. Like EDA-009.",
+    "params": [
+      "iterations: 20 to 200",
+      "theta: 0.1 to 2",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Boards of <= 30 nodes with an optimum from an ILP. Keep if the bound gap <= 15% and the routes are not worse than EDA-009.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-009",
+      "EDA-011",
+      "EDA-051",
+      "EDA-017"
+    ]
+  },
+  {
+    "id": "EDA-013",
+    "family": "fields",
+    "name": "Track assignment across gaps",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Track assignment: a desirable intermediate step between global routing and detailed routing",
+        "authors": "S. Batterywala, N. Shenoy, W. Nicholls, H. Zhou",
+        "year": 2002,
+        "url": "https://doi.org/10.1145/774572.774581"
+      }
+    ],
+    "step": "room",
+    "mechanism": "After the global ways, give each long piece a track in each gap, so that the pieces of one edge keep one track from gap to gap and lanes cross little at junctions. It is the lane order of ROOM-C, solved for all gaps together, not gap by gap.",
+    "math": "Interval coloring per gap with cost w1 * overlaps + w2 * track changes + w3 * crossings. Greedy by length with local swaps, or an ILP on small boards.",
+    "cost": "O(p log p) per gap for the greedy form. ILP on small boards only.",
+    "params": [
+      "w1, w2, w3: 0 to 10",
+      "method: greedy | ilp",
+      "maxSwaps: 0 to 1000"
+    ],
+    "wins": [
+      "B5",
+      "R1",
+      "R15"
+    ],
+    "risks": [
+      "M1"
+    ],
+    "placementDependent": true,
+    "screen": "case-many-groups and grid-400: B5 and R1 against gapLanes with the order crossings. Keep if crossings fall >= 15% at <= 5% more lanes.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-004",
+      "EDA-007",
+      "EDA-026"
+    ]
+  },
+  {
+    "id": "EDA-014",
+    "family": "fields",
+    "name": "Layer assignment as zoom levels",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Congestion-constrained layer assignment for via minimization in global routing",
+        "authors": "T.-H. Lee, T.-C. Wang",
+        "year": 2008,
+        "url": "https://doi.org/10.1109/TCAD.2008.927733"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Chips put long wires on high layers and count each layer change as a via. Treat each zoom level as a layer. Assign each edge the coarsest level where it shows alone, by its span and its group, with a budget for each level. A dynamic program on the tree of sections minimizes the changes of form along each route.",
+    "math": "min sum_e vias(e) with items_d + links_d <= B_d. A via is a change from a level link to a route of its own. COLA solves one net on a tree exactly by dynamic programming.",
+    "cost": "O(m x depth). Under 10 ms at 1000 nodes.",
+    "params": [
+      "budget B per level",
+      "spanThreshold per level",
+      "viaCost: 0 to 10"
+    ],
+    "wins": [
+      "Z4",
+      "Z9",
+      "Z5"
+    ],
+    "risks": [
+      "Z1",
+      "Z7"
+    ],
+    "placementDependent": true,
+    "screen": "nestedGridBoard and the levels of small-clustered. Keep if Z4 <= 1 at each level, Z9 is 10% better and Z1 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-036",
+      "EDA-038",
+      "EDA-040",
+      "EDA-050"
+    ]
+  },
+  {
+    "id": "EDA-015",
+    "family": "fields",
+    "name": "Rectilinear Steiner trunks (FLUTE)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "FLUTE: fast lookup table based rectilinear Steiner minimal tree algorithm for VLSI design",
+        "authors": "C. Chu, Y.-C. Wong",
+        "year": 2008,
+        "url": "https://doi.org/10.1109/TCAD.2007.907068"
+      },
+      {
+        "title": "On Steiner minimal trees with rectilinear distance",
+        "authors": "F. K. Hwang",
+        "year": 1976,
+        "url": "https://doi.org/10.1137/0130013"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For a fan-out from one plug to k targets, replace the split point of `trunks` with a rectilinear Steiner tree of the plug and the targets. FLUTE looks up the optimal tree in a table for up to 9 points and splits larger nets. The trunk then uses the least ink for an orthogonal style.",
+    "math": "RSMT on the Hanan grid. Hwang: RMST <= 1.5 RSMT. FLUTE is optimal up to degree 9. A euclidean form uses GeoSteiner on small sets.",
+    "cost": "O(k log k) per net. Negligible against the router.",
+    "params": [
+      "degreeLimit: 2 to 9",
+      "accuracy: 1 to 8",
+      "metric: rectilinear | octilinear | euclidean"
+    ],
+    "wins": [
+      "B1",
+      "B3",
+      "B7"
+    ],
+    "risks": [
+      "R9",
+      "R10"
+    ],
+    "placementDependent": true,
+    "screen": "trunks on mid-fanout and case-dense-groups: B1 and the total trunk length against the split of today. Keep if B1 rises >= 5% with R9 = 0 after an obstacle repair.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-030",
+      "EDA-035",
+      "EDA-003"
+    ]
+  },
+  {
+    "id": "EDA-016",
+    "family": "fields",
+    "name": "River routing for merges and buses",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "An optimal solution to a wire-routing problem",
+        "authors": "M. Tompa",
+        "year": 1980,
+        "url": "https://doi.org/10.1145/800141.804677"
+      },
+      {
+        "title": "Optimal placement for river routing",
+        "authors": "C. E. Leiserson, R. Y. Pinter",
+        "year": 1983,
+        "url": "https://doi.org/10.1137/0212030"
+      }
+    ],
+    "step": "curve",
+    "mechanism": "Where a bundle of k lanes meets k plugs, or another bundle, in the same order, route the lanes as a river: in order, with no crossing, and with the lane spacing kept. Each lane takes the shortest way that keeps its distance from the lane before it.",
+    "math": "Tompa: each wire hugs the previous one at distance s. The least separation of two rows comes in O(k). The routes are planar, so R1 = 0 inside the merge.",
+    "cost": "O(k) per merge.",
+    "params": [
+      "spacing: 2 to 8 units",
+      "shape: rectilinear | any-angle"
+    ],
+    "wins": [
+      "B5",
+      "R12",
+      "B9",
+      "B6"
+    ],
+    "risks": [
+      "R4",
+      "C2"
+    ],
+    "placementDependent": true,
+    "screen": "shared-all on case-many-groups: R12 and B9 near the merges. Keep if the lane spacing errors fall >= 50% at no rise of R1.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-021",
+      "EDA-022",
+      "EDA-024"
+    ]
+  },
+  {
+    "id": "EDA-017",
+    "family": "fields",
+    "name": "Stretch balance in a bundle (inverse length matching)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A length-matching routing algorithm for high-performance printed circuit boards",
+        "authors": "M. M. Ozdal, M. D. F. Wong",
+        "year": 2006,
+        "url": "https://doi.org/10.1109/TCAD.2006.882479"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Board routers make the wires of a bus equal in length. Here the goal is the inverse: choose where each lane leaves a bundle so that the stretch of the members stays even, and no member pays a large detour for the bundle. Prices on the members with too much stretch move their exits earlier.",
+    "math": "min sum len with st(e) <= tau for each member. Lagrange: exit cost += lambda_e (st(e) - tau), and lambda_e grows with the excess.",
+    "cost": "O(k x iterations) per bundle.",
+    "params": [
+      "tau: 1.1 to 2",
+      "iterations: 5 to 30"
+    ],
+    "wins": [
+      "B3",
+      "R6",
+      "R5"
+    ],
+    "risks": [
+      "B1",
+      "B2"
+    ],
+    "placementDependent": true,
+    "screen": "trunks on mid-fanout. Keep if the B3 q95 falls >= 10% at a B1 loss <= 3%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-012",
+      "EDA-030"
+    ]
+  },
+  {
+    "id": "EDA-018",
+    "family": "fields",
+    "name": "RUDY demand map for room",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Fast and accurate routing demand estimation for efficient routability-driven placement",
+        "authors": "P. Spindler, F. M. Johannes",
+        "year": 2007,
+        "url": "https://portal.fis.tum.de/en/publications/fast-and-accurate-routing-demand-estimation-for-efficient-routabi/"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Before any route, spread each link as a uniform wire density over the bounding box of its two boxes. Sum the densities on a grid with prefix sums. The map tells which gaps need room before routing, so roomDemand can open them in one pass, and the host can see the hot spots.",
+    "math": "d(x, y) = sum_e w (W_e + H_e) / (W_e H_e) for (x, y) in bbox(e). Use 2-D prefix sums. Gap demand = the integral of d over the gap.",
+    "cost": "O(m + cells). Near 1 ms at 1000 nodes.",
+    "params": [
+      "cell: 5 to 40 units",
+      "wireWidth: 1 to 8 units",
+      "smoothing: 0 to 2 cells"
+    ],
+    "wins": [
+      "M1",
+      "M4"
+    ],
+    "risks": [
+      "M4",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "The Spearman correlation of the RUDY demand and the demand of roomDemand with the method routes, on 5 boards. Keep if rho >= 0.8 at 10x less time.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-051",
+      "EDA-008",
+      "EDA-039"
+    ]
+  },
+  {
+    "id": "EDA-019",
+    "family": "fields",
+    "name": "Corner-stitched free tiles as the channel graph",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Corner stitching: a data-structuring technique for VLSI layout tools",
+        "authors": "J. K. Ousterhout",
+        "year": 1984,
+        "url": "https://doi.org/10.1109/TCAD.1984.1270058"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Split the free space into maximal horizontal rectangles (corner stitching). Each tile knows its neighbours and its width. Route on the tile graph, so each corridor has a known width and thus a capacity in lanes. The tiles also give the gaps for room without a sweep.",
+    "math": "O(n) tiles. Point location in O(sqrt n) on average. capacity = floor(width / s).",
+    "cost": "Build O(n log n). Route O(T log T) per edge for T tiles.",
+    "params": [
+      "orientation: horizontal | vertical | both",
+      "minTile: 0 to 4 units"
+    ],
+    "wins": [
+      "R8",
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "The corridor capacities against boardGaps on the packed and nested boards. Keep as the base of EDA-008 if the build time <= the corner graph time.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-008",
+      "EDA-045"
+    ]
+  },
+  {
+    "id": "EDA-020",
+    "family": "fields",
+    "name": "Topological routing, then rubber bands",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "SURF: rubber-band routing system for multichip modules",
+        "authors": "D. Staepelaere, J. Jue, T. Dayan, W. W.-M. Dai",
+        "year": 1993,
+        "url": "https://doi.org/10.1109/54.245962"
+      },
+      {
+        "title": "Computing minimum length paths of a given homotopy class",
+        "authors": "J. Hershberger, J. Snoeyink",
+        "year": 1994,
+        "url": "https://doi.org/10.1016/0925-7721(94)90010-8"
+      },
+      {
+        "title": "Algorithms for routing and testing routability of planar VLSI layouts",
+        "authors": "C. E. Leiserson, F. M. Maley",
+        "year": 1985,
+        "url": "https://doi.org/10.1145/22145.22152"
+      }
+    ],
+    "step": "router",
+    "mechanism": "First decide only the topology of each edge: on which side of each box it goes (its homotopy class). Then pull each edge tight like a rubber band, in its class, with a clearance around the box corners. The second stage gives the shortest way in that class and keeps the lanes of one class apart.",
+    "math": "Homotopic shortest path by the funnel algorithm on a triangulation (Hershberger-Snoeyink). Routability: the capacity of each cut >= the flow across it (Leiserson-Maley).",
+    "cost": "Triangulation O(n log n). O(n) per edge in the worst case. Near 1 s at 1000 nodes.",
+    "params": [
+      "clearance: 2 to 10 units",
+      "classSearch: corners | sketch",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "R5",
+      "R6",
+      "R8",
+      "R12"
+    ],
+    "risks": [
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "corners against topology plus rubber band on the case boards. Keep if the R5 median falls >= 3% with a better R8 and no worse R1.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "EDA-024",
+      "EDA-043",
+      "EDA-021"
+    ]
+  },
+  {
+    "id": "EDA-021",
+    "family": "fields",
+    "name": "Fat-path bundle routing",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Drawing with fat edges",
+        "authors": "C. A. Duncan, A. Efrat, S. G. Kobourov, C. Wenk",
+        "year": 2001,
+        "url": "https://doi.org/10.1007/3-540-45848-4_14"
+      },
+      {
+        "title": "On the escape routing of differential pairs",
+        "authors": "T. Yan, P.-C. Wu, Q. Ma, M. D. F. Wong",
+        "year": 2010,
+        "url": "https://doi.org/10.1109/ICCAD.2010.5654214"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Route each bundle as one wide path of width k times the lane spacing, as a board router routes a differential pair as one trace. Grow the boxes by half that width and search the corner graph of the grown boxes. Then split the path into k lanes by offsets.",
+    "math": "Configuration space: obstacles grown by w / 2, w = k s + clearance. A path in it has offsets at +-(i - (k - 1) / 2) s that are clear of the boxes.",
+    "cost": "One corner graph for each width bucket (1, 2, 4, 8 lanes): <= 4 graphs, near 4x corners.",
+    "params": [
+      "spacing: 2 to 8 units",
+      "widthBuckets: 2 to 6",
+      "splitOnFail: boolean"
+    ],
+    "wins": [
+      "M4",
+      "R12",
+      "B9",
+      "R9"
+    ],
+    "risks": [
+      "R5",
+      "R6",
+      "B2"
+    ],
+    "placementDependent": true,
+    "screen": "shared-all on case-dense-groups and on packedGridBoard with no room step. Keep if M4 falls >= 80% at an R5 median rise <= 5%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-045",
+      "EDA-016",
+      "EDA-009"
+    ]
+  },
+  {
+    "id": "EDA-022",
+    "family": "fields",
+    "name": "Ordered escape for plugs",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Ordered escape routing based on Boolean satisfiability",
+        "authors": "L. Luo, M. D. F. Wong",
+        "year": 2008,
+        "url": "https://www.cecs.uci.edu/~papers/aspdac08/pdf/p244_3A-4.pdf"
+      },
+      {
+        "title": "Algorithmic studies on PCB routing (thesis)",
+        "authors": "T. Yan",
+        "year": 2010,
+        "url": "https://www.ideals.illinois.edu/items/18457"
+      }
+    ],
+    "step": "plugs",
+    "mechanism": "When many links leave one side of a box, order their plugs so that the stubs leave the box with no crossing and enter their bundles in lane order. A sort by the direction of the next leg gives the order. A min-cost flow gives each stub a free slot when slots are few.",
+    "math": "Sort the plugs of one side by the angle of the first leg of each way. The stubs are then planar. Unordered escape: min-cost max-flow (optimal). Ordered escape: SAT (exact).",
+    "cost": "O(k log k) per side. Flow O(k^2) on small sides.",
+    "params": [
+      "method: sort | flow",
+      "slotSpacing: 2 to 8 units",
+      "cornerReserve: 0 to 0.25 of the side"
+    ],
+    "wins": [
+      "R1",
+      "R11",
+      "B5",
+      "R10"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "small-clustered and case-dense-groups: crossings within 2 u of a box. Keep if they fall >= 30%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-041",
+      "EDA-016"
+    ]
+  },
+  {
+    "id": "EDA-023",
+    "family": "fields",
+    "name": "Push and shove for edits",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "KiCad PCB editor: the interactive router",
+        "authors": "KiCad developers",
+        "year": 2024,
+        "url": "https://docs.kicad.org/8.0/en/pcbnew/pcbnew.html"
+      }
+    ],
+    "step": "router",
+    "mechanism": "When a host adds one edge, route it, and push the routes in its way aside to keep their clearance, instead of routing all edges again. A shove moves out to the next routes until each clearance holds or a limit stops it. The other routes keep their shape.",
+    "math": "For each segment in collision: offset it by the clearance and pass the push on. On a failure, walk around.",
+    "cost": "Local to the change. A few ms per edit.",
+    "params": [
+      "mode: shove | walkaround | both",
+      "maxIterations: 10 to 1000",
+      "clearance: 2 to 10 units"
+    ],
+    "wins": [
+      "Z10",
+      "R12"
+    ],
+    "risks": [
+      "R8",
+      "R3"
+    ],
+    "placementDependent": true,
+    "screen": "Add one edge to small-clustered, 20 times. Keep if the mean Frechet move (Z10) falls >= 80% against a full reroute, with R9 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-034"
+    ]
+  },
+  {
+    "id": "EDA-024",
+    "family": "fields",
+    "name": "Tangent arcs at any angle (TopoR style)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "TopoR topological router",
+        "authors": "Eremex",
+        "year": 2024,
+        "url": "https://en.wikipedia.org/wiki/TopoR"
+      },
+      {
+        "title": "SURF: rubber-band routing system for multichip modules",
+        "authors": "D. Staepelaere, J. Jue, T. Dayan, W. W.-M. Dai",
+        "year": 1993,
+        "url": "https://doi.org/10.1109/54.245962"
+      }
+    ],
+    "step": "curve",
+    "mechanism": "Draw each route as straight tangent lines and circle arcs around the corners that it passes, with the clearance as the radius. It is the shape of a rubber band around round pegs, with no grid of angles. The lanes of a bundle get concentric arcs.",
+    "math": "A route is a chain of common tangents of circles of radius r = clearance + lane offset at the corners. It is G1, its length is exact, and its offsets are exact.",
+    "cost": "O(points) per route.",
+    "params": [
+      "radius: clearance + offset",
+      "minRadius: 1 to 8 units"
+    ],
+    "wins": [
+      "C1",
+      "C5",
+      "R8",
+      "B9"
+    ],
+    "risks": [
+      "C2",
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "Against the curve arc on corners. Keep if the min R8 >= clearance on each route and C7 = 0 at a length rise <= 1%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-020",
+      "EDA-043"
+    ]
+  },
+  {
+    "id": "EDA-025",
+    "family": "fields",
+    "name": "Octilinear grid router",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Metro maps on octilinear grid graphs",
+        "authors": "H. Bast, P. Brosi, S. Storandt",
+        "year": 2020,
+        "url": "https://doi.org/10.1111/cgf.13986"
+      },
+      {
+        "title": "The X architecture: not your father's diagonal wiring",
+        "authors": "S. L. Teig",
+        "year": 2002,
+        "url": "https://doi.org/10.1145/505348.505355"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Lay an octilinear grid (8 directions) over the board. Route each edge by A* on the grid, with a cost for each bend by its angle and a lower cost on grid links that other edges of its bundle use. The style is the style of a metro map.",
+    "math": "Grid graph with bend links inside each grid node, costs c135 < c90 < c45. A* per edge. The ILP form is exact for the grid.",
+    "cost": "O(G log G) per edge. 100 nodes: near 1 s for all edges. 1000 nodes: CI only.",
+    "params": [
+      "cell: 5 to 20 units",
+      "bendCosts: c45, c90, c135",
+      "shareDiscount: 0.2 to 1"
+    ],
+    "wins": [
+      "R3",
+      "R4",
+      "B1",
+      "R2"
+    ],
+    "risks": [
+      "R5",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "The case boards: R2 mean angle and R3 against corners. Keep if R3 falls >= 20% at an R5 median rise <= 8%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-001",
+      "EDA-027",
+      "EDA-026"
+    ]
+  },
+  {
+    "id": "EDA-026",
+    "family": "fields",
+    "name": "Exact lane order by ILP (metro-line crossing minimization)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Efficient generation of geographically accurate transit maps",
+        "authors": "H. Bast, P. Brosi, S. Storandt",
+        "year": 2018,
+        "url": "https://arxiv.org/abs/1710.02226"
+      },
+      {
+        "title": "Metro-line crossing minimization: hardness, approximations, and tractable cases",
+        "authors": "M. Fink, S. Pupyrev",
+        "year": 2013,
+        "url": "https://arxiv.org/abs/1306.2079"
+      },
+      {
+        "title": "Edge routing with ordered bundles",
+        "authors": "S. Pupyrev, L. Nachmanson, S. Bereg, A. E. Holroyd",
+        "year": 2011,
+        "url": "https://arxiv.org/abs/1209.4227"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Order the lanes of all runs together by an integer program. Each pair of edges on each run has one variable. A crossing costs where their order changes from run to run, and a separation costs where two edges part and meet again. Rules on the graph first fix most pairs, so the program stays small.",
+    "math": "x_ab^r in {0, 1} (a left of b on run r). A crossing at a junction when x^r != x^r'. min sum w_c crossings + w_s separations. MLCM is NP-hard. MLCM-P has an O(sqrt(log L)) approximation.",
+    "cost": "An ILP. Seconds at 100 nodes after the rules. Needs a solver in wasm (HiGHS or GLPK).",
+    "params": [
+      "wCross: 1 to 10",
+      "wSep: 0 to 5",
+      "timeLimit: 0.1 to 10 s",
+      "solver: highs | glpk"
+    ],
+    "wins": [
+      "B5",
+      "R1"
+    ],
+    "risks": [],
+    "placementDependent": true,
+    "screen": "shared-all on case-many-groups and small-clustered: lane crossings against laneOrder bundle. Keep as a MEAS2 reference in any case. Keep as a strategy if B5 falls >= 10% within 2 s at 100 nodes.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-013",
+      "EDA-007",
+      "EDA-022"
+    ]
+  },
+  {
+    "id": "EDA-027",
+    "family": "fields",
+    "name": "Route schematization (C-oriented paths)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Schematization of networks",
+        "authors": "S. Cabello, M. de Berg, M. van Kreveld",
+        "year": 2005,
+        "url": "https://doi.org/10.1016/j.comgeo.2004.11.002"
+      },
+      {
+        "title": "Path schematization for route sketches",
+        "authors": "D. Delling, A. Gemsa, M. Nollenburg, T. Pajor",
+        "year": 2010,
+        "url": "https://i11www.iti.kit.edu/extra/publications/dgnp-psrs-10.pdf"
+      }
+    ],
+    "step": "curve",
+    "mechanism": "Turn each route into a path that uses only a set of directions (4, 6 or 8), with the fewest legs and near the route. A dynamic program over the points of the route gives it. A test keeps it clear of the boxes and keeps its side of the other routes.",
+    "math": "min legs with Frechet <= delta and the topology kept. Dynamic program O(k^2) per route for a fixed set of directions.",
+    "cost": "O(k^2) per route. Some ms in total.",
+    "params": [
+      "directions: 4 | 6 | 8",
+      "delta: 0.5 to 4 u",
+      "keepTopology: boolean"
+    ],
+    "wins": [
+      "R3",
+      "R14",
+      "R4"
+    ],
+    "risks": [
+      "R9",
+      "R5",
+      "C8"
+    ],
+    "placementDependent": true,
+    "screen": "On the routes of corners. Keep if R3 falls >= 30% with R9 = 0 and C8 max <= 2 u.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-025",
+      "EDA-037"
+    ]
+  },
+  {
+    "id": "EDA-028",
+    "family": "fields",
+    "name": "Weber hubs",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A quadratic integer program for the location of interacting hub facilities",
+        "authors": "M. E. O'Kelly",
+        "year": 1987,
+        "url": "https://doi.org/10.1016/S0377-2217(87)80007-3"
+      },
+      {
+        "title": "Weiszfeld's method: old and new results",
+        "authors": "A. Beck, S. Sabach",
+        "year": 2015,
+        "url": "https://doi.org/10.1007/s10957-014-0586-7"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The router `sections` puts each hub at the center of its section. Put it at the weighted geometric median of the plugs of the edges that use it, as a hub-location model places a hub. Weiszfeld steps find that point. Ways through the hub get shorter and turn back less.",
+    "math": "h* = argmin sum_i w_i |h - p_i|. Weiszfeld: h <- (sum w_i p_i / |h - p_i|) / (sum w_i / |h - p_i|). p-hub median with the inter-hub discount alpha (O'Kelly).",
+    "cost": "O(edges through the hub x 20 steps). Negligible.",
+    "params": [
+      "iterations: 5 to 50",
+      "weight: count | length",
+      "clampToSection: boolean"
+    ],
+    "wins": [
+      "R5",
+      "R6",
+      "R7",
+      "Z9"
+    ],
+    "risks": [
+      "Z7",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "sections and sections-tree on case-hub-chain and small-clustered, and mid-clustered in CI. Keep if the R5 median falls >= 3% and R7 does not rise.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-033",
+      "EDA-049",
+      "EDA-030"
+    ]
+  },
+  {
+    "id": "EDA-029",
+    "family": "fields",
+    "name": "Branched transport cost (Gilbert flow cost)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Minimum cost communication networks",
+        "authors": "E. N. Gilbert",
+        "year": 1967,
+        "url": "https://www.nokia.com/bell-labs/publications-and-media/publications/minimum-cost-communication-networks"
+      },
+      {
+        "title": "Optimal paths related to transport problems",
+        "authors": "Q. Xia",
+        "year": 2003,
+        "url": "https://doi.org/10.1142/S0219199703000963"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Give each shared link the cost len * f^alpha, with f the number of edges on it and 0 < alpha < 1. Edges together cost less than apart, so ways merge where the saving pays for the detour. alpha = 1 gives no bundles. The discount of shared is a fixed form of it.",
+    "math": "E = sum_links len(a) f(a)^alpha. The marginal cost of one more edge on a link with f edges is len ((f + 1)^alpha - f^alpha). Route in order with that cost, then reroute each edge with the others fixed.",
+    "cost": "As shared x 1 to 5 passes.",
+    "params": [
+      "alpha: 0.3 to 1",
+      "passes: 1 to 5"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B7"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "shared-all with alpha 0.3, 0.5, 0.7, 1 on case-many-groups and small-clustered: the front of B1 against the B3 q95. Keep if one setting is better than discount 0.5 on both.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-030",
+      "EDA-032",
+      "EDA-046",
+      "EDA-050"
+    ]
+  },
+  {
+    "id": "EDA-030",
+    "family": "fields",
+    "name": "Gilbert split point for trunks",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Minimum cost communication networks",
+        "authors": "E. N. Gilbert",
+        "year": 1967,
+        "url": "https://www.nokia.com/bell-labs/publications-and-media/publications/minimum-cost-communication-networks"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The router `trunks` puts its split at a fixed share (0.5) of the way to the center of the targets. Put the split where the flow cost len * f^alpha of the trunk and its branches is least. There, the branches meet the trunk at Gilbert's angles, which depend on their counts.",
+    "math": "min over s: len(p, s) k^alpha + sum_j len(s, t_j) f_j^alpha, by weighted Weiszfeld steps. Angle of two branches m1, m2: cos(theta) = ((m1 + m2)^(2 alpha) - m1^(2 alpha) - m2^(2 alpha)) / (2 m1^alpha m2^alpha). Equal flows: alpha 0.5 gives 90 degrees, alpha 0 gives 120 degrees.",
+    "cost": "O(k x iterations) per trunk. Negligible.",
+    "params": [
+      "alpha: 0.3 to 0.9",
+      "clamp: 0.2 to 0.8 of the way"
+    ],
+    "wins": [
+      "B1",
+      "B6",
+      "R5"
+    ],
+    "risks": [
+      "R9",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "trunks-all on mid-fanout and case-dense-groups. Keep if B1 rises >= 3%, the B6 max falls >= 10 degrees and R9 = 0.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-029",
+      "EDA-015",
+      "EDA-035"
+    ]
+  },
+  {
+    "id": "EDA-031",
+    "family": "fields",
+    "name": "Wardrop spreading by Frank-Wolfe",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Some theoretical aspects of road traffic research",
+        "authors": "J. G. Wardrop",
+        "year": 1952,
+        "url": "https://doi.org/10.1680/ipeds.1952.11259"
+      },
+      {
+        "title": "An algorithm for quadratic programming",
+        "authors": "M. Frank, P. Wolfe",
+        "year": 1956,
+        "url": "https://doi.org/10.1002/nav.3800030109"
+      },
+      {
+        "title": "How bad is selfish routing?",
+        "authors": "T. Roughgarden, E. Tardos",
+        "year": 2002,
+        "url": "https://doi.org/10.1145/506147.506153"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Where many edges want one corridor, give each corridor link a cost that rises with its load, as a road gets slow in a jam (the BPR curve). Frank-Wolfe steps move a share of the edges to their best way at the current costs, until no edge gains alone. Overfull gaps spread into parallel gaps.",
+    "math": "t(x) = t0 (1 + beta (x / c)^4). Beckmann potential Phi = sum_a integral_0^x_a t_a. FW: y = all-or-nothing at t(x), x <- x + gamma (y - x), gamma by line search. At the end, each edge takes its most used way.",
+    "cost": "10 to 50 iterations of m shortest paths.",
+    "params": [
+      "beta: 0.15 to 1",
+      "power: 1 to 4",
+      "iterations: 10 to 50",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "M4",
+      "R12",
+      "B9"
+    ],
+    "risks": [
+      "B1",
+      "B2",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "case-dense-groups and packedGridBoard: the max overuse falls >= 50% at an R5 rise <= 5%. Compare with EDA-009.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-009",
+      "EDA-032"
+    ]
+  },
+  {
+    "id": "EDA-032",
+    "family": "fields",
+    "name": "Concave then convex link cost",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Minimum cost communication networks",
+        "authors": "E. N. Gilbert",
+        "year": 1967,
+        "url": "https://www.nokia.com/bell-labs/publications-and-media/publications/minimum-cost-communication-networks"
+      },
+      {
+        "title": "PathFinder: a negotiation-based performance-driven router for FPGAs",
+        "authors": "L. McMurchie, C. Ebeling",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/201310.201328"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "One cost for two wishes. Below the capacity of a corridor, each more edge costs less, so bundles form (EDA-029). Above it, each more edge costs much more (EDA-031). Edges bundle until a corridor is full, then the next bundle takes the next corridor.",
+    "math": "c(f) = len f^alpha for f <= cap. Above: len (cap^alpha + (f - cap) mu (1 + beta ((f - cap) / cap)^p)). The marginal costs drive a negotiated loop with the history term of EDA-009.",
+    "cost": "As EDA-009.",
+    "params": [
+      "alpha: 0.3 to 1",
+      "beta: 0.15 to 1",
+      "power: 1 to 4",
+      "mu: 1 to 10",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "B1",
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R5",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "shared-all on case-dense-groups and packedGridBoard. Keep if B1 is within 5% of EDA-029 and M4 is within 10% of EDA-031.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-029",
+      "EDA-031",
+      "EDA-009"
+    ]
+  },
+  {
+    "id": "EDA-033",
+    "family": "fields",
+    "name": "Consolidation by origin and destination cells",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Service network design in freight transportation",
+        "authors": "T. G. Crainic",
+        "year": 2000,
+        "url": "https://doi.org/10.1016/S0377-2217(99)00233-7"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Carriers merge the loads that go from one region to another into one truck between two terminals, with short trips at the ends. Group the edges by the pair (section of the source, section of the target) at one level. Each group with enough edges gets one trunk between two terminals, with short legs to its plugs.",
+    "math": "Key = (cell_d(source), cell_d(target)). Terminal = the Weber point of the plugs of the group in each cell. Trunk through the corner graph, legs from the plugs to the terminals.",
+    "cost": "O(m) to group, one route per group, and the legs. Faster than shared.",
+    "params": [
+      "level: 1 to 4",
+      "minGroup: 2 to 8",
+      "legMax: 0.1 to 0.4 of the span"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "Z9"
+    ],
+    "risks": [
+      "B4",
+      "R5",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "small-clustered and case-dense-groups. Keep if B1 rises >= 10% against shared, the R5 median stays within 5% and B4 is not worse.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-028",
+      "EDA-049",
+      "EDA-050"
+    ]
+  },
+  {
+    "id": "EDA-034",
+    "family": "fields",
+    "name": "Growth order for stable networks",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Modeling urban street patterns",
+        "authors": "M. Barthelemy, A. Flammini",
+        "year": 2008,
+        "url": "https://doi.org/10.1103/PhysRevLett.100.138702"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Roads grow: each new place joins the network that exists by the shortest new piece. Route the edges in a fixed order that does not depend on the input order, and let each edge use the drawn network at a discount. Then a new edge adds a road, and the old routes stay.",
+    "math": "Route e_i on the graph with the drawn links at a discount. Order sigma = sort by a stable key: a hash of the id, or (span, id).",
+    "cost": "As shared.",
+    "params": [
+      "order: hash | span | id",
+      "discount: 0.2 to 1"
+    ],
+    "wins": [
+      "Z10"
+    ],
+    "risks": [
+      "B1",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "20 edits of one edge on small-clustered: the share of routes that change. Keep if it falls >= 50% against shared at a B1 loss <= 3%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-010",
+      "EDA-023"
+    ]
+  },
+  {
+    "id": "EDA-035",
+    "family": "fields",
+    "name": "Spiral trees for fan-out (flow maps)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Flow map layout via spiral trees",
+        "authors": "K. Verbeek, K. Buchin, B. Speckmann",
+        "year": 2011,
+        "url": "https://research.tue.nl/en/publications/flow-map-layout-via-spiral-trees/"
+      },
+      {
+        "title": "Angle-restricted Steiner arborescences for flow map layout",
+        "authors": "K. Buchin, B. Speckmann, K. Verbeek",
+        "year": 2015,
+        "url": "https://doi.org/10.1007/s00453-013-9867-z"
+      },
+      {
+        "title": "Flow map layout",
+        "authors": "D. Phan, L. Xiao, R. Yeh, P. Hanrahan, T. Winograd",
+        "year": 2005,
+        "url": "https://doi.org/10.1109/INFVIS.2005.1532150"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For one source with many targets, build a tree whose branches are logarithmic spirals with an angle limit. A branch never turns back toward the source, branches merge smoothly, and the tree goes around obstacles. Flow maps of migration use it.",
+    "math": "Angle-restricted Steiner arborescence: the angle between the tangent and the direction to the root is <= alpha. A greedy method gives a 2-approximation of the shortest spiral tree. The exact problem is NP-hard.",
+    "cost": "O(k log k) per fan.",
+    "params": [
+      "alpha: 10 to 35 degrees",
+      "smoothing: 0 to 1",
+      "widthByCount: boolean"
+    ],
+    "wins": [
+      "B6",
+      "R7",
+      "B1",
+      "C2"
+    ],
+    "risks": [
+      "R9",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "trunks on mid-fanout and case-dense-groups. Keep if R7 = 0 for the members, the B6 max falls >= 20 degrees and B1 is not worse.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-015",
+      "EDA-030",
+      "EDA-046"
+    ]
+  },
+  {
+    "id": "EDA-036",
+    "family": "fields",
+    "name": "Stroke selection across zoom",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Bending the axial line: smoothly continuous road centre-line segments as a basis for road network analysis",
+        "authors": "R. C. Thomson",
+        "year": 2003,
+        "url": "https://www.spacesyntax.net/symposia-archive/SSS4/fullpapers/50Thomsonfpaper.pdf"
+      },
+      {
+        "title": "How to eat a graph: computing selection sequences for the continuous generalization of transportation networks",
+        "authors": "M. Chimani, T. C. van Dijk, J.-H. Haunert",
+        "year": 2014,
+        "url": "https://doi.org/10.1145/2666310.2666414"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Join route pieces that continue each other with little turn into long strokes. Rank the strokes by length and count. At a coarse zoom, show only the top strokes, and remove strokes in an order that keeps the drawn network connected. Each zoom shows the main roads.",
+    "math": "A stroke is a chain with turns <= 30 to 45 degrees. Rank = sum count x len. Chimani and others: an order of deletions that keeps the network connected, by ILP or greedy.",
+    "cost": "O(segments log segments) for the greedy form.",
+    "params": [
+      "turnLimit: 20 to 60 degrees",
+      "keepShare: 0.1 to 0.5 per level",
+      "connected: boolean"
+    ],
+    "wins": [
+      "Z4",
+      "Z5",
+      "Z9"
+    ],
+    "risks": [
+      "Z1",
+      "Z3"
+    ],
+    "placementDependent": true,
+    "screen": "The levels of sections on small-clustered and nestedGridBoard. Keep if Z4 <= 1 at each level and Z9 is not worse than today.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-014",
+      "EDA-038",
+      "EDA-050"
+    ]
+  },
+  {
+    "id": "EDA-037",
+    "family": "fields",
+    "name": "Topology-safe simplification for each zoom",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Algorithms for the reduction of the number of points required to represent a digitized line or its caricature",
+        "authors": "D. H. Douglas, T. K. Peucker",
+        "year": 1973,
+        "url": "https://doi.org/10.3138/FM57-6770-U75U-7727"
+      },
+      {
+        "title": "Line generalisation by repeated elimination of points",
+        "authors": "M. Visvalingam, J. D. Whyatt",
+        "year": 1993,
+        "url": "https://doi.org/10.1179/000870493786962263"
+      },
+      {
+        "title": "Topologically consistent line simplification with the Douglas-Peucker algorithm",
+        "authors": "A. Saalfeld",
+        "year": 1999,
+        "url": "https://doi.org/10.1559/152304099782424901"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "At each coarse zoom, simplify the points of each route and level link, with a tolerance that grows with the zoom. Saalfeld's test refuses a removal that changes the side of a box or of another route where the line goes. Lines get calmer and stay correct.",
+    "math": "Douglas-Peucker keeps the farthest point when it is > eps. Visvalingam-Whyatt removes the point of least area. A removal is safe when no other feature is in its triangle. eps_d = eps0 2^d.",
+    "cost": "O(k log k) per line.",
+    "params": [
+      "method: dp | vw",
+      "eps0: 0.5 to 4 u",
+      "safe: boolean"
+    ],
+    "wins": [
+      "R3",
+      "C3"
+    ],
+    "risks": [
+      "R9",
+      "Z3",
+      "R1"
+    ],
+    "placementDependent": true,
+    "screen": "The levels of small-clustered. Keep if the points fall >= 40% with no rise of the Z3 faults.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-027",
+      "EDA-038"
+    ]
+  },
+  {
+    "id": "EDA-038",
+    "family": "fields",
+    "name": "Lane collapse for each zoom",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A strategy for collapsing OS Integrated Transport Network dual carriageways",
+        "authors": "S. Thom",
+        "year": 2005,
+        "url": "https://ica.ign.fr/2005_Coruna/papers/thom.pdf"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "At far zooms, draw each bundle as one line with a width by its count, not as k lanes. At near zooms, open the lanes. The switch comes at the first level where the lane spacing falls under the smallest visible distance of the host. Each segment already has its count.",
+    "math": "Show lanes iff s x zoom >= pxMin. width = f(count) with f linear, sqrt or log. Merge parallel lanes within eps.",
+    "cost": "O(segments).",
+    "params": [
+      "pxMin: 1 to 4",
+      "widthScale: linear | sqrt | log",
+      "minCount: 2 to 5"
+    ],
+    "wins": [
+      "Z4",
+      "B7",
+      "R12"
+    ],
+    "risks": [
+      "B5",
+      "B9"
+    ],
+    "placementDependent": false,
+    "screen": "The count of drawn elements at each level against the budget. Keep if Z4 falls >= 30% at the far levels.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-014",
+      "EDA-036",
+      "EDA-037"
+    ]
+  },
+  {
+    "id": "EDA-039",
+    "family": "fields",
+    "name": "Least-squares displacement for room",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "The constraint method for solving spatial conflicts in cartographic generalization",
+        "authors": "L. Harrie",
+        "year": 1999,
+        "url": "https://doi.org/10.1559/152304099782424884"
+      },
+      {
+        "title": "Fast node overlap removal",
+        "authors": "T. Dwyer, K. Marriott, P. J. Stuckey",
+        "year": 2006,
+        "url": "https://doi.org/10.1007/11618058_15"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Do not open whole gaps. Move each box by the least amount that gives the spacing that its lanes need. A least-squares program with one constraint for each spacing rule and a weight on each move gives the moves. Rows and columns can bend a little, and far boxes stay.",
+    "math": "min sum w_i |delta_i|^2 with gap_ij(delta) >= demand_ij and the order constraints x_i + w_i + d <= x_j. A convex QP, solved by projection (VPSC) or by repeated least squares.",
+    "cost": "O(n log n) per pass with VPSC, 10 to 20 passes.",
+    "params": [
+      "weight: move against shape",
+      "keepOrder: boolean",
+      "maxMove: 0 to 10 u"
+    ],
+    "wins": [
+      "M3",
+      "M1",
+      "M5"
+    ],
+    "risks": [
+      "M2"
+    ],
+    "placementDependent": true,
+    "screen": "packedGridBoard: M1 and M3 against openGaps at M4 = 0. Keep if M3 falls >= 30% at an M1 rise <= 5%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-018",
+      "EDA-051"
+    ]
+  },
+  {
+    "id": "EDA-040",
+    "family": "fields",
+    "name": "Active ranges for the levels",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Optimizing active ranges for consistent dynamic map labeling",
+        "authors": "K. Been, M. Nollenburg, S.-H. Poon, A. Wolff",
+        "year": 2010,
+        "url": "https://i11www.iti.kit.edu/extra/publications/bnpw-oarcd-08.pdf"
+      },
+      {
+        "title": "Dynamic map labeling",
+        "authors": "K. Been, E. Daiches, C. Yap",
+        "year": 2006,
+        "url": "https://doi.org/10.1109/TVCG.2006.136"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Give each bundle, label and level link one range of zoom where it shows, with no hole: it comes once and goes once while the reader zooms. Choose the ranges to show the most items over all zooms, with no two in conflict at one zoom. Then no item pops in and out.",
+    "math": "Each item i gets [a_i, b_i]. max sum (b_i - a_i) w_i with no conflict at any scale. Simple 1-D forms have greedy optimal solutions. The general form is NP-hard, with constant-factor approximations.",
+    "cost": "O(n log n) for the greedy sweep.",
+    "params": [
+      "weight: count | length",
+      "minRange: 1 to 3 levels"
+    ],
+    "wins": [
+      "Z7",
+      "Z8",
+      "Z4"
+    ],
+    "risks": [
+      "Z1"
+    ],
+    "placementDependent": true,
+    "screen": "The level sequence of nestedGridBoard. Keep if 0 items vanish and come back across the zoom, and Z4 <= 1.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-014",
+      "EDA-036"
+    ]
+  },
+  {
+    "id": "EDA-041",
+    "family": "fields",
+    "name": "Boundary leaders as plug stubs",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Boundary labeling: models and efficient algorithms for rectangular maps",
+        "authors": "M. A. Bekos, M. Kaufmann, A. Symvonis, A. Wolff",
+        "year": 2007,
+        "url": "https://doi.org/10.1016/j.comgeo.2006.05.003"
+      }
+    ],
+    "step": "plugs",
+    "mechanism": "Boundary labeling joins points to labels on the border of a map with leaders that do not cross. Here the plugs on one side of a box are the labels, and the lanes in the next gap are the points. Leaders of the type po (across, then along) give stubs with no crossing and the least total length.",
+    "math": "One-sided po leaders: least total length with no crossing, by a sweep in O(n log n) or a dynamic program in O(n^2).",
+    "cost": "O(k log k) per side.",
+    "params": [
+      "leader: s | po | opo",
+      "slotSpacing: 2 to 8 units"
+    ],
+    "wins": [
+      "R1",
+      "R11",
+      "R10"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "As EDA-022. Keep if the crossings within 2 u of a box fall >= 30%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-022"
+    ]
+  },
+  {
+    "id": "EDA-042",
+    "family": "fields",
+    "name": "Count badges on bundles",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "An empirical study of algorithms for point-feature label placement",
+        "authors": "J. Christensen, J. Marks, S. Shieber",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/212332.212334"
+      }
+    ],
+    "step": "room",
+    "mechanism": "A host shows the count of a wide segment as a small badge. Place each badge on its segment where it covers no box, no other badge and no crossing, by the slider model of line labels. When no place is free, the room step gets a demand for that gap. It needs a new measure: badge overlaps.",
+    "math": "Slider labels along a polyline, a conflict graph, and a greedy maximum independent set. The 4-position model is NP-hard. A free-place shortage adds w x h to the demand of its gap.",
+    "cost": "O(b log b) for b badges.",
+    "params": [
+      "badgeSize: 8 to 24 units",
+      "minCount: 2 to 5",
+      "positions: slider | midpoint"
+    ],
+    "wins": [],
+    "risks": [
+      "M1"
+    ],
+    "placementDependent": true,
+    "screen": "The case boards: the badges over a box or another badge = 0, at an M1 rise <= 2%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-038",
+      "EDA-018"
+    ]
+  },
+  {
+    "id": "EDA-043",
+    "family": "fields",
+    "name": "Exact tangent visibility graph",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "An algorithm for planning collision-free paths among polyhedral obstacles",
+        "authors": "T. Lozano-Perez, M. A. Wesley",
+        "year": 1979,
+        "url": "https://doi.org/10.1145/359156.359164"
+      }
+    ],
+    "step": "router",
+    "mechanism": "The corner graph links each corner to its 8 nearest visible corners, so a way can be longer than the shortest. Keep instead each link between two corners that see each other and are tangent at both ends (the reduced visibility graph). A* on it gives the exact shortest way around the grown boxes.",
+    "math": "A shortest path among polygons lies on the visibility graph. The tangent filter keeps a link only when it is tangent to the boxes at both ends. |E| = O(n^2).",
+    "cost": "100 nodes: 400 corners and near 2e4 links, fast. 1000 nodes: near 2e6 links, heavy without a corridor limit.",
+    "params": [
+      "maxExact: 100 to 1000 nodes",
+      "fallbackK: 8 to 16"
+    ],
+    "wins": [
+      "R5",
+      "R6"
+    ],
+    "risks": [
+      "R8",
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "corners against the exact graph on boards <= 400 nodes: R5 median and R6. Keep as the MEAS2 length reference in any case. Keep as a router if the gap is >= 2% on a board.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-044",
+      "EDA-020"
+    ]
+  },
+  {
+    "id": "EDA-044",
+    "family": "fields",
+    "name": "Any-angle search (Theta*, Anya, Polyanya)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Theta*: any-angle path planning on grids",
+        "authors": "K. Daniel, A. Nash, S. Koenig, A. Felner",
+        "year": 2010,
+        "url": "https://doi.org/10.1613/jair.2994"
+      },
+      {
+        "title": "Optimal any-angle pathfinding in practice",
+        "authors": "D. D. Harabor, A. Grastien, D. Oz, V. Aksakalli",
+        "year": 2016,
+        "url": "https://doi.org/10.1613/jair.5007"
+      },
+      {
+        "title": "Compromise-free pathfinding on a navigation mesh",
+        "authors": "M. L. Cui, D. D. Harabor, A. Grastien",
+        "year": 2017,
+        "url": "https://doi.org/10.24963/ijcai.2017/70"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Search a mesh of the free space, or a grid, at any angle. Theta* tests if the parent of a node sees the next node and skips the middle point. Anya and Polyanya search intervals on the mesh edges and find the true shortest way. Polyanya needs no visibility graph, so it scales.",
+    "math": "Theta*: g(s') = g(parent(s)) + |parent(s) - s'| when in view. Polyanya: search nodes (interval I, root r) with an admissible h, optimal. Mesh: constrained Delaunay triangulation of the free space.",
+    "cost": "Mesh O(n log n). Queries from microseconds to ms. Near 0.1 s for all edges at 1000 nodes.",
+    "params": [
+      "method: theta | polyanya",
+      "mesh: cdt | rect",
+      "margin: 2 to 10 units"
+    ],
+    "wins": [
+      "R5",
+      "R6"
+    ],
+    "risks": [
+      "R8",
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "As EDA-043, plus the time at 1000 nodes in CI. Keep if R5 is within 0.5% of EDA-043 and the time <= corners.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-043",
+      "EDA-045"
+    ]
+  },
+  {
+    "id": "EDA-045",
+    "family": "fields",
+    "name": "Navigation mesh with clearance",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Shortest paths with arbitrary clearance from navigation meshes",
+        "authors": "M. Kallmann",
+        "year": 2010,
+        "url": "https://diglib.eg.org/handle/10.2312/SCA.SCA10.159-168"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Triangulate the free space so that each passage between two boxes knows its true width (a local clearance triangulation). A search can ask for a way wide enough for a disc of any size, so a bundle of k lanes finds a way with room for k lanes. The passage widths are the capacities for room and for congestion.",
+    "math": "O(n) triangles. A disc of radius r passes a portal iff its clearance >= r. A locally shortest path with clearance in O(n) after the search. capacity = floor(width / s).",
+    "cost": "Build O(n log n). A search in ms.",
+    "params": [
+      "radius: by the bundle width",
+      "refine: boolean"
+    ],
+    "wins": [
+      "R8",
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "With EDA-021: M4 and R8 against corners. Keep if a fat way fails less often than with the grown corner graph.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "EDA-021",
+      "EDA-044",
+      "EDA-019"
+    ]
+  },
+  {
+    "id": "EDA-046",
+    "family": "fields",
+    "name": "Flow field for each target",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Continuum crowds",
+        "authors": "A. Treuille, S. Cooper, Z. Popovic",
+        "year": 2006,
+        "url": "https://doi.org/10.1145/1141911.1142008"
+      },
+      {
+        "title": "Crowd pathfinding and steering using flow field tiles",
+        "authors": "E. Emerson",
+        "year": 2013,
+        "url": "http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For a target with many incoming edges, compute one distance field from that target (one Dijkstra on the corner graph). Each edge into it follows the field down. The ways form a shortest-path tree, so they merge like streams and never cross each other. One field serves all edges of the target.",
+    "math": "D(v) = distance to the target. The way of an edge follows the parent pointers of the tree. With one tie rule, the union of the ways is a tree: 0 crossings among them and the most sharing that shortest ways permit.",
+    "cost": "One Dijkstra for each target with fan-in >= minFanIn, not one search per edge. d times faster for a fan-in of d.",
+    "params": [
+      "minFanIn: 2 to 10",
+      "graph: corners | grid",
+      "tieBreak: index | angle"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "R1"
+    ],
+    "risks": [
+      "B4",
+      "B8"
+    ],
+    "placementDependent": true,
+    "screen": "mid-hubs in CI and case-dense-groups: R1 among the edges of one target = 0, B1 above corners, and the time.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-029",
+      "EDA-035",
+      "EDA-050"
+    ]
+  },
+  {
+    "id": "EDA-047",
+    "family": "fields",
+    "name": "Conflict search over crossings",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Conflict-based search for optimal multi-agent pathfinding",
+        "authors": "G. Sharon, R. Stern, A. Felner, N. R. Sturtevant",
+        "year": 2015,
+        "url": "https://doi.org/10.1016/j.artint.2014.11.006"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Multi-agent path finding resolves collisions with a tree of constraints. Here a conflict is a crossing at a sharp angle, two lanes too near, or a route through a box. At each node of the tree, take one conflict, branch two ways (each forbids one edge from the place), and route only that edge again.",
+    "math": "CBS: best-first search on the constraint tree by sum of lengths. The low level is A* with the constraints. ECBS(w) is bounded: cost <= w x OPT.",
+    "cost": "Exponential in the worst case. A node limit bounds it. Small boards only.",
+    "params": [
+      "conflicts: angle | spacing | through",
+      "w: 1 to 1.5",
+      "nodeLimit: 100 to 10000"
+    ],
+    "wins": [
+      "R12",
+      "R2",
+      "R9"
+    ],
+    "risks": [
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "tiny-uniform and case-hub-chain at a node limit of 1000. Keep if the conflicts fall >= 50% against shared at an R5 rise <= 3%.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "EDA-010",
+      "EDA-048"
+    ]
+  },
+  {
+    "id": "EDA-048",
+    "family": "fields",
+    "name": "Cooperative A* with lane reservations",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Cooperative pathfinding",
+        "authors": "D. Silver",
+        "year": 2005,
+        "url": "https://ojs.aaai.org/index.php/AIIDE/article/view/18726"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Route the edges one by one. Each routed edge reserves its lane slots in each corridor in a table. A later edge sees the free slots and pays more for a full corridor. The members of one bundle share their reservations, so they pay nothing to each other.",
+    "math": "R(a) = used lanes. cost = len (1 + gamma [R(a) >= cap(a)]), with the bundle discount for the same key. Prioritized planning.",
+    "cost": "As shared.",
+    "params": [
+      "gamma: 0.5 to 10",
+      "priority: span | count | id",
+      "spacing: 2 to 8 units"
+    ],
+    "wins": [
+      "M4",
+      "R12"
+    ],
+    "risks": [
+      "R5",
+      "R6",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Against EDA-009 on case-dense-groups. Keep if the overuse is within 10% of EDA-009 at <= 1/3 of its time.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "EDA-009",
+      "EDA-047"
+    ]
+  },
+  {
+    "id": "EDA-049",
+    "family": "fields",
+    "name": "Hierarchical pathfinding on the tree of sections",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Near optimal hierarchical path-finding",
+        "authors": "A. Botea, M. Muller, J. Schaeffer",
+        "year": 2004,
+        "url": "https://www.semanticscholar.org/paper/Near-Optimal-Hierarchical-Path-Finding-Botea-M%C3%BCller/b0f0432ba69e4d730b93a75e3d19c8e9d811efac"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Make an abstract graph for each level: its points are the entrances on the borders of the sections, with the costs inside each section known in advance. Route on the coarse graph first, then refine inside each section. The level links and the fine routes come from one graph, so they agree.",
+    "math": "HPA*: borders, entrances, links inside each cluster by A*. A query inserts s and t, searches the abstract graph and refines. The paper reports routes near 1% longer after smoothing.",
+    "cost": "Precompute O(sum of cluster sizes^2). Fast queries.",
+    "params": [
+      "level: 1 to 4",
+      "entranceSpacing: 2 to 8 margins",
+      "smooth: boolean"
+    ],
+    "wins": [
+      "Z9",
+      "R7"
+    ],
+    "risks": [
+      "R5",
+      "R6"
+    ],
+    "placementDependent": true,
+    "screen": "sections-tree on mid-clustered in CI. Keep if Z9 falls >= 20% and the time falls >= 30% at an R5 rise <= 2%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-028",
+      "EDA-050",
+      "EDA-014"
+    ]
+  },
+  {
+    "id": "EDA-050",
+    "family": "fields",
+    "name": "Highway hierarchy of the corner graph",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Highway hierarchies hasten exact shortest path queries",
+        "authors": "P. Sanders, D. Schultes",
+        "year": 2005,
+        "url": "https://doi.org/10.1007/11561071_51"
+      },
+      {
+        "title": "Contraction hierarchies: faster and simpler hierarchical routing in road networks",
+        "authors": "R. Geisberger, P. Sanders, D. Schultes, D. Delling",
+        "year": 2008,
+        "url": "https://doi.org/10.1007/978-3-540-68552-4_24"
+      },
+      {
+        "title": "In transit to constant time shortest-path queries in road networks",
+        "authors": "H. Bast, S. Funke, D. Matijevic, P. Sanders, D. Schultes",
+        "year": 2007,
+        "url": "https://doi.org/10.1137/1.9781611972870.5"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Road planners rank roads: a link is a highway when many long shortest ways use it. Compute that rank for each link of the corner graph from the ways of the edges. The top links become the highways, and each zoom shows the links above its rank. Few access points join each section to them.",
+    "math": "(u, v) is a highway link when it is on a shortest s-t way with v outside the H nearest of s and u outside the H nearest of t. Option: a load rank b(a) = sum_e [a in way_e]. Transit nodes: the access points of each cell.",
+    "cost": "One pass over the ways of the edges, as shared. Near the cost of shared.",
+    "params": [
+      "H: 4 to 64",
+      "levels: 1 to 4",
+      "rank: hh | load"
+    ],
+    "wins": [
+      "B2",
+      "B8",
+      "Z9",
+      "Z4"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "shared-all with the highway set from the rank, against the discount: the front of B1 and B3 on case-many-groups and small-clustered.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-029",
+      "EDA-046",
+      "EDA-049",
+      "EDA-033"
+    ]
+  },
+  {
+    "id": "EDA-051",
+    "family": "fields",
+    "name": "Room by congestion prices",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Fast and accurate routing demand estimation for efficient routability-driven placement",
+        "authors": "P. Spindler, F. M. Johannes",
+        "year": 2007,
+        "url": "https://portal.fis.tum.de/en/publications/fast-and-accurate-routing-demand-estimation-for-efficient-routabi/"
+      },
+      {
+        "title": "The Lagrangian relaxation method for solving integer programming problems",
+        "authors": "M. L. Fisher",
+        "year": 1981,
+        "url": "https://doi.org/10.1287/mnsc.27.1.1"
+      }
+    ],
+    "step": "room",
+    "mechanism": "Chip placers grow the cells in hot areas so the router gets room. Use the prices of EDA-012, or the history of EDA-009, for each gap: the price tells how much one more unit of width saves. Open the gaps with the highest price first, until the prices fall under a limit or the area budget is spent.",
+    "math": "Delta width_g proportional to lambda_g, the shadow price. Stop when max lambda <= tau or M1 >= budget. Route and room alternate 2 to 3 times.",
+    "cost": "2 to 3 x (router + room).",
+    "params": [
+      "tau: 0 to 1",
+      "areaBudget: 1.0 to 1.5",
+      "rounds: 1 to 3"
+    ],
+    "wins": [
+      "M1",
+      "M4",
+      "R5"
+    ],
+    "risks": [
+      "M3",
+      "M2"
+    ],
+    "placementDependent": true,
+    "screen": "packedGridBoard: the area at M4 = 0 against roomDemand with passes. Keep if M1 falls >= 10% at M4 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "EDA-012",
+      "EDA-009",
+      "EDA-018",
+      "EDA-039"
+    ]
+  }
+]
