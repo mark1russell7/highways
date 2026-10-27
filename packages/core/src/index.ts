@@ -23,4 +23,6 @@ export * from "./bench/run.ts";
 export * from "./bench/curves.ts";
 export * from "./bench/room.ts";
 export * from "./bench/sections.ts";
+export * from "./bench/measures/index.ts";
+export * from "./bench/suite.ts";
 export * from "./strategies/index.ts";

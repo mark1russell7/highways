@@ -88,6 +88,17 @@ export function sameData(a: unknown, b: unknown): boolean {
  * After the routes pass `cellLimit` milliseconds, it starts no more routes and marks the row with `overLimit`.
  */
 export function benchOne(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity): BenchRow {
+  return benchRun(router, fixture, graph, repeat, cellLimit).row;
+}
+
+/** One run of `benchRun`: the row of the benchmark and the result that the row measures. */
+export interface BenchRun {
+  readonly row: BenchRow;
+  readonly result: Result;
+}
+
+/** This function does the work of `benchOne` and also gives the result, so more measures can read it without a second route. */
+export function benchRun(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity): BenchRun {
   const times: number[] = [];
   let first: Result | undefined;
   let deterministic = true;
@@ -106,7 +117,7 @@ export function benchOne(router: Router, fixture: string, graph: Graph, repeat =
   times.sort((a, b) => a - b);
   const result = first!;
   const all = checkProperties(graph, result, 1_000_000);
-  return {
+  const row: BenchRow = {
     router: router.name,
     fixture,
     nodes: graph.nodes.length,
@@ -120,6 +131,7 @@ export function benchOne(router: Router, fixture: string, graph: Graph, repeat =
     levelFaults: measureLevelFaults(result),
     ...(spent > cellLimit ? { overLimit: { limit: cellLimit, runs } } : {}),
   };
+  return { row, result };
 }
 
 /**

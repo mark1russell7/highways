@@ -103,6 +103,18 @@ export function manyGroupsBoard(): Graph {
   return b.graph();
 }
 
+/** The options of `packedGridBoard`. */
+export interface PackedGridOptions {
+  /** The seed of the links. The default is 11. */
+  readonly seed?: number;
+  /** The number of columns. The default is 12. */
+  readonly cols?: number;
+  /** The number of rows. The default is 8. */
+  readonly rows?: number;
+  /** The number of long links between boxes far apart. The default is 48. */
+  readonly long?: number;
+}
+
 /**
  * This function makes the far view of a board after a host layout packs it.
  * The board has 96 boxes of one size in a grid of 12 columns and 8 rows.
@@ -110,12 +122,14 @@ export function manyGroupsBoard(): Graph {
  * The links have no channel between the boxes. The roadmap item ROOM measures this board before and after `makeRoom`.
  *
  * The board is not in `CASES`, because the digests of the router fix the output on each board of `CASES`.
+ * The options make a family of such boards for the measure suite. Without options, the board does not change.
  */
-export function packedGridBoard(): Graph {
-  const R = rng(11);
+export function packedGridBoard(options: PackedGridOptions = {}): Graph {
+  const R = rng(options.seed ?? 11);
   const b = new Board();
-  const cols = 12;
-  const rows = 8;
+  const cols = options.cols ?? 12;
+  const rows = options.rows ?? 8;
+  const long = options.long ?? 48;
   const w = 140;
   const h = 90;
   const id = (r: number, c: number): string => `p${r}-${c}`;
@@ -127,7 +141,7 @@ export function packedGridBoard(): Graph {
       const cc = Math.max(0, Math.min(cols - 1, c + step()));
       b.link(id(r, c), id(rr, cc));
     }
-  for (let n = 0; n < 48; n++) b.link(id(Math.floor(R() * rows), Math.floor(R() * cols)), id(Math.floor(R() * rows), Math.floor(R() * cols)));
+  for (let n = 0; n < long; n++) b.link(id(Math.floor(R() * rows), Math.floor(R() * cols)), id(Math.floor(R() * rows), Math.floor(R() * cols)));
   return b.graph();
 }
 
