@@ -169,7 +169,7 @@ describe("the measure table", () => {
     expect(new Set(MEASURES.map((m) => m.name)).size).toBe(MEASURES.length);
     for (const m of MEASURES) {
       expect(m.name).toMatch(/^route(\.[a-z0-9-]+)+$/);
-      expect(m.id).toMatch(/^[RBCGZM]\d+$/);
+      expect(m.id).toMatch(/^[RBCGZMW]\d+$/);
       expect(m.unit.length).toBeGreaterThan(0);
       expect(["lower", "higher"]).toContain(m.better);
       expect(typeof m.placementDependent).toBe("boolean");
@@ -200,6 +200,25 @@ describe("screen", () => {
   it("gives the same records for the same input, apart from the time", () => {
     const again = screen("router", ["corners"], { inputs: [tiny], baseline: false, commit: "abc1234" });
     expect(again.records.map(strip)).toEqual(one.records.map(strip));
+  });
+
+  it("writes the bundle measures B2, B3 and B6 for each router record", () => {
+    const m = one.records[0]!.measures;
+    for (const name of ["route.bundle.share", "route.bundle.stretch.median", "route.bundle.stretch.q95", "route.bundle.merge-angle.max"]) expect(m[name]).toBeTypeOf("number");
+    // The base of the bundle stretch is the routes of corners, so corners has a stretch of 1.
+    expect(m["route.bundle.stretch.median"]).toBe(1);
+  });
+
+  it("adds the wrapped routers of `wrap`, and the order fragility of `shuffles`", () => {
+    const report = screen("router", ["corners"], { inputs: [tiny], baseline: false, wrap: ["stable", "repair"], shuffles: 3 });
+    expect(report.records.map((r) => r.strategy)).toEqual(["corners", "corners+stable", "corners+repair"]);
+    for (const r of report.records) {
+      expect(r.measures["route.order.changed"]).toBe(0);
+      expect(r.measures["route.order.crossings"]).toBe(0);
+    }
+    expect(report.summary.strategies.filter((s) => s.candidate).map((s) => s.strategy)).toEqual(["corners", "corners+stable", "corners+repair"]);
+    expect(one.records[0]!.measures["route.order.changed"]).toBeUndefined();
+    expect(findStrategy(STRATEGIES, "router", "corners+stable")).toBeUndefined();
   });
 
   it("screens a strategy that is not in the registry, and leaves the registry as it is", () => {

@@ -229,6 +229,16 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.ink` | R1 | `ink` | units | lower | yes |
 | `route.bundle.ink-saved` | B1 | `B1.inkSaved` | 0 to 1 | higher | no |
 | `route.bundle.ambiguity` | B4 | `B4.ambiguity` | 0 to 1 | lower | no |
+| `route.bundle.share` | B2 | `B2.share` | 0 to 1 | higher | no |
+| `route.bundle.stretch.median` | B3 | `B3.median` | ratio | lower | no |
+| `route.bundle.stretch.q95` | B3 | `B3.q95` | ratio | lower | no |
+| `route.bundle.merge-angle.max` | B6 | `B6.max` | degrees | lower | no |
+| `route.order.crossings` | W3 | `W3.crossings` | IQR over the median | lower | yes |
+| `route.order.detour` | W3 | `W3.detour` | IQR over the median | lower | yes |
+| `route.order.ink-saved` | W3 | `W3.inkSaved` | IQR over the median | lower | yes |
+| `route.order.ink` | W3 | `W3.ink` | IQR over the median | lower | yes |
+| `route.order.changed` | W3 | `W3.changed` | 0 to 1 | lower | yes |
+| `route.order.poa` | W3 | `W3.poa` | ratio | lower | yes |
 | `route.stability.mean` | Z10 | `Z10.mean` | units of the board | lower | no |
 | `route.stability.max` | Z10 | `Z10.max` | units of the board | lower | no |
 | `route.stability.moved` | Z10 | `Z10.moved` | 0 to 1 | lower | no |
@@ -261,6 +271,19 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 
 `route.stability.*` compares the routes after the small change of `changeGraph`. `route.stability.base.*` compares the routes of a variant with the routes of its base input.
 
+The screen adds the bundle measures for each router record:
+
+- `route.bundle.share` (B2) is the share of the edges that share a way. Such an edge is in a run, in a bundle of two edges or more, or on a shared segment.
+- `route.bundle.stretch.*` (B3) is the length of each route divided by the length of the route of `corners` on the same input. The record gives the median and the `0.95` quantile.
+- `route.bundle.merge-angle.max` (B6) is the largest turn of a route where it joins or leaves a shared segment, in degrees.
+
+`route.order.*` (W3 of MEAS3) is the order fragility of WILD-056. The screen writes it only with the option `shuffles`.
+
+- The screen routes the input again in `shuffles` random orders of the edges.
+- Each spread is the interquartile range over the median. A value of 0 is a router that the order of the edges does not move.
+- `route.order.changed` is the share of the orders that change one route or more.
+- `route.order.poa` is the crossings of the input order divided by the fewest crossings of the random orders.
+
 ## The screen
 
 `screen(step, strategies, options)` runs strategies of one step on each input of a screen set. It gives the records and a summary.
@@ -270,6 +293,8 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 - The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
 - A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
+- The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
+- The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
 
 The script `packages/core/scripts/screen.ts` writes `screen.jsonl` and `screen.md`:
 
@@ -278,6 +303,11 @@ pnpm --filter @mark1russell7/highways screen --step router --module ./proto/my-r
 ```
 
 The workflow `Screen` runs the screen in CI and keeps the two files as an artifact. Start it from the Actions tab with a step, names or prototype files.
+The inputs `wrap`, `shuffles` and `minutes` set the wrappers, the number of random orders and the time limit of the job.
+
+```sh
+gh workflow run screen.yml --ref main -f step=router -f wrap=stable -f shuffles=20 -f minutes=60
+```
 
 ### The screen set `screen-v1`
 

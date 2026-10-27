@@ -29,3 +29,5 @@ export * from "./strategies/index.ts";
 export * from "./bench/compare.ts";
 export * from "./bench/screen/index.ts";
 export * from "./highways/index.ts";
+export * from "./order/index.ts";
+export * from "./repair/index.ts";
