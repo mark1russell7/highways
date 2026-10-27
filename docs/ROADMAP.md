@@ -70,6 +70,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL9 | Version 0.4.2 on npm: the highway strategies and gates of wave 2, Weiszfeld meeting points and the edit screen. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | this PR |
 | CONTRACT-FIT | The fit test of the input and record types to `@mark1russell7/layout-contract` 0.1.0 (a devDependency at commit `52fefbb`). It lists 9 gaps, G1 to G9, in `docs/LAYOUT-RECORDS.md`. `TOLERANCE` equals `DEFAULT_TOLERANCE.through`. | 2026-10-27 | #82 |
 | CONTRACT-GAPS | The contract 0.2.0 (commit `69933a6`) closes G1, G2, G3, G6 and G8. `highways` closes G4 (`locked` is a boolean) and G5 (`inputGraph` takes a `RouteInput`). The joint measures with a floor of 0 agree with the floors of `docs/PROMOTION.md`. G7 and G9 stay open. | 2026-10-27 | #83 |
+| BUILD-W3A | Five clustering finders: `mingle`, `spiral`, `flow-clusters`, `traclus` and `diffusion`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `diffusion` (HWY-020) wins 2: B1 rises on 4 boards and R1 falls 22% to 84%. HWY-003, HWY-017, EDA-035, HWY-023, HWY-025 and HWY-020 are dropped. | 2026-10-27 | #84 |
 
 ## Open
 

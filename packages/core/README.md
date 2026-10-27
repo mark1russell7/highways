@@ -344,7 +344,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -384,6 +384,11 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `wspd` | The well-separated pairs of HWY-018. The edges between the two sets of one pair share one highway. |
 | `od-cells` | The origin and destination cells of EDA-033. The edges between two cells of a zoom level share one trunk. |
 | `select` | The candidate selection of HWY-045. Some strategies propose highways, and a greedy pass with swaps keeps the best set. |
+| `mingle` | The agglomerative bundles of HWY-003 (MINGLE). Two bundles that are near in 4D merge when the merge saves ink. |
+| `spiral` | The spiral trees of HWY-017 and EDA-035. The edges of a hub with many targets share the branches of one tree of spirals. |
+| `flow-clusters` | The end point clusters of HWY-023. A hierarchical clustering puts the edges with near ends in 4D into one highway. |
+| `traclus` | The segment clusters of HWY-025 (TRACLUS). The near segments of the first routes make clusters, and each cluster gives its mean line. |
+| `diffusion` | The route-aware bundling of HWY-020. The use of each link spreads to the links next to it, and dense links cost less. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper` and `level-links` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
