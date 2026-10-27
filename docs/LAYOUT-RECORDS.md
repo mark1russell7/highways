@@ -295,6 +295,29 @@ The screen adds the bundle measures for each router record:
 - `route.stability.highway-churn` is the share of the pairs of edges on one highway that come or go over one edit. Only the edges of both graphs count.
 - `route.stability.highway-ids` is the share of the matched highways that keep their id over one edit. Two highways match when the Jaccard index of their edges is 0.5 or more.
 
+## The measures of the packer
+
+The packer measures are the measures of `packing`. Its [measure note](https://github.com/mark1russell7/packing/blob/main/docs/MEASURES.md) is the source. This table is a copy for the joint harness.
+
+| Name | Unit | Better | Where |
+|---|---|---|---|
+| `pack.area` | square units of the input | lower | each input |
+| `pack.fill` | 0 to 1 | higher | each input |
+| `pack.aspectError` | 0 or more | lower | each input |
+| `pack.order.inversions` | 0 to 1 | lower | each input |
+| `pack.overflow` | count | lower | fixed cells |
+| `pack.stability.mean` | 0 or more, in container widths | lower | change pairs |
+| `pack.stability.q95` | 0 or more, in container widths | lower | change pairs |
+| `pack.stability.moved` | 0 to 1 | lower | change pairs |
+| `pack.deterministic` | true or false | true | each input |
+| `pack.search.ms` | milliseconds | lower | each input |
+
+- `pack.area` is the area of the hull of the placed boxes, not the area of the container. A free container has no fixed size.
+- `pack.order.inversions` divides the inverted pairs by the pairs with different ranks. Without ranks, the value is the same as before.
+- `pack.stability.mean` is the mean move of the items that stay, divided by the container width. A vertical move can be longer than the width, so the value can be more than 1.
+- `pack.stability.q95` is the q0.95 move of the items that stay, divided by the container width.
+- `pack.overflow` counts the items outside the container in a cell with a fixed container.
+
 ## The screen
 
 `screen(step, strategies, options)` runs strategies of one step on each input of a screen set. It gives the records and a summary.

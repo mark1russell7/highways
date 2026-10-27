@@ -73,7 +73,7 @@ The program screens approximately 250 ideas. At a p-value of 0.05, approximately
 
 ## The measures of each step
 
-The ids are the ids of [the measure note](research/MEASURES.md). The `pack` measures have names until `packing` gives them ids.
+The ids are the ids of [the measure note](research/MEASURES.md). The ids of the `pack` measures are the ids of the [packing measure note](https://github.com/mark1russell7/packing/blob/main/docs/MEASURES.md).
 
 | Step | Guard measures |
 |---|---|
@@ -82,9 +82,12 @@ The ids are the ids of [the measure note](research/MEASURES.md). The `pack` meas
 | `curve` | `C3`, `C5`, `C7`, `C8` max |
 | `room` | `R1`, `R12` |
 | `group` | `Z4`, `Z5`, `Z6`, `Z9` |
-| `pack` | area, fill, aspect error, order inversions, unplaced items in fixed cells |
-| `pack`, on change pairs | the median and q0.95 move of the items that stay |
+| `pack` | `pack.area`, `pack.fill`, `pack.aspectError`, `pack.order.inversions` |
+| `pack`, in fixed cells | `pack.overflow` |
+| `pack`, on change pairs | `pack.stability.mean`, `pack.stability.q95`, `pack.stability.moved` |
 | all routing steps, on change pairs | `Z10` |
+
+For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. `pack.search.ms` gives the time test.
 
 ## The selector
 
@@ -100,7 +103,7 @@ The ids are the ids of [the measure note](research/MEASURES.md). The `pack` meas
 `layout-stack` owns the joint selector and its docs. Its docs refer to this note and do not copy it.
 
 - The guards are the `joint.*` measures, the `pack.*` guards and the `route.*` guards.
-- The `pack.*` guards are area, fill, aspect error and order inversions.
+- The `pack.*` guards are `pack.area`, `pack.fill`, `pack.aspectError` and `pack.order.inversions`.
 - The hard rules are the rules of the two stages, with the `tolerance` field of each record.
 - The cells are only the cells known before the placement. They are the dimensions of the packing taxonomy and the routing cells that do not use positions. These routing cells are `edgeDensity`, `edgeShape`, `groups` and `ports`.
 - The parameters are the parameters of this note.
