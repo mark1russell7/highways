@@ -100,12 +100,12 @@ The benchmark measures the board `packedGridBoard`: 96 touching boxes and 132 li
 
 | Board | Area | Through | Crossings | Mean detour | Worst detour | Lane routes through a box |
 |---|---:|---:|---:|---:|---:|---:|
-| Packed | 1.00 | 62 | 162 | 1.12 | 1.48 | 94 |
+| Packed | 1.00 | 56 | 113 | 1.14 | 1.48 | 94 |
 | Gutter only | 1.13 | 0 | 345 | 1.34 | 2.38 | 10 |
 | Method `routes` | 1.50 | 0 | 276 | 1.32 | 2.09 | 2 |
 | Method `lines` | 3.80 | 0 | 382 | 1.20 | 1.47 | 5 |
 
-On the packed board, the links are short only because they go through the boxes. The method `routes` is the default, because it gives the fewest crossings for its area.
+On the packed board, the links are short only because they go through the boxes. Before ER3d, 62 links went through a box, with 162 crossings. The method `routes` is the default, because it gives the fewest crossings for its area.
 
 `sweepRoom` changes one knob at a time on the same board. `growthSettings`, `laneSettings` and `passSettings` give the settings of the benchmark.
 
