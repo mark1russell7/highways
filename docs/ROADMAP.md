@@ -50,6 +50,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX2 | The page `compare.html` puts the strategies of one step side by side, with their measures, the best values and the Pareto front. The 9 router panels of a board of 100 nodes take 826 ms. | 2026-10-27 | #53 |
 | REL6 | Version 0.3.0 on npm: OPTS to EX2. MINOR, because the type `CurveType` gains `smooth` and `clothoid`. The default routes change for HWC-B, HWC-C, ER3d and SEC-V. | 2026-10-27 | #54 |
 | EX2-FIX | On the 5 boards of the compare page, 68 of 78 controls change the drawing or the measures. A test lists the other 10 with their reason. | 2026-10-27 | #55 |
+| HWY-R | Research: [ways to make highways](research/HIGHWAYS.md). The note gives 60 ideas in four groups, 17 of them ours and 11 hybrids. It gives a build order of 14 steps for BUILD-W. | 2026-10-27 | #58 |
 
 ## Open
 
@@ -64,7 +65,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
 | IDEA0 | The idea catalog: each idea is a record with its source, its step, its math, its cost and the test that keeps or drops it. The tracker shows the funnel of the ideas. | `later` | — | P1 |
-| HWY-R | Research: each way to decide when, where and how to make a highway. Examples are clusters of edges that overlap, edge bundling, network design and flows. | `active` | MEAS0 | P1 |
 | NAT-R | Research: ideas from nature. Examples are slime molds, ant trails, rivers, leaf veins, blood vessels and the paths that walkers make. | `active` | MEAS0 | P1 |
 | RULE-R | Research: approaches that obey rendering rules. Examples are forces, constraints, energy, fields and gradient descent on the measures. | `active` | MEAS0 | P1 |
 | EDA-R | Research: routing in other fields. Examples are chips, circuit boards, metro maps, transport and logistics networks. | `active` | MEAS0 | P1 |
