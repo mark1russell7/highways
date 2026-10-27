@@ -83,9 +83,13 @@ A renderer uses these segments for the three views of a bundle:
 
 The [examples page](https://mark1russell7.github.io/highways/examples.html) shows these views on boards of made-up data.
 
+The [compare page](https://mark1russell7.github.io/highways/compare.html) puts the strategies of one step side by side. Each panel shows the output of a strategy and its measures, and a mark shows the best value of each measure.
+
 ## The curve types
 
 `curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline`, `arc`, `smooth` or `clothoid`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
+
+The [compare page](https://mark1russell7.github.io/highways/compare.html) runs each strategy of a step on the same board. It marks the best value of each measure and the Pareto front.
 
 ## Room for the links
 
@@ -163,7 +167,7 @@ The benchmark also races the routers on three case boards of made-up data. Each 
 | Package | Content |
 |---|---|
 | `packages/core` | The geometry, the model, the fixtures, the routers and the benchmark |
-| `packages/site` | The GitHub Pages site: a live map of the routers, the idea and the benchmark. The workflow `Pages` deploys it from `main`. |
+| `packages/site` | The GitHub Pages site: a live map of the routers, the idea, the benchmark, the examples and the compare page. The workflow `Pages` deploys it from `main`. |
 
 ## Development
 

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways compare: the strategies of each step</title>
+    <meta name="description" content="Put the strategies of one step of highways side by side: the routers, the curves and the grouping rules, each with its measures, on boards of made-up data." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body class="compare">
+    <a class="skip" href="#panels">Skip to the panels</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <p class="wordmark wordmark-small"><a href="./">highways</a></p>
+          <h1 class="tagline">Compare: the strategies of each step</h1>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="./">Live demo</a>
+          <a href="examples.html">Examples</a>
+          <a href="compare.html" aria-current="page">Compare</a>
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-intro" id="intro"></div>
+
+      <section class="demo" aria-labelledby="cmp-title">
+        <div class="router-row" role="radiogroup" aria-label="Step" id="steps"></div>
+        <div class="cmp-controls">
+          <div class="field">
+            <label for="board">Board</label>
+            <select id="board"></select>
+          </div>
+          <details class="cmp-options" id="options">
+            <summary>Options of the strategies <span class="cmp-count" id="option-count"></span></summary>
+            <div class="cmp-option-grid" id="option-body"></div>
+            <button type="button" class="link" id="reset">Reset each option</button>
+          </details>
+        </div>
+        <p class="cmp-status" id="status" role="status" aria-live="polite"></p>
+
+        <div class="cmp-summary">
+          <h2 id="cmp-title">The measures side by side</h2>
+          <p class="cmp-front" id="front"></p>
+          <div class="table-wrap">
+            <table class="num cmp-table" id="table"></table>
+          </div>
+        </div>
+
+        <div class="cmp-grid" id="panels" aria-busy="true"></div>
+      </section>
+
+      <section class="prose wide" id="howto">
+        <h2>How to read the panels</h2>
+        <div id="howto-body"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The names and the numbers on these boards are made up.
+      </p>
+    </footer>
+    <script type="module" src="/src/compare.ts"></script>
+  </body>
+</html>

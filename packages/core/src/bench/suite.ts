@@ -1,12 +1,12 @@
 import { packedGridBoard } from "../cases.ts";
-import { curveSpace, sampleCurve } from "../curves/index.ts";
+import { curveSpace, sampleCurve, type CurveSegment } from "../curves/index.ts";
 import { FIXTURES, makeFixture, type FixtureSpec } from "../fixtures.ts";
 import { polylineLength } from "../geom.ts";
 import { nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, openGaps, roomLinks } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
-import { checkSections } from "../sections.ts";
+import { checkSections, type Section } from "../sections.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { asRouter, listStrategies, STEPS, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
@@ -191,7 +191,7 @@ export function familySeed(spec: FixtureSpec, k: number): number {
 }
 
 /** This function gives the measures of the levels of a result: Z6, Z7, Z8, and G1, G2 and G8 of the far view. A result without groups gives none. */
-function levelMeasures(graph: Graph, result: Result): Record<string, number> {
+export function levelMeasures(graph: Graph, result: Result): Record<string, number> {
   const levels = result.levels ?? [];
   if (!levels.some((l) => l.items.some((i) => i.nodes.length > 1))) return {};
   const far = farLevel(levels);
@@ -209,7 +209,7 @@ function levelMeasures(graph: Graph, result: Result): Record<string, number> {
 }
 
 /** This function gives the new measures of the routes of a result (MEAS1). The row of `benchRun` gives the values of today. */
-function routeMeasures(graph: Graph, result: Result, row: BenchRow): Record<string, number> {
+export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Record<string, number> {
   const routes = result.routes;
   const m = Math.max(1, graph.edges.length);
   const ca = crossingAngles(drawnSegments(routes));
@@ -245,13 +245,31 @@ interface CurveRoute {
   readonly endNormal: { x: number; y: number };
 }
 
+/** The options of `curveRuns`. */
+export interface CurveRunOptions {
+  /** The name of the fixture family, for the rows. */
+  readonly fixture: string;
+  /** The index of the seed in the family, for the rows. */
+  readonly seed: number;
+  /** The curve strategies that are G1 by their design. The rule `curve-g1` examines them. */
+  readonly smooth: ReadonlySet<string>;
+  /** The curve strategies that read the normals of the plugs. The rule `curve-ends` examines their end tangents. */
+  readonly normals: ReadonlySet<string>;
+  /** The options of each curve strategy, by its name. A strategy without an entry gets its defaults. */
+  readonly curveOptions?: Readonly<Record<string, object>>;
+}
+
+/** One curve strategy on the routes of one result: the row of the suite and the drawn curves. */
+export interface CurveRun {
+  readonly row: SuiteRow;
+  /** The segments of each curve, in the order of the routes that have two points or more. */
+  readonly drawn: readonly CurveSegment[][];
+  /** The edge of each curve of `drawn`. */
+  readonly edges: readonly string[];
+}
+
 /** This function draws the routes of a result with each curve strategy and measures the curves (C1, C2, C3, C6 and the curve rules). */
-function curveRows(
-  graph: Graph,
-  result: Result,
-  curves: readonly Strategy<"curve">[],
-  options: { fixture: string; seed: number; smooth: ReadonlySet<string>; normals: ReadonlySet<string> },
-): SuiteRow[] {
+export function curveRuns(graph: Graph, result: Result, curves: readonly Strategy<"curve">[], options: CurveRunOptions): CurveRun[] {
   const byId = nodeIndex(graph);
   const edges = new Map(graph.edges.map((e) => [e.id, e]));
   const space = curveSpace(
@@ -260,17 +278,20 @@ function curveRows(
   );
   const u = boardUnit(graph);
   const routes: CurveRoute[] = [];
+  const ids: string[] = [];
   for (const r of result.routes) {
     const e = edges.get(r.edge);
     const s = e && byId.get(e.source.node);
     const t = e && byId.get(e.target.node);
     if (!s || !t || r.points.length < 2) continue;
+    ids.push(r.edge);
     routes.push({ points: r.points, startNormal: SIDE_NORMAL[nearestSide(s.box, r.points[0]!)], endNormal: SIDE_NORMAL[nearestSide(t.box, r.points[r.points.length - 1]!)] });
   }
   const ink = routes.reduce((sum, r) => sum + polylineLength(r.points), 0);
-  return curves.map((curve): SuiteRow => {
+  return curves.map((curve): CurveRun => {
+    const own = options.curveOptions?.[curve.name];
     const t0 = now();
-    const drawn = routes.map((r) => curve.run({ points: r.points, startNormal: r.startNormal, endNormal: r.endNormal, space }));
+    const drawn = routes.map((r) => curve.run({ points: r.points, startNormal: r.startNormal, endNormal: r.endNormal, space }, own));
     const samples = drawn.map((d) => sampleCurve(d, 0.25));
     const ms = now() - t0;
     const t1 = now();
@@ -311,7 +332,7 @@ function curveRows(
       "C6.length": ink > 0 ? length / ink : 1,
       ...rules,
     };
-    return {
+    const row: SuiteRow = {
       step: "curve",
       fixture: options.fixture,
       seed: options.seed,
@@ -324,7 +345,50 @@ function curveRows(
       extraMs: 0,
       values,
     };
+    return { row, drawn, edges: ids };
   });
+}
+
+/** One grouping rule on one graph: the row of the suite, the tree of the rule and the result of `sections` on that tree. */
+export interface GroupRun {
+  readonly row: SuiteRow;
+  readonly tree: Section;
+  /** The result of the router `sections` with the tree of the rule. A tree that `checkSections` refuses gives no result. */
+  readonly result?: Result;
+}
+
+/**
+ * This function groups one graph with one grouping rule, routes it with the router `sections` on that tree, and measures the levels.
+ * The grouping of the changed graph gives the group stability (G9). `options` are the options of the rule on `graph`.
+ */
+export function groupRun(
+  graph: Graph,
+  strategy: Strategy<"group">,
+  options: object,
+  change: { readonly graph: Graph; readonly options: object },
+  at: { readonly fixture: string; readonly seed: number },
+): GroupRun {
+  const t0 = now();
+  const tree = strategy.run(graph, options);
+  const treeMs = now() - t0;
+  const base = { step: "group" as const, fixture: at.fixture, seed: at.seed, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length };
+  // A tree that `checkSections` refuses is one violation. The router refuses it too, so the row has no measures.
+  try {
+    checkSections(tree, graph.nodes.length);
+  } catch {
+    return { row: { ...base, violations: 1, ms: treeMs, measureMs: 0, extraMs: 0, treeMs, values: {} }, tree };
+  }
+  const result = sectionsRouter({ name: "sections", group: strategy, groupOptions: options }).route(graph);
+  const ms = now() - t0;
+  const t1 = now();
+  // The hard rules of the levels (`counts-sum` and `link-ends`) are the violations of the step `group`.
+  const violations = checkLevels(graph, result.levels ?? []).length;
+  const values: Record<string, number> = { ...levelMeasures(graph, result), "Z3.through": sumFaults(measureLevelFaults(result)).through };
+  const measureMs = now() - t1;
+  const t2 = now();
+  values["G9.ari"] = groupStability(tree, strategy.run(change.graph, change.options), graph.nodes.length);
+  const extraMs = now() - t2;
+  return { row: { ...base, violations, ms, measureMs, extraMs, treeMs, values }, tree, result };
 }
 
 /**
@@ -408,32 +472,14 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
           extraMs,
           values,
         });
-        if (strategy.name === curveRouter && curves.length > 0 && graph.nodes.length <= curveMax) rows.push(...curveRows(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }));
+        if (strategy.name === curveRouter && curves.length > 0 && graph.nodes.length <= curveMax)
+          rows.push(...curveRuns(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }).map((c) => c.row));
       }
       // The step `group`: the router `sections` with each grouping rule, and the grouping of the changed graph (G9).
       for (const strategy of groups) {
         const opts = fixtureGroupOptions(strategy.name, graph);
-        const t0 = now();
-        const tree = strategy.run(graph, opts);
-        const treeMs = now() - t0;
-        // A tree that `checkSections` refuses is one violation. The router refuses it too, so the row has no measures.
-        try {
-          checkSections(tree, graph.nodes.length);
-        } catch {
-          rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations: 1, ms: treeMs, measureMs: 0, extraMs: 0, treeMs, values: {} });
-          continue;
-        }
-        const result = sectionsRouter({ name: "sections", group: strategy, groupOptions: opts }).route(graph);
-        const ms = now() - t0;
-        const t1 = now();
-        // The hard rules of the levels (`counts-sum` and `link-ends`) are the violations of the step `group`.
-        const violations = checkLevels(graph, result.levels ?? []).length;
-        const values: Record<string, number> = { ...levelMeasures(graph, result), "Z3.through": sumFaults(measureLevelFaults(result)).through };
-        const measureMs = now() - t1;
-        const t2 = now();
-        values["G9.ari"] = groupStability(tree, strategy.run(change.graph, fixtureGroupOptions(strategy.name, change.graph)), graph.nodes.length);
-        const extraMs = now() - t2;
-        rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations, ms, measureMs, extraMs, treeMs, values });
+        const changed = { graph: change.graph, options: fixtureGroupOptions(strategy.name, change.graph) };
+        rows.push(groupRun(graph, strategy, opts, changed, { fixture: spec.name, seed: k }).row);
       }
       // The time of each row, in milliseconds: the step, the new measures and the extra routes.
       log(
