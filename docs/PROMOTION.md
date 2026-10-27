@@ -18,14 +18,15 @@ A change of this rule is a change of this note. The three projects agree on the 
 4. **The win test.** Apply the tests of [The win test](#the-win-test) to the promotion corpus. All tests must pass.
 5. **The confirmation.** When the win test passes, screen the candidate again on fresh seeds (refer to [The confirmation run](#the-confirmation-run)). The win test must pass again.
 6. **The decision.** The option becomes the default when the test passes on the full corpus. When it passes only on some cells, the option becomes a rule of the selector (refer to [The selector](#the-selector)). Otherwise, the option stays off.
-7. **The release.** A change of the default routes is MINOR before 1.0.0. The same PR updates the digest tests and names the screen run. The hosts get a message before the release.
+7. **The release.** A change of the default output (routes or placements) is MINOR before 1.0.0. The same PR updates the digest tests and names the screen run. The hosts get a message before the release.
 
 ## The corpus
 
 - The promotion corpus is every input of the current screen sets, with all their seeds.
-- The bench fixtures up to 1000 nodes give the times.
+- Each step names its time fixtures. For `highways`, the bench fixtures up to 1000 nodes give the times. For `packing`, the fixtures go up to 10 000 items.
 - The decision uses holdout seeds: seeds that the screen of the idea did not use. The generators of the shared corpus (CORPUS) make them.
-- Until CORPUS is in the screen, the holdout is the inputs of `screen-v1` outside the decision boards of the idea.
+- `packing` makes its holdout seeds with its generators (`@mark1russell7/packing` 0.1.4 and later).
+- For `highways`, until CORPUS is in the screen, the holdout is the inputs of `screen-v1` outside the decision boards of the idea.
 
 ## The paired ratio
 
@@ -72,7 +73,7 @@ The program screens approximately 250 ideas. At a p-value of 0.05, approximately
 
 ## The measures of each step
 
-The ids are the ids of [the measure note](research/MEASURES.md).
+The ids are the ids of [the measure note](research/MEASURES.md). The `pack` measures have names until `packing` gives them ids.
 
 | Step | Guard measures |
 |---|---|
@@ -81,11 +82,13 @@ The ids are the ids of [the measure note](research/MEASURES.md).
 | `curve` | `C3`, `C5`, `C7`, `C8` max |
 | `room` | `R1`, `R12` |
 | `group` | `Z4`, `Z5`, `Z6`, `Z9` |
-| all steps, on change pairs | `Z10` |
+| `pack` | area, fill, aspect error, order inversions, unplaced items in fixed cells |
+| `pack`, on change pairs | the median and q0.95 move of the items that stay |
+| all routing steps, on change pairs | `Z10` |
 
 ## The selector
 
-- The selector is a strategy that picks an option for each input. It reads only the cells of the input that are known before the routing. The cells are `edgeDensity`, `edgeShape`, `groups` and `ports`, and the cells of the packer.
+- The selector is a strategy that picks an option for each input. It reads only the cells of the input that are known before the step. The cells are `edgeDensity`, `edgeShape`, `groups` and `ports`, and the cells of the packer.
 - A rule of the selector is a cell and an option. The win test must pass on the inputs of that cell, with `cellMin` or more inputs in the cell.
 - A cell with fewer inputs gets more inputs from the generators before the decision.
 - **The regret.** For each input, the oracle is the best option for that input. The regret of the selector is the median gap between its option and the oracle. A new rule must decrease the regret of the full selector on the full corpus. Thus many small wins in cells do not make a worse selector.
@@ -129,7 +132,7 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 
 ## Demotion
 
-A later corpus can show that a default fails the win test against the option that it replaced. Then the old default comes back, with the same steps. The change of the default routes is MINOR.
+A later corpus can show that a default fails the win test against the option that it replaced. Then the old default comes back, with the same steps. The change of the default output is MINOR.
 
 ## The record of a promotion
 
