@@ -40,12 +40,12 @@ Status: `done`, `active`, `blocked`, `later`.
 | CURV-R | Research: [curve families and their math](research/CURVES.md). The note gives 16 families with their curvature, offsets and clearance, 5 of them with exact offsets. It ranks them for 3 uses and gives an 8-step build order for CURV2. | 2026-10-27 | #41 |
 | HWC-B | `laneOrder: "bundle"` keeps two edges on one side through their common stretch. On `shared-all` and `case-many-groups`, end crossings: 2301 before, 687 after. Body crossings: 12 before, 0 after. | 2026-10-26 | #40 |
 | GRP-R | Research: [grouping rules for the zoom levels](research/GROUPING.md). The note gives 19 rules in four kinds and a build order of 5 rules for GRP2. A guillotine cut that reads the links cuts fewer links than the quadtree at the far view on 8 of 10 boards. | 2026-10-26 | #39 |
+| HWC-C | `leave: "part"` lets each lane of a trunk leave where its way parts, so few branches turn back. On `trunks-all` and `case-dense-groups`, worst lane spacing error: 133.2% before, 0.8% after. Body crossings: 3 before, 0 after. | 2026-10-27 | #44 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| HWC-C | The lanes of a trunk leave the bundle at the split point, so a branch does not turn back over its trunk. | `later` | HWC | P1 |
 | HWC-D | Room for the bends of wide bundles: the gaps grow so that the concentric arcs of a bundle fit. | `later` | HWC, ROOM2 | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
