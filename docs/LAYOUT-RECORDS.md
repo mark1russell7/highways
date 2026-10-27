@@ -186,8 +186,9 @@ The [measure note](research/MEASURES.md) tells each rule. The rule `sections` co
 
 A record of a packer counts the breaks of `no-overlap`, `in-container`, `locked-kept` and `complete`. The `FORMAT.md` file of `packing` defines them. They follow `layout-contract` 0.2.0:
 
-- A locked box without a position breaks only `locked-kept`. It does not break `complete`.
-- For `no-overlap` and `in-container`, such a box stays at its input position.
+- A locked box without a placement breaks only `locked-kept`. It does not break `complete`. It stays at its input position for `no-overlap` and `in-container`.
+- A locked box moves when a coordinate changes by more than `RECORD_EPS`.
+- A locked box without a position in the input is a bad input, not a break. `checkInput` of the contract refuses it.
 
 ## The shared contract
 
