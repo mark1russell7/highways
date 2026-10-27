@@ -47,7 +47,9 @@ describe("paretoFront", () => {
   ];
 
   it("keeps each item that no other item dominates, in the order of the items", () => {
-    expect(paretoFront(items, (i) => ({ cost: i.cost, gain: i.gain }), axes).map((i) => i.name)).toEqual(["a", "b"]);
+    // The item e has no cost, so its cost is the worst. Its gain is the best, so no other item dominates it.
+    expect(paretoFront(items, (i) => ({ cost: i.cost, gain: i.gain }), axes).map((i) => i.name)).toEqual(["a", "b", "e"]);
+    expect(paretoFront(items.slice(0, 4), (i) => ({ cost: i.cost, gain: i.gain }), axes).map((i) => i.name)).toEqual(["a", "b"]);
   });
 
   it("counts a missing value as the worst value", () => {
