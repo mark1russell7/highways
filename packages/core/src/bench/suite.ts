@@ -6,12 +6,14 @@ import { nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, openGaps, roomLinks } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
+import { checkSections } from "../sections.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { asRouter, listStrategies, STEPS, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
+import { checkLevels } from "./properties.ts";
 import { ambiguity, inkSaved } from "./measures/bundles.ts";
 import { bendingEnergy, curveFaults, g1Defect, g2Defect } from "./measures/curves.ts";
-import { cutShare, farLevel, groupStability, levelGrouping, modularity, treeCost } from "./measures/groups.ts";
+import { balance, cutShare, farLevel, groupStability, levelGrouping, modularity, treeCost } from "./measures/groups.ts";
 import { nestingFaults, orderStability, positionStability } from "./measures/levels.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
 import { roomOrderFaults } from "./measures/room.ts";
@@ -88,7 +90,10 @@ export interface SuiteRow {
   readonly strategy: string;
   readonly nodes: number;
   readonly edges: number;
-  /** The violations of the hard rules of today (`checkProperties` and "same twice"). Only the step `router` checks them. */
+  /**
+   * The violations of the hard rules of today. The step `router` checks `checkProperties` and "same twice".
+   * The step `group` checks `checkSections` and the rules of the levels (`checkLevels`).
+   */
   readonly violations: number;
   /** The time of the step and of the measures of today, in milliseconds. */
   readonly ms: number;
@@ -96,6 +101,8 @@ export interface SuiteRow {
   readonly measureMs: number;
   /** The time of the extra routes of the stability measures (Z10 and G9), in milliseconds. */
   readonly extraMs: number;
+  /** The time of the grouping rule alone, without the router, in milliseconds. Only the rows of the step `group` have it. */
+  readonly treeMs?: number;
   /** The measures, by a key that starts with the id of MEAS0, or the name of a proposed rule. */
   readonly values: Readonly<Record<string, number>>;
 }
@@ -191,10 +198,12 @@ function levelMeasures(graph: Graph, result: Result): Record<string, number> {
   const groups = far ? levelGrouping(far) : new Map<string, string>();
   return {
     "level-nesting": nestingFaults(levels),
+    "Z4.farItems": far?.items.length ?? 0,
     "Z7.position": positionStability(levels),
     "Z8.order": orderStability(graph, levels),
     "G1.modularity": modularity(graph, groups),
     "G2.cut": cutShare(graph, groups),
+    "G6.balance": far ? balance(far) : 1,
     "G8.treeCost": treeCost(graph, levels),
   };
 }
@@ -406,15 +415,25 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
         const opts = fixtureGroupOptions(strategy.name, graph);
         const t0 = now();
         const tree = strategy.run(graph, opts);
+        const treeMs = now() - t0;
+        // A tree that `checkSections` refuses is one violation. The router refuses it too, so the row has no measures.
+        try {
+          checkSections(tree, graph.nodes.length);
+        } catch {
+          rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations: 1, ms: treeMs, measureMs: 0, extraMs: 0, treeMs, values: {} });
+          continue;
+        }
         const result = sectionsRouter({ name: "sections", group: strategy, groupOptions: opts }).route(graph);
         const ms = now() - t0;
         const t1 = now();
+        // The hard rules of the levels (`counts-sum` and `link-ends`) are the violations of the step `group`.
+        const violations = checkLevels(graph, result.levels ?? []).length;
         const values: Record<string, number> = { ...levelMeasures(graph, result), "Z3.through": sumFaults(measureLevelFaults(result)).through };
         const measureMs = now() - t1;
         const t2 = now();
         values["G9.ari"] = groupStability(tree, strategy.run(change.graph, fixtureGroupOptions(strategy.name, change.graph)), graph.nodes.length);
         const extraMs = now() - t2;
-        rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations: 0, ms, measureMs, extraMs, values });
+        rows.push({ step: "group", fixture: spec.name, seed: k, strategy: strategy.name, nodes: graph.nodes.length, edges: graph.edges.length, violations, ms, measureMs, extraMs, treeMs, values });
       }
       // The time of each row, in milliseconds: the step, the new measures and the extra routes.
       log(
@@ -575,6 +594,7 @@ export function summarizeRows(rows: readonly SuiteRow[]): SuiteSummary[] {
     for (const k of keys) measures[k] = summarize(list.map((r) => r.values[k] ?? Number.NaN));
     measures["ms"] = summarize(list.map((r) => r.ms));
     measures["measureMs"] = summarize(list.map((r) => r.measureMs));
+    if (list.some((r) => r.treeMs !== undefined)) measures["treeMs"] = summarize(list.map((r) => r.treeMs ?? Number.NaN));
     return {
       step: first.step,
       fixture: first.fixture,
@@ -637,7 +657,7 @@ export const SUITE_COLUMNS: Readonly<Record<Step, readonly string[]>> = {
   router: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved", "Z8.order", "Z7.position", "G8.treeCost"],
   curve: ["C1.share", "C1.max", "C2.median", "C3.median", "C3.q95", "C6.length"],
   room: ["M1.area", "M4.laneThrough", "crossings", "through", "room-order"],
-  group: ["G1.modularity", "G2.cut", "G8.treeCost", "G9.ari", "Z7.position", "Z8.order", "Z3.through"],
+  group: ["Z4.farItems", "G1.modularity", "G2.cut", "G6.balance", "G8.treeCost", "G9.ari", "Z7.position", "Z8.order", "Z3.through", "treeMs"],
 };
 
 /**

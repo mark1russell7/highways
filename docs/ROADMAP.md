@@ -46,6 +46,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SEC-V | A level link between two items that touch keeps two points, so it obeys the rule `link-ends`. On `mid-clustered` seed 4, the violations of `sections` and of `sections-tree` are 2 each before, 0 after. | 2026-10-27 | #46 |
 
 ## Open
+| GRP2 | The grouping rules `kd` and `cut` are strategies of the step `group`. At the far view, `cut` cuts fewer links than the quadtree on 8 of 10 boards and more on none. On `case-dense-groups`, its cut share is 0.370 against 0.430. | 2026-10-27 | #48 |
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
@@ -53,7 +54,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
-| GRP2 | More grouping strategies from GRP-R, each in its folder with its tests and a row in the benchmark. | `later` | GRP-R, MEAS1 | P2 |
+| GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |

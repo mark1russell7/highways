@@ -17,6 +17,6 @@ describe("the grouping rule quadtree", () => {
   });
 
   it("is the first strategy of the step group in the registry", () => {
-    expect(listStrategies(STRATEGIES, "group").map((s) => s.name)).toEqual(["quadtree", "keys"]);
+    expect(listStrategies(STRATEGIES, "group").map((s) => s.name)).toEqual(["quadtree", "keys", "kd", "cut"]);
   });
 });
