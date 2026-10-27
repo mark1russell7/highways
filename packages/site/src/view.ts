@@ -1,8 +1,13 @@
 import {
+  curveOf,
+  curveSpace,
   laneRoutes,
   polylineLength,
   runKey,
   type Box,
+  type CurveSegment,
+  type CurveSpace,
+  type CurveType,
   type Graph,
   type Level,
   type Node,
@@ -44,6 +49,8 @@ export interface Scene {
   /** The index of a level, `levels.length` for the routes, or "auto" to follow the zoom of the camera. */
   readonly level: number | "auto";
   readonly selected: string | undefined;
+  /** The curve type of the routes. The default is `straight`. The links of a level stay polylines. */
+  readonly curve?: CurveType;
   /**
    * The keys (`runKey`) of the open runs. With this set, the "unpack" view puts a count badge on each shared run.
    * An open run shows one lane for each edge.
@@ -124,6 +131,9 @@ export class MapView {
   private shapes = new WeakMap<Level, Map<string, GroupShape>>();
   private badges: Badge[] = [];
   private lanes: { graph: SegmentGraph; open: ReadonlySet<string>; width: number; routes: Route[] } | undefined;
+  /** The free space of the nodes of the graph, and the curve of each drawn polyline. */
+  private space: CurveSpace | undefined;
+  private curves = new WeakMap<readonly Point[], CurveSegment[]>();
 
   /**
    * @param onSelect - The view starts this function with the id of the clicked node, or `undefined` for empty space.
@@ -156,7 +166,9 @@ export class MapView {
   set(scene: Scene): void {
     const newGraph = this.scene?.graph !== scene.graph;
     if (this.scene?.done !== scene.done) this.sizes = scene.done?.result.levels ? itemSizes(scene.done.result.levels) : [];
+    if (newGraph || this.scene?.curve !== scene.curve) this.curves = new WeakMap();
     if (newGraph) {
+      this.space = curveSpace(scene.graph.nodes.map((n) => n.box));
       this.nodeById = new Map(scene.graph.nodes.map((n) => [n.id, n]));
       // A new graph tells its level again, even when the index of the level does not change.
       this.shownLevel = -1;
@@ -379,20 +391,37 @@ export class MapView {
     ctx.restore();
   }
 
-  private line(points: readonly Point[]): void {
+  private line(points: readonly Point[], curved: boolean): void {
     const { ctx } = this;
     if (points.length < 2) return;
+    const type = this.scene?.curve ?? "straight";
+    if (curved && type !== "straight") {
+      let segments = this.curves.get(points);
+      if (!segments) {
+        segments = curveOf(points, this.space ? { type, space: this.space } : { type });
+        this.curves.set(points, segments);
+      }
+      const X = (p: Point): number => p.x * this.s + this.tx;
+      const Y = (p: Point): number => p.y * this.s + this.ty;
+      for (const g of segments) {
+        if (g.kind === "move") ctx.moveTo(X(g.to), Y(g.to));
+        else if (g.kind === "line") ctx.lineTo(X(g.to), Y(g.to));
+        else if (g.kind === "cubic") ctx.bezierCurveTo(X(g.c1), Y(g.c1), X(g.c2), Y(g.c2), X(g.to), Y(g.to));
+        else ctx.arc(X(g.center), Y(g.center), g.radius * this.s, g.start, g.start + g.sweep, g.sweep < 0);
+      }
+      return;
+    }
     ctx.moveTo(points[0]!.x * this.s + this.tx, points[0]!.y * this.s + this.ty);
     for (let i = 1; i < points.length; i++) ctx.lineTo(points[i]!.x * this.s + this.tx, points[i]!.y * this.s + this.ty);
   }
 
-  private strokeAll(lines: readonly (readonly Point[])[], color: string, width: number, alpha: number): void {
+  private strokeAll(lines: readonly (readonly Point[])[], color: string, width: number, alpha: number, curved = true): void {
     const { ctx } = this;
     ctx.globalAlpha = alpha * this.fade;
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.beginPath();
-    for (const p of lines) this.line(p);
+    for (const p of lines) this.line(p, curved);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
@@ -675,7 +704,7 @@ export class MapView {
     const links = [...level.links]
       .sort((a, b) => a.count - b.count)
       .map((l) => ({ ...l, points: endsOnOutlines(l.points, shapes.get(l.source), shapes.get(l.target)) }));
-    for (const l of links) this.strokeAll([l.points], c.sign, this.fat(l.count), 0.85);
+    for (const l of links) this.strokeAll([l.points], c.sign, this.fat(l.count), 0.85, false);
     this.paintNodeIds(
       scene,
       singles.map((i) => i.nodes[0]!),
@@ -756,7 +785,7 @@ export class MapView {
       ctx.stroke();
     }
     const links = [...level.links].sort((a, b) => a.count - b.count);
-    for (const l of links) this.strokeAll([l.points], c.sign, this.fat(l.count), 0.85);
+    for (const l of links) this.strokeAll([l.points], c.sign, this.fat(l.count), 0.85, false);
     if (scene.cards)
       this.paintNodeIds(
         scene,

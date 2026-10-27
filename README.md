@@ -68,7 +68,7 @@ On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less in
 
 `sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39% and the crossings by 2.2 to 3 times. The routes are 20% to 32% longer.
 
-The metric `bends` counts each vertex of a curve, because a route is a polyline. A later step gives the curves to the renderer as curves.
+The metric `bends` counts each vertex of a curve, because a route is a polyline.
 
 ## The segments
 
@@ -83,12 +83,18 @@ A renderer uses these segments for the three views of a bundle:
 
 The [examples page](https://mark1russell7.github.io/highways/examples.html) shows these views on boards of made-up data.
 
+## The curve types
+
+`curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline` or `arc`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
+
 ## The benchmark
 
 `pnpm --filter @mark1russell7/highways bench` races the routers on the fixtures and writes a Markdown table.
 
 - `--max <nodes>` sets the largest fixture. The default is 1 000. The fixtures go from 10 to 100 000 nodes.
 - `--json <file>` also writes the rows as JSON.
+
+A third table compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space, and it gives the ratio of the lengths.
 
 The workflow `Bench` races the routers on all the fixtures, to 100 000 nodes, in CI. It starts on each change of `packages/core` on `main`, or by hand. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 

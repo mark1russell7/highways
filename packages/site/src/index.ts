@@ -1,4 +1,4 @@
-import { FIXTURES, makeFixture, ROUTERS, type BenchRow, type Graph } from "@mark1russell7/highways";
+import { CURVE_TYPES, FIXTURES, makeFixture, ROUTERS, type BenchRow, type CurveType, type Graph } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
@@ -28,12 +28,13 @@ interface State {
   fixture: string;
   router: string;
   bundles: BundleView;
+  curve: CurveType;
   level: number;
   follow: boolean;
   selected: string | undefined;
 }
 
-const state: State = { fixture: START.fixture, router: START.router, bundles: "unpack", level: -1, follow: true, selected: undefined };
+const state: State = { fixture: START.fixture, router: START.router, bundles: "unpack", curve: "straight", level: -1, follow: true, selected: undefined };
 
 // The worker routes one request at a time. A request of the visitor goes before the requests that fill the cache.
 const worker = new Worker(new URL("./route.worker.ts", import.meta.url), { type: "module" });
@@ -156,6 +157,19 @@ fixtureSelect.addEventListener("change", () => {
   update();
 });
 
+const curveSelect = $<HTMLSelectElement>("curve");
+for (const t of CURVE_TYPES) {
+  const o = document.createElement("option");
+  o.value = t;
+  o.textContent = t;
+  curveSelect.append(o);
+}
+curveSelect.value = state.curve;
+curveSelect.addEventListener("change", () => {
+  state.curve = curveSelect.value as CurveType;
+  render();
+});
+
 for (const input of document.querySelectorAll<HTMLInputElement>('input[name="bundles"]'))
   input.addEventListener("change", () => {
     if (input.checked) state.bundles = input.value as BundleView;
@@ -251,7 +265,7 @@ function render(): void {
   levelInput.disabled = !levels;
   follow.disabled = !levels;
   if (levels && !state.follow) levelInput.value = String(state.level);
-  view.set({ graph, done, bundles: state.bundles, level: state.follow ? "auto" : state.level, selected: state.selected });
+  view.set({ graph, done, bundles: state.bundles, curve: state.curve, level: state.follow ? "auto" : state.level, selected: state.selected });
   if (!levels) {
     $("level-name").textContent = "This router gives no zoom levels.";
     $("level-badge").hidden = true;

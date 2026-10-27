@@ -3,7 +3,9 @@ import { writeFileSync } from "node:fs";
 import { CASES } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { ROUTERS } from "../src/routers/index.ts";
+import { benchCurves, formatCurves, type CurveBenchRow } from "../src/bench/curves.ts";
 import { benchOne, formatFaults, formatTable, runBenchmark } from "../src/bench/run.ts";
+import { makeFixture } from "../src/fixtures.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -24,6 +26,14 @@ for (const c of CASES) {
 console.log(formatTable(rows));
 console.log();
 console.log(formatFaults(rows));
+// The curve types change only the drawing of the routes, so the small fixtures are enough.
+const curves: CurveBenchRow[] = [];
+for (const spec of FIXTURES.filter((f) => f.nodes <= 100)) {
+  const graph = makeFixture(spec);
+  for (const router of ROUTERS) curves.push(...benchCurves(router, spec.name, graph));
+}
+console.log();
+console.log(formatCurves(curves));
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
 if (rows.some((r) => !r.deterministic)) process.exitCode = 1;
