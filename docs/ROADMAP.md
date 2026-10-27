@@ -64,6 +64,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W1C | Cost, order and merge options of `shared` and `trunks`, off by default. With `passes: 3` (HWY-039), B1 of `shared-all` rises on 4 boards, and the B3 q95 does not rise. NAT-035 (`merge: snell`) cuts the B6 max 8% to 27%. NAT-024 is kept. EDA-030 is dropped. | 2026-10-27 | #72 |
 | REL8 | Version 0.4.1 on npm: the kept ideas of wave 1 (free plugs, lane tracks, the repair step, rip-up passes, Snell merges, pioneer order) and the bundle measures. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | #74 |
 | BUILD-W2B | Five highway strategies on the plans of `shared-ways` and `corridors`. HWY-043 (`weiszfeld`) is kept: the B6 max falls 20% on dense-groups. The zipper (NAT-022) adds B1 on 4 boards but fails the q95. HWY-050, HWY-015 and HWY-056 are dropped. | 2026-10-27 | #76 |
+| BUILD-W2A | Gates after a highway plan: `gateStrategy` and the strategies `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis` and `corridors+ids`. The screen option `edits` measures Z10 over seeded edits. HWY-046, HWY-047, HWY-048 and HWY-049 are dropped: B1 falls, or the gate removes no edge. HWY-054 is screened: each matched highway keeps its id, and the warm start is open. | 2026-10-27 | #75 |
 
 ## Open
 
