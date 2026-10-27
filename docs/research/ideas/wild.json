@@ -1700,7 +1700,7 @@
     "placementDependent": true,
     "screen": "Against sections on case-hub-chain and small-clustered: keep it when B1 is within 0.02 and R7 is lower.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-034",
       "WILD-033",
@@ -1711,7 +1711,93 @@
       "EDA-033"
     ],
     "canonical": "EDA-033",
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40580733027",
+      "records": [
+        "screen-v1/*/shared@5dcf8d6",
+        "screen-v1/*/od-cells@5dcf8d6",
+        "screen-v1/*/od-cells+stretch@5dcf8d6",
+        "screen-v1/*/od-cells-l1@5dcf8d6",
+        "screen-v1/*/od-cells-l3@5dcf8d6",
+        "screen-v1/*/od-cells-shared@5dcf8d6"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.073,
+            "dense-groups": 0.104,
+            "hub-chain": 0.215,
+            "many-groups": 0.118
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1,
+            "dense-groups": 1,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.48,
+            "hub-chain": 0.08,
+            "many-groups": 0.35
+          },
+          "new": {
+            "small-clustered": 0.4,
+            "dense-groups": 0.29,
+            "hub-chain": 0.08,
+            "many-groups": 0.36
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.055,
+            "dense-groups": 0.063,
+            "hub-chain": 0.094,
+            "many-groups": 0.101
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1,
+            "dense-groups": 1,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The screen of EDA-033. The strategy `od-cells` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.073 and 0.104 on small-clustered and dense-groups, against 0.210 and 0.307. The level 1 wins on 0 boards and the level 3 bundles almost nothing. The screen of the step `highway` has no measure of Z9 or B8. The strategy stays in the registry."
+    }
   },
   {
     "id": "WILD-033",

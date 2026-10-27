@@ -18,13 +18,19 @@ import { hysteresisGate, type HysteresisOptions } from "../highways/gates/hyster
 import { stableIdGate, type StableIdOptions } from "../highways/gates/ids/index.ts";
 import { gateStrategy } from "../highways/gates/model.ts";
 import { stretchGate, type StretchOptions } from "../highways/gates/stretch/index.ts";
+import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
 import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
 import { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "../highways/level-links/index.ts";
 import { MEET_DEFAULTS, meetPlan, type MeetOptions } from "../highways/meet/index.ts";
 import type { HighwayInput } from "../highways/model.ts";
+import { OD_CELL_DEFAULTS, odCellPlan, type OdCellOptions } from "../highways/od-cells/index.ts";
+import { QUICKBUNDLES_DEFAULTS, quickBundlesPlan, type QuickBundlesOptions } from "../highways/quickbundles/index.ts";
+import { ROAD_CLASS_DEFAULTS, roadClassPlan, type RoadClassOptions } from "../highways/road-classes/index.ts";
+import { SELECT_DEFAULTS, selectPlan, type SelectOptions } from "../highways/select/index.ts";
 import { sharedWaysPlan, type SharedWaysOptions } from "../highways/shared-ways/index.ts";
 import { STUB_DEFAULTS, stubPlan, type StubOptions } from "../highways/stubs/index.ts";
 import { WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
+import { WSPD_DEFAULTS, wspdPlan, type WspdOptions } from "../highways/wspd/index.ts";
 import { ZIPPER_DEFAULTS, zipperPlan, type ZipperOptions } from "../highways/zipper/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
@@ -38,7 +44,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, FLOW_FIELD_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -377,6 +383,12 @@ export const highwayStrategies: {
   readonly stubs: Strategy<"highway", StubOptions>;
   readonly zipper: Strategy<"highway", ZipperOptions>;
   readonly "level-links": Strategy<"highway", LevelHighwayOptions>;
+  readonly quickbundles: Strategy<"highway", QuickBundlesOptions>;
+  readonly "road-classes": Strategy<"highway", RoadClassOptions>;
+  readonly "flow-field": Strategy<"highway", FlowFieldOptions>;
+  readonly wspd: Strategy<"highway", WspdOptions>;
+  readonly "od-cells": Strategy<"highway", OdCellOptions>;
+  readonly select: Strategy<"highway", SelectOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -446,6 +458,60 @@ export const highwayStrategies: {
     schema: LEVEL_HIGHWAY_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<LevelHighwayOptions>) => levelHighwayPlan(input, o),
+  }),
+  quickbundles: defineStrategy({
+    step: "highway",
+    name: "quickbundles",
+    describe: "QuickBundles (HWY-026). One pass puts each edge in the nearest cluster of resampled lines. Each cluster gets highways.",
+    defaults: { ...QUICKBUNDLES_DEFAULTS } as QuickBundlesOptions,
+    schema: QUICKBUNDLES_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<QuickBundlesOptions>) => quickBundlesPlan(input, o),
+  }),
+  "road-classes": defineStrategy({
+    step: "highway",
+    name: "road-classes",
+    describe: "Road classes (HWY-034, EDA-050). The links that most ways use become main roads, and a second pass routes the edges onto them.",
+    defaults: { ...ROAD_CLASS_DEFAULTS } as RoadClassOptions,
+    schema: ROAD_CLASS_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<RoadClassOptions>) => roadClassPlan(input, o),
+  }),
+  "flow-field": defineStrategy({
+    step: "highway",
+    name: "flow-field",
+    describe: "A flow field for each target (EDA-046, HWY-037). The edges into one side of a box merge like streams on shortest ways to one root.",
+    defaults: { ...FLOW_FIELD_DEFAULTS } as FlowFieldOptions,
+    schema: FLOW_FIELD_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<FlowFieldOptions>) => flowFieldPlan(input, o),
+  }),
+  wspd: defineStrategy({
+    step: "highway",
+    name: "wspd",
+    describe: "Well-separated pairs (HWY-018). The edges between the two sets of one pair share one highway.",
+    defaults: { ...WSPD_DEFAULTS } as WspdOptions,
+    schema: WSPD_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<WspdOptions>) => wspdPlan(input, o),
+  }),
+  "od-cells": defineStrategy({
+    step: "highway",
+    name: "od-cells",
+    describe: "Origin and destination cells (EDA-033, WILD-032). The edges between two cells of a zoom level share one trunk.",
+    defaults: { ...OD_CELL_DEFAULTS } as OdCellOptions,
+    schema: OD_CELL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<OdCellOptions>) => odCellPlan(input, o),
+  }),
+  select: defineStrategy({
+    step: "highway",
+    name: "select",
+    describe: "Candidate generation and selection (HWY-045). Some strategies propose highways, and a greedy pass with swaps keeps the best set.",
+    defaults: { ...SELECT_DEFAULTS } as SelectOptions,
+    schema: SELECT_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SelectOptions>) => selectPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
