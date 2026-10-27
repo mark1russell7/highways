@@ -34,12 +34,12 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL5 | Version 0.2.0 on npm: CUSTOM. MINOR, because the type `Step` gains the step `group`. The routes do not change. | 2026-10-26 | #29 |
 | OPTS | Each strategy declares its options in `schema`: 74 declarations on 17 built-in strategies. A sweep from the declarations gives the hub-limit table of CUSTOM. The defaults do not change. | 2026-10-26 | #31 |
 | MEAS0 | Research: [the measures of a good result](research/MEASURES.md). The note gives 59 measures in six areas, 35 of them new to the bench, and 6 proposed hard rules. | 2026-10-26 | #32 |
+| ER3d | The measures split level through into unavoidable and avoidable links. A link through a far box gets a second way (`throughCost`, default 8). On `mid-clustered`, avoidable level through: 114 before, 54 after. The level links take 8% more time. | 2026-10-26 | #33 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | HWC | Curved highways: a bundle bends as one. Its lanes stay parallel at the lane spacing through each bend, and merge and split on smooth curves. | `later` | CURVE | P1 |
