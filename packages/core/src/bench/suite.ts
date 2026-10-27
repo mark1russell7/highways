@@ -41,7 +41,7 @@ export interface SuiteOptions {
   readonly curveMax?: number;
   /** The router whose routes the step `curve` draws. The default is `corners`. */
   readonly curveRouter?: string;
-  /** The curve strategies that are G1 by their design. The rule `curve-g1` examines them. The default is `rounded`, `arc` and `spline`. */
+  /** The curve strategies that are G1 by their design. The rule `curve-g1` examines them. The default is `rounded`, `arc`, `spline` and `highway`. */
   readonly smoothCurves?: readonly string[];
   /** The curve strategies that read the normals of the plugs. The rule `curve-ends` examines their end tangents. The default is `spline`. */
   readonly normalCurves?: readonly string[];
@@ -335,7 +335,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const curveMax = options.curveMax ?? 1000;
   const curveRouter = options.curveRouter ?? "corners";
   const registry = options.registry ?? STRATEGIES;
-  const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline"]);
+  const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "highway"]);
   const normals = new Set(options.normalCurves ?? ["spline"]);
   const log = options.log ?? ((): void => {});
   const fixtures = (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max);

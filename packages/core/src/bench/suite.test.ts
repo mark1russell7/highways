@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { routersOf } from "../strategies/model.ts";
+import { listStrategies, routersOf } from "../strategies/model.ts";
 import { benchOne } from "./run.ts";
 import { familySeed, formatFronts, formatMeasureTime, formatRules, formatSummaries, PROPOSED_RULES, runSuite } from "./suite.ts";
 
@@ -15,7 +15,8 @@ describe("runSuite (MEAS1)", () => {
     expect(familySeed(tiny, 0)).toBe(tiny.seed);
     expect(familySeed(tiny, 1)).not.toBe(tiny.seed);
     expect(new Set(rows("router").map((r) => r.seed))).toEqual(new Set([0, 1]));
-    expect(rows("room").map((r) => r.strategy)).toEqual(["gutter", "routes", "lines", "gutter", "routes", "lines"]);
+    const boards = ["gutter", ...listStrategies(STRATEGIES, "room").map((s) => s.name)];
+    expect(rows("room").map((r) => r.strategy)).toEqual([...boards, ...boards]);
   });
 
   it("keeps the rows of today: the first seed gives the rows of benchOne", () => {
