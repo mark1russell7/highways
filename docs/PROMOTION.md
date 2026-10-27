@@ -15,9 +15,10 @@ A change of this rule is a change of this note. The three projects agree on the 
 1. **The candidate.** The idea has the verdict `kept` in the catalog. Its option or strategy is in a release.
 2. **The prediction.** Write the prediction before the promotion screen. It names the measures, the values that it expects and its confidence. The screen writes the prediction id in each record.
 3. **The promotion screen.** Screen the candidate and the current default on the same inputs and seeds, in CI. The inputs are the promotion corpus (refer to [The corpus](#the-corpus)).
-4. **The win test.** Apply the tests of [The win test](#the-win-test). All tests must pass.
-5. **The decision.** The option becomes the default when the test passes on the full corpus. When it passes only on some cells, the option becomes a rule of the selector (refer to [The selector](#the-selector)). Otherwise, the option stays off.
-6. **The release.** A change of the default routes is MINOR before 1.0.0. The same PR updates the digest tests and names the screen run. The hosts get a message before the release.
+4. **The win test.** Apply the tests of [The win test](#the-win-test) to the promotion corpus. All tests must pass.
+5. **The confirmation.** When the win test passes, screen the candidate again on fresh seeds (refer to [The confirmation run](#the-confirmation-run)). The win test must pass again.
+6. **The decision.** The option becomes the default when the test passes on the full corpus. When it passes only on some cells, the option becomes a rule of the selector (refer to [The selector](#the-selector)). Otherwise, the option stays off.
+7. **The release.** A change of the default routes is MINOR before 1.0.0. The same PR updates the digest tests and names the screen run. The hosts get a message before the release.
 
 ## The corpus
 
@@ -58,6 +59,15 @@ The screens test many ideas on one corpus, so some ideas pass by chance. The gai
 2. **The paired bootstrap.** On the holdout inputs, take `bootstrapRuns` samples of the inputs, with replacement, from a fixed seed. Calculate the median ratio of each sample. The `bootstrapLevel` interval of these medians does not include 1.
 
 The sign test replaces a fixed share of better inputs. A share of 60% of 20 inputs is not a signal, but 60% of 2000 inputs is a strong signal.
+
+### The confirmation run
+
+The program screens approximately 250 ideas. At a p-value of 0.05, approximately 12 ideas can pass by chance. The confirmation run controls this, and it also finds an option that fits only the corpus.
+
+- The generators make a fresh set of inputs after the win test passes. No screen used these seeds before.
+- The fresh set has `confirmInputs` or more inputs, in the same cells as the corpus.
+- The candidate passes the full win test on the fresh set, with the same parameters.
+- The record of the promotion names the fresh seeds. A later screen does not use them for a decision.
 
 ## The measures of each step
 
@@ -109,6 +119,7 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 | `timeTail` | 2.0 | Time |
 | `cellMin` | 10 | Selector |
 | `flipRate` | 0.05 | Selector |
+| `confirmInputs` | 200 | Confirmation |
 
 ## The order of promotions
 
