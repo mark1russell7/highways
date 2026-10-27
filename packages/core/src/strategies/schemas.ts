@@ -4,7 +4,7 @@ import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
-import type { HighwayStrategyOptions, RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
+import type { HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
 import type { OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
@@ -133,6 +133,15 @@ export const ROOM_SCHEMA: OptionSchema<RoomPreset> = {
   lanes: { type: "enum", values: ["link", "count"], default: "link", describe: "With `count`, a link takes one lane for each of its edges. With `link`, a link takes one lane." },
   snap: { type: "number", min: 0, max: 4, step: 0.25, default: 0.5, describe: "Two box edges nearer than this distance make one boundary of the sweep." },
   passes: { type: "integer", min: 1, max: 4, step: 1, marks: [1, 2], default: 1, describe: "The number of passes of the demand. Each pass after the first finds the lanes on the open board." },
+};
+
+/** The declarations of the options of the room strategy `levels`. They are the options of the room, the levels with room and the limits of the quadtree. */
+export const LEVEL_ROOM_SCHEMA: OptionSchema<LevelRoomPreset> = {
+  ...ROOM_SCHEMA,
+  depths: { type: "list", describe: "The depths of the tree that get room. Without it, each depth with groups gets room." },
+  nodes: { type: "boolean", default: false, describe: "With `true`, the last level, with each node alone, also gets room." },
+  board: { type: "enum", values: ["shared", "each"], default: "shared", describe: "With `shared`, each level uses the board of the nearest level. With `each`, each level has its own board." },
+  ...SECTION_SCHEMA,
 };
 
 /** The declarations of the options of the grouping rule `keys`. */

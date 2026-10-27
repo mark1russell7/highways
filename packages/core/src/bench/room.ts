@@ -1,7 +1,10 @@
+import type { Box } from "../geom.ts";
 import { levelLinks } from "../levels.ts";
-import type { Graph, Node, Result } from "../model.ts";
+import type { Graph, LevelLink, Node, Result } from "../model.ts";
 import { makeRoom, openGaps, roomLinks, type RoomOptions } from "../room/index.ts";
 import { gapLanes, LANE_ORDERS, type LaneOrder } from "../room/lanes.ts";
+import { levelPairs, levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
+import { buildSections, levelCut, treeDepth, type SectionOptions } from "../sections.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { roomStrategies } from "../strategies/builtins.ts";
@@ -37,7 +40,7 @@ export interface RoomBenchRow {
 }
 
 /** This function gives the area of the bounding box of the nodes. */
-function areaOf(nodes: readonly Node[]): number {
+function areaOf(nodes: readonly { readonly box: Box }[]): number {
   let x0 = Infinity;
   let y0 = Infinity;
   let x1 = -Infinity;
@@ -186,5 +189,168 @@ export function formatRoom(rows: readonly RoomBenchRow[]): string {
     const f = r.faults;
     return `| ${r.fixture} | ${r.board} | ${r.area.toFixed(3)} | ${f.links} | ${f.through} | ${f.outside} | ${f.backtrack} | ${f.worstDetour.toFixed(2)} | ${r.crossings} | ${Math.round(r.ink)} | ${r.detour.toFixed(3)} | ${r.laneThrough} | ${r.ms.toFixed(1)} |`;
   });
+  return [head, line, ...body].join("\n");
+}
+
+/** One row of the benchmark of the room of the zoom levels: one level with groups of one board. */
+export interface LevelRoomRow {
+  readonly fixture: string;
+  /** The board: `packed`, `gutter` (each level open to the gutter only), `routes` (the room of the nodes alone), `levels` or `levels each`. */
+  readonly board: string;
+  readonly depth: number;
+  /** The number of items of the level. */
+  readonly items: number;
+  /** The number of links of the level. */
+  readonly links: number;
+  /** The area of the bounding box of the items of the level, as a share of the area of the packed board. */
+  readonly area: number;
+  /** The number of level links that go through a box that is not one of their ends. */
+  readonly through: number;
+  /** The crossings of the level links, with a lane for each link in each gap (`gapLanes` with the order `crossings`). */
+  readonly crossings: number;
+  /** The crossings of the level links without lanes. The links of a gap share one line, so this count hides crossings. */
+  readonly sharedCrossings: number;
+  /** The mean detour of the level links. */
+  readonly detour: number;
+  /** The worst detour of the level links. */
+  readonly worstDetour: number;
+  /** The number of pairs of items of the level whose order or alignment on an axis is not the order of the packed board. */
+  readonly order: number;
+  /** The number of pairs of items of the level before whose order or alignment on an axis changes at this level. */
+  readonly levelOrder: number;
+  /**
+   * The mean shift of an item against its parent from the level before, in gutters. The shift compares the place of the item in its parent
+   * at this level with its place in its parent at the level before. The value 0 means that the item moves with its parent.
+   */
+  readonly shift: number;
+  /** The largest shift of an item against its parent, in gutters. */
+  readonly worstShift: number;
+  /** The time to open the board of all levels, in milliseconds. It is 0 for the packed board. */
+  readonly ms: number;
+}
+
+/** One board of the benchmark of the room of the zoom levels. It has a name and the nodes at each depth, from 0 to the level with each node alone. */
+interface LevelBoards {
+  readonly name: string;
+  readonly nodes: readonly (readonly Node[])[];
+  readonly ms: number;
+}
+
+/** This function gives the sign of `d`, with 0 for a value nearer to 0 than `snap`. */
+const sign = (d: number, snap: number): number => (Math.abs(d) <= snap ? 0 : Math.sign(d));
+
+/**
+ * This function counts the pairs of boxes whose order or alignment on an axis is not the same in `a` and in `b`.
+ * The order of two boxes is the order of their left (or top) edges. The cost is quadratic in the number of boxes.
+ */
+export function orderChanges(a: readonly Box[], b: readonly Box[], snap: number = 0.5): number {
+  let n = 0;
+  for (const axis of ["x", "y"] as const)
+    for (let i = 0; i < a.length; i++)
+      for (let j = i + 1; j < a.length; j++) if (sign(a[i]![axis] - a[j]![axis], snap) !== sign(b[i]![axis] - b[j]![axis], snap)) n++;
+  return n;
+}
+
+const middle = (b: Box): { x: number; y: number } => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 });
+
+/**
+ * This function measures the room of the zoom levels of a board. The rows of each board give each level with groups, from depth 1.
+ * The boards are the packed board, the fair baseline with each level open to the gutter only, and the room of the nodes alone (`makeRoom`).
+ * Then come two boards of `levelRoom` with the options. The board `levels` uses the board of the nearest level for each level.
+ * The board `levels each` has a board for each level.
+ *
+ * The links of each level are `levelLinks` with their defaults. Each link gets a lane of `spacing` in each gap.
+ */
+export function benchLevelRoom(fixture: string, graph: Graph, options: LevelRoomOptions = {}, sections: SectionOptions = {}): LevelRoomRow[] {
+  const gutter = options.gutter ?? 8;
+  const spacing = options.spacing ?? 4;
+  const snap = options.snap ?? 0.5;
+  const root = buildSections(graph.nodes, sections);
+  const deepest = treeDepth(root);
+  const links = roomLinks(graph);
+  const all = (nodes: readonly Node[]): (readonly Node[])[] => Array.from({ length: deepest + 2 }, () => nodes);
+  const timed = (name: string, make: () => (readonly Node[])[]): LevelBoards => {
+    const t0 = now();
+    const nodes = make();
+    return { name, nodes, ms: now() - t0 };
+  };
+  const boards: LevelBoards[] = [
+    { name: "packed", nodes: all(graph.nodes), ms: 0 },
+    timed("gutter", () => levelRoom(graph.nodes, links, root, { ...options, spacing: 0, maxGrowth: Infinity, passes: 1, board: "each" }).levels.map((l) => l.nodes)),
+    timed("routes", () => all(makeRoom(graph.nodes, links, { ...options, method: "routes" }).items)),
+    timed("levels", () => levelRoom(graph.nodes, links, root, { ...options, board: "shared" }).levels.map((l) => l.nodes)),
+    timed("levels each", () => levelRoom(graph.nodes, links, root, { ...options, board: "each" }).levels.map((l) => l.nodes)),
+  ];
+  const indexOf = new Map(graph.nodes.map((n, i) => [n.id, i]));
+  const area0 = areaOf(graph.nodes);
+  const rows: LevelRoomRow[] = [];
+  for (const board of boards) {
+    for (let d = 1; d <= deepest; d++) {
+      const here = board.nodes[d]!;
+      const before = board.nodes[d - 1]!;
+      const cut = levelCut(here, root, d);
+      const pairs = levelPairs(cut.items, cut.owner, indexOf, links);
+      const boxes = new Map(cut.items.map((i) => [i.id, i.box]));
+      const shared = levelLinks(cut.items, pairs);
+      const drawn = gapLanes(cut.items, shared, { spacing, order: "crossings", snap });
+      const asGraph: Graph = { nodes: cut.items, edges: pairs.map((p, i) => ({ id: `l${i}`, source: { node: p.source }, target: { node: p.target } })) };
+      const asRoutes = (list: readonly LevelLink[]): Result => ({ routes: list.map((l, i) => ({ edge: `l${i}`, points: l.points })) });
+      const q = measureQuality(asGraph, asRoutes(drawn));
+      const faults = measureLinks(boxes, drawn);
+      // The level before: its items at its own places, and the same items at the places of this level.
+      const parentsThen = levelCut(before, root, d - 1);
+      const parentsNow = levelCut(here, root, d - 1);
+      const childrenThen = levelCut(before, root, d);
+      let shift = 0;
+      let worstShift = 0;
+      cut.items.forEach((c, k) => {
+        const parent = parentsThen.owner[indexOf.get(c.nodes[0]!)!]!;
+        const at = middle(c.box);
+        const was = middle(childrenThen.items[k]!.box);
+        const parentAt = middle(parentsNow.items[parent]!.box);
+        const parentWas = middle(parentsThen.items[parent]!.box);
+        const s = Math.hypot(at.x - parentAt.x - (was.x - parentWas.x), at.y - parentAt.y - (was.y - parentWas.y)) / gutter;
+        shift += s;
+        worstShift = Math.max(worstShift, s);
+      });
+      rows.push({
+        fixture,
+        board: board.name,
+        depth: d,
+        items: cut.items.length,
+        links: pairs.length,
+        area: area0 > 0 ? areaOf(cut.items) / area0 : 1,
+        through: faults.through,
+        crossings: q.crossings,
+        sharedCrossings: measureQuality(asGraph, asRoutes(shared)).crossings,
+        detour: q.detour,
+        worstDetour: faults.worstDetour,
+        order: orderChanges(
+          levelCut(graph.nodes, root, d).items.map((i) => i.box),
+          cut.items.map((i) => i.box),
+          snap,
+        ),
+        levelOrder: orderChanges(
+          parentsThen.items.map((i) => i.box),
+          parentsNow.items.map((i) => i.box),
+          snap,
+        ),
+        shift: cut.items.length ? shift / cut.items.length : 0,
+        worstShift,
+        ms: board.ms,
+      });
+    }
+  }
+  return rows;
+}
+
+/** This function writes the rows of `benchLevelRoom` as a Markdown table. */
+export function formatLevelRoom(rows: readonly LevelRoomRow[]): string {
+  const head = "| fixture | board | depth | items | links | area | through | crossings | shared crossings | detour | worst detour | order | level order | shift | worst shift | ms |";
+  const line = "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+  const body = rows.map(
+    (r) =>
+      `| ${r.fixture} | ${r.board} | ${r.depth} | ${r.items} | ${r.links} | ${r.area.toFixed(3)} | ${r.through} | ${r.crossings} | ${r.sharedCrossings} | ${r.detour.toFixed(3)} | ${r.worstDetour.toFixed(2)} | ${r.order} | ${r.levelOrder} | ${r.shift.toFixed(2)} | ${r.worstShift.toFixed(2)} | ${r.ms.toFixed(1)} |`,
+  );
   return [head, line, ...body].join("\n");
 }

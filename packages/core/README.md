@@ -145,6 +145,49 @@ On the packed board, the links are short only because they go through the boxes.
 
 The links of a gap without lanes share one line. Thus the crossings on that line do not count. With a lane for each link, the crossings show, and the order `crossings` removes 20% of them. The spacing changes the crossings less than 5%. The mean detour stays near 1.32 for each knob, because a link with legs parallel to the axes goes around the boxes.
 
+### Room at each zoom level
+
+At a far view, a group of nodes is one box. The boxes of the groups touch, so the level links have no channel. `levelRoom` gives each zoom level the gaps that its own links need.
+
+- `levelRoom(nodes, links, root, options)` takes the nodes, the links and the tree of sections. The indices of the tree are the indices of `nodes`.
+- The far levels open first. Each nearer level measures its links on the board of the level before it, and only adds growth. Thus a box moves with its parent.
+- The nodes move by one monotone shift on each axis. Thus each level keeps the order and the alignment of the boxes, and no gap of a far level gets narrower.
+- Each level of the result gives its `items` at their open places, its links (`pairs`), its demand (`gaps`) and its `nodes`.
+- With `board: "shared"`, the default, each level uses the board of the nearest level. No box moves between two levels.
+- With `board: "each"`, each level has its own board. The items of a far level stay nearer together, but a box moves in its parent when the level changes.
+- `depths` sets the depths that get room. With `nodes: true`, the level with each node alone also gets room.
+- The result also gives the `gaps` of the nodes: `openGaps(nodes, gaps)` gives the board of the nearest level. The room strategy `levels` gives these gaps.
+- `levelCut(nodes, root, depth)` gives the items of one level, as the router `sections` makes them.
+
+```ts
+import { buildSections, levelRoom, roomLinks, sectionsRouter } from "@mark1russell7/highways";
+
+const root = buildSections(graph.nodes);
+const room = levelRoom(graph.nodes, roomLinks(graph), root, { gutter: 8, spacing: 4 });
+// Each level gives its items at their open places.
+const far = room.levels[1]!.items;
+const result = sectionsRouter({ name: "sections" }).route({ nodes: room.items, edges: graph.edges });
+```
+
+The router makes the tree of sections again from the open board. To keep the tree of the packed board, give the router a `group` strategy that gives `root`.
+
+`benchLevelRoom` measures each level with groups. The board `nestedGridBoard` has 256 touching boxes, and its quadtree has 4, 16 and 64 groups. The fair baseline opens each level to the gutter only. Each link gets a lane of 4 units in each gap, and the crossings count these lanes. The shift is the move of a box in its parent from the level before, in gutters.
+
+| Board | Depth | Area | Through | Crossings | Worst detour | Order changes | Mean shift |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Packed | 2 | 1.00 | 6 | 14 | 2.36 | 0 | 0 |
+| Packed | 3 | 1.00 | 36 | 122 | 1.87 | 0 | 0 |
+| Gutter only | 1 | 1.01 | 0 | 0 | 1.32 | 0 | 0.71 |
+| Gutter only | 2 | 1.03 | 0 | 290 | 2.45 | 0 | 0.71 |
+| Gutter only | 3 | 1.07 | 0 | 836 | 2.37 | 0 | 0.71 |
+| Room of the nodes alone (`makeRoom`) | 1 to 3 | 1.61 | 0 | 0, 273, 836 | 1.38, 2.27, 2.15 | 0 | 0 |
+| `levelRoom`, board `shared` | 1 to 3 | 1.35 | 0 | 0, 273, 836 | 1.40, 2.18, 2.14 | 0 | 0 |
+| `levelRoom`, board `each` | 1 | 1.02 | 0 | 0 | 1.41 | 0 | 1.12 |
+| `levelRoom`, board `each` | 2 | 1.17 | 0 | 273 | 2.21 | 0 | 3.66 |
+| `levelRoom`, board `each` | 3 | 1.35 | 0 | 836 | 2.14 | 0 | 2.63 |
+
+The room removes each level link through a box, and no level changes the order of the boxes. Against the gutter only, the crossings with lanes fall 6% at depth 2 and stay the same at depth 3. Most crossings come from the links themselves, not from the width of the gaps. The board `shared` uses 16% less area than the room of the nodes alone, and no box moves between two levels. The board `each` keeps the far levels small, but the boxes move 1 to 4 gutters in their parents. Thus `shared` is the default.
+
 ## Options of the zoom levels
 
 The router `sections` makes its hubs and its zoom levels from a tree of groups. Each rule and each limit of that tree is an option. The defaults give the output of version 0.1.5, but `throughCost` changes the links of a walled-in level.
@@ -226,7 +269,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc` |
-| `room` | `RoomInput`: the boxes and the links of a board | `Gap[]` | `routes`, `lines` |
+| `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
 A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.
 

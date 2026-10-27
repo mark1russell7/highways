@@ -1,9 +1,9 @@
 import { BACKTRACK_MIN, goesOutAndBack } from "../bench/links.ts";
-import { center, dist, pointSegmentDistance, polylineLength, type Box, type Point } from "../geom.ts";
+import { center, dist, pointSegmentDistance, polylineLength, type Point } from "../geom.ts";
 import { LEVEL_LINK_DEFAULTS, levelLinks, type ItemPair, type LevelLinkOptions } from "../levels.ts";
-import { nodeIndex, type Graph, type Level, type LevelItem, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, type Graph, type Level, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
-import { allSections, buildSections, checkSections, SECTION_DEFAULTS, treeDepth, type Section, type SectionOptions } from "../sections.ts";
+import { allSections, buildSections, checkSections, levelCut, SECTION_DEFAULTS, treeDepth, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes } from "../segments.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { WayFinder } from "../ways.ts";
@@ -236,45 +236,17 @@ function makeLevels(graph: Graph, root: Section, routeOf: ReadonlyMap<string, Ro
   const shown = options.levels && new Set(options.levels);
   for (let d = 0; d <= deepest + 1; d++) {
     if (shown && d <= deepest && !shown.has(d)) continue;
-    const items: LevelItem[] = [];
-    const itemOf: (Section | number)[] = [];
-    const boxOf = (list: readonly number[]): Box => {
-      let x0 = Infinity;
-      let y0 = Infinity;
-      let x1 = -Infinity;
-      let y1 = -Infinity;
-      for (const i of list) {
-        const b = graph.nodes[i]!.box;
-        x0 = Math.min(x0, b.x);
-        y0 = Math.min(y0, b.y);
-        x1 = Math.max(x1, b.x + b.w);
-        y1 = Math.max(y1, b.y + b.h);
-      }
-      return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
-    };
-    const visit = (s: Section): void => {
-      if (s.depth >= d) {
-        items.push({ id: s.id, box: boxOf(s.nodes), nodes: s.nodes.map((i) => graph.nodes[i]!.id) });
-        for (const i of s.nodes) itemOf[i] = s;
-      } else if (s.children.length > 0) for (const c of s.children) visit(c);
-      else
-        for (const i of s.nodes) {
-          const n = graph.nodes[i]!;
-          items.push({ id: n.id, box: n.box, nodes: [n.id] });
-          itemOf[i] = i;
-        }
-    };
-    if (graph.nodes.length > 0) visit(root);
+    const { items, owner } = levelCut(graph.nodes, root, d);
     const links = new Map<string, { source: string; target: string; count: number; edge: string }>();
     for (const e of graph.edges) {
       const iu = indexOfNode.get(e.source.node);
       const iv = indexOfNode.get(e.target.node);
       if (iu === undefined || iv === undefined) continue;
-      const a = itemOf[iu]!;
-      const b = itemOf[iv]!;
+      const a = owner[iu]!;
+      const b = owner[iv]!;
       if (a === b) continue;
-      const ida = typeof a === "number" ? graph.nodes[a]!.id : a.id;
-      const idb = typeof b === "number" ? graph.nodes[b]!.id : b.id;
+      const ida = items[a]!.id;
+      const idb = items[b]!.id;
       const key = `${ida}\u0000${idb}`;
       const link = links.get(key);
       if (link) {

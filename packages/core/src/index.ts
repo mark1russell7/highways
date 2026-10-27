@@ -15,6 +15,7 @@ export * from "./pick.ts";
 export * from "./routers/index.ts";
 export * from "./room/index.ts";
 export * from "./room/lanes.ts";
+export * from "./room/levels/index.ts";
 export * from "./bench/properties.ts";
 export * from "./bench/quality.ts";
 export * from "./bench/links.ts";

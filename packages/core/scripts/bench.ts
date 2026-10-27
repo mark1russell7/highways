@@ -1,11 +1,11 @@
 // The command line of the benchmark: `pnpm bench [--max <nodes>] [--json <file>]`.
 import { writeFileSync } from "node:fs";
-import { CASES, packedGridBoard } from "../src/cases.ts";
+import { CASES, nestedGridBoard, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, benchHighways, formatCurves, formatHighways, type CurveBenchRow, type HighwayBenchRow } from "../src/bench/curves.ts";
 import { measureLevelFaults } from "../src/bench/links.ts";
 import { benchOne, formatFaults, formatLevels, formatTable, runBenchmark, type LevelRow } from "../src/bench/run.ts";
-import { benchRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
+import { benchLevelRoom, benchRoom, formatLevelRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
 import { levelLinks, THROUGH_COST_SWEEP } from "../src/levels.ts";
@@ -71,6 +71,9 @@ for (const settings of [growthSettings(), laneSettings(), passSettings()]) {
   console.log();
   console.log(formatRoom(sweepRoom("packed-grid", packedGridBoard(), settings)));
 }
+// The room of each zoom level (ROOM2): each level with groups of two packed boards, before and after `levelRoom` at gutter 8 and spacing 4.
+console.log();
+console.log(formatLevelRoom([...benchLevelRoom("packed-grid", packedGridBoard(), { gutter: 8, spacing: 4 }), ...benchLevelRoom("nested-grid", nestedGridBoard(), { gutter: 8, spacing: 4 })]));
 // The sweeps of the options of the levels (CUSTOM). The first row of each table is the fair baseline: the router `sections` with the defaults.
 const board = (name: string) => CASES.find((c) => c.name === name)!.make();
 const groupKey = (n: Node): string => n.id.slice(0, n.id.lastIndexOf("-"));
