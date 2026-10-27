@@ -39,6 +39,12 @@ export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
   split: { type: "number", min: 0.1, max: 0.9, step: 0.05, default: 0.5, describe: "The split point is at this share of the way to the center of the targets." },
   minSize: { type: "integer", min: 1, max: 8, step: 1, default: 2, describe: "A group with fewer edges stays unbundled." },
   laneOrder: LANE_ORDER,
+  leave: {
+    type: "enum",
+    values: ["part", "split"],
+    default: "part",
+    describe: "With `part`, a lane leaves the trunk where its way parts from the other ways. With `split`, each lane leaves at the split point.",
+  },
 };
 
 /** The declarations of the options of the routers `shared` and `shared-all`. */

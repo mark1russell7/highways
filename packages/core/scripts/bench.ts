@@ -59,6 +59,9 @@ const bundlers = [
   trunksRouter({ name: "trunks-all (run order)", rule: all, laneOrder: "run" }),
   sharedRouter({ name: "shared (run order)", rule: byCollection, laneOrder: "run" }),
   sharedRouter({ name: "shared-all (run order)", rule: all, laneOrder: "run" }),
+  // The lanes leave the trunk at the split point (HWC-C): the old default, for the comparison.
+  trunksRouter({ name: "trunks (leave at split)", rule: byCollection, leave: "split" }),
+  trunksRouter({ name: "trunks-all (leave at split)", rule: all, leave: "split" }),
 ];
 const highways: HighwayBenchRow[] = [];
 for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {

@@ -113,6 +113,27 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 
 With `bundle`, 90% or more of the end crossings that stay are necessary. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
 
+### Where the lanes leave a trunk
+
+The router `trunks` gives each group one trunk from the plug to a split point. The option `leave` sets where each lane leaves the trunk.
+
+- With `part`, the default, a lane leaves the trunk where its way parts from the ways of the other lanes.
+- A lane that turns back over the trunk by more than 90 degrees leaves at an earlier point of the trunk. It does so only on a line that is clear of the boxes.
+- On the second leg of the trunk, the lane leaves at the foot of its next point. A foot less than two margins from the start of that leg puts the edge out of the bundle.
+- The bundle keeps the points that all its routes share. Past them, the lanes that go on together share a run, in the `runs` of the result.
+- With `split`, each lane leaves at the split point, as in version 0.2.0. Lanes that go on together past the split point have no run.
+- `leaveTrunk(trunk, branch, clear, min)` gives the place where one branch leaves its trunk.
+
+The benchmark measures the lanes of `highwayCurves` on the case boards, with each value of `leave`.
+
+| Router | Board | Worst lane spacing error, `split` → `part` | Body crossings, `split` → `part` |
+|---|---|---:|---:|
+| `trunks` | `case-dense-groups` | 45.6% → 0.6% | 0 → 0 |
+| `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 3 → 0 |
+| `trunks-all` | `case-many-groups` | 68.2% → 47.6% | 1 → 0 |
+
+The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
+
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
 
 ## Room for the links
