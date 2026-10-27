@@ -1,4 +1,4 @@
-import { CURVE_TYPES, FIXTURES, makeFixture, ROUTERS, type BenchRow, type CurveType, type Graph } from "@mark1russell7/highways";
+import { FIXTURES, listStrategies, makeFixture, STRATEGIES, type BenchRow, type Graph } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
@@ -17,6 +17,9 @@ const $ = <T extends HTMLElement>(id: string): T => {
 
 // The fixtures of the demo: all fixtures that a browser routes in a few seconds.
 const DEMO_FIXTURES = FIXTURES.filter((f) => f.nodes <= 1000);
+// The registry of the core gives the routers and the curve types, so a new strategy shows up here with no edit.
+const ROUTERS = listStrategies(STRATEGIES, "router");
+const CURVES = listStrategies(STRATEGIES, "curve");
 const START = { fixture: "small-clustered", router: "shared" };
 const fmt = new Intl.NumberFormat("en-US");
 
@@ -28,7 +31,7 @@ interface State {
   fixture: string;
   router: string;
   bundles: BundleView;
-  curve: CurveType;
+  curve: string;
   level: number;
   follow: boolean;
   selected: string | undefined;
@@ -115,6 +118,7 @@ for (const r of ROUTERS) {
   b.className = "exit";
   b.dataset["router"] = r.name;
   b.textContent = r.name;
+  b.title = r.describe;
   b.addEventListener("click", () => pickRouter(r.name));
   routerRow.append(b);
 }
@@ -158,15 +162,16 @@ fixtureSelect.addEventListener("change", () => {
 });
 
 const curveSelect = $<HTMLSelectElement>("curve");
-for (const t of CURVE_TYPES) {
+for (const c of CURVES) {
   const o = document.createElement("option");
-  o.value = t;
-  o.textContent = t;
+  o.value = c.name;
+  o.textContent = c.name;
+  o.title = c.describe;
   curveSelect.append(o);
 }
 curveSelect.value = state.curve;
 curveSelect.addEventListener("change", () => {
-  state.curve = curveSelect.value as CurveType;
+  state.curve = curveSelect.value;
   render();
 });
 

@@ -1,13 +1,13 @@
 import {
-  curveOf,
   curveSpace,
+  findStrategy,
   laneRoutes,
   polylineLength,
   runKey,
+  STRATEGIES,
   type Box,
   type CurveSegment,
   type CurveSpace,
-  type CurveType,
   type Graph,
   type Level,
   type Node,
@@ -50,7 +50,7 @@ export interface Scene {
   readonly level: number | "auto";
   readonly selected: string | undefined;
   /** The curve type of the routes. The default is `straight`. The links of a level stay polylines. */
-  readonly curve?: CurveType;
+  readonly curve?: string;
   /**
    * The keys (`runKey`) of the open runs. With this set, the "unpack" view puts a count badge on each shared run.
    * An open run shows one lane for each edge.
@@ -395,10 +395,11 @@ export class MapView {
     const { ctx } = this;
     if (points.length < 2) return;
     const type = this.scene?.curve ?? "straight";
-    if (curved && type !== "straight") {
+    const curve = curved && type !== "straight" ? findStrategy(STRATEGIES, "curve", type) : undefined;
+    if (curve) {
       let segments = this.curves.get(points);
       if (!segments) {
-        segments = curveOf(points, this.space ? { type, space: this.space } : { type });
+        segments = curve.run(this.space ? { points, space: this.space } : { points });
         this.curves.set(points, segments);
       }
       const X = (p: Point): number => p.x * this.s + this.tx;

@@ -13,7 +13,7 @@ export { sharedRouter, type SharedOptions } from "./shared.ts";
 export { sectionsRouter, type SectionsOptions } from "./sections.ts";
 export { byCollection, groupEdges, laneOrder, splitPoint, trunksRouter, type TrunksOptions } from "./trunks.ts";
 
-/** The routers that the benchmark races. */
+/** The built-in routers. The registry `STRATEGIES` holds the same routers as strategies, and the benchmark races the routers of the registry. */
 export const ROUTERS: readonly Router[] = [
   straightRouter,
   plugsRouter,

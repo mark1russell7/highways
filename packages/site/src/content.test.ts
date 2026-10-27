@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ROUTERS } from "@mark1russell7/highways";
+import { listStrategies, STRATEGIES } from "@mark1russell7/highways";
 import { firstTable, README, routerMethods, sectionOf } from "./content.ts";
 
 const md = ["# T", "", "## A", "text a", "", "## B", "| x | y |", "|---|---|", "| `one` | first |", "", "after", "# C"].join("\n");
@@ -19,7 +19,7 @@ describe("content", () => {
   });
 
   it("gives a method from the README for each router of the core", () => {
-    for (const r of ROUTERS) expect(README.methods.get(r.name), r.name).toBeTruthy();
+    for (const r of listStrategies(STRATEGIES, "router")) expect(README.methods.get(r.name), r.name).toBeTruthy();
     expect(README.idea).toContain("highway");
   });
 });

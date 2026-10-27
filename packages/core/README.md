@@ -104,6 +104,53 @@ The benchmark measures the board `packedGridBoard`: 96 touching boxes and 132 li
 
 On the packed board, the links are short only because they go through the boxes. The method `routes` is the default, because it gives the fewest crossings for its area.
 
+## Strategies
+
+The steps of the pipeline that vary have strategies. Each step has one interface, so a consumer chooses a strategy by its name or adds its own.
+
+| Step | Input | Output | Built-in strategies |
+|---|---|---|---|
+| `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
+| `curve` | `CurveInput`: the points, the normals of the plugs and the free space | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc` |
+| `room` | `RoomInput`: the boxes and the links of a board | `Gap[]` | `routes`, `lines` |
+
+A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.
+
+- `defineStrategy({ step, name, describe, defaults, run, maxNodes? })` makes a strategy. The function `run` gets each option.
+- `createRegistry(strategies)` makes a registry. Two strategies with one step and one name are an error.
+- `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
+- `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
+- `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
+- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `routerStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
+
+A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:
+
+```ts
+import { BUILT_IN_STRATEGIES, center, createRegistry, defineStrategy, FIXTURES, routersOf, runBenchmark } from "@mark1russell7/highways";
+
+const elbow = defineStrategy({
+  step: "router",
+  name: "elbow",
+  describe: "Each edge goes along one axis, then along the other, from center to center.",
+  defaults: { turn: "x" as "x" | "y" },
+  run(graph, o) {
+    const box = new Map(graph.nodes.map((n) => [n.id, n.box]));
+    const routes = graph.edges.map((e) => {
+      const a = center(box.get(e.source.node)!);
+      const b = center(box.get(e.target.node)!);
+      return { edge: e.id, points: [a, o.turn === "x" ? { x: b.x, y: a.y } : { x: a.x, y: b.y }, b] };
+    });
+    return { routes };
+  },
+});
+const registry = createRegistry([...BUILT_IN_STRATEGIES, elbow]);
+const rows = runBenchmark(routersOf(registry), FIXTURES.slice(0, 1)); // The rows include the router `elbow`.
+```
+
+The built-in strategies give the same output as their functions. `curveStrategies.rounded.run({ points, space }, { radius: 8 })` gives the segments of `curveOf(points, { type: "rounded", space, radius: 8 })`. `benchCurveStrategies` and the fourth argument of `benchRoom` take a list of strategies.
+
+The plugs and the zoom levels have one strategy each, so they have no step yet.
+
 ## License
 
 MIT

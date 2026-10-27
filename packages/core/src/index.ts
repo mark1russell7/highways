@@ -18,3 +18,4 @@ export * from "./bench/links.ts";
 export * from "./bench/run.ts";
 export * from "./bench/curves.ts";
 export * from "./bench/room.ts";
+export * from "./strategies/index.ts";
