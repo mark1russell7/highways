@@ -39,6 +39,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | ROOM2 | `levelRoom` gives each zoom level the gaps of its own level links. On `nestedGridBoard`, level through: 6 and 36 before, 0 after. The area grows 1.35x, with 0 order changes and 0 shift. | 2026-10-26 | #37 |
 | CURV-R | Research: [curve families and their math](research/CURVES.md). The note gives 16 families with their curvature, offsets and clearance, 5 of them with exact offsets. It ranks them for 3 uses and gives an 8-step build order for CURV2. | 2026-10-27 | #41 |
 | HWC-B | `laneOrder: "bundle"` keeps two edges on one side through their common stretch. On `shared-all` and `case-many-groups`, end crossings: 2301 before, 687 after. Body crossings: 12 before, 0 after. | 2026-10-26 | #40 |
+| GRP-R | Research: [grouping rules for the zoom levels](research/GROUPING.md). The note gives 19 rules in four kinds and a build order of 5 rules for GRP2. A guillotine cut that reads the links cuts fewer links than the quadtree at the far view on 8 of 10 boards. | 2026-10-26 | #39 |
 
 ## Open
 
@@ -50,7 +51,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV2 | More curve types, each with its options: clothoid corners, biarcs, Hobby curves, centripetal Catmull-Rom, B-splines, tension curves and superellipse corners. | `later` | CURV-R, OPTS | P2 |
-| GRP-R | Research: grouping rules and their measures. Spatial trees, clusters of positions, communities of links, mixed rules, and the stability of each. | `later` | MEAS0 | P2 |
 | GRP2 | More grouping strategies from GRP-R, each in its folder with its tests and a row in the benchmark. | `later` | GRP-R, MEAS1 | P2 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
