@@ -61,9 +61,7 @@ describe("the grouping rule cut", () => {
   it("gives levels that nest and pass the hard rules of the levels in the router sections", () => {
     for (const [name, graph] of boards) {
       const result = sectionsRouter({ name: "cut", group: groupStrategies.cut }).route(graph);
-      // On the board `nested-grid`, the router `sections` gives link ends off the item boundaries with each rule, the quadtree too. This test checks only the counts there.
-      const faults = checkLevels(graph, result.levels ?? []).filter((v) => name !== "nested-grid" || v.rule !== "link-ends");
-      expect(faults, name).toEqual([]);
+      expect(checkLevels(graph, result.levels ?? []), name).toEqual([]);
       expect(nestingFaults(result.levels ?? []), name).toBe(0);
     }
   });
