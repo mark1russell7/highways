@@ -1,7 +1,8 @@
-import { dist, polylineLength } from "../../geom.ts";
+import { dist, polylineLength, type Point } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
-import type { Graph, Route } from "../../model.ts";
+import type { Graph, Result, Route } from "../../model.ts";
 import { drawnSegments, segmentKey } from "./routes.ts";
+import { quantile } from "./stats.ts";
 
 /**
  * This function gives the share of the ink that shared segments save (B1 of MEAS0): `inkSaved = 1 - ink(S) / Σ_e L(r_e)`.
@@ -116,4 +117,102 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
       }
   });
   return { value: all ? wrong / all : 0, estimated: !exact };
+}
+
+/** The drawn segments of each route, as keys, in the order of its points. A segment shorter than the grain of `segmentKey` has no key. */
+function routeKeys(routes: readonly Route[]): { readonly keys: Map<string, string[]>; readonly users: Map<string, Set<string>> } {
+  const keys = new Map<string, string[]>();
+  const users = new Map<string, Set<string>>();
+  for (const r of routes) {
+    const own: string[] = [];
+    for (let i = 1; i < r.points.length; i++) {
+      const k = segmentKey(r.points[i - 1]!, r.points[i]!);
+      if (k === undefined) continue;
+      own.push(k);
+      let set = users.get(k);
+      if (!set) users.set(k, (set = new Set()));
+      set.add(r.edge);
+    }
+    keys.set(r.edge, own);
+  }
+  return { keys, users };
+}
+
+/**
+ * This function gives the bundled share of a result (B2 of MEAS0): `count(e : e is in a run or a bundle) / m`.
+ * An edge is also in a bundle when its route shares a drawn segment with the route of another edge. Thus a router without `runs` and `bundles` gets a value too.
+ * The scale is 0 to 1. A higher value is better only in context. The cost is linear.
+ */
+export function bundledShare(result: Result): number {
+  const routes = result.routes;
+  if (routes.length === 0) return 0;
+  const shared = new Set<string>();
+  for (const run of result.runs ?? []) for (const e of run.edges) shared.add(e);
+  for (const b of result.bundles ?? []) if (b.edges.length > 1) for (const e of b.edges) shared.add(e);
+  const { keys, users } = routeKeys(routes);
+  for (const [edge, own] of keys) if (own.some((k) => (users.get(k)?.size ?? 0) > 1)) shared.add(edge);
+  let count = 0;
+  for (const r of routes) if (shared.has(r.edge)) count++;
+  return count / routes.length;
+}
+
+/** The bundle stretch of the routes against base routes (B3 of MEAS0). */
+export interface BundleStretch {
+  /** The median of `st(e) = L(r_e) / L(r*_e)`. A value of 1 is the length of the base route. Lower is better. */
+  readonly median: number;
+  /** The `0.95` quantile of `st(e)`: the tail of long detours that the bundles add. */
+  readonly q95: number;
+  /** The number of edges with a route in both lists and a base route longer than 1 unit. */
+  readonly edges: number;
+}
+
+/**
+ * This function gives the bundle stretch (B3 of MEAS0): `st(e) = L(r_e) / L(r*_e)` for each edge, with `r*_e` the base route of the edge.
+ * The base routes are the routes of `corners` on the same input. An edge without a base route, or with a base route of 1 unit or less, does not count.
+ * The cost is an extra run of the base router, and then linear.
+ */
+export function bundleStretch(routes: readonly Route[], base: readonly Route[]): BundleStretch {
+  const baseLength = new Map<string, number>();
+  for (const r of base) baseLength.set(r.edge, polylineLength(r.points));
+  const st: number[] = [];
+  for (const r of routes) {
+    const b = baseLength.get(r.edge);
+    if (b === undefined || b <= 1 || r.points.length < 2) continue;
+    st.push(polylineLength(r.points) / b);
+  }
+  if (st.length === 0) return { median: 1, q95: 1, edges: 0 };
+  return { median: quantile(st, 0.5), q95: quantile(st, 0.95), edges: st.length };
+}
+
+/**
+ * This function gives the merge angle of the routes (B6 of MEAS0): the largest turn of a lane where it joins or leaves a run, in degrees.
+ * A run is a drawn segment that the routes of two edges or more share. A route joins or leaves a run at a vertex where the edges on its segment change.
+ * One of the two segments at that vertex has two edges or more. The turn is the angle between the two segments.
+ * Routes without a shared segment give 0. The scale is 0 to 180 degrees, and lower is better. The cost is linear.
+ */
+export function mergeAngle(routes: readonly Route[]): number {
+  const { users } = routeKeys(routes);
+  const sig = new Map<string, string>();
+  for (const [k, set] of users) sig.set(k, [...set].sort().join("\u0000"));
+  let max = 0;
+  for (const r of routes) {
+    // The vertices of the route, with each segment that has no key dropped.
+    let prev: { readonly k: string; readonly a: Point; readonly b: Point } | undefined;
+    for (let i = 1; i < r.points.length; i++) {
+      const a = r.points[i - 1]!;
+      const b = r.points[i]!;
+      const k = segmentKey(a, b);
+      if (k === undefined) continue;
+      if (prev && sig.get(prev.k) !== sig.get(k) && ((users.get(prev.k)?.size ?? 0) > 1 || (users.get(k)?.size ?? 0) > 1)) {
+        const ux = prev.b.x - prev.a.x;
+        const uy = prev.b.y - prev.a.y;
+        const vx = b.x - a.x;
+        const vy = b.y - a.y;
+        const turn = Math.abs(Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy));
+        max = Math.max(max, (turn * 180) / Math.PI);
+      }
+      prev = { k, a, b };
+    }
+  }
+  return max;
 }

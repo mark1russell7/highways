@@ -49,6 +49,18 @@ const ROWS: readonly Row[] = [
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
   ["B4.ambiguity", "B4", "route.bundle.ambiguity", "0 to 1", "lower", false],
+  // B2, B3 and B6 score the shared ways of the routes for a fixed placement, as B1 does. B3 compares with the routes of `corners` on the same input.
+  ["B2.share", "B2", "route.bundle.share", "0 to 1", "higher", false],
+  ["B3.median", "B3", "route.bundle.stretch.median", "ratio", "lower", false],
+  ["B3.q95", "B3", "route.bundle.stretch.q95", "ratio", "lower", false],
+  ["B6.max", "B6", "route.bundle.merge-angle.max", "degrees", "lower", false],
+  // The order fragility (W3 of MEAS3, from WILD-056): the spread of a measure over random orders of the edges. The placement can move it.
+  ["W3.crossings", "W3", "route.order.crossings", "IQR over the median", "lower", true],
+  ["W3.detour", "W3", "route.order.detour", "IQR over the median", "lower", true],
+  ["W3.inkSaved", "W3", "route.order.ink-saved", "IQR over the median", "lower", true],
+  ["W3.ink", "W3", "route.order.ink", "IQR over the median", "lower", true],
+  ["W3.changed", "W3", "route.order.changed", "0 to 1", "lower", true],
+  ["W3.poa", "W3", "route.order.poa", "ratio", "lower", true],
   // The stability after the small change of `changeGraph`, and against the run on the base input of a variant.
   ["Z10.mean", "Z10", "route.stability.mean", "units of the board", "lower", false],
   ["Z10.max", "Z10", "route.stability.max", "units of the board", "lower", false],

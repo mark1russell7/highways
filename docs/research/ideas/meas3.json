@@ -10,20 +10,8 @@
       "name": "Orthogonality"
     },
     {
-      "id": "B2",
-      "name": "Bundled share"
-    },
-    {
-      "id": "B3",
-      "name": "Bundle stretch"
-    },
-    {
       "id": "B5",
       "name": "Lane crossings"
-    },
-    {
-      "id": "B6",
-      "name": "Merge angle"
     },
     {
       "id": "B7",
@@ -122,14 +110,6 @@
         "WILD-055"
       ],
       "note": "The gap of a router to the exact answer on small boards."
-    },
-    {
-      "id": "W3",
-      "name": "Order fragility",
-      "from": [
-        "WILD-056"
-      ],
-      "note": "The spread of the cost over random edge orders."
     },
     {
       "id": "W4",

@@ -383,6 +383,25 @@ const rows = runBenchmark(routersOf(registry), FIXTURES.slice(0, 1)); // The row
 
 The built-in strategies give the same output as their functions. `curveStrategies.rounded.run({ points, space }, { radius: 8 })` gives the segments of `curveOf(points, { type: "rounded", space, radius: 8 })`. `benchCurveStrategies` and the fourth argument of `benchRoom` take a list of strategies.
 
+### Wrappers of a router
+
+Two functions wrap a router strategy. The wrapped strategy has a new name, and the router does not change.
+
+- `stableOrderStrategy(strategy)` gives `<name>+stable`. It routes the edges in a stable order: by a hash of their ids, then by the ids. Thus each order of the input edges gives the same output.
+- `repairStrategy(strategy, repair?)` gives `<name>+repair`. After the router, `repairResult` repairs the breaks of the hard rules.
+  - It moves each free end back to its plug, and pushes each inner leg out of a box.
+  - It replaces each other leg through a box with a detour through the corner graph.
+  - When a leg does not repair, it routes the whole route again. Else it walks along the boundaries of the boxes, so boxes that touch do not block it.
+  - A route that it cannot repair keeps its base route.
+- `withStableOrder(router)` and `withRepair(router, repair?)` wrap a `Router` in the same way.
+
+```ts
+import { repairStrategy, routerStrategies, stableOrderStrategy } from "@mark1russell7/highways";
+
+const shared = stableOrderStrategy(routerStrategies.shared);
+const result = repairStrategy(shared).run(graph); // The router `shared+stable+repair`.
+```
+
 ### Declarations of the options
 
 Each strategy declares its options in `schema`. A declaration tells the type, the range, the step and the meaning of one option. Tools make controls and sweeps from these declarations, with no other data.

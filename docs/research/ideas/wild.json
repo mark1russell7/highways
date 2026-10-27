@@ -94,7 +94,7 @@
             "small-clustered": 0.091,
             "dense-groups": 0.073,
             "many-groups": 0.9,
-            "hub-chain": 1.0
+            "hub-chain": 1
           }
         }
       },
@@ -2364,7 +2364,7 @@
     "placementDependent": false,
     "screen": "Shuffle small-clustered 10 times: keep it when each route is equal over the shuffles, against the spread of today.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "WILD-056",
       "WILD-022",
@@ -2372,7 +2372,115 @@
       "EDA-034",
       "EDA-010"
     ],
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40563171676",
+      "records": [
+        "screen-v1/*/<router>+stable@9474059",
+        "screen-v1/*/<router>@9474059"
+      ],
+      "measures": {
+        "W3": {
+          "base": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0,
+            "corners-smooth": 0,
+            "trunks": 0,
+            "shared": 0,
+            "shared-all": 0,
+            "sections": 0,
+            "sections-tree": 0
+          },
+          "new": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0,
+            "corners-smooth": 0,
+            "trunks": 0,
+            "shared": 0,
+            "shared-all": 0,
+            "sections": 0,
+            "sections-tree": 0
+          }
+        },
+        "R1": {
+          "base": {
+            "straight": 608,
+            "plugs": 635.5,
+            "corners": 554.5,
+            "corners-smooth": 641.5,
+            "trunks": 554.5,
+            "shared": 473.5,
+            "shared-all": 289.5,
+            "sections": 285.5,
+            "sections-tree": 275
+          },
+          "new": {
+            "straight": 608,
+            "plugs": 635.5,
+            "corners": 554.5,
+            "corners-smooth": 641.5,
+            "trunks": 554.5,
+            "shared": 473.5,
+            "shared-all": 289.5,
+            "sections": 285.5,
+            "sections-tree": 275
+          }
+        },
+        "R5": {
+          "base": {
+            "straight": 1,
+            "plugs": 1.009,
+            "corners": 1.019,
+            "corners-smooth": 1.02,
+            "trunks": 1.028,
+            "shared": 1.029,
+            "shared-all": 1.044,
+            "sections": 1.044,
+            "sections-tree": 1.104
+          },
+          "new": {
+            "straight": 1,
+            "plugs": 1.009,
+            "corners": 1.019,
+            "corners-smooth": 1.02,
+            "trunks": 1.028,
+            "shared": 1.029,
+            "shared-all": 1.044,
+            "sections": 1.044,
+            "sections-tree": 1.104
+          }
+        },
+        "B1": {
+          "base": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0.041,
+            "corners-smooth": 0.035,
+            "trunks": 0.076,
+            "shared": 0.081,
+            "shared-all": 0.412,
+            "sections": 0.283,
+            "sections-tree": 0.342
+          },
+          "new": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0.041,
+            "corners-smooth": 0.035,
+            "trunks": 0.076,
+            "shared": 0.081,
+            "shared-all": 0.412,
+            "sections": 0.283,
+            "sections-tree": 0.342
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The values are medians by router over the 14 inputs, with 20 shuffles. The built-in routers already sort the edges by their ids, so the stable order gives the same routes. All 126 pairs have the same measures and hard counts. stableOrderStrategy stays as a tool for other routers."
+    }
   },
   {
     "id": "WILD-054",
@@ -2490,14 +2598,49 @@
     "placementDependent": true,
     "screen": "On shared and sections over 3 boards: keep the measure when two routers differ in fragility by 2 times or more.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "WILD-022",
       "WILD-053",
       "WILD-024",
       "NAT-024"
     ],
-    "wave": 1
+    "wave": 1,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40563171676",
+      "records": [
+        "screen-v1/*/<router>@9474059"
+      ],
+      "measures": {
+        "W3": {
+          "base": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0,
+            "corners-smooth": 0,
+            "trunks": 0,
+            "shared": 0,
+            "shared-all": 0,
+            "sections": 0,
+            "sections-tree": 0
+          },
+          "new": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0,
+            "corners-smooth": 0,
+            "trunks": 0,
+            "shared": 0,
+            "shared-all": 0,
+            "sections": 0,
+            "sections-tree": 0
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The values are the medians of route.order.crossings by router over the 14 inputs, with 20 shuffles. The fragility is 0 for each router and each input, and changed is 0. No two routers differ by 2 times, so the measure does not rank them. W3 stays as a check of the screen (--shuffles)."
+    }
   },
   {
     "id": "WILD-057",

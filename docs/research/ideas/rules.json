@@ -2343,7 +2343,7 @@
     "placementDependent": true,
     "screen": "After each soft method: keep it if the hard faults are 0 on 9 fixtures with 5 seeds, and it changes 5% of the points or fewer.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "RULE-001",
       "RULE-019",
@@ -2353,7 +2353,91 @@
     "wave": 1,
     "rules": "The hard rules no-pass-through, ends-at-plugs, link-ends and complete.",
     "hardRules": "Exact, because of the fallback to the base route.",
-    "zoom": "It changes only the parts with a fault, so it adds little change between levels."
+    "zoom": "It changes only the parts with a fault, so it adds little change between levels.",
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40562828031",
+      "records": [
+        "screen-v1/*/<router>+repair@f933a25",
+        "screen-v1/*/<router>@f933a25"
+      ],
+      "measures": {
+        "R9": {
+          "base": {
+            "straight": 1186,
+            "plugs": 1269,
+            "corners": 280,
+            "corners-smooth": 280,
+            "trunks": 280,
+            "shared": 280,
+            "shared-all": 280,
+            "sections": 280,
+            "sections-tree": 280
+          },
+          "new": {
+            "straight": 0,
+            "plugs": 0,
+            "corners": 0,
+            "corners-smooth": 0,
+            "trunks": 0,
+            "shared": 0,
+            "shared-all": 0,
+            "sections": 0,
+            "sections-tree": 0
+          }
+        },
+        "R1": {
+          "base": {
+            "straight": 94736.937,
+            "plugs": 97175.786,
+            "corners": 95321.012,
+            "corners-smooth": 95321.012,
+            "trunks": 95321.012,
+            "shared": 95321.012,
+            "shared-all": 95321.012,
+            "sections": 104980.356,
+            "sections-tree": 132048.778
+          },
+          "new": {
+            "straight": 117225.46,
+            "plugs": 118405.543,
+            "corners": 118405.543,
+            "corners-smooth": 118405.543,
+            "trunks": 118405.543,
+            "shared": 118405.543,
+            "shared-all": 118405.543,
+            "sections": 118405.543,
+            "sections-tree": 118405.543
+          }
+        },
+        "R5": {
+          "base": {
+            "straight": 1,
+            "plugs": 1.005,
+            "corners": 1,
+            "corners-smooth": 1,
+            "trunks": 1,
+            "shared": 1,
+            "shared-all": 1,
+            "sections": 1,
+            "sections-tree": 1
+          },
+          "new": {
+            "straight": 1.351,
+            "plugs": 1.313,
+            "corners": 1.313,
+            "corners-smooth": 1.313,
+            "trunks": 1.313,
+            "shared": 1.313,
+            "shared-all": 1.313,
+            "sections": 1.313,
+            "sections-tree": 1.313
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "R9 is the sum of route.through by router over the 14 inputs. R1 is route.ink and R5 the median detour, by router on packed-grid. The hard breaks go to 0 for each router on each input, packed-grid too. On packed-grid the ink grows by 20% to 23% for most routers, 13% for sections, and drops 9% for sections-tree. A route without a fault keeps its points."
+    }
   },
   {
     "id": "RULE-047",

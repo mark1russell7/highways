@@ -1,8 +1,12 @@
 import { highwayRouterStrategy } from "../../highways/router.ts";
-import type { Graph, Result } from "../../model.ts";
+import type { Graph, Result, Route } from "../../model.ts";
+import { stableOrderStrategy } from "../../order/index.ts";
+import { repairStrategy } from "../../repair/index.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
-import { createRegistry, getStrategy, listStrategies, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
+import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
 import { compareStep, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
+import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
+import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { routeStability } from "../measures/stability.ts";
 import { quantile } from "../measures/stats.ts";
@@ -25,6 +29,15 @@ export const SCREEN_STEPS: readonly ScreenStep[] = ["group", "router", "highway"
 
 /** The routers that the screen of the step `highway` also runs by default. They are the baselines of the note on highways. */
 export const HIGHWAY_BASE_ROUTERS: readonly string[] = ["corners", "shared", "trunks"];
+
+/**
+ * A wrapper of each router of a screen. `stable` routes the edges in the stable order of WILD-053 (`stableOrderStrategy`).
+ * `repair` runs the repair step of RULE-046 after the router (`repairStrategy`).
+ */
+export type ScreenWrap = "stable" | "repair";
+
+/** The wrappers of `ScreenWrap`. */
+export const SCREEN_WRAPS: readonly ScreenWrap[] = ["stable", "repair"];
 
 /** The hard rules of the routes of a router, or of a plan after `follow`. */
 const ROUTE_RULES: readonly string[] = ["complete", "ends-at-plugs", "fixed-plugs", "no-pass-through", "counts-sum", "link-ends", "bundle-trunk", "run-shared", "same-twice"];
@@ -59,8 +72,18 @@ export interface ScreenOptions {
    * The default is `HIGHWAY_BASE_ROUTERS`. The other steps do not read it.
    */
   readonly baseRouters?: readonly string[];
-  /** The seed of the small change of the stability measures. The default is 1. */
+  /** The seed of the small change of the stability measures, and of the first random order of `shuffles`. The default is 1. */
   readonly seed?: number;
+  /**
+   * The wrappers of each router of the steps `router` and `highway`. Each wrapper `w` adds the router `<name>+<w>` as a new strategy, beside the router `<name>`.
+   * The default is none. The steps `group` and `curve` do not read it.
+   */
+  readonly wrap?: readonly ScreenWrap[];
+  /**
+   * The number of random orders of the edges for the order fragility (W3, from WILD-056). Each router routes each input this number of times more.
+   * The default is 0: no measure of the order fragility. The steps `group` and `curve` do not read it.
+   */
+  readonly shuffles?: number;
   /** The commit of the code, for the records. */
   readonly commit?: string;
   /** The predictions of the run. Each record names the first prediction with its strategy, its set and its input. */
@@ -175,8 +198,11 @@ function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenS
 /** This function tells if a step of the screen gives routes. The step `router` gives routes, and the step `highway` gives routes after `follow`. */
 const givesRoutes = (step: ScreenStep): step is "router" | "highway" => step === "router" || step === "highway";
 
-/** This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router. */
-function rowValues(step: ScreenStep, graph: Graph, row: CompareRow): Record<string, number> {
+/**
+ * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
+ * A router also gets the bundled share (B2), the merge angle (B6) and the bundle stretch (B3) against the routes `base` of `corners`.
+ */
+function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => readonly Route[]): Record<string, number> {
   const values: Record<string, number> = { ...row.values };
   delete values["ms"];
   if (givesRoutes(step) && row.result) {
@@ -186,6 +212,11 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow): Record<stri
     values["R8.tight"] = q.tight;
     values["R10.plugAngle"] = q.plugAngle;
     values["R15.inflections"] = q.inflections;
+    values["B2.share"] = bundledShare(row.result);
+    const st = bundleStretch(row.result.routes, base());
+    values["B3.median"] = st.median;
+    values["B3.q95"] = st.q95;
+    values["B6.max"] = mergeAngle(row.result.routes);
   }
   return values;
 }
@@ -206,6 +237,20 @@ function rowRules(step: ScreenStep, graph: Graph, row: CompareRow, again: Compar
   }
   const deterministic = again !== undefined && sameData(row.curves, again.curves);
   return { hard: { ...countRules(rules, []), "same-twice": deterministic ? 0 : 1 }, deterministic };
+}
+
+/** This function adds the router `<name>+<w>` for each router of the registry and each wrapper `w`. It gives the new registry and the new names. */
+function wrapRouters(registry: Registry, wraps: readonly ScreenWrap[]): { registry: Registry; added: string[] } {
+  const routers = listStrategies(registry, "router");
+  const added: AnyStrategy[] = [];
+  for (const w of wraps) for (const s of routers) added.push((w === "stable" ? stableOrderStrategy(s) : repairStrategy(s)) as AnyStrategy);
+  return { registry: added.length === 0 ? registry : register(registry, ...added), added: added.map((s) => s.name) };
+}
+
+/** This function gives the name of a router without the suffix of a wrapper, for example `shared` for `shared+repair`. */
+export function unwrappedName(name: string): string {
+  for (const w of SCREEN_WRAPS) if (name.endsWith(`+${w}`)) return name.slice(0, -(w.length + 1));
+  return name;
 }
 
 /** This function keeps the finite values and gives them the names of a record. */
@@ -232,14 +277,23 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   const candidates = screened.candidates;
   // The step `highway` runs as the step `router`. Each highway strategy with `follow` is a router, after the base routers.
   const base = step === "highway" ? (options.baseRouters ?? HIGHWAY_BASE_ROUTERS).map((name) => getStrategy(STRATEGIES, "router", name)) : [];
-  const registry =
+  const unwrapped =
     step === "highway"
       ? createRegistry([...base, ...listStrategies(screened.registry, "highway").map((s) => highwayRouterStrategy(s))] as readonly AnyStrategy[])
       : screened.registry;
+  const wrapped = givesRoutes(step) ? wrapRouters(unwrapped, options.wrap ?? []) : { registry: unwrapped, added: [] };
+  const registry = wrapped.registry;
+  for (const name of wrapped.added) candidates.add(name);
   const compareAs: CompareStep = step === "highway" ? "router" : step;
   const baseNames = new Set(base.map((s) => s.name));
-  const stepOf = (name: string): ScreenStep => (baseNames.has(name) ? "router" : step);
-  const own = options.options ?? {};
+  const stepOf = (name: string): ScreenStep => (baseNames.has(unwrappedName(name)) ? "router" : step);
+  // A wrapped router gets the options of its router, unless the call gives its own.
+  const own: Record<string, object> = { ...options.options };
+  for (const name of wrapped.added) {
+    const from = options.options?.[unwrappedName(name)];
+    if (own[name] === undefined && from !== undefined) own[name] = from;
+  }
+  const shuffles = givesRoutes(step) ? Math.max(0, Math.floor(options.shuffles ?? 0)) : 0;
   const seed = options.seed ?? 1;
   const log = options.log ?? ((): void => {});
   const families = options.families;
@@ -259,6 +313,10 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
     comparisons.push(cmp);
     log(`${input.id}: ${graph.nodes.length} nodes, ${graph.edges.length} edges, ${cmp.rows.map((r) => `${r.strategy} ${r.ms.toFixed(0)}`).join(", ")}`);
     if (bases.has(input.id)) kept.set(input.id, { graph, results: new Map(cmp.rows.flatMap((r) => (r.result ? [[r.strategy, r.result] as const] : []))) });
+    // The routes of `corners` on the input: the base of the bundle stretch (B3). The row of `corners` gives them, or one more run.
+    let cornersRoutes: readonly Route[] | undefined;
+    const cornersBase = (): readonly Route[] =>
+      (cornersRoutes ??= (cmp.rows.find((r) => r.strategy === "corners" && r.result)?.result ?? asRouter(getStrategy(STRATEGIES, "router", "corners")).route(graph)).routes);
     cmp.rows.forEach((row, i) => {
       const strategy = byName.get(row.strategy)!;
       const head = {
@@ -282,7 +340,13 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
         return;
       }
       const { hard, deterministic } = rowRules(step, graph, row, again?.rows[i]);
-      const record = { ...head, measures: named(rowValues(step, graph, row)), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
+      const values = rowValues(step, graph, row, cornersBase);
+      if (shuffles > 0 && row.result) {
+        const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);
+        const f = orderFragility(graph, (g) => router.route(g), { orders: shuffles, seed, base: row.result });
+        Object.assign(values, { "W3.crossings": f.crossings, "W3.detour": f.detour, "W3.inkSaved": f.inkSaved, "W3.ink": f.ink, "W3.changed": f.changed, "W3.poa": f.poa });
+      }
+      const record = { ...head, measures: named(values), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
       records.push(record);
       if (givesRoutes(step) && input.base !== undefined && row.result) variants.push({ record, base: input.base, result: row.result });
     });
