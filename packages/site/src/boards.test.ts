@@ -6,11 +6,12 @@ import { BOARDS } from "./boards.ts";
 /**
  * The digests of the routes of the example boards with version 0.1.2 of the core. A host app pins `^0.1.2`.
  * A change that only makes the router faster keeps each digest. A digest covers the routes, the shared runs, the levels, the run keys and the lane routes.
+ * ER3b changed the routes of the three boards, because their edges took the hubs out and back.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  delivery: "eb50f2d466e7e13b2860ba5432081d01b67a3d164ec4f9def04eecf429cdba6d",
-  services: "2acbdd6cdcd07bca4dcb210ba8388d0bc298c82e6427341cc1395dbbb3d92a5c",
-  courses: "5920f43929d0994b213d91e2aaeb784fd13b5929b5deb5008d08fd2901ba6f59",
+  delivery: "6ed6c5d4875e531d3fb182313c5fde5b794f177dda2c80d1b41bfe4c30d7e7c0",
+  services: "db7dfedbdf302d726add19839ebf0bfebd83414ec4c0e3a101e7a2f7062884dd",
+  courses: "6576118180b3b090fad9f1c4033dbfb11bb02a8feb42a7af170ac9bceb0f0e6b",
 };
 
 /** The router of the examples page. */
