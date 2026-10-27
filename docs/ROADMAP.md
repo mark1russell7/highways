@@ -59,6 +59,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWY-STEP | The step `highway` gives a plan as data, and `follow` routes it. `keys`, `shared-ways` and `corridors` plug in, and the 16 digests of the routers stay the same. | 2026-10-27 | #67 |
 | REL7 | Version 0.4.0 on npm: EX2-FIX, SCREEN, the record field `tolerance` and HWY-STEP. MINOR, because the type `Step` gains `highway`. The default routes do not change. | 2026-10-27 | #68 |
 | IDEA0 | [The idea catalog](research/CATALOG.md): 273 records, 24 duplicate groups, 248 distinct ideas and seven waves for BUILD-W. A test checks the schema, the links and the measure ids. | 2026-10-27 | #69 |
+| BUILD-W1B | Plug and lane options, off by default. WILD-001 (`plugs: side`) is kept: R3 falls 11% to 33%. EDA-004 (`tracks: left-edge`) is kept: lanes fall 5% to 26%. WILD-002 and NAT-031 (`plugGap`) are dropped: R1 grows more than 2%. | 2026-10-27 | #70 |
 
 ## Open
 
