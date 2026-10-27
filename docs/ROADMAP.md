@@ -38,11 +38,14 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWC | `highwayCurves` bends the lanes of a bundle as one, with concentric arcs. On `shared` and `case-dense-groups`, worst lane spacing error: 13.6% before, 0.8% after, with 0 tangent breaks. | 2026-10-26 | #36 |
 | ROOM2 | `levelRoom` gives each zoom level the gaps of its own level links. On `nestedGridBoard`, level through: 6 and 36 before, 0 after. The area grows 1.35x, with 0 order changes and 0 shift. | 2026-10-26 | #37 |
 | CURV-R | Research: [curve families and their math](research/CURVES.md). The note gives 16 families with their curvature, offsets and clearance, 5 of them with exact offsets. It ranks them for 3 uses and gives an 8-step build order for CURV2. | 2026-10-27 | #41 |
+| HWC-B | `laneOrder: "bundle"` keeps two edges on one side through their common stretch. On `shared-all` and `case-many-groups`, end crossings: 2301 before, 687 after. Body crossings: 12 before, 0 after. | 2026-10-26 | #40 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| HWC-C | The lanes of a trunk leave the bundle at the split point, so a branch does not turn back over its trunk. | `later` | HWC | P1 |
+| HWC-D | Room for the bends of wide bundles: the gaps grow so that the concentric arcs of a bundle fit. | `later` | HWC, ROOM2 | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
