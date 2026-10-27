@@ -165,7 +165,7 @@ describe("the fit of highways to layout-contract", () => {
     for (const spec of C.JOINT_MEASURES) {
       if (spec.floor !== 0) continue;
       // A joint measure with a packer twin, for example `joint.aspectError` and `pack.aspectError`, has the floor and the tolerance of the twin.
-      const row = floors.get(spec.id.replace(/^joint./, "pack."));
+      const row = floors.get(spec.id.replace(/^joint\./, "pack."));
       if (row === undefined) continue;
       expect({ id: spec.id, floor: spec.floor, tol: spec.tol }).toEqual({ id: spec.id, floor: row.floor, tol: row.tol });
       matched++;
