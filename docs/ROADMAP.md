@@ -31,6 +31,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | ROOM-D | The option `passes` of `roomDemand`. Two passes at gutter 8: worst detour 2.03, not 2.09, for 4% more area. The mean detour stays 1.32 for each gutter and each number of passes. | 2026-10-26 | #26 |
 | REL4 | Version 0.1.5 on npm: STRAT and the options of ROOM-A, ROOM-C and ROOM-D. The routes do not change. | 2026-10-26 | #27 |
 | CUSTOM | Options for the grouping rule (the step `group`), the levels, the hub limit, the far-view thresholds and the limits of the tree. With the defaults, the output does not change. On `case-hub-chain`, hub limit 1.5 gives a worst detour of 1.39, not 1.78. | 2026-10-26 | #28 |
+| REL5 | Version 0.2.0 on npm: CUSTOM. MINOR, because the type `Step` gains the step `group`. The routes do not change. | 2026-10-26 | #29 |
 
 ## Open
 
@@ -41,7 +42,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 ## Rules for each item
 
-- Keep `laneRoutes`, `runKey` and the levels compatible. A host app pins `^0.1.2`.
+- Keep `laneRoutes`, `runKey` and the levels compatible. A host app pins `^0.1.x`, and goes to `^0.2.0` for CUSTOM.
 - Before 1.0.0, a breaking change raises the MINOR version. A feature or a fix raises the PATCH version.
 - A change to the output of a route needs a note to the consumers before the release.
 - Each strategy has its own folder, its tests and a row in the benchmark.
