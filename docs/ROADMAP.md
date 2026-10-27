@@ -29,6 +29,9 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| ROOM-A | Fit the board area of ROOM to `maxGrowth`. ROOM missed its area bound (1.50 times, against 1.40). Measure the area for each `maxGrowth` and give the curve. | `later` | | P2 |
+| ROOM-C | Fit the crossings of ROOM to the lane order and to `spacing`. Against the board opened to the gutter, crossings fell 20%, against 30% in the prediction. | `later` | | P2 |
+| ROOM-D | Fit the detour of ROOM to `gutter` and to a second pass of the demand. The mean detour rose 18%, and the worst detour is 2.09. | `later` | | P2 |
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
 | CUSTOM | Options for the generalizations: the grouping rule, the levels and their limits. | `later` | STRAT | P2 |
