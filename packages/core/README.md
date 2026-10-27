@@ -430,7 +430,9 @@ const { report } = runSuite({ max: 1000, seeds: 5 });
 console.log(formatFronts(report.fronts));
 ```
 
-The script `bench` takes `--seeds <n>` and `--report <file>`. The workflow `Bench` keeps `report.json` and `bench.json` as an artifact. The tables of today do not change.
+The script `bench` takes `--seeds <n>` and `--report <file>`. A family with more nodes than `--seeds-max-nodes` (default 1 000) gets one seed only. `--suite-steps <a,b>` runs only these steps of the suite. The workflow `Bench` keeps `report.json` and `bench.json` as an artifact. The tables of today do not change.
+
+The workflow `Bench` runs the suite in parts. Each part writes its report, and `joinReports` joins the reports into the report of one run.
 
 ## License
 

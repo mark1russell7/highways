@@ -1,5 +1,6 @@
 // The command line of the benchmark: `pnpm bench [--min <nodes>] [--max <nodes>] [--repeat <n>] [--routers <a,b>] [--skip-routers <a,b>]
-// [--cell-limit <ms>] [--rows-only] [--json <file>] [--side-tables <file>]`.
+// [--cell-limit <ms>] [--rows-only] [--seeds <n>] [--seeds-max-nodes <nodes>] [--stability-max <nodes>] [--suite-steps <a,b>]
+// [--json <file>] [--side-tables <file>] [--report <file>]`.
 // The workflow `Bench` starts one part of the benchmark in each job, with `--min`, `--max`, `--routers` and `--rows-only`.
 // The script `bench-join.ts` joins the parts.
 import { writeFileSync } from "node:fs";
@@ -7,7 +8,7 @@ import { CASES, nestedGridBoard, packedGridBoard } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { benchCurveStrategies, benchHighways, formatCurves, formatHighways, type CurveBenchRow, type HighwayBenchRow } from "../src/bench/curves.ts";
 import { measureLevelFaults } from "../src/bench/links.ts";
-import { benchOne, formatFaults, formatLevels, formatTable, runBenchmark, type LevelRow } from "../src/bench/run.ts";
+import { benchOne, formatFaults, formatLevels, formatTable, type LevelRow } from "../src/bench/run.ts";
 import { benchLevelRoom, benchRoom, formatLevelRoom, formatRoom, growthSettings, laneSettings, passSettings, sweepRoom } from "../src/bench/room.ts";
 import { capSettings, formatSections, groupSettings, slackSettings, stretchSettings, sweepSections } from "../src/bench/sections.ts";
 import { makeFixture } from "../src/fixtures.ts";
@@ -17,7 +18,8 @@ import { sectionsRouter } from "../src/routers/sections.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection, trunksRouter } from "../src/routers/trunks.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
-import { listStrategies, routersOf } from "../src/strategies/model.ts";
+import { listStrategies, routersOf, STEPS, type Step } from "../src/strategies/model.ts";
+import { formatFronts, formatMeasureTime, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -43,11 +45,24 @@ const repeat = number("--repeat", 3);
 const cellLimit = number("--cell-limit", Infinity);
 // A part with `--rows-only` gives only the rows of its fixtures: no case boards and no side tables.
 const rowsOnly = args.includes("--rows-only");
-const rows = runBenchmark(
-  ROUTERS,
-  FIXTURES.filter((f) => f.nodes >= min && f.nodes <= max),
-  { repeat, cellLimit },
-);
+// The steps of the measure suite. A part of the workflow `Bench` runs some steps only, so each step runs in one part.
+const suiteSteps = (list("--suite-steps") ?? [...STEPS]) as Step[];
+for (const step of suiteSteps) if (!STEPS.includes(step)) throw new Error(`There is no step "${step}"`);
+// The measure suite (MEAS1) runs each fixture family over the seeds. Its first seed gives the rows of today.
+// A family with more nodes than `--seeds-max-nodes` gets one seed only.
+const suite = runSuite({
+  fixtures: FIXTURES.filter((f) => f.nodes >= min),
+  max,
+  seeds: number("--seeds", 5),
+  seedsMaxNodes: number("--seeds-max-nodes", 1000),
+  repeat,
+  stabilityMax: number("--stability-max", 1000),
+  routers: ROUTERS.map((r) => r.name),
+  steps: suiteSteps,
+  cellLimit,
+  log: (line) => process.stderr.write(line + "\n"),
+});
+const rows = suite.bench;
 // The case boards are small, so each run races them. Each case shows one known defect.
 if (!rowsOnly)
   for (const c of CASES) {
@@ -74,6 +89,23 @@ const show = (table: string): void => {
 if (!rowsOnly) sideTables();
 const sideFile = opt("--side-tables");
 if (sideFile && side.length > 0) writeFileSync(sideFile, side.join("\n\n") + "\n");
+// The measure suite: the spread over the seeds, the Pareto front of each step, the counts of the proposed hard rules and the time of the measures.
+// The script `bench-join.ts` prints the same tables for the joined report.
+const report = suite.report;
+for (const step of ["router", "curve", "room", "group"] as const) {
+  console.log();
+  console.log(formatSummaries(report.summaries, step));
+}
+console.log();
+console.log(formatFronts(report.fronts));
+console.log();
+console.log(formatRules(report.rules));
+for (const step of ["router", "group"] as const) {
+  console.log();
+  console.log(formatMeasureTime(report.rows, step));
+}
+const out = opt("--report");
+if (out) writeFileSync(out, JSON.stringify(report) + "\n");
 
 /** This function prints the side tables: the curves, the highways, the room, the sweeps of the levels and the cost of a link through a box. */
 function sideTables(): void {

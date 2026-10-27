@@ -7,7 +7,7 @@ import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, openGaps, roomLinks } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { asRouter, listStrategies, type Registry, type Step, type Strategy } from "../strategies/model.ts";
+import { asRouter, listStrategies, STEPS, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
 import { ambiguity, inkSaved } from "./measures/bundles.ts";
 import { bendingEnergy, curveFaults, g1Defect, g2Defect } from "./measures/curves.ts";
@@ -33,6 +33,8 @@ export interface SuiteOptions {
   readonly max?: number;
   /** The number of seeds of each fixture family. The default is 5. The first seed is the seed of the fixture. */
   readonly seeds?: number;
+  /** A fixture family or a room family with more nodes than this number gets one seed only. The default is 1000. */
+  readonly seedsMaxNodes?: number;
   /** The number of timed routes of the first seed. The other seeds route two times, for the rule "same twice". The default is 3. */
   readonly repeat?: number;
   /** The route stability (Z10) routes a changed graph again, so the suite measures it only up to this number of nodes. The default is 1000. */
@@ -51,6 +53,12 @@ export interface SuiteOptions {
   readonly fixtures?: readonly FixtureSpec[];
   /** The families of the step `room`. The default is `ROOM_FAMILIES`. */
   readonly roomFamilies?: readonly RoomFamily[];
+  /** The names of the routers of the step `router`. The default is each router of the registry. */
+  readonly routers?: readonly string[];
+  /** The steps that the suite runs. The default is each step. Each part of the workflow `Bench` runs some steps only. The step `curve` needs the step `router`. */
+  readonly steps?: readonly Step[];
+  /** The time limit of one cell of the step `router`, in milliseconds, as `BenchOptions.cellLimit` gives it. The default is no limit. */
+  readonly cellLimit?: number;
   /** This function gets one line of progress for each fixture and seed. */
   readonly log?: (line: string) => void;
 }
@@ -131,6 +139,7 @@ export interface SuiteReport {
   readonly options: {
     readonly max: number;
     readonly seeds: number;
+    readonly seedsMaxNodes: number;
     readonly repeat: number;
     readonly stabilityMax: number;
     readonly curveMax: number;
@@ -330,6 +339,10 @@ export function fixtureGroupOptions(strategy: string, graph: Graph): object {
 export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; bench: BenchRow[] } {
   const max = options.max ?? 1000;
   const seeds = Math.max(1, Math.floor(options.seeds ?? 5));
+  const seedsMaxNodes = options.seedsMaxNodes ?? 1000;
+  const seedsOf = (nodes: number): number => (nodes > seedsMaxNodes ? 1 : seeds);
+  const steps = new Set<Step>(options.steps ?? STEPS);
+  const cellLimit = options.cellLimit ?? Infinity;
   const repeat = options.repeat ?? 3;
   const stabilityMax = options.stabilityMax ?? 1000;
   const curveMax = options.curveMax ?? 1000;
@@ -338,16 +351,16 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "highway"]);
   const normals = new Set(options.normalCurves ?? ["spline"]);
   const log = options.log ?? ((): void => {});
-  const fixtures = (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max);
-  const routers = listStrategies(registry, "router");
-  const curves = listStrategies(registry, "curve");
-  const groups = listStrategies(registry, "group");
+  const fixtures = steps.has("router") || steps.has("group") ? (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max) : [];
+  const routers = steps.has("router") ? listStrategies(registry, "router").filter((s) => options.routers?.includes(s.name) ?? true) : [];
+  const curves = steps.has("curve") ? listStrategies(registry, "curve") : [];
+  const groups = steps.has("group") ? listStrategies(registry, "group") : [];
   const rooms = listStrategies(registry, "room");
   const rows: SuiteRow[] = [];
   const bench: BenchRow[] = [];
 
   for (const spec of fixtures) {
-    for (let k = 0; k < seeds; k++) {
+    for (let k = 0; k < seedsOf(spec.nodes); k++) {
       const seed = familySeed(spec, k);
       const graph = makeFixture({ ...spec, seed });
       const change = changeGraph(graph, seed);
@@ -358,7 +371,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
         if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) continue;
         const router = asRouter(strategy);
         const t0 = now();
-        const { row, result } = benchRun(router, spec.name, graph, k === 0 ? repeat : 1);
+        const { row, result } = benchRun(router, spec.name, graph, k === 0 ? repeat : 1, cellLimit);
         const ms = now() - t0;
         if (k === 0) bench.push(row);
         const t1 = now();
@@ -386,7 +399,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
           extraMs,
           values,
         });
-        if (strategy.name === curveRouter && graph.nodes.length <= curveMax) rows.push(...curveRows(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }));
+        if (strategy.name === curveRouter && curves.length > 0 && graph.nodes.length <= curveMax) rows.push(...curveRows(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }));
       }
       // The step `group`: the router `sections` with each grouping rule, and the grouping of the changed graph (G9).
       for (const strategy of groups) {
@@ -414,9 +427,9 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   }
 
   // The step `room`: the board with each gap open to the gutter only, then each room strategy.
-  for (const family of options.roomFamilies ?? ROOM_FAMILIES) {
+  for (const family of steps.has("room") ? (options.roomFamilies ?? ROOM_FAMILIES) : []) {
     if (family.cols * family.rows > max) continue;
-    for (let k = 0; k < seeds; k++) {
+    for (let k = 0; k < seedsOf(family.cols * family.rows); k++) {
       const graph = packedGridBoard({ seed: 11 + 1009 * k, cols: family.cols, rows: family.rows, long: family.long });
       log(`${family.name} seed ${k}: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
       const links = roomLinks(graph);
@@ -460,13 +473,74 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const summaries = summarizeRows(rows);
   return {
     report: {
-      options: { max, seeds, repeat, stabilityMax, curveMax, curveRouter },
+      options: { max, seeds, seedsMaxNodes, repeat, stabilityMax, curveMax, curveRouter },
       rows,
       summaries,
       fronts: suiteFronts(summaries),
       rules: ruleCounts(rows),
     },
     bench,
+  };
+}
+
+/**
+ * This function puts the rows of the suite in the order of one run. It sorts them by fixture family, then by seed.
+ * In one seed, the routers come first, and the curves come after the router of the curves. The grouping rules and the room come last.
+ * A name that is not in its list goes after the names of the list.
+ * The workflow `Bench` uses it to join the reports of its parts.
+ */
+export function orderSuiteRows(
+  rows: readonly SuiteRow[],
+  options: { registry?: Registry; fixtures?: readonly FixtureSpec[]; roomFamilies?: readonly RoomFamily[]; curveRouter?: string } = {},
+): SuiteRow[] {
+  const registry = options.registry ?? STRATEGIES;
+  const families = [...(options.fixtures ?? FIXTURES).map((f) => f.name), ...(options.roomFamilies ?? ROOM_FAMILIES).map((f) => f.name)];
+  const place = (list: readonly string[], name: string): number => {
+    const i = list.indexOf(name);
+    return i < 0 ? list.length : i;
+  };
+  const names = (step: Step): string[] => listStrategies(registry, step).map((s) => s.name);
+  const routers = names("router");
+  const curves = names("curve");
+  const after = place(routers, options.curveRouter ?? "corners");
+  // The routers and the curves share one rank. Each curve comes after the router of the curves, as `runSuite` gives them.
+  const rank = (r: SuiteRow): [number, number] => {
+    if (r.step === "router") return [0, 2 * place(routers, r.strategy) * (curves.length + 1)];
+    if (r.step === "curve") return [0, 2 * after * (curves.length + 1) + 1 + place(curves, r.strategy)];
+    if (r.step === "group") return [1, place(names("group"), r.strategy)];
+    return [2, r.strategy === "gutter" ? -1 : place(names("room"), r.strategy)];
+  };
+  return rows
+    .map((row, i) => ({ row, i, f: place(families, row.fixture), rank: rank(row) }))
+    .sort((a, b) => a.f - b.f || a.row.seed - b.row.seed || a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.i - b.i)
+    .map((x) => x.row);
+}
+
+/**
+ * This function joins the reports of the parts of one benchmark into one report. It puts the rows in the order of one run.
+ * Then it calculates the summaries, the fronts and the rule counts again from all the rows.
+ */
+export function joinReports(reports: readonly SuiteReport[], options: { registry?: Registry; fixtures?: readonly FixtureSpec[]; roomFamilies?: readonly RoomFamily[] } = {}): SuiteReport {
+  const first = reports[0]?.options;
+  const rows = orderSuiteRows(
+    reports.flatMap((r) => r.rows),
+    { ...options, curveRouter: first?.curveRouter ?? "corners" },
+  );
+  const summaries = summarizeRows(rows);
+  return {
+    options: {
+      max: Math.max(0, ...reports.map((r) => r.options.max)),
+      seeds: first?.seeds ?? 0,
+      seedsMaxNodes: first?.seedsMaxNodes ?? 0,
+      repeat: first?.repeat ?? 0,
+      stabilityMax: first?.stabilityMax ?? 0,
+      curveMax: first?.curveMax ?? 0,
+      curveRouter: first?.curveRouter ?? "corners",
+    },
+    rows,
+    summaries,
+    fronts: suiteFronts(summaries),
+    rules: ruleCounts(rows),
   };
 }
 

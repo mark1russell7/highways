@@ -3,6 +3,8 @@
 # The job `join` joins the rows of the parts into one table and one bench.json, in the format of one run.
 # A push to main runs the fixtures up to 10 000 nodes. The nightly run and a run with `max` 100000 also run the fixture of 100 000 nodes.
 # Each cell has a time limit. After the routes of a cell pass the limit, the cell starts no more routes, and its row shows "over the limit".
+# The measure suite runs each fixture family over `seeds` seeds to 1 000 nodes, and over one seed above. Each part keeps its report.
+# The job `join` joins the reports into one report.json, in the same artifact as bench.json.
 name: Bench
 
 on:
@@ -19,6 +21,9 @@ on:
       repeat:
         description: "The runs of each cell up to 10 000 nodes (the time is the median). A cell of 100 000 nodes runs two times."
         default: "3"
+      seeds:
+        description: "The seeds of each fixture family to 1 000 nodes (the measure suite gives the median and the spread). A larger family gets one seed."
+        default: "5"
 
 permissions:
   contents: read
@@ -37,28 +42,32 @@ jobs:
       parts: ${{ steps.plan.outputs.parts }}
       max: ${{ steps.plan.outputs.max }}
       repeat: ${{ steps.plan.outputs.repeat }}
+      seeds: ${{ steps.plan.outputs.seeds }}
     steps:
       - name: Plan the parts
         id: plan
         env:
           MAX: ${{ github.event_name == 'schedule' && '100000' || inputs.max || '10000' }}
           REPEAT: ${{ inputs.repeat || '3' }}
+          SEEDS: ${{ inputs.seeds || '5' }}
         # Each part has the nodes of its fixtures, the options of `pnpm bench`, the cell limit in milliseconds and the time limit of its job in minutes.
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
+        # Each step of the measure suite runs in one part of each size: `small` runs each step, and the parts `rest` run the step `group`.
         run: |
           [[ "$MAX" =~ ^[0-9]+$ ]] || { echo "max must be a number, not '$MAX'"; exit 1; }
           [[ "$REPEAT" =~ ^[1-9][0-9]*$ ]] || { echo "repeat must be a number of 1 or more, not '$REPEAT'"; exit 1; }
-          parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" '[
-            {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat)", limit: 900000, timeout: 30},
-            {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --routers shared-all", limit: 900000, timeout: 40},
-            {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --routers shared,sections", limit: 900000, timeout: 40},
-            {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},
-            {name: "huge-sections", min: 100000, max: 100000, args: "--rows-only --repeat 1 --routers sections", limit: 3600000, timeout: 300},
-            {name: "huge-sections-tree", min: 100000, max: 100000, args: "--rows-only --repeat 1 --routers sections-tree", limit: 3600000, timeout: 300},
-            {name: "huge-rest", min: 100000, max: 100000, args: "--rows-only --repeat 1 --skip-routers sections,sections-tree", limit: 3600000, timeout: 120}
+          [[ "$SEEDS" =~ ^[1-9][0-9]*$ ]] || { echo "seeds must be a number of 1 or more, not '$SEEDS'"; exit 1; }
+          parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" '[
+            {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds)", limit: 900000, timeout: 30},
+            {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared-all", limit: 900000, timeout: 40},
+            {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared,sections", limit: 900000, timeout: 40},
+            {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router,group --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},
+            {name: "huge-sections", min: 100000, max: 100000, args: "--rows-only --repeat 1 --seeds \($seeds) --suite-steps router --routers sections", limit: 3600000, timeout: 300},
+            {name: "huge-sections-tree", min: 100000, max: 100000, args: "--rows-only --repeat 1 --seeds \($seeds) --suite-steps router --routers sections-tree", limit: 3600000, timeout: 300},
+            {name: "huge-rest", min: 100000, max: 100000, args: "--rows-only --repeat 1 --seeds \($seeds) --suite-steps router,group --skip-routers sections,sections-tree", limit: 3600000, timeout: 300}
           ] | map(select(.min <= $max))')
           echo "$parts" | jq .
-          { echo "parts=$parts"; echo "max=$MAX"; echo "repeat=$REPEAT"; } >> "$GITHUB_OUTPUT"
+          { echo "parts=$parts"; echo "max=$MAX"; echo "repeat=$REPEAT"; echo "seeds=$SEEDS"; } >> "$GITHUB_OUTPUT"
 
   part:
     needs: plan
@@ -94,7 +103,8 @@ jobs:
           status=0
           # shellcheck disable=SC2086
           pnpm --filter @mark1russell7/highways bench --min "$MIN" --max "$MAX" --cell-limit "$CELL_LIMIT" $ARGS \
-            --json "$GITHUB_WORKSPACE/parts/bench-$PART.json" --side-tables "$GITHUB_WORKSPACE/parts/side-$PART.txt" | tee "parts/table-$PART.txt" || status=$?
+            --json "$GITHUB_WORKSPACE/parts/bench-$PART.json" --side-tables "$GITHUB_WORKSPACE/parts/side-$PART.txt" \
+            --report "$GITHUB_WORKSPACE/parts/report-$PART.json" | tee "parts/table-$PART.txt" || status=$?
           echo "$((SECONDS - start))" > "parts/time-$PART.txt"
           echo "$status" > "parts/status-$PART.txt"
           exit "$status"
@@ -115,6 +125,7 @@ jobs:
       PARTS: ${{ needs.plan.outputs.parts }}
       MAX: ${{ needs.plan.outputs.max }}
       REPEAT: ${{ needs.plan.outputs.repeat }}
+      SEEDS: ${{ needs.plan.outputs.seeds }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -132,9 +143,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p parts
-          node packages/core/scripts/bench-join.ts --parts parts --json "$GITHUB_WORKSPACE/bench.json" | tee table.txt
+          node packages/core/scripts/bench-join.ts --parts parts --json "$GITHUB_WORKSPACE/bench.json" --report "$GITHUB_WORKSPACE/report.json" | tee table.txt
           {
-            echo "## Bench (max $MAX nodes, $REPEAT runs up to 10 000 nodes, 2 runs at 100 000 nodes)"
+            echo "## Bench (max $MAX nodes, $REPEAT runs up to 10 000 nodes, 2 runs at 100 000 nodes, $SEEDS seeds up to 1 000 nodes, 1 seed above)"
             echo
             echo '```'
             cat table.txt
@@ -161,5 +172,7 @@ jobs:
         if: always()
         with:
           name: bench-${{ github.sha }}
-          path: bench.json
+          path: |
+            bench.json
+            report.json
           if-no-files-found: warn

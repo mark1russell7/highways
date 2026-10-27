@@ -3,7 +3,7 @@ import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { listStrategies, routersOf } from "../strategies/model.ts";
 import { benchOne } from "./run.ts";
-import { familySeed, formatFronts, formatMeasureTime, formatRules, formatSummaries, PROPOSED_RULES, runSuite } from "./suite.ts";
+import { familySeed, formatFronts, formatMeasureTime, formatRules, formatSummaries, joinReports, PROPOSED_RULES, runSuite } from "./suite.ts";
 
 describe("runSuite (MEAS1)", () => {
   const tiny = FIXTURES.find((f) => f.name === "tiny-uniform")!;
@@ -56,5 +56,42 @@ describe("runSuite (MEAS1)", () => {
     expect(formatFronts(report.fronts).split("\n")).toHaveLength(2 + report.fronts.length);
     expect(formatRules(report.rules)).toContain("level-nesting");
     expect(formatMeasureTime(report.rows)).toContain("tiny-uniform");
+  });
+});
+
+describe("runSuite in parts (BENCH-CI)", () => {
+  const tiny = FIXTURES.find((f) => f.name === "tiny-uniform")!;
+  const small = FIXTURES.find((f) => f.name === "small-clustered")!;
+  const family = { name: "packed-small", cols: 4, rows: 3, long: 3 };
+  const base = { max: 100, seeds: 2, repeat: 2, seedsMaxNodes: 10, fixtures: [tiny, small], roomFamilies: [family] };
+  const one = runSuite(base).report;
+  const seedsOf = (report: typeof one, fixture: string) => new Set(report.rows.filter((r) => r.fixture === fixture).map((r) => r.seed)).size;
+
+  it("gives one seed to a family with more nodes than seedsMaxNodes", () => {
+    expect(one.options.seedsMaxNodes).toBe(10);
+    expect(seedsOf(one, "tiny-uniform")).toBe(2);
+    expect(seedsOf(one, "small-clustered")).toBe(1);
+    expect(seedsOf(one, "packed-small")).toBe(1);
+  });
+
+  it("runs only the steps and the routers of a part", () => {
+    const part = runSuite({ ...base, fixtures: [small], steps: ["router"], routers: ["corners"] }).report;
+    expect(new Set(part.rows.map((r) => `${r.step}/${r.strategy}`))).toEqual(new Set(["router/corners"]));
+  });
+
+  it("joins the reports of the parts into the report of one run", () => {
+    const routers = routersOf(STRATEGIES).map((r) => r.name);
+    const parts = [
+      runSuite({ ...base, fixtures: [tiny] }).report,
+      runSuite({ ...base, fixtures: [small], steps: ["router", "curve"], routers: routers.slice(0, 3) }).report,
+      runSuite({ ...base, fixtures: [small], steps: ["router", "group"], routers: routers.slice(3) }).report,
+    ];
+    const joined = joinReports([parts[2]!, parts[0]!, parts[1]!], { roomFamilies: [family] });
+    const key = (r: (typeof one.rows)[number]) => [r.step, r.fixture, r.seed, r.strategy, r.values];
+    expect(joined.rows.map(key)).toEqual(one.rows.map(key));
+    expect(joined.fronts).toEqual(one.fronts);
+    expect(joined.rules).toEqual(one.rules);
+    const medians = (s: (typeof one.summaries)[number]) => [s.step, s.fixture, s.strategy, s.seeds, s.violations, Object.keys(s.measures)];
+    expect(joined.summaries.map(medians)).toEqual(one.summaries.map(medians));
   });
 });
