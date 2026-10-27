@@ -87,6 +87,12 @@ The [examples page](https://mark1russell7.github.io/highways/examples.html) show
 
 `curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline` or `arc`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
 
+## Room for the links
+
+A host layout can pack boxes with no gap between them. Then the links have no channel. `roomDemand` gives the width that each gap between two columns or two rows needs. That width is a gutter and a lane for each link along the gap.
+
+`openGaps` moves the boxes apart to that width, and a grid stays a grid. `makeRoom` does both. The [package README](packages/core/README.md) tells the API and the measures.
+
 ## The benchmark
 
 `pnpm --filter @mark1russell7/highways bench` races the routers on the fixtures and writes a Markdown table.
@@ -95,6 +101,8 @@ The [examples page](https://mark1russell7.github.io/highways/examples.html) show
 - `--json <file>` also writes the rows as JSON.
 
 A third table compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space, and it gives the ratio of the lengths.
+
+A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens.
 
 The workflow `Bench` races the routers on all the fixtures, to 100 000 nodes, in CI. It starts on each change of `packages/core` on `main`, or by hand. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 

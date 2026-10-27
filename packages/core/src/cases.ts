@@ -103,6 +103,34 @@ export function manyGroupsBoard(): Graph {
   return b.graph();
 }
 
+/**
+ * This function makes the far view of a board after a host layout packs it.
+ * The board has 96 boxes of one size in a grid of 12 columns and 8 rows.
+ * The boxes touch, with no gap between them. Each box links to a box near it, and 48 long links join boxes far apart.
+ * The links have no channel between the boxes. The roadmap item ROOM measures this board before and after `makeRoom`.
+ *
+ * The board is not in `CASES`, because the digests of the router fix the output on each board of `CASES`.
+ */
+export function packedGridBoard(): Graph {
+  const R = rng(11);
+  const b = new Board();
+  const cols = 12;
+  const rows = 8;
+  const w = 140;
+  const h = 90;
+  const id = (r: number, c: number): string => `p${r}-${c}`;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) b.node(id(r, c), c * w, r * h, w, h);
+  const step = (): number => Math.floor(R() * 5) - 2;
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const rr = Math.max(0, Math.min(rows - 1, r + step()));
+      const cc = Math.max(0, Math.min(cols - 1, c + step()));
+      b.link(id(r, c), id(rr, cc));
+    }
+  for (let n = 0; n < 48; n++) b.link(id(Math.floor(R() * rows), Math.floor(R() * cols)), id(Math.floor(R() * rows), Math.floor(R() * cols)));
+  return b.graph();
+}
+
 /** The case boards of the benchmark. Each board has a few hundred nodes at most, so the benchmark races them on each run. */
 export const CASES: readonly CaseBoard[] = [
   { name: "case-dense-groups", defect: "Groups overlap at the far view, and level links go through other groups.", make: denseGroupsBoard },
