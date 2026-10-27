@@ -49,6 +49,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HWC-D | The room option `bends` grows the gaps where the legs of a bundle are too short for its arcs. On `shared-all` and `case-many-groups`, against ROOM alone: under min 137 before, 120 after. Room-fixable arcs: 49 before, 3 after. The area grows by 4.6%. | 2026-10-27 | #52 |
 | EX2 | The page `compare.html` puts the strategies of one step side by side, with their measures, the best values and the Pareto front. The 9 router panels of a board of 100 nodes take 826 ms. | 2026-10-27 | #53 |
 | REL6 | Version 0.3.0 on npm: OPTS to EX2. MINOR, because the type `CurveType` gains `smooth` and `clothoid`. The default routes change for HWC-B, HWC-C, ER3d and SEC-V. | 2026-10-27 | #54 |
+| EX2-FIX | On the 5 boards of the compare page, 68 of 78 controls change the drawing or the measures. A test lists the other 10 with their reason. | 2026-10-27 | #55 |
 
 ## Open
 
