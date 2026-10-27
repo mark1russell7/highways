@@ -62,7 +62,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W1B | Plug and lane options, off by default. WILD-001 (`plugs: side`) is kept: R3 falls 11% to 33%. EDA-004 (`tracks: left-edge`) is kept: lanes fall 5% to 26%. WILD-002 and NAT-031 (`plugGap`) are dropped: R1 grows more than 2%. | 2026-10-27 | #70 |
 | BUILD-W1A | The bundle measures B2, B3 and B6, and the order fragility W3, in the screen. RULE-046 (the repair step) is kept: the hard breaks fall to 0 on each input. WILD-053 and WILD-056 are dropped: the fragility is 0 for each router. | 2026-10-27 | #71 |
 | BUILD-W1C | Cost, order and merge options of `shared` and `trunks`, off by default. With `passes: 3` (HWY-039), B1 of `shared-all` rises on 4 boards, and the B3 q95 does not rise. NAT-035 (`merge: snell`) cuts the B6 max 8% to 27%. NAT-024 is kept. EDA-030 is dropped. | 2026-10-27 | #72 |
-| REL8 | Version 0.4.1 on npm: the kept ideas of wave 1 (free plugs, lane tracks, the repair step, rip-up passes, Snell merges, pioneer order) and the bundle measures. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | #PRNUM |
+| REL8 | Version 0.4.1 on npm: the kept ideas of wave 1 (free plugs, lane tracks, the repair step, rip-up passes, Snell merges, pioneer order) and the bundle measures. PATCH: each is off by default, and the default routes do not change. | 2026-10-27 | #74 |
 
 ## Open
 
