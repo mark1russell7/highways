@@ -1996,7 +1996,7 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout and case-dense-groups. Keep if R7 = 0 for the members, the B6 max falls >= 20 degrees and B1 is not worse.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "EDA-015",
       "EDA-030",
@@ -2006,7 +2006,122 @@
       "HWY-017"
     ],
     "canonical": "HWY-017",
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40602316383",
+      "records": [
+        "screen-v1/*/shared@a33fe48",
+        "screen-v1/*/shared-ways@a33fe48",
+        "screen-v1/*/spiral@a33fe48",
+        "screen-v1/*/spiral+stretch@a33fe48",
+        "screen-v1/*/spiral-a15@a33fe48",
+        "screen-v1/*/spiral-a35@a33fe48",
+        "screen-v1/*/spiral-n3@a33fe48"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.155,
+            "dense-groups": 0.19,
+            "hub-chain": 0.078,
+            "many-groups": 0.197
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.113,
+            "dense-groups": 1.118,
+            "hub-chain": 1,
+            "many-groups": 1.063
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.153,
+            "dense-groups": 0.19,
+            "hub-chain": 0.078,
+            "many-groups": 0.197
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.111,
+            "dense-groups": 1.118,
+            "hub-chain": 1,
+            "many-groups": 1.063
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.48,
+            "hub-chain": 0.08,
+            "many-groups": 0.35
+          },
+          "new": {
+            "small-clustered": 0.63,
+            "dense-groups": 0.64,
+            "hub-chain": 0.08,
+            "many-groups": 0.41
+          }
+        },
+        "R4 against shared": {
+          "base": {
+            "small-clustered": 0.799,
+            "dense-groups": 0.853,
+            "hub-chain": 0.157,
+            "many-groups": 0.937
+          },
+          "new": {
+            "small-clustered": 0.888,
+            "dense-groups": 0.898,
+            "hub-chain": 0.157,
+            "many-groups": 1.025
+          }
+        },
+        "B6 against shared-ways": {
+          "base": {
+            "small-clustered": 126.384,
+            "dense-groups": 158.199,
+            "hub-chain": 50.44,
+            "many-groups": 90
+          },
+          "new": {
+            "small-clustered": 143.303,
+            "dense-groups": 159.7,
+            "hub-chain": 50.44,
+            "many-groups": 148.188
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "This record rides HWY-017 in the strategy `spiral`. The strategy beats `shared` on 1 of the 4 boards (hub-chain, a tie with no highway). On hub-chain the B6 max does not change against `shared-ways` (50.4). On the other boards it rises. The strategy stays in the registry."
+    }
   },
   {
     "id": "EDA-036",
