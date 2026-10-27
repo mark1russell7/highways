@@ -12,6 +12,7 @@ import { makeRoom, roomDemand, roomLinks } from "../room/index.ts";
 import { ROUTERS } from "../routers/index.ts";
 import {
   BUILT_IN_STRATEGIES,
+  checkSchema,
   createRegistry,
   curveStrategies,
   defineStrategy,
@@ -22,6 +23,7 @@ import {
   routersOf,
   STEPS,
   STRATEGIES,
+  sweepOf,
   type Strategy,
 } from "./index.ts";
 
@@ -31,6 +33,7 @@ const elbow = defineStrategy({
   name: "elbow",
   describe: "Each edge goes along one axis, then along the other, from center to center.",
   defaults: { turn: "x" as "x" | "y" },
+  schema: { turn: { type: "enum", values: ["x", "y"], describe: "The axis of the first leg." } },
   run(graph, o) {
     const box = new Map(graph.nodes.map((n) => [n.id, n.box]));
     const routes = graph.edges.map((e) => {
@@ -137,6 +140,8 @@ describe("a consumer strategy", () => {
     expect(elbow.run(edge).routes[0]!.points[1]).toEqual({ x: 105, y: 5 });
     expect(elbow.run(edge, { turn: "y" }).routes[0]!.points[1]).toEqual({ x: 5, y: 55 });
     expect(elbow.defaults).toEqual({ turn: "x" });
+    expect(checkSchema(elbow)).toEqual([]);
+    expect(sweepOf(elbow, "turn").map((s) => s.options)).toEqual([{ turn: "x" }, { turn: "y" }]);
     // @ts-expect-error The option `turn` takes only "x" or "y".
     elbow.run(edge, { turn: "z" });
   });

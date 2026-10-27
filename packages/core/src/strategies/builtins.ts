@@ -14,6 +14,8 @@ import { straightRouter } from "../routers/straight.ts";
 import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
 import { SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
+import type { OptionSchema } from "./options.ts";
+import { CORNERS_SCHEMA, KEY_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -25,13 +27,14 @@ function routerStrategy<O extends object>(
   maxNodes: number,
   defaults: O,
   make: (options: O & { readonly name: string }) => Router,
+  schema: OptionSchema<O>,
 ): Strategy<"router", O> {
-  return defineStrategy({ step: "router", name, describe, defaults, maxNodes, run: (graph: Graph, options: Readonly<O>): Result => make({ ...options, name }).route(graph) });
+  return defineStrategy({ step: "router", name, describe, defaults, schema, maxNodes, run: (graph: Graph, options: Readonly<O>): Result => make({ ...options, name }).route(graph) });
 }
 
 /** This function makes a router strategy for a router without options. */
 function fixedRouter(router: Router, describe: string): Strategy<"router", object> {
-  return defineStrategy({ step: "router", name: router.name, describe, defaults: {}, run: (graph: Graph): Result => router.route(graph) });
+  return defineStrategy({ step: "router", name: router.name, describe, defaults: {}, schema: {}, run: (graph: Graph): Result => router.route(graph) });
 }
 
 /** The built-in router strategies, in the order of the benchmark. They route as the routers of `ROUTERS`. */
@@ -57,6 +60,7 @@ export const routerStrategies: {
     10_000,
     {},
     cornersRouter,
+    CORNERS_SCHEMA,
   ),
   "corners-smooth": routerStrategy<RouterPreset<CornersOptions>>(
     "corners-smooth",
@@ -64,6 +68,7 @@ export const routerStrategies: {
     10_000,
     { smooth: true },
     cornersRouter,
+    CORNERS_SCHEMA,
   ),
   trunks: routerStrategy<RouterPreset<TrunksOptions>>(
     "trunks",
@@ -71,6 +76,7 @@ export const routerStrategies: {
     10_000,
     { rule: byCollection },
     trunksRouter,
+    TRUNKS_SCHEMA,
   ),
   shared: routerStrategy<RouterPreset<SharedOptions>>(
     "shared",
@@ -78,14 +84,16 @@ export const routerStrategies: {
     10_000,
     { rule: byCollection },
     sharedRouter,
+    SHARED_SCHEMA,
   ),
-  "shared-all": routerStrategy<RouterPreset<SharedOptions>>("shared-all", "The same as `shared`, but all edges share their ways.", 10_000, {}, sharedRouter),
+  "shared-all": routerStrategy<RouterPreset<SharedOptions>>("shared-all", "The same as `shared`, but all edges share their ways.", 10_000, {}, sharedRouter, SHARED_SCHEMA),
   sections: routerStrategy<RouterPreset<SectionsOptions>>(
     "sections",
     "A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly.",
     100_000,
     {},
     sectionsRouter,
+    SECTIONS_SCHEMA,
   ),
   "sections-tree": routerStrategy<RouterPreset<SectionsOptions>>(
     "sections-tree",
@@ -93,6 +101,7 @@ export const routerStrategies: {
     100_000,
     { stretch: Infinity },
     sectionsRouter,
+    SECTIONS_SCHEMA,
   ),
 });
 
@@ -122,12 +131,13 @@ export const curveStrategies: {
   readonly spline: Strategy<"curve", TensionOptions>;
   readonly arc: Strategy<"curve", RadiusOptions>;
 } = Object.freeze({
-  straight: defineStrategy({ step: "curve", name: "straight", describe: "The polyline as it is.", defaults: {}, run: (input: CurveInput) => straightCurve(input.points) }),
+  straight: defineStrategy({ step: "curve", name: "straight", describe: "The polyline as it is.", defaults: {}, schema: {}, run: (input: CurveInput) => straightCurve(input.points) }),
   rounded: defineStrategy({
     step: "curve",
     name: "rounded",
     describe: "A quadratic Bezier curve at each corner, as `roundCorners` draws it. The first and the last legs stay.",
     defaults: { radius: 12 },
+    schema: RADIUS_SCHEMA,
     run: (input: CurveInput, o: Readonly<RadiusOptions>) => roundedCurve(input.points, { ...contextOf(input), radius: o.radius } satisfies RoundedOptions),
   }),
   spline: defineStrategy({
@@ -135,6 +145,7 @@ export const curveStrategies: {
     name: "spline",
     describe: "A centripetal Catmull-Rom spline through each point. It does not overshoot or make loops in a piece.",
     defaults: { tension: 0 },
+    schema: TENSION_SCHEMA,
     run: (input: CurveInput, o: Readonly<TensionOptions>) => splineCurve(input.points, { ...contextOf(input), tension: o.tension } satisfies SplineOptions),
   }),
   arc: defineStrategy({
@@ -142,6 +153,7 @@ export const curveStrategies: {
     name: "arc",
     describe: "A circular arc at each corner, tangent to the two legs. The first and the last legs stay.",
     defaults: { radius: 12 },
+    schema: RADIUS_SCHEMA,
     run: (input: CurveInput, o: Readonly<RadiusOptions>) => arcCurve(input.points, { ...contextOf(input), radius: o.radius } satisfies ArcOptions),
   }),
 });
@@ -150,7 +162,7 @@ export const curveStrategies: {
 export type RoomPreset = Omit<RoomOptions, "method">;
 
 const roomStrategy = (method: RoomMethod, describe: string): Strategy<"room", RoomPreset> =>
-  defineStrategy<"room", RoomPreset>({ step: "room", name: method, describe, defaults: {}, run: (input, o) => roomDemand(input.items, input.links, { ...o, method }) });
+  defineStrategy<"room", RoomPreset>({ step: "room", name: method, describe, defaults: {}, schema: ROOM_SCHEMA, run: (input, o) => roomDemand(input.items, input.links, { ...o, method }) });
 
 /** The built-in room strategies: the methods of `roomDemand`. */
 export const roomStrategies: {
@@ -171,6 +183,7 @@ export const groupStrategies: {
     name: "quadtree",
     describe: "The cells of a quadtree of the plane. A cell with more than `cap` nodes splits in four. It is the default rule of the router `sections`.",
     defaults: { ...SECTION_DEFAULTS },
+    schema: SECTION_SCHEMA,
     run: (graph: Graph, o: Readonly<Required<SectionOptions>>) => quadtreeGroups(graph, o),
   }),
   keys: defineStrategy({
@@ -178,6 +191,7 @@ export const groupStrategies: {
     name: "keys",
     describe: "One group for each key of the nodes. The default key is the string `data.group` of the node. A node without a key is a group alone.",
     defaults: { key: byDataGroup } as KeyOptions,
+    schema: KEY_SCHEMA,
     run: (graph: Graph, o: Readonly<KeyOptions>) => keyGroups(graph, o),
   }),
 });
