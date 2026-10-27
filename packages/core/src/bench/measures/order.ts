@@ -72,7 +72,8 @@ export function orderFragility(graph: Graph, route: (graph: Graph) => Result, op
   const ink: number[] = [];
   let changed = 0;
   for (let k = 0; k < orders; k++) {
-    const routes = route(shuffleEdges(graph, seed + k)).routes;
+    // The measures read the routes in the order of the edge ids, so the order of the output does not move them.
+    const routes = byEdge(route(shuffleEdges(graph, seed + k)).routes);
     const segs = drawnSegments(routes);
     crossings.push(crossingAngles(segs).crossings);
     detour.push(detourSpread(routes).median);
@@ -80,9 +81,9 @@ export function orderFragility(graph: Graph, route: (graph: Graph) => Result, op
     let length = 0;
     for (const [a, b] of segs) length += Math.hypot(b.x - a.x, b.y - a.y);
     ink.push(length);
-    if (!sameData(byEdge(routes), baseRoutes)) changed++;
+    if (!sameData(routes, baseRoutes)) changed++;
   }
-  const own = crossingAngles(drawnSegments(base.routes)).crossings;
+  const own = crossingAngles(drawnSegments(baseRoutes)).crossings;
   const best = Math.min(...crossings);
   return {
     orders,
