@@ -174,6 +174,8 @@ export interface LayoutRecord {
   readonly measures: Readonly<Record<string, number>>;
   /** The count of the breaks of each hard rule. A good run has 0 for each rule. */
   readonly hard: Readonly<Record<string, number>>;
+  /** The tolerance of each hard rule of the run, for example `{ through: 0.5 }`. */
+  readonly tolerance?: Readonly<Record<string, number>>;
   /** This value is `true` when two runs on the same input give the same output. */
   readonly deterministic: boolean;
   /** The id of the prediction of this run, from the predictions file. */

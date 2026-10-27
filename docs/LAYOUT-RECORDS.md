@@ -147,6 +147,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
   "edges": 15,
   "measures": { "route.crossings": 8, "route.detour.median": 1.029 },
   "hard": { "complete": 0, "no-pass-through": 0, "same-twice": 0 },
+  "tolerance": { "through": 0.5 },
   "deterministic": true,
   "prediction": "p-2026-10-27-corners",
   "ms": 1.8,
@@ -161,7 +162,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 - `nodes` counts the boxes and the obstacles of the input.
 - `measures` holds the measures of the table below. A measure without a finite value is not in the record.
 - `hard` counts the breaks of each hard rule. A good run has 0 for each rule.
-- `hard.tolerance` gives the tolerance of each rule of the run. The defaults are `overlap` 0.001 and `through` 0.5. A record of a packer writes `overlap`, and a record of a router writes `through`. The screen of `highways` writes it after a later change. Until then, its records use the default 0.5.
+- `tolerance` gives the tolerance of each hard rule of the run. It is a field next to `hard`, so `hard` holds only counts. The defaults are `overlap` 0.001 and `through` 0.5. A record of a packer writes `overlap`, and a record of a router writes `through`.
 - `deterministic` is `true` when two runs of the same input give the same output. The screen runs each input two times.
 - `ms` is the time of the run. It is not a measure. Only the times of CI compare.
 - `skipped` gives the reason when a strategy did not run, for example an input over its `maxNodes`. Then the record has no measures.

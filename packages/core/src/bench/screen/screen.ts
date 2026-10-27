@@ -5,7 +5,7 @@ import { compareStep, type CompareRow, type CompareStep, type StepComparison } f
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { routeStability } from "../measures/stability.ts";
 import { quantile } from "../measures/stats.ts";
-import { checkLevels, checkProperties } from "../properties.ts";
+import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
 import { sameData } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
@@ -241,11 +241,11 @@ export function screen(step: CompareStep, strategies: readonly (Strategy<Compare
       const prediction = options.predictions?.find((p) => p.strategy === row.strategy && p.set === input.set && p.input === input.id)?.id;
       const tail = { ...(prediction !== undefined ? { prediction } : {}), ...(options.commit !== undefined ? { commit: options.commit } : {}) };
       if (row.skipped !== undefined) {
-        records.push({ ...head, measures: {}, hard: {}, deterministic: true, ms: 0, ...tail, skipped: row.skipped });
+        records.push({ ...head, measures: {}, hard: {}, tolerance: { through: TOLERANCE }, deterministic: true, ms: 0, ...tail, skipped: row.skipped });
         return;
       }
       const { hard, deterministic } = rowRules(step, graph, row, again?.rows[i]);
-      const record = { ...head, measures: named(rowValues(step, graph, row)), hard, deterministic, ms: row.ms, ...tail };
+      const record = { ...head, measures: named(rowValues(step, graph, row)), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
       records.push(record);
       if (step === "router" && input.base !== undefined && row.result) variants.push({ record, base: input.base, result: row.result });
     });
