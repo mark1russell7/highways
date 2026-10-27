@@ -6,9 +6,11 @@ import { nodeIndex, type Graph, type Node, type Result } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { makeRoom, openGaps, roomLinks } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
+import { byDataGroup } from "../groups/keys/index.ts";
 import { checkSections, type Section } from "../sections.ts";
+import { laneRoutes } from "../segments.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { asRouter, listStrategies, STEPS, type Registry, type Step, type Strategy } from "../strategies/model.ts";
+import { asRouter, listStrategies, STEPS, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
 import { checkLevels } from "./properties.ts";
 import { ambiguity, inkSaved } from "./measures/bundles.ts";
@@ -241,6 +243,8 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
 /** The input of one curve: a route with the normals of its plugs. */
 interface CurveRoute {
   readonly points: readonly { x: number; y: number }[];
+  /** The index of the route in the order of `laneRoutes`, when the curves draw the lanes of a board. */
+  readonly lane?: number;
   readonly startNormal: { x: number; y: number };
   readonly endNormal: { x: number; y: number };
 }
@@ -257,6 +261,11 @@ export interface CurveRunOptions {
   readonly normals: ReadonlySet<string>;
   /** The options of each curve strategy, by its name. A strategy without an entry gets its defaults. */
   readonly curveOptions?: Readonly<Record<string, object>>;
+  /**
+   * With this board, each curve draws the lanes of `laneRoutes` in place of the routes of the result, and each input has its `lane`.
+   * So the curve `highway` bends the lanes of a bundle as one. Without it, each curve draws the routes of the result.
+   */
+  readonly lanes?: LaneBoard;
 }
 
 /** One curve strategy on the routes of one result: the row of the suite and the drawn curves. */
@@ -279,19 +288,24 @@ export function curveRuns(graph: Graph, result: Result, curves: readonly Strateg
   const u = boardUnit(graph);
   const routes: CurveRoute[] = [];
   const ids: string[] = [];
-  for (const r of result.routes) {
+  const board = options.lanes;
+  const source = board ? laneRoutes(board.graph, board.open, board.width, board.maxWidth) : result.routes;
+  source.forEach((r, i) => {
     const e = edges.get(r.edge);
     const s = e && byId.get(e.source.node);
     const t = e && byId.get(e.target.node);
-    if (!s || !t || r.points.length < 2) continue;
+    if (!s || !t || r.points.length < 2) return;
     ids.push(r.edge);
-    routes.push({ points: r.points, startNormal: SIDE_NORMAL[nearestSide(s.box, r.points[0]!)], endNormal: SIDE_NORMAL[nearestSide(t.box, r.points[r.points.length - 1]!)] });
-  }
+    const normals = { startNormal: SIDE_NORMAL[nearestSide(s.box, r.points[0]!)], endNormal: SIDE_NORMAL[nearestSide(t.box, r.points[r.points.length - 1]!)] };
+    routes.push({ points: r.points, ...normals, ...(board ? { lane: i } : {}) });
+  });
   const ink = routes.reduce((sum, r) => sum + polylineLength(r.points), 0);
   return curves.map((curve): CurveRun => {
     const own = options.curveOptions?.[curve.name];
     const t0 = now();
-    const drawn = routes.map((r) => curve.run({ points: r.points, startNormal: r.startNormal, endNormal: r.endNormal, space }, own));
+    const drawn = routes.map((r) =>
+      curve.run({ points: r.points, startNormal: r.startNormal, endNormal: r.endNormal, space, ...(board && r.lane !== undefined ? { lane: { board, index: r.lane } } : {}) }, own),
+    );
     const samples = drawn.map((d) => sampleCurve(d, 0.25));
     const ms = now() - t0;
     const t1 = now();
@@ -392,8 +406,8 @@ export function groupRun(
 }
 
 /**
- * This function gives the options of a grouping rule on a fixture. The rule `keys` gets a key from the data of the edges:
- * the collection of the first edge into the node. A node without such an edge is a group alone.
+ * This function gives the options of a grouping rule on a fixture. The rule `keys` gets the string `data.group` of the node.
+ * A node without it gets a key from the data of the edges: the collection of the first edge into the node. A node without such an edge is a group alone.
  */
 export function fixtureGroupOptions(strategy: string, graph: Graph): object {
   if (strategy !== "keys") return {};
@@ -402,7 +416,7 @@ export function fixtureGroupOptions(strategy: string, graph: Graph): object {
     const c = e.data?.["collection"];
     if (typeof c === "string" && !key.has(e.target.node)) key.set(e.target.node, c);
   }
-  return { key: (n: Node) => key.get(n.id) };
+  return { key: (n: Node, i: number) => byDataGroup(n, i) ?? key.get(n.id) };
 }
 
 /**
