@@ -35,13 +35,16 @@ The corpus is a folder of input files and a manifest `corpus.json`. Each input i
 | `cell` | The cell of the input in the taxonomy. Refer to [The cells](#the-cells). |
 | `hash` | The first 16 hex characters of the SHA-256 of the canonical file. Refer to [The hash](#the-hash). |
 | `container` | The outer rectangle: `w`, `h`, `fixed`, `aspect` and `shape`. `fixed` is `none`, `width`, `height` or `size`. `aspect` is the target `w / h`. The router ignores it. |
-| `gap` | The space between two boxes. The router ignores it. |
+| `gap` | The free space between two boxes with their margins. The routes use it. The router ignores the value. |
+| `container.inset` | The space between the border and the boxes with their margins. The router ignores it. |
 | `obstacles` | The areas that the boxes and the routes must not use. Each one has an `id`, a `region` and a `move` with a `cost`. Refer to [Regions](#regions). |
 | `boxes[].w`, `boxes[].h` | The size of a box. The packer reads them. The router uses them as the bounding box of the box. |
 | `boxes[].x`, `boxes[].y` | The position of the top-left corner. The packer writes them. The router reads them. A box without a position is an error for the router. |
 | `boxes[].locked` | The value `true` makes the box an obstacle for the packer: its `x` and `y` stay. The router ignores it. |
 | `boxes[].rank` | The reading order that the caller wants. The router ignores it. |
 | `boxes[].parent`, `boxes[].group` | The nesting and the grouping. |
+| `boxes[].margin` | A ring around the box: a number, or `top`, `right`, `bottom` and `left`. No box enters it. A route enters it only at a plug stub, at a right angle. The default is 0. The router reads it after MARGIN-BOX. Until then, the router uses its option `margin` for each box. |
+| `boxes[].turnable` | The value `true` lets the packer turn the box by 90 degrees. The record holds the turned box and the turned ports, so the router does not see a turn. |
 | `boxes[].shape` | The shape of the box, as a region relative to the top-left corner of the box. The router ignores it. |
 | `boxes[].ports` | The ports of a box. Each port has an `id` and a `side`: `top`, `right`, `bottom` or `left`. |
 | `boxes[].ports[].x`, `boxes[].ports[].y` | The fixed place of a port, relative to the top-left corner of the box. The router does not move such a port. The `side` is the side that holds it. |
@@ -158,6 +161,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 - `nodes` counts the boxes and the obstacles of the input.
 - `measures` holds the measures of the table below. A measure without a finite value is not in the record.
 - `hard` counts the breaks of each hard rule. A good run has 0 for each rule.
+- `hard.tolerance` gives the tolerance of each rule of the run. The defaults are `overlap` 0.001 and `through` 0.5. A record of a packer writes `overlap`, and a record of a router writes `through`. The screen of `highways` writes it after a later change. Until then, its records use the default 0.5.
 - `deterministic` is `true` when two runs of the same input give the same output. The screen runs each input two times.
 - `ms` is the time of the run. It is not a measure. Only the times of CI compare.
 - `skipped` gives the reason when a strategy did not run, for example an input over its `maxNodes`. Then the record has no measures.
@@ -171,6 +175,8 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 | `curve` | `same-twice` |
 
 The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
+
+The packer is exact, so the shared rule `no-overlap` uses the smaller tolerance 0.001. A route is a curve on the line of the margin, so the rule `through` uses 0.5. A route in the margin of a box, outside the box, is a soft measure, not a break. The joint corpus keeps the packed inputs with a gap of 0 and no margin as a stress cell. On them, the rule `through` is expected to break. Each other joint input has a margin and a gap larger than 0.
 
 The [measure note](research/MEASURES.md) tells each rule. The rule `sections` counts a tree that the router refuses. The proposed rules of MEAS0 are measures: `route.curve.rule.*` and `route.level.nesting`.
 
