@@ -1,0 +1,2589 @@
+[
+  {
+    "id": "HWY-001",
+    "family": "highway",
+    "name": "Hierarchical edge bundling along the tree of sections",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Hierarchical edge bundles: visualization of adjacency relations in hierarchical data",
+        "authors": "Holten",
+        "year": 2006,
+        "url": "https://doi.org/10.1109/TVCG.2006.147"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge follows the path of hub points from its source section up to the lowest common section and down to its target section. A straightness value beta pulls the path toward the straight line. Edges with the same section path share the spine between the hubs.",
+    "math": "Control points P = hubs on path(s, lca, t). Bundled point p_i' = beta p_i + (1 - beta)(s + (i/(k-1))(t - s)). Highway = maximal run of hubs shared by >= minSize edges.",
+    "cost": "O(m depth) after the group step. 100 nodes: < 5 ms. 1000 nodes: < 30 ms, plus the ramps through the corner graph.",
+    "params": [
+      "beta 0..1 (default 0.85)",
+      "minSize 2..16",
+      "hubs per side 1..depth",
+      "group strategy (quadtree, kd, cut)"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "G8",
+      "Z9"
+    ],
+    "risks": [
+      "B3",
+      "B4",
+      "R5",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= sections at the same B3 q95 on 3 of 5 boards with R7 = 0. Drop if B4 > 1.2 x sections.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-052",
+      "HWY-056",
+      "HWY-041"
+    ]
+  },
+  {
+    "id": "HWY-002",
+    "family": "highway",
+    "name": "Force-directed edge bundling (FDEB) with box repulsion",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Force-directed edge bundling for graph visualization",
+        "authors": "Holten, van Wijk",
+        "year": 2009,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01450.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge gets subdivision points. Springs keep each edge smooth. Compatible edges attract their matching points. Boxes repel the points. After the cycles, points of different edges that come within the lane width snap together, and each snapped run with enough edges is a highway.",
+    "math": "F_i = k_p(|p_{i-1}-p_i| + |p_{i+1}-p_i|) + sum_{q compatible} C(P,Q)/|p_i - q_i| - sum_{boxes} repel. C = Ca Cs Cp Cv (angle, scale, position, visibility), keep pairs with C >= 0.6.",
+    "cost": "O(c P I) for c compatible pairs, P points per edge, I steps (6 cycles, P doubles). 100 nodes: 50 to 150 ms. 1000 nodes: 2 to 10 s with a grid for the pairs.",
+    "params": [
+      "compatibility threshold 0.3..0.9",
+      "k spring 0.05..0.5",
+      "cycles 3..8",
+      "points per edge 8..64",
+      "box repulsion 0..4",
+      "snap width 0.5..2 lanes"
+    ],
+    "wins": [
+      "B1",
+      "B7",
+      "B2"
+    ],
+    "risks": [
+      "R9",
+      "B4",
+      "B3",
+      "C5",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if R9 = 0 after snapping and B1 > shared at B3 q95 within 10% on 3 of 5 boards. Drop if 1000 nodes takes > 5x shared.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-006",
+      "HWY-028",
+      "HWY-019"
+    ]
+  },
+  {
+    "id": "HWY-003",
+    "family": "highway",
+    "name": "Multilevel agglomerative edge bundling (MINGLE)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Multilevel agglomerative edge bundling for visualizing large graphs",
+        "authors": "Gansner, Hu, North, Scheidegger",
+        "year": 2011,
+        "url": "https://www.sci.utah.edu/images/people/Alumni/scheidegger/gansner_edge_bundling.pdf"
+      },
+      {
+        "title": "Improved circular layouts",
+        "authors": "Gansner, Koren",
+        "year": 2006,
+        "url": "https://doi.org/10.1007/978-3-540-70904-6_37"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge is a point in 4D (its two ends). A k-nearest-neighbour graph of these points gives merge candidates. Two neighbours merge into one bundle when the ink of the bundle with its two meeting points is less than the sum of their inks. The merges repeat on the coarser graph, level by level.",
+    "math": "Gain(A,B) = ink(A) + ink(B) - ink(A u B). ink(G) = sum |s_i - M1| + |M1 - M2| + sum |M2 - t_i| with M1, M2 the optimal meeting points (Weiszfeld). Merge while gain > 0 and the turn at M1, M2 <= 40 deg.",
+    "cost": "O(m log m) per level with a k-d tree, 4 to 8 levels. 100 nodes: < 10 ms. 1000 nodes: 30 to 100 ms, plus routes of the ramps and trunks.",
+    "params": [
+      "k neighbours 4..16",
+      "max turn 20..60 deg",
+      "levels 1..10",
+      "trunk weight 0.5..1"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "R1"
+    ],
+    "risks": [
+      "B3",
+      "B4",
+      "B6"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B3 q95 <= shared on 3 of 5 boards. Drop if B4 > 1.2 x shared.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-043",
+      "HWY-047",
+      "HWY-045"
+    ]
+  },
+  {
+    "id": "HWY-004",
+    "family": "highway",
+    "name": "Geometry-based edge clustering with a control mesh",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Geometry-based edge clustering for graph visualization",
+        "authors": "Cui, Zhou, Qu, Wong, Li",
+        "year": 2008,
+        "url": "https://doi.org/10.1109/TVCG.2008.135"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A mesh covers the free space. Its edges follow the main local direction of the straight lines. Where many lines cross one mesh edge, their crossing points cluster to a few control points. Each edge goes through the control points of its clusters, so edges of one cluster share a way.",
+    "math": "Grid of cells, dominant direction per cell from the angle histogram of the lines. Constrained Delaunay mesh along those directions. On each mesh edge, k-means of the crossing points, k = ceil(count / capacity).",
+    "cost": "O(m cells_crossed + mesh) . 100 nodes: 10 to 30 ms. 1000 nodes: 100 to 300 ms.",
+    "params": [
+      "cell size 2..8 u",
+      "capacity of a control point 2..32",
+      "merge distance 0.5..3 u"
+    ],
+    "wins": [
+      "B1",
+      "B7",
+      "R1"
+    ],
+    "risks": [
+      "R9",
+      "B4",
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Use the corner graph as the mesh. Keep if B1 > shared on 3 of 5 boards at R9 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-020",
+      "HWY-057"
+    ]
+  },
+  {
+    "id": "HWY-005",
+    "family": "highway",
+    "name": "Winding Roads: grid routing with a reuse discount",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Winding Roads: routing edges into bundles",
+        "authors": "Lambert, Bourqui, Auber",
+        "year": 2010,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01700.x"
+      }
+    ],
+    "step": "router",
+    "mechanism": "A quadtree or Voronoi grid covers the board. Each edge takes a shortest path in the grid. After each pass, the weight of each grid edge drops with its use, so the next pass attracts more edges to the busy grid edges. Shared grid edges become highways.",
+    "math": "w_k(e) = len(e) / (1 + lambda use_{k-1}(e))^gamma. Repeat shortest paths for K passes. Highway = grid edge chain with use >= minSize.",
+    "cost": "O(K m (V log V)) for the grid with V nodes. 100 nodes: 50 ms for K = 3. 1000 nodes: 1 to 3 s.",
+    "params": [
+      "passes K 1..6",
+      "lambda 0..2",
+      "gamma 0.5..2",
+      "grid: quadtree or corner graph"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "B4",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Run it on the corner graph. Keep if 2 passes beat shared (1 pass) on B1 at equal B3 q95 on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-039",
+      "HWY-044",
+      "HWY-034"
+    ]
+  },
+  {
+    "id": "HWY-006",
+    "family": "highway",
+    "name": "Kernel density estimation edge bundling (KDEEB) with an obstacle mask",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Graph bundling by kernel density estimation",
+        "authors": "Hurter, Ersoy, Telea",
+        "year": 2012,
+        "url": "https://doi.org/10.1111/j.1467-8659.2012.03079.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The straight lines or first routes draw a density image. Each sample point of each edge moves up the gradient of the density. The bandwidth shrinks each step, so the edges gather into ridges. Boxes are a mask with zero density and a push out. The final ridges are the highway spines.",
+    "math": "rho(x) = sum_e sum_samples K_h(x - p). p <- p + eps grad rho(p) / |grad rho(p)|. h_{k+1} = 0.7 h_k. Then Laplacian smoothing of each polyline.",
+    "cost": "O(I (S + W H)) for S samples and an image of W x H pixels. 100 nodes: 30 to 80 ms at 256^2. 1000 nodes: 0.3 to 1 s at 512^2.",
+    "params": [
+      "start bandwidth 2..16 u",
+      "decay 0.5..0.9",
+      "steps 5..20",
+      "image size 128..1024",
+      "smoothing 0..1"
+    ],
+    "wins": [
+      "B1",
+      "B7",
+      "B2"
+    ],
+    "risks": [
+      "R9",
+      "B4",
+      "R5",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared and R9 = 0 after the mask on 3 of 5 boards. Drop if the ridges need > 1 s at 1000 nodes in CI.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-007",
+      "HWY-032",
+      "HWY-053"
+    ]
+  },
+  {
+    "id": "HWY-007",
+    "family": "highway",
+    "name": "Fast density bundling: CUBu and FFTEB",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "CUBu: universal real-time bundling for large graphs",
+        "authors": "van der Zwan, Codreanu, Telea",
+        "year": 2016,
+        "url": "https://doi.org/10.1109/TVCG.2016.2515611"
+      },
+      {
+        "title": "FFTEB: edge bundling of huge graphs by the fast Fourier transform",
+        "authors": "Lhuillier, Hurter, Telea",
+        "year": 2017,
+        "url": "https://hal-enac.archives-ouvertes.fr/hal-01533755"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The same advection as KDEEB, but the density comes from a separable kernel (CUBu) or from a product in the frequency domain (FFTEB). Resampling keeps the sample spacing even. This makes a density step cheap enough to run at each zoom.",
+    "math": "rho = splat * K_h. CUBu: two 1D convolutions, O(W H h). FFTEB: rho = IFFT(FFT(splat) . FFT(K_h)), O(W H log(W H)), with no dependence on h.",
+    "cost": "O(I W H log(W H)). 100 nodes: 10 to 30 ms. 1000 nodes: 80 to 250 ms on the CPU at 512^2.",
+    "params": [
+      "as KDEEB",
+      "kernel: separable or FFT",
+      "resample step 0.5..4 u"
+    ],
+    "wins": [
+      "B1",
+      "B7"
+    ],
+    "risks": [
+      "R9",
+      "B4",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Same as KDEEB. Keep only if KDEEB is kept and the FFT form gives the same B1 within 2% at 3x less time.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-006",
+      "HWY-053"
+    ]
+  },
+  {
+    "id": "HWY-008",
+    "family": "highway",
+    "name": "Moving least squares bundling (MLSEB)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "MLSEB: edge bundling using moving least squares approximation",
+        "authors": "Wu, Zeng, Zhu, Yu",
+        "year": 2017,
+        "url": "https://arxiv.org/abs/1709.01221"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each sample point moves to a local least squares fit of the samples of the other edges near it. The weight falls with the distance and the angle. The moves repeat with a shrinking radius. The edges converge onto shared local lines, which become the highway spines.",
+    "math": "For a point p, fit a line or a parabola f to the samples q within r, weights w = exp(-|q-p|^2 / r^2) cos(angle). p <- projection of p on f. r_{k+1} = 0.8 r_k.",
+    "cost": "O(I S k) for k neighbours per sample with a grid. 100 nodes: 20 to 60 ms. 1000 nodes: 0.3 to 1 s.",
+    "params": [
+      "start radius 2..12 u",
+      "decay 0.6..0.9",
+      "steps 3..12",
+      "fit: line or parabola",
+      "angle weight 0..1"
+    ],
+    "wins": [
+      "B1",
+      "B7",
+      "C3"
+    ],
+    "risks": [
+      "R9",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= KDEEB at lower C3 on 3 of 5 boards. It is a second choice behind KDEEB.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-006",
+      "HWY-009"
+    ]
+  },
+  {
+    "id": "HWY-009",
+    "family": "highway",
+    "name": "Skeleton-based edge bundling (SBEB): the skeleton is the spine",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Skeleton-based edge bundling for graph visualization",
+        "authors": "Ersoy, Hurter, Paulovich, Cantareiro, Telea",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2011.233"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A clusterer gives groups of edges. Each group draws a thick shape, the union of its edges with a radius. The medial axis (skeleton) of the shape is the highway spine. Each edge moves toward the skeleton, and the skeleton points where edges join or leave give the ramps.",
+    "math": "Shape = union of disks of radius r along the edges, minus the boxes. Skeleton by the distance transform and its ridge. Attraction p <- p + a (closest skeleton point - p), a falls with the distance.",
+    "cost": "O(groups x W H) for the distance transforms. 100 nodes: 20 to 60 ms. 1000 nodes: 0.2 to 0.8 s.",
+    "params": [
+      "shape radius 1..6 u",
+      "attraction 0..1",
+      "steps 1..10",
+      "clusterer (any of HWY-023 to HWY-031)"
+    ],
+    "wins": [
+      "B1",
+      "B9",
+      "C3",
+      "B6"
+    ],
+    "risks": [
+      "R9",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Compare the skeleton spine against the mean polyline of each cluster. Keep if B6 is lower at equal B1 on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-026",
+      "HWY-025",
+      "HWY-050"
+    ]
+  },
+  {
+    "id": "HWY-010",
+    "family": "highway",
+    "name": "Image-based edge bundles: a highway as a shaded area",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Image-based edge bundles: simplified visualization of large graphs",
+        "authors": "Telea, Ersoy",
+        "year": 2010,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01680.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each cluster of edges is drawn as one smooth area with a shade that is darker at its spine. The single edges disappear at a far zoom. The highway thus has a shape and a width, not only a line. A closer zoom opens the area into lanes.",
+    "math": "Area = offset of the cluster skeleton by the local spread of its edges. Shade = distance to the skeleton / local half width.",
+    "cost": "O(groups x W H). 100 nodes: 20 to 50 ms. 1000 nodes: 0.2 to 0.5 s. A renderer can do it on the GPU.",
+    "params": [
+      "width rule: spread or count",
+      "shade curve",
+      "zoom where lanes open"
+    ],
+    "wins": [
+      "B7",
+      "Z4"
+    ],
+    "risks": [
+      "B4",
+      "B9"
+    ],
+    "placementDependent": true,
+    "screen": "A renderer test, not a measure test. Keep as an output option if B7 drops by 20% on the far view of 3 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-009",
+      "HWY-052"
+    ]
+  },
+  {
+    "id": "HWY-011",
+    "family": "highway",
+    "name": "Divided edge bundling: two-way highways with sides",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Divided edge bundling for directional network data",
+        "authors": "Selassie, Heller, Heer",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2011.190"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Edges of opposite directions in one corridor go on two sides of the spine, as traffic on a road. Edges of one direction attract each other. Edges of opposite direction attract a point at a fixed offset. The highway thus has two carriageways, and a reader sees the direction.",
+    "math": "Target of p_i for an opposite edge q: q_i + o n(q_i), with n the left normal and o the half width. Compatibility as FDEB. Lane order by direction first, then by the lane order of today.",
+    "cost": "The cost of the base method plus O(m). In the lane order only: O(m log m).",
+    "params": [
+      "side offset 1..4 lanes",
+      "rule: left-hand or right-hand traffic"
+    ],
+    "wins": [
+      "B5",
+      "B9",
+      "R1"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": false,
+    "screen": "Boards with edges in both directions: case-many-groups, small-clustered. Keep if B5 drops by 20% at a B1 loss < 5%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-051",
+      "HWY-016"
+    ]
+  },
+  {
+    "id": "HWY-012",
+    "family": "highway",
+    "name": "Edge-path bundling: ride along the routes of a graph path",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Edge-path bundling: a less ambiguous edge bundling approach",
+        "authors": "Wallinger, Archambault, Auber, Nöllenburg, Peltonen",
+        "year": 2022,
+        "url": "https://arxiv.org/abs/2108.05467"
+      },
+      {
+        "title": "Faster edge-path bundling through graph spanners",
+        "authors": "Wallinger, Archambault, Auber, Nöllenburg, Peltonen",
+        "year": 2023,
+        "url": "https://diglib.eg.org/handle/10.1111/cgf14789"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For each long edge, find a shortest path between its ends through other edges of the graph. Its length is at most k times the length of the edge. If such a path exists, the edge rides next to the routes of that path. Bundles then always follow real paths, so they show no false link.",
+    "math": "Weight w(e) = len(e)^d. Process edges by decreasing length. Bundle e = (s,t) along P if len(P) <= k len(e) and no edge of P is bundled. Each middle node is passed at the clearance, never through.",
+    "cost": "O(m (m + n log n)) with Dijkstra per edge, less with a spanner. 100 nodes: 20 to 50 ms. 1000 nodes: 1 to 4 s, 0.2 to 0.6 s with the spanner.",
+    "params": [
+      "k max distortion 1.5..4",
+      "d edge weight power 1..3",
+      "spanner stretch 1.5..3"
+    ],
+    "wins": [
+      "B4",
+      "B1"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "R8",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B4 < 0.5 x shared at B1 >= 0.8 x shared on 3 of 5 boards, with R9 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-049",
+      "HWY-021",
+      "HWY-030"
+    ]
+  },
+  {
+    "id": "HWY-013",
+    "family": "highway",
+    "name": "Confluent drawings: junctions as train tracks",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Confluent drawings: visualizing non-planar diagrams in a planar way",
+        "authors": "Dickerson, Eppstein, Goodrich, Meng",
+        "year": 2005,
+        "url": "https://arxiv.org/abs/cs/0212046"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Edges merge smoothly at junctions, as train tracks. A biclique of edges between node sets A and B becomes one track. The track has a merge junction near the first set and a split junction near the second set. A path from u to v that turns smoothly at each junction is an edge, so the drawing is exact.",
+    "math": "Find bicliques K(A,B) with |A| |B| >= q. Replace |A| |B| edges by |A| + |B| + 1 curves. Junction angles below the smooth limit. Recognition is NP-hard in general, so use a greedy biclique search.",
+    "cost": "Greedy bicliques O(m deg). 100 nodes: < 10 ms. 1000 nodes: 20 to 80 ms, plus the routes.",
+    "params": [
+      "min biclique size q 4..16",
+      "junction distance from the boxes 1..6 u"
+    ],
+    "wins": [
+      "B1",
+      "B4",
+      "R1",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "B6"
+    ],
+    "placementDependent": false,
+    "screen": "Boards with dense key groups: case-dense-groups, mid-fanout. Keep if R1 drops by 15% with B4 = 0 for the confluent tracks.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-014",
+      "HWY-030",
+      "HWY-049"
+    ]
+  },
+  {
+    "id": "HWY-014",
+    "family": "highway",
+    "name": "Edge compression: modules and power graphs",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Edge compression techniques for visualization of dense directed graphs",
+        "authors": "Dwyer, Henry Riche, Marriott, Mears",
+        "year": 2013,
+        "url": "https://ialab.it.monash.edu/~timd/Dwyer2013EdgeCompression.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Nodes with the same neighbours form a module. All edges between two modules become one power edge, drawn as one highway from module to module. Nested modules give nested highways. The compression is lossless, so the highway is exact.",
+    "math": "Modular decomposition in O(n + m). Power graph: greedy merge of node sets by the count of edges saved, |A||B| - 1 for each new power edge.",
+    "cost": "O(n + m) for modules. Power graph greedy O(m^1.5). 100 nodes: < 10 ms. 1000 nodes: 20 to 200 ms.",
+    "params": [
+      "min edges saved 2..16",
+      "nesting depth 1..4",
+      "module source: exact or near (Jaccard >= 0.8)"
+    ],
+    "wins": [
+      "B4",
+      "B1",
+      "R1"
+    ],
+    "risks": [
+      "B3",
+      "G5"
+    ],
+    "placementDependent": false,
+    "screen": "Boards with real modules: mid-fanout, case-dense-groups. Keep if the edges in power edges are > 20% with B4 = 0 on 2 of 2 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-013",
+      "HWY-030",
+      "HWY-049"
+    ]
+  },
+  {
+    "id": "HWY-015",
+    "family": "highway",
+    "name": "Stub bundling at both ends",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Stub bundling and confluent spirals for geographic networks",
+        "authors": "Nocaj, Brandes",
+        "year": 2013,
+        "url": "https://kops.uni-konstanz.de/entities/publication/2cad6ab7-003a-4c25-9fc6-025887b6baf7"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Edges bundle only near their ends. At a node, the edges that leave within an angle window share a short stub. The middle of each edge stays its own. The stubs show the fan of each node with no ambiguity in the middle. The router trunks does this at the source today, and this idea adds the target side.",
+    "math": "At node v, sort the edges by angle. Group runs with an angle spread <= omega. Stub length = min(sigma span, half the distance to the nearest target). Each edge has at most one turn point between its two stubs.",
+    "cost": "O(m log m). 100 nodes: < 5 ms. 1000 nodes: < 20 ms, plus the routes.",
+    "params": [
+      "angle window omega 10..60 deg",
+      "stub share sigma 0.1..0.4",
+      "ends: source, target or both",
+      "minSize 2..8"
+    ],
+    "wins": [
+      "R11",
+      "B2",
+      "B4"
+    ],
+    "risks": [
+      "B1",
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B4 <= trunks and B1 >= trunks on 3 of 5 boards with the stubs at both ends.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-037",
+      "HWY-050"
+    ]
+  },
+  {
+    "id": "HWY-016",
+    "family": "highway",
+    "name": "Ordered bundles with channel capacity (metro-line style)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Edge routing with ordered bundles",
+        "authors": "Pupyrev, Nachmanson, Bereg, Holroyd",
+        "year": 2016,
+        "url": "https://arxiv.org/abs/1209.4227"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Routes go through a sparse graph of the free space with a discount on shared links, as the router shared does. A channel between two boxes has a capacity from its width. A link whose lanes do not fit costs more, so a highway does not enter a gap that is too narrow. Lanes get a metro-line order.",
+    "math": "cost(e) = len(e) (1 - discount [shared]) + mu max(0, lanes(e) w - width(e)). Lane order by the metro-line crossing minimization of the common subpaths.",
+    "cost": "As shared plus O(1) per link. 100 nodes: as shared + 5%. 1000 nodes: as shared + 10%.",
+    "params": [
+      "discount 0.05..1",
+      "lane width w 2..8",
+      "capacity penalty mu 0..10"
+    ],
+    "wins": [
+      "M4",
+      "B5",
+      "R8"
+    ],
+    "risks": [
+      "B1",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: packedGridBoard and case-dense-groups. Keep if M4 drops by 50% at a B1 loss < 10% against shared.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-051",
+      "HWY-057",
+      "HWY-039"
+    ]
+  },
+  {
+    "id": "HWY-017",
+    "family": "highway",
+    "name": "Flow maps with spiral trees for a fan-out",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Flow map layout via spiral trees",
+        "authors": "Buchin, Speckmann, Verbeek",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2011.202"
+      },
+      {
+        "title": "Flow map layout",
+        "authors": "Phan, Xiao, Yeh, Hanrahan, Winograd",
+        "year": 2005,
+        "url": "https://doi.org/10.1109/INFVIS.2005.1532150"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "One source node with many targets gets a branching tree. Each branch is a spiral arc with a fixed angle to the source, so each target path goes away from the source all the time. The tree avoids the boxes. Its trunk and its branches are the highway, with the flow as the width.",
+    "math": "Spiral tree: approximate Steiner arborescence where each path makes angle <= alpha with the line to the root. Merge the two targets with the largest join point first. Width of a branch = k^(1/2) times the lane width, or the count of lanes.",
+    "cost": "O(k log k) per source with k targets, plus the box test. 100 nodes: < 10 ms. 1000 nodes: 20 to 80 ms.",
+    "params": [
+      "spiral angle alpha 10..40 deg",
+      "min targets 3..20",
+      "width rule: lanes or sqrt"
+    ],
+    "wins": [
+      "B1",
+      "B6",
+      "R4",
+      "B2"
+    ],
+    "risks": [
+      "R8",
+      "R9",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: mid-fanout and case-hub-chain. Keep if B1 > trunks by 10% at a lower B6 with R9 = 0.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-037",
+      "HWY-036",
+      "HWY-015"
+    ]
+  },
+  {
+    "id": "HWY-018",
+    "family": "highway",
+    "name": "Clustered edge routing with the WSPD",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Clustered edge routing",
+        "authors": "Bouts, Speckmann",
+        "year": 2015,
+        "url": "https://doi.org/10.1109/PACIFICVIS.2015.7156356"
+      },
+      {
+        "title": "A decomposition of multidimensional point sets with applications to k-nearest-neighbors and n-body potential fields",
+        "authors": "Callahan, Kosaraju",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/200836.200853"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A well-separated pair decomposition splits all node pairs into pairs of compact sets (A,B), far apart compared with their size. All edges from A to B form one cluster, and each cluster gets one highway from A to B on a sparse visibility graph. The clusters are compatible by proof.",
+    "math": "Pairs (A,B) with dist(A,B) >= s max(diam A, diam B). O(s^2 n) pairs. Each edge is in exactly one pair. Highway of (A,B) if it has >= minSize edges.",
+    "cost": "O(n log n + s^2 n) for the WSPD, O(m) to assign. 100 nodes: < 10 ms. 1000 nodes: 20 to 60 ms, plus the routes.",
+    "params": [
+      "separation s 1..8",
+      "minSize 2..16",
+      "spanner stretch 1.1..2"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "Z10"
+    ],
+    "risks": [
+      "B3",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared at B3 q95 <= shared on 3 of 5 boards. Check Z10 against shared.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-023",
+      "HWY-056",
+      "HWY-045"
+    ]
+  },
+  {
+    "id": "HWY-019",
+    "family": "highway",
+    "name": "Attribute-driven bundling: soft keys",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Attribute-driven edge bundling for general graphs with applications in trail analysis",
+        "authors": "Peysakhovich, Hurter, Telea",
+        "year": 2015,
+        "url": "https://doi.org/10.1109/PACIFICVIS.2015.7156354"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Today a key splits the edges into hard groups. Here the key is one more term of the distance between two edges. Other data, for example a weight or a time, add more terms. Edges with other keys can still share a highway when they are very near. Edges with one key do not bundle when they are far.",
+    "math": "d(e,f) = d_geom(e,f) + lambda [key(e) != key(f)] + sum_a w_a |a(e) - a(f)|. Any clusterer of this note takes d.",
+    "cost": "The cost of the clusterer. O(1) more per pair.",
+    "params": [
+      "key weight lambda 0..inf (inf = today)",
+      "attribute weights 0..4"
+    ],
+    "wins": [
+      "B1",
+      "B2"
+    ],
+    "risks": [
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Boards with keys: mid-fanout, case-dense-groups. Sweep lambda. Keep if a finite lambda gives a Pareto point of (B1, B4) that the hard key does not give.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-028",
+      "HWY-049"
+    ]
+  },
+  {
+    "id": "HWY-020",
+    "family": "highway",
+    "name": "Route-aware bundling on the corner graph",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Route-aware edge bundling for visualizing origin-destination trails in urban traffic",
+        "authors": "Zeng, Shen, Jiang, Telea",
+        "year": 2019,
+        "url": "https://diglib.eg.org/handle/10.1111/cgf13712"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The density of the edges is spread on the links of the corner graph, not on pixels. A diffusion along the graph smooths it. Then each edge takes a shortest path where a dense link costs less. Highways appear on the dense links, and they always stay in the free space.",
+    "math": "rho_0(l) = number of first routes on link l. rho_{k+1} = (1 - a) rho_k + a mean_{l' adjacent} rho_k(l'). cost(l) = len(l) / (1 + lambda rho(l))^gamma.",
+    "cost": "O(K L + m L log L) for L links. 100 nodes: 30 to 60 ms. 1000 nodes: 0.5 to 1.5 s.",
+    "params": [
+      "diffusion a 0..0.5",
+      "diffusion steps K 0..10",
+      "lambda 0..2",
+      "gamma 0.5..2"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "R9"
+    ],
+    "risks": [
+      "B3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared at the same B3 q95 on 3 of 5 boards, with R9 = 0 by design.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-034",
+      "HWY-005",
+      "HWY-006"
+    ]
+  },
+  {
+    "id": "HWY-021",
+    "family": "highway",
+    "name": "Spectral bundling by effective resistance",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Fast and faithful edge bundling using spectral sparsification",
+        "authors": "Jiang, Hong, Meidiana, Zeng",
+        "year": 2026,
+        "url": "https://arxiv.org/abs/2604.26994"
+      },
+      {
+        "title": "Graph sparsification by effective resistances",
+        "authors": "Spielman, Srivastava",
+        "year": 2011,
+        "url": "https://arxiv.org/abs/0803.0929"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The effective resistance of an edge in the graph tells if other paths join its ends. An edge with a low resistance lies in a dense part, so a bundle with its neighbours hides little. An edge with a high resistance is a bridge and stays alone. The resistance thus scales the compatibility of each pair.",
+    "math": "R(u,v) = (e_u - e_v)^T L^+ (e_u - e_v). Approximate with a few random projections and a Laplacian solver. C'(e,f) = C(e,f) (1 - R_e R_f).",
+    "cost": "O(m log n / eps^2) with random projections. 100 nodes: 10 to 30 ms. 1000 nodes: 100 to 400 ms with a simple conjugate gradient.",
+    "params": [
+      "projections 8..64",
+      "resistance weight 0..1",
+      "sparsify: on or off"
+    ],
+    "wins": [
+      "B4",
+      "B1"
+    ],
+    "risks": [
+      "B2"
+    ],
+    "placementDependent": false,
+    "screen": "Boards: small-clustered, case-dense-groups, mid-clustered. Keep if B4 drops by 20% at a B1 loss < 10% with any base clusterer.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-012",
+      "HWY-049",
+      "HWY-030"
+    ]
+  },
+  {
+    "id": "HWY-022",
+    "family": "highway",
+    "name": "Bundled crossings",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Bundled crossings in embedded graphs",
+        "authors": "Fink, Hershberger, Suri, Verbeek",
+        "year": 2016,
+        "url": "https://doi.org/10.1007/978-3-662-49529-2_34"
+      },
+      {
+        "title": "The bundled crossing number",
+        "authors": "Alam, Fink, Pupyrev",
+        "year": 2016,
+        "url": "https://arxiv.org/abs/1608.08161"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Where a group of parallel edges crosses another group, all the crossings happen in one block. The model is two roads that cross at one bridge. The rule moves the crossings of two highways to one place. The reader thus sees one bundled crossing and not many single ones.",
+    "math": "Partition the crossings into bundled crossings (two bundles crossing as a complete crossbar). Minimum is NP-hard, an O(1) approximation exists for fixed embeddings. Greedy: grow a crossbar while the lanes stay parallel.",
+    "cost": "O(X log X) for X crossings, greedy. 100 nodes: < 10 ms. 1000 nodes: 20 to 100 ms.",
+    "params": [
+      "parallel tolerance 5..20 deg",
+      "min crossbar 2x2..4x4"
+    ],
+    "wins": [
+      "R1",
+      "R2",
+      "B5"
+    ],
+    "risks": [
+      "B3",
+      "R4"
+    ],
+    "placementDependent": true,
+    "screen": "Boards with crossing highways: case-many-groups, mid-uniform. Measure the count of crossing blocks. Keep if the blocks drop by 30% at an R5 rise < 3%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-016",
+      "HWY-051"
+    ]
+  },
+  {
+    "id": "HWY-023",
+    "family": "highway",
+    "name": "End point clustering in 4D (flow clustering)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Mapping large spatial flow data with hierarchical clustering",
+        "authors": "Zhu, Guo",
+        "year": 2014,
+        "url": "https://metatoc.com/papers/43809-mapping-large-spatial-flow-data-with-hierarchical-clustering"
+      },
+      {
+        "title": "Multilevel agglomerative edge bundling for visualizing large graphs",
+        "authors": "Gansner, Hu, North, Scheidegger",
+        "year": 2011,
+        "url": "https://www.sci.utah.edu/images/people/Alumni/scheidegger/gansner_edge_bundling.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge is a 4D point: its source and its target. Two edges are near when both their sources and their targets are near, relative to their length. A hierarchical clustering with this distance gives groups of edges that go from one area to another area. Each group with enough edges is a highway.",
+    "math": "d(e,f) = max(|s_e - s_f|, |t_e - t_f|) / min(len e, len f), and min with the swapped ends for undirected edges. Average linkage, cut at d <= tau.",
+    "cost": "O(m log m) with a k-d tree in 4D and a sparse linkage. 100 nodes: < 10 ms. 1000 nodes: 20 to 80 ms.",
+    "params": [
+      "tau 0.1..0.6",
+      "linkage: average, complete, single",
+      "directed: yes or no",
+      "minSize 2..16"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B4"
+    ],
+    "risks": [
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= trunks and B4 <= shared on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-018",
+      "HWY-026",
+      "HWY-028"
+    ]
+  },
+  {
+    "id": "HWY-024",
+    "family": "highway",
+    "name": "Hough voting for corridors",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Use of the Hough transformation to detect lines and curves in pictures",
+        "authors": "Duda, Hart",
+        "year": 1972,
+        "url": "https://doi.org/10.1145/361237.361242"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each straight line of an edge votes for its line parameters (angle, offset) in an accumulator, with a weight of its length. Each peak of the votes is a corridor that many edges follow. The edges near a peak join its highway, and the highway runs over the common span of their projections.",
+    "math": "theta = atan2(dy,dx) mod pi, rho = x cos theta + y sin theta. Vote with a Gaussian of widths (d theta, d rho). Peaks by non-maximum suppression. An edge joins a peak if |theta - theta_p| <= d theta and |rho - rho_p| <= d rho.",
+    "cost": "O(m B) for B bins of the vote kernel. 100 nodes: < 5 ms. 1000 nodes: 10 to 30 ms.",
+    "params": [
+      "d theta 3..20 deg",
+      "d rho 1..8 u",
+      "min votes 2..16",
+      "orthogonal mode: theta in {0, 90}"
+    ],
+    "wins": [
+      "B1",
+      "R14",
+      "B2"
+    ],
+    "risks": [
+      "B3",
+      "B4",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > 0.8 x shared at 1/10 of its time on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-058",
+      "HWY-023"
+    ]
+  },
+  {
+    "id": "HWY-025",
+    "family": "highway",
+    "name": "Segment clustering of the first routes (TRACLUS)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Trajectory clustering: a partition-and-group framework",
+        "authors": "Lee, Han, Whang",
+        "year": 2007,
+        "url": "https://doi.org/10.1145/1247480.1247546"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each first route breaks into a few long segments by a minimum description length rule. Segments that are near in distance and angle cluster by density. Each dense cluster of segments from enough edges is a highway section, and its representative line is the spine. One edge can join several highways along its way.",
+    "math": "Distance of segments: d = w_perp d_perp + w_par d_par + w_theta d_theta. DBSCAN with eps and minLns. Representative: sweep along the mean direction, average the segments that cover each point.",
+    "cost": "O(S log S) with a grid for S segments. 100 nodes: 10 to 30 ms. 1000 nodes: 80 to 250 ms, plus one run of corners.",
+    "params": [
+      "eps 1..6 u",
+      "minLns 2..16",
+      "weights w_perp, w_par, w_theta 0..2",
+      "MDL cost ratio 0.5..2"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "B9"
+    ],
+    "risks": [
+      "B3",
+      "B6",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B3 q95 <= shared on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-031",
+      "HWY-050",
+      "HWY-027"
+    ]
+  },
+  {
+    "id": "HWY-026",
+    "family": "highway",
+    "name": "QuickBundles: one pass with a distance threshold",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "QuickBundles, a method for tractography simplification",
+        "authors": "Garyfallidis, Brett, Correia, Williams, Nimmo-Smith",
+        "year": 2012,
+        "url": "https://doi.org/10.3389/fnins.2012.00175"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Each edge (straight line or first route) resamples to K points. In one pass, an edge joins the nearest cluster whose centroid is within a threshold, else it starts a new cluster. The centroid line of each cluster is the highway spine. The pass is online, so an added edge does not change the old clusters.",
+    "math": "MDF(e,f) = min(mean_i |e_i - f_i|, mean_i |e_i - f_{K-1-i}|). Join if MDF <= theta, update the centroid as a running mean.",
+    "cost": "O(m c K) for c clusters. 100 nodes: < 5 ms. 1000 nodes: 10 to 50 ms.",
+    "params": [
+      "theta 1..10 u",
+      "K points 6..24",
+      "input: lines or first routes",
+      "order: input order or by length"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "Z10"
+    ],
+    "risks": [
+      "B3",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at 1/5 of its time on 3 of 5 boards. The Z10 moved share must also be below shared.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-025",
+      "HWY-009",
+      "HWY-054"
+    ]
+  },
+  {
+    "id": "HWY-027",
+    "family": "highway",
+    "name": "Subtrajectory clustering by Fréchet distance",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Detecting commuting patterns by clustering subtrajectories",
+        "authors": "Buchin, Buchin, Gudmundsson, Löffler, Luo",
+        "year": 2011,
+        "url": "https://doi.org/10.1142/S0218195911003638"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Find each subpath that at least k first routes follow within a Fréchet distance eps. Such a subpath is a highway with k lanes, and its length is as long as possible. The method finds shared parts of routes that start and end in different places.",
+    "math": "Find the longest subpath P of a route with >= k other subroutes within Fréchet distance eps of P. Exact is O(n^3 k) in the worst case. Use the free space diagram with a grid of candidate starts.",
+    "cost": "O(m^2 p^2) for p points per route in the worst case. 100 nodes: 0.1 to 0.5 s. 1000 nodes: 10 s or more, so only below 300 nodes.",
+    "params": [
+      "eps 1..6 u",
+      "k min lanes 2..8",
+      "min length 2..20 u"
+    ],
+    "wins": [
+      "B9",
+      "B1",
+      "B8"
+    ],
+    "risks": [
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Small boards only: the case boards and small-clustered. Use it as a reference for TRACLUS and corridor signatures. Keep as a reference if its B1 is > 1.1 x theirs.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "HWY-025",
+      "HWY-031",
+      "HWY-040"
+    ]
+  },
+  {
+    "id": "HWY-028",
+    "family": "highway",
+    "name": "HDBSCAN on edges with a compatibility distance",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Density-based clustering based on hierarchical density estimates",
+        "authors": "Campello, Moulavi, Sander",
+        "year": 2013,
+        "url": "https://doi.org/10.1007/978-3-642-37456-2_14"
+      },
+      {
+        "title": "Force-directed edge bundling for graph visualization",
+        "authors": "Holten, van Wijk",
+        "year": 2009,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01450.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The distance between two edges is 1 minus their FDEB compatibility, or the 4D end point distance. HDBSCAN builds the tree of all density levels and keeps the clusters that live over a long range. Noise edges stay alone. The kept clusters are the highways, with no fixed count.",
+    "math": "d(e,f) = 1 - Ca Cs Cp Cv. Mutual reachability d_m = max(core_k(e), core_k(f), d). Minimum spanning tree, condensed tree, stability = sum (lambda_leave - lambda_birth).",
+    "cost": "O(m log m) with a k-d tree on 4D, O(m^2) with the compatibility. 100 nodes: 10 to 40 ms. 1000 nodes: 0.1 to 2 s.",
+    "params": [
+      "min cluster size 2..16",
+      "min samples k 1..8",
+      "distance: compatibility or 4D"
+    ],
+    "wins": [
+      "B1",
+      "B4",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared and B4 <= shared on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-023",
+      "HWY-002",
+      "HWY-053"
+    ]
+  },
+  {
+    "id": "HWY-029",
+    "family": "highway",
+    "name": "Spectral clustering of the compatibility graph",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "A tutorial on spectral clustering",
+        "authors": "von Luxburg",
+        "year": 2007,
+        "url": "https://arxiv.org/abs/0711.0189"
+      },
+      {
+        "title": "Force-directed edge bundling for graph visualization",
+        "authors": "Holten, van Wijk",
+        "year": 2009,
+        "url": "https://doi.org/10.1111/j.1467-8659.2009.01450.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A graph has one vertex for each edge of the board, and a weight for each compatible pair. A spectral cut splits this graph into groups with many strong pairs inside them. The eigengap gives the count of highways, so the count is not a guess.",
+    "math": "W_ef = C(e,f) if C >= c0. L_sym = I - D^-1/2 W D^-1/2. k = argmax eigengap. k-means on the first k eigenvectors.",
+    "cost": "O(nnz(W) k t) with Lanczos. 100 nodes: 20 to 50 ms. 1000 nodes: 0.3 to 1.5 s.",
+    "params": [
+      "c0 0.2..0.8",
+      "k: eigengap or fixed 2..64"
+    ],
+    "wins": [
+      "B1",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > HDBSCAN on 3 of 5 boards. It is a second choice behind HDBSCAN.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-028",
+      "HWY-021"
+    ]
+  },
+  {
+    "id": "HWY-030",
+    "family": "highway",
+    "name": "Link communities on the line graph",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Link communities reveal multiscale complexity in networks",
+        "authors": "Ahn, Bagrow, Lehmann",
+        "year": 2010,
+        "url": "https://arxiv.org/abs/0903.3178"
+      },
+      {
+        "title": "Line graphs, link partitions and overlapping communities",
+        "authors": "Evans, Lambiotte",
+        "year": 2009,
+        "url": "https://arxiv.org/abs/0903.2181"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Two edges that share a node are similar when their other ends have similar neighbours. A clustering of the edges with this similarity gives link communities, which can overlap in the nodes. A link community is a set of edges that belong together in the graph, so its highway shows no false link.",
+    "math": "S(e_ik, e_jk) = |N+(i) n N+(j)| / |N+(i) u N+(j)|. Single linkage, cut at the best partition density D = 2/m sum m_c (m_c - n_c + 1) / ((n_c - 2)(n_c - 1)).",
+    "cost": "O(n k_max^2) for the pairs. 100 nodes: < 10 ms. 1000 nodes: 20 to 100 ms.",
+    "params": [
+      "cut: best density or a fixed share",
+      "min community 2..16",
+      "geometry check: max spread 2..10 u"
+    ],
+    "wins": [
+      "B4",
+      "G1"
+    ],
+    "risks": [
+      "B1",
+      "B3"
+    ],
+    "placementDependent": false,
+    "screen": "Boards: small-clustered, mid-clustered, case-dense-groups. Keep if B4 < 0.6 x shared at B1 >= 0.7 x shared.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-012",
+      "HWY-013",
+      "HWY-014"
+    ]
+  },
+  {
+    "id": "HWY-031",
+    "family": "highway",
+    "name": "Corridor signatures: overlap of the first routes",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "On the resemblance and containment of documents",
+        "authors": "Broder",
+        "year": 1997,
+        "url": "https://doi.org/10.1109/SEQUEN.1997.666900"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Route each edge alone first (corners). The signature of a route is its list of corner graph links. Two edges overlap by the length of their common links. Edges whose overlap is long make a cluster, and the common run of their links is the highway. MinHash finds the pairs fast.",
+    "math": "ov(e,f) = sum len(l) over l in links(e) n links(f). Join if ov >= max(L*, rho min(len e, len f)). MinHash with h hashes and b bands finds candidates with Jaccard >= j0. Union-find for the clusters, then the longest common run in order.",
+    "cost": "O(m h + candidates p). 100 nodes: < 10 ms after corners. 1000 nodes: 20 to 60 ms after corners.",
+    "params": [
+      "rho share 0.1..0.8",
+      "minSize 2..16",
+      "hashes h 16..128",
+      "bands b 4..32",
+      "near links: same link or within 1 lane"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B3",
+      "B8"
+    ],
+    "risks": [
+      "B4",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at B3 q95 <= 0.95 x shared on 3 of 5 boards. This is the first idea to screen.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-025",
+      "HWY-034",
+      "HWY-047",
+      "HWY-050"
+    ]
+  },
+  {
+    "id": "HWY-032",
+    "family": "highway",
+    "name": "Ridges of the line density in one pass",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Edge detection and ridge detection with automatic scale selection",
+        "authors": "Lindeberg",
+        "year": 1998,
+        "url": "https://doi.org/10.1023/A:1008097225773"
+      },
+      {
+        "title": "Graph bundling by kernel density estimation",
+        "authors": "Hurter, Ersoy, Telea",
+        "year": 2012,
+        "url": "https://doi.org/10.1111/j.1467-8659.2012.03079.x"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Draw the density of the straight lines or of the first routes once, with no advection. Find its ridges with the Hessian. A ridge with a high density and a length above a limit is a highway spine. Edges near a ridge snap to it between their nearest entry and exit points.",
+    "math": "Ridge where the larger eigenvalue of the Hessian of rho is negative and the gradient along its eigenvector is zero. Strength = rho times |lambda|. Keep ridges with strength >= s0 and length >= l0.",
+    "cost": "O(W H) for one blur and one Hessian. 100 nodes: 5 to 20 ms. 1000 nodes: 30 to 100 ms.",
+    "params": [
+      "bandwidth 1..8 u",
+      "s0 strength",
+      "l0 min length 2..20 u",
+      "image size 128..1024"
+    ],
+    "wins": [
+      "B1",
+      "B7"
+    ],
+    "risks": [
+      "R9",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x KDEEB at 1/5 of its time on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-006",
+      "HWY-053"
+    ]
+  },
+  {
+    "id": "HWY-033",
+    "family": "highway",
+    "name": "Territory aggregation of flows",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Spatial generalization and aggregation of massive movement data",
+        "authors": "Andrienko, Andrienko",
+        "year": 2011,
+        "url": "https://openaccess.city.ac.uk/id/eprint/7614"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Characteristic points (the plugs, the bends of the first routes) cluster by distance. The cluster centres make Voronoi cells. Each route becomes a list of cell crossings, and the counts give a flow between neighbour cells. Strong flows between cells are the highways, and the cell centres are the interchanges.",
+    "math": "Points -> groups of radius r -> centroids -> Voronoi. flow(c, c') = count of routes that cross from c to c'. Highway segment where flow >= minSize. The radius r sets the scale.",
+    "cost": "O(P log P) for P points. 100 nodes: 10 to 20 ms. 1000 nodes: 50 to 150 ms.",
+    "params": [
+      "radius r 2..20 u",
+      "minSize 2..16",
+      "points: plugs, bends or both"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "Z9"
+    ],
+    "risks": [
+      "B3",
+      "R9"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Also run it at 3 radii as 3 zoom levels. Keep if Z9 improves with B1 >= shared.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-052",
+      "HWY-060",
+      "HWY-056"
+    ]
+  },
+  {
+    "id": "HWY-034",
+    "family": "highway",
+    "name": "Route betweenness on the corner graph (road classes)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Highway hierarchies hasten exact shortest path queries",
+        "authors": "Sanders, Schultes",
+        "year": 2005,
+        "url": "https://doi.org/10.1007/11561071_51"
+      },
+      {
+        "title": "A faster algorithm for betweenness centrality",
+        "authors": "Brandes",
+        "year": 2001,
+        "url": "https://doi.org/10.1080/0022250X.2001.9990249"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Count how many first routes use each link of the corner graph. Links with a high count form the highway network, as the main roads of a road map. A second routing pass gives these links a discount, so more edges join them. Road classes come from quantiles of the count.",
+    "math": "use(l) = |{e : l in route(e)}|. Highway links H = {l : use(l) >= max(minSize, q_p(use))}. Second pass cost(l) = len(l) (1 - delta [l in H]).",
+    "cost": "Two runs of corners plus O(sum route links). 100 nodes: 2 x corners. 1000 nodes: 2 x corners + 10 ms.",
+    "params": [
+      "quantile p 0.8..0.99",
+      "minSize 2..16",
+      "discount delta 0.1..0.8",
+      "classes 1..3"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "B8",
+      "Z10"
+    ],
+    "risks": [
+      "B3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= shared at B3 q95 <= shared on 3 of 5 boards, and Z10 moved share <= shared.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-005",
+      "HWY-020",
+      "HWY-031",
+      "HWY-044"
+    ]
+  },
+  {
+    "id": "HWY-035",
+    "family": "highway",
+    "name": "Consensus of clusterings",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Cluster ensembles: a knowledge reuse framework for combining multiple partitions",
+        "authors": "Strehl, Ghosh",
+        "year": 2002,
+        "url": "https://www.jmlr.org/papers/v3/strehl02a.html"
+      },
+      {
+        "title": "Combining multiple clusterings using evidence accumulation",
+        "authors": "Fred, Jain",
+        "year": 2005,
+        "url": "https://doi.org/10.1109/TPAMI.2005.113"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Several clusterers (or one clusterer with several seeds and thresholds) each give highways. A pair of edges gets one vote for each clustering that puts them in one highway. A final clustering of the vote matrix keeps only the pairs that most runs agree on. The result is stable after small edits.",
+    "math": "Co-association A_ef = (1/R) sum_r [c_r(e) = c_r(f)]. Single or average linkage on 1 - A, cut at 0.5.",
+    "cost": "R times the base cost plus O(pairs). 100 nodes: R x base. 1000 nodes: R x base + 20 ms.",
+    "params": [
+      "runs R 3..20",
+      "members: which clusterers",
+      "cut 0.3..0.8"
+    ],
+    "wins": [
+      "Z10",
+      "B4"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if Z10 moved share drops by 30% against the best member at a B1 loss < 5%.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-054",
+      "HWY-045"
+    ]
+  },
+  {
+    "id": "HWY-036",
+    "family": "highway",
+    "name": "Obstacle-avoiding rectilinear Steiner tree for a group",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "On Steiner's problem with rectilinear distance",
+        "authors": "Hanan",
+        "year": 1966,
+        "url": "https://doi.org/10.1137/0114025"
+      },
+      {
+        "title": "FLUTE: fast lookup table based rectilinear Steiner minimal tree algorithm for VLSI design",
+        "authors": "Chu, Wong",
+        "year": 2008,
+        "url": "https://doi.org/10.1109/TCAD.2007.907068"
+      },
+      {
+        "title": "Orthogonal hyperedge routing",
+        "authors": "Wybrow, Marriott, Stuckey",
+        "year": 2012,
+        "url": "https://doi.org/10.1007/978-3-642-31223-6_10"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The plugs of a group of edges (one source and its targets, or a key group) are the terminals. A rectilinear Steiner tree joins them with the least length around the boxes. The tree is the highway network of the group, with the Steiner points as junctions. Diagram editors route hyperedges this way.",
+    "math": "Candidate Steiner points on the Hanan grid of the terminals and the box corners. Iterated 1-Steiner or FLUTE tables for small groups, then a repair around the boxes.",
+    "cost": "O(k^2 log k) per group of k terminals with iterated 1-Steiner. 100 nodes: < 20 ms. 1000 nodes: 50 to 200 ms.",
+    "params": [
+      "max group 3..32",
+      "Steiner method: 1-Steiner or FLUTE-like",
+      "orthogonal or octilinear"
+    ],
+    "wins": [
+      "B1",
+      "R14",
+      "B2"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: mid-fanout, case-hub-chain. Keep if B1 > trunks by 10% with R7 = 0 and B3 q95 < 1.5.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-037",
+      "HWY-017",
+      "HWY-058"
+    ]
+  },
+  {
+    "id": "HWY-037",
+    "family": "highway",
+    "name": "Steiner arborescence for a fan-out",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "The rectilinear Steiner arborescence problem",
+        "authors": "Rao, Sadayappan, Hwang, Shor",
+        "year": 1992,
+        "url": "https://doi.org/10.1007/BF01758754"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For one source and many targets, build a tree where each target path is a shortest path from the source. The tree shares as much as it can without a detour. Each target thus keeps its direct length, and the shared trunk saves ink. It is the monotone form of the trunk of today.",
+    "math": "Rectilinear Steiner arborescence: greedy merge of the two points p, q whose meet point (min x, min y in the quadrant frame) is farthest from the root. Ratio 2 to the optimum.",
+    "cost": "O(k log k) per source. 100 nodes: < 5 ms. 1000 nodes: 10 to 30 ms.",
+    "params": [
+      "min targets 2..20",
+      "quadrant split: 4 or by angle",
+      "max stretch 1.0..1.3"
+    ],
+    "wins": [
+      "B1",
+      "B3",
+      "R5"
+    ],
+    "risks": [
+      "R9",
+      "R8"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: mid-fanout, small-clustered. Keep if B3 q95 <= 1.05 with B1 >= trunks on 2 of 2 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-017",
+      "HWY-036",
+      "HWY-015"
+    ]
+  },
+  {
+    "id": "HWY-038",
+    "family": "highway",
+    "name": "Branched transport: cost f^alpha (Gilbert, Xia)",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Minimum cost communication networks",
+        "authors": "Gilbert",
+        "year": 1967,
+        "url": "https://doi.org/10.1002/j.1538-7305.1967.tb03174.x"
+      },
+      {
+        "title": "Optimal paths related to transport problems",
+        "authors": "Xia",
+        "year": 2003,
+        "url": "https://www.math.ucdavis.edu/~saito/data/optxport/CCMtransport.pdf"
+      },
+      {
+        "title": "Optimal transportation networks: models and theory",
+        "authors": "Bernot, Caselles, Morel",
+        "year": 2009,
+        "url": "https://doi.org/10.1007/978-3-540-69315-4"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A link that carries f edges costs f^alpha times its length, with alpha between 0 and 1. A smaller alpha rewards sharing more. The best network has closed-form merge angles and a closed-form rule for when two edges merge. One number, alpha, thus sets when highways form, where they merge and how wide they are.",
+    "math": "Cost = sum_l f_l^alpha len_l. Two equal flows merge at a half angle theta with cos theta = 2^(alpha-1) (alpha 0: 60 deg, 0.5: 45 deg). Two parallel edges at gap d merge if their overlap L > d sqrt((2+t)/(2-t)), t = 2^alpha.",
+    "cost": "Local search over the merge points: O(m log m) per pass, 3 to 10 passes. 100 nodes: 10 to 40 ms. 1000 nodes: 0.1 to 0.5 s.",
+    "params": [
+      "alpha 0..1 (default 0.6)",
+      "passes 1..10",
+      "width rule: f^beta, beta 0.33..1"
+    ],
+    "wins": [
+      "B1",
+      "B6",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Sweep alpha in 0.2 steps. Keep if its (B1, B3) front dominates the discount sweep of shared on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-039",
+      "HWY-047",
+      "HWY-043",
+      "HWY-051"
+    ]
+  },
+  {
+    "id": "HWY-039",
+    "family": "highway",
+    "name": "Buy-at-bulk with concave link costs and rip-up",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Buy-at-bulk network design",
+        "authors": "Awerbuch, Azar",
+        "year": 1997,
+        "url": "https://doi.org/10.1109/SFCS.1997.646117"
+      },
+      {
+        "title": "Cost-distance: two metric network design",
+        "authors": "Meyerson, Munagala, Plotkin",
+        "year": 2000,
+        "url": "https://doi.org/10.1109/SFCS.2000.892327"
+      },
+      {
+        "title": "Minimum concave cost flows in certain networks",
+        "authors": "Zangwill",
+        "year": 1968,
+        "url": "https://doi.org/10.1287/mnsc.14.7.429"
+      }
+    ],
+    "step": "router",
+    "mechanism": "Each edge routes on the marginal cost of a concave function of the load of each link. The order of the edges changes the result. Thus a second phase rips up each edge and routes it again on the loads of all the others. The router shared is the first pass with one fixed discount.",
+    "math": "Marginal cost of link l for one more edge: len_l (g(f_l + 1) - g(f_l)), g concave (f^alpha, log(1+f), or 1 + delta (f - 1)). Rip-up passes until no change or P passes.",
+    "cost": "O(P m L log L). 100 nodes: 3 x shared. 1000 nodes: 3 to 5 x shared.",
+    "params": [
+      "g: power, log, fixed charge",
+      "alpha 0.2..0.9",
+      "passes P 1..5",
+      "order: length, random seed"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "Z10"
+    ],
+    "risks": [
+      "B3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-038",
+      "HWY-005",
+      "HWY-044",
+      "HWY-016"
+    ]
+  },
+  {
+    "id": "HWY-040",
+    "family": "highway",
+    "name": "Fixed-charge network design, exact on small boards",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Network design and transportation planning: models and algorithms",
+        "authors": "Magnanti, Wong",
+        "year": 1984,
+        "url": "https://doi.org/10.1287/trsc.18.1.1"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A mixed integer program opens links of the corner graph for a fixed charge and routes each edge on the open links. The optimum is the least ink for a given stretch limit. It is too slow for real boards. But it gives the best answer on small boards, so the bench can show the gap of each heuristic.",
+    "math": "min sum_l F_l y_l + sum_{e,l} c_l x_el, flow conservation for each edge, x_el <= y_l, len(path e) <= s len*(e). Branch and bound, or a Lagrangean bound.",
+    "cost": "Exponential. Boards of 10 to 20 nodes: 1 to 60 s in CI. No run at 100 nodes.",
+    "params": [
+      "fixed charge F 0..1 x len",
+      "stretch limit s 1.1..2",
+      "time limit"
+    ],
+    "wins": [
+      "B1"
+    ],
+    "risks": [],
+    "placementDependent": true,
+    "screen": "MEAS2 boards of 10 to 20 nodes. Keep as the reference if it solves 10 boards in CI within 10 min. It does not enter the build of strategies.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "HWY-038",
+      "HWY-045",
+      "HWY-027"
+    ]
+  },
+  {
+    "id": "HWY-041",
+    "family": "highway",
+    "name": "Hub location (p-hub median)",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "A quadratic integer program for the location of interacting hub facilities",
+        "authors": "O'Kelly",
+        "year": 1987,
+        "url": "https://doi.org/10.1016/S0377-2217(87)80007-3"
+      },
+      {
+        "title": "Integer programming formulations of discrete hub location problems",
+        "authors": "Campbell",
+        "year": 1994,
+        "url": "https://doi.org/10.1016/0377-2217(94)90318-2"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Choose p hubs among candidate points of the free space. Each edge goes from its source to a hub, maybe to a second hub, and to its target. A link between two hubs costs alpha times its length, so many edges share it. The hub links are the highways.",
+    "math": "min sum_e min_{h,k} (d(s,h) + alpha d(h,k) + d(k,t)). Single allocation: each node to one hub. Heuristic: p-median of the plugs for the hubs, then assignment, then swap hubs.",
+    "cost": "O(m p^2) for the assignment, times the swaps. 100 nodes: 10 to 50 ms. 1000 nodes: 0.2 to 1 s.",
+    "params": [
+      "p hubs 2..sqrt(n)",
+      "alpha 0.2..0.8",
+      "allocation: single or multiple",
+      "candidates: corners or section centres"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "Z9"
+    ],
+    "risks": [
+      "B3",
+      "R7",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > sections at a lower R7 and B3 q95 on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-042",
+      "HWY-001",
+      "HWY-060"
+    ]
+  },
+  {
+    "id": "HWY-042",
+    "family": "highway",
+    "name": "Hub arc location: choose q highways",
+    "kind": "literature",
+    "sources": [
+      {
+        "title": "Hub arc location problems: part I, introduction and results",
+        "authors": "Campbell, Ernst, Krishnamoorthy",
+        "year": 2005,
+        "url": "https://doi.org/10.1287/mnsc.1050.0407"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Instead of hubs, choose q discounted arcs directly. An edge can use at most one arc (or a path of arcs) with the discount alpha, and the rest of its way at full cost. The q chosen arcs are the highways. The model answers the exact question of this note: which few shared ways serve the most edges.",
+    "math": "min sum_e min(d(s,t), min_{arc (h,k) in Q} d(s,h) + alpha d(h,k) + d(k,t)), |Q| = q. Greedy: add the arc with the largest saving, then swap arcs.",
+    "cost": "O(q A m) for A candidate arcs. 100 nodes: 20 to 80 ms. 1000 nodes: 0.5 to 2 s with candidate arcs from the corridor signatures.",
+    "params": [
+      "q arcs 1..64, or until the saving < s0",
+      "alpha 0.2..0.8",
+      "candidate arcs: corner links, corridor runs"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "B3"
+    ],
+    "risks": [
+      "B4",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the greedy q curve reaches 80% of its B1 with q < 10 highways on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-041",
+      "HWY-045",
+      "HWY-031"
+    ]
+  },
+  {
+    "id": "HWY-043",
+    "family": "highway",
+    "name": "Meeting points by Weiszfeld with a weighted trunk",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Weiszfeld's method: old and new results",
+        "authors": "Beck, Sabach",
+        "year": 2015,
+        "url": "https://doi.org/10.1007/s10957-014-0586-7"
+      },
+      {
+        "title": "Multilevel agglomerative edge bundling for visualizing large graphs",
+        "authors": "Gansner, Hu, North, Scheidegger",
+        "year": 2011,
+        "url": "https://www.sci.utah.edu/images/people/Alumni/scheidegger/gansner_edge_bundling.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Find the merge point M1 near the sources of a group and the split point M2 near its targets. Together they give the least weighted ink. The trunk M1 to M2 has the weight of its load. Weiszfeld iterations solve it fast. Any clusterer of this note can use it to place the ends of a highway.",
+    "math": "min_{M1,M2} sum_i |s_i - M1| + w |M1 - M2| + sum_i |M2 - t_i|, w = k^alpha. Alternate Weiszfeld steps: M1 = (sum s_i/|s_i - M1| + w M2/|M1 - M2|) / (sum 1/|s_i - M1| + w/|M1 - M2|).",
+    "cost": "O(k I) per group, I = 10 to 30. 100 nodes: < 2 ms. 1000 nodes: < 10 ms.",
+    "params": [
+      "alpha 0..1",
+      "steps 10..50",
+      "box push: move M out of a box"
+    ],
+    "wins": [
+      "B1",
+      "B6"
+    ],
+    "risks": [
+      "R9",
+      "B3"
+    ],
+    "placementDependent": true,
+    "screen": "Use the groups of HWY-023 on 3 boards. Keep if B1 rises by 3% over the split rule of trunks (split 0.5) at equal B3.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-003",
+      "HWY-038",
+      "HWY-050"
+    ]
+  },
+  {
+    "id": "HWY-044",
+    "family": "highway",
+    "name": "Negotiated attraction (PathFinder turned around)",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "PathFinder: a negotiation-based performance-driven router for FPGAs",
+        "authors": "McMurchie, Ebeling",
+        "year": 1995,
+        "url": "https://doi.org/10.1145/201310.201328"
+      }
+    ],
+    "step": "router",
+    "mechanism": "PathFinder in chip routing raises the cost of busy links until the routes spread. Here the history term lowers the cost of links that many edges used in earlier passes. A capacity term stops a highway from growing past its width. The passes converge to a few strong highways that fit their gaps.",
+    "math": "cost_k(l) = len(l) (1 - a h_k(l)) (1 + b max(0, use_k(l) - cap(l))). h_{k+1}(l) = h_k(l) + use_k(l)/m, capped at 0.9/a.",
+    "cost": "O(K m L log L). 100 nodes: 3 to 5 x shared. 1000 nodes: 3 to 6 x shared.",
+    "params": [
+      "passes K 2..10",
+      "attraction a 0..1",
+      "capacity weight b 0..10",
+      "capacity from the gap width"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "M4"
+    ],
+    "risks": [
+      "B3",
+      "R5",
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared by 5% with M4 <= shared on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-039",
+      "HWY-005",
+      "HWY-034",
+      "HWY-016"
+    ]
+  },
+  {
+    "id": "HWY-045",
+    "family": "highway",
+    "name": "Candidate generation and selection",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "A greedy heuristic for the set-covering problem",
+        "authors": "Chvátal",
+        "year": 1979,
+        "url": "https://doi.org/10.1287/moor.4.3.233"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Several generators (clusterers, Steiner trees, hub arcs) each propose candidate highways. Each candidate has a gain (ink saved) and a cost (stretch, ambiguity, width). A selection picks the set of candidates with the largest net gain, where each edge rides at most one highway at each place. This splits where a highway runs from the choice to make it.",
+    "math": "max sum_h x_h (gain_h - lambda_3 stretch_h - lambda_4 amb_h), x_h in {0,1}, conflicts: x_h + x_h' <= 1 when they claim one edge on one stretch. Greedy by net gain per edge, then 1-swap local search.",
+    "cost": "O(H log H + conflicts) for H candidates. 100 nodes: < 10 ms. 1000 nodes: 20 to 100 ms, plus the generators.",
+    "params": [
+      "generators: list",
+      "weights lambda_3, lambda_4 0..4",
+      "swap passes 0..5"
+    ],
+    "wins": [
+      "B1",
+      "B3",
+      "B4"
+    ],
+    "risks": [
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the selection over 3 generators dominates each generator alone on (B1, B3, B4) on 3 of 5 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-042",
+      "HWY-059",
+      "HWY-035"
+    ]
+  },
+  {
+    "id": "HWY-046",
+    "family": "highway",
+    "name": "Count threshold with hysteresis",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Smooth bundling of large streaming and sequence graphs",
+        "authors": "Hurter, Ersoy, Telea",
+        "year": 2013,
+        "url": "https://webspace.science.uu.nl/~telea001/uploads/PAPERS/PacificVis13/paper.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A highway forms when k_on edges share a corridor and dissolves only when fewer than k_off remain, with k_off < k_on. An edit that adds or removes one edge near the threshold thus does not make a highway flicker. Today the rule is one number, minSize 2.",
+    "math": "state(h) = on if n_h >= k_on, off if n_h < k_off, else the state of the previous result.",
+    "cost": "O(H). No measurable time.",
+    "params": [
+      "k_on 2..16",
+      "k_off 1..k_on"
+    ],
+    "wins": [
+      "Z10",
+      "B8"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": false,
+    "screen": "Use the seeded edits of Z10 on the 5 screen boards. Keep if Z10 moved share drops by 20% at a B1 loss < 3%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-054",
+      "HWY-047"
+    ]
+  },
+  {
+    "id": "HWY-047",
+    "family": "highway",
+    "name": "Break-even overlap law",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Minimum cost communication networks",
+        "authors": "Gilbert",
+        "year": 1967,
+        "url": "https://doi.org/10.1002/j.1538-7305.1967.tb03174.x"
+      },
+      {
+        "title": "Optimal paths related to transport problems",
+        "authors": "Xia",
+        "year": 2003,
+        "url": "https://www.math.ucdavis.edu/~saito/data/optxport/CCMtransport.pdf"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Two edges at gap d merge only if their common stretch is longer than d sqrt((2+t)/(2-t)). Here t is the drawn cost of a shared stretch. With t = 1 (B1 ink, one line) the limit is sqrt(3) d. A short or wide overlap thus does not make a highway that adds ink.",
+    "math": "Ink of the merged pair = t L + d sqrt(4 - t^2) with the optimal merge legs. Merge if 2L > that, so L* = d sqrt((2+t)/(2-t)). Merge leg half angle theta: cos theta = t/2.",
+    "cost": "O(1) per candidate pair.",
+    "params": [
+      "t 1..1.9 (or alpha 0..0.93)",
+      "d: lane gap or the gap of the straight lines"
+    ],
+    "wins": [
+      "B1",
+      "B6",
+      "B3"
+    ],
+    "risks": [
+      "B2"
+    ],
+    "placementDependent": true,
+    "screen": "Apply it as a filter to corridor signatures and QuickBundles. Keep if B1 does not drop and B3 q95 drops on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-038",
+      "HWY-031",
+      "HWY-026"
+    ]
+  },
+  {
+    "id": "HWY-048",
+    "family": "highway",
+    "name": "Stretch budget for each edge (join test)",
+    "kind": "ours",
+    "sources": [],
+    "step": "highway",
+    "mechanism": "An edge joins a highway only if its route on the highway is at most s times its own first route, plus a pad. An edge that fails stays alone, and the highway does not bend for it. The router sections has this limit for hubs today, and this rule makes it general.",
+    "math": "join(e,h) iff len(ramp_in) + len(spine part) + len(ramp_out) <= s len(first(e)) + pad.",
+    "cost": "O(1) per test with the spine length table.",
+    "params": [
+      "s 1.0..2.0",
+      "pad 0..4 margins"
+    ],
+    "wins": [
+      "B3",
+      "R5",
+      "R6",
+      "R7"
+    ],
+    "risks": [
+      "B1",
+      "B2"
+    ],
+    "placementDependent": true,
+    "screen": "Apply it to 3 generators on the 5 screen boards. Keep if R6 drops by 20% at a B1 loss < 5%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-045",
+      "HWY-047"
+    ]
+  },
+  {
+    "id": "HWY-049",
+    "family": "highway",
+    "name": "Ambiguity guard",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Edge-path bundling: a less ambiguous edge bundling approach",
+        "authors": "Wallinger, Archambault, Auber, Nöllenburg, Peltonen",
+        "year": 2022,
+        "url": "https://arxiv.org/abs/2108.05467"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "A merge of two groups adds false neighbours: pairs of nodes whose routes share a way with no edge between them. The guard counts them before the merge and refuses a merge that adds more than a share of false pairs. Highways then join edges that belong together.",
+    "math": "amb(A u B) = false pairs / all pairs of the ends of A u B. Refuse if amb(A u B) - max(amb A, amb B) > a0, or if the ends of A and B share no node and no group.",
+    "cost": "O(|A| |B|) per merge test, sampled above 64 x 64.",
+    "params": [
+      "a0 0..0.5",
+      "group test: same section pair on or off"
+    ],
+    "wins": [
+      "B4"
+    ],
+    "risks": [
+      "B1",
+      "B2"
+    ],
+    "placementDependent": false,
+    "screen": "Apply it to MINGLE and corridor signatures. Keep if B4 drops by 30% at a B1 loss < 10% on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-012",
+      "HWY-021",
+      "HWY-030"
+    ]
+  },
+  {
+    "id": "HWY-050",
+    "family": "highway",
+    "name": "Merge and split points where the routes meet and part",
+    "kind": "ours",
+    "sources": [],
+    "step": "highway",
+    "mechanism": "For each edge of a highway, the on-ramp is the first point where its first route comes within one lane of the spine. The off-ramp is the last such point. Merges thus happen late and splits early, where the routes really meet. The option leave: part of the router trunks does the same for one trunk.",
+    "math": "on(e) = min{s : dist(first(e)(s), spine) <= w}, off(e) = max{s : ...}. Clamp so that on < off and the ramp turn <= theta_max.",
+    "cost": "O(p log p) per edge with a grid on the spine. 100 nodes: < 5 ms. 1000 nodes: < 30 ms.",
+    "params": [
+      "w 0.5..2 lanes",
+      "theta_max 20..60 deg",
+      "rule: meet, Steiner angle, fixed share"
+    ],
+    "wins": [
+      "B3",
+      "B6",
+      "R4"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "Use the clusters of corridor signatures on 3 boards. Keep if B6 and B3 q95 drop at a B1 loss < 3%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-031",
+      "HWY-043",
+      "HWY-009"
+    ]
+  },
+  {
+    "id": "HWY-051",
+    "family": "highway",
+    "name": "Width, lanes and capacity: split a highway that does not fit",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "The physiological principle of minimum work: I. The vascular system and the cost of blood volume",
+        "authors": "Murray",
+        "year": 1926,
+        "url": "https://doi.org/10.1073/pnas.12.3.207"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "The width of a highway is its lanes times the lane gap, capped by maxWidth. Where a gap between boxes is narrower than the width, the highway splits into two parallel highways in two gaps. Or it asks the room step for space. A width rule f^beta gives a calmer far view, with beta near 1/3 as in Murray's law.",
+    "math": "W = min(maxWidth, n w) for lanes, or W = w0 n^beta for one fat line. If W > gap(l) on a link l: split the lanes into two sets by lane order, or add demand W - gap(l) to the room step.",
+    "cost": "O(links of the spine) per highway.",
+    "params": [
+      "lane gap w 2..8",
+      "maxWidth 8..64",
+      "beta 0.33..1",
+      "on narrow gap: split, room or squeeze"
+    ],
+    "wins": [
+      "M4",
+      "R8",
+      "B9"
+    ],
+    "risks": [
+      "B1",
+      "M1"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: packedGridBoard, case-dense-groups. Keep if M4 reaches 0 at an M1 rise < 10% or a B1 loss < 10%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-016",
+      "HWY-057",
+      "HWY-011"
+    ]
+  },
+  {
+    "id": "HWY-052",
+    "family": "highway",
+    "name": "Highways for each zoom level that nest",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "GraphMaps: browsing large graphs as interactive maps",
+        "authors": "Nachmanson, Prutkin, Lee, Riche, Holroyd, Chen",
+        "year": 2015,
+        "url": "https://arxiv.org/abs/1506.06745"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Each zoom level gets its own set of highways from the same rule with a coarser scale. A highway of a fine level must lie inside one highway of the coarser level. Thus zooming in only splits highways and does not move them. Far levels show few wide highways. Close levels show many narrow ones.",
+    "math": "Scale sigma_d = sigma_0 r^d. H_d = rule(edges, sigma_d) restricted to the edges of each h in H_{d-1}. Nesting check: each h in H_d has its edges inside one h' in H_{d-1}.",
+    "cost": "Depth times the rule cost, with the edges split. 100 nodes: 2 to 3 x the rule. 1000 nodes: 2 to 4 x the rule.",
+    "params": [
+      "levels 2..6",
+      "scale ratio r 1.5..4",
+      "rule: any clusterer with a scale"
+    ],
+    "wins": [
+      "Z7",
+      "Z8",
+      "Z9",
+      "Z4"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: nestedGridBoard, mid-clustered. Keep if Z9 drops by 20% with 0 nesting violations.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-053",
+      "HWY-056",
+      "HWY-001"
+    ]
+  },
+  {
+    "id": "HWY-053",
+    "family": "highway",
+    "name": "Scale space with persistence",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Topological persistence and simplification",
+        "authors": "Edelsbrunner, Letscher, Zomorodian",
+        "year": 2002,
+        "url": "https://doi.org/10.1007/s00454-002-2885-2"
+      },
+      {
+        "title": "Edge detection and ridge detection with automatic scale selection",
+        "authors": "Lindeberg",
+        "year": 1998,
+        "url": "https://doi.org/10.1023/A:1008097225773"
+      }
+    ],
+    "step": "levels",
+    "mechanism": "Run a density or clustering rule at many scales. Track each highway from the scale where it is born to the scale where it merges into a larger one. Long-lived highways are real, short-lived ones are noise. The zoom levels take the highways that live at their scale, so a zoom shows only stable structure.",
+    "math": "persistence(h) = log(sigma_death / sigma_birth). Keep h at level d if sigma_d in [sigma_birth, sigma_death) and persistence(h) >= p0.",
+    "cost": "S scales times the rule. 100 nodes: 50 to 200 ms. 1000 nodes: 0.5 to 2 s.",
+    "params": [
+      "scales S 4..16",
+      "p0 0.3..2",
+      "rule: KDEEB, ridges, HDBSCAN"
+    ],
+    "wins": [
+      "Z10",
+      "Z9",
+      "B8"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: mid-clustered, small-clustered. Keep if Z10 moved share drops by 20% against one scale.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-052",
+      "HWY-032",
+      "HWY-028"
+    ]
+  },
+  {
+    "id": "HWY-054",
+    "family": "highway",
+    "name": "Stable highway ids across edits",
+    "kind": "hybrid",
+    "sources": [
+      {
+        "title": "Smooth bundling of large streaming and sequence graphs",
+        "authors": "Hurter, Ersoy, Telea",
+        "year": 2013,
+        "url": "https://webspace.science.uu.nl/~telea001/uploads/PAPERS/PacificVis13/paper.pdf"
+      },
+      {
+        "title": "The Hungarian method for the assignment problem",
+        "authors": "Kuhn",
+        "year": 1955,
+        "url": "https://doi.org/10.1002/nav.3800020109"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "After an edit, the rule starts from the previous highways (warm start). Each new highway gets the id of the old highway with the most common edges. A renderer can then animate a highway as one object. Unmatched highways are new, and their old ones end.",
+    "math": "Match by max sum J(h, h') with the Hungarian method, J = Jaccard of the edge sets, keep matches with J >= 0.5. Warm start: seed the clusterer with the old centroids.",
+    "cost": "O(H^3) Hungarian, or greedy O(H log H). 1000 nodes: < 10 ms greedy.",
+    "params": [
+      "min Jaccard 0.3..0.8",
+      "warm start on or off"
+    ],
+    "wins": [
+      "Z10"
+    ],
+    "risks": [
+      "B1"
+    ],
+    "placementDependent": false,
+    "screen": "The seeded edits of Z10 on the 5 screen boards. Keep if Z10 mean and moved share drop by 20%.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-046",
+      "HWY-026",
+      "HWY-035"
+    ]
+  },
+  {
+    "id": "HWY-055",
+    "family": "highway",
+    "name": "Local growth by accretion and extension",
+    "kind": "ours",
+    "sources": [],
+    "step": "highway",
+    "mechanism": "Start with the longest edge as a seed highway. Each next edge, from long to short, joins the highway that gives it the largest saving, if the saving beats its own route. A highway extends at an end while enough lanes go on together. The growth is local, fast and online.",
+    "math": "save(e,h) = len(first e) - (ramp_in + t spine part + ramp_out). Join argmax_h save if > 0, else e is a new seed. Extend an end while >= k lanes stay within w of each other.",
+    "cost": "O(m H) with a grid on the spines. 100 nodes: < 10 ms. 1000 nodes: 30 to 100 ms.",
+    "params": [
+      "order: length or input",
+      "t shared cost 1..1.9",
+      "extension lanes k 2..8"
+    ],
+    "wins": [
+      "B1",
+      "B2",
+      "Z10"
+    ],
+    "risks": [
+      "B3",
+      "B4"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at 1/3 of its time on 3 of 5 boards.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-026",
+      "HWY-045",
+      "HWY-047"
+    ]
+  },
+  {
+    "id": "HWY-056",
+    "family": "highway",
+    "name": "Level links become highways",
+    "kind": "ours",
+    "sources": [],
+    "step": "highway",
+    "mechanism": "At the far view, a level link stands for the edges between two items. At the close view, those same edges ride one highway along the path of that level link. The highway set is thus the level links, and a zoom shows the same lines that open into lanes.",
+    "math": "For each level link (A, B, count) with count >= minSize: highway spine = link points outside A and B, edges = the edges from A to B. Ramps through the corner graph inside A and B.",
+    "cost": "O(m) after the levels. 100 nodes: < 5 ms. 1000 nodes: < 20 ms.",
+    "params": [
+      "depth of the level 1..3",
+      "minSize 2..16",
+      "stretch limit s 1.2..2"
+    ],
+    "wins": [
+      "Z9",
+      "B1",
+      "B8"
+    ],
+    "risks": [
+      "B3",
+      "R7"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: case-many-groups, nestedGridBoard, mid-clustered. Keep if Z9 drops by 50% with R7 <= sections.",
+    "prototype": "S",
+    "stage": "catalogued",
+    "related": [
+      "HWY-001",
+      "HWY-052",
+      "HWY-018"
+    ]
+  },
+  {
+    "id": "HWY-057",
+    "family": "highway",
+    "name": "Gap highways",
+    "kind": "ours",
+    "sources": [],
+    "step": "highway",
+    "mechanism": "The room step knows the gaps between boxes and the demand of each gap. A gap with demand of k or more lanes holds one highway along its middle line. The highways of neighbour gaps join at the crossings of the gaps. The highway network is thus the street plan of the board.",
+    "math": "Gap graph: nodes = gap crossings, links = gap middle lines. Demand from the first routes. Highway link if demand >= k. Edges route on the gap graph with the highway discount.",
+    "cost": "O(gaps + m log gaps). 100 nodes: < 10 ms. 1000 nodes: 30 to 80 ms.",
+    "params": [
+      "k 2..16",
+      "discount 0.1..0.8",
+      "gap source: room step or the corner graph"
+    ],
+    "wins": [
+      "R14",
+      "M4",
+      "B1"
+    ],
+    "risks": [
+      "B3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: packedGridBoard, grid-400, nestedGridBoard. Keep if B1 >= shared and M4 = 0 on 2 of 3 boards.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-016",
+      "HWY-051",
+      "HWY-058"
+    ]
+  },
+  {
+    "id": "HWY-058",
+    "family": "highway",
+    "name": "Orthogonal streets by set cover",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "A greedy heuristic for the set-covering problem",
+        "authors": "Chvátal",
+        "year": 1979,
+        "url": "https://doi.org/10.1287/moor.4.3.233"
+      },
+      {
+        "title": "Drawing and labeling high-quality metro maps by mixed-integer programming",
+        "authors": "Nöllenburg, Wolff",
+        "year": 2011,
+        "url": "https://doi.org/10.1109/TVCG.2010.81"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "For an orthogonal style, candidate streets are horizontal and vertical lines in the gaps. Each street covers the edges whose legs can run on it with a small detour. A greedy set cover picks the few streets that cover the most edges. Edges then route with legs on the streets.",
+    "math": "Candidates: gap lines y = c, x = c. cover(street) = {e : detour of e via street <= s}. Greedy: pick the street with the largest new cover per unit length, until the gain < g0.",
+    "cost": "O(C m) for C candidates. 100 nodes: < 20 ms. 1000 nodes: 0.1 to 0.3 s.",
+    "params": [
+      "detour limit s 1.0..1.5",
+      "g0 min gain",
+      "max streets 4..64"
+    ],
+    "wins": [
+      "R14",
+      "B1",
+      "R3"
+    ],
+    "risks": [
+      "B3",
+      "R5"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: grid-400, packedGridBoard. Keep if R14 > 0.9 and B1 >= shared at B3 q95 <= 1.3.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-024",
+      "HWY-057",
+      "HWY-036"
+    ]
+  },
+  {
+    "id": "HWY-059",
+    "family": "highway",
+    "name": "Local search over the highway set on the measures",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Optimization by simulated annealing",
+        "authors": "Kirkpatrick, Gelatt, Vecchi",
+        "year": 1983,
+        "url": "https://doi.org/10.1126/science.220.4598.671"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Start from any highway set. Moves add a candidate, drop a highway, move one edge to another highway, or move a merge point. Each move is kept if a weighted sum of the measures improves, or by an annealing rule. The search tunes the result on the measures of MEAS0 directly.",
+    "math": "Score = w1 B1 - w3 B3_q95 - w4 B4 - w6 B6. Accept if delta > 0 or with probability exp(delta / T). T falls by 0.95 per sweep.",
+    "cost": "Sweeps times moves times the delta cost. 100 nodes: 0.1 to 0.5 s. 1000 nodes: 2 to 10 s, so CI only.",
+    "params": [
+      "weights w 0..4",
+      "sweeps 5..50",
+      "start T",
+      "moves: add, drop, move edge, move point"
+    ],
+    "wins": [
+      "B1",
+      "B3",
+      "B4",
+      "B6"
+    ],
+    "risks": [
+      "Z10"
+    ],
+    "placementDependent": true,
+    "screen": "Boards: the 3 case boards. Keep if it gains 5% on the score over its start set. It also gives an upper bound for the fast rules.",
+    "prototype": "M",
+    "stage": "catalogued",
+    "related": [
+      "HWY-045",
+      "HWY-040"
+    ]
+  },
+  {
+    "id": "HWY-060",
+    "family": "highway",
+    "name": "Interchanges: a network of highways",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Spatial generalization and aggregation of massive movement data",
+        "authors": "Andrienko, Andrienko",
+        "year": 2011,
+        "url": "https://openaccess.city.ac.uk/id/eprint/7614"
+      }
+    ],
+    "step": "highway",
+    "mechanism": "Highways do not stay alone: they meet at interchanges, where edges change from one highway to another. An edge can ride two or three highways in a row. The interchanges sit where several highways come near, and a budget limits their count. The highways thus make a small road graph of the board.",
+    "math": "Interchange candidates: points where >= 2 spines come within w. Each edge takes the cheapest path over the highway graph with a change cost c. Keep interchanges with >= k changes.",
+    "cost": "O(H^2 + m H log H). 100 nodes: < 20 ms. 1000 nodes: 0.1 to 0.4 s.",
+    "params": [
+      "change cost c 0..8 u",
+      "interchange budget 1..32",
+      "max highways per edge 1..3"
+    ],
+    "wins": [
+      "B1",
+      "B8",
+      "Z9"
+    ],
+    "risks": [
+      "B3",
+      "B4",
+      "B5"
+    ],
+    "placementDependent": true,
+    "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > the best single-highway rule by 5% at B3 q95 within 5% on 3 of 5 boards.",
+    "prototype": "L",
+    "stage": "catalogued",
+    "related": [
+      "HWY-041",
+      "HWY-033",
+      "HWY-042"
+    ]
+  }
+]
