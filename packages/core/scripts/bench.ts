@@ -134,7 +134,7 @@ function sideTables(): void {
   const highways: HighwayBenchRow[] = [];
   for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {
     const graph = CASES.find((c) => c.name === name)!.make();
-    for (const router of bundlers) highways.push(...benchHighways(router, name, graph));
+    for (const router of bundlers) highways.push(...benchHighways(router, name, graph, { jogs: ["biarc", "cubic", "quintic"] }));
   }
   show(formatHighways(highways));
   // The room of the links: a packed board of touching boxes, before and after `makeRoom` at gutter 8 and spacing 4.

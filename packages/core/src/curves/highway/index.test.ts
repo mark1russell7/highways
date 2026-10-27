@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { measureHighways, SPACING_LIMIT } from "../../bench/curves.ts";
+import { measureHighways, measureJogs, SPACING_LIMIT } from "../../bench/curves.ts";
 import type { Point } from "../../geom.ts";
 import { pathPoints, runKey, type SegmentGraph } from "../../segments.ts";
 import { arcCurve } from "../arc/index.ts";
 import type { ArcSegment, CurveSegment } from "../model.ts";
 import { curveSpace } from "../space.ts";
-import { highwayCurve, highwayCurves } from "./index.ts";
+import { highwayCurve, highwayCurves, tracedHighwayCurves } from "./index.ts";
 
 const P = (x: number, y: number): Point => ({ x, y });
 
@@ -83,6 +83,49 @@ describe("highwayCurves", () => {
     expect(curves[3]!.segments).toEqual(arcCurve(pathPoints(graph, graph.paths[3]!), { radius: 12 }));
     const closed = highwayCurves(graph, new Set(), 4);
     for (const [i, path] of graph.paths.entries()) expect(closed[i]!.segments).toEqual(arcCurve(pathPoints(graph, path), { radius: 12 }));
+  });
+});
+
+describe("the S curves of highwayCurves", () => {
+  const jogsOf = (options: Parameters<typeof tracedHighwayCurves>[3]): ReturnType<typeof measureJogs> => {
+    const t = tracedHighwayCurves(graph, open, 4, options);
+    return measureJogs(t.curves, t.jogs);
+  };
+  it("gives the same curves with the jog biarc as with no jog", () => {
+    expect(highwayCurves(graph, open, 4, { maxWidth: 16, jog: "biarc" })).toEqual(highwayCurves(graph, open, 4, { maxWidth: 16 }));
+  });
+
+  it("finds the S curves of each lane", () => {
+    const { curves, jogs } = tracedHighwayCurves(graph, open, 4, { maxWidth: 16 });
+    expect(jogs).toHaveLength(curves.length);
+    const m = measureJogs(curves, jogs);
+    expect(m.count).toBeGreaterThan(0);
+    // A biarc has the curvature 1 / r at its ends and a jump of 2 / r at its inflection.
+    expect(m.endJump).toBeGreaterThan(0);
+    expect(m.innerJump).toBeGreaterThan(0);
+  });
+
+  for (const jog of ["cubic", "quintic"] as const) {
+    it(`draws ${jog} S curves with no break of the tangent, and keeps the lanes at the spacing`, () => {
+      const { curves, jogs } = tracedHighwayCurves(graph, open, 4, { maxWidth: 16, minRadius: 4, jog });
+      const m = measureJogs(curves, jogs);
+      expect(m.count).toBe(jogsOf({ maxWidth: 16, minRadius: 4 }).count);
+      // Each S curve keeps its curvature at 1 / 4 or less: the radius of the smallest arc of a biarc.
+      expect(m.peakMax).toBeLessThanOrEqual(1 / 4 + 1e-3);
+      const h = measureHighways(graph, open, 4, curves, { maxWidth: 16, minRadius: 4 });
+      expect(h.breaks).toBe(0);
+      expect(h.worstSpacing).toBeLessThanOrEqual(SPACING_LIMIT);
+      expect(h.crossings + h.endCrossings).toBe(0);
+    });
+  }
+
+  it("draws quintic S curves with no jump of the curvature", () => {
+    const { curves, jogs } = tracedHighwayCurves(graph, open, 4, { maxWidth: 16, jog: "quintic" });
+    const m = measureJogs(curves, jogs);
+    expect(m.endJump).toBeLessThan(1e-9);
+    expect(m.innerJump).toBeLessThan(1e-6);
+    const one = jogsOf({ maxWidth: 16, jog: "quintic", jogPieces: 1 });
+    expect(one.count).toBe(m.count);
   });
 });
 

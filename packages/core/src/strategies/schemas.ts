@@ -7,7 +7,7 @@ import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
 import type { RunOrder } from "../segments.ts";
-import type { HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, TensionOptions } from "./builtins.ts";
+import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
 import type { EnumOption, OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
@@ -131,6 +131,26 @@ export const RADIUS_SCHEMA: OptionSchema<RadiusOptions> = {
 export const HIGHWAY_SCHEMA: OptionSchema<HighwayStrategyOptions> = {
   ...RADIUS_SCHEMA,
   minRadius: { type: "number", min: 0, max: 24, step: 1, describe: "The smallest radius of a lane at a bend of a bundle." },
+  jog: {
+    type: "enum",
+    values: ["biarc", "cubic", "quintic"],
+    default: "biarc",
+    describe: "The shape of the S curve where a lane changes its offset. A `quintic` S curve has no jump of the curvature.",
+  },
+  jogPieces: { type: "integer", min: 1, max: 8, step: 1, default: 4, describe: "The number of cubic pieces of a `quintic` S curve." },
+};
+
+/** The declarations of the options of the curve `smooth`. */
+export const SMOOTH_SCHEMA: OptionSchema<SmoothStrategyOptions> = {
+  ...RADIUS_SCHEMA,
+  smoothing: { type: "number", min: 0, max: 1, step: 0.05, describe: "The share of the turn of a corner in its two spirals. The value 0 gives the curve `arc`." },
+};
+
+/** The declarations of the options of the curve `clothoid`. */
+export const CLOTHOID_SCHEMA: OptionSchema<ClothoidStrategyOptions> = {
+  ...RADIUS_SCHEMA,
+  spiral: { type: "number", min: 0, max: 1, step: 0.05, describe: "The share of the turn of a corner in its two clothoids. The value 0 gives the curve `arc`." },
+  tolerance: { type: "number", min: 0.05, max: 1, step: 0.05, describe: "The largest distance from the cubic pieces to the true clothoid." },
 };
 
 /** The declarations of the option of the curve `spline`. */

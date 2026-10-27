@@ -85,7 +85,7 @@ The [examples page](https://mark1russell7.github.io/highways/examples.html) show
 
 ## The curve types
 
-`curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline` or `arc`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
+`curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline`, `arc`, `smooth` or `clothoid`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
 
 ## Room for the links
 

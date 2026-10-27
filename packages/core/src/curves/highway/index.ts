@@ -2,6 +2,7 @@ import type { Point } from "../../geom.ts";
 import type { Result } from "../../model.ts";
 import { laneRoutes, runKey, segmentsOf, type Segment, type SegmentGraph } from "../../segments.ts";
 import { arcCurve } from "../arc/index.ts";
+import { fitPieces } from "../fit.ts";
 import { distinctPoints, type CurveSegment } from "../model.ts";
 import { sampleCurve } from "../sample.ts";
 import type { CurveSpace } from "../space.ts";
@@ -16,7 +17,25 @@ export interface HighwayOptions {
   readonly maxWidth?: number;
   /** The boxes that the lanes must not go through, from `curveSpace`. With it, no lane goes through a box that its lane of `laneRoutes` avoids. */
   readonly space?: CurveSpace;
+  /** The shape of the S curve where a lane joins or leaves a bundle. The default is `biarc`. */
+  readonly jog?: JogStyle;
+  /** The number of cubic pieces of a `quintic` S curve, from 1 to 8. The default is 4. */
+  readonly jogPieces?: number;
 }
+
+/**
+ * The shape of the S curve where a lane changes its offset.
+ *
+ * - `biarc`: two circular arcs. The curvature jumps at each end and at the inflection.
+ * - `cubic`: one cubic Bezier curve with its handles along the leg. The curvature jumps at each end.
+ * - `quintic`: the quintic `y = d (10 t³ - 15 t⁴ + 6 t⁵)`, in G2 cubic pieces. The curvature is 0 at each end and has no jump.
+ *
+ * Each shape keeps its curvature at `1 / radius` or less. The polynomial shapes are longer than the biarc for this reason.
+ */
+export type JogStyle = "biarc" | "cubic" | "quintic";
+
+/** The S curves of the lanes, by the order of `laneRoutes`. Each S curve is the first and the last index of its segments in the curve of its lane. */
+export type JogTrace = (readonly [number, number])[][];
 
 /** The curve of the lane of one edge: a list of segments for any renderer, as `curveOf` gives. */
 export interface LaneCurve {
@@ -59,7 +78,25 @@ interface LaneVertex {
   readonly r: number;
   /** A fixed arc keeps its radius when an arc next to it on a short leg must shrink. The bends of a bundle are fixed. */
   readonly fixed?: boolean;
+  /** The mark of an S curve. The first vertex of an S curve has the part `start`, and the last vertex has the part `end`. */
+  readonly jog?: JogMark;
 }
+
+/**
+ * The mark of a vertex of an S curve. The two vertices of a biarc have arcs.
+ * The first vertex of a polynomial S curve has the direction `u` of the leg. The curve goes from it to the next vertex along `u`.
+ */
+interface JogMark {
+  readonly part: "start" | "end";
+  readonly style: JogStyle;
+  readonly u?: Point;
+  readonly pieces?: number;
+}
+
+/** The ratio `l² / (d r)` of a quintic S curve with the length `l`, the shift `d` and the smallest radius `r`. It is the peak of `h''`. */
+const QUINTIC_ROOM = 10 / Math.sqrt(3);
+/** The ratio `l² / (d r)` of a cubic S curve with its handles at half of the length. A numeric search gives the peak curvature. */
+const CUBIC_ROOM = 5.5212;
 
 /** A shift of the lane from one offset to another on one end of a leg: two arcs in an S. */
 interface Jog {
@@ -84,13 +121,15 @@ function miter(v: Point, nA: Point, nB: Point, o: number): Point {
 }
 
 /**
- * This function gives the length along the leg of an S of two arcs with the radius `r` that shifts a lane by `shift`.
- * It gives also the angle of each arc. A radius smaller than half of the shift makes two quarter circles and a straight piece.
+ * This function gives the length along the leg of an S with the smallest radius `r` that shifts a lane by `shift`.
+ * For a biarc, it gives also the angle of each arc. A radius smaller than half of the shift makes two quarter circles and a straight piece.
+ * A polynomial S curve has the length `sqrt(c d r)`, so that its curvature is `1 / r` or less.
  */
-function jogShape(r: number, shift: number): { readonly length: number; readonly angle: number } {
+function jogShape(r: number, shift: number, style: JogStyle = "biarc"): { readonly length: number; readonly angle: number } {
   const d = Math.abs(shift);
   if (d < SAME) return { length: 0, angle: 0 };
   if (r <= 0) return { length: 0, angle: Math.PI / 2 };
+  if (style !== "biarc") return { length: Math.sqrt((style === "quintic" ? QUINTIC_ROOM : CUBIC_ROOM) * d * r), angle: 0 };
   if (r < d / 2) return { length: 2 * r, angle: Math.PI / 2 };
   const angle = Math.acos(1 - d / (2 * r));
   return { length: 2 * r * Math.sin(angle), angle };
@@ -113,12 +152,14 @@ function largestClear(max: number, clear: (size: number) => boolean): number {
  * This function gives the segments of a polyline with an arc at each vertex. The arc of a vertex has the radius of the vertex.
  * The arc is tangent to the two legs, so the curve has no break of its tangent. A vertex with the radius 0 stays sharp.
  */
-function filletPolyline(vertices: readonly LaneVertex[]): CurveSegment[] {
+function filletPolyline(vertices: readonly LaneVertex[], trace?: [number, number][]): CurveSegment[] {
   const v: LaneVertex[] = [];
   for (const q of vertices) {
     const last = v[v.length - 1];
-    if (last && Math.hypot(q.p.x - last.p.x, q.p.y - last.p.y) <= SAME) v[v.length - 1] = { ...last, r: Math.max(last.r, q.r) };
-    else v.push(q);
+    if (last && Math.hypot(q.p.x - last.p.x, q.p.y - last.p.y) <= SAME) {
+      const jog = q.jog?.part === "start" ? q.jog : (last.jog ?? q.jog);
+      v[v.length - 1] = jog ? { ...last, r: Math.max(last.r, q.r), jog } : { ...last, r: Math.max(last.r, q.r) };
+    } else v.push(q);
   }
   if (v.length === 0) return [];
   const out: CurveSegment[] = [{ kind: "move", to: v[0]!.p }];
@@ -157,11 +198,36 @@ function filletPolyline(vertices: readonly LaneVertex[]): CurveSegment[] {
     }
   }
   const at = (): Point => out[out.length - 1]!.to;
+  // The start of the biarc that the pen draws now: the index of its first segment. A polynomial S curve has its trace in `reach`.
+  let open = -1;
+  const begin = (i: number): void => {
+    if (v[i]!.jog?.part === "start" && v[i]!.jog?.style === "biarc") open = out.length;
+  };
+  const finish = (i: number): void => {
+    if (open >= 0 && v[i]!.jog?.part === "end" && v[i]!.jog?.style === "biarc") {
+      trace?.push([open, out.length - 1]);
+      open = -1;
+    }
+  };
+  // The pen goes from the vertex `i - 1` to the point `to`. After the first vertex of a polynomial S curve, it draws the S curve to the vertex `i`.
+  const reach = (i: number, to: Point): void => {
+    const mark = v[i - 1]!.jog;
+    const from = at();
+    if (mark?.part !== "start" || mark.style === "biarc" || mark.u === undefined || to !== v[i]!.p || Math.hypot(from.x - v[i - 1]!.p.x, from.y - v[i - 1]!.p.y) > 1e-9) {
+      out.push({ kind: "line", to });
+      return;
+    }
+    const first = out.length;
+    out.push(...jogSegments(from, to, mark.u, mark.style, mark.pieces ?? 4));
+    trace?.push([first, out.length - 1]);
+  };
   for (let i = 1; i + 1 < v.length; i++) {
     const q = v[i]!.p;
     const t = tan[i]!;
     if (t <= 0) {
-      out.push({ kind: "line", to: q });
+      reach(i, q);
+      finish(i);
+      begin(i);
       continue;
     }
     const u = unit(v[i - 1]!.p, q);
@@ -174,10 +240,41 @@ function filletPolyline(vertices: readonly LaneVertex[]): CurveSegment[] {
     const p2 = along(q, w, t, w, 0);
     // The center is on the side of the turn, at the distance r from the first leg.
     const center = { x: p1.x - side * u.y * r, y: p1.y + side * u.x * r };
-    if (Math.hypot(p1.x - at().x, p1.y - at().y) > 1e-9) out.push({ kind: "line", to: p1 });
+    if (Math.hypot(p1.x - at().x, p1.y - at().y) > 1e-9) reach(i, p1);
+    begin(i);
     out.push({ kind: "arc", center, radius: r, start: Math.atan2(p1.y - center.y, p1.x - center.x), sweep: turn, to: p2 });
+    finish(i);
   }
-  out.push({ kind: "line", to: v[v.length - 1]!.p });
+  reach(v.length - 1, v[v.length - 1]!.p);
+  return out;
+}
+
+/**
+ * This function gives the segments of a polynomial S curve from `from` to `to`, with the tangent `u` at each end.
+ * The curve goes `l` along `u` and `d` to the side, with `l` and `d` from the chord.
+ * A `cubic` S curve is one cubic Bezier curve with each handle at half of `l`. A `quintic` S curve is `y = d h(t)` with `h(t) = 10 t³ - 15 t⁴ + 6 t⁵`, in `pieces` G2 cubic pieces.
+ */
+function jogSegments(from: Point, to: Point, u: Point, style: JogStyle, pieces: number): CurveSegment[] {
+  const D = sub(to, from);
+  const l = dot(D, u);
+  const d = cross(u, D);
+  if (l <= SAME) return [{ kind: "line", to }];
+  const side = { x: -u.y, y: u.x };
+  if (style === "cubic") return [{ kind: "cubic", c1: along(from, u, l / 2, u, 0), c2: along(to, u, -l / 2, u, 0), to }];
+  const at = (t: number): { p: Point; d: Point; dd: Point } => {
+    const h = t * t * t * (10 - 15 * t + 6 * t * t);
+    const h1 = 30 * t * t * (1 - t) * (1 - t);
+    const h2 = 60 * t * (1 - t) * (1 - 2 * t);
+    return {
+      p: { x: from.x + u.x * l * t + side.x * d * h, y: from.y + u.y * l * t + side.y * d * h },
+      d: { x: u.x * l + side.x * d * h1, y: u.y * l + side.y * d * h1 },
+      dd: { x: side.x * d * h2, y: side.y * d * h2 },
+    };
+  };
+  const out: CurveSegment[] = fitPieces(at, Math.max(1, Math.min(8, Math.round(pieces)))).map((q) => ({ kind: "cubic", c1: q.c1, c2: q.c2, to: q.to }));
+  // The last piece ends at the exact point of the vertex.
+  const last = out[out.length - 1]!;
+  if (last.kind === "cubic") out[out.length - 1] = { ...last, to };
   return out;
 }
 
@@ -229,8 +326,8 @@ export function highwayCurve(points: readonly Point[], options: Pick<HighwayOpti
  * plus or minus its offset. So the lanes stay at the lane spacing through the bend. The bend grows to keep the inner lane at `minRadius`,
  * and it shrinks to fit on the legs and in the free space.
  *
- * A lane joins (merges) or leaves (splits) a bundle on an S of two arcs on the leg with fewer lanes.
- * The radius of these arcs is `radius` or less.
+ * A lane joins (merges) or leaves (splits) a bundle on an S curve on the leg with fewer lanes. The option `jog` gives its shape.
+ * The smallest radius of the S curve is `radius` or less.
  * Each curve has no break of its tangent where each radius is more than 0.
  * A lane that is in no open segment gets the curve of `arcCurve`.
  *
@@ -238,11 +335,26 @@ export function highwayCurve(points: readonly Point[], options: Pick<HighwayOpti
  * The output is a list of segments for any renderer. `toSvgPath` writes it as SVG path data, and `sampleCurve` gives points.
  */
 export function highwayCurves(source: Result | SegmentGraph, open: ReadonlySet<string>, laneWidth: number, options: HighwayOptions = {}): LaneCurve[] {
+  return tracedHighwayCurves(source, open, laneWidth, options).curves;
+}
+
+/**
+ * This function gives the curves of `highwayCurves` and the S curves of each lane. The benchmark measures the S curves.
+ * The package does not export this function.
+ */
+export function tracedHighwayCurves(
+  source: Result | SegmentGraph,
+  open: ReadonlySet<string>,
+  laneWidth: number,
+  options: HighwayOptions = {},
+): { readonly curves: LaneCurve[]; readonly jogs: JogTrace } {
   const graph = "paths" in source ? source : segmentsOf(source);
   const radius = Math.max(0, options.radius ?? 12);
   const minRadius = Math.max(0, options.minRadius ?? 4);
   const maxWidth = options.maxWidth ?? Infinity;
   const space = options.space;
+  const style: JogStyle = options.jog ?? "biarc";
+  const pieces = options.jogPieces ?? 4;
   const byId = new Map(graph.segments.map((s) => [s.id, s]));
   const spacingOf = (s: Segment): number => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0);
   // The polylines of `laneRoutes`: the free space keeps each curve out of the boxes that its polyline avoids.
@@ -298,13 +410,17 @@ export function highwayCurves(source: Result | SegmentGraph, open: ReadonlySet<s
     }
   });
   const bends = bendRadii(groups, radius, minRadius, space);
-  return graph.paths.map((path, i): LaneCurve => {
+  const jogs: JogTrace = [];
+  const curves = graph.paths.map((path, i): LaneCurve => {
     const polyline = polylines[i]!.points;
     const plan = plans[i];
+    const trace: [number, number][] = [];
+    jogs.push(trace);
     if (!plan) return { edge: path.edge, segments: highwayCurve(polyline, { radius, ...(space ? { space } : {}) }) };
     if (plan.legs.length === 0) return { edge: path.edge, segments: [{ kind: "move", to: polyline[0]! }] };
-    return { edge: path.edge, segments: laneCurve(plan, bends, polyline, radius, minRadius, space) };
+    return { edge: path.edge, segments: laneCurve(plan, bends, polyline, { radius, minRadius, space, style, pieces }, trace) };
   });
+  return { curves, jogs };
 }
 
 /**
@@ -370,9 +486,8 @@ function laneCurve(
   plan: LanePlan,
   bends: Bends,
   polyline: readonly Point[],
-  radius: number,
-  minRadius: number,
-  space: CurveSpace | undefined,
+  { radius, minRadius, space, style, pieces }: { radius: number; minRadius: number; space: CurveSpace | undefined; style: JogStyle; pieces: number },
+  trace?: [number, number][],
 ): CurveSegment[] {
   const { legs, at } = plan;
   const L = legs.length;
@@ -435,14 +550,26 @@ function laneCurve(
     // The arcs of a shift have the wanted radius too. So the radius of each arc of the lane is at least `floor`.
     const shift = (leg: Leg, jog: Jog | undefined, start: number, sign: 1 | -1): LaneVertex[] => {
       if (!jog) return [];
-      const { length, angle } = jogShape(want, jog.to - jog.from);
+      const { length, angle } = jogShape(want, jog.to - jog.from, style);
+      if (style !== "biarc") {
+        // The S curve goes along the leg from the offset `jog.from` to the offset `jog.to`, in the order of the route.
+        const s0 = sign === 1 ? start : -(start + length);
+        const p0 = along(v, leg.u, s0, leg.n, jog.from);
+        const p3 = along(v, leg.u, s0 + length, leg.n, jog.to);
+        return [
+          { p: p0, r: 0, jog: { part: "start", style, u: leg.u, pieces } },
+          { p: p3, r: 0, jog: { part: "end", style } },
+        ];
+      }
       const k = want < Math.abs(jog.to - jog.from) / 2 ? want : want * Math.tan(angle / 2);
       // On the leg after the vertex, the shift goes forward from `start`. On the leg before it, it goes back from `start`.
       const p1 = along(v, leg.u, sign * (start + k), leg.n, sign === 1 ? jog.from : jog.to);
       const p2 = along(v, leg.u, sign * (start + length - k), leg.n, sign === 1 ? jog.to : jog.from);
-      return sign === 1 ? [{ p: p1, r: want }, { p: p2, r: want }] : [{ p: p2, r: want }, { p: p1, r: want }];
+      return sign === 1
+        ? [{ p: p1, r: want, jog: { part: "start", style } }, { p: p2, r: want, jog: { part: "end", style } }]
+        : [{ p: p2, r: want, jog: { part: "start", style } }, { p: p1, r: want, jog: { part: "end", style } }];
     };
-    const lenOf = (jog: Jog | undefined): number => (jog ? jogShape(want, jog.to - jog.from).length : 0);
+    const lenOf = (jog: Jog | undefined): number => (jog ? jogShape(want, jog.to - jog.from, style).length : 0);
     return {
       vertices: [...(A ? shift(A, endJog[j - 1], t - xA, -1) : []), ...corner, ...(B ? shift(B, startJog[j], xB + t, 1) : [])],
       back: A ? Math.max(0, t - xA) + lenOf(endJog[j - 1]) : 0,
@@ -490,5 +617,5 @@ function laneCurve(
     }
     vertices.push(...near(j, s, floor, loose).vertices);
   }
-  return filletPolyline(vertices);
+  return filletPolyline(vertices, trace);
 }
