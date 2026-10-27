@@ -1281,7 +1281,7 @@
     "placementDependent": true,
     "screen": "On small-clustered and case-many-groups: keep it when B1 is 0.10 or more, B4 is below 0.1 and R9 is 0.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "prototyped",
     "related": [
       "WILD-037",
       "WILD-031",

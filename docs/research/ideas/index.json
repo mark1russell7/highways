@@ -26,9 +26,9 @@
       "whole": 29
     },
     "byStage": {
-      "cataloged": 273,
+      "cataloged": 271,
       "screened": 0,
-      "prototyped": 0,
+      "prototyped": 2,
       "built": 0,
       "kept": 0,
       "dropped": 0
@@ -3923,7 +3923,7 @@
       "placementDependent": true,
       "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at B3 q95 <= 0.95 x shared on 3 of 5 boards. This is the first idea to screen.",
       "prototype": "S",
-      "stage": "cataloged",
+      "stage": "prototyped",
       "related": [
         "HWY-025",
         "HWY-034",
@@ -11733,7 +11733,7 @@
       "placementDependent": true,
       "screen": "On small-clustered and case-many-groups: keep it when B1 is 0.10 or more, B4 is below 0.1 and R9 is 0.",
       "prototype": "M",
-      "stage": "cataloged",
+      "stage": "prototyped",
       "related": [
         "WILD-037",
         "WILD-031",

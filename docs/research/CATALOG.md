@@ -5,7 +5,8 @@ This note joins the ideas of the five research notes into one catalog (IDEA0). B
 ## Summary
 
 - The catalog has 273 records in five family files. 24 groups hold the same idea in two or three families, so the catalog has 248 distinct ideas.
-- Each record has a stage. Today each record is at the stage `cataloged`. No idea leaves the catalog without a screen result.
+- Each record has a stage. 271 records are at the stage `cataloged`. `HWY-031` and its rider are at `prototyped`.
+- No idea leaves the catalog without a screen result.
 - The three forms of the merge-angle law agree. The router `shared` follows a different model: a greedy Snell merge with a fixed charge.
 - The build order has seven waves. Wave 1 holds 11 cheap ideas that need no new step. Wave 2 holds 17 ideas of the step `highway`.
 - The ideas need 26 measures of MEAS0 that the screen does not have yet. MEAS3 adds them, and the first three are `B2`, `B3` and `B6`.
@@ -84,8 +85,11 @@ The other counts are for the 248 distinct ideas.
 
 | Stage | Records |
 |---|---|
-| `cataloged` | 273 |
-| `screened`, `prototyped`, `built`, `kept` and `dropped` | 0 |
+| `cataloged` | 271 |
+| `prototyped` | 2 |
+| `screened`, `built`, `kept` and `dropped` | 0 |
+
+HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) added the strategy `corridors`, which is the prototype of `HWY-031`. Its screen is the first item of wave 2.
 
 ## The duplicate groups
 
@@ -183,8 +187,8 @@ The columns of the tables:
 | Wave | Ideas | Records | Expected wins | Cost (S, M, L) | What it needs |
 |---|---|---|---|---|---|
 | 1 | 11 | 15 | `R5`, `B1`, `B2`, `R1`, `R4`, `R10` | 10, 1, 0 | `B2`, `B3` and `B6` in the screen |
-| 2 | 17 | 24 | `B1`, `B2`, `B8`, `B3`, `Z10`, `B6` | 15, 2, 0 | The step `highway` (HWY-STEP) |
-| 3 | 43 | 48 | `B1`, `B8`, `B2`, `B4`, `B7`, `R1` | 13, 27, 3 | Wave 2, and the step `follow` for some ideas |
+| 2 | 17 | 24 | `B1`, `B2`, `B8`, `B3`, `Z10`, `B6` | 15, 2, 0 | The step `highway` (HWY-STEP, shipped) |
+| 3 | 43 | 48 | `B1`, `B8`, `B2`, `B4`, `B7`, `R1` | 13, 27, 3 | The corridors and merge points of wave 2 |
 | 4 | 50 | 54 | `B1`, `R1`, `R5`, `M1`, `Z10`, `M4` | 18, 30, 2 | The measures W1 to W7 |
 | 5 | 41 | 43 | `R12`, `M4`, `R5`, `R6`, `R1`, `B5` | 15, 21, 5 | `R12`, `B5` and `M4` in the screen |
 | 6 | 43 | 46 | `B1`, `R5`, `B2`, `B7`, `R4`, `B6` | 14, 26, 3 | A measure of loops (P2) |
@@ -200,7 +204,7 @@ Each idea of wave 1 changes a step or a router that exists. It changes the plugs
 
 ### Wave 2: the step `highway`
 
-The ideas of wave 2 are strategies of the step `highway`. HWY-STEP makes this step at this time. The corridor signatures (`HWY-031`) and the merge points (`HWY-050`) come first.
+The ideas of wave 2 are strategies of the step `highway`. HWY-STEP made this step and the step `follow`. The corridor signatures (`HWY-031`) and the merge points (`HWY-050`) come first.
 
 - **Expected wins.** `B1`, `B2`, `B8`, `B3`, `Z10` and `B6`.
 - **The screen that decides.** Five boards: `case-dense-groups`, `case-hub-chain`, `case-many-groups`, `small-clustered` (5 seeds) and `mid-fanout` (1 seed). The baselines are `corners`, `shared` and `trunks`. An idea stays when it is better than `shared` on 3 of 5 boards. Better means a `B1` at least as high and a `B3` q95 at most as high.
@@ -212,7 +216,7 @@ Wave 3 holds the other ideas of the highway note. The ideas of tier 2 come first
 
 - **Expected wins.** `B1`, `B8`, `B2`, `B4`, `B7` and `R1`.
 - **The screen that decides.** The five boards of wave 2, with the same baselines.
-- **Cost.** 13 small, 27 medium and 3 large prototypes. The ideas that follow a highway need the step `follow`, which does not exist yet.
+- **Cost.** 13 small, 27 medium and 3 large prototypes.
 
 ### Wave 4: the other new ideas (WILD)
 
@@ -585,6 +589,6 @@ The notes also propose new measures that MEAS0 does not have. `meas3.json` gives
 ## Gaps
 
 - The screen does not have `B2`, `B3` and `B6` yet. Wave 1 needs them, so MEAS3 comes before wave 1 or with it.
-- The step `follow` does not exist. Some ideas of wave 3 need it.
+- The screen of `corridors` (`HWY-031`) against its rule is not done. Until then, `HWY-031` stays at `prototyped`.
 - The near pairs are a judgment. BUILD-W can find more pairs while it builds. Then it adds them to `related` or to a group.
 - The stage of each record is `cataloged`. The screen results of BUILD-W move the stages.

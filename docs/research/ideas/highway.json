@@ -1403,7 +1403,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at B3 q95 <= 0.95 x shared on 3 of 5 boards. This is the first idea to screen.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "prototyped",
     "related": [
       "HWY-025",
       "HWY-034",
