@@ -1031,18 +1031,15 @@
     "placementDependent": true,
     "screen": "On shared and shared-all over case-hub-chain, case-many-groups and small-clustered, with 5 seeds: keep an order when Â12 is 0.64 or more on the q95 of R5 or on B1.",
     "prototype": "S",
-    "stage": "kept",
+    "stage": "dropped",
     "related": [
-      "WILD-023",
-      "WILD-056",
-      "WILD-053",
+      "EDA-034",
       "NAT-024",
-      "EDA-034"
+      "WILD-023",
+      "WILD-053",
+      "WILD-056"
     ],
-    "same": [
-      "NAT-024"
-    ],
-    "canonical": "NAT-024",
+    "same": [],
     "wave": 1,
     "result": {
       "date": "2026-10-27",

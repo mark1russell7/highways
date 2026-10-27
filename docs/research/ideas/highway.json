@@ -1759,13 +1759,12 @@
     "stage": "screened",
     "related": [
       "HWY-039",
-      "HWY-047",
       "HWY-043",
+      "HWY-047",
       "HWY-051"
     ],
     "same": [
-      "EDA-029",
-      "HWY-039"
+      "EDA-029"
     ],
     "canonical": "EDA-029",
     "wave": 1,
@@ -1879,19 +1878,16 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if the rip-up passes raise B1 by 5% over shared at equal B3 q95 on 3 of 5 boards.",
     "prototype": "S",
-    "stage": "screened",
+    "stage": "kept",
     "related": [
-      "HWY-038",
-      "HWY-005",
-      "HWY-044",
-      "HWY-016",
-      "EDA-010"
-    ],
-    "same": [
+      "EDA-010",
       "EDA-029",
-      "HWY-038"
+      "HWY-005",
+      "HWY-016",
+      "HWY-038",
+      "HWY-044"
     ],
-    "canonical": "EDA-029",
+    "same": [],
     "wave": 1,
     "result": {
       "date": "2026-10-27",
