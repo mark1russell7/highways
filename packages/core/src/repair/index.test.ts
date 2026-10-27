@@ -66,9 +66,23 @@ describe("repairResult (RULE-046)", () => {
     expect(rules(plugged, fixed.result)).toEqual([]);
   });
 
+  it("walks along the boundaries of boxes that touch", () => {
+    // The three boxes touch, so no way goes around `c` with a margin. The walk goes along the top side of `c`.
+    const row: Graph = {
+      nodes: [node("a", 0, 0), node("c", 10, 0), node("b", 20, 0)],
+      edges: [{ id: "ab", source: { node: "a" }, target: { node: "b" } }],
+    };
+    const base = { routes: [route("ab", [10, 5], [20, 5])] };
+    expect(rules(row, base)).toContain("no-pass-through");
+    const out = repairResult(row, base, { detour: false, reroute: false });
+    expect(out.counts.walked).toBe(1);
+    expect(out.result.routes[0]!.points).toEqual([{ x: 10, y: 5 }, { x: 10, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 5 }]);
+    expect(rules(row, out.result)).toEqual([]);
+  });
+
   it("keeps the base route when no repair works", () => {
     const r = route("ab", [10, 5], [100, 5]);
-    const out = repairResult(board, { routes: [r] }, { push: false, detour: false });
+    const out = repairResult(board, { routes: [r] }, { push: false, detour: false, reroute: false, walk: false });
     expect(out.counts.kept).toBe(1);
     expect(out.result.routes[0]).toBe(r);
   });
@@ -116,7 +130,7 @@ describe("repairResult (RULE-046)", () => {
     expect(sameData(a, repairResult(g, base))).toBe(true);
     const before = checkProperties(g, base, 1e6).filter((v) => v.rule === "no-pass-through").length;
     const after = checkProperties(g, a.result, 1e6).filter((v) => v.rule === "no-pass-through").length;
-    expect(after).toBeLessThanOrEqual(before);
+    expect(after).toBeLessThan(before);
   });
 
   it("makes a strategy with the name, the defaults and the schema of the router", () => {

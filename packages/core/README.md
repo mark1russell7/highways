@@ -391,6 +391,7 @@ Two functions wrap a router strategy. The wrapped strategy has a new name, and t
 - `repairStrategy(strategy, repair?)` gives `<name>+repair`. After the router, `repairResult` repairs the breaks of the hard rules.
   - It moves each free end back to its plug, and pushes each inner leg out of a box.
   - It replaces each other leg through a box with a detour through the corner graph.
+  - When a leg does not repair, it routes the whole route again. Else it walks along the boundaries of the boxes, so boxes that touch do not block it.
   - A route that it cannot repair keeps its base route.
 - `withStableOrder(router)` and `withRepair(router, repair?)` wrap a `Router` in the same way.
 

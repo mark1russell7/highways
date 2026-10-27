@@ -5,6 +5,9 @@ import { fixedPortPoint, nodeIndex, type Bundle, type Edge, type Graph, type Lev
 import { nearestSide, placePlug, SIDE_NORMAL } from "../plugs.ts";
 import { defineStrategy, type Strategy } from "../strategies/model.ts";
 import { WayFinder } from "../ways.ts";
+import { BoundaryWalk, nearestOnBoundary } from "./walk.ts";
+
+export { BoundaryWalk, nearestOnBoundary } from "./walk.ts";
 
 /** The options of the repair step (RULE-046). */
 export interface RepairOptions {
@@ -16,6 +19,10 @@ export interface RepairOptions {
   readonly push?: boolean;
   /** With `false`, the step takes no detour through the corner graph. The default is `true`. */
   readonly detour?: boolean;
+  /** With `false`, the step does not route a whole faulty route again through the corner graph. The default is `true`. */
+  readonly reroute?: boolean;
+  /** With `false`, the step does not walk along the boundaries of the boxes. The default is `true`. */
+  readonly walk?: boolean;
 }
 
 /** The counts of one repair: what the step found and what it did. */
@@ -30,6 +37,10 @@ export interface RepairCounts {
   readonly pushed: number;
   /** The legs that the step replaced with a detour through the corner graph. */
   readonly detoured: number;
+  /** The faulty routes that the step routed again from end to end through the corner graph. */
+  readonly rerouted: number;
+  /** The faulty routes that the step replaced with a walk along the boundaries of the boxes. */
+  readonly walked: number;
   /** The missing routes that the step added. */
   readonly added: number;
   /** The faulty routes that the step could not repair. They keep their base routes. */
@@ -48,21 +59,6 @@ export interface RepairReport {
 
 /** The repair step makes at most this number of fixes for one route. A route that needs more keeps its base route. */
 const MAX_FIXES = 64;
-
-/** This function gives the point of the boundary of the box that is nearest to `p`. */
-export function nearestOnBoundary(box: Box, p: Point): Point {
-  const x0 = box.x;
-  const y0 = box.y;
-  const x1 = box.x + box.w;
-  const y1 = box.y + box.h;
-  const inside = p.x > x0 && p.x < x1 && p.y > y0 && p.y < y1;
-  if (!inside) return { x: Math.min(x1, Math.max(x0, p.x)), y: Math.min(y1, Math.max(y0, p.y)) };
-  const side = nearestSide(box, p);
-  if (side === "north") return { x: p.x, y: y0 };
-  if (side === "south") return { x: p.x, y: y1 };
-  if (side === "west") return { x: x0, y: p.y };
-  return { x: x1, y: p.y };
-}
 
 /** This function tells if the point is on the boundary of the box, within `TOLERANCE`, as the rule `link-ends` tests it. */
 function onBoundary(p: Point, b: Box): boolean {
@@ -92,6 +88,8 @@ function dedupe(p: readonly Point[]): Point[] {
  * - It moves each end back to its fixed plug, or to the nearest point of the box of its node (`ends-at-plugs` and `fixed-plugs`).
  * - It pushes each inner leg out of a box that it goes through, to the near side of the box (`no-pass-through`).
  * - It replaces each other leg through a box with a detour through the corner graph.
+ * - When a leg does not repair, it routes the whole route again through the corner graph.
+ *   Else it walks along the boundaries of the boxes (`BoundaryWalk`).
  * - A route that still breaks a rule keeps its base route.
  * - It takes an edge out of a run or a bundle when its new route does not hold the run or the trunk (`run-shared` and `bundle-trunk`).
  * - It moves the ends of each level link to the boundaries of its items (`link-ends`).
@@ -102,12 +100,16 @@ export function repairResult(graph: Graph, result: Result, options: RepairOption
   const margin = options.margin ?? 5;
   const doPush = options.push ?? true;
   const doDetour = options.detour ?? true;
+  const doReroute = options.reroute ?? true;
+  const doWalk = options.walk ?? true;
   const byId = nodeIndex(graph);
   const grid = new Grid<Node>(180);
   for (const n of graph.nodes) grid.add(n, n.box);
   let ways: WayFinder | undefined;
+  let walker: BoundaryWalk | undefined;
+  const walkerOf = (): BoundaryWalk => (walker ??= new BoundaryWalk(graph.nodes, grid));
   const waysOf = (): WayFinder => (ways ??= new WayFinder(graph.nodes, { margin, ...(options.k === undefined ? {} : { k: options.k }) }));
-  const counts = { routes: 0, faulty: 0, snapped: 0, pushed: 0, detoured: 0, added: 0, kept: 0, unbundled: 0, linkEnds: 0 };
+  const counts = { routes: 0, faulty: 0, snapped: 0, pushed: 0, detoured: 0, rerouted: 0, walked: 0, added: 0, kept: 0, unbundled: 0, linkEnds: 0 };
 
   // The test of the rule `no-pass-through`: a node whose box the segment goes through. The end nodes `s` and `t` do not count.
   const hitOf = (p: Point, q: Point, s: Node, t: Node): Node | undefined => {
@@ -222,13 +224,35 @@ export function repairResult(graph: Graph, result: Result, options: RepairOption
     }
     if (!fault) return r;
     counts.faulty++;
+    let whole: "rerouted" | "walked" | undefined;
     if (failed) {
-      counts.kept++;
-      return r;
+      // The legs do not repair one by one. The step routes the whole route again from its two ends.
+      const a = p[0]!;
+      const b = p[p.length - 1]!;
+      const finder = doReroute ? waysOf() : undefined;
+      const way = finder?.corners.path(leave(a), leave(b));
+      const again = way ? dedupe([a, ...finder!.corners.pull(way), b]) : undefined;
+      if (again && clear(again, s, t)) {
+        p = again;
+        whole = "rerouted";
+      } else {
+        const walk = doWalk ? walkerOf().path(a, s, b, t) : undefined;
+        if (walk && clear(walk, s, t)) {
+          p = walk;
+          whole = "walked";
+        }
+      }
+      if (!whole) {
+        counts.kept++;
+        return r;
+      }
+      counts[whole]++;
     }
     counts.snapped += snapped;
-    counts.pushed += pushed;
-    counts.detoured += detoured;
+    if (!whole) {
+      counts.pushed += pushed;
+      counts.detoured += detoured;
+    }
     changed.add(r.edge);
     return { edge: r.edge, points: p };
   };
@@ -247,8 +271,11 @@ export function repairResult(graph: Graph, result: Result, options: RepairOption
       continue;
     }
     counts.faulty++;
-    const way = waysOf().between(placePlug(s, e.source, center(t.box)), placePlug(t, e.target, center(s.box)), new Set<Node>([s, t]));
-    if (!clear(way, s, t)) {
+    const ps = placePlug(s, e.source, center(t.box));
+    const pt = placePlug(t, e.target, center(s.box));
+    let way: Point[] | undefined = waysOf().between(ps, pt, new Set<Node>([s, t]));
+    if (!clear(way, s, t)) way = doWalk ? walkerOf().path(ps.point, s, pt.point, t) : undefined;
+    if (!way || !clear(way, s, t)) {
       counts.kept++;
       continue;
     }
