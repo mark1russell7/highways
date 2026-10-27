@@ -57,6 +57,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | NAT-R | Research: [ideas from nature](research/NATURE.md). The note gives 49 ideas, 7 of them ours and 25 hybrids, in [a catalog](research/ideas/nature.json). It gives a build order of 14 ideas for BUILD-W. | 2026-10-27 | #62 |
 | RULE-R | Research: [rules, forces and constraints for the routes](research/RULES.md). The note gives 53 ideas in seven areas, 13 of them ours and 25 hybrids. It gives a build order of 15 steps for BUILD-W. | 2026-10-27 | #63 |
 | HWY-STEP | The step `highway` gives a plan as data, and `follow` routes it. `keys`, `shared-ways` and `corridors` plug in, and the 16 digests of the routers stay the same. | 2026-10-27 | #67 |
+| REL7 | Version 0.4.0 on npm: EX2-FIX, SCREEN, the record field `tolerance` and HWY-STEP. MINOR, because the type `Step` gains `highway`. The default routes do not change. | 2026-10-27 | #68 |
 
 ## Open
 
