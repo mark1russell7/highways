@@ -3,15 +3,20 @@ import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
+import type { DiffusionOptions } from "../highways/diffusion/index.ts";
+import type { FlowClusterOptions } from "../highways/flow-clusters/index.ts";
 import type { FlowFieldOptions } from "../highways/flow-field/index.ts";
 import type { GroupSpine } from "../highways/grouped.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
+import type { MingleOptions } from "../highways/mingle/index.ts";
 import type { OdCellOptions } from "../highways/od-cells/index.ts";
 import type { QuickBundlesOptions } from "../highways/quickbundles/index.ts";
 import type { RoadClassOptions } from "../highways/road-classes/index.ts";
 import type { SelectOptions } from "../highways/select/index.ts";
+import type { SpiralOptions } from "../highways/spiral/index.ts";
 import type { StubOptions } from "../highways/stubs/index.ts";
+import type { TraclusOptions } from "../highways/traclus/index.ts";
 import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
 import type { WspdOptions } from "../highways/wspd/index.ts";
 import type { ZipperOptions } from "../highways/zipper/index.ts";
@@ -402,4 +407,55 @@ export const SELECT_SCHEMA: OptionSchema<SelectOptions> = {
   generators: { type: "list", default: ["corridors", "quickbundles", "wspd", "road-classes"], describe: "The highway strategies that propose the candidates." },
   lambda: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the added length of the edges against the ink that a highway saves." },
   swaps: { type: "integer", min: 0, max: 5, step: 1, default: 2, describe: "The number of passes of the local search with one swap." },
+};
+
+/** The declarations of the options of the highway strategy `mingle` (HWY-003). */
+export const MINGLE_SCHEMA: OptionSchema<MingleOptions> = {
+  k: { type: "integer", min: 4, max: 16, step: 1, default: 8, describe: "Each bundle looks for a merge among this number of nearest bundles in 4D." },
+  maxTurn: { type: "number", min: 20, max: 60, step: 5, marks: [20, 40, 60], default: 40, describe: "The largest turn of an edge at a meeting point, in degrees." },
+  levels: { type: "integer", min: 1, max: 10, step: 1, default: 6, describe: "The number of levels of merges." },
+  weight: { type: "number", min: 0.5, max: 1, step: 0.05, default: 1, describe: "The weight of the trunk in the ink. With 1, the trunk costs its length one time." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A bundle with this number of edges or more gets highways." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `spiral` (HWY-017 with EDA-035). */
+export const SPIRAL_SCHEMA: OptionSchema<SpiralOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  alpha: { type: "number", min: 10, max: 40, step: 5, marks: [15, 25, 35], default: 25, describe: "The spiral angle, in degrees: the largest angle between a branch and the line to the root." },
+  minTargets: { type: "integer", min: 3, max: 20, step: 1, default: 4, describe: "A node with this number of edges or more gets a spiral tree." },
+  arc: { type: "integer", min: 2, max: 8, step: 1, default: 4, describe: "The number of points of the arc of each branch." },
+};
+
+/** The declarations of the options of the highway strategy `flow-clusters` (HWY-023). */
+export const FLOW_CLUSTER_SCHEMA: OptionSchema<FlowClusterOptions> = {
+  tau: { type: "number", min: 0.1, max: 0.6, step: 0.05, marks: [0.2, 0.3, 0.45], default: 0.3, describe: "Two clusters join while their distance is this share of the length of the shorter edge, or less." },
+  linkage: { type: "enum", values: ["average", "complete", "single"], default: "average", describe: "The distance of two clusters: the mean, the largest or the smallest distance of their edges." },
+  directed: { type: "boolean", default: false, describe: "With this option, the source of one edge only compares with the source of the other edge." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `traclus` (HWY-025). */
+export const TRACLUS_SCHEMA: OptionSchema<TraclusOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  eps: { type: "number", min: 1, max: 6, step: 0.5, marks: [1, 2, 4], default: 2, describe: "Two segments are neighbours when their distance is this value or less, in units of the board." },
+  minLns: { type: "integer", min: 2, max: 16, step: 1, default: 3, describe: "A cluster has segments of this number of edges or more." },
+  wPerp: { type: "number", min: 0, max: 2, step: 0.25, default: 1, describe: "The weight of the perpendicular distance." },
+  wPar: { type: "number", min: 0, max: 2, step: 0.25, default: 1, describe: "The weight of the parallel distance." },
+  wTheta: { type: "number", min: 0, max: 2, step: 0.25, default: 1, describe: "The weight of the angle distance." },
+  mdl: { type: "number", min: 0.5, max: 2, step: 0.25, default: 1, describe: "A route keeps a corner when the cost without it is more than this value times the cost with it." },
+};
+
+/** The declarations of the options of the highway strategy `diffusion` (HWY-020). */
+export const DIFFUSION_SCHEMA: OptionSchema<DiffusionOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  a: { type: "number", min: 0, max: 0.5, step: 0.05, default: 0.25, describe: "The share of the density that each step takes from the links next to a link." },
+  steps: { type: "integer", min: 0, max: 10, step: 1, default: 3, describe: "The number of steps of the diffusion." },
+  lambda: { type: "number", min: 0, max: 2, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the density in the cost of a link." },
+  gamma: { type: "number", min: 0.5, max: 2, step: 0.25, default: 1, describe: "The power of the discount of a dense link." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
 };

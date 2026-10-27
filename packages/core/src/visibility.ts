@@ -211,6 +211,11 @@ export class CornerGraph {
     return n / 2;
   }
 
+  /** This method gives the corners that link to the corner `i`, in the order of their indexes. A corner that is not in the graph gives an empty list. */
+  neighbours(i: number): readonly number[] {
+    return this.#adj[i] ?? [];
+  }
+
   /** This method gives the index of the corner nearest to `p`, seen or not, or -1 when the graph has no corner near it. */
   nearest(p: Point): number {
     for (let r = this.#cell; r <= this.#cell * 64; r *= 2) {

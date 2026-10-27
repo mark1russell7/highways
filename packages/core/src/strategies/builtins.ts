@@ -18,17 +18,22 @@ import { hysteresisGate, type HysteresisOptions } from "../highways/gates/hyster
 import { stableIdGate, type StableIdOptions } from "../highways/gates/ids/index.ts";
 import { gateStrategy } from "../highways/gates/model.ts";
 import { stretchGate, type StretchOptions } from "../highways/gates/stretch/index.ts";
+import { DIFFUSION_DEFAULTS, diffusionPlan, type DiffusionOptions } from "../highways/diffusion/index.ts";
+import { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, type FlowClusterOptions } from "../highways/flow-clusters/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
 import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
 import { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "../highways/level-links/index.ts";
 import { MEET_DEFAULTS, meetPlan, type MeetOptions } from "../highways/meet/index.ts";
+import { MINGLE_DEFAULTS, minglePlan, type MingleOptions } from "../highways/mingle/index.ts";
 import type { HighwayInput } from "../highways/model.ts";
 import { OD_CELL_DEFAULTS, odCellPlan, type OdCellOptions } from "../highways/od-cells/index.ts";
 import { QUICKBUNDLES_DEFAULTS, quickBundlesPlan, type QuickBundlesOptions } from "../highways/quickbundles/index.ts";
 import { ROAD_CLASS_DEFAULTS, roadClassPlan, type RoadClassOptions } from "../highways/road-classes/index.ts";
 import { SELECT_DEFAULTS, selectPlan, type SelectOptions } from "../highways/select/index.ts";
 import { sharedWaysPlan, type SharedWaysOptions } from "../highways/shared-ways/index.ts";
+import { SPIRAL_DEFAULTS, spiralPlan, type SpiralOptions } from "../highways/spiral/index.ts";
 import { STUB_DEFAULTS, stubPlan, type StubOptions } from "../highways/stubs/index.ts";
+import { TRACLUS_DEFAULTS, traclusPlan, type TraclusOptions } from "../highways/traclus/index.ts";
 import { WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
 import { WSPD_DEFAULTS, wspdPlan, type WspdOptions } from "../highways/wspd/index.ts";
 import { ZIPPER_DEFAULTS, zipperPlan, type ZipperOptions } from "../highways/zipper/index.ts";
@@ -44,7 +49,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, FLOW_FIELD_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -389,6 +394,11 @@ export const highwayStrategies: {
   readonly wspd: Strategy<"highway", WspdOptions>;
   readonly "od-cells": Strategy<"highway", OdCellOptions>;
   readonly select: Strategy<"highway", SelectOptions>;
+  readonly mingle: Strategy<"highway", MingleOptions>;
+  readonly spiral: Strategy<"highway", SpiralOptions>;
+  readonly "flow-clusters": Strategy<"highway", FlowClusterOptions>;
+  readonly traclus: Strategy<"highway", TraclusOptions>;
+  readonly diffusion: Strategy<"highway", DiffusionOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -512,6 +522,51 @@ export const highwayStrategies: {
     schema: SELECT_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SelectOptions>) => selectPlan(input, o),
+  }),
+  mingle: defineStrategy({
+    step: "highway",
+    name: "mingle",
+    describe: "MINGLE (HWY-003). Edges are points in 4D. Near bundles merge level by level while the merge saves ink, and each bundle gets one trunk.",
+    defaults: { ...MINGLE_DEFAULTS } as MingleOptions,
+    schema: MINGLE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<MingleOptions>) => minglePlan(input, o),
+  }),
+  spiral: defineStrategy({
+    step: "highway",
+    name: "spiral",
+    describe: "Spiral trees (HWY-017, EDA-035). The edges of a node with many edges branch on arcs of spirals, and each branch with two edges is a highway.",
+    defaults: { ...SPIRAL_DEFAULTS } as SpiralOptions,
+    schema: SPIRAL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SpiralOptions>) => spiralPlan(input, o),
+  }),
+  "flow-clusters": defineStrategy({
+    step: "highway",
+    name: "flow-clusters",
+    describe: "Flow clusters (HWY-023). A hierarchical clustering puts the edges with near sources and near targets together, and each cluster gets highways.",
+    defaults: { ...FLOW_CLUSTER_DEFAULTS } as FlowClusterOptions,
+    schema: FLOW_CLUSTER_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<FlowClusterOptions>) => flowClusterPlan(input, o),
+  }),
+  traclus: defineStrategy({
+    step: "highway",
+    name: "traclus",
+    describe: "TRACLUS (HWY-025). The first routes break into segments, and the dense clusters of near segments become highways.",
+    defaults: { ...TRACLUS_DEFAULTS } as TraclusOptions,
+    schema: TRACLUS_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<TraclusOptions>) => traclusPlan(input, o),
+  }),
+  diffusion: defineStrategy({
+    step: "highway",
+    name: "diffusion",
+    describe: "Route-aware bundling (HWY-020). The density of the first ways diffuses on the corner graph, and dense links cost less in a second pass.",
+    defaults: { ...DIFFUSION_DEFAULTS } as DiffusionOptions,
+    schema: DIFFUSION_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<DiffusionOptions>) => diffusionPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

@@ -19,4 +19,9 @@ export { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FieldEnd, type FlowFieldOption
 export { SplitTree, WSPD_DEFAULTS, wspdGroups, wspdPlan, type SplitCell, type WspdOptions } from "./wspd/index.ts";
 export { OD_CELL_DEFAULTS, odCellPlan, odGroups, type OdCellOptions } from "./od-cells/index.ts";
 export { CANDIDATE_SOURCES, candidatePlan, candidateScore, SELECT_DEFAULTS, selectPlan, type CandidateSource, type SelectOptions } from "./select/index.ts";
+export { MINGLE_DEFAULTS, mingleBundles, minglePlan, type MingleOptions } from "./mingle/index.ts";
+export { SPIRAL_DEFAULTS, spiralJoin, spiralPlan, spiralTree, type SpiralNode, type SpiralOptions } from "./spiral/index.ts";
+export { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, flowClusters, flowDistance, LINKAGES, type FlowClusterOptions, type Linkage } from "./flow-clusters/index.ts";
+export { characteristicPoints, representative, segmentClusters, segmentDistance, TRACLUS_DEFAULTS, traclusPlan, type RouteSegment, type TraclusOptions } from "./traclus/index.ts";
+export { DIFFUSION_DEFAULTS, diffusionPlan, linkDensity, type DiffusionOptions } from "./diffusion/index.ts";
 export * from "./gates/index.ts";
