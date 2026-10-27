@@ -281,6 +281,11 @@ describe("screen", () => {
       ["highway", "keys"],
       ["highway", "shared-ways"],
       ["highway", "corridors"],
+      ["highway", "meet"],
+      ["highway", "weiszfeld"],
+      ["highway", "stubs"],
+      ["highway", "zipper"],
+      ["highway", "level-links"],
     ]);
     for (const r of records.filter((x) => x.step === "highway")) {
       expect(Object.keys(r.hard), r.strategy).toEqual([...SCREEN_RULES.highway]);

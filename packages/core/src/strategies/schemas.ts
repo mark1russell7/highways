@@ -1,7 +1,13 @@
 import type { CutOptions } from "../groups/cut/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
+import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
+import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
+import type { MeetOptions } from "../highways/meet/index.ts";
+import type { StubOptions } from "../highways/stubs/index.ts";
+import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
+import type { ZipperOptions } from "../highways/zipper/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
@@ -282,4 +288,54 @@ export const CUT_SCHEMA: OptionSchema<CutOptions> = {
   objective: { type: "enum", values: ["ratio", "normalized", "sparsest"], default: "ratio", describe: "The cost of a line: the ratio cut, the normalized cut or the sparsest cut." },
   pull: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 0.5, 1, 2, 4], default: 0.5, describe: "The cost of a line grows with its distance from the middle of the cell, by this factor." },
   guard: { type: "boolean", default: true, describe: "With `true`, each section also tests the quadtree split, and keeps the split that cuts fewer edges." },
+};
+
+/** The declaration of the plan that a post step of the step `highway` changes (BUILD-W2B). */
+const HIGHWAY_BASE: EnumOption<HighwayBase> = {
+  type: "enum",
+  values: ["none", "shared-ways", "corridors"],
+  default: "shared-ways",
+  describe: "The plan that the strategy changes: no highway, the highways of `shared-ways`, or the highways of `corridors`.",
+};
+
+/** The declarations of the options of the highway strategy `meet` (HWY-050). */
+export const MEET_SCHEMA: OptionSchema<MeetOptions> = {
+  from: HIGHWAY_BASE,
+  near: { type: "number", min: 2, max: 40, step: 2, default: 8, describe: "A first route meets the spine where it is this distance from the spine, or nearer." },
+  maxTurn: { type: "number", min: 10, max: 90, step: 5, default: 45, describe: "A first route meets the spine only where it runs at this angle to the spine, or less, in degrees." },
+  minRun: { type: "number", min: 0, max: 80, step: 5, default: 10, describe: "A member keeps its places when the stretch where its first route meets the spine is shorter than this length." },
+};
+
+/** The declarations of the options of the highway strategy `weiszfeld` (HWY-043). */
+export const WEISZFELD_SCHEMA: OptionSchema<WeiszfeldOptions> = {
+  from: HIGHWAY_BASE,
+  alpha: { type: "number", min: 0, max: 1, step: 0.1, default: 0.5, describe: "The weight of the trunk is `k^alpha` for `k` members." },
+  steps: { type: "integer", min: 1, max: 50, step: 1, marks: [10, 20, 50], default: 20, describe: "The number of steps of Weiszfeld." },
+};
+
+/** The declarations of the options of the highway strategy `stubs` (HWY-015 with WILD-005). */
+export const STUB_SCHEMA: OptionSchema<StubOptions> = {
+  from: HIGHWAY_BASE,
+  omega: { type: "number", min: 10, max: 60, step: 5, default: 30, describe: "The ends of one side of a box whose directions are in a window of this angle share a stub, in degrees." },
+  sigma: { type: "number", min: 0.1, max: 0.4, step: 0.05, default: 0.25, describe: "The length of a stub is this share of the distance to the nearest other end." },
+  ends: { type: "enum", values: ["source", "target", "both"], default: "both", describe: "The ends that get stubs." },
+  minSize: { type: "integer", min: 2, max: 8, step: 1, default: 2, describe: "A stub has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `zipper` (NAT-022 with WILD-037). */
+export const ZIPPER_SCHEMA: OptionSchema<ZipperOptions> = {
+  from: HIGHWAY_BASE,
+  near: { type: "number", min: 0.5, max: 3, step: 0.25, default: 1, describe: "Two legs zip when they are this distance apart or nearer, in units of the board." },
+  maxAngle: { type: "number", min: 5, max: 30, step: 5, default: 15, describe: "Two legs zip when the angle between them is this value or less, in degrees." },
+  adhesion: { type: "number", min: 0, max: 1, step: 0.1, default: 0.3, describe: "Two legs zip when this value times their overlap is more than the length that the zip adds." },
+  minOverlap: { type: "number", min: 1, max: 5, step: 0.5, default: 1, describe: "Two legs zip when they overlap along this length or more, in units of the board." },
+  passes: { type: "integer", min: 1, max: 5, step: 1, default: 1, describe: "The number of passes. Each pass routes the plan and zips the legs again." },
+};
+
+/** The declarations of the options of the highway strategy `level-links` (HWY-056 with WILD-034). */
+export const LEVEL_HIGHWAY_SCHEMA: OptionSchema<LevelHighwayOptions> = {
+  from: HIGHWAY_BASE,
+  depth: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "The depth of the level in the tree of sections." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A level link becomes a highway when this number of edges or more ride it." },
+  stretch: { type: "number", min: 1.2, max: 2, step: 0.1, default: 1.5, describe: "An edge rides the link only when its way along the link is this many times its first route, or shorter." },
 };
