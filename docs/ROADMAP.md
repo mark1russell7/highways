@@ -35,6 +35,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | OPTS | Each strategy declares its options in `schema`: 74 declarations on 17 built-in strategies. A sweep from the declarations gives the hub-limit table of CUSTOM. The defaults do not change. | 2026-10-26 | #31 |
 | MEAS0 | Research: [the measures of a good result](research/MEASURES.md). The note gives 59 measures in six areas, 35 of them new to the bench, and 6 proposed hard rules. | 2026-10-26 | #32 |
 | ER3d | The measures split level through into unavoidable and avoidable links. A link through a far box gets a second way (`throughCost`, default 8). On `mid-clustered`, avoidable level through: 114 before, 54 after. The level links take 8% more time. | 2026-10-26 | #33 |
+| HWC | `highwayCurves` bends the lanes of a bundle as one, with concentric arcs. On `shared` and `case-dense-groups`, worst lane spacing error: 13.6% before, 0.8% after, with 0 tangent breaks. | 2026-10-26 | #36 |
 
 ## Open
 
@@ -42,7 +43,6 @@ Status: `done`, `active`, `blocked`, `later`.
 |---|---|---|---|---|
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 | MEAS1 | The measure suite: each measure of MEAS0 in the bench, with seeds, medians and spread. The report gives the Pareto front of each step. | `later` | MEAS0 | P1 |
-| HWC | Curved highways: a bundle bends as one. Its lanes stay parallel at the lane spacing through each bend, and merge and split on smooth curves. | `later` | CURVE | P1 |
 | ROOM2 | Room at each zoom level: each level of the tree gets the gaps that its level links need. The boxes stay stable from level to level. | `later` | ROOM, CUSTOM | P1 |
 | MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
 | CURV-R | Research: curve families and their math. Continuity of the tangent and the curvature, clothoids, biarcs, Hobby curves, splines and the clearance to the boxes. | `later` | MEAS0 | P2 |

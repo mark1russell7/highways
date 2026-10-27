@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { CURVE_TYPES } from "../curves/index.ts";
+import { CASES } from "../cases.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { ROUTERS } from "../routers/index.ts";
-import { benchCurves, formatCurves } from "./curves.ts";
+import { benchCurves, benchHighways, formatCurves, formatHighways, SPACING_LIMIT } from "./curves.ts";
 
 describe("benchCurves", () => {
   it("gives one row for each type, and a clamped curve goes through no box that its route avoids", () => {
@@ -14,5 +15,21 @@ describe("benchCurves", () => {
       expect(rows[0]!.length).toBeCloseTo(1, 9);
       expect(formatCurves(rows).split("\n")).toHaveLength(2 + CURVE_TYPES.length);
     }
+  });
+});
+
+describe("benchHighways", () => {
+  it("measures the lanes of each bundle when each lane bends alone and when the bundle bends as one", () => {
+    const graph = CASES.find((c) => c.name === "case-dense-groups")!.make();
+    const rows = benchHighways(ROUTERS.find((r) => r.name === "shared")!, "case-dense-groups", graph);
+    expect(rows.map((r) => r.curve)).toEqual(["rounded", "highway"]);
+    const [alone, together] = rows as [(typeof rows)[0], (typeof rows)[0]];
+    expect(together.bundles).toBeGreaterThan(0);
+    expect(together.lanes).toBe(alone.lanes);
+    expect(alone.worstSpacing).toBeGreaterThan(SPACING_LIMIT);
+    expect(together.worstSpacing).toBeLessThanOrEqual(SPACING_LIMIT);
+    expect(together.breaks).toBe(0);
+    expect(together.through).toBe(0);
+    expect(formatHighways(rows).split("\n")).toHaveLength(4);
   });
 });

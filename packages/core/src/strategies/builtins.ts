@@ -1,4 +1,5 @@
 import { arcCurve, type ArcOptions } from "../curves/arc/index.ts";
+import { highwayCurve } from "../curves/highway/index.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
 import { splineCurve, type SplineOptions } from "../curves/spline/index.ts";
 import { straightCurve } from "../curves/straight/index.ts";
@@ -15,7 +16,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CORNERS_SCHEMA, KEY_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
+import { CORNERS_SCHEMA, HIGHWAY_SCHEMA, KEY_SCHEMA, RADIUS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, TENSION_SCHEMA, TRUNKS_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -124,12 +125,24 @@ export interface TensionOptions {
   readonly tension: number;
 }
 
-/** The built-in curve strategies, in the order of `CURVE_TYPES`. Each one gives the same segments as `curveOf` with its type. */
+/** The options of the curve strategy `highway`. */
+export interface HighwayStrategyOptions {
+  /** The radius of the center line of a bundle at a bend, and of each lone corner. The default is 12. */
+  readonly radius: number;
+  /** The smallest radius of a lane at a bend of a bundle. The default is 4. */
+  readonly minRadius: number;
+}
+
+/**
+ * The built-in curve strategies. The first four are in the order of `CURVE_TYPES`, and each one gives the same segments as `curveOf` with its type.
+ * The strategy `highway` gives the curve of `arc` for one polyline. `highwayCurves` bends the lanes of a bundle as one.
+ */
 export const curveStrategies: {
   readonly straight: Strategy<"curve", object>;
   readonly rounded: Strategy<"curve", RadiusOptions>;
   readonly spline: Strategy<"curve", TensionOptions>;
   readonly arc: Strategy<"curve", RadiusOptions>;
+  readonly highway: Strategy<"curve", HighwayStrategyOptions>;
 } = Object.freeze({
   straight: defineStrategy({ step: "curve", name: "straight", describe: "The polyline as it is.", defaults: {}, schema: {}, run: (input: CurveInput) => straightCurve(input.points) }),
   rounded: defineStrategy({
@@ -155,6 +168,14 @@ export const curveStrategies: {
     defaults: { radius: 12 },
     schema: RADIUS_SCHEMA,
     run: (input: CurveInput, o: Readonly<RadiusOptions>) => arcCurve(input.points, { ...contextOf(input), radius: o.radius } satisfies ArcOptions),
+  }),
+  highway: defineStrategy({
+    step: "curve",
+    name: "highway",
+    describe: "The lanes of a bundle bend as one, with concentric arcs at the lane spacing. One lane alone gets the curve of `arc`.",
+    defaults: { radius: 12, minRadius: 4 },
+    schema: HIGHWAY_SCHEMA,
+    run: (input: CurveInput, o: Readonly<HighwayStrategyOptions>) => highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) }),
   }),
 });
 

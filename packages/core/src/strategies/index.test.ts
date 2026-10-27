@@ -69,7 +69,7 @@ describe("the built-in registry", () => {
   });
 
   it("holds each curve type, with the segments of curveOf", () => {
-    expect(listStrategies(STRATEGIES, "curve").map((s) => s.name)).toEqual(CURVE_TYPES);
+    expect(listStrategies(STRATEGIES, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway"]);
     const space = curveSpace(tiny.nodes.map((n) => n.box));
     const byId = nodeIndex(tiny);
     const result = ROUTERS.find((r) => r.name === "corners")!.route(tiny);
@@ -86,6 +86,12 @@ describe("the built-in registry", () => {
     expect(curveStrategies.rounded.run({ points: result.routes[0]!.points }, { radius: 4 })).toEqual(
       curveOf(result.routes[0]!.points, { type: "rounded", radius: 4 }),
     );
+    // One polyline alone has no bundle. So the curve "highway" gives the curve "arc".
+    for (const route of result.routes) {
+      const p = route.points;
+      expect(curveStrategies.highway.run({ points: p, space })).toEqual(curveOf(p, { type: "arc", space }));
+      expect(curveStrategies.highway.run({ points: p }, { radius: 6, minRadius: 2 })).toEqual(curveOf(p, { type: "arc", radius: 6 }));
+    }
   });
 
   it("holds each method of roomDemand", () => {
@@ -101,7 +107,8 @@ describe("the built-in registry", () => {
     expect(withoutTime(runBenchmark(routersOf(STRATEGIES), fixtures, { repeat: 2 }))).toEqual(withoutTime(runBenchmark(ROUTERS, fixtures, { repeat: 2 })));
     const router = ROUTERS.find((r) => r.name === "shared")!;
     const strip = (rows: readonly { ms: number }[]): unknown[] => rows.map(({ ms: _ms, ...rest }) => rest);
-    expect(strip(benchCurveStrategies(router, "tiny-uniform", tiny, listStrategies(STRATEGIES, "curve")))).toEqual(strip(benchCurves(router, "tiny-uniform", tiny)));
+    const types = listStrategies(STRATEGIES, "curve").filter((s) => (CURVE_TYPES as readonly string[]).includes(s.name));
+    expect(strip(benchCurveStrategies(router, "tiny-uniform", tiny, types))).toEqual(strip(benchCurves(router, "tiny-uniform", tiny)));
   });
 
   it("gives the same rows of the room benchmark as makeRoom with each method", () => {
@@ -155,15 +162,15 @@ describe("a consumer strategy", () => {
       run: (input) => [{ kind: "move", to: input.points[0]! }, ...input.points.slice(1).map((to) => ({ kind: "line" as const, to }))],
     });
     const more = register(STRATEGIES, zigzag);
-    expect(listStrategies(more, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "zigzag"]);
-    expect(listStrategies(STRATEGIES, "curve")).toHaveLength(CURVE_TYPES.length);
-    expect(benchCurveStrategies(ROUTERS[0]!, "tiny-uniform", tiny, listStrategies(more, "curve")).map((r) => r.type)).toEqual([...CURVE_TYPES, "zigzag"]);
+    expect(listStrategies(more, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag"]);
+    expect(listStrategies(STRATEGIES, "curve")).toHaveLength(CURVE_TYPES.length + 1);
+    expect(benchCurveStrategies(ROUTERS[0]!, "tiny-uniform", tiny, listStrategies(more, "curve")).map((r) => r.type)).toEqual([...CURVE_TYPES, "highway", "zigzag"]);
   });
 
   it("works with a registry of version 0.1.5, which has no list group", () => {
     const old = { router: STRATEGIES.router, curve: STRATEGIES.curve, room: STRATEGIES.room };
     expect(listStrategies(old, "group")).toEqual([]);
-    expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "zigzag-like"]);
+    expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag-like"]);
     expect(STEPS).toEqual(["group", "router", "curve", "room"]);
   });
 

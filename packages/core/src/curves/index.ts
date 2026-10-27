@@ -13,6 +13,7 @@ export { straightCurve } from "./straight/index.ts";
 export { roundedCurve, type RoundedOptions } from "./rounded/index.ts";
 export { splineCurve, type SplineOptions } from "./spline/index.ts";
 export { arcCurve, type ArcOptions } from "./arc/index.ts";
+export { highwayCurve, highwayCurves, type HighwayOptions, type LaneCurve } from "./highway/index.ts";
 
 /** The options of `curveOf`. Each type reads only the options that it uses. */
 export interface CurveOptions {

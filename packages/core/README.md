@@ -68,6 +68,29 @@ A canvas draws an `arc` segment with `ctx.arc(center.x, center.y, radius, start,
 
 Each type has its own function too: `straightCurve`, `roundedCurve`, `splineCurve` and `arcCurve`.
 
+### Curved highways
+
+A curve of one lane does not know the other lanes of its bundle. So the lanes of `laneRoutes` lose their spacing at a bend. `highwayCurves` curves all the lanes together, and a bundle bends as one.
+
+- At each bend of a bundle, the lanes are arcs with one center. The radius of a lane is the radius of the center line plus or minus its offset.
+- The bend grows to keep the inner lane at `minRadius`. It shrinks to fit on its legs and in the free space.
+- A lane joins or leaves a bundle on an S of two arcs on the leg with fewer lanes. The tangent has no break there.
+- A lane in no open bundle gets the curve of `arcCurve`.
+
+```ts
+import { highwayCurves, runKey, segmentsOf, toSvgPath, curveSpace } from "@mark1russell7/highways";
+
+const graph = segmentsOf(result);
+const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+const space = curveSpace(board.nodes.map((n) => n.box));
+// The same input as laneRoutes(graph, open, 4, 16). The curves come in the order of laneRoutes.
+for (const lane of highwayCurves(graph, open, 4, { maxWidth: 16, radius: 12, minRadius: 4, space })) {
+  const d = toSvgPath(lane.segments);
+}
+```
+
+The curve strategy `highway` is in the registry. For one polyline, it gives the curve of `arc`. `benchHighways` compares each lane curved alone with `rounded` to the lanes of `highwayCurves`. It gives the error of the lane spacing and the crossings in a bundle. It also gives the breaks of the tangent, the smallest radius and the curves through a box.
+
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
 
 ## Room for the links

@@ -1,6 +1,7 @@
 import {
   curveSpace,
   findStrategy,
+  highwayCurves,
   laneRoutes,
   polylineLength,
   runKey,
@@ -508,6 +509,12 @@ export class MapView {
     const width = LANE_PX / 2 ** (Math.round(Math.log2(this.s) * 8) / 8);
     if (!this.lanes || this.lanes.graph !== graph || this.lanes.open !== open || this.lanes.width !== width)
       this.lanes = { graph, open, width, routes: laneRoutes(graph, open, width, LANE_MAX) };
+    // The curve `highway` bends the lanes of a bundle as one. So it gives the curves of all the lanes together.
+    const first = this.lanes.routes[0];
+    if (this.scene?.curve === "highway" && first && !this.curves.has(first.points)) {
+      const curves = highwayCurves(graph, open, width, { maxWidth: LANE_MAX, ...(this.space ? { space: this.space } : {}) });
+      this.lanes.routes.forEach((r, i) => this.curves.set(r.points, curves[i]!.segments));
+    }
     const inOpen = new Set<string>();
     for (const s of graph.segments) if (s.count >= 2 && open.has(runKey(s.edges))) for (const e of s.edges) inOpen.add(e);
     const single = graph.segments.filter((s) => s.count < 2 && !inOpen.has(s.edges[0]!));
