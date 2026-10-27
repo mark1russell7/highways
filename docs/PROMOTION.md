@@ -33,9 +33,19 @@ A change of this rule is a change of this note. The three projects agree on the 
 All tests use paired ratios. For each input and seed, the ratio of a measure is the value of the candidate divided by the value of the default. The two values come from the same input and the same seed.
 
 - A ratio is "worse" in the direction of the measure. For a measure where less is better, a ratio of 1.02 is 2% worse. For a measure where more is better, the test uses the inverse ratio.
-- When both values are 0, the ratio is 1.
-- When only the value of the default is 0, the ratio is worse than each limit.
 - A median of a measure is the median of its ratios, not a ratio of two medians. Thus the verdict does not change with the scale of the inputs.
+
+### The floor rule
+
+Some measures have a floor: the best value that the measure can have. A measure with a floor of 0 gives no ratio when the default is at the floor. For example, a default with no merges has a largest merge angle of 0. Then each merge of the candidate is a loss without limit.
+
+- When the default is at the floor of a guard measure on an input, that input uses an absolute tolerance in place of the ratio.
+- The input passes when the value of the candidate minus the floor is at most the tolerance. Then its ratio counts as 1. Otherwise, its ratio counts as worse than each limit.
+- For a win measure at the floor, the input is better when the candidate is better. It is equal when the two values are equal.
+- Each tolerance is a named parameter in [The floors](#the-floors). A measure that is not in that table has a tolerance of 0.
+- The record of the test names, for each guard measure, the inputs where the floor rule applied.
+
+A floor that is not 0 keeps the ratio, because the ratio has a value there. For example, `B3` has a floor of 1. A ratio of 1.09 at that floor is a real stretch of 9%, so the ratio test applies.
 
 ## The win test
 
@@ -127,6 +137,17 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 | `cellMin` | 10 | Selector |
 | `flipRate` | 0.05 | Selector |
 | `confirmInputs` | 200 | Confirmation |
+
+## The floors
+
+Each row is a named parameter. These values were written on 2026-10-27, before the first promotion screen.
+
+| Measure | Floor | Tolerance | Reason |
+|---|---|---|---|
+| `R1` | 0 | 0 | A new crossing is a loss. |
+| `B6` max | 0 | 60 degrees | The default model of `shared` merges at approximately 60 degrees. A merge at that angle is not a loss. |
+| `pack.order.inversions` | 0 | 0 | `packing` asks that each new inversion fails. |
+| `pack.overflow` | 0 | 0 | An item outside a fixed container is a loss. |
 
 ## The order of promotions
 
