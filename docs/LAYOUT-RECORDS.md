@@ -40,7 +40,7 @@ The corpus is a folder of input files and a manifest `corpus.json`. Each input i
 | `obstacles` | The areas that the boxes and the routes must not use. Each one has an `id`, a `region` and a `move` with a `cost`. Refer to [Regions](#regions). |
 | `boxes[].w`, `boxes[].h` | The size of a box. The packer reads them. The router uses them as the bounding box of the box. |
 | `boxes[].x`, `boxes[].y` | The position of the top-left corner. The packer writes them. The router reads them. A box without a position is an error for the router. |
-| `boxes[].locked` | The value `true` makes the box an obstacle for the packer: its `x` and `y` stay. The router ignores it. |
+| `boxes[].locked` | The value `true` makes the box an obstacle for the packer: its `x` and `y` stay. `false` is the same as no value. The router ignores it. |
 | `boxes[].rank` | The reading order that the caller wants. The router ignores it. |
 | `boxes[].parent`, `boxes[].group` | The nesting and the grouping. |
 | `boxes[].margin` | A ring around the box: a number, or `top`, `right`, `bottom` and `left`. No box enters it. A route enters it only at a plug stub, at a right angle. The default is 0. The router reads it after MARGIN-BOX. Until then, the router uses its option `margin` for each box. |
@@ -102,7 +102,7 @@ The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
 
 | Dimension | Values |
 |---|---|
-| `containerSize` | `fixed`, `freeWidth`, `freeAspect` |
+| `containerSize` | `fixed`, `freeHeight`, `freeWidth`, `freeAspect`, `freeArea` |
 | `containerShape` | `rect`, `convex`, `polygon`, `circle`, `ellipse`, `holes` |
 | `obstacles` | `none`, `center`, `scattered`, `wall`, `corridors`, `touching`, `edge` |
 | `sizes` | `identical`, `uniform`, `heavyTail`, `bimodal`, `extremeAspect`, `nearIdentical` |
@@ -184,21 +184,25 @@ The [measure note](research/MEASURES.md) tells each rule. The rule `sections` co
 
 ## The shared contract
 
-The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has it as a development dependency at commit `52fefbb`, until it is on npm. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.0 as a development dependency at commit `69933a6`, until it is on npm. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
 
-Each known gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typecheck` fails. Then remove the directive and the row of the gap.
+The test also compares `JOINT_MEASURES` with [the floors](PROMOTION.md#the-floors). A joint measure with a floor of 0 has the floor and the tolerance of its row, or of the row of its packer twin. `joint.aspectError`, `joint.stability.mean` and `joint.stability.moved` have a twin row.
 
-| Id | Gap | Direction |
-|---|---|---|
-| G1 | The `side` of a port is optional in `highways`, because the router picks a side. The contract needs a `side`. | `highways` to the contract |
-| G2 | A router input has no `container`. The contract needs one. | `highways` to the contract |
-| G3 | The change `packed` is not in the contract. | `highways` to the contract |
-| G4 | `locked` is a boolean in the contract and only `true` in `highways`. | The contract to `highways` |
-| G5 | `set`, `family`, `seed`, `source`, `hash` and `edges` are optional in the contract. `inputGraph` needs them. | The contract to `highways` |
-| G6 | `ms` is optional in a contract record. `highways` needs it. | The contract to `highways` |
-| G7 | `highways` has no `margin` or `turnable` on a box, and no `inset` or `aspectWeight` on a container. | The contract to `highways` |
-| G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract |
-| G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both |
+`inputGraph` reads only the fields of `RouteInput`: `id`, `boxes`, `obstacles` and `edges`. Thus a contract input, for example the result of `applyPack`, goes to the router.
+
+Each open gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typecheck` fails. Then remove the directive, and mark the gap as closed.
+
+| Id | Gap | Direction | Status |
+|---|---|---|---|
+| G1 | The `side` of a port is optional in `highways`, because the router picks a side. The contract needs a `side`. | `highways` to the contract | Closed by the contract 0.2.0: `side` is optional. |
+| G2 | A router input has no `container`. The contract needs one. | `highways` to the contract | Closed by the contract 0.2.0: `container` is optional, and `toPackInput` gives `{ fixed: "none" }`. |
+| G3 | The change `packed` is not in the contract. | `highways` to the contract | Closed by the contract 0.2.0. |
+| G4 | `locked` is a boolean in the contract and only `true` in `highways`. | The contract to `highways` | Closed: `locked` is a boolean in `highways`. |
+| G5 | `set`, `family`, `seed`, `source`, `hash` and `edges` are optional in the contract. `inputGraph` needs them. | The contract to `highways` | Closed: `inputGraph` takes a `RouteInput`. |
+| G6 | `ms` is optional in a contract record. `highways` needs it. | The contract to `highways` | Closed by the contract 0.2.0: `ms` is necessary. |
+| G7 | `highways` has no `margin` or `turnable` on a box, and no `inset` or `aspectWeight` on a container. | The contract to `highways` | Open, until the item MARGIN-BOX. |
+| G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract | Closed by the contract 0.2.0. The `containerSize` values of `highways` are the values of the contract. |
+| G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both | Open, until the contract is on npm. |
 
 ## The predictions
 
