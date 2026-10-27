@@ -93,6 +93,10 @@ A host layout can pack boxes with no gap between them. Then the links have no ch
 
 `openGaps` moves the boxes apart to that width, and a grid stays a grid. `makeRoom` does both. The [package README](packages/core/README.md) tells the API and the measures.
 
+## Strategies
+
+The steps `router`, `curve` and `room` have strategies with one interface. A consumer chooses a strategy by its name, or adds its own with `defineStrategy`. The registry `STRATEGIES` gives the lists of the benchmark and of the site. The [package README](packages/core/README.md) tells the API.
+
 ## The benchmark
 
 `pnpm --filter @mark1russell7/highways bench` races the routers on the fixtures and writes a Markdown table.

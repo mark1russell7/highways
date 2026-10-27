@@ -24,6 +24,8 @@ Status: `done`, `active`, `blocked`, `later`.
 | ER3c | On a level with many groups, the level links go through the groups, not around the outer edge. Level outside on `case-many-groups`: 4 before, 0 after. | 2026-10-26 | #19 |
 | CURVE | Curve types for the routes: straight, rounded, spline and arc, as segments for any renderer. With the free space, no curve goes through a box. | 2026-10-26 | #21 |
 | ROOM | `roomDemand` gives the room that each gap needs, and `openGaps` opens it. On `packedGridBoard`, links through boxes: 62 before, 0 after, for 50% more area. | 2026-10-26 | #22 |
+| REL3 | Version 0.1.4 on npm: ER3c, CURVE and ROOM. | 2026-10-26 | #23 |
+| STRAT | One strategy interface and one registry for the steps `router`, `curve` and `room`. The benchmark and the site list the registry. | 2026-10-26 | #25 |
 
 ## Open
 
@@ -33,7 +35,6 @@ Status: `done`, `active`, `blocked`, `later`.
 | ROOM-C | Fit the crossings of ROOM to the lane order and to `spacing`. Against the board opened to the gutter, crossings fell 20%, against 30% in the prediction. | `later` | | P2 |
 | ROOM-D | Fit the detour of ROOM to `gutter` and to a second pass of the demand. The mean detour rose 18%, and the worst detour is 2.09. | `later` | | P2 |
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
-| STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
 | CUSTOM | Options for the generalizations: the grouping rule, the levels and their limits. | `later` | STRAT | P2 |
 | EX2 | Example pages that compare the strategies and the curve types. | `later` | CURVE, STRAT | P3 |
 

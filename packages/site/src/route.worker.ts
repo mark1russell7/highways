@@ -1,11 +1,12 @@
 import {
   checkProperties,
+  findStrategy,
   FIXTURES,
   makeFixture,
   measureQuality,
   pullApart,
-  ROUTERS,
   segmentsOf,
+  STRATEGIES,
   type Graph,
 } from "@mark1russell7/highways";
 import type { RouteReply, RouteRequest } from "./protocol.ts";
@@ -30,11 +31,11 @@ self.addEventListener("message", (event: MessageEvent<RouteRequest>) => {
   const { id, fixture, router: name } = event.data;
   let reply: RouteReply;
   try {
-    const router = ROUTERS.find((r) => r.name === name);
+    const router = findStrategy(STRATEGIES, "router", name);
     if (!router) throw new Error(`There is no router "${name}".`);
     const graph = graphOf(fixture);
     const t0 = now();
-    const result = router.route(graph);
+    const result = router.run(graph);
     const ms = now() - t0;
     const shared = (result.runs?.length ?? 0) + (result.bundles?.length ?? 0) > 0;
     const segments = shared ? segmentsOf(result) : undefined;

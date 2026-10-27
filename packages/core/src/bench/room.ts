@@ -1,8 +1,10 @@
 import { levelLinks } from "../levels.ts";
 import type { Graph, Node, Result } from "../model.ts";
-import { makeRoom, roomLinks, type RoomOptions } from "../room/index.ts";
+import { makeRoom, openGaps, roomLinks, type RoomOptions } from "../room/index.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
+import { roomStrategies } from "../strategies/builtins.ts";
+import type { Strategy } from "../strategies/model.ts";
 import { measureLinks, measureRouteFaults, type LinkFaults } from "./links.ts";
 import { measureQuality } from "./quality.ts";
 
@@ -82,10 +84,15 @@ export function measureBoard(graph: Graph, spacing: number): Omit<RoomBenchRow, 
 }
 
 /**
- * This function measures a packed board, the board with each gap open to the gutter only, and the board that `makeRoom` opens with each method.
- * The options of `makeRoom` are the same for each method, except `method`.
+ * This function measures a packed board, the board with each gap open to the gutter only, and the board that each room strategy opens.
+ * The options are the same for each strategy, except `method`. The default strategies are the methods `routes` and `lines` of `roomDemand`.
  */
-export function benchRoom(fixture: string, graph: Graph, options: RoomOptions = {}): RoomBenchRow[] {
+export function benchRoom(
+  fixture: string,
+  graph: Graph,
+  options: RoomOptions = {},
+  methods: readonly Strategy<"room">[] = [roomStrategies.routes, roomStrategies.lines],
+): RoomBenchRow[] {
   const spacing = options.spacing ?? 4;
   const area0 = areaOf(graph.nodes);
   const links = roomLinks(graph);
@@ -97,15 +104,15 @@ export function benchRoom(fixture: string, graph: Graph, options: RoomOptions = 
     ...measureBoard({ nodes, edges: graph.edges }, spacing),
   });
   const rows = [row("packed", graph.nodes, 0)];
-  const states: [string, RoomOptions][] = [
-    ["gutter", { ...options, spacing: 0, method: "routes" }],
-    ["routes", { ...options, method: "routes" }],
-    ["lines", { ...options, method: "lines" }],
-  ];
-  for (const [board, o] of states) {
-    const t0 = now();
-    const room = makeRoom(graph.nodes, links, o);
-    rows.push(row(board, room.items, now() - t0));
+  const t0 = now();
+  const gutter = makeRoom(graph.nodes, links, { ...options, spacing: 0, method: "routes" });
+  rows.push(row("gutter", gutter.items, now() - t0));
+  const { method: _method, ...preset } = options;
+  for (const s of methods) {
+    const t1 = now();
+    const gaps = s.run({ items: graph.nodes, links }, preset);
+    const nodes = openGaps(graph.nodes, gaps, options.snap);
+    rows.push(row(s.name, nodes, now() - t1));
   }
   return rows;
 }
