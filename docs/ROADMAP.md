@@ -27,6 +27,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| ROOM | Room for the links between boxes. The router gives the room that each gap needs, from the links that cross it, the line spacing and a minimum gutter. A layout opens the gaps to that room before it places the boxes. Measure: a dense board with touching boxes, before and after. | `later` | | P1 |
 | ER3d | On a level where each group overlaps its neighbours on all sides, some links still go through a group. Measure: level through on `mid-clustered`, in CI. | `later` | | P2 |
 | CURVE | Curve types for the edges: straight, rounded corners, splines and arcs, as an option of the route. | `later` | | P2 |
 | STRAT | One interface for the strategies of each step, so that a consumer can choose or add a strategy. | `later` | | P2 |
