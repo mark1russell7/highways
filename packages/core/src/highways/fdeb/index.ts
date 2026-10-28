@@ -21,7 +21,7 @@ export interface FdebOptions extends Pick<WayOptions, "margin" | "k"> {
    * The stretch budget of each edge (RULE-002). An edge whose polyline is longer than this value times its straight line gets no pull.
    * `Infinity` sets no budget. The default is 1.25.
    */
-  readonly budget: number;
+  readonly pullLimit: number;
   /** The side of the grid that the points of the edges snap to after the cycles, in units of the board. The default is 8. */
   readonly snap: number;
   /** A highway has this number of edges or more. The default is 2. */
@@ -35,7 +35,7 @@ export const FDEB_DEFAULTS: Readonly<Required<Omit<FdebOptions, "margin" | "k">>
   cycles: 5,
   iterations: 50,
   repulsion: 1,
-  budget: 1.25,
+  pullLimit: 1.25,
   snap: 8,
   minSize: 2,
 });
@@ -126,7 +126,7 @@ export function fdebLines(input: HighwayInput, finder: WayFinder, o: Readonly<Fd
   const median = sorted[Math.floor(sorted.length / 2)]!;
   const pad = finder.margin / 2;
   const reach = finder.margin * 2;
-  const budget = o.budget > 0 ? o.budget : Infinity;
+  const budget = o.pullLimit > 0 ? o.pullLimit : Infinity;
   let lines: Point[][] = segments.map((s) => [s.a, s.b]);
   let step = STEP * median;
   let iterations = Math.max(0, Math.round(o.iterations));

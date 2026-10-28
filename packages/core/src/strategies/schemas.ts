@@ -630,7 +630,7 @@ export const FDEB_SCHEMA: OptionSchema<FdebOptions> = {
   cycles: { type: "integer", min: 0, max: 7, step: 1, default: 5, describe: "The number of cycles. Each cycle doubles the points of each edge." },
   iterations: { type: "integer", min: 0, max: 200, step: 10, marks: [50], default: 50, describe: "The number of steps of the first cycle." },
   repulsion: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1], default: 1, describe: "The weight of the push of the boxes. The value 0 turns it off." },
-  budget: {
+  pullLimit: {
     type: "number",
     min: 1,
     max: 3,

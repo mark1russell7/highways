@@ -51,7 +51,7 @@ export const hierarchyBeta05 = hierarchy("hierarchy-b0.5", { beta: 0.5 });
 export const hierarchyKd = hierarchy("hierarchy-kd", { group: "kd" });
 
 // HWY-002 with RULE-002: no stretch budget, and no push of the boxes (only the hard projection).
-export const fdebNoBudget = fdeb("fdeb-nobudget", { budget: Infinity });
+export const fdebNoBudget = fdeb("fdeb-nobudget", { pullLimit: Infinity });
 export const fdebNoPush = fdeb("fdeb-nopush", { repulsion: 0 });
 
 // HWY-004: larger cells, and clusters of up to 16 edges.
