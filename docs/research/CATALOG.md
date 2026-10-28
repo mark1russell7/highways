@@ -95,7 +95,7 @@ The other counts are for the 248 distinct ideas.
 | `prototyped` | 2 |
 | `screened`, `built`, `kept` and `dropped` | 0 |
 
-HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) added the strategy `corridors`, which is the prototype of `HWY-031`. Its screen is the first item of wave 2.
+HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) added the strategy `corridors`, which is the build of `HWY-031`. BUILD-Q1 screened it. Refer to [Queue builds](#queue-builds).
 
 ## The duplicate groups
 
@@ -896,9 +896,26 @@ On 2026-10-28, no taken idea is built. The back test applies the formula to the 
 | 3. The results page grows by 5 KB gzip or less. | high | Met by an estimate: the changed sources and the data grow by 1.8 KB gzip. The Pages build of CI gives the true size. |
 | 4. No route output, digest or Xplat hash changes. | high | Met: the change adds scripts and tests only, and no file of `packages/core/src` outside the tests. |
 
+## Queue builds
+
+BUILD-QUEUE takes the ideas from the top of the queue (direction 10). Each build screens its idea alone and with the gate `stretch`, on `screen-v1` and `screen-v2`. The table gives the label against `shared` and the breadth (the families against, of 6) on each named win. The ratios are the median of the paired ratio candidate/`shared` on `screen-v2`.
+
+| idea | strategy | B1 v1 | B1 v2 | B2 v1, v2 | B3 q0.95 v1, v2 | B8 runs v1, v2 | B1 ratio | B3 q95 ratio | time ratio v1, v2 | new hard-rule breaks | stage |
+|---|---|---|---|---|---|---|---:|---:|---|---:|---|
+| `HWY-031` (with `WILD-030`) | `corridors` | depends on the mix, 2 | no verdict, 3 | no verdict, 2 and 2 | better, 1 and 1 | no verdict 3, better 3 | 1.000 | 1.000 | 1.83, 1.92 | 0 | `screened` |
+
+### BUILD-Q1: the corridor signatures (`HWY-031`)
+
+- HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) built this idea as the strategy `corridors`. The strategy has its folder, its tests, a schema for each param of the record and a row in the benchmark. BUILD-Q1 adds no strategy. It adds the screen module `packages/core/scripts/screens/build-q1.ts` with the params of the record.
+- The runs: [40764071893](https://github.com/mark1russell7/highways/actions/runs/40764071893) (`screen-v1`) and [40764744994](https://github.com/mark1russell7/highways/actions/runs/40764744994) (`screen-v2`).
+- `corridors` saves more ink than `shared` on hub-chain and many-groups, where `shared` bundles almost nothing. It saves less on dense-groups and small-clustered (B1 0.118 against 0.323 on dense-groups of `screen-v2`). Thus B1 has no side.
+- B3 q0.95 is `better` on both sets. Only many-groups is against it (1.017 against 1.000 on `screen-v2`).
+- The gate `stretch` removes no member, so `corridors+stretch` has the same labels.
+- No variant gives B1 a side. The near links within one lane (`near` 4) have the best B1 of the variants (stratified mean +0.034 on `screen-v2`, p 0.16). The signature with 128 hashes in 16 bands finds fewer pairs, and it is `worse` on B1.
+- The idea is not `better` on B1, so it is not kept. No named win is `worse`, so it is not dropped. Its stage is `screened`.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
-- The screen of `corridors` (`HWY-031`) against its rule is not done. Until then, `HWY-031` stays at `prototyped`.
 - The near pairs are a judgment. BUILD-W can find more pairs while it builds. Then it adds them to `related` or to a group.
 - The stage of each record is `cataloged`. The screen results of BUILD-W move the stages.
