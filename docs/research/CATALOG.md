@@ -830,7 +830,7 @@ The header of `queue.json` has the formula version, the date and the commit. It 
 The score is `gain × uncertainty ÷ cost`. The rank sorts the scores from high to low, then the ids.
 
 - **The gain** is 1, plus for each named win: 0.5 and the count of the open targets on that measure.
-  - An open target is a `better` verdict of the newest set of snapshots with 1 or more families against it. The newest set is `screen-v2`, and it has 40 open targets.
+  - An open target is a `better` verdict of the newest set of snapshots with 1 or more families against it. The newest set is `screen-v2`, and it has 46 open targets.
   - A target counts for each form of its measure. For example, the guard `B3 q0.95` counts for `B3`.
 - **The uncertainty** is 1.0 for `ours`, 0.85 for `hybrid` and 0.7 for `literature`. It is 1.2 times larger when no near idea has a screen result.
 - **The cost** is the size of the prototype: S 1, M 2 or L 4. The cost doubles when the cost text tells "CI only" or a slow run. It doubles again when the step has no strategies.
@@ -845,28 +845,29 @@ The map reads the idea ids in the text `describe` of each strategy. The list `EX
 
 ### The queue on 2026-10-28
 
-- The queue has 195 rows: 184 canonical ideas and 11 duplicates. 183 ideas have a rank.
+- The queue has 188 rows: 178 canonical ideas and 10 duplicates. 177 ideas have a rank.
+- [Wave 3G](#wave-3g-build-w3g) builds 6 ideas, so they leave the queue. Its snapshots add 6 open targets.
 - `HWY-031` and its rider `WILD-030` are `built`. The strategy `corridors` builds them (HWY-STEP, #67). Its stage stays `prototyped` until the screen of `HWY-031`.
-- 77 of the 183 ranked ideas are blocked:
+- 77 of the 177 ranked ideas are blocked:
   - 51 by a step with no strategies: `whole` 27, `levels` 18 and `plugs` 6.
   - 21 by a measure that the screen does not have. For 17, the measure is the only block.
   - 17 by an idea of `dependsOn`.
-- 94 of the 183 ranked ideas have no near idea with a screen result.
+- 92 of the 177 ranked ideas have no near idea with a screen result.
 
 The top 10:
 
 | Rank | Idea | Step | Score | Blocked by |
 |---:|---|---|---:|---|
-| 1 | `NAT-018` Knee of the plant Pareto front | `highway` | 20.825 | |
-| 2 | `RULE-021` Simulated annealing over candidate routes | `router` | 18.7 | |
-| 3 | `NAT-019` Bronchial space-filling splits | `highway` | 17.85 | |
-| 4 | `EDA-017` Stretch balance in a bundle | `highway` | 13.175 | |
-| 5 | `WILD-023` Tight edges first | `router` | 12.5 | |
-| 6 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 12 | |
-| 7 | `WILD-036` Manifolds for a fan to a row | `highway` | 12 | |
-| 8 | `WILD-031` Approval corridors | `highway` | 11.75 | |
-| 9 | `RULE-020` Adam with a seeded sample of pairs | `router` | 11.73 | `idea:RULE-019` |
-| 10 | `RULE-047` Pull toward the lane slots of the highway skeleton | `highway` | 11.5 | |
+| 1 | `NAT-018` Knee of the plant Pareto front | `highway` | 23.375 | |
+| 2 | `RULE-021` Simulated annealing over candidate routes | `router` | 22.1 | |
+| 3 | `NAT-019` Bronchial space-filling splits | `highway` | 20.4 | |
+| 4 | `WILD-023` Tight edges first | `router` | 14.5 | |
+| 5 | `EDA-017` Stretch balance in a bundle | `highway` | 14.025 | |
+| 6 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 14 | |
+| 7 | `WILD-036` Manifolds for a fan to a row | `highway` | 14 | |
+| 8 | `RULE-020` Adam with a seeded sample of pairs | `router` | 13.77 | `idea:RULE-019` |
+| 9 | `RULE-047` Pull toward the lane slots of the highway skeleton | `highway` | 13.5 | |
+| 10 | `WILD-031` Approval corridors | `highway` | 13.25 | |
 
 The [results page](https://mark1russell7.github.io/highways/results.html) shows the top 20 and the count of each status.
 
@@ -1030,9 +1031,9 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 
 ### The snapshots of the verdicts
 
-The snapshots of [`verdicts/`](verdicts/README.md) hold the screens of this wave, with all the built-in strategies and the strategies of the wave.
+The snapshots of [`verdicts/`](verdicts/README.md) hold the screens of this wave, with the registered strategies only. The variants of the wave and the opt-in router `attraction` are only in this section and in the idea records.
 
-- Over all the `better` verdicts of `screen-v2`, 61 of 139 have 1 or more families against them. Over all the `better` and `worse` verdicts, 132 of 294 have.
+- Over all the `better` verdicts of `screen-v2`, 46 of 103 have 1 or more families against them. Over all the `better` and `worse` verdicts, 102 of 220 have.
 - The results page reads these counts. A new screen in a snapshot changes them.
 
 ### The measures with no value
