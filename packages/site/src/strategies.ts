@@ -64,7 +64,7 @@ const shown = (c: StrategyCard): boolean =>
 function idea(id: string, via: string): string {
   const r: CardIdea | undefined = data.ideas[id];
   if (r === undefined) return `<li><code>${esc(id)}</code></li>`;
-  const sources = r.sources.length === 0 ? "<p>No source paper. The idea is ours.</p>" : `<ul class="sc-sources">${r.sources.map((s) => `<li><a href="${esc(s.url)}">${esc(s.title)}</a>. ${esc(s.authors)}, ${s.year}.</li>`).join("")}</ul>`;
+  const sources = r.sources.length === 0 ? "<p>No source paper. The idea comes from this project.</p>" : `<ul class="sc-sources">${r.sources.map((s) => `<li><a href="${esc(s.url)}">${esc(s.title)}</a>. ${esc(s.authors)}, ${s.year}.</li>`).join("")}</ul>`;
   const guarantee = r.guarantee.length === 0 ? "none stated" : r.guarantee.map(esc).join(" ");
   return `<li><details><summary><code>${esc(r.id)}</code> ${esc(r.name)} <span class="sc-stage">${esc(r.stage)}</span>${via}</summary>
     ${sources}
