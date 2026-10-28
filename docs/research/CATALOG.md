@@ -1015,7 +1015,18 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 - `search` reads only the graph and the routes of its input. Its score does not read the records of a screen. The option `evaluations` (0 to 400, default 16) sets its budget.
 - On both sets, `interchanges` gets B1 `better` with 0 families against. Its only loss is B8 runs. It gets a new screen after MEAS-FLAT corrects B8 runs.
 - On both sets, `attraction` gets B1 and R1 `better` with 0 families against. The B1 gain is 0.003 on the mean of the families. B8 runs is `worse`, and R4, R5 and the B3 q95 are a little worse on `screen-v2`.
-- The time of `attraction` is 2.63 times `shared` on `screen-v1`. Thus the workflow `Scale` times it on the dense board of 1000 boxes.
+- The time of `attraction` is 2.63 times `shared` on `screen-v1`. Thus the workflow `Scale` timed it on the dense board of 1000 boxes and 4000 edges ([40769406706](https://github.com/mark1russell7/highways/actions/runs/40769406706)). The warm median is 39.6 s on a Xeon 8573C. `shared` takes 20.9 s in [ROUTE-SCALE](SCALE.md), on an EPYC 9V74. The ratio is thus approximately 1.9.
+
+### The prediction of wave 3G
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. At most 1 of the 6 ideas gets B1 `better` against `shared` on `screen-v2` with 0 families against it. | 0.6 | Not met: 3 of 6 (`gaps`, `interchanges` and `attraction`). |
+| 2. HWY-059 gets B1 `better` on `screen-v2`. | 0.45 | Not met: `no verdict`, with 2 of 6 families against. |
+| 3. HWY-044 takes 2 times or more the warm median time of `shared` on the router screen of `screen-v1`. | 0.5 | Met: 2.63 times. |
+| 4. HWY-036 has a median B1 ratio over `shared` of 1.05 or more on `screen-v2`. | 0.35 | Met: 2.108. |
+| 5. HWY-057 and HWY-058 add 0 new hard-rule breaks on both sets. | medium | Met: 0 on each input of both sets. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass, and `xplat` passes at `a32522f`. The router screen of `Scale` gives 126 of 126 equal records against `main`. |
 
 ### The snapshots of the verdicts
 

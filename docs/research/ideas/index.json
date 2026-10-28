@@ -12723,7 +12723,7 @@
           }
         },
         "verdict": "screened",
-        "note": "The records are the screen-v2 run 40767715430 and the screen-v1 run 40766283584, at a32522f. On both sets, attraction is better on B1 and on R1 with 0 families against. The B1 gain is small: 0.003 on the mean of the families. B8 runs is worse on both sets, and M4 has no verdict. The B3 q95, R4 and R5 are a little worse on screen-v2. The median time is 2.76 times shared on screen-v2 and 2.63 times on screen-v1. It adds 0 hard-rule breaks."
+        "note": "The records are the screen-v2 run 40767715430 and the screen-v1 run 40766283584, at a32522f. On both sets, attraction is better on B1 and on R1 with 0 families against. The B1 gain is small: 0.003 on the mean of the families. B8 runs is worse on both sets, and M4 has no verdict. The B3 q95, R4 and R5 are a little worse on screen-v2. The median time is 2.76 times shared on screen-v2 and 2.63 times on screen-v1. On the dense board of 1000 boxes, the warm median is 39.6 s (Scale run 40769406706). That is approximately 1.9 times the 20.9 s of shared in ROUTE-SCALE, on another CPU. It adds 0 hard-rule breaks."
       }
     },
     {
