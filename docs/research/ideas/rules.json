@@ -221,7 +221,16 @@
         }
       },
       "verdict": "dropped",
-      "note": "The strategy `fdeb` beats `shared` on 0 of the 4 boards, alone and with the gate `stretch`. The paired median ratios are 0.68 for B1 and 0.96 for the q95. B7 rises on each board, so the bundles do not use less area. B2 rises on each board, but B1 falls on 3 boards. The option `pullLimit` replaces the option `budget` of the record, because the gate `stretch` has an option `budget`."
+      "note": "The strategy `fdeb` beats `shared` on 0 of the 4 boards, alone and with the gate `stretch`. The paired median ratios are 0.68 for B1 and 0.96 for the q95. B7 rises on each board, so the bundles do not use less area. B2 rises on each board, but B1 falls on 3 boards. The option `pullLimit` replaces the option `budget` of the record, because the gate `stretch` has an option `budget`.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 0,
+        "oldBoards": 0,
+        "candidate": "fdeb against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, fdeb against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+      }
     }
   },
   {
@@ -1691,7 +1700,16 @@
         }
       },
       "verdict": "dropped",
-      "note": "The strategy `kdeeb` beats `shared` on 0 of the 4 boards alone. With the gate `stretch`, it wins 1 (small-clustered). B1 rises on 3 boards, with a paired median ratio of 1.15. But the q95 rises on 3 boards, to a paired maximum ratio of 1.13. B2 rises and B7 falls on each board. B5 rises to 47 to 176 lane crossings. The density of the first routes (`kdeeb-routes`) wins 2 (small-clustered, dense-groups). Without the mask, the q95 rises to 1.06 to 1.26."
+      "note": "The strategy `kdeeb` beats `shared` on 0 of the 4 boards alone. With the gate `stretch`, it wins 1 (small-clustered). B1 rises on 3 boards, with a paired median ratio of 1.15. But the q95 rises on 3 boards, to a paired maximum ratio of 1.13. B2 rises and B7 falls on each board. B5 rises to 47 to 176 lane crossings. The density of the first routes (`kdeeb-routes`) wins 2 (small-clustered, dense-groups). Without the mask, the q95 rises to 1.06 to 1.26.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 2,
+        "oldBoards": 2,
+        "candidate": "kdeeb-routes against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, kdeeb-routes against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+      }
     }
   },
   {
@@ -2653,6 +2671,14 @@
       },
       "verdict": "kept",
       "note": "R9 is the sum of route.through by router over the 14 inputs. R1 is route.ink and R5 the median detour, by router on packed-grid. The hard breaks go to 0 for each router on each input, packed-grid too. On packed-grid the ink grows by 20% to 23% for most routers, 13% for sections, and drops 9% for sections-tree. A route without a fault keeps its points.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": null,
+        "oldBoards": null,
+        "verdict": "kept",
+        "old": "kept",
+        "note": "The screen field of the record decides on the hard faults, not on the board count of B1 and the B3 q95. The hard counts stay exact. The repair takes R9 to 0 for each router on each input, so each router has fewer hard breaks. The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",

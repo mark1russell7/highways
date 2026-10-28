@@ -78,6 +78,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | RESCREEN-M3A | The ideas of waves 1 to 3 again, on the wins of MEAS3A. 8 of 27 records are at least as good as their baseline on 3 or more boards. No stage or verdict changes. Each built strategy also gets the part of the gap to the exact B1 that it closes on `tiny-uniform`. `growth` closes the most of the built-ins, a median of 0.51. | 2026-10-27 | #92 |
 | BUILD-W3D | Six highway finders: `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb` and `cubu`. `divided` (HWY-011) wins 3 of 4 boards against `shared`, but by very small margins that come from its base `shared-ways`. It is kept. No other finder wins more than 1, alone or with the gate `stretch`. HWY-001, HWY-002, HWY-004, HWY-006 and HWY-007 are dropped. | 2026-10-27 | #93 |
 | MEAS2 | The set `exact-v1` (4 classes of 10 boards, 10 nodes) with 240 proven optima of the exact model, and the gap closed (B10) in the screen. At 300 s for each solve, 10 nodes prove on each class and rule, and 14 nodes for the rule `collection`. The best median is 0.595 (0.508 to 0.634), from `growth`. [`GAP.md`](research/GAP.md) ranks each strategy. | 2026-10-28 | #94 |
+| WIN-RES | A win must beat the baseline by more than the resolution. `compareMeasure` gives `"better"`, `"worse"` or `"tie"` with the `minEffect` of each measure, and a tie is not a win. With the strict rule, HWY-011 and HWY-016 change from kept to dropped. NAT-022 and WILD-037 reach 3 boards, but their guards keep them dropped. | 2026-10-28 | #96 |
 
 ## Open
 

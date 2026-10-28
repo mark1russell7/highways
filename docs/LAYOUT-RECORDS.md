@@ -211,6 +211,7 @@ Each open gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typ
 | G7 | `highways` has no `margin` or `turnable` on a box, and no `inset` or `aspectWeight` on a container. | The contract to `highways` | Open, until the item MARGIN-BOX. |
 | G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract | Closed by the contract 0.2.0. The `containerSize` values of `highways` are the values of the contract. |
 | G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both | Closed: `RECORD_EPS` of `bench/screen/hash.ts` has the value of the contract, and the test compares them. |
+| G10 | The contract 0.2.1 has no `compareMeasure` and no `minEffectOf`. `highways` has its own copy in `bench/screen/compare.ts`, and a test compares the copy with [the per-input classification](PROMOTION.md#the-per-input-classification). | The contract to `highways` | Open, until the contract 0.2.2. Then `highways` uses the functions of the contract (WIN-RES). |
 
 ## The predictions
 

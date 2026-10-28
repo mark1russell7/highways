@@ -36,6 +36,7 @@ This note joins the ideas of the five research notes into one catalog (IDEA0). B
 - `result` holds the screen result: the ids of the screen records, the measures that decided and the date. A `dropped` record must have a `result`.
   - `measures` gives each measure that decided as `{ base, new }`. A value is a number, or the numbers by board.
   - `run` links the CI run of the screen. `verdict` is `kept`, `dropped` or `screened`. `note` tells the reason.
+  - `strict` gives the verdict again with the strict wave rule of WIN-RES: the date, the board count, the new verdict and the old verdict.
 
 ### How to change the catalog
 
@@ -210,7 +211,8 @@ Each idea of wave 1 changes a step or a router that exists. It changes the plugs
 The ideas of wave 2 are strategies of the step `highway`. HWY-STEP made this step and the step `follow`. The corridor signatures (`HWY-031`) and the merge points (`HWY-050`) come first.
 
 - **Expected wins.** `B1`, `B2`, `B8`, `B3`, `Z10` and `B6`.
-- **The screen that decides.** Five boards: `case-dense-groups`, `case-hub-chain`, `case-many-groups`, `small-clustered` (5 seeds) and `mid-fanout` (1 seed). The baselines are `corners`, `shared` and `trunks`. An idea stays when it is better than `shared` on 3 of 5 boards. Better means a `B1` at least as high and a `B3` q95 at most as high.
+- **The screen that decides.** Five boards: `case-dense-groups`, `case-hub-chain`, `case-many-groups`, `small-clustered` (5 seeds) and `mid-fanout` (1 seed). The baselines are `corners`, `shared` and `trunks`. An idea stays when it is better than `shared` on 3 of 5 boards.
+  - A board is a win only when neither `B1` nor the `B3` q95 is `"worse"`, and one or both is `"better"`. `compareMeasure` gives these classes, and a change at most the minimum effect is a `"tie"`. A tie is not a win (WIN-RES, [the per-input classification](../PROMOTION.md#the-per-input-classification)).
 - **Cost.** 15 small prototypes and 2 medium prototypes.
 
 ### Wave 3: the other highway ideas

@@ -93,6 +93,10 @@ holds<Has<LayoutBox, "turnable">>();
 holds<Has<LayoutContainer, "inset">>();
 // @ts-expect-error G7: highways has no `aspectWeight` on a container.
 holds<Has<LayoutContainer, "aspectWeight">>();
+// @ts-expect-error G10: the contract 0.2.1 has no `compareMeasure`. highways has its own copy in `compare.ts`.
+void C.compareMeasure;
+// @ts-expect-error G10: the contract 0.2.1 has no `minEffectOf`.
+void C.minEffectOf;
 // G8 is closed: the contract has `data` on a box, `generator`, `cell` and `step` on an input, and `skipped` on a record.
 holds<Has<C.LayoutBox, "data">>();
 holds<Has<C.LayoutInput, "generator">>();

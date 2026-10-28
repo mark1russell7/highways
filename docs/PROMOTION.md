@@ -51,6 +51,25 @@ Some measures have a floor: the best value that the measure can have. A measure 
 
 A floor that is not 0 keeps the ratio, because the ratio has a value there. For example, `B3` has a floor of 1. A ratio of 1.09 at that floor is a real stretch of 9%, so the ratio test applies.
 
+### The per-input classification
+
+The sign test, the wins and the flips put each input, or each board, in one of three classes: `"better"`, `"worse"` or `"tie"`. A change smaller than the resolution of a measure is noise, not a result. Thus the classification uses a minimum effect.
+
+- `MeasureSpec` gets an optional field `minEffect?: number | { rel: number }`. It is separate from `tol`. `tol` is the slack above a floor, and it can be much larger than the resolution. For example, `B6.tol` is 60 degrees.
+- The threshold, with `m = spec.minEffect ?? 0`, is `threshold(a, b) = max(RECORD_EPS, typeof m === "number" ? m : m.rel * max(|a|, |b|))`.
+- A non-finite `rel` product falls back to `RECORD_EPS`.
+- The threshold scales with the two values, not with the baseline alone. Thus the rule is symmetric.
+- `compareMeasure(a, b, spec)`, with `a` the candidate and `b` the baseline, gives `"tie"` when `|a − b| ≤ threshold(a, b)`.
+- Otherwise, `compareMeasure` gives `"better"` or `"worse"` by `spec.direction`.
+- Two equal `Infinity` values are a tie. `compareMeasure` refuses `NaN`.
+- The rule is symmetric: a loss smaller than the threshold is a tie, not a loss.
+- A tie does not count as a win.
+- The hard-rule counts stay exact. Each new hard break is a loss.
+
+The tie applies only to the classification of each input and each board: the sign test, the wins and the flips. The median test, the tail test and the bootstrap read the raw values. Thus a steady loss below the resolution on each input still shows in the median test.
+
+[The minimum effects](#the-minimum-effects) gives the value of `minEffect` for each measure of `highways`.
+
 ## The win test
 
 The test compares the candidate with the current default on each input of the corpus. The guard measures are the measures of the step in [The measures of each step](#the-measures-of-each-step). The win measures are the measures that the record of the idea names in `wins`.
@@ -150,6 +169,22 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 |---|---|---|
 | `R1.floor` = 0 | `R1.tol` = 0 | A new crossing is a loss. |
 | `B6.floor` = 0 | `B6.tol` = 60 degrees | The default model of `shared` merges at approximately 60 degrees. A merge at that angle is not a loss. The guard is the max of `B6`. |
+
+## The minimum effects
+
+`MIN_EFFECTS` of `bench/screen/measures.ts` gives the `minEffect` of each measure of `MEASURES` by its unit. These values were written on 2026-10-28 (WIN-RES).
+
+| Units | `minEffect` | Reason |
+|---|---|---|
+| `0 to 1`, `-1 to 1`, `-0.5 to 1`, `share of the gap`, `0 or 1` | none, so `RECORD_EPS` | A share or a flag of 0 or 1 has the precision of a written file. |
+| `ratio`, `IQR over the median`, `no unit`, `half turns for each route`, `curvature times the unit of the board` | none, so `RECORD_EPS` | A stretch or another value without a unit has the precision of a written file. |
+| `count`, `count for each edge`, `count for each route` | 0, so `RECORD_EPS` | A count changes in steps. A change of 1 counts. |
+| `units`, `units of the board` | `{ rel: 0.01 }` | A length in pixels moves with each small move of a point. A change of 1% or less is not visible. |
+| `degrees` | `{ rel: 0.01 }` | An angle is a continuous value of the geometry, as a length. |
+
+The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
+
+`highways` has its own copy of `compareMeasure` and `minEffectOf` in `bench/screen/compare.ts`. The contract `@mark1russell7/layout-contract` adds the two functions in 0.2.2. After that release, `highways` uses the functions of the contract. A test checks that the copy agrees with this note.
 
 This file does not copy the floors of the other projects:
 

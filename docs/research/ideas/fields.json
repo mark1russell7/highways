@@ -249,6 +249,14 @@
       },
       "verdict": "kept",
       "note": "The option `tracks: left-edge` of `gapLanes` is off by default. The sum of lanes falls 5% to 26% on 7 boards. Crossings stay the same or fall, except +0.1% on grid-400. R12 falls. M1 and M4 do not change, because `roomDemand` already reads the density. The screen has no room step, so the side table of the bench measured it.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": null,
+        "oldBoards": null,
+        "verdict": "kept",
+        "old": "kept",
+        "note": "The screen field of the record decides on the lanes, R1 and M1 of the side table of the bench, not on the board count of B1 and the B3 q95. The screen artifacts have no raw values of that table. Thus the old verdict stays."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -1584,6 +1592,15 @@
       },
       "verdict": "dropped",
       "note": "The option `cost: flow` of `shared` is off by default. No alpha from 0.5 to 0.8 beats `discount` 0.5 on B1 and the B3 q95 on more than 1 of the 4 boards. A smaller alpha gives more B1 and fewer crossings, but a longer stretch. For example, `shared-all` alpha 0.5 on small-clustered: B1 0.430 to 0.558, R1 305 to 209, B3 q95 1.359 to 2.218. An alpha of 0.8 gives the inverse. The only win is many-groups with `shared` (B1 0.083 to 0.085, q95 1.000 both). hub-chain does not change. The group stays screened, because its rider HWY-039 (the rip-up) is a win.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 1,
+        "oldBoards": 2,
+        "candidate": "shared-flow-a05 against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, shared-flow-a05 against shared wins 1 of 4 boards (2 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -1764,6 +1781,15 @@
       },
       "verdict": "dropped",
       "note": "The option `splitAt: gilbert` of `trunks` is off by default. The B6 max rises with each alpha: small-clustered 97.7 to 99.9, dense-groups 110.3 to 118.9. The ink changes 0.6% at most, and hub-chain and many-groups do not change, because they have no group that `trunks` splits. The B3 q95 falls 8% to 12%.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 0,
+        "oldBoards": 2,
+        "candidate": "trunks-gilbert-a03 against trunks, on B1 and the B6 max",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "The screen field of the record decides on B1 and the B6 max, not on the board count of B1 and the B3 q95. The B6 max rises on small-clustered and dense-groups, and the other 2 boards are ties. The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -2072,6 +2098,15 @@
       },
       "verdict": "dropped",
       "note": "The strategy `od-cells` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.073 and 0.104 on small-clustered and dense-groups, against 0.210 and 0.307. The level 1 wins on 0 boards and the level 3 bundles almost nothing. The screen of the step `highway` has no measure of Z9 or B8. The strategy stays in the registry.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 2,
+        "oldBoards": 2,
+        "candidate": "od-cells against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, od-cells against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -2318,6 +2353,15 @@
       },
       "verdict": "dropped",
       "note": "This record rides HWY-017 in the strategy `spiral`. The strategy beats `shared` on 1 of the 4 boards (hub-chain, a tie with no highway). On hub-chain the B6 max does not change against `shared-ways` (50.4). On the other boards it rises. The strategy stays in the registry.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 1,
+        "oldBoards": 1,
+        "candidate": "spiral-a35 against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, spiral-a35 against shared wins 1 of 4 boards (1 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -2941,6 +2985,15 @@
       },
       "verdict": "dropped",
       "note": "The strategy `flow-field` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.056 and 0.065 on small-clustered and dense-groups, against 0.210 and 0.307. R1 falls on hub-chain and many-groups and rises on the other 2 boards. Few fans share a stretch of corner links. The variant `source` wins on 1 board. The strategy stays in the registry.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 2,
+        "oldBoards": 2,
+        "candidate": "flow-field against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, flow-field against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -3325,6 +3378,15 @@
       },
       "verdict": "dropped",
       "note": "The screen of HWY-034. The strategy `road-classes` beats `shared` on 2 of the 4 boards (small-clustered, dense-groups), alone and with the gate `stretch`. It has the largest B1 of the wave on each board, and R1 falls by 14% to 69%. On hub-chain and many-groups, `shared` bundles almost nothing and has a q95 of 1.000, and `road-classes` has 1.015 and 1.090. The screen has no measure of B8. Z10: the churn is less than the churn of `corridors` on 2 boards (hub-chain, many-groups). The strategy stays in the registry.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 2,
+        "oldBoards": 2,
+        "candidate": "road-classes against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, road-classes against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",

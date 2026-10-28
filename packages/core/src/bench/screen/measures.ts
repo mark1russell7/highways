@@ -1,4 +1,5 @@
 import type { Objective } from "../measures/pareto.ts";
+import type { CompareSpec, MinEffect } from "./compare.ts";
 
 /**
  * One measure of a record. `key` is the key of the measure in the values of `runSuite` and `compareStep`.
@@ -18,7 +19,54 @@ export interface MeasureInfo {
    * Then two values compare only on the same input. The value is `false` when the measure scores the routes or the curves for a fixed placement.
    */
   readonly placementDependent: boolean;
+  /**
+   * The smallest change that counts as better or worse in `compareMeasure` (WIN-RES). `MIN_EFFECTS` gives it by the unit, with its reason.
+   * A measure without this field has the threshold `RECORD_EPS`.
+   */
+  readonly minEffect?: MinEffect;
 }
+
+/** One rule of `MIN_EFFECTS`: the units, the minimum effect of a measure with one of these units, and the reason. */
+export interface MinEffectRule {
+  readonly units: readonly string[];
+  /** The minimum effect. The value `undefined` gives the threshold `RECORD_EPS`. */
+  readonly minEffect: MinEffect | undefined;
+  readonly reason: string;
+}
+
+/**
+ * The minimum effect of each measure of `MEASURES`, by the unit of the measure (WIN-RES).
+ * Each unit of `MEASURES` is in one rule. The test of the module checks it.
+ */
+export const MIN_EFFECTS: readonly MinEffectRule[] = Object.freeze([
+  {
+    units: ["0 to 1", "-1 to 1", "-0.5 to 1", "share of the gap", "0 or 1"],
+    minEffect: undefined,
+    reason: "A share or a flag of 0 or 1 has the precision of a written file. Thus the threshold is `RECORD_EPS`.",
+  },
+  {
+    units: ["ratio", "IQR over the median", "no unit", "half turns for each route", "curvature times the unit of the board"],
+    minEffect: undefined,
+    reason: "A stretch or another value without a unit has the precision of a written file. Thus the threshold is `RECORD_EPS`.",
+  },
+  {
+    units: ["count", "count for each edge", "count for each route"],
+    minEffect: 0,
+    reason: "A count or a mean of counts changes in steps. The threshold is `RECORD_EPS`, so a change of 1 counts.",
+  },
+  {
+    units: ["units", "units of the board"],
+    minEffect: { rel: 0.01 },
+    reason: "A length in pixels moves with each small move of a point. A change of 1% or less is not visible.",
+  },
+  {
+    units: ["degrees"],
+    minEffect: { rel: 0.01 },
+    reason: "An angle is a continuous value of the geometry, as a length. A change of 1% or less is not visible.",
+  },
+]);
+
+const MIN_EFFECT_BY_UNIT: ReadonlyMap<string, MinEffectRule> = new Map(MIN_EFFECTS.flatMap((r) => r.units.map((u) => [u, r] as const)));
 
 /** The text of a row of `MEASURES`: the key, the id, the name, the unit, the better side and the placement dependence. */
 type Row = readonly [key: string, id: string, name: string, unit: string, better: "lower" | "higher", placement: boolean];
@@ -133,7 +181,19 @@ const ROWS: readonly Row[] = [
  * A joint harness that moves the boxes and routes the edges reads `placementDependent`.
  * It compares a measure with the value `true` only between runs on the same input.
  */
-export const MEASURES: readonly MeasureInfo[] = Object.freeze(ROWS.map(([key, id, name, unit, better, placementDependent]) => Object.freeze({ key, id, name, unit, better, placementDependent })));
+export const MEASURES: readonly MeasureInfo[] = Object.freeze(
+  ROWS.map(([key, id, name, unit, better, placementDependent]) => {
+    const rule = MIN_EFFECT_BY_UNIT.get(unit);
+    if (!rule) throw new Error(`MEASURES: the unit "${unit}" of ${key} has no rule in MIN_EFFECTS`);
+    const info: MeasureInfo = { key, id, name, unit, better, placementDependent };
+    return Object.freeze(rule.minEffect === undefined ? info : { ...info, minEffect: rule.minEffect });
+  }),
+);
+
+/** This function gives the spec of a compare of a measure: its better side and its minimum effect. */
+export function compareSpec(info: MeasureInfo): CompareSpec {
+  return info.minEffect === undefined ? { direction: info.better } : { direction: info.better, minEffect: info.minEffect };
+}
 
 const BY_KEY: ReadonlyMap<string, MeasureInfo> = new Map(MEASURES.map((m) => [m.key, m]));
 const BY_NAME: ReadonlyMap<string, MeasureInfo> = new Map(MEASURES.map((m) => [m.name, m]));
