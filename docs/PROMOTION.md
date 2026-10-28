@@ -53,7 +53,7 @@ A floor that is not 0 keeps the ratio, because the ratio has a value there. For 
 
 ### The per-input classification
 
-The sign test, the wins and the flips put each input, or each board, in one of three classes: `"better"`, `"tie"` or `"worse"`. A change smaller than the resolution of a measure is noise, not a result. Thus the classification uses a minimum effect.
+The sign test, the wins and the flips put each input, or each board, in one of three classes: `"better"`, `"worse"` or `"tie"`. A change smaller than the resolution of a measure is noise, not a result. Thus the classification uses a minimum effect.
 
 - `MeasureSpec` gets an optional field `minEffect?: number | { rel: number }`. It is separate from `tol`. `tol` is the slack above a floor, and it can be much larger than the resolution. For example, `B6.tol` is 60 degrees.
 - The threshold, with `m = spec.minEffect ?? 0`, is `threshold(a, b) = max(RECORD_EPS, typeof m === "number" ? m : m.rel * max(|a|, |b|))`.
@@ -63,7 +63,7 @@ The sign test, the wins and the flips put each input, or each board, in one of t
 - Otherwise, `compareMeasure` gives `"better"` or `"worse"` by `spec.direction`.
 - Two equal `Infinity` values are a tie. `compareMeasure` refuses `NaN`.
 - The rule is symmetric: a loss smaller than the threshold is a tie, not a loss.
-- A tie never counts as a win.
+- A tie does not count as a win.
 - The hard-rule counts stay exact. Each new hard break is a loss.
 
 The tie applies only to the classification of each input and each board: the sign test, the wins and the flips. The median test, the tail test and the bootstrap read the raw values. Thus a steady loss below the resolution on each input still shows in the median test.
@@ -172,7 +172,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 ## The minimum effects
 
-`MIN_EFFECTS` of `bench/screen/measures.ts` gives the `minEffect` of each measure of `MEASURES` by its unit. These values were written on 2026-10-27 (WIN-RES).
+`MIN_EFFECTS` of `bench/screen/measures.ts` gives the `minEffect` of each measure of `MEASURES` by its unit. These values were written on 2026-10-28 (WIN-RES).
 
 | Units | `minEffect` | Reason |
 |---|---|---|

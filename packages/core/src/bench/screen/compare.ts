@@ -3,12 +3,12 @@ import { RECORD_EPS } from "./hash.ts";
 /**
  * The smallest change of a measure that counts as better or worse (WIN-RES).
  * A number is an absolute change. `{ rel }` is a share of the larger of the two absolute values.
- * The threshold is never less than `RECORD_EPS`.
+ * The threshold is not less than `RECORD_EPS` at any time.
  */
 export type MinEffect = number | { readonly rel: number };
 
 /** The result of a compare of a candidate with a baseline on one measure. A tie is not a win. */
-export type MeasureCompare = "better" | "tie" | "worse";
+export type MeasureCompare = "better" | "worse" | "tie";
 
 /** The part of a measure that a compare reads: the better side and the minimum effect. */
 export interface CompareSpec {

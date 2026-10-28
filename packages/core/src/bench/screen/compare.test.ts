@@ -111,7 +111,7 @@ describe("the copy and the text of docs/PROMOTION.md agree (WIN-RES)", () => {
   it("writes the tie rule of compareMeasure", () => {
     expect(text).toContain("gives `\"tie\"` when `|a − b| ≤ threshold(a, b)`");
     expect(text).toContain("Two equal `Infinity` values are a tie. `compareMeasure` refuses `NaN`.");
-    expect(text).toContain("A tie never counts as a win.");
+    expect(text).toContain("A tie does not count as a win.");
   });
 
   it("lists each rule of MIN_EFFECTS in the table of the minimum effects", () => {

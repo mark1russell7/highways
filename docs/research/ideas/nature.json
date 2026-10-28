@@ -358,6 +358,15 @@
       },
       "verdict": "screened",
       "note": "NAT-005 is screened with HWY-005, as the option `reuse` of the router `shared`. The baseline is `shared-all`. With 2 passes and `reuse: 1`, B1 rises on each board (0.430 to 0.624 on small-clustered), and crossings fall 23% to 89%. But the q95 rises on each board (1.359 to 2.475 on small-clustered), so neither dominates the other.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 0,
+        "oldBoards": 2,
+        "candidate": "shared-p2 against shared",
+        "verdict": "screened",
+        "old": "screened",
+        "note": "With the strict rule, shared-p2 against shared wins 0 of 4 boards (2 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -1107,6 +1116,15 @@
       },
       "verdict": "screened",
       "note": "The option `fan: tree` of `trunks` is off by default. bf 0.2 and 0.4 beat `trunks` on B1 and the B3 q95 on dense-groups (B1 0.081 to 0.095 with bf 0.2). On small-clustered, the q95 falls but B1 falls 4%. hub-chain and many-groups do not change. A smaller bf gives more B1, so a screen of bf 0 and 0.1 is next.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 1,
+        "oldBoards": 3,
+        "candidate": "trunks-tree-bf02 against trunks",
+        "verdict": "screened",
+        "old": "screened",
+        "note": "With the strict rule, trunks-tree-bf02 against trunks wins 1 of 4 boards (3 with the old rule). The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -1580,6 +1598,15 @@
       },
       "verdict": "dropped",
       "note": "The strategy `zipper` beats `shared` on 2 of the 4 boards, and `adhesion: 1` also on 2. It fails only on the q95, by 0.1% to 1.5%. Against `shared-ways`, B1 rises 12% to 199% on all 4 boards, B2 rises, and R1 falls on 3 boards. B6 and R4 rise. The screen has no measure of B7 or R12. A stretch gate can make it pass. The strategy stays in the registry.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 3,
+        "oldBoards": 2,
+        "candidate": "zipper-a1 against shared",
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "With the strict rule, zipper-a1 against shared wins 3 of 4 boards (2 with the old rule): small-clustered, dense-groups and hub-chain. On hub-chain, the q95 rises 1.000 to 1.001, a tie. But on hub-chain, B4 rises from 0.063 to 0.316 and R1 from 68 to 80, and the screen field of the record forbids that rise. Thus the guard keeps the record dropped. Strict count 3, kept dropped by the guard."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -1822,7 +1849,16 @@
         }
       },
       "verdict": "kept",
-      "note": "The default order `span` (the longest first) is the pioneer order. The base is `order: input`. With `shared-all`, B1 rises 6.2% and 5.3% on small-clustered and dense-groups, and R1 falls 19% and 10%. With `shared`, B1 rises 6.2% on dense-groups and R1 falls 0.7%. On many-groups with `shared-all`, R1 rises 7%. The order `load` does not beat `span`."
+      "note": "The default order `span` (the longest first) is the pioneer order. The base is `order: input`. With `shared-all`, B1 rises 6.2% and 5.3% on small-clustered and dense-groups, and R1 falls 19% and 10%. With `shared`, B1 rises 6.2% on dense-groups and R1 falls 0.7%. On many-groups with `shared-all`, R1 rises 7%. The order `load` does not beat `span`.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 3,
+        "oldBoards": 3,
+        "candidate": "shared-all against shared-all-order-input, on B1",
+        "verdict": "kept",
+        "old": "kept",
+        "note": "The screen field of the record decides on B1 against the order input, not on the board count of B1 and the B3 q95. With the strict rule, B1 of the order span is better on 3 of 4 boards and worse on many-groups (0.718 against 0.722). The verdict does not change."
+      }
     }
   },
   {
@@ -2237,6 +2273,14 @@
       },
       "verdict": "dropped",
       "note": "This rider of WILD-002 is the option `plugGap: 8`. The R11 q05 rises by more than 0.2, but R1 grows 3% to 5% on dense-groups and small-clustered.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": null,
+        "oldBoards": null,
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "The screen field of the record decides on R11 and R1 of the router corners, not on the board count of B1 and the B3 q95. R1 grows 3% to 5% on 2 boards, a loss above the minimum effect. The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
@@ -2554,6 +2598,15 @@
       },
       "verdict": "kept",
       "note": "The option `merge: snell` of `shared` is off by default. The B6 max falls on each board with merges: 8% to 27%. The ink rises 0.5% at most. The crossings rise 6% to 13% (18 to 24 on hub-chain), because the new merge lines cut across other routes. The option is only in `shared`, not in `trunks`.",
+      "strict": {
+        "date": "2026-10-28",
+        "boards": 4,
+        "oldBoards": 4,
+        "candidate": "shared-all-snell against shared-all, on the B6 max",
+        "verdict": "kept",
+        "old": "kept",
+        "note": "The screen field of the record decides on the B6 max, not on the board count of B1 and the B3 q95. With the strict rule, the B6 max of shared-all-snell is better on 4 of 4 boards. With shared, it is better on 2 and a tie on 2. The verdict does not change."
+      },
       "rescreen": {
         "item": "RESCREEN-M3A",
         "date": "2026-10-27",
