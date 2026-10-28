@@ -327,19 +327,29 @@ export function laneStretches(runs: readonly LaneRun[], options: Partial<LaneStr
   return stretchesOf(prepare(runs), { ...LANE_STRETCH_DEFAULTS, ...options });
 }
 
-/** The side of each pair of edges of a run, in the way of the root. The key is the two edges in the order of their ids. */
-type Sides = Map<string, number>;
+/**
+ * The side of each pair of edges of a stretch, in the way of the root. The value -1 puts the first edge of the pair on the left.
+ * The key of a pair is `a * count + b`, with `a < b` the ids of the two edges and `count` the number of the ids.
+ */
+type Sides = Map<number, number>;
 
-/** This function gives the sides of the pairs of a run in its own way. The value -1 puts the first edge of the key on the left. */
-function sidesOf(run: Prepared): Sides {
-  const out: Sides = new Map();
+/** The sides of the pairs of one run, in its own way. The pair of the lanes `x < y` has the index `x * n - x * (x + 1) / 2 + y - x - 1`. */
+interface RunSides {
+  /** The ids of the edges of the run, in increasing order. */
+  readonly ids: Int32Array;
+  /** The side of each pair: 1 or -1. */
+  readonly sides: Int8Array;
+}
+
+/** This function gives the sides of the pairs of a run in its own way. A typed array keeps them small, because a dense board has many large runs. */
+function sidesOf(run: Prepared, idOf: ReadonlyMap<string, number>): RunSides {
   const lanes = [...run.placed].sort(byEdge);
-  for (let x = 0; x < lanes.length; x++)
-    for (let y = x + 1; y < lanes.length; y++) {
-      const v = byBundle(lanes[x]!, lanes[y]!);
-      out.set(`${lanes[x]!.edge}\u0000${lanes[y]!.edge}`, v > 0 ? 1 : -1);
-    }
-  return out;
+  const n = lanes.length;
+  const ids = Int32Array.from(lanes, (l) => idOf.get(l.edge)!);
+  const sides = new Int8Array((n * (n - 1)) / 2);
+  let k = 0;
+  for (let x = 0; x < n; x++) for (let y = x + 1; y < n; y++) sides[k++] = byBundle(lanes[x]!, lanes[y]!) > 0 ? 1 : -1;
+  return { ids, sides };
 }
 
 /**
@@ -353,12 +363,26 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
   const rank = new Map(keyOrder.map((i, r) => [i, r] as const));
   const done = new Uint8Array(prepared.length);
   const out: LaneStretch[] = [];
+  // The id of each edge, in the order of `byText`. Thus the lanes of a run in the order of `byEdge` have increasing ids.
+  const names = [...new Set(prepared.flatMap((r) => r.placed.map((p) => p.edge)))].sort(byText);
+  const idOf = new Map(names.map((e, i) => [e, i] as const));
+  const count = names.length;
   // The sides of each run, in its own way. Each run gets them one time, because the walks test a run again in each later stretch.
-  const own = new Map<number, Sides>();
-  const sidesOfRun = (i: number): Sides => {
+  const own = new Map<number, RunSides>();
+  const sidesOfRun = (i: number): RunSides => {
     let s = own.get(i);
-    if (!s) own.set(i, (s = sidesOf(prepared[i]!)));
+    if (!s) own.set(i, (s = sidesOf(prepared[i]!, idOf)));
     return s;
+  };
+  /** This function calls `f` for each pair of a run with its key and its side in the way `t`. A return of false stops the loop. */
+  const eachPair = (r: RunSides, t: 1 | -1, f: (key: number, side: number) => boolean): boolean => {
+    const n = r.ids.length;
+    let k = 0;
+    for (let x = 0; x < n; x++) {
+      const base = r.ids[x]! * count;
+      for (let y = x + 1; y < n; y++) if (!f(base + r.ids[y]!, r.sides[k++]! * t)) return false;
+    }
+    return true;
   };
   // Each loop makes one stretch and marks its runs. A run that the walk does not take stays for a later stretch.
   for (let p = 0; p < keyOrder.length; ) {
@@ -387,7 +411,8 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
     const runsOf: number[] = [root];
     const turns: (1 | -1)[] = [1];
     const turnOf = new Map<number, 1 | -1>([[root, 1]]);
-    const sides: Sides = new Map(sidesOfRun(root));
+    const sides: Sides = new Map();
+    eachPair(sidesOfRun(root), 1, (key, side) => (sides.set(key, side), true));
     done[root] = 1;
     for (let k = 0; k < runsOf.length; k++) {
       const i = runsOf[k]!;
@@ -395,38 +420,39 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
       for (const l of links[i]!) {
         if (done[l.to] || prepared[l.to]!.twice) continue;
         const t = (turnOf.get(i)! * l.turn) as 1 | -1;
-        const base = sidesOfRun(l.to);
-        let agrees = true;
-        for (const [key, side] of base) {
+        const run = sidesOfRun(l.to);
+        const agrees = eachPair(run, t, (key, side) => {
           const s = sides.get(key);
-          if (s !== undefined && s !== side * t) {
-            agrees = false;
-            break;
-          }
-        }
+          return s === undefined || s === side;
+        });
         if (!agrees) continue;
-        for (const [key, side] of base) sides.set(key, side * t);
+        eachPair(run, t, (key, side) => (sides.set(key, side), true));
         done[l.to] = 1;
         turnOf.set(l.to, t);
         runsOf.push(l.to);
         turns.push(t);
       }
     }
-    out.push({ runs: runsOf, turns, order: orderOf(prepared, runsOf, turns, sides, options) });
+    out.push({ runs: runsOf, turns, order: orderOf(prepared, runsOf, turns, sides, names, options) });
   }
   return out;
 }
 
 /** This function gives the order of the edges of one stretch, from left to right in the way of its root. */
-function orderOf(prepared: readonly Prepared[], runs: readonly number[], turns: readonly (1 | -1)[], sides: Sides, options: Readonly<LaneStretchOptions>): string[] {
+function orderOf(
+  prepared: readonly Prepared[],
+  runs: readonly number[],
+  turns: readonly (1 | -1)[],
+  sides: Sides,
+  names: readonly string[],
+  options: Readonly<LaneStretchOptions>,
+): string[] {
   // A stretch of one run keeps the order `bundle` of the run. The method `none` keeps the order of each run.
   if (runs.length === 1 || options.method === "none") return bundleOrder(prepared[runs[0]!]!);
   const edges = [...new Set(runs.flatMap((i) => prepared[i]!.placed.map((p) => p.edge)))].sort(byText);
   const rel = new Relation(edges);
-  for (const [key, side] of sides) {
-    const [a, b] = key.split("\u0000") as [string, string];
-    rel.set(a, b, side);
-  }
+  const count = names.length;
+  for (const [key, side] of sides) rel.set(names[Math.floor(key / count)]!, names[key % count]!, side);
   let order: number[];
   if (options.method === "periphery") order = peripheryOrder(rel, prepared, runs, turns);
   else {
