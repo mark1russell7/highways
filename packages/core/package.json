@@ -45,6 +45,8 @@
     "screen": "node scripts/screen.ts",
     "exact": "node scripts/exact.ts",
     "oracle": "node scripts/oracle.ts",
+    "portfolio": "node scripts/portfolio.ts",
+    "portfolio:time": "node scripts/portfolio-time.ts",
     "screen:inputs": "node scripts/screen-inputs.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"

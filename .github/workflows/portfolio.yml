@@ -1,0 +1,155 @@
+# The time of each strategy of the portfolio (PORTFOLIO). Each shard times a part of the strategies on the small boards of `exact-v1`
+# at each size, and the last job joins the lines into one artifact. The times of CI machines are not the times of the UI machine,
+# so the note `docs/research/PORTFOLIO.md` also gives each time relative to the time of `shared` on the same machine.
+name: Portfolio
+
+on:
+  workflow_call:
+    inputs:
+      args:
+        type: string
+        default: ""
+      report:
+        type: string
+        default: ""
+      minutes:
+        type: string
+        default: "60"
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "The arguments of pnpm portfolio:time, without --shard and --out. --shards gives the number of shards (default 16)."
+        default: "--sizes 10,24,40 --seeds 0,1,2 --repeats 5 --shards 16"
+      report:
+        description: "The ids of CI runs, with commas: --exact <id> --screen <id,...> --time <id>. The job then writes the report of pnpm portfolio from their artifacts, and times nothing."
+        default: ""
+      minutes:
+        description: "The time limit of each shard, in minutes."
+        default: "60"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    if: ${{ !inputs.report }}
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - id: plan
+        env:
+          ARGS: ${{ inputs.args }}
+        run: |
+          n=$(printf '%s' "$ARGS" | sed -n 's/.*--shards \([0-9][0-9]*\).*/\1/p')
+          n=${n:-16}
+          echo "count=$n" >> "$GITHUB_OUTPUT"
+          echo "shards=[$(seq -s, 0 $((n - 1)))]" >> "$GITHUB_OUTPUT"
+
+  time:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJSON(inputs.minutes || '60') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    env:
+      ARGS: ${{ inputs.args }}
+      SHARD: ${{ matrix.shard }}
+      SHARDS: ${{ needs.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time the shard
+        run: |
+          set -o pipefail
+          nproc
+          read -ra args <<< "$ARGS"
+          pnpm --filter @mark1russell7/highways portfolio:time "${args[@]}" --shard "$SHARD/$SHARDS" --out "$GITHUB_WORKSPACE/time-$SHARD.jsonl"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: time-shard-${{ matrix.shard }}
+          path: time-${{ matrix.shard }}.jsonl
+          if-no-files-found: warn
+
+  merge:
+    needs: time
+    if: ${{ always() && !inputs.report }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: time-shard-*
+          path: shards
+      - name: Join the shards
+        run: |
+          cat shards/*/*.jsonl > time.jsonl
+          echo "The job joined $(wc -l < time.jsonl) timed runs." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: portfolio-time-${{ github.sha }}
+          path: time.jsonl
+
+  # The report of the portfolio from the artifacts of other runs: the screens of `exact-v1` and `screen-v1`, and the times.
+  report:
+    if: ${{ inputs.report }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      REPORT: ${{ inputs.report }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check the script of the report
+        run: |
+          pnpm --filter @mark1russell7/highways typecheck
+          pnpm --filter @mark1russell7/highways exec vitest run src/bench/screen/portfolio.test.ts
+      - name: Download the artifacts and write the report
+        run: |
+          set -o pipefail
+          read -ra words <<< "$REPORT"
+          args=()
+          for ((i = 0; i < ${#words[@]}; i += 2)); do
+            flag=${words[i]}
+            dirs=""
+            IFS=',' read -ra ids <<< "${words[i + 1]}"
+            # A run of the times also has the file of each shard. Only the joined file counts.
+            pattern="screen-*"
+            [ "$flag" = "--time" ] && pattern="portfolio-time-*"
+            for id in "${ids[@]}"; do
+              gh run download "$id" -p "$pattern" -D "$GITHUB_WORKSPACE/runs/$id"
+              dirs="${dirs:+$dirs,}$GITHUB_WORKSPACE/runs/$id"
+            done
+            args+=("$flag" "$dirs")
+          done
+          pnpm --filter @mark1russell7/highways portfolio "${args[@]}" --out "$GITHUB_WORKSPACE/portfolio.md" --json "$GITHUB_WORKSPACE/portfolio.json" > /dev/null
+          cat portfolio.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: portfolio-report-${{ github.sha }}
+          path: |
+            portfolio.md
+            portfolio.json
+          if-no-files-found: warn
