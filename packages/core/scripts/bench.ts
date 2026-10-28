@@ -1,6 +1,7 @@
 // The command line of the benchmark: `pnpm bench [--min <nodes>] [--max <nodes>] [--repeat <n>] [--routers <a,b>] [--skip-routers <a,b>]
 // [--cell-limit <ms>] [--rows-only] [--seeds <n>] [--seeds-max-nodes <nodes>] [--stability-max <nodes>] [--suite-steps <a,b>]
-// [--json <file>] [--side-tables <file>] [--report <file>]`.
+// [--opt-in <a,b>] [--json <file>] [--side-tables <file>] [--report <file>]`.
+// `--opt-in` adds opt-in routers to the race, for example `portfolio` (PORTFOLIO-API). The default race does not have them.
 // The workflow `Bench` starts one part of the benchmark in each job, with `--min`, `--max`, `--routers` and `--rows-only`.
 // The script `bench-join.ts` joins the parts.
 import { writeFileSync } from "node:fs";
@@ -17,8 +18,9 @@ import type { Graph, Node } from "../src/model.ts";
 import { sectionsRouter } from "../src/routers/sections.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection, trunksRouter } from "../src/routers/trunks.ts";
-import { STRATEGIES } from "../src/strategies/builtins.ts";
-import { listStrategies, routersOf, STEPS, type Step } from "../src/strategies/model.ts";
+import { portfolioStrategy } from "../src/portfolio/router.ts";
+import { STRATEGIES as BUILT_IN } from "../src/strategies/builtins.ts";
+import { listStrategies, register, routersOf, STEPS, type AnyStrategy, type Step } from "../src/strategies/model.ts";
 import { formatFronts, formatMeasureTime, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
 
 const args = process.argv.slice(2);
@@ -34,6 +36,10 @@ const number = (name: string, fallback: number): number => {
   if (!Number.isFinite(value) || value < 0) throw new Error(`${name} needs a number of 0 or more, not "${text}"`);
   return value;
 };
+// The opt-in routers that `--opt-in` can add to the registry of the race.
+const OPT_IN: Readonly<Record<string, AnyStrategy>> = { portfolio: portfolioStrategy };
+for (const name of list("--opt-in") ?? []) if (OPT_IN[name] === undefined) throw new Error(`There is no opt-in router "${name}". The opt-in routers are ${Object.keys(OPT_IN).join(", ")}.`);
+const STRATEGIES = register(BUILT_IN, ...(list("--opt-in") ?? []).map((name) => OPT_IN[name]!));
 // The registry gives each list, so a new strategy gets its rows with no edit here.
 const only = list("--routers");
 const skip = list("--skip-routers") ?? [];
@@ -57,6 +63,7 @@ const suite = runSuite({
   seedsMaxNodes: number("--seeds-max-nodes", 1000),
   repeat,
   stabilityMax: number("--stability-max", 1000),
+  registry: STRATEGIES,
   routers: ROUTERS.map((r) => r.name),
   steps: suiteSteps,
   cellLimit,

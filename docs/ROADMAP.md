@@ -88,13 +88,13 @@ Status: `done`, `active`, `blocked`, `later`.
 | GUARDS | Two guards in [the promotion rule](PROMOTION.md#activation), with the same text as packing and layout-contract. A verdict counts only when the candidate is exercised. Candidates with the same `outputHash` on each decision input count as one output group. | 2026-10-28 | #102 |
 | ACTIVATION | Each screen record gets its `outputHash` and the move counts of its strategy. A verdict counts only when a candidate is exercised on a decision board. Of 289 strategies, 17 are silent on the static screen. 15 of them go to a rebuild wave. The edit screen of the gate `ids` shows its move. No verdict changes. | 2026-10-28 | #107 |
 | EXACT-BOUNDS | [The bounds of the gap closed](research/BOUNDS.md) at 18, 24 and 40 nodes and at the caps 1.1, 1.25 and 1.5, from 720 solves. The intervals are narrow: the median width of the first 5 is 0.1 or less. The [portfolio](research/PORTFOLIO.md#the-portfolio-at-each-cap-exact-bounds) gets a curve and greedy sets for each rule and cap. | 2026-10-28 | #110 |
+| PORTFOLIO-API | [The opt-in portfolio router](research/PORTFOLIO.md#the-portfolio-router-portfolio-api) `portfolio`: `shared` and the greedy set of the size band, rule and cap of the caller, with the shared combinator of layout-contract. On the held-out seeds, k = 5 keeps 4% to 100% of the oracle gain. At 40 nodes, k = 3 takes 51 to 176 ms. | 2026-10-28 | #112 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. A portfolio with a score of the output alone keeps 6% on `exact-v1` (PORTFOLIO), so the selector needs a score that knows the rule of the run. PORTFOLIO-RULE gives that score: B1 among the runs that obey the rule of the caller, at one cap. | `later` | ORACLE | P1 |
-| PORTFOLIO-API | An opt-in strategy `portfolio`. It takes the rule, the stretch cap and `budgetMs`. It runs the greedy set of that rule and cap ([`PORTFOLIO.md`](research/PORTFOLIO.md#the-greedy-sets-for-portfolio-api)) in the budget, and returns the best guarded output. The default does not change until the strategy passes [`PROMOTION.md`](PROMOTION.md). | `later` | EXACT-BOUNDS | P1 |
 | CORPUS-SEEDS | 10 or more seeds for each board kind of `screen-v1`. Today `hub-chain` and `many-groups` have 1 seed, so a choice of a set cannot hold out their winners. | `later` | SCREEN | P1 |
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
 | MEAS-FLAT | Z2 is 0 on each record, and B8 `runs` is degenerate where `shared` has 0. Correct each definition, or mark it inactive with its reason. | `later` | MEAS3A | P2 |
@@ -105,7 +105,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
-| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at the rule `collection` first, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
+| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at the rule `collection` first, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. The second aim is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item
 

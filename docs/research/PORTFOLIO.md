@@ -8,6 +8,7 @@ This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A
 - The section [The rule of the caller](#the-rule-of-the-caller-portfolio-rule) is the result of the item PORTFOLIO-RULE. The script also makes its tables, with the optima of `exact-v1`.
 - The section [The portfolio at each cap](#the-portfolio-at-each-cap-exact-bounds) is the result of the item EXACT-BOUNDS. It gives the greedy sets of each rule and cap.
 - The script [`scripts/portfolio-time.ts`](../../packages/core/scripts/portfolio-time.ts) times each strategy. The workflow `Portfolio` starts it in CI.
+- The section [The portfolio router](#the-portfolio-router-portfolio-api) is the result of the item PORTFOLIO-API: the opt-in router `portfolio` of the core.
 
 ## Summary
 
@@ -368,4 +369,109 @@ The greedy choice on all inputs of the cap, for each rule and cap of the caller.
 
 - The sets of the rule `collection` share no strategy between the caps 1.1 and 1.5. `corners-side` is first at 1.1 and 1.25.
 - The sets of the rule `all` hold `growth` only from the cap 1.25. At the cap 1.1, the forms of `zipper`, `cubu` and `kdeeb` lead.
-- The sets come from all 40 inputs of `exact-v1` (1 board size). They need a check on other seeds and sizes before PORTFOLIO-API uses them.
+- The sets come from all 40 inputs of `exact-v1` (1 board size). The section [The portfolio router](#the-portfolio-router-portfolio-api) replaces them with a set for each size band, with a test on held-out seeds.
+
+## The portfolio router (PORTFOLIO-API)
+
+This section is the result of the item PORTFOLIO-API of the [roadmap](../ROADMAP.md). The core has an opt-in router `portfolio`. It is not in the registry `STRATEGIES`, so no default output changes.
+
+- `routePortfolio(graph, { rule, cap, k, budgetMs, maxMembers })` runs the base `shared`, then the first k members of the set of its rule, cap and size band.
+- The rule is `collection` (the default) or `all`. The cap is 1.1, 1.25 or 1.5 (the default). k is 3 (the default), 5 or 8.
+- The combinator is a local copy of `portfolio` of `@mark1russell7/layout-contract` 0.2.6, in `src/bench/screen/portfolio-pick.ts`. The test `portfolio-pick.test.ts` runs 2 000 seeded cases through the copy and the contract. The picks, the errors and the clock reads are equal on each case. `selectBest` and `pickMoves` are also equal.
+- The key of the pick:
+  - `hard` counts the breaks of the hard rules, plus each edge with a stretch above the cap. Under `collection`, it also counts each shared segment that holds edges of two collections.
+  - The one level `B1` is the ink saved (higher is better), with the `minEffect` of the table `MEASURES`.
+  - The hash is `resultHash`.
+- The result of `routePortfolio` has the trace of the pick and the move count `move.pick`. The strategy `portfolioStrategy` gives only the output.
+
+### The size bands
+
+The router chooses the band from the node count at call time: up to 12 nodes, 13 to 24 nodes, and 25 to 40 nodes. A larger graph uses the band of 25 to 40 nodes.
+
+- The records come from the CI run [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) on `exact-v1` (10 nodes), and from the 12 runs of EXACT-BOUNDS on `exact-v1-bounds` (18, 24 and 40 nodes).
+- The script [`scripts/portfolio-sets.ts`](../../packages/core/scripts/portfolio-sets.ts) (`pnpm portfolio:sets`) keeps a short table of the runs in `scripts/data/portfolio-runs.json.gz`. From it, the script writes the sets to `src/portfolio/sets.ts`. The test `sets.test.ts` checks that the file is current.
+- The seeds 0 to 4 of each band choose the set. The seeds 5 to 9 test it. Each rule and cap has the same split.
+- The value is the gap closed at the cap, with the midpoint of the interval of [`BOUNDS.md`](BOUNDS.md) above 10 nodes.
+- The choice uses the guard of the records. A member has no more hard breaks than `shared`. Its stretch is at or below the cap, and it obeys the rule of the caller.
+- The column `base wins` counts the test inputs where `shared` wins at k = 5.
+
+The share of the oracle gain on the test seeds (5 to 9). In the larger bands, each cell gives the band set first. Then it gives the set of the band up to 12 nodes (the 10-node set) on the same test inputs:
+
+| band | rule | cap | test | base | best single | oracle | k = 3 | k = 5 | k = 8 | base wins |
+|---|---|---:|---:|---:|---:|---:|---|---|---|---:|
+| n1-12 | `collection` | 1.1 | 20 | 0.000 | 0.094 | 0.452 | 11% | 23% | 58% | 1 of 20 |
+| n13-24 | `collection` | 1.1 | 40 | 0.000 | 0.000 | 0.161 | 0% / 0% | 4% / 0% | 4% / 0% | 20 of 40 |
+| n25-40 | `collection` | 1.1 | 20 | 0.000 | 0.000 | 0.000 | - | - | - | 18 of 20 |
+| n1-12 | `collection` | 1.25 | 20 | 0.000 | 0.048 | 0.432 | 5% | 5% | 19% | 2 of 20 |
+| n13-24 | `collection` | 1.25 | 40 | 0.000 | 0.045 | 0.223 | 25% / -25% | 38% / -25% | 44% / -17% | 7 of 40 |
+| n25-40 | `collection` | 1.25 | 20 | 0.000 | 0.030 | 0.100 | 36% / -43% | 43% / -43% | 62% / -43% | 4 of 20 |
+| n1-12 | `collection` | 1.5 | 20 | 0.000 | 0.000 | 0.398 | 10% | 47% | 70% | 5 of 20 |
+| n13-24 | `collection` | 1.5 | 40 | 0.000 | 0.020 | 0.216 | 41% / -10% | 45% / -10% | 51% / 11% | 3 of 40 |
+| n25-40 | `collection` | 1.5 | 16 | 0.000 | 0.045 | 0.110 | 86% / -68% | 94% / -68% | 100% / -68% | 0 of 16 |
+| n1-12 | `all` | 1.1 | 19 | 0.000 | 0.199 | 0.798 | 14% | 95% | 95% | 2 of 19 |
+| n13-24 | `all` | 1.1 | 40 | -0.563 | -0.369 | 0.063 | 72% / -20% | 89% / -20% | 97% / -2% | 1 of 40 |
+| n25-40 | `all` | 1.1 | 20 | -1.256 | -0.997 | -0.659 | 3% / -77% | 83% / -77% | 83% / -77% | 4 of 20 |
+| n1-12 | `all` | 1.25 | 20 | -0.023 | 0.391 | 0.653 | 78% | 83% | 89% | 0 of 20 |
+| n13-24 | `all` | 1.25 | 40 | -0.318 | 0.205 | 0.336 | 74% / 74% | 74% / 100% | 78% / 100% | 0 of 40 |
+| n25-40 | `all` | 1.25 | 19 | -0.615 | -0.057 | 0.074 | 20% / 20% | 43% / 20% | 43% / 20% | 0 of 19 |
+| n1-12 | `all` | 1.5 | 20 | -0.019 | 0.526 | 0.686 | 42% | 42% | 97% | 0 of 20 |
+| n13-24 | `all` | 1.5 | 40 | -0.242 | 0.343 | 0.443 | 66% / 51% | 100% / 51% | 100% / 59% | 1 of 40 |
+| n25-40 | `all` | 1.5 | 13 | -0.472 | 0.196 | 0.241 | 100% / -69% | 100% / -69% | 100% / 86% | 0 of 13 |
+
+The share on the train seeds (0 to 4, in sample):
+
+| rule | cap | n1-12 k = 3, 5, 8 | n13-24 k = 3, 5, 8 | n25-40 k = 3, 5, 8 |
+|---|---:|---|---|---|
+| `collection` | 1.1 | 25%, 64%, 100% | 35%, 64%, 86% | - |
+| `collection` | 1.25 | 47%, 94%, 100% | 44%, 71%, 81% | 52%, 100%, 100% |
+| `collection` | 1.5 | 47%, 79%, 100% | 49%, 84%, 95% | 78%, 100%, 100% |
+| `all` | 1.1 | 61%, 86%, 100% | 58%, 75%, 100% | 86%, 100%, 100% |
+| `all` | 1.25 | 54%, 65%, 100% | 55%, 76%, 100% | 98%, 100%, 100% |
+| `all` | 1.5 | 76%, 100%, 100% | 70%, 95%, 100% | 94%, 100%, 100% |
+
+- A set of one band does not carry to another band. At k = 5, the 10-node set is below the best single strategy in 7 of the 12 cells of the larger bands. The band set is above the 10-node set in 10 of the 12 cells.
+- The held-out share is lower than the share in sample, most at k = 8. The test has 13 to 40 inputs, so a cell can change by 20 points or more with a new seed.
+- Under `collection` at the cap 1.1, the large bands have little gain. At 25 to 40 nodes, the best single strategy and the oracle both have a gap closed of 0. `shared` wins on 18 of 20 test inputs.
+- Under `all` at the caps 1.1 and 1.25, the median of the base on large boards is negative: -0.318 to -1.256. At 25 to 40 nodes and the cap 1.1, the oracle is also negative (-0.659). The idea waves of BUILD-W aim there.
+
+### The router in CI
+
+The screen module [`scripts/screens/portfolio-api.ts`](../../packages/core/scripts/screens/portfolio-api.ts) gives one form of the router for each rule, cap and k. The script [`scripts/portfolio-api-report.ts`](../../packages/core/scripts/portfolio-api-report.ts) (`pnpm portfolio:api`) makes the tables from its records.
+
+| Set | CI runs of the workflow `Screen` |
+|---|---|
+| `exact-v1` | [40649456144](https://github.com/mark1russell7/highways/actions/runs/40649456144) |
+| `exact-v1-bounds`, 18 nodes | [40649458704](https://github.com/mark1russell7/highways/actions/runs/40649458704), [40649461187](https://github.com/mark1russell7/highways/actions/runs/40649461187), [40649463378](https://github.com/mark1russell7/highways/actions/runs/40649463378), [40649465760](https://github.com/mark1russell7/highways/actions/runs/40649465760) |
+| `exact-v1-bounds`, 24 nodes | [40649468315](https://github.com/mark1russell7/highways/actions/runs/40649468315), [40649470298](https://github.com/mark1russell7/highways/actions/runs/40649470298), [40649472758](https://github.com/mark1russell7/highways/actions/runs/40649472758), [40649475187](https://github.com/mark1russell7/highways/actions/runs/40649475187) |
+| `exact-v1-bounds`, 40 nodes | [40649477333](https://github.com/mark1russell7/highways/actions/runs/40649477333), [40649479774](https://github.com/mark1russell7/highways/actions/runs/40649479774), [40649481965](https://github.com/mark1russell7/highways/actions/runs/40649481965), [40649484540](https://github.com/mark1russell7/highways/actions/runs/40649484540) |
+| `screen-v1` | [40649453791](https://github.com/mark1russell7/highways/actions/runs/40649453791) |
+
+- **The gap closed.** The 54 cells are each band, rule, cap and k. In each cell, the median gap closed of the router on the test seeds is equal to that of the offline choice. So each share of the table above is also the share of the router.
+- **The key against the guard.** The key of the router and the guard of the records do not always choose the same member. Under `collection` at the cap 1.1, the router and the offline choice have a different B1 on some test inputs. At 13 to 24 nodes, 16 to 19 of 40 inputs differ. At 25 to 40 nodes, 9 of 20 differ. There the base `shared` has edges above the cap. The key counts each of them as a hard break, so a member in the cap with less ink wins. In the other cells, 0 to 3 inputs differ.
+- **`screen-v1`.** On each of the 14 inputs, the router has no more hard breaks than `shared`. The median B1 of `shared` is 0.081. The router gives 0.082 to 0.126 under `collection`, and 0.158 to 0.400 under `all`. The records of `screen-v1` have no stretch of the model, so the pool gets the guard of the B3 q95 there. That guard is not the key of the router, so the router and the pool do not compare directly.
+
+The median time of the router, one member after the other, on a CI machine. `shared` alone takes 0.8 ms at 10 nodes, 2.2 ms at 18 and 24 nodes, and 4.6 ms at 40 nodes:
+
+| rule | cap | 10 nodes k = 3, 8 | 18 and 24 nodes k = 3, 8 | 40 nodes k = 3, 8 |
+|---|---:|---|---|---|
+| `collection` | 1.1 | 15 ms, 27 ms | 32 ms, 57 ms | 76 ms, 74 ms |
+| `collection` | 1.25 | 11 ms, 25 ms | 21 ms, 48 ms | 53 ms, 108 ms |
+| `collection` | 1.5 | 10 ms, 24 ms | 25 ms, 39 ms | 51 ms, 89 ms |
+| `all` | 1.1 | 19 ms, 32 ms | 32 ms, 74 ms | 69 ms, 142 ms |
+| `all` | 1.25 | 25 ms, 39 ms | 74 ms, 94 ms | 176 ms, 204 ms |
+| `all` | 1.5 | 29 ms, 59 ms | 56 ms, 160 ms | 62 ms, 84 ms |
+
+- At 40 nodes and k = 3, the router takes 51 to 176 ms. The members take most of it: the records of EXACT-BOUNDS give 33 to 164 ms for `shared` and the same 3 members. The key adds approximately 10 to 20 ms.
+- The set of `all` at the cap 1.25 holds `w3d:kdeeb-routes` and `w3e:mlseb+stretch`. They are the slowest members.
+- On `screen-v1`, the boards of 96 to 150 nodes take 0.4 to 1.8 s (median), against 20 ms for `shared`. The sets come from boards of 40 nodes or fewer. Above 40 nodes, set `budgetMs` to keep the time in a limit.
+
+### The predictions of PORTFOLIO-API
+
+| Prediction | Confidence | Result |
+|---|---|---|
+| 1. The local copy and the contract give the same pick on each case. | high | Met: 2 000 cases of `portfolio`, 500 of `selectBest`, and `pickMoves`. |
+| 4. At 40 nodes, k = 3 and no budget, the router takes less than 50 ms in CI. | medium | Not met: 51 to 176 ms (median). |
+| 5. No default output changes, so the version step is PATCH. | high | Met: the digest tests of `sections`, the bundlers and the site boards pass. The router is not in `STRATEGIES`. |
+| 6. At 13 to 24 and 25 to 40 nodes, the band set at k = 5 beats the 10-node set in each rule and cap, by 10 points or more in at least half of the 12 cells. | medium | Not met: it beats the 10-node set in 10 of 12 cells, and by 10 points or more in 9. It loses under `all` at 1.25 and 13 to 24 nodes (74% against 100%). At 25 to 40 nodes under `collection` at 1.1, no set has a gain. |
+| 7. Under `collection`, the band set at k = 5 keeps 20% or more at 13 to 24 nodes at each cap. | low | Not met: 4% at 1.1, 38% at 1.25 and 45% at 1.5. |
+| 8. At 25 to 40 nodes under `all` at the caps 1.1 and 1.25, the base wins on half of the test inputs or more. | medium | Not met: 4 of 20 and 0 of 19. The base wins most under `collection` at 1.1: 18 of 20. |

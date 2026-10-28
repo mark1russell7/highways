@@ -485,6 +485,22 @@ const shared = stableOrderStrategy(routerStrategies.shared);
 const result = repairStrategy(shared).run(graph); // The router `shared+stable+repair`.
 ```
 
+### The portfolio router
+
+The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change. [`PORTFOLIO.md`](../../docs/research/PORTFOLIO.md#the-portfolio-router-portfolio-api) gives its tables.
+
+- `routePortfolio(graph, options?)` runs the router `shared` first, then the greedy set of the size band of the graph. It gives the output with the fewest hard breaks, then the most ink saved (B1).
+- The options are `rule` (`collection` or `all`), `cap` (1.1, 1.25 or 1.5), `k` (3, 5 or 8), `budgetMs` and `maxMembers`.
+- Under the rule `collection`, a shared segment with edges of two collections counts as a hard break. Each edge with a stretch above the cap also counts as a hard break.
+- The result has the output, the winner, the trace of the pick and the move count `move.pick`.
+- `portfolioRouter(options?)` gives a `Router`, and `portfolioStrategy` is the router strategy. Add `portfolioStrategy` to a registry of your own to race it.
+
+```ts
+import { routePortfolio } from "@mark1russell7/highways";
+
+const { result, winner } = routePortfolio(graph, { rule: "all", cap: 1.25, k: 5, budgetMs: 50 });
+```
+
 ### Declarations of the options
 
 Each strategy declares its options in `schema`. A declaration tells the type, the range, the step and the meaning of one option. Tools make controls and sweeps from these declarations, with no other data.

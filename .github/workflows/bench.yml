@@ -53,12 +53,14 @@ jobs:
         # Each part has the nodes of its fixtures, the options of `pnpm bench`, the cell limit in milliseconds and the time limit of its job in minutes.
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
         # Each step of the measure suite runs in one part of each size: `small` runs each step, and the parts `rest` run the step `group`.
+        # The part `opt-in` races the opt-in router `portfolio` (PORTFOLIO-API) to 1 000 nodes, with one seed. The default race does not have it.
         run: |
           [[ "$MAX" =~ ^[0-9]+$ ]] || { echo "max must be a number, not '$MAX'"; exit 1; }
           [[ "$REPEAT" =~ ^[1-9][0-9]*$ ]] || { echo "repeat must be a number of 1 or more, not '$REPEAT'"; exit 1; }
           [[ "$SEEDS" =~ ^[1-9][0-9]*$ ]] || { echo "seeds must be a number of 1 or more, not '$SEEDS'"; exit 1; }
           parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" '[
             {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds)", limit: 900000, timeout: 30},
+            {name: "opt-in", min: 0, max: ([$max, 1000] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio --routers portfolio", limit: 900000, timeout: 30},
             {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared-all", limit: 900000, timeout: 40},
             {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared,sections", limit: 900000, timeout: 40},
             {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router,group --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},
