@@ -27,6 +27,23 @@ export interface BenchRow {
   readonly levelFaults: readonly LevelFaults[];
   /** The routes of this cell took longer than the cell limit. The cell did not start more routes. A row within the limit has no such field. */
   readonly overLimit?: OverLimit;
+  /** The time of the paired baseline arm (BENCH-GREEN). Only a cell with a baseline router has it. */
+  readonly paired?: Paired;
+}
+
+/**
+ * The paired baseline arm of a cell. The baseline router routes the same graph in turn with the router, on the same CPU.
+ * The ratio does not change with the speed of the runner, so the ratios of two runs compare better than their times.
+ */
+export interface Paired {
+  /** The name of the baseline router. */
+  readonly base: string;
+  /** The median time of one route of the router in the paired routes, in milliseconds. */
+  readonly ms: number;
+  /** The median time of one route of the baseline router, in milliseconds. */
+  readonly baseMs: number;
+  /** The ratio `ms / baseMs`. A ratio below 1 tells that the router is faster than the baseline. */
+  readonly ratio: number;
 }
 
 /** The record of a cell over its time limit. */
@@ -97,32 +114,49 @@ export interface BenchRun {
   readonly result: Result;
 }
 
-/** This function does the work of `benchOne` and also gives the result, so more measures can read it without a second route. */
-export function benchRun(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity): BenchRun {
+/**
+ * This function does the work of `benchOne` and also gives the result, so more measures can read it without a second route.
+ * With a baseline router `pair`, the baseline routes the graph one time for each route of the router, in turn: first before, then after.
+ * The row then gets `paired`. The baseline routes do not count for the cell limit, and their results do not change the row.
+ */
+export function benchRun(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity, pair?: Router): BenchRun {
   const times: number[] = [];
+  const baseTimes: number[] = [];
+  const timeBase = (): void => {
+    if (!pair) return;
+    const t0 = now();
+    pair.route(graph);
+    baseTimes.push(now() - t0);
+  };
   let first: Result | undefined;
   let deterministic = true;
   let spent = 0;
   for (let i = 0; i < Math.max(2, repeat); i++) {
+    // The order of the two arms changes at each route, so a warm cache helps each arm equally.
+    if (i % 2 === 0) timeBase();
     const t0 = now();
     const r = router.route(graph);
     const t = now() - t0;
     times.push(t);
     spent += t;
+    if (i % 2 === 1) timeBase();
     if (!first) first = r;
     else if (i === 1 && !sameData(r, first)) deterministic = false;
     if (spent > cellLimit) break;
   }
   const runs = times.length;
   times.sort((a, b) => a - b);
+  baseTimes.sort((a, b) => a - b);
   const result = first!;
+  const ms = times[Math.floor(times.length / 2)]!;
+  const baseMs = baseTimes[Math.floor(baseTimes.length / 2)];
   const all = checkProperties(graph, result, 1_000_000);
   const row: BenchRow = {
     router: router.name,
     fixture,
     nodes: graph.nodes.length,
     edges: graph.edges.length,
-    ms: times[Math.floor(times.length / 2)]!,
+    ms,
     deterministic,
     violations: all.length,
     sample: all.slice(0, 5),
@@ -130,6 +164,7 @@ export function benchRun(router: Router, fixture: string, graph: Graph, repeat =
     faults: measureRouteFaults(graph, result),
     levelFaults: measureLevelFaults(result),
     ...(spent > cellLimit ? { overLimit: { limit: cellLimit, runs } } : {}),
+    ...(pair && baseMs !== undefined ? { paired: { base: pair.name, ms, baseMs, ratio: baseMs > 0 ? ms / baseMs : 0 } } : {}),
   };
   return { row, result };
 }

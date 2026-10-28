@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { listStrategies, routersOf } from "../strategies/model.ts";
-import { benchOne } from "./run.ts";
-import { familySeed, formatFronts, formatMeasureTime, formatRules, formatSummaries, joinReports, PROPOSED_RULES, runSuite } from "./suite.ts";
+import { benchOne, benchRun } from "./run.ts";
+import { familySeed, formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, joinReports, PROPOSED_RULES, runSuite } from "./suite.ts";
 
 describe("runSuite (MEAS1)", () => {
   const tiny = FIXTURES.find((f) => f.name === "tiny-uniform")!;
@@ -96,4 +96,67 @@ describe("runSuite in parts (BENCH-CI)", () => {
     expect(joined.summaries.map(medians)).toEqual(one.summaries.map(medians));
     // The parts run the whole suite again, and each built-in strategy adds rows. Thus the test gets more time than the default.
   }, 30_000);
+});
+
+describe("runSuite in shards, with caps and the paired arm (BENCH-GREEN)", () => {
+  const tiny = FIXTURES.find((f) => f.name === "tiny-uniform")!;
+  const base = { max: 20, seeds: 3, repeat: 2, fixtures: [tiny], steps: ["router", "highway", "curve"] as const };
+  const whole = runSuite(base).report;
+  const key = (r: (typeof whole.rows)[number]) => [r.step, r.fixture, r.seed, r.strategy, r.values];
+
+  it("gives each cell to one shard, and the join of the shards is the whole run", () => {
+    const shards = [0, 1, 2].map((index) => runSuite({ ...base, shard: { index, count: 3 } }));
+    const count = shards.map((s) => s.report.rows.filter((r) => r.step !== "curve").length);
+    expect(count.reduce((a, b) => a + b, 0)).toBe(whole.rows.filter((r) => r.step !== "curve").length);
+    for (const c of count) expect(c).toBeGreaterThan(0);
+    // The seeds of one strategy go to different shards.
+    const corners = shards.map((s) => s.report.rows.filter((r) => r.step === "router" && r.strategy === "corners").map((r) => r.seed));
+    expect(corners.map((x) => x.length)).toEqual([1, 1, 1]);
+    const joined = joinReports([shards[2]!.report, shards[0]!.report, shards[1]!.report]);
+    expect(joined.rows.map(key)).toEqual(whole.rows.map(key));
+    expect(shards.flatMap((s) => s.bench).length).toBe(routersOf(STRATEGIES).length);
+  }, 30_000);
+
+  it("refuses a shard that is not valid, and a shard with the steps group or room", () => {
+    expect(() => runSuite({ ...base, shard: { index: 3, count: 3 } })).toThrow(/not valid/);
+    expect(() => runSuite({ ...base, steps: ["group"], shard: { index: 0, count: 2 } })).toThrow(/only the steps/);
+    expect(() => runSuite({ ...base, pair: "no-such-router" })).toThrow(/no baseline router/);
+  });
+
+  it("lists a capped cell one time, and does not route it", () => {
+    const capped = runSuite({ ...base, steps: ["router"], caps: { corners: 5 } }).report;
+    expect(capped.rows.some((r) => r.strategy === "corners")).toBe(false);
+    expect(capped.capped).toEqual([{ step: "router", strategy: "corners", fixture: "tiny-uniform", nodes: 10, cap: 5 }]);
+    expect(formatCapped(capped.capped!)).toContain("| router | corners | tiny-uniform | 10 | 5 | capped |");
+    expect(whole.capped).toBeUndefined();
+    expect(joinReports([capped, whole]).capped).toHaveLength(1);
+  });
+
+  it("adds the paired arm on the first seed only, and the arm does not change the measures", () => {
+    const paired = runSuite({ ...base, steps: ["router"], pair: "shared" });
+    for (const r of paired.report.rows) {
+      if (r.seed === 0) expect(r.paired?.base, r.strategy).toBe("shared");
+      else expect(r.paired).toBeUndefined();
+    }
+    for (const row of paired.bench) expect(row.paired?.ratio).toBeGreaterThan(0);
+    const control = paired.bench.find((r) => r.router === "shared")!.paired!;
+    expect(control.ratio).toBeCloseTo(control.ms / control.baseMs, 9);
+    const plain = (rows: typeof paired.report.rows) => rows.map(key);
+    expect(plain(paired.report.rows)).toEqual(plain(runSuite({ ...base, steps: ["router"] }).report.rows));
+    expect(formatPaired(paired.report.rows)).toContain("| router | shared | tiny-uniform | 10 |");
+    expect(runSuite({ ...base, steps: ["router"], pair: "shared", pairMax: 5 }).report.rows.some((r) => r.paired)).toBe(false);
+  }, 30_000);
+
+  it("gives the same route with and without the baseline router", () => {
+    const graph = makeFixture(tiny);
+    const corners = routersOf(STRATEGIES).find((r) => r.name === "corners")!;
+    const shared = routersOf(STRATEGIES).find((r) => r.name === "shared")!;
+    const a = benchRun(corners, tiny.name, graph, 3);
+    const b = benchRun(corners, tiny.name, graph, 3, Infinity, shared);
+    expect(b.result).toEqual(a.result);
+    const { ms: _a, ...restA } = a.row;
+    const { ms: _b, paired, ...restB } = b.row;
+    expect(restB).toEqual(restA);
+    expect(paired?.base).toBe("shared");
+  });
 });

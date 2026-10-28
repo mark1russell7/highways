@@ -24,7 +24,7 @@ import { boardUnit, crossingAngles, detourSpread, drawnSegments, plugSpacing, to
 import { changeGraph, routeStability } from "./measures/stability.ts";
 import { quantile, summarize, type Spread } from "./measures/stats.ts";
 import { measureBoard } from "./room.ts";
-import { benchRun, type BenchRow } from "./run.ts";
+import { benchRun, type BenchRow, type Paired } from "./run.ts";
 
 // The core runs in any host, so it reads the clock without the types of Node or the browser.
 const now = (): number => (globalThis as { performance?: { now(): number } }).performance?.now() ?? Date.now();
@@ -64,6 +64,26 @@ export interface SuiteOptions {
   readonly steps?: readonly Step[];
   /** The time limit of one cell of the step `router`, in milliseconds, as `BenchOptions.cellLimit` gives it. The default is no limit. */
   readonly cellLimit?: number;
+  /**
+   * One shard of the cells of the steps `router` and `highway` (BENCH-GREEN). The default is all the cells.
+   * The strategy at place `s` of its step, on the seed `k`, belongs to the shard `(s + k) % count`, from 0.
+   * So the seeds of one strategy go to different shards, and each shard gets a similar share of the time.
+   * A shard has only these two steps and the step `curve`, because the cells of the other steps do not divide.
+   */
+  readonly shard?: { readonly index: number; readonly count: number };
+  /**
+   * The largest fixture of a strategy of the steps `router` and `highway`, in nodes, by the name of the strategy. The default is no cap.
+   * A capped strategy does not route a larger fixture. The report lists each such cell in `capped`, so the row is capped, not missing.
+   */
+  readonly caps?: Readonly<Record<string, number>>;
+  /**
+   * The name of the baseline router of the paired arm, for example `shared`. The default is no paired arm.
+   * On the first seed of each fixture, the baseline routes the same graph in turn with each strategy of the steps `router` and `highway`.
+   * The row and the bench row then get `paired`.
+   */
+  readonly pair?: string;
+  /** The paired arm routes only the fixtures up to this number of nodes. The default is 1000. */
+  readonly pairMax?: number;
   /** This function gets one line of progress for each fixture and seed. */
   readonly log?: (line: string) => void;
 }
@@ -108,6 +128,19 @@ export interface SuiteRow {
   readonly treeMs?: number;
   /** The measures, by a key that starts with the id of MEAS0, or the name of a proposed rule. */
   readonly values: Readonly<Record<string, number>>;
+  /** The time of the paired baseline arm (`SuiteOptions.pair`). Only the first seed of a fixture has it. */
+  readonly paired?: Paired;
+}
+
+/** A cell that the suite did not route, because the fixture is larger than the cap of the strategy (`SuiteOptions.caps`). */
+export interface CappedCell {
+  readonly step: Step;
+  readonly strategy: string;
+  readonly fixture: string;
+  /** The nodes of the fixture. */
+  readonly nodes: number;
+  /** The cap of the strategy, in nodes. */
+  readonly cap: number;
 }
 
 /** The spread of each measure of one strategy on one fixture family, over the seeds. */
@@ -159,6 +192,8 @@ export interface SuiteReport {
   readonly summaries: readonly SuiteSummary[];
   readonly fronts: readonly SuiteFront[];
   readonly rules: readonly RuleCount[];
+  /** The cells over the cap of their strategy, one for each strategy and fixture. A report with no cap has no such field. */
+  readonly capped?: readonly CappedCell[];
 }
 
 /** The axes of the Pareto front of each step. The note MEAS0 asks for two to four scores. */
@@ -445,6 +480,25 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "smooth", "clothoid", "highway"]);
   const normals = new Set(options.normalCurves ?? ["spline"]);
   const log = options.log ?? ((): void => {});
+  const shard = options.shard ?? { index: 0, count: 1 };
+  if (!Number.isInteger(shard.count) || shard.count < 1 || !Number.isInteger(shard.index) || shard.index < 0 || shard.index >= shard.count)
+    throw new Error(`The shard ${shard.index} of ${shard.count} is not valid. The index must be from 0 to count - 1.`);
+  if (shard.count > 1 && [...steps].some((s) => s !== "router" && s !== "highway" && s !== "curve"))
+    throw new Error("A shard runs only the steps router, highway and curve.");
+  const mine = (place: number, seed: number): boolean => (place + seed) % shard.count === shard.index;
+  const caps = options.caps ?? {};
+  const pairMax = options.pairMax ?? 1000;
+  const pairStrategy = options.pair === undefined ? undefined : listStrategies(registry, "router").find((s) => s.name === options.pair);
+  if (options.pair !== undefined && pairStrategy === undefined) throw new Error(`There is no baseline router "${options.pair}".`);
+  const pair = pairStrategy ? asRouter(pairStrategy) : undefined;
+  const capped: CappedCell[] = [];
+  // This function tells if the cap of a strategy stops a cell. It records the capped cell one time, on the first seed.
+  const overCap = (step: Step, strategy: string, fixture: string, nodes: number, seed: number): boolean => {
+    const cap = caps[strategy];
+    if (cap === undefined || nodes <= cap) return false;
+    if (seed === 0) capped.push({ step, strategy, fixture, nodes, cap });
+    return true;
+  };
   const fixtures = steps.has("router") || steps.has("group") || steps.has("highway") ? (options.fixtures ?? FIXTURES).filter((f) => f.nodes <= max) : [];
   const routers = steps.has("router") ? listStrategies(registry, "router").filter((s) => options.routers?.includes(s.name) ?? true) : [];
   const curves = steps.has("curve") ? listStrategies(registry, "curve") : [];
@@ -463,11 +517,14 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
       log(`${spec.name} seed ${k}: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
       const first = rows.length;
       // The step `router`: the hard rules and the measures of today, then the new measures.
-      for (const strategy of routers) {
+      for (const [place, strategy] of routers.entries()) {
         if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) continue;
+        if (!mine(place, k)) continue;
+        if (overCap("router", strategy.name, spec.name, graph.nodes.length, k)) continue;
         const router = asRouter(strategy);
+        const paired = k === 0 && graph.nodes.length <= pairMax ? pair : undefined;
         const t0 = now();
-        const { row, result } = benchRun(router, spec.name, graph, k === 0 ? repeat : 1, cellLimit);
+        const { row, result } = benchRun(router, spec.name, graph, k === 0 ? repeat : 1, cellLimit, paired);
         const ms = now() - t0;
         if (k === 0) bench.push(row);
         const t1 = now();
@@ -494,16 +551,20 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
           measureMs,
           extraMs,
           values,
+          ...(row.paired ? { paired: row.paired } : {}),
         });
         if (strategy.name === curveRouter && curves.length > 0 && graph.nodes.length <= curveMax)
           rows.push(...curveRuns(graph, result, curves, { fixture: spec.name, seed: k, smooth, normals }).map((c) => c.row));
       }
       // The step `highway`: the plan of each strategy, routed with `follow`. The measures are the measures of the step `router`.
-      for (const strategy of highways) {
+      for (const [place, strategy] of highways.entries()) {
         if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) continue;
+        if (!mine(place, k)) continue;
+        if (overCap("highway", strategy.name, spec.name, graph.nodes.length, k)) continue;
         const router = asRouter(strategy);
+        const paired = k === 0 && graph.nodes.length <= pairMax ? pair : undefined;
         const t0 = now();
-        const { row, result } = benchRun(router, spec.name, graph, 2, cellLimit);
+        const { row, result } = benchRun(router, spec.name, graph, 2, cellLimit, paired);
         const ms = now() - t0;
         const t1 = now();
         const values: Record<string, number> = routeMeasures(graph, result, row);
@@ -529,6 +590,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
           measureMs,
           extraMs,
           values,
+          ...(row.paired ? { paired: row.paired } : {}),
         });
       }
       // The step `group`: the router `sections` with each grouping rule, and the grouping of the changed graph (G9).
@@ -599,6 +661,7 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
       summaries,
       fronts: suiteFronts(summaries),
       rules: ruleCounts(rows),
+      ...(capped.length > 0 ? { capped } : {}),
     },
     bench,
   };
@@ -649,6 +712,7 @@ export function joinReports(reports: readonly SuiteReport[], options: { registry
     { ...options, curveRouter: first?.curveRouter ?? "corners" },
   );
   const summaries = summarizeRows(rows);
+  const capped = reports.flatMap((r) => r.capped ?? []);
   return {
     options: {
       max: Math.max(0, ...reports.map((r) => r.options.max)),
@@ -663,6 +727,7 @@ export function joinReports(reports: readonly SuiteReport[], options: { registry
     summaries,
     fronts: suiteFronts(summaries),
     rules: ruleCounts(rows),
+    ...(capped.length > 0 ? { capped } : {}),
   };
 }
 
@@ -835,5 +900,26 @@ export function formatMeasureTime(rows: readonly SuiteRow[], step: Step = "route
     const extra = list.reduce((s, r) => s + r.extraMs, 0);
     return `| ${step} | ${fixture} | ${list[0]!.nodes} | ${list.length} | ${old.toFixed(0)} | ${added.toFixed(0)} | ${old > 0 ? ((100 * added) / old).toFixed(1) : "-"}% | ${extra.toFixed(0)} |`;
   });
+  return [head, line, ...body].join("\n");
+}
+
+/** This function writes the capped cells as a Markdown table. Each line is a cell that the cap of its strategy stopped, so the row is capped, not missing. */
+export function formatCapped(capped: readonly CappedCell[]): string {
+  const head = "| step | strategy | fixture | nodes | cap | state |";
+  const line = "|---|---|---|---:|---:|---|";
+  const body = capped.map((c) => `| ${c.step} | ${c.strategy} | ${c.fixture} | ${c.nodes} | ${c.cap} | capped |`);
+  return [head, line, ...body].join("\n");
+}
+
+/**
+ * This function writes the paired arm of the rows as a Markdown table. It gives the medians of the strategy and of the baseline, and their ratio.
+ * Only the rows with `paired` count.
+ */
+export function formatPaired(rows: readonly SuiteRow[]): string {
+  const head = "| step | strategy | fixture | nodes | ms | baseline | baseline ms | ratio |";
+  const line = "|---|---|---|---:|---:|---|---:|---:|";
+  const body = rows.flatMap((r) =>
+    r.paired ? [`| ${r.step} | ${r.strategy} | ${r.fixture} | ${r.nodes} | ${r.paired.ms.toFixed(1)} | ${r.paired.base} | ${r.paired.baseMs.toFixed(1)} | ${r.paired.ratio.toFixed(3)} |`] : [],
+  );
   return [head, line, ...body].join("\n");
 }

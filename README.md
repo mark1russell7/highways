@@ -114,12 +114,17 @@ The steps `group`, `router`, `highway`, `curve` and `room` have strategies with 
 - `--cell-limit <ms>` sets the time limit of each cell. After the routes of a cell pass the limit, the cell starts no more routes. Its row shows "over the limit". A route that runs does not stop.
 - `--rows-only` races only the fixtures. It does not race the case boards, and it does not print the side tables.
 - `--json <file>` also writes the rows as JSON. `--side-tables <file>` also writes the side tables to a file.
+- `--shard <i>/<n>` starts only the shard `i` of `n` shards of the cells of the steps `router` and `highway`. Each shard gets one seed of each strategy.
+- `--caps <name>=<nodes>` stops a strategy above a fixture size. The report lists each capped cell, so the row is capped, not missing.
+- `--pair <router>` adds the paired arm. On the first seed, this router routes each fixture in turn with each strategy. The row gets the ratio of the times.
 
 A third table compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space, and it gives the ratio of the lengths.
 
 A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens. Three more tables change one knob of the room at a time: `maxGrowth`, the lane order with the spacing, and the gutter with the passes.
 
 The workflow `Bench` races the routers in CI, in parts that run at the same time. A change of `packages/core` on `main` races the fixtures to 10 000 nodes. Each night, the workflow races all the fixtures, to 100 000 nodes. A run by hand with `max` 100000 does the same. The last job joins the parts with `pnpm bench:join`. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
+
+The workflow divides the step `highway` of the suite into 6 shards to 1 000 nodes, one job each (BENCH-GREEN). A push run caps `mlseb` at 400 nodes, and the nightly run has no cap. Each part to 1 000 nodes pairs each strategy with `shared`. The ratio of the times comes from one CPU, so it compares better between runs than the time.
 
 Each router must obey the hard rules. A broken rule is a violation:
 
