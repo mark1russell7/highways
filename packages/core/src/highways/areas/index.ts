@@ -124,9 +124,9 @@ function quantileOf(values: readonly number[], q: number): number {
 /**
  * This function gives the highways of the image-based edge bundles (HWY-010, Telea and Ersoy 2010). Each group of edges is one area with one spine.
  * The spine goes through the corner graph between the two ends of the longest path of the skeleton of the shape of the group.
- * The area is the skeleton path with a half width: the 90th percentile of the distances of the points of the group to the path (`spread`),
- * or the number of lanes times half of `laneWidth` (`count`). The half width is at least the margin.
- * An edge joins the spine where its line goes into the area first, and it leaves the spine where its line comes out of the area last.
+ * The area is the skeleton path with a half width. With `spread`, the half width is the 90th percentile of the distances of the points to the path.
+ * With `count`, it is the number of lanes times half of `laneWidth`. The half width is at least the margin.
+ * An edge joins the spine where its line first goes into the area. It leaves the spine where its line last comes out of the area.
  */
 export function areaPlan(input: HighwayInput, o: Readonly<AreaOptions>): HighwayPlan {
   const way: WayOptions = { ...(o.margin === undefined ? {} : { margin: o.margin }), ...(o.k === undefined ? {} : { k: o.k }) };

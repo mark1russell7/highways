@@ -41,12 +41,13 @@ export function samplesOf(line: readonly Point[], step: number): Point[] {
   return out;
 }
 
-/** The cells of one row of the free space of a reference curve and another curve that a monotone path reaches, as sorted indices of the other curve. */
+/** The cells of one row of the free space that a monotone path reaches. Each cell is a sorted index of the other curve. */
 type Row = readonly number[];
 
 /**
- * This function gives the next row of the free space of the discrete Fréchet distance, with a free start and a free end on the curve `q`.
- * A cell `(j, b)` is free when the distance of `p[j]` to `q[b]` is `eps` or less. A path reaches it from `(j - 1, b)`, `(j - 1, b - 1)` or `(j, b - 1)`.
+ * This function gives the next row of the free space of the discrete Fréchet distance. The curve `q` has a free start and a free end.
+ * A cell `(j, b)` is free when the distance of `p[j]` to `q[b]` is `eps` or less.
+ * A path reaches a free cell from `(j - 1, b)`, `(j - 1, b - 1)` or `(j, b - 1)`.
  */
 export function nextRow(prev: Row, pj: Point, q: readonly Point[], eps: number): number[] {
   const out: number[] = [];
@@ -55,7 +56,7 @@ export function nextRow(prev: Row, pj: Point, q: readonly Point[], eps: number):
   const last = prev[prev.length - 1]!;
   let left = false;
   for (let b = prev[0]!; b < q.length; b++) {
-    const reach = dist(pj, q[b]!) <= eps && (has.has(b) || has.has(b - 1) || left);
+    const reach: boolean = dist(pj, q[b]!) <= eps && (has.has(b) || has.has(b - 1) || left);
     if (reach) out.push(b);
     left = reach;
     if (!reach && b > last) break;
@@ -88,7 +89,8 @@ export interface FrechetBundle {
 /**
  * This function gives the bundles of the search (HWY-027, after Buchin, Buchin, Gudmundsson, Löffler and Luo 2011, in a simple exact form).
  * For each reference route and each start sample (at each `stride`), it grows the reference part one sample at a time.
- * It keeps the other routes, in both senses, with a part at a discrete Fréchet distance of `eps` or less, and it stops when fewer than `minSize - 1` remain.
+ * It keeps the other routes, in both senses, with a part at a discrete Fréchet distance of `eps` or less.
+ * It stops when fewer than `minSize - 1` routes remain.
  * Each start gives the part with the best score: the number of edges times the length.
  * The search uses the discrete distance on samples only. It does not use the continuous distance or the full free space diagram.
  */

@@ -71,7 +71,7 @@ export function skeletonGroups(input: HighwayInput, group: SkeletonGroups): Map<
   return out;
 }
 
-/** This function gives the first line of each edge, from the point at `margin` out of its source plug to the point at `margin` out of its target plug. */
+/** This function gives the first line of each edge. The line goes from a point at `margin` out of the source plug to a point at `margin` out of the target plug. */
 export function firstLines(input: HighwayInput, finder: WayFinder, source: DensitySource, spacing: number): Map<string, Point[]> {
   const routes = source === "routes" ? firstRoutes(input) : undefined;
   const out = new Map<string, Point[]>();
@@ -115,8 +115,9 @@ const PAIRS: readonly (readonly [number, number])[] = [
 
 /**
  * This function gives the shape of a group and its skeleton (its medial axis). The shape is the union of the disks of radius `radius` along the lines, minus the boxes.
- * The depth is a chamfer distance transform with the steps 1 and √2. A cell is on the skeleton when its depth is half of `radius` or more,
- * and when it is a ridge of the depth along one of the four pairs of opposite neighbours: not lower than the two, and higher than one of them.
+ * The depth is a chamfer distance transform with the steps 1 and √2. A cell is on the skeleton when two conditions are true.
+ * Its depth is half of `radius` or more. Its depth is a ridge along one of the four pairs of opposite neighbours.
+ * A ridge is not lower than the two neighbours, and it is higher than one of them.
  */
 export function shapeSkeleton(lines: readonly (readonly Point[])[], finder: WayFinder, radius: number, cell: number): ShapeSkeleton {
   let x0 = Infinity;
@@ -231,7 +232,7 @@ export function nearestOnLine(line: readonly Point[], p: Point): Point {
   return best;
 }
 
-/** This function gives the groups with `min` edges or more, each as its list of edges, in the order of the first edge of each group. */
+/** This function gives the groups with `min` edges or more, as lists of edges. The groups are in the order of their first edges. */
 export function bigGroups(groups: ReadonlyMap<string, EdgeGroup>, min: number): { key: string; edges: { edge: string; flip: boolean }[] }[] {
   const byKey = new Map<string, { edge: string; flip: boolean }[]>();
   for (const [edge, g] of groups) {

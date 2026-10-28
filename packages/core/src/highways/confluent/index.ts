@@ -124,7 +124,7 @@ export function greedyBicliques(links: Map<string, Map<string, string[]>>, min: 
 
 /**
  * This function gives the group of each edge of a set of bicliques. The edges of one biclique are one group, with the key `<prefix><scope>/<index>`.
- * An edge from a node of `b` to a node of `a` has `flip`, so each trunk goes from the side `a` to the side `b`.
+ * An edge from a node of `b` to a node of `a` has `flip`. Thus each trunk goes from the side `a` to the side `b`.
  */
 export function bicliqueGroups(graph: Graph, scope: NodeLinks, bicliques: readonly Biclique[], prefix: string, into: Map<string, EdgeGroup>): void {
   const sourceOf = new Map(graph.edges.map((e) => [e.id, e.source.node] as const));

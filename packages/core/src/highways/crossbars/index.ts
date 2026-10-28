@@ -151,7 +151,7 @@ export function greedyCrossbars(crossings: readonly RouteCrossing[], reach: numb
  * This function gives the highways of the bundled crossings (HWY-022). The edges outside the highways of the plan `from` keep their routes after `follow`.
  * Each crossbar of those routes gives two highways, one for each side. Each spine is a line through the mean crossing, along the mean direction of its side.
  * It is `2 reach` long, and it goes through the corner graph. So each side crosses the other side at one place, as a bundle.
- * An edge joins the spine at the place nearest to the point of its route nearest to one end of the line, and leaves it near the other end.
+ * An edge joins the spine near the point of its route nearest to one end of the line. It leaves the spine near the other end.
  */
 export function crossbarPlan(input: HighwayInput, o: Readonly<CrossbarOptions>): HighwayPlan {
   const way: WayOptions = { ...(o.margin === undefined ? {} : { margin: o.margin }), ...(o.k === undefined ? {} : { k: o.k }) };

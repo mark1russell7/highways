@@ -54,4 +54,28 @@ export {
   type KdeebOptions,
 } from "./kdeeb/index.ts";
 export { CUBU_DEFAULTS, cubuPlan, type CubuOptions } from "./cubu/index.ts";
+export { MLS_FITS, MLSEB_DEFAULTS, mlsebLines, mlsebPlan, mlsPoint, type MlsebOptions, type MlsFit } from "./mlseb/index.ts";
+export {
+  bigGroups,
+  firstLines,
+  meanLine,
+  nearestOnLine,
+  nearestSkeleton,
+  SBEB_DEFAULTS,
+  sbebLines,
+  sbebPlan,
+  shapeSkeleton,
+  SKELETON_GROUPS,
+  SKELETON_TARGETS,
+  skeletonGroups,
+  type SbebOptions,
+  type ShapeSkeleton,
+  type SkeletonGroups,
+  type SkeletonTarget,
+} from "./sbeb/index.ts";
+export { AREA_DEFAULTS, AREA_WIDTHS, areaPlan, skeletonPath, type AreaOptions, type AreaWidth } from "./areas/index.ts";
+export { bicliqueGroups, CONFLUENT_DEFAULTS, confluentPlan, GROUP_SCOPES, greedyBicliques, nodeLinks, type Biclique, type ConfluentOptions, type GroupScope, type NodeLinks } from "./confluent/index.ts";
+export { jaccardIndex, MODULE_RULES, modulesOf, POWER_DEFAULTS, powerPlan, type ModuleRule, type PowerOptions } from "./power/index.ts";
+export { CROSSBAR_DEFAULTS, crossbarPlan, greedyCrossbars, routeCrossings, type Crossbar, type CrossbarOptions, type RouteCrossing } from "./crossbars/index.ts";
+export { FRECHET_DEFAULTS, frechetBundles, frechetPlan, nextRow, partWithin, samplesOf, type FrechetBundle, type FrechetOptions } from "./frechet/index.ts";
 export * from "./gates/index.ts";

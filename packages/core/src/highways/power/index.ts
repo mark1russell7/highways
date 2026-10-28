@@ -13,7 +13,7 @@ export const MODULE_RULES: readonly ModuleRule[] = Object.freeze(["exact", "near
 export interface PowerOptions extends Pick<WayOptions, "margin" | "k"> {
   /** The rule of the modules. The default is `exact`. */
   readonly modules: ModuleRule;
-  /** With the rule `near`, a node joins a module when the Jaccard index of its neighbours and those of the first node of the module is this value or more. The default is 0.8. */
+  /** With the rule `near`, a node joins a module at this Jaccard index or more with the first node of the module. The default is 0.8. */
   readonly jaccard: number;
   /** A power edge saves the number of its edges less 1. It becomes a highway when it saves this number of edges or more. The default is 2. */
   readonly minSaved: number;
@@ -74,7 +74,8 @@ export function modulesOf(links: ReadonlyMap<string, ReadonlyMap<string, readonl
 /**
  * This function gives the highways of the edge compression with modules and power graphs (HWY-014, Dwyer, Henry Riche, Marriott and Mears 2013).
  * The edges between two modules are one power edge. With modules of the rule `exact`, each node of one module links to each node of the other.
- * A power edge that saves `minSaved` edges or more is one highway from module to module, with a trunk between the Weber points of the two ends.
+ * A power edge that saves `minSaved` edges or more is one highway from module to module.
+ * Its trunk goes between the Weber points of the two ends.
  * The search does not nest modules, so it finds no power edge inside a power edge.
  */
 export function powerPlan(input: HighwayInput, o: Readonly<PowerOptions>): HighwayPlan {

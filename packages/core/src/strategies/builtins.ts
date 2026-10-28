@@ -30,6 +30,13 @@ import { FDEB_DEFAULTS, fdebPlan, type FdebOptions } from "../highways/fdeb/inde
 import { MESH_DEFAULTS, meshPlan, type MeshOptions } from "../highways/mesh/index.ts";
 import { KDEEB_DEFAULTS, kdeebPlan, type KdeebOptions } from "../highways/kdeeb/index.ts";
 import { CUBU_DEFAULTS, cubuPlan, type CubuOptions } from "../highways/cubu/index.ts";
+import { MLSEB_DEFAULTS, mlsebPlan, type MlsebOptions } from "../highways/mlseb/index.ts";
+import { SBEB_DEFAULTS, sbebPlan, type SbebOptions } from "../highways/sbeb/index.ts";
+import { AREA_DEFAULTS, areaPlan, type AreaOptions } from "../highways/areas/index.ts";
+import { CONFLUENT_DEFAULTS, confluentPlan, type ConfluentOptions } from "../highways/confluent/index.ts";
+import { POWER_DEFAULTS, powerPlan, type PowerOptions } from "../highways/power/index.ts";
+import { CROSSBAR_DEFAULTS, crossbarPlan, type CrossbarOptions } from "../highways/crossbars/index.ts";
+import { FRECHET_DEFAULTS, frechetPlan, type FrechetOptions } from "../highways/frechet/index.ts";
 import { RIDGE_DEFAULTS, ridgePlan, type RidgeOptions } from "../highways/ridges/index.ts";
 import { SOFT_KEY_DEFAULTS, softKeyPlan, type SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
@@ -64,6 +71,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
+import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
 import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
@@ -429,6 +437,13 @@ export const highwayStrategies: {
   readonly mesh: Strategy<"highway", MeshOptions>;
   readonly kdeeb: Strategy<"highway", KdeebOptions>;
   readonly cubu: Strategy<"highway", CubuOptions>;
+  readonly mlseb: Strategy<"highway", MlsebOptions>;
+  readonly sbeb: Strategy<"highway", SbebOptions>;
+  readonly areas: Strategy<"highway", AreaOptions>;
+  readonly confluent: Strategy<"highway", ConfluentOptions>;
+  readonly power: Strategy<"highway", PowerOptions>;
+  readonly crossbars: Strategy<"highway", CrossbarOptions>;
+  readonly frechet: Strategy<"highway", FrechetOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -732,6 +747,69 @@ export const highwayStrategies: {
     schema: CUBU_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<CubuOptions>) => cubuPlan(input, o),
+  }),
+  mlseb: defineStrategy({
+    step: "highway",
+    name: "mlseb",
+    describe: "Moving least squares bundling (HWY-008). Each point of an edge moves to a local fit of the near edges, and the bundled points snap back to legal ways.",
+    defaults: { ...MLSEB_DEFAULTS } as MlsebOptions,
+    schema: MLSEB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<MlsebOptions>) => mlsebPlan(input, o),
+  }),
+  sbeb: defineStrategy({
+    step: "highway",
+    name: "sbeb",
+    describe: "Skeleton-based edge bundling (HWY-009). The edges of a group move toward the skeleton of their shape, and the bundled points snap back to legal ways.",
+    defaults: { ...SBEB_DEFAULTS } as SbebOptions,
+    schema: SBEB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SbebOptions>) => sbebPlan(input, o),
+  }),
+  areas: defineStrategy({
+    step: "highway",
+    name: "areas",
+    describe: "Image-based edge bundles (HWY-010). Each group of edges is one shaded area around the longest path of the skeleton of its shape.",
+    defaults: { ...AREA_DEFAULTS } as AreaOptions,
+    schema: AREA_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<AreaOptions>) => areaPlan(input, o),
+  }),
+  confluent: defineStrategy({
+    step: "highway",
+    name: "confluent",
+    describe: "Confluent drawings (HWY-013). Each biclique of a greedy search is one track, with a merge junction and a split junction.",
+    defaults: { ...CONFLUENT_DEFAULTS } as ConfluentOptions,
+    schema: CONFLUENT_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ConfluentOptions>) => confluentPlan(input, o),
+  }),
+  power: defineStrategy({
+    step: "highway",
+    name: "power",
+    describe: "Edge compression with modules and power graphs (HWY-014). The edges between two modules are one power edge, and a large power edge is a highway.",
+    defaults: { ...POWER_DEFAULTS } as PowerOptions,
+    schema: POWER_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<PowerOptions>) => powerPlan(input, o),
+  }),
+  crossbars: defineStrategy({
+    step: "highway",
+    name: "crossbars",
+    describe: "Bundled crossings (HWY-022). Two sets of edges that cross near one place cross as two bundles, at one place.",
+    defaults: { ...CROSSBAR_DEFAULTS } as CrossbarOptions,
+    schema: CROSSBAR_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CrossbarOptions>) => crossbarPlan(input, o),
+  }),
+  frechet: defineStrategy({
+    step: "highway",
+    name: "frechet",
+    describe: "Subtrajectory clusters by the discrete Fréchet distance (HWY-027). The parts of the first routes that stay near one reference part become highways.",
+    defaults: { ...FRECHET_DEFAULTS } as FrechetOptions,
+    schema: FRECHET_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<FrechetOptions>) => frechetPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

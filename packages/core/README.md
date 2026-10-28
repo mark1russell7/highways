@@ -346,7 +346,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -406,9 +406,16 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `mesh` | The control mesh of HWY-004. The crossings of the edges with the mesh form clusters, and a cluster shares one point. |
 | `kdeeb` | The density bundling of RULE-028 with HWY-006. The edges move up a density that is 0 in the boxes. |
 | `cubu` | The fast density bundling of HWY-007. The steps of `kdeeb` with a separable blur or a Fourier transform. |
+| `mlseb` | The moving least squares bundling of HWY-008. Each point moves to a local fit of the near edges, and snaps back to a legal way. |
+| `sbeb` | The skeleton-based edge bundling of HWY-009. The edges of a group move toward the skeleton of their shape. |
+| `areas` | The image-based edge bundles of HWY-010. Each group of edges is one area around the longest path of its skeleton. |
+| `confluent` | The confluent drawings of HWY-013. Each biclique of a greedy search is one track with two junctions. |
+| `power` | The power graphs of HWY-014. The edges between two modules of nodes are one power edge, and one highway. |
+| `crossbars` | The bundled crossings of HWY-022. Two sets of edges that cross near one place cross as two bundles. |
+| `frechet` | The subtrajectory clusters of HWY-027. The parts of the first routes near one reference part, by the discrete Fréchet distance, become highways. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
-The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes` and `divided` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided` and `crossbars` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
