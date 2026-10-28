@@ -795,6 +795,107 @@ The guard is a test that refuses a promotion when a family loses beyond the tie.
 | 5. Of the verdicts that are `better` or `worse` on both sets, 80% or more get the same label. | 0.45 | Met: 145 of 145 (100%). |
 | 6. `checkDeclared` of 0.2.11 passes on both manifests with the new `familyBy`, with no change of a cell. | medium | Partly met: it passes with no change of a cell, but only with the hook `familyCell`. The cells cannot give the 6 families. |
 
+## The build queue
+
+The queue puts each idea that is not built in the order of a score (IDEA-QUEUE). Up to 3 builds at a time take the ideas from the top. An idea leaves the catalog only after its build and its screen, with its record kept.
+
+### The files and the commands
+
+- [`queue.json`](queue.json) has one row for each record at the stage `cataloged` or `prototyped`, and one row for each taken idea that is built.
+- [`queue-taken.json`](queue-taken.json) holds the taken ideas, with the numbers of the queue at the time of the take.
+- `pnpm queue` writes `queue.json`. The script is `packages/core/scripts/queue.ts`. Do not change `queue.json` by hand.
+- `pnpm queue --take <id> --by <item>` takes an idea. A second take with `--strategy <name>` sets the strategy that the build made.
+- `pnpm queue --calibration` gives the table of the calibration below.
+- The test `packages/core/src/bench/screen/queue.test.ts` fails when `queue.json` is old.
+
+The header of `queue.json` has the formula version, the date and the commit. It also has the files that the script read, the runs of the snapshots and the counts.
+
+### The fields of a row
+
+- `id`, `name`, `step`, `kind` and `wins` come from the record.
+- `gain`, `uncertainty`, `cost` and `score` come from the formula. `rank` is the rank by score.
+- `slot` tells if the step has strategies in `STEPS`.
+- `canonical` is the id of the canonical idea of the group. A duplicate has no rank, and it takes the status of its canonical.
+- `blockedBy` gives the reasons that block a build:
+  - `step:<step>`: the step has no strategies.
+  - `measure:<id>`: the screen does not have the measure.
+  - `idea:<id>`: an idea of `dependsOn` is not built.
+- `status` is `queued`, `building` or `built`.
+  - A taken idea at the stage `cataloged` or `prototyped` is `building`.
+  - An idea is `built` when a registered strategy builds it, or when its take is done and its stage moved.
+- `strategy` names the strategy that builds the idea. `takenAt` and `predicted` hold the date and the numbers of the take. `measured` holds the measured gain.
+
+### The formula `queue/1`
+
+The score is `gain × uncertainty ÷ cost`. The rank sorts the scores from high to low, then the ids.
+
+- **The gain** is 1, plus for each named win: 0.5 and the count of the open targets on that measure.
+  - An open target is a `better` verdict of the newest set of snapshots with 1 or more families against it. The newest set is `screen-v2`, and it has 40 open targets.
+  - A target counts for each form of its measure. For example, the guard `B3 q0.95` counts for `B3`.
+- **The uncertainty** is 1.0 for `ours`, 0.85 for `hybrid` and 0.7 for `literature`. It is 1.2 times larger when no near idea has a screen result.
+- **The cost** is the size of the prototype: S 1, M 2 or L 4. The cost doubles when the cost text tells "CI only" or a slow run. It doubles again when the step has no strategies.
+
+The draft of the formula had three gaps. The script closes them with these changes:
+
+1. The near ideas of a record are its `related` and `same` ideas, and each record that names it in `related`. The draft did not tell the mechanism family.
+2. The cost of an idea at the stage `prototyped` is half, because its code exists.
+3. An idea that a registered strategy builds is `built`, and it gets no rank. `packages/core/scripts/strategy-ideas.ts` gives this map from each strategy to its ideas.
+
+The map reads the idea ids in the text `describe` of each strategy. The list `EXTRA_LINKS` adds the links that `describe` does not give, each with its source. The site reads the same module.
+
+### The queue on 2026-10-28
+
+- The queue has 195 rows: 184 canonical ideas and 11 duplicates. 183 ideas have a rank.
+- `HWY-031` and its rider `WILD-030` are `built`. The strategy `corridors` builds them (HWY-STEP, #67). Its stage stays `prototyped` until the screen of `HWY-031`.
+- 77 of the 183 ranked ideas are blocked:
+  - 51 by a step with no strategies: `whole` 27, `levels` 18 and `plugs` 6.
+  - 21 by a measure that the screen does not have. For 17, the measure is the only block.
+  - 17 by an idea of `dependsOn`.
+- 94 of the 183 ranked ideas have no near idea with a screen result.
+
+The top 10:
+
+| Rank | Idea | Step | Score | Blocked by |
+|---:|---|---|---:|---|
+| 1 | `NAT-018` Knee of the plant Pareto front | `highway` | 20.825 | |
+| 2 | `RULE-021` Simulated annealing over candidate routes | `router` | 18.7 | |
+| 3 | `NAT-019` Bronchial space-filling splits | `highway` | 17.85 | |
+| 4 | `EDA-017` Stretch balance in a bundle | `highway` | 13.175 | |
+| 5 | `WILD-023` Tight edges first | `router` | 12.5 | |
+| 6 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 12 | |
+| 7 | `WILD-036` Manifolds for a fan to a row | `highway` | 12 | |
+| 8 | `WILD-031` Approval corridors | `highway` | 11.75 | |
+| 9 | `RULE-020` Adam with a seeded sample of pairs | `router` | 11.73 | `idea:RULE-019` |
+| 10 | `RULE-047` Pull toward the lane slots of the highway skeleton | `highway` | 11.5 | |
+
+The [results page](https://mark1russell7.github.io/highways/results.html) shows the top 20 and the count of each status.
+
+### Queue calibration
+
+The calibration compares the predicted gain of each taken idea with its measured gain after its screen. The lead updates this section each month with `pnpm queue --calibration`.
+
+- `predicted` is frozen at the take. A new formula does not change it.
+- The measured gain uses the scale of the gain: 1, plus for each named win:
+  - 0.5 when a guard of the win is `better` for the strategy in the newest set.
+  - 1 for each open target of an other strategy on that measure that the strategy closes.
+- The strategy closes a target when, on the guard of the target, it wins on each family against the target.
+- The test checks that each taken idea that is built has `predicted` and `measured`.
+- The rank correlation (Spearman) comes when 5 or more taken ideas are built.
+
+On 2026-10-28, no taken idea is built. The back test applies the formula to the 50 ideas that a strategy builds and that have a screen result. These are from before the queue. Their rank correlation is 0.50. The predicted gain of the back test does not count the open targets of the strategy itself.
+
+| Idea | Taken | Predicted gain | Predicted score | Measured gain |
+|---|---|---:|---:|---:|
+
+### The prediction
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. 7 or more of the draft top 10 stay in the final top 10. | 0.5 | Met: 9 of 10. Only `HWY-031` left, because `corridors` builds it. `RULE-020` came in at rank 9. |
+| 2. 15% or more of the ranked ideas have a `blockedBy`. | 0.45 | Met: 77 of 183 (42%). |
+| 3. The results page grows by 5 KB gzip or less. | high | Met by an estimate: the changed sources and the data grow by 1.8 KB gzip. The Pages build of CI gives the true size. |
+| 4. No route output, digest or Xplat hash changes. | high | Met: the change adds scripts and tests only, and no file of `packages/core/src` outside the tests. |
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

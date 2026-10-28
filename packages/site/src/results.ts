@@ -47,6 +47,7 @@ $("verdicts-body").innerHTML = data.text["The verdicts"] ?? "";
 $("split-body").innerHTML = data.text["Where no single default wins"] ?? "";
 $("ideas-body").innerHTML = data.text["The ideas"] ?? "";
 $("new-body").innerHTML = data.text["What is new"] ?? "";
+$("queue-body").innerHTML = data.text["The build queue"] ?? "";
 
 // The tiles at the top: four numbers that a visitor reads first.
 function tiles(): void {
@@ -182,6 +183,19 @@ function ideas(): void {
   $("kept").innerHTML = `<table class="res-kept"><caption>The kept and opt-in strategies and options</caption><thead><tr><th scope="col">Id</th><th scope="col">Strategy or option</th><th scope="col">Step</th><th scope="col">State</th><th scope="col">Default</th><th scope="col">Result</th><th scope="col">Date</th><th scope="col">Link</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+// The build queue: the count of each status and the top rows of the queue.
+function queue(): void {
+  const q = data.queue;
+  $("queue-counts").innerHTML = `${q.statuses.map((s) => `<li><span class="res-tag ${s.status === "built" ? "lab-better" : s.status === "building" ? "lab-mix" : "lab-none"}">${esc(s.status)}</span> <b>${s.count}</b></li>`).join("")}<li>ranked <b>${q.ranked}</b></li><li>blocked <b>${q.blocked}</b></li>`;
+  const rows = q.top
+    .map(
+      (r) =>
+        `<tr><td>${r.rank}</td><th scope="row">${esc(r.id)}<div class="hint">${esc(r.name)}</div></th><td>${esc(r.step)}</td><td>${r.score}</td><td><span class="res-tag ${r.status === "building" ? "lab-mix" : "lab-none"}">${esc(r.status)}</span>${r.blockedBy.length > 0 ? `<div class="hint">blocked by ${r.blockedBy.map((b) => `<code>${esc(b)}</code>`).join(" ")}</div>` : ""}</td></tr>`,
+    )
+    .join("");
+  $("queue-top").innerHTML = `<table class="res-kept"><caption>The top ${q.top.length} of the queue on ${esc(q.date)} (formula <code>${esc(q.formula)}</code>)</caption><thead><tr><th scope="col">Rank</th><th scope="col">Idea</th><th scope="col">Step</th><th scope="col">Score</th><th scope="col">Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
 // What is new: the last Shipped rows of the roadmap.
 function news(): void {
   $("news").innerHTML = data.shipped
@@ -205,5 +219,6 @@ tiles();
 draw();
 split();
 ideas();
+queue();
 news();
 snapshots();

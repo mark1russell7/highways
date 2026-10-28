@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, keptRows, linkHtml, parseSnapshot, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, keptRows, linkHtml, parseSnapshot, QUEUE_TOP, queueView, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -78,6 +78,16 @@ describe("the committed files of the results page", () => {
     expect(data.shipped).toHaveLength(SHIPPED_COUNT);
     expect(data.text["The verdicts"]).toContain("<p>");
     for (const t of data.tables) for (const s of t.strategies) expect(s.cells.length, `${t.set} ${s.name}`).toBe(t.guards.length);
+  });
+
+  it("shows the top of the idea queue and the count of each status", () => {
+    const data = readResults(root);
+    expect(data.queue.top).toHaveLength(QUEUE_TOP);
+    expect(data.queue.top.map((r) => r.rank)).toEqual(Array.from({ length: QUEUE_TOP }, (_, i) => i + 1));
+    expect(data.queue.statuses.map((s) => s.status)).toEqual(["queued", "building", "built"]);
+    expect(data.queue.statuses.filter((s) => s.status !== "built").reduce((n, s) => n + s.count, 0)).toBe(data.queue.ranked);
+    expect(data.text["The build queue"]).toContain("<p>");
+    expect(() => queueView("{}")).toThrow(/queue.json/);
   });
 
   it("gives the data line of the build", () => {

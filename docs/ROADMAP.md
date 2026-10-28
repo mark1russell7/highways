@@ -112,6 +112,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SITE-LIVE | The [results page](https://mark1russell7.github.io/highways/results.html) reads only committed files: the verdict snapshots of [`research/verdicts/`](research/verdicts/README.md), the idea records and this roadmap. It shows the verdict grid, the 40 `better` verdicts with families against them, the ideas and the newest items. The Pages build starts no race. It reads a committed benchmark snapshot, and it adds the Status and Releases pages. | 2026-10-28 | #143 |
 | COMPARE-ALL | The compare page and the demo show each step of the pipeline and each strategy of the registry: 4 grouping rules, 9 routers, 53 highways, 7 curves and 3 room strategies. A highway plan goes through `follow`, as in the screen. Each room strategy opens the board "Packed grid". A test fails when a step or a strategy is missing. | 2026-10-28 | #146 |
 | COMPARE-PICK | The compare page reads the key `pick` of its link, for example `#step=highway&pick=corridors,keys`. It shows the picked strategies first and marks them. It ignores a name that the step does not have, and a note tells it. Each panel has a toggle of the pick. | 2026-10-28 | #149 |
+| IDEA-QUEUE | [The build queue](research/CATALOG.md#the-build-queue): `pnpm queue` writes [`research/queue.json`](research/queue.json), with one row for each idea that is not built. The score is the gain on the open targets, times the uncertainty, divided by the cost. 183 ideas have a rank, and 77 are blocked. `corridors` builds `HWY-031`, so it gets no rank. The results page shows the top 20. A section of the catalog compares the predicted gain with the measured gain. | 2026-10-28 | #PRNUM |
 
 ## Calibration
 
@@ -151,6 +152,9 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
+| CORPUS-GEN | The example boards of the site become the corpus generator, with sliders for each parameter of a board. | `later` | CORPUS-SEEDS | P1 |
+| STRATEGY-CARDS | An analysis card for each strategy: the source, the complexity, the guarantee and the scaling exponent. It adds the sweeps of one option at a time and the Sobol indices from the nightly sweep. | `later` | IDEA-QUEUE | P2 |
 | LANE-WALK | The lane order of a dense run without a walk for each compare. After ROUTE-SCALE, `partBefore` and `partAfter` take approximately 55% of a `shared` route on the dense board. The lane order stays the same. | `later` | ROUTE-SCALE | P2 |
 | BENCH-STEPS | Cheaper measures on a dense board: `exactStretches` (a landmark guide for `distancesTo`), `measureQuality` and `checkProperties`. The values stay the same. | `later` | ROUTE-SCALE | P3 |
 | STAGE-DATA | The stages of the routers and their options as data (`strategy-space/1` of layout-contract 0.2.10): `routeSpace`, `routeConfig` and each router of today as a named point with an equal route hash. | `later` | LANE-STRETCH, OPTS | P1 |

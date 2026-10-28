@@ -16,6 +16,8 @@ export const RESULT_FILES = {
   core: "packages/core/package.json",
   /** The benchmark snapshot: `bench.json` and `bench-meta.json` of one run of the workflow `Bench`. */
   bench: "docs/research/bench",
+  /** The idea queue that `pnpm queue` writes (IDEA-QUEUE). */
+  queue: "docs/research/queue.json",
 } as const;
 
 /** This function gives the snapshot files of the folder of verdicts: each JSON file. */
@@ -58,6 +60,7 @@ export function readResults(root: string): ResultsData {
     roadmap: readFileSync(join(root, RESULT_FILES.roadmap), "utf8"),
     inline: (md) => marked.parseInline(md, { async: false }),
     text: textSections(readFileSync(join(root, RESULT_FILES.text), "utf8")),
+    queue: readFileSync(join(root, RESULT_FILES.queue), "utf8"),
   });
 }
 

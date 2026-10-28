@@ -39,6 +39,7 @@
     "test": "vitest run",
     "bench": "node scripts/bench.ts",
     "ideas": "node scripts/ideas.ts",
+    "queue": "node scripts/queue.ts",
     "bench:join": "node scripts/bench-join.ts",
     "profile": "node scripts/profile.ts",
     "levels": "node scripts/levels.ts",

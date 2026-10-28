@@ -217,6 +217,58 @@ export function stageCounts(records: readonly IdeaRecord[]): { readonly stage: s
   return order.filter((s) => counts.has(s)).map((stage) => ({ stage, count: counts.get(stage)! }));
 }
 
+/** One row of the idea queue that the page shows. */
+export interface QueueTopRow {
+  readonly rank: number;
+  readonly id: string;
+  readonly name: string;
+  readonly step: string;
+  readonly score: number;
+  readonly status: string;
+  /** The reasons that block a build, for example `step:levels`. */
+  readonly blockedBy: readonly string[];
+}
+
+/** The part of the idea queue that the page shows: the top rows and the counts. */
+export interface QueueView {
+  readonly date: string;
+  readonly formula: string;
+  readonly ranked: number;
+  readonly blocked: number;
+  /** The count of the canonical ideas of each status, in the sequence of `QUEUE_STATUSES`. */
+  readonly statuses: readonly { readonly status: string; readonly count: number }[];
+  readonly top: readonly QueueTopRow[];
+}
+
+/** The statuses of a row of the queue, in the sequence of the page. */
+export const QUEUE_STATUSES: readonly string[] = ["queued", "building", "built"];
+
+/** The number of queue rows that the page shows. */
+export const QUEUE_TOP = 20;
+
+/** This function reads the text of `queue.json` and gives the part that the page shows. */
+export function queueView(text: string): QueueView {
+  const q = JSON.parse(text) as {
+    date: string;
+    formula: string;
+    counts: { ranked: number; blocked: number; byStatus: Record<string, number> };
+    rows: { rank: number | null; id: string; name: string; step: string; score: number; status: string; blockedBy: string[] }[];
+  };
+  if (!Array.isArray(q.rows) || typeof q.counts?.ranked !== "number") throw new Error("queue.json has no rows or no counts.");
+  return {
+    date: q.date,
+    formula: q.formula,
+    ranked: q.counts.ranked,
+    blocked: q.counts.blocked,
+    statuses: QUEUE_STATUSES.map((status) => ({ status, count: q.counts.byStatus[status] ?? 0 })),
+    top: q.rows
+      .filter((r): r is typeof r & { rank: number } => r.rank !== null)
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, QUEUE_TOP)
+      .map((r) => ({ rank: r.rank, id: r.id, name: r.name, step: r.step, score: r.score, status: r.status, blockedBy: r.blockedBy })),
+  };
+}
+
 /** The data of the results page. The build makes it from the committed files. */
 export interface ResultsData {
   readonly tables: readonly VerdictTable[];
@@ -226,6 +278,8 @@ export interface ResultsData {
   /** The number of `better` verdicts of the split set. */
   readonly betterCount: number;
   readonly ideas: { readonly total: number; readonly stages: readonly { readonly stage: string; readonly count: number }[]; readonly kept: readonly KeptRow[] };
+  /** The top of the idea queue and its counts. */
+  readonly queue: QueueView;
   /** The last Shipped rows of the roadmap, the newest first, with the item and the link as HTML. */
   readonly shipped: readonly ShippedRow[];
   /** The text of the page as HTML, by the headings of `content/results.md`. */
@@ -240,6 +294,8 @@ export interface ResultsInput {
   /** This function changes Markdown to inline HTML. */
   readonly inline: (markdown: string) => string;
   readonly text: Readonly<Record<string, string>>;
+  /** The text of `docs/research/queue.json`. */
+  readonly queue: string;
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -275,6 +331,7 @@ export function resultsData(input: ResultsInput): ResultsData {
     split,
     betterCount,
     ideas: { total: input.ideas.length, stages: stageCounts(input.ideas), kept: keptRows(input.ideas, shipped).map((k) => ({ ...k, note: input.inline(absoluteLinks(k.note)), link: keptLink(k) })) },
+    queue: queueView(input.queue),
     shipped: shipped
       .slice(-SHIPPED_COUNT)
       .reverse()

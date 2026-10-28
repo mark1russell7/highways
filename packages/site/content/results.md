@@ -20,6 +20,10 @@ These verdicts are `better`, but 1 or more families are against them. On these f
 
 The [idea catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md) has a record for each idea. The screen keeps an idea or drops it. A kept strategy or option is off by default, so the default routes do not change.
 
+## The build queue
+
+The queue puts each idea that is not built in the order of its score. The score is the expected gain times the uncertainty, divided by the cost. The builds take the ideas from the top. A blocked idea waits for a step, a measure or an other idea. The [catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md#the-build-queue) tells the formula, and [`queue.json`](https://github.com/mark1russell7/highways/blob/main/docs/research/queue.json) has all the rows.
+
 ## What is new
 
 The last items of the [roadmap](https://github.com/mark1russell7/highways/blob/main/docs/ROADMAP.md), the newest first.

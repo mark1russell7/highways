@@ -23,6 +23,8 @@ Each file `<set>-<step>.json` holds the verdicts of one screen against the defau
 
 Each item that changes a strategy, a measure, a verdict or a corpus commits its new snapshots in the same pull request. The site then shows the new verdicts after the merge.
 
+An item that screens an idea also starts `pnpm queue` and commits `docs/research/queue.json` in the same pull request.
+
 ## The benchmark snapshot
 
 The folder [`../bench/`](../bench/) holds `bench.json` and `bench-meta.json` of one run of the workflow `Bench`. The Pages build copies them into the site and does not start the benchmark. To make a new snapshot, download the artifact `bench-<sha>` of a finished run on `main`. Then write its rows into `bench.json`, one row on each line, and its run, commit and date into `bench-meta.json`.
