@@ -47,4 +47,14 @@ describe("the map from the strategies to their ideas", () => {
     const none = map.filter((m) => m.ideas.length === 0 && Object.keys(m.options ?? {}).length === 0).map((m) => `${m.step}:${m.strategy}`);
     console.log(`Strategies with no idea record (${none.length} of ${map.length}): ${none.join(", ")}`);
   });
+
+  // The texts `describe` of the strategies of wave 3G (BUILD-W3G) cite their ideas, so `EXTRA_LINKS` has no entry for them.
+  it("gives the cards the ideas of the highway strategies of wave 3G", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/steiner"]).toEqual(expect.arrayContaining(["HWY-036", "EDA-015"]));
+    expect(built.strategies["highway/gaps"]).toContain("HWY-057");
+    expect(built.strategies["highway/streets"]).toContain("HWY-058");
+    expect(built.strategies["highway/search"]).toContain("HWY-059");
+    expect(built.strategies["highway/interchanges"]).toContain("HWY-060");
+  });
 });
