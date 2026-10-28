@@ -134,6 +134,9 @@ const activation = list("--activation");
 const candidates = new Set(report.summary.strategies.filter((s) => s.candidate).map((s) => s.strategy));
 const decision = activation?.includes("all") ? {} : { families: activation ?? [] };
 const activationText = activation ? "\n" + formatActivation(activationReport(report.records, decision), candidates.size > 0 ? candidates : undefined) : "";
-const text = formatScreen(report.summary) + activationText + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
+// A record that is not skipped and has no output hash has no output, or a number in its output that is not finite.
+const unhashed = report.records.filter((r) => r.skipped === undefined && r.outputHash === undefined).map((r) => `${r.strategy} on ${r.input}`);
+const unhashedText = unhashed.length > 0 ? `\n${unhashed.length} records have no output hash: ${unhashed.slice(0, 20).join(", ")}.\n` : "";
+const text = formatScreen(report.summary) + activationText + unhashedText + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
 writeFileSync(opt("--summary") ?? "screen.md", text);
 console.log(text);
