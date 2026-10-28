@@ -45,7 +45,7 @@ Some measures have a floor: the best value that the measure can have. A measure 
 - Otherwise, the ratio of the input is +Infinity. It is not a veto. It goes into the median, the tail and the sign test as each other ratio does.
 - The sign test drops each tie. The record counts the ties in the inputs where the floor rule applied.
 - A win measure at the floor cannot win on that input. The default is at its best value, so the candidate can only tie or lose.
-- Each measure has its own floor and tolerance, as two named parameters in [The floors](#the-floors). A measure that is not in that table has a tolerance of 0.
+- Each measure has its own floor and tolerance, as two named parameters. [The floors](#the-floors) gives them or names their source. A measure without them has a tolerance of 0.
 - A count has a tolerance of 0. Thus a count above 0 is beyond the tolerance.
 - The record of the test names, for each measure, the inputs where the floor rule applied.
 
@@ -150,16 +150,11 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 |---|---|---|
 | `R1.floor` = 0 | `R1.tol` = 0 | A new crossing is a loss. |
 | `B6.floor` = 0 | `B6.tol` = 60 degrees | The default model of `shared` merges at approximately 60 degrees. A merge at that angle is not a loss. The guard is the max of `B6`. |
-| `pack.order.inversions.floor` = 0 | `pack.order.inversions.tol` = 0 | A count. `packing` asks that each new inversion fails. |
-| `pack.overflow.floor` = 0 | `pack.overflow.tol` = 0 | A count. An item outside a fixed container is a loss. |
-| `pack.stability.moved.floor` = 0 | `pack.stability.moved.tol` = 0.02 | On a small change, the default often moves no item. A move of 1 item in 100 is not a loss. |
-| `pack.stability.mean.floor` = 0 | `pack.stability.mean.tol` = 0.005 container widths | The default often moves no item. |
-| `pack.stability.q95.floor` = 0 | `pack.stability.q95.tol` = 0.01 container widths | The default often moves no item. |
-| `pack.aspectError.floor` = 0 | `pack.aspectError.tol` = 0.01 (natural log) | An exact tiling gives the default an error of 0. The tolerance is approximately 1% of the aspect. |
 
-The four tolerances of `pack.stability` and `pack.aspectError` are first values of `packing`. The records of the floor rule give the data to measure them later.
+This file does not copy the floors of the other projects:
 
-The floor and the tolerance of each `joint.*` measure are in `JOINT_MEASURES` of `@mark1russell7/layout-contract`. Its table is in `docs/JOINT-MEASURES.md`. This file does not copy them.
+- The floor and the tolerance of each `pack.*` measure are in `MEASURE_SPECS` of `@mark1russell7/packing`, from version 0.1.7. Their reasons are in the section "The floors of the guards" of `docs/MEASURES.md` of `packing`.
+- The floor and the tolerance of each `joint.*` measure are in `JOINT_MEASURES` of `@mark1russell7/layout-contract`. Its table is in `docs/JOINT-MEASURES.md`.
 
 ## The order of promotions
 

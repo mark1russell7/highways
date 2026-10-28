@@ -156,21 +156,12 @@ describe("the fit of highways to layout-contract", () => {
     expect(inputGraph(open)).toEqual(inputGraph(tiny));
   });
 
-  it("takes the joint floors from the contract and matches their packer twins in `docs/PROMOTION.md`", () => {
+  it("keeps the floors of the packer and the joint measures out of `docs/PROMOTION.md`", () => {
     const floors = promotionFloors();
-    expect(floors.size).toBeGreaterThan(0);
-    // `JOINT_MEASURES` is the one source of each joint floor, so `docs/PROMOTION.md` has no `joint.*` row.
-    expect([...floors.keys()].filter((id) => id.startsWith("joint."))).toEqual([]);
-    let matched = 0;
-    for (const spec of C.JOINT_MEASURES) {
-      if (spec.floor !== 0) continue;
-      // A joint measure with a packer twin, for example `joint.aspectError` and `pack.aspectError`, has the floor and the tolerance of the twin.
-      const row = floors.get(spec.id.replace(/^joint\./, "pack."));
-      if (row === undefined) continue;
-      expect({ id: spec.id, floor: spec.floor, tol: spec.tol }).toEqual({ id: spec.id, floor: row.floor, tol: row.tol });
-      matched++;
-    }
-    expect(matched).toBeGreaterThanOrEqual(3);
+    expect([...floors.keys()].sort()).toEqual(["B6", "R1"]);
+    // `MEASURE_SPECS` of `packing` and `JOINT_MEASURES` of the contract are the one source of the other floors.
+    expect(C.JOINT_MEASURES.length).toBeGreaterThan(0);
+    for (const spec of C.JOINT_MEASURES) expect(floors.has(spec.id)).toBe(false);
   });
 
   it("gives a record of screen-v1 that is a contract record", () => {

@@ -182,11 +182,19 @@ The packer is exact, so the shared rule `no-overlap` uses the smaller tolerance 
 
 The [measure note](research/MEASURES.md) tells each rule. The rule `sections` counts a tree that the router refuses. The proposed rules of MEAS0 are measures: `route.curve.rule.*` and `route.level.nesting`.
 
+### The hard rules of the packer
+
+A record of a packer counts the breaks of `no-overlap`, `in-container`, `locked-kept` and `complete`. The `FORMAT.md` file of `packing` defines them. They follow `layout-contract` 0.2.0:
+
+- A locked box without a placement breaks only `locked-kept`. It does not break `complete`. It stays at its input position for `no-overlap` and `in-container`.
+- A locked box moves when a coordinate changes by more than `RECORD_EPS`.
+- A locked box without a position in the input is a bad input, not a break. `checkInput` of the contract refuses it.
+
 ## The shared contract
 
 The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.0 as a development dependency at commit `69933a6`, until it is on npm. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
 
-The test also compares `JOINT_MEASURES` with [the floors](PROMOTION.md#the-floors). A joint measure with a floor of 0 has the floor and the tolerance of its row, or of the row of its packer twin. `joint.aspectError`, `joint.stability.mean` and `joint.stability.moved` have a twin row.
+The test also checks that [the floors](PROMOTION.md#the-floors) has no row of a `joint.*` or a `pack.*` measure. `JOINT_MEASURES` of the contract and `MEASURE_SPECS` of `packing` give these floors.
 
 `inputGraph` reads only the fields of `RouteInput`: `id`, `boxes`, `obstacles` and `edges`. Thus a contract input, for example the result of `applyPack`, goes to the router.
 
@@ -339,6 +347,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - `pack.stability.mean` is the mean move of the items that stay, divided by the container width. A vertical move can be longer than the width, so the value can be more than 1.
 - `pack.stability.q95` is the q0.95 move of the items that stay, divided by the container width.
 - `pack.overflow` counts the items outside the container in a cell with a fixed container.
+- `MEASURE_SPECS` of `packing` 0.1.7 gives the floor and the tolerance of each guard. The promotion rule uses them.
 
 ## The screen
 
