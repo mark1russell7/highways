@@ -607,6 +607,15 @@ const { rows, front } = compareStep("curve", graph, { options: { arc: { radius: 
 const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { width: 5, maxWidth: 30 }, options: { highway: { jog: "quintic" } } });
 ```
 
+## The same routes on each platform
+
+A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can give a different last bit on another platform or node version. A decision of a router must not depend on that bit.
+
+- The script `scripts/check-math.mjs` of the repository counts these calls in each source file. `pnpm test` fails when a count goes up.
+- For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
+- A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
+- The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
+
 ## License
 
 MIT
