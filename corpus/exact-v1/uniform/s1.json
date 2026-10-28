@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 21, "id": "n0", "w": 55, "x": 63, "y": 267},
+    {"h": 27, "id": "n1", "w": 43, "x": 75, "y": 165},
+    {"h": 22, "id": "n2", "w": 47, "x": 178, "y": 175},
+    {"h": 29, "id": "n3", "w": 38, "x": 156, "y": 254},
+    {"h": 21, "id": "n4", "w": 32, "x": 4, "y": 178},
+    {"h": 27, "id": "n5", "w": 53, "x": 256, "y": 268},
+    {"h": 29, "id": "n6", "w": 38, "x": 4, "y": 37},
+    {"h": 29, "id": "n7", "w": 39, "x": 73, "y": 213},
+    {"h": 18, "id": "n8", "w": 45, "x": 98, "y": 85},
+    {"h": 28, "id": "n9", "w": 34, "x": 221, "y": 39}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"data": {"collection": "users"}, "id": "e0", "source": "n6", "target": "n3"},
+    {"data": {"collection": "scores"}, "id": "e1", "source": "n9", "target": "n2"},
+    {"data": {"collection": "modes"}, "id": "e2", "source": "n8", "target": "n0"},
+    {"data": {"collection": "teams"}, "id": "e3", "source": "n3", "target": "n5"},
+    {"data": {"collection": "modes"}, "id": "e4", "source": "n1", "target": "n9"},
+    {"data": {"collection": "users"}, "id": "e5", "source": "n4", "target": "n7"},
+    {"data": {"collection": "modes"}, "id": "e6", "source": "n1", "target": "n0"},
+    {"data": {"collection": "users"}, "id": "e7", "source": "n1", "target": "n7"},
+    {"data": {"collection": "users"}, "id": "e8", "source": "n1", "target": "n8"},
+    {"data": {"collection": "users"}, "id": "e9", "source": "n4", "target": "n8"},
+    {"data": {"collection": "users"}, "id": "e10", "source": "n8", "target": "n3"},
+    {"data": {"collection": "users"}, "id": "e11", "source": "n1", "target": "n3"},
+    {"data": {"collection": "speeds"}, "id": "e12", "source": "n6", "target": "n1"},
+    {"data": {"collection": "scores"}, "id": "e13", "source": "n8", "target": "n2"},
+    {"data": {"collection": "users"}, "id": "e14", "source": "n0", "target": "n6"}
+  ],
+  "family": "uniform",
+  "generator": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "uniform", "nodes": 10}, "seed": 101, "version": 1},
+  "hash": "8385cc21def731ba",
+  "id": "exact-v1/uniform/s1",
+  "schema": "layout-input/1",
+  "seed": 1,
+  "set": "exact-v1",
+  "source": "made-up"
+}

@@ -54,8 +54,12 @@ export function exactFamily(cls: ExactClass, sizes: readonly number[], seeds: nu
   };
 }
 
-/** The node counts of the boards of `EXACT_V1`. The member `k` of each class has `EXACT_V1_SIZES[k mod 2]` nodes. */
-export const EXACT_V1_SIZES: readonly number[] = [10, 14];
+/**
+ * The node counts of the boards of `EXACT_V1`. The member `k` of each class has `EXACT_V1_SIZES[k mod length]` nodes.
+ * The size ladder of MEAS2 (CI run 40613531631) proved each optimum at 10 nodes within 300 s, for each class, both rules and the cap 1.5.
+ * At 14 nodes, 4 of 24 solves stopped at the time limit.
+ */
+export const EXACT_V1_SIZES: readonly number[] = [10];
 
 /** The number of seeds of each class of `EXACT_V1`. It is `cellMin` of the promotion rule. */
 export const EXACT_V1_SEEDS = 10;

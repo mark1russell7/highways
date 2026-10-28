@@ -270,6 +270,15 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.bundle.runs` | B8 | `B8.runs` | count | lower | no |
 | `route.bundle.run-edges.median` | B8 | `B8.median` | count | higher | no |
 | `route.bundle.run-edges.max` | B8 | `B8.max` | count | higher | no |
+| `route.bundle.stretch.max` | B3 | `B3.max` | ratio | lower | no |
+| `route.bundle.stretch.model.max` | B3 | `gap.stretch` | ratio | lower | no |
+| `route.bundle.gap-closed` | B10 | `gap` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap` | B10 | `gap.cap` | ratio | lower | no |
+| `route.bundle.gap-closed.mixed` | B10 | `gap.mixed` | 0 or 1 | lower | no |
+| `route.bundle.gap-closed.collection` | B10 | `gap.collection` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap.collection` | B10 | `gap.cap.collection` | ratio | lower | no |
+| `route.bundle.gap-closed.all` | B10 | `gap.all` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap.all` | B10 | `gap.cap.all` | ratio | lower | no |
 | `route.bundle.lane-fidelity.median` | B9 | `B9.median` | ratio | lower | no |
 | `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | lower | no |
 | `route.lane.area` | M1 | `M1.area` | ratio | lower | no |
