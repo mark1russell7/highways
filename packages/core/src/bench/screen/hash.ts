@@ -122,7 +122,10 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-/** This function rounds a number to 3 decimals, as the files of a corpus keep it. The value `-0` becomes `0`. */
+/** The epsilon of a number in a file. It is the same value as `RECORD_EPS` of `@mark1russell7/layout-contract`. */
+export const RECORD_EPS = 0.001;
+
+/** This function rounds a number to 3 decimals (a step of `RECORD_EPS`), as the files of a corpus keep it. The value `-0` becomes `0`. */
 export function round3(value: number): number {
   const r = Math.round(value * 1000) / 1000;
   return r === 0 ? 0 : r;

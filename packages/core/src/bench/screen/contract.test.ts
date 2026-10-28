@@ -25,7 +25,7 @@ import {
   type Region,
   type RouteInput,
 } from "./forms.ts";
-import { round3 } from "./hash.ts";
+import { RECORD_EPS, round3 } from "./hash.ts";
 import { screen } from "./screen.ts";
 import { screenInputs } from "./set.ts";
 
@@ -117,8 +117,8 @@ describe("the fit of highways to layout-contract", () => {
   });
 
   it("rounds the numbers of a file within `RECORD_EPS`", () => {
-    // G9: highways has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`.
-    expect(C.RECORD_EPS).toBe(1e-3);
+    // G9: the epsilon of highways is the epsilon of the contract.
+    expect(RECORD_EPS).toBe(C.RECORD_EPS);
     for (const v of [0, 0.0004, 0.0005, 1.23456, -7.8999, 123.4565, 1e6 / 3]) expect(Math.abs(round3(v) - v)).toBeLessThanOrEqual(C.RECORD_EPS / 2 + 1e-12);
   });
 
