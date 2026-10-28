@@ -135,7 +135,7 @@ Each candidate ran behind a switch for the measure only. The final change keeps 
 
 ### The merge sort on each node version
 
-The screens of the final change ran on node 24 and on node 26, beside the screens of the sort of the engine on the same day.
+The screens of the final change ran on node 24 and on node 26. The screens of the sort of the engine ran on the same day.
 
 | Measure | Node 24 | Node 26 |
 |---|---|---|
@@ -174,7 +174,7 @@ These tables count the runs where the merge sort gives another order than the so
 - `case-many-groups/shared-all`
 - `small-clustered/shared` and `small-clustered/shared-all`
 
-The 8 digests of `sections.same.test.ts` and the 3 boards of the site do not change. HWC-B now expects 15 swaps on `case-many-groups`, the value of the merge sort.
+The 8 digests of `sections.same.test.ts` and the 3 boards of the site do not change. HWC-B expects 15 swaps on `case-many-groups`, the value of the merge sort.
 
 ### The score of the predictions
 
