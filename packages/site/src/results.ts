@@ -1,6 +1,7 @@
 // The results page (SITE-LIVE). The build gives all its data from the committed files, so the page reads no network.
 import data from "virtual:results";
 import { LABELS, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
+import { cardId } from "./strategies-data.ts";
 import "./style.css";
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -116,7 +117,7 @@ function grid(): void {
   const body = rows
     .map(
       (s) =>
-        `<tr><th scope="row"><code>${esc(s.name)}</code></th>${s.cells
+        `<tr><th scope="row"><a href="strategies.html#${esc(cardId(t.step, s.name))}" title="The card of the strategy"><code>${esc(s.name)}</code></a></th>${s.cells
           .map((c) => {
             const on = state.labels.has(c.label);
             const picked = state.pick?.strategy === s.name && state.pick.guard === c.guard;

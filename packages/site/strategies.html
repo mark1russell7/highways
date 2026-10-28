@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways strategies: a card for each strategy</title>
+    <meta name="description" content="A card for each strategy of highways: its step, its status, its ideas and their papers, its options, its verdicts and its time." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body class="results strategies">
+    <a class="skip" href="#cards">Skip to the cards</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <p class="wordmark wordmark-small"><a href="./">highways</a></p>
+          <h1 class="tagline">Strategies: a card for each one</h1>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="./">Live demo</a>
+          <a href="examples.html">Examples</a>
+          <a href="compare.html">Compare</a>
+          <a href="./#bench">Benchmark</a>
+          <a href="results.html">Results</a>
+          <a href="strategies.html" aria-current="page">Strategies</a>
+          <a href="status/">Status</a>
+          <a href="releases/">Releases</a>
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-intro prose wide">
+        <p>
+          Each card is one strategy of the registry <code>STRATEGIES</code>. The build makes the cards from the registry, so a new strategy gets a card with no change to this page. A card tells the step and the status of the strategy. It shows the ideas that the strategy builds, with their papers, their math and their cost. It also shows the options, the verdicts against the default of the step and the time in the benchmark.
+        </p>
+      </div>
+      <dl class="res-tiles" id="tiles"></dl>
+
+      <section class="prose wide" id="cards" aria-labelledby="cards-title">
+        <h2 id="cards-title">The cards</h2>
+        <div class="res-controls" role="group" aria-label="Filters">
+          <div class="field">
+            <span class="res-label" id="step-label">Step</span>
+            <div class="seg" role="radiogroup" aria-labelledby="step-label" id="steps"></div>
+          </div>
+          <fieldset class="field res-labels">
+            <legend>Status</legend>
+            <div class="res-chips" id="statuses"></div>
+          </fieldset>
+          <div class="field">
+            <label for="find">Search</label>
+            <input type="search" id="find" placeholder="Name or idea id" autocomplete="off" />
+          </div>
+        </div>
+        <p class="res-summary" id="summary" role="status" aria-live="polite"></p>
+        <div class="sc-grid" id="grid"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The map <a href="https://github.com/mark1russell7/highways/blob/main/packages/core/scripts/strategy-ideas.ts"><code>strategy-ideas.ts</code></a> links each strategy and its options to their idea records.
+      </p>
+      <p class="data-line"><!--data-line--></p>
+      <p class="data-line" id="sources"></p>
+    </footer>
+    <script type="module" src="/src/strategies.ts"></script>
+  </body>
+</html>
