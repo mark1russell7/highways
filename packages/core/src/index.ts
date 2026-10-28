@@ -35,3 +35,6 @@ export * from "./highways/index.ts";
 export * from "./order/index.ts";
 export * from "./repair/index.ts";
 export * from "./portfolio/index.ts";
+// One lane order for each stretch of runs (LANE-STRETCH), and its opt-in router `shared-stretch`.
+export * from "./lane-orders/stretch/index.ts";
+export { sharedStretchStrategy } from "./lane-orders/stretch/router.ts";

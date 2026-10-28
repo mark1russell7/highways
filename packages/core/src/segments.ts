@@ -1,5 +1,5 @@
 import { dist, type Point } from "./geom.ts";
-import { orderPlaced, type Placed } from "./lane-order.ts";
+import { findRun, orderPlaced, placeRoutes } from "./lane-order.ts";
 import type { Result, Route } from "./model.ts";
 
 /** A piece of drawn way. A shared segment carries several edges, in lane order. A private segment carries one edge. */
@@ -34,16 +34,6 @@ export interface SegmentGraph {
 
 const SAME = 1e-6;
 
-/** This function gives the index where `p` holds the points of `part` in a row, from `from` on, or -1. */
-function indexOf(p: readonly Point[], part: readonly Point[], from: number): number {
-  for (let i = from; i + part.length <= p.length; i++) {
-    let ok = true;
-    for (let j = 0; ok && j < part.length; j++) ok = dist(p[i + j]!, part[j]!) <= SAME;
-    if (ok) return i;
-  }
-  return -1;
-}
-
 /**
  * This function breaks each route into segments. The runs and the trunks of the bundles become shared segments.
  * The other parts of each route become private segments. The segments of a path, in order, give the points of its route again.
@@ -68,10 +58,10 @@ export function segmentsOf(result: Result): SegmentGraph {
     // The place of each shared segment in the route, in the order of the route.
     const found: { at: number; end: number; ref: SegmentRef }[] = [];
     for (const s of onEdge.get(route.edge) ?? []) {
-      let at = indexOf(p, s.points, 0);
+      let at = findRun(p, s.points, 0);
       let reverse = false;
       if (at < 0) {
-        at = indexOf(p, [...s.points].reverse(), 0);
+        at = findRun(p, [...s.points].reverse(), 0);
         reverse = true;
       }
       if (at >= 0) found.push({ at, end: at + s.points.length - 1, ref: { segment: s.id, reverse, lane: s.lane } });
@@ -221,18 +211,7 @@ export type RunOrder = "bundle" | "run";
  * On a run with a cycle, the order depends on the order of `routes`. The item LANE-STRETCH is to remove the cycles.
  */
 export function orderLanes(run: readonly Point[], routes: readonly Route[], order: RunOrder = "run"): string[] {
-  const placed: Placed[] = [];
-  const lost: string[] = [];
-  for (const r of routes) {
-    let at = indexOf(r.points, run, 0);
-    if (at >= 0) placed.push({ edge: r.edge, p: r.points, s: at, e: at + run.length - 1 });
-    else {
-      const p = [...r.points].reverse();
-      at = indexOf(p, run, 0);
-      if (at >= 0) placed.push({ edge: r.edge, p, s: at, e: at + run.length - 1 });
-      else lost.push(r.edge);
-    }
-  }
+  const { placed, lost } = placeRoutes(run, routes);
   const lanes = orderPlaced(placed, order);
   return [...lanes.map((x) => x.edge), ...lost.sort()];
 }

@@ -2,6 +2,7 @@ import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
 import { orderRun } from "../lane-order.ts";
+import { stretchLaneOrders, type LaneStretchOrder } from "../lane-orders/stretch/index.ts";
 import { byText } from "../compare.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
@@ -28,6 +29,13 @@ export interface SharedOptions extends WayOptions {
   readonly discount?: number;
   /** The lane order of the runs. With `bundle`, the default, two edges keep one order on each run of their common stretch. With `run`, each run gets its order alone. */
   readonly laneOrder?: RunOrder;
+  /**
+   * The lane order of each stretch of runs (LANE-STRETCH). With `none`, the default, each run gets its order alone.
+   * With `consensus`, `periphery` or `sifting`, the runs that follow each other on the routes share one order. Only the lane order `bundle` reads it.
+   */
+  readonly stretchOrder?: LaneStretchOrder;
+  /** The number of passes of the stretch order `sifting`, from 1 to 4. The default is 2. */
+  readonly siftPasses?: number;
   /**
    * The cost of a shared link. With `fixed`, the default, a link that the key uses already costs `discount` times its length.
    * With `flow`, one more edge on a link with `f` edges costs `len * ((f + 1)^alpha - f^alpha)` (EDA-029).
@@ -311,10 +319,15 @@ export function sharedRouter(options: SharedOptions): Router {
       for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? [w.ps.point, w.pt.point] });
       const shared: SharedRun[] = [];
       const routeOf = new Map(routes.map((r) => [r.edge, r]));
-      for (const run of runs.values()) {
-        const edges = options.laneOrder === "run" ? laneOrderOfRun(run) : orderLanes(run.points, run.ways.map((w) => routeOf.get(w.edge.id)!), "bundle");
+      const list = [...runs.values()];
+      const routesOf = (run: Run): Route[] => run.ways.map((w) => routeOf.get(w.edge.id)!);
+      // With a stretch order, the runs that follow each other on the routes share one lane order (LANE-STRETCH).
+      const method = options.laneOrder === "run" ? "none" : (options.stretchOrder ?? "none");
+      const stretch = method === "none" ? undefined : stretchLaneOrders(list.map((run) => ({ points: run.points, routes: routesOf(run) })), { method, passes: options.siftPasses ?? 2 });
+      list.forEach((run, i) => {
+        const edges = options.laneOrder === "run" ? laneOrderOfRun(run) : (stretch?.[i] ?? orderLanes(run.points, routesOf(run), "bundle"));
         shared.push({ id: `r${shared.length}`, key: run.key, points: run.points, edges });
-      }
+      });
       return { routes, runs: shared };
     },
   };
