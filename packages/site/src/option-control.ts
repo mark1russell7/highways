@@ -22,8 +22,10 @@ export function optionControl(id: string, key: string, d: ControlOption, value: 
     wrap.append(box, label);
   } else if (d.type === "enum") {
     const select = document.createElement("select");
+    // Without a value of the list, the first entry keeps the default of the strategy.
+    if (typeof value !== "string" || !d.values.includes(value)) select.append(new Option("default", "", false, true));
     for (const v of d.values) select.append(new Option(v, v, false, v === value));
-    select.addEventListener("change", () => changed(select.value));
+    select.addEventListener("change", () => changed(select.value === "" ? undefined : select.value));
     input = select;
     wrap.append(label, select);
   } else if (d.values !== undefined) {

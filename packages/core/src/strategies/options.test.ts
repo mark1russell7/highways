@@ -91,9 +91,7 @@ describe("the declarations of the built-in strategies (OPTS)", () => {
     expect(routerStrategies["sections-tree"].defaults).toEqual({ stretch: Infinity });
     expect(roomStrategies.routes.defaults).toEqual({});
     expect(optionDefaults(routerStrategies["sections-tree"])).toMatchObject({ stretch: Infinity, hubSlack: 80, cap: 8, margin: 5 });
-    // The router `shared-all` sets no rule. Its schema gives the name `all`, which is the same as no rule (SCHEMA-GAPS).
-    expect(routerStrategies["shared-all"].defaults).toEqual({});
-    expect(optionDefaults(routerStrategies["shared-all"])).toHaveProperty("rule", "all");
+    expect(optionDefaults(routerStrategies["shared-all"])).not.toHaveProperty("rule");
     expect(optionDefaults(routerStrategies["corners-smooth"])).toEqual({ margin: 5, k: 8, smooth: true, plugs: "facing", plugGap: 0 });
   });
 
@@ -199,6 +197,18 @@ describe("the named rules of the edges (SCHEMA-GAPS)", () => {
     }
     expect(sameData(runOn(routerStrategies.shared, { rule: "all" }), runOn(routerStrategies["shared-all"])), "shared all").toBe(true);
   }, 30_000);
+
+  it("keep the rule byCollection in the defaults, as before, and give its name collection as the default of the schema", () => {
+    const strategies: readonly AnyStrategy[] = [routerStrategies.trunks, routerStrategies.shared, highwayStrategies.keys, highwayStrategies["shared-ways"], highwayStrategies["soft-keys"]];
+    for (const s of strategies) {
+      expect((s.defaults as { readonly rule?: unknown }).rule, s.name).toBe(byCollection);
+      expect(optionDefaults(s), s.name).toHaveProperty("rule", byCollection);
+      expect(listOptions(s).find((o) => o.key === "rule")!.declaration.default, s.name).toBe("collection");
+    }
+    // The router `shared-all` sets no rule, as before. Its declaration has no default.
+    expect(routerStrategies["shared-all"].defaults).toEqual({});
+    expect(listOptions(routerStrategies["shared-all"]).find((o) => o.key === "rule")!.declaration.default).toBeUndefined();
+  });
 
   it("keep the default output of the old path, with the rule byCollection", () => {
     for (const graph of [tiny, board("case-hub-chain")]) {

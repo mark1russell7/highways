@@ -76,14 +76,14 @@ import { plugsRouter } from "../routers/plugs.ts";
 import { sectionsRouter, type SectionsOptions } from "../routers/sections.ts";
 import { sharedRouter, type SharedOptions } from "../routers/shared.ts";
 import { straightRouter } from "../routers/straight.ts";
-import { trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
+import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { runPipeline, type PipelineOptions } from "../whole/pipeline/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
 import { DEPTHS_SCHEMA, PIPELINE_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -142,7 +142,7 @@ export const routerStrategies: {
     "trunks",
     "A rule puts edges in groups. The edges of a group leave one plug of one node on one trunk. At a split point, each edge goes on to its target.",
     10_000,
-    { rule: "collection" },
+    { rule: byCollection },
     trunksRouter,
     TRUNKS_SCHEMA,
   ),
@@ -150,11 +150,11 @@ export const routerStrategies: {
     "shared",
     "The edges of one collection share their ways through the corner graph. A link that the group uses already costs half.",
     10_000,
-    { rule: "collection" },
+    { rule: byCollection },
     sharedRouter,
     SHARED_SCHEMA,
   ),
-  "shared-all": routerStrategy<RouterPreset<SharedOptions>>("shared-all", "The same as `shared`, but all edges share their ways.", 10_000, {}, sharedRouter, SHARED_SCHEMA),
+  "shared-all": routerStrategy<RouterPreset<SharedOptions>>("shared-all", "The same as `shared`, but all edges share their ways.", 10_000, {}, sharedRouter, SHARED_ALL_SCHEMA),
   sections: routerStrategy<RouterPreset<SectionsOptions>>(
     "sections",
     "A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly.",
@@ -472,7 +472,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "keys",
     describe: "The highways of the router `trunks`. The edges from one plug with one key share a trunk, and the edges that go on together share a run past it.",
-    defaults: { rule: "collection" } as KeysOptions,
+    defaults: { rule: byCollection } as KeysOptions,
     schema: TRUNKS_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<KeysOptions>) => keysPlan(input, o),
@@ -481,7 +481,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "shared-ways",
     describe: "The highways of the router `shared`. The edges of one key share their ways through the corner graph, and each shared stretch is a highway.",
-    defaults: { rule: "collection" } as SharedWaysOptions,
+    defaults: { rule: byCollection } as SharedWaysOptions,
     schema: SHARED_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SharedWaysOptions>) => sharedWaysPlan(input, o),
@@ -671,7 +671,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "soft-keys",
     describe: "Soft keys (HWY-019). The key of an edge adds a distance to the flow distance, and a hierarchical clustering makes the highways.",
-    defaults: { ...SOFT_KEY_DEFAULTS, rule: "collection" } as SoftKeyOptions,
+    defaults: { ...SOFT_KEY_DEFAULTS } as SoftKeyOptions,
     schema: SOFT_KEY_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SoftKeyOptions>) => softKeyPlan(input, o),

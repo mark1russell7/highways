@@ -86,6 +86,7 @@ export const LANE_STRETCH_SCHEMA: OptionSchema<LaneStretchOptions> = {
 /**
  * The declaration of the grouping rule of the edges: a name of `GROUP_RULE_NAMES`. A new name of the list needs no change here.
  * The option also takes a rule of the caller (`custom`), so the old value form stays valid.
+ * The `defaults` of a strategy keep the rule `byCollection`, and the declaration gives its name `collection` as its `default`.
  */
 const EDGE_RULE: EnumOption<GroupRuleName> = { type: "enum", values: GROUP_RULE_NAMES, custom: "function", describe: "The grouping rule." };
 
@@ -150,10 +151,10 @@ export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
   bf: { type: "number", min: 0, max: 1, step: 0.05, default: 0.4, describe: "The balancing factor of the fan `tree`. 0 gives the least ink, and a larger factor gives more direct routes." },
 };
 
-/** The declarations of the options of the routers `shared` and `shared-all`. */
+/** The declarations of the options of the router `shared` and of the highway strategy `shared-ways`. */
 export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
   ...WAY_SCHEMA,
-  rule: { ...EDGE_RULE, default: "all", describe: "The edges with one key share their ways. With `collection`, the key is `data.collection`. With `all`, the default, all edges share." },
+  rule: { ...EDGE_RULE, default: "collection", describe: "The edges with one key share their ways. With `collection`, the key is `data.collection`. With `all`, all edges share." },
   discount: {
     type: "number",
     min: 0.05,
@@ -207,6 +208,12 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     describe: "With `none`, each run gets its lane order alone. With the other values, the runs that follow each other share one order (LANE-STRETCH).",
   },
   siftPasses: LANE_STRETCH_SCHEMA.passes,
+};
+
+/** The declarations of the options of the router `shared-all`. It sets no rule, so all edges share. Thus its rule has no `default`. */
+export const SHARED_ALL_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
+  ...SHARED_SCHEMA,
+  rule: { ...EDGE_RULE, describe: "The edges with one key share their ways. Without a rule, or with `all`, all edges share. With `collection`, the key is `data.collection`." },
 };
 
 /** The declarations of the options of the highway strategy `corridors` (HWY-031). */

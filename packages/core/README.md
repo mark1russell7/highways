@@ -581,8 +581,8 @@ An option of a rule or its name, for example `GroupRule | "collection" | "all"`,
 
 The option `rule` of the routers `trunks`, `shared` and `shared-all`, and of the highway strategies `keys`, `shared-ways` and `soft-keys`, takes a name (SCHEMA-GAPS):
 
-- With `collection`, the rule is `byCollection`. It is the default of each strategy except `shared-all`.
-- With `all`, each edge has one key. For the router `shared`, it is the same as no rule, so it is the default of `shared-all`.
+- With `collection`, the rule is `byCollection`. With `all`, each edge has one key. For the router `shared`, `all` is the same as no rule.
+- The `defaults` of each strategy keep the rule `byCollection`, as before. The declaration gives its name `collection` as its `default`. The router `shared-all` sets no rule.
 - A rule of the caller stays valid. The name `collection` gives the same output as the rule `byCollection`.
 
 The helpers read the declarations:

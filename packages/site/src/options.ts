@@ -21,9 +21,14 @@ export interface TextEntry {
   readonly text: string;
 }
 
-/** This function gives the options of a strategy that a control can set, with the default value of each one. */
+/**
+ * This function gives the options of a strategy that a control can set, with the default value of each one.
+ * An enum option with `custom: "function"` can have a rule as its default. The control then shows the name of the rule: the `default` of the declaration.
+ */
 export function controlOptions(strategy: Strategy<Step, object>): ControlEntry[] {
-  return listOptions(strategy).filter((o): o is typeof o & { declaration: ControlOption } => isControl(o.declaration));
+  return listOptions(strategy)
+    .filter((o): o is typeof o & { declaration: ControlOption } => isControl(o.declaration))
+    .map((o) => (o.declaration.type === "enum" && typeof o.value === "function" ? { ...o, value: o.declaration.default } : o));
 }
 
 /** This function writes the default value of an option without a range as short text. */
