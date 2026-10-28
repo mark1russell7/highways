@@ -233,7 +233,8 @@ function boundsArea(nodes: readonly Node[]): number {
 }
 
 /**
- * This function gives the measures of a board that a room strategy opened, with the keys and the lane spacing 4 of the step `room` of `runSuite`.
+ * This function gives the measures of a board that a room strategy opened.
+ * It uses the keys and the lane spacing 4 of the step `room` of `runSuite`.
  * The measures are the area against the board before (`M1.area`), the lane routes through a box (`M4.laneThrough`), the faults of the far view and `room-order`.
  */
 export function roomValues(graph: Graph, open: readonly Node[]): Record<string, number> {

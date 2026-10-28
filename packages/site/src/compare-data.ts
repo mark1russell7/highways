@@ -285,7 +285,8 @@ function lanesOf(result: Result): readonly Route[] {
 }
 
 /**
- * This function gives the drawing of one row: the routes, the curves, the groups and the links of the far view, or the open board and its links.
+ * This function gives the drawing of one row: the routes, the curves, or the groups and the links of the far view.
+ * For the step `room`, it gives the open board and its links.
  * A strategy that did not run gives the boxes of the board only.
  */
 function drawingOf(graph: Graph, row: AnyCompareRow): Drawing {

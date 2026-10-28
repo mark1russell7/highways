@@ -43,7 +43,8 @@ export function optionControl(id: string, key: string, d: ControlOption, value: 
 }
 
 /**
- * This function gives the options of one strategy as a field set: a control for each option with a range, and the default value as text for each other option.
+ * This function gives the options of one strategy as a field set. Each option with a range gets a control.
+ * Each other option shows its default value as text.
  * It gives `undefined` for a strategy without options.
  */
 export function optionSet(
