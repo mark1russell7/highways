@@ -24,6 +24,9 @@ on:
       pool:
         type: string
         default: ""
+      summary:
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       args:
@@ -44,13 +47,16 @@ on:
       pool:
         description: "With api: the ids of the Screen runs of the pool on screen-v1, with commas (--pool of pnpm portfolio:api)."
         default: ""
+      summary:
+        description: "FIT-COST: the ids of runs of the times, with commas. The job writes the table of portfolio:time --summary from their shards, and times nothing."
+        default: ""
 
 permissions:
   contents: read
 
 jobs:
   plan:
-    if: ${{ !inputs.report && !inputs.sets && !inputs.api }}
+    if: ${{ !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.plan.outputs.shards }}
@@ -102,7 +108,7 @@ jobs:
 
   merge:
     needs: time
-    if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api }}
+    if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
@@ -111,7 +117,8 @@ jobs:
           path: shards
       - name: Join the shards
         run: |
-          cat shards/*/*.jsonl > time.jsonl
+          # With one shard, the action puts the file of the shard in shards/ itself, with no folder of the artifact (FIT-COST).
+          find shards -name '*.jsonl' -exec cat {} + > time.jsonl
           echo "The job joined $(wc -l < time.jsonl) timed runs." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -185,7 +192,7 @@ jobs:
 
   # PORTFOLIO-FIT: the sets, the fit and the report of the portfolio router from the artifacts of other runs.
   fit:
-    if: ${{ inputs.sets || inputs.api }}
+    if: ${{ inputs.sets || inputs.api || inputs.summary }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -194,6 +201,7 @@ jobs:
       SETS: ${{ inputs.sets }}
       API: ${{ inputs.api }}
       POOL: ${{ inputs.pool }}
+      SUMMARY: ${{ inputs.summary }}
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
@@ -225,12 +233,25 @@ jobs:
         if: ${{ env.SETS != '' }}
         run: |
           set -o pipefail
-          gh run download "$SETS" -p "portfolio-time-*" -D "$GITHUB_WORKSPACE/runs/time"
-          files=$(find "$GITHUB_WORKSPACE/runs/time" -name time.jsonl | paste -sd, -)
+          # The files of the shards are the times. They do not need the job that joins them (FIT-COST).
+          gh run download "$SETS" -p "time-shard-*" -D "$GITHUB_WORKSPACE/runs/time"
+          files=$(find "$GITHUB_WORKSPACE/runs/time" -name 'time-*.jsonl' | paste -sd, -)
           pnpm --filter @mark1russell7/highways portfolio:sets --time "$files" --time-source "$SETS" --out "$GITHUB_WORKSPACE/portfolio-sets.md" > /dev/null
           mkdir -p "$GITHUB_WORKSPACE/out"
           cp packages/core/src/portfolio/sets.ts packages/core/src/portfolio/fit.ts packages/core/scripts/data/portfolio-times.json "$GITHUB_WORKSPACE/out/"
           cat portfolio-sets.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Write the table of the lines of the times
+        if: ${{ env.SUMMARY != '' }}
+        run: |
+          set -o pipefail
+          files=""
+          IFS=',' read -ra ids <<< "$SUMMARY"
+          for id in "${ids[@]}"; do
+            gh run download "$id" -p "time-shard-*" -D "$GITHUB_WORKSPACE/runs/summary-$id"
+            files="${files:+$files,}$(find "$GITHUB_WORKSPACE/runs/summary-$id" -name 'time-*.jsonl' | paste -sd, -)"
+          done
+          pnpm --filter @mark1russell7/highways portfolio:time --summary "$files" --out "$GITHUB_WORKSPACE/portfolio-time-summary.md" > /dev/null
+          cat portfolio-time-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Write the report of the router
         if: ${{ env.API != '' }}
         run: |
@@ -257,5 +278,6 @@ jobs:
             portfolio-sets.md
             portfolio-api.md
             portfolio-api.json
+            portfolio-time-summary.md
             bundle.md
           if-no-files-found: warn
