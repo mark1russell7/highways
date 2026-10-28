@@ -1,10 +1,11 @@
 // The command line that writes the input files of a screen set: `pnpm screen:inputs [--set screen-v1] [--out <dir>]`.
 // It writes `<out>/<set>/<family>/s<seed>.json` and the manifest `<out>/<set>/corpus.json`. The default folder is `corpus` at the root of the repository.
+// A set with held-out members also gets its split file `<out>/splits/<set>.<corpus hash>.json` (`corpus-split/1`).
 // The packing repository reads the same files. A test compares the files with `screenInputs`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { corpusManifest, formatInput, SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
+import { formatInput, SCREEN_SETS, screenInputs, screenSplit, setManifest, splitPath } from "../src/bench/screen/index.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -21,5 +22,13 @@ for (const input of inputs) {
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, formatInput(input));
 }
-writeFileSync(join(out, set.id, "corpus.json"), JSON.stringify(corpusManifest(set.id, inputs), null, 2) + "\n");
+const manifest = setManifest(set, inputs);
+writeFileSync(join(out, set.id, "corpus.json"), JSON.stringify(manifest, null, 2) + "\n");
 console.log(`${inputs.length} inputs of ${set.id} in ${join(out, set.id)}`);
+const split = screenSplit(set, manifest);
+if (split) {
+  const file = join(out, splitPath(split));
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(split, null, 2) + "\n");
+  console.log(`The split file of ${set.id}: ${file}`);
+}
