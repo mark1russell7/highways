@@ -15,6 +15,7 @@ on:
         default: "40688908137"
   pull_request:
     paths:
+      - packages/core/src/**
       - .github/workflows/xplat.yml
       - packages/core/scripts/xplat.ts
       - packages/core/scripts/xplat-summary.ts
