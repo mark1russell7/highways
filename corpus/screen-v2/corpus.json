@@ -1035,7 +1035,11 @@
         "hub-chain": 10,
         "many-groups": 10,
         "packed-grid": 10
-      }
+      },
+      "familyBy": {
+        "*": []
+      },
+      "familyMin": 10
     }
   }
 }

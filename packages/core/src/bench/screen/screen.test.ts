@@ -147,7 +147,7 @@ describe("the input files (layout-input/1)", () => {
       expect(JSON.parse(formatInput(input))).toEqual(input);
     }
     const manifest = JSON.parse(readFileSync(new URL("corpus.json", root), "utf8")) as LayoutCorpus;
-    expect(manifest).toEqual(corpusManifest("screen-v1", inputs));
+    expect(manifest).toEqual(corpusManifest("screen-v1", inputs, SCREEN_V1.claims));
   });
 
   it("gives each input its generator and its cell, and the manifest lists each seed of each generator", () => {

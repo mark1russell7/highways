@@ -1,4 +1,4 @@
-import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim } from "@mark1russell7/layout-contract";
+import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
 import { hubChainBoard, manyGroupsBoard, packedGridBoard } from "../../cases.ts";
 import { FIXTURES, makeFixture, type FixtureSpec } from "../../fixtures.ts";
 import type { Graph } from "../../model.ts";
@@ -20,6 +20,15 @@ export interface ScreenFamily {
   /** The cell of each member in the taxonomy of the corpus. */
   readonly cell: LayoutCell;
 }
+
+/**
+ * The key of the family of a screen input (SCREEN-WEIGHT). The map form gives the kind of the cell as the key, with no other dimension.
+ * The cells of a screen set have no `kind`, and `dense-groups` and `many-groups` have the same cell. Thus `familyCell` adds the family of the input as the kind.
+ */
+export const SCREEN_FAMILY_BY: FamilyBy = Object.freeze({ "*": Object.freeze([]) as readonly string[] });
+
+/** This function gives the cell of an input for the key `familyBy`: the cell of the input, with its family as `kind`. */
+export const familyCell = (input: { readonly family: string; readonly cell?: LayoutCell }): FamilyCell => ({ ...input.cell, kind: input.family });
 
 /** The claims of a manifest. `declared` gives the count of the inputs of each family (`docs/CORPUS-CHECKS.md` of `layout-contract`). */
 export interface CorpusClaims {
@@ -98,13 +107,27 @@ function screenFamilies(seeds: number, caseSeeds: number): ScreenFamily[] {
   ];
 }
 
+const V1_FAMILIES = screenFamilies(3, 1);
+
 /**
  * The screen set `screen-v1`: 14 boards of made-up data from 10 to 150 nodes. Each family shows a known hard case.
  * The seed 0 of each family is the fixture or the case board of the benchmark. The seed `k` of a fixture family is `familySeed(spec, k)`, as in `runSuite`.
  * The generators wrap the fixtures and the case boards without a change to their output.
- * This set does not change. The tests compare it with the files in `corpus/screen-v1`.
+ * The manifest declares the inputs of each family, with `minCount` 3. The case boards `hub-chain` and `many-groups` have 1 input, so they are in `thin`.
+ * The boards of this set do not change. The tests compare it with the files in `corpus/screen-v1`.
  */
-export const SCREEN_V1: ScreenSet = { id: "screen-v1", families: screenFamilies(3, 1) };
+export const SCREEN_V1: ScreenSet = {
+  id: "screen-v1",
+  families: V1_FAMILIES,
+  claims: {
+    declared: {
+      minCount: 3,
+      thin: V1_FAMILIES.filter((f) => f.seeds < 3).map((f) => f.name),
+      counts: Object.fromEntries(V1_FAMILIES.map((f) => [f.name, f.seeds])),
+      familyBy: SCREEN_FAMILY_BY,
+    },
+  },
+};
 
 /** The member seeds of each family of `screen-v2` that the split `default` holds out. */
 export const SCREEN_V2_HELD_OUT: readonly number[] = [7, 8, 9];
@@ -115,13 +138,13 @@ const V2_FAMILIES = screenFamilies(10, 10);
  * The screen set `screen-v2` (CORPUS-SEEDS): the 6 families of `screen-v1`, each with the 10 members 0 to 9, thus 60 boards.
  * Each family keeps the seed rule of `screen-v1`. Thus the members 0 to 2 are the boards of `screen-v1`, and the member 0 of `hub-chain` and `many-groups` is their board.
  *
- * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
+ * The manifest declares 10 inputs for each family, and each family key has 10 inputs or more. The split `default` holds out the members 7 to 9 of each family.
  * This set does not change. The tests compare it with the files in `corpus/screen-v2`.
  */
 export const SCREEN_V2: ScreenSet = {
   id: "screen-v2",
   families: V2_FAMILIES,
-  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V2_FAMILIES.map((f) => [f.name, f.seeds])) } },
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V2_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
   heldOut: SCREEN_V2_HELD_OUT,
 };
 
@@ -196,10 +219,13 @@ export function setManifest(set: ScreenSet, inputs: readonly LayoutInput[] = scr
 /** The hook of the claim `declared` of a screen set: each input declares its family. */
 export const declaresFamily = (input: { readonly family: string }): readonly string[] => [input.family];
 
-/** This function checks the claim `declared` of a manifest against its inputs, with the shared check of the contract. A manifest without the claim gives no break. */
+/**
+ * This function checks the claim `declared` of a manifest against its inputs, with the shared check of the contract. A manifest without the claim gives no break.
+ * With `familyBy`, the check reads the cell of each input with `familyCell`.
+ */
 export function checkFamilies(manifest: LayoutCorpus, inputs: readonly LayoutInput[]): ClaimBreak[] {
   const claim = manifest.claims?.declared;
-  return claim ? checkDeclared(inputs, declaresFamily, claim) : [];
+  return claim ? checkDeclared(inputs, declaresFamily, claim, undefined, familyCell) : [];
 }
 
 /** This function gives the hash of the corpus of a manifest with the shared function `corpusHashOf` of the contract. It reads the input ids and the input hashes. */

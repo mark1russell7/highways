@@ -287,5 +287,25 @@
         "ports": "free"
       }
     }
-  ]
+  ],
+  "claims": {
+    "declared": {
+      "minCount": 3,
+      "thin": [
+        "hub-chain",
+        "many-groups"
+      ],
+      "counts": {
+        "tiny-uniform": 3,
+        "small-clustered": 3,
+        "dense-groups": 3,
+        "hub-chain": 1,
+        "many-groups": 1,
+        "packed-grid": 3
+      },
+      "familyBy": {
+        "*": []
+      }
+    }
+  }
 }
