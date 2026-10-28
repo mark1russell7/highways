@@ -113,6 +113,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | COMPARE-ALL | The compare page and the demo show each step of the pipeline and each strategy of the registry: 4 grouping rules, 9 routers, 53 highways, 7 curves and 3 room strategies. A highway plan goes through `follow`, as in the screen. Each room strategy opens the board "Packed grid". A test fails when a step or a strategy is missing. | 2026-10-28 | #146 |
 | COMPARE-PICK | The compare page reads the key `pick` of its link, for example `#step=highway&pick=corridors,keys`. It shows the picked strategies first and marks them. It ignores a name that the step does not have, and a note tells it. Each panel has a toggle of the pick. | 2026-10-28 | #149 |
 | IDEA-QUEUE | [The build queue](research/CATALOG.md#the-build-queue): `pnpm queue` writes [`research/queue.json`](research/queue.json), with one row for each idea that is not built. The score is the gain on the open targets, times the uncertainty, divided by the cost. 183 ideas have a rank, and 77 are blocked. `corridors` builds `HWY-031`, so it gets no rank. The results page shows the top 20. A section of the catalog compares the predicted gain with the measured gain. | 2026-10-28 | #147 |
+| BUILD-Q1 | The first build of the queue: the screen of the corridor signatures (`HWY-031`). The strategy `corridors` of #67 is its build. On both screens, B3 q0.95 is `better` with 1 family against, and B1 has no side. The record goes to `screened`. Refer to [Queue builds](research/CATALOG.md#queue-builds). | 2026-10-28 | #151 |
 
 ## Calibration
 
