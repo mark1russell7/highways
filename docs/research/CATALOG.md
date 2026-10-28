@@ -1013,7 +1013,7 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 - `streets` raises the bends (R3) by 24% to 49% on 4 of 5 families with bends.
 - `search` starts at `corridors`. Against `corridors`, its median B1 ratio is 1.000, and 0.998 with 48 evaluations at 45 times the time of `shared`. Its `better` B3 q95 and B6 come from the start plan.
 - `search` reads only the graph and the routes of its input. Its score does not read the records of a screen. The option `evaluations` (0 to 400, default 16) sets its budget.
-- On both sets, `interchanges` gets B1 `better` with 0 families against. Its only loss is B8 runs.
+- On both sets, `interchanges` gets B1 `better` with 0 families against. Its only loss is B8 runs. It gets a new screen after MEAS-FLAT corrects B8 runs.
 - On both sets, `attraction` gets B1 and R1 `better` with 0 families against. The B1 gain is 0.003 on the mean of the families. B8 runs is `worse`, and R4, R5 and the B3 q95 are a little worse on `screen-v2`.
 - The time of `attraction` is 2.63 times `shared` on `screen-v1`. Thus the workflow `Scale` times it on the dense board of 1000 boxes.
 

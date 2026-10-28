@@ -12337,7 +12337,7 @@
         }
       },
       "verdict": "screened",
-      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On both sets, interchanges is better on B1 with 0 families against. The median B1 ratio is 1.450, and the B3 q95 ratio is 1.019. B8 runs is worse on both sets, but B8 runs is 0 for shared on hub-chain and many-groups (MEAS-FLAT). Z9 has no value for a highway plan. The time is 3.03 times shared. It adds 0 hard-rule breaks."
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On both sets, interchanges is better on B1 with 0 families against. The median B1 ratio is 1.450, and the B3 q95 ratio is 1.019. B8 runs is worse on both sets, but B8 runs is 0 for shared on hub-chain and many-groups (MEAS-FLAT). Z9 has no value for a highway plan. The time is 3.03 times shared. It adds 0 hard-rule breaks. Rescreen after MEAS-FLAT fixes B8 runs."
     }
   }
 ]
