@@ -4,7 +4,7 @@
 // `--edits` runs each highway strategy over this number of seeded edits, with its plan before each edit (BUILD-W2A).
 // `--wrap` adds the router `<name>+<w>` for each router and each wrapper. `--shuffles` measures the order fragility (W3) over this number of random orders.
 // `--strategy` names strategies of the registry. `--module` loads a prototype file and screens each export that is a strategy of the step,
-// or only the exports of `--export`. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
+// or only the exports of `--export`. An export can also be a list of strategies. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
 // `--set exact-v1` screens the small boards with a known optimum (MEAS2). With that set, the screen reads the optima of `src/bench/exact/optima-exact-v1.json`,
 // or of `--optima <file>`, and gives the gap closed of each strategy. `--optima none` gives no optima.
 // The workflow `Screen` starts it in CI. Locally, start it only on one or two small families, for example `--families tiny-uniform`.
@@ -49,9 +49,13 @@ const strategies: (Strategy<ScreenStep> | string)[] = [...(list("--strategy") ??
 const only = list("--export");
 for (const file of list("--module") ?? []) {
   const mod = (await import(pathToFileURL(resolve(file)).href)) as Record<string, unknown>;
-  const found = Object.entries(mod).filter(([name, value]) => isStrategy(value) && (only?.includes(name) ?? true));
+  // An export can be a strategy or a list of strategies.
+  const found = Object.entries(mod)
+    .filter(([name]) => only?.includes(name) ?? true)
+    .flatMap(([, value]) => (Array.isArray(value) ? (value as unknown[]) : [value]))
+    .filter(isStrategy);
   if (found.length === 0) throw new Error(`The file "${file}" exports no strategy of the step "${step}".`);
-  for (const [, value] of found) if (!strategies.includes(value as Strategy<ScreenStep>)) strategies.push(value as Strategy<ScreenStep>);
+  for (const value of found) if (!strategies.includes(value)) strategies.push(value);
 }
 
 const optionsFile = opt("--options");

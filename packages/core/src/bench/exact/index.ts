@@ -1,7 +1,7 @@
-import { dist, type Point } from "../../geom.ts";
+import { dist, polylineLength, type Point } from "../../geom.ts";
 import { edgePlugs, sharedStretches, type KeyedWay } from "../../highways/stretches.ts";
 import type { HighwayPlan } from "../../highways/model.ts";
-import type { Graph } from "../../model.ts";
+import type { Edge, Graph, Route } from "../../model.ts";
 import { byCollection } from "../../routers/trunks.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 
@@ -56,13 +56,19 @@ function distances(adj: readonly (readonly { to: number; len: number }[])[], sta
   }
 }
 
-/**
- * This function gives the model of fixed-charge network design (Magnanti and Wong 1984) for the edges of a graph (HWY-040).
- * The network is the corner graph, plus the point out of each plug. Each link costs its length once for each key that uses it.
- * Each edge goes one way between the points out of its two plugs. The way is `stretch` times its shortest way or shorter.
- * The optimum has the least ink for the stretch limit. The ways of the solution give highways with `sharedStretches`.
- */
-export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel {
+/** The network of the exact model: the corner graph, plus the point out of each plug of each edge. */
+interface ExactNetwork {
+  readonly points: readonly Point[];
+  readonly links: readonly { readonly u: number; readonly v: number; readonly len: number }[];
+  readonly adj: readonly (readonly { to: number; len: number }[])[];
+  /** The two end points of each edge: the points out of its plugs. */
+  readonly ends: readonly { readonly edge: Edge; readonly a: number; readonly b: number }[];
+  /** The distance from a plug to the point out of it. */
+  readonly margin: number;
+}
+
+/** This function makes the network of the exact model for the edges of a graph. */
+function exactNetwork(graph: Graph, o: Readonly<WayOptions>): ExactNetwork {
   const finder = new WayFinder(graph.nodes, { ...(o.margin === undefined ? {} : { margin: o.margin }), ...(o.k === undefined ? {} : { k: o.k }) });
   const corners = finder.corners;
   const k = o.k ?? 8;
@@ -81,7 +87,7 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
   };
   corners.points.forEach((p, i) => ids.set(`${p.x},${p.y}`, i));
   const plugs = edgePlugs(graph);
-  const ends = plugs.map(({ edge, ps, pt }) => ({ edge: edge.id, key: o.rule === "all" ? "*" : (byCollection(edge) ?? `\u0000${edge.id}`), a: nodeOf(finder.out(ps)), b: nodeOf(finder.out(pt)) }));
+  const ends = plugs.map(({ edge, ps, pt }) => ({ edge, a: nodeOf(finder.out(ps)), b: nodeOf(finder.out(pt)) }));
 
   // The links: each corner to its k nearest visible corners, as in the corner graph, and each end point to its 2k nearest visible corners.
   const linkIds = new Map<string, number>();
@@ -101,6 +107,18 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
     adj[l.u]!.push({ to: l.v, len: l.len });
     adj[l.v]!.push({ to: l.u, len: l.len });
   }
+  return { points, links, adj, ends, margin: finder.margin };
+}
+
+/**
+ * This function gives the model of fixed-charge network design (Magnanti and Wong 1984) for the edges of a graph (HWY-040).
+ * The network is the corner graph, plus the point out of each plug. Each link costs its length once for each key that uses it.
+ * Each edge goes one way between the points out of its two plugs. The way is `stretch` times its shortest way or shorter.
+ * The optimum has the least ink for the stretch limit. The ways of the solution give highways with `sharedStretches`.
+ */
+export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel {
+  const { points, links, adj, ends: outs } = exactNetwork(graph, o);
+  const ends = outs.map((e) => ({ edge: e.edge.id, key: o.rule === "all" ? "*" : (byCollection(e.edge) ?? `\u0000${e.edge.id}`), a: e.a, b: e.b }));
 
   // The arcs of each edge: the arcs on some way within the stretch limit.
   const eps = o.epsilon ?? 0.001;
@@ -199,4 +217,23 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
     return sharedStretches(ways, { minSize: 2 });
   };
   return { lp, columns: binaries.length, rows: rows.length, edges: arcsOf.length, lengths, decode };
+}
+
+/**
+ * This function gives the largest stretch of routes as the exact model counts it: the length of a route without its two plug ends,
+ * divided by the shortest way in the network of the model. The cap of the model is a limit on this value.
+ * An edge without a route or without a way in the network does not count. Without such an edge, the value is 1.
+ */
+export function exactStretch(graph: Graph, routes: readonly Route[], o: Readonly<WayOptions> = {}): number {
+  const { adj, ends, margin } = exactNetwork(graph, o);
+  const byEdge = new Map(routes.map((r) => [r.edge, r]));
+  let max = 1;
+  for (const e of ends) {
+    const r = byEdge.get(e.edge.id);
+    if (!r || r.points.length < 2 || e.a === e.b) continue;
+    const best = distances(adj, e.a)[e.b]!;
+    if (!Number.isFinite(best) || best <= 1) continue;
+    max = Math.max(max, (polylineLength(r.points) - 2 * margin) / best);
+  }
+  return max;
 }

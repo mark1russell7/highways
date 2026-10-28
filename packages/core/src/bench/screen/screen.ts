@@ -391,7 +391,7 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
       const values = rowValues(step, graph, row, cornersBase);
       // Z2 is the count of the hard rule `link-ends`, as a measure. The steps `router`, `highway` and `group` check the rule.
       if (hard["link-ends"] !== undefined) values["Z2.linkEnds"] = hard["link-ends"];
-      if (optima && withOptima.has(input.id) && row.result) Object.assign(values, gapValues(input, row.result.routes, cornersBase(), gapBase(), optima));
+      if (optima && withOptima.has(input.id) && row.result) Object.assign(values, gapValues(input, graph, row.result, cornersBase(), gapBase(), optima));
       if (shuffles > 0 && row.result) {
         const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);
         const f = orderFragility(graph, (g) => router.route(g), { orders: shuffles, seed, base: row.result });

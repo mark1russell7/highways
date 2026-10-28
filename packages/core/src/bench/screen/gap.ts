@@ -2,11 +2,13 @@ import { polylineLength } from "../../geom.ts";
 import { follow } from "../../highways/follow.ts";
 import type { HighwayInput, HighwayPlan } from "../../highways/model.ts";
 import { sharedWaysPlan } from "../../highways/shared-ways/index.ts";
-import type { Graph, Route } from "../../model.ts";
+import type { Graph, Result, Route } from "../../model.ts";
+import { byCollection } from "../../routers/trunks.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { asRouter, defineStrategy, getStrategy, type Strategy } from "../../strategies/model.ts";
 import { inkSaved } from "../measures/bundles.ts";
 import { quantile } from "../measures/stats.ts";
+import { exactStretch } from "../exact/index.ts";
 import { mulberry32 } from "./hash.ts";
 
 /** The rule of the exact model: `collection` lets only the edges of one collection share a link, and `all` lets each edge share a link. */
@@ -14,6 +16,15 @@ export type GapRule = "collection" | "all";
 
 /** The rules of the gap closed, in the order of the records. */
 export const GAP_RULES: readonly GapRule[] = ["collection", "all"];
+
+/**
+ * A view of the gap closed: one rule, or `chosen`. The view `chosen` takes the rule `all` for a run when a shared segment of the run
+ * holds edges of two collections, and the rule `collection` when it does not.
+ */
+export type GapView = GapRule | "chosen";
+
+/** The views of the gap closed, in the order of the tables. */
+export const GAP_VIEWS: readonly GapView[] = ["chosen", "collection", "all"];
 
 /** The stretch caps of the exact optima, from small to large. */
 export const GAP_CAPS: readonly number[] = [1.1, 1.25, 1.5];
@@ -156,10 +167,10 @@ export function bootstrapMedian(values: readonly number[], o: { readonly runs?: 
   return { median: quantile(values, 0.5), lo: quantile(medians, tail), hi: quantile(medians, 1 - tail) };
 }
 
-/** The gap closed of one strategy and one rule over the inputs of a screen. */
+/** The gap closed of one strategy and one view over the inputs of a screen. */
 export interface GapSummary {
   readonly strategy: string;
-  readonly rule: GapRule;
+  readonly rule: GapView;
   /** The number of runs, and the number of runs with a value. A run has no value above the largest cap, or without a proven optimum. */
   readonly runs: number;
   readonly values: number;
@@ -171,23 +182,27 @@ export interface GapSummary {
   readonly byClass: Readonly<Record<string, number>>;
   /** The number of values at each cap, by the cap. */
   readonly caps: Readonly<Record<string, number>>;
+  /** The number of runs with some ink saved (B1 above 0): the runs where the strategy builds a shared segment. */
+  readonly builds: number;
+  /** The number of runs where a shared segment holds edges of two collections. */
+  readonly mixed: number;
 }
 
-/** The names of the measures of the gap closed in a record, for a rule. */
-export function gapNames(rule: GapRule): { readonly gap: string; readonly cap: string } {
-  return { gap: `route.bundle.gap-closed.${rule}`, cap: `route.bundle.gap-closed.cap.${rule}` };
+/** The names of the measures of the gap closed in a record, for a view. */
+export function gapNames(view: GapView): { readonly gap: string; readonly cap: string } {
+  return view === "chosen" ? { gap: "route.bundle.gap-closed", cap: "route.bundle.gap-closed.cap" } : { gap: `route.bundle.gap-closed.${view}`, cap: `route.bundle.gap-closed.cap.${view}` };
 }
 
 /** This function gives the family of an input id `<set>/<family>/s<seed>`. */
 const familyOf = (input: string): string => input.split("/")[1] ?? input;
 
-/** This function gives the gap closed of each strategy and rule over records, sorted by the rule and then by the median, from high to low. */
+/** This function gives the gap closed of each strategy and view over records, sorted by the view and then by the median, from high to low. */
 export function summarizeGap(
   records: readonly { readonly strategy: string; readonly input: string; readonly skipped?: string; readonly measures: Readonly<Record<string, number>> }[],
 ): GapSummary[] {
   const out: GapSummary[] = [];
   const names = [...new Set(records.map((r) => r.strategy))];
-  for (const rule of GAP_RULES) {
+  for (const rule of GAP_VIEWS) {
     const key = gapNames(rule);
     const rows: GapSummary[] = [];
     for (const strategy of names) {
@@ -202,7 +217,9 @@ export function summarizeGap(
         const c = String(r.measures[key.cap]);
         caps[c] = (caps[c] ?? 0) + 1;
       }
-      rows.push({ strategy, rule, runs: ran.length, values: values.length, median: boot.median, lo: boot.lo, hi: boot.hi, byClass, caps });
+      const builds = ran.filter((r) => (r.measures["route.bundle.ink-saved"] ?? 0) > 1e-9).length;
+      const mixed = ran.filter((r) => r.measures["route.bundle.gap-closed.mixed"] === 1).length;
+      rows.push({ strategy, rule, runs: ran.length, values: values.length, median: boot.median, lo: boot.lo, hi: boot.hi, byClass, caps, builds, mixed });
     }
     rows.sort((a, b) => (Number.isNaN(b.median) ? -Infinity : b.median) - (Number.isNaN(a.median) ? -Infinity : a.median) || (a.strategy < b.strategy ? -1 : 1));
     out.push(...rows);
@@ -210,46 +227,61 @@ export function summarizeGap(
   return out;
 }
 
-/** This function writes the gap closed as Markdown: one table for each rule, sorted by the median. */
+/** This function writes the gap closed as Markdown: one table for each view, sorted by the median. */
 export function formatGap(rows: readonly GapSummary[]): string {
   const f = (v: number): string => (Number.isNaN(v) ? "-" : v.toFixed(3));
   const lines: string[] = [];
-  for (const rule of GAP_RULES) {
+  for (const rule of GAP_VIEWS) {
     const mine = rows.filter((r) => r.rule === rule);
     if (mine.length === 0) continue;
     const classes = [...new Set(mine.flatMap((r) => Object.keys(r.byClass)))].sort();
     lines.push(
       "",
-      `### The gap closed with the rule \`${rule}\` (baseline \`${GAP_BASELINES[rule]}\`)`,
+      rule === "chosen"
+        ? "### The gap closed with the rule of each run (`all` when a shared segment mixes collections, else `collection`)"
+        : `### The gap closed with the rule \`${rule}\` (baseline \`${GAP_BASELINES[rule]}\`)`,
       "",
-      "The value of an input is `(B1 - B1 of the baseline) / (the optimum B1 - B1 of the baseline)`, at the smallest cap at or above the largest B3 of the routes.",
+      "The value of an input is `(B1 - B1 of the baseline) / (the optimum B1 - B1 of the baseline)`, at the smallest cap at or above the largest stretch of the routes.",
+      "The stretch is the stretch of the exact model: the length of a route without its plug ends, divided by the shortest way in the network of the model.",
       "The interval is the 95% paired bootstrap interval of the median, with 10000 samples.",
       "",
-      `| strategy | runs | values | median | interval | ${classes.join(" | ")} | caps 1.1 / 1.25 / 1.5 |`,
-      `|---|---:|---:|---:|---|${classes.map(() => "---:").join("|")}|---|`,
+      `| strategy | runs | builds | mixed | values | median | interval | ${classes.join(" | ")} | caps 1.1 / 1.25 / 1.5 |`,
+      `|---|---:|---:|---:|---:|---:|---|${classes.map(() => "---:").join("|")}|---|`,
       ...mine.map(
         (r) =>
-          `| ${r.strategy} | ${r.runs} | ${r.values} | ${f(r.median)} | ${f(r.lo)} to ${f(r.hi)} | ${classes.map((c) => f(r.byClass[c] ?? Number.NaN)).join(" | ")} | ${GAP_CAPS.map((c) => r.caps[String(c)] ?? 0).join(" / ")} |`,
+          `| ${r.strategy} | ${r.runs} | ${r.builds} | ${r.mixed} | ${r.values} | ${f(r.median)} | ${f(r.lo)} to ${f(r.hi)} | ${classes.map((c) => f(r.byClass[c] ?? Number.NaN)).join(" | ")} | ${GAP_CAPS.map((c) => r.caps[String(c)] ?? 0).join(" / ")} |`,
       ),
     );
   }
   return lines.join("\n") + "\n";
 }
 
+/** This function tells if a shared segment of a result (a run or a bundle) holds edges of two collections. */
+export function mixesCollections(graph: Graph, result: Result): boolean {
+  const key = new Map(graph.edges.map((e) => [e.id, byCollection(e) ?? `\u0000${e.id}`]));
+  const shared = [...(result.runs ?? []).map((r) => r.edges), ...(result.bundles ?? []).map((b) => b.edges)];
+  return shared.some((edges) => new Set(edges.map((e) => key.get(e))).size > 1);
+}
+
 /**
- * This function gives the gap measures of the routes of one run on an input with optima, by the keys of `MEASURES`.
- * `B3.max` is the largest stretch against the routes `corners`. `gap.<rule>` is the gap closed at the cap `gap.cap.<rule>`.
+ * This function gives the gap measures of the result of one run on an input with optima, by the keys of `MEASURES`.
+ * `B3.max` is the largest stretch against the routes of `corners`. `gap.stretch` is the largest stretch as the exact model counts it (`exactStretch`).
+ * The cap is the smallest cap at or above `gap.stretch`, so both sides of the gap have the same stretch limit.
+ * `gap.<rule>` is the gap closed at the cap `gap.cap.<rule>`. `gap` is the gap closed of the rule of the run: `all` when `gap.mixed` is 1, else `collection`.
  * A rule has no value above the largest cap, without a proven optimum at the cap, or when the hash of the optimum is not the hash of the input.
  */
 export function gapValues(
   input: { readonly id: string; readonly hash: string },
-  routes: readonly Route[],
+  graph: Graph,
+  result: Result,
   corners: readonly Route[],
   baselines: Readonly<Record<GapRule, number>>,
   optima: ReadonlyMap<string, ExactOptimum>,
 ): Record<string, number> {
-  const stretch = maxStretch(routes, corners);
-  const out: Record<string, number> = { "B3.max": stretch };
+  const routes = result.routes;
+  const stretch = exactStretch(graph, routes);
+  const mixed = mixesCollections(graph, result);
+  const out: Record<string, number> = { "B3.max": maxStretch(routes, corners), "gap.stretch": stretch, "gap.mixed": mixed ? 1 : 0 };
   const cap = gapCap(stretch);
   if (cap === undefined) return out;
   const b1 = inkSaved(routes);
@@ -260,6 +292,11 @@ export function gapValues(
     if (g === undefined) continue;
     out[`gap.${rule}`] = g;
     out[`gap.cap.${rule}`] = cap;
+  }
+  const chosen: GapRule = mixed ? "all" : "collection";
+  if (out[`gap.${chosen}`] !== undefined) {
+    out["gap"] = out[`gap.${chosen}`]!;
+    out["gap.cap"] = cap;
   }
   return out;
 }

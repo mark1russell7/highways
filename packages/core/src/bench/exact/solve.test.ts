@@ -2,7 +2,10 @@ import highsModule from "highs";
 import { describe, expect, it } from "vitest";
 import type { Box } from "../../geom.ts";
 import type { Graph } from "../../model.ts";
-import { bootstrapMedian, gapCap, gapClosed } from "../screen/gap.ts";
+import { STRATEGIES } from "../../strategies/builtins.ts";
+import { asRouter, getStrategy } from "../../strategies/model.ts";
+import { bootstrapMedian, gapCap, gapClosed, gapValues, mixesCollections, optimumKey, type ExactOptimum } from "../screen/gap.ts";
+import { exactStretch } from "./index.ts";
 import { planMeasures, solveExact, type HighsLike } from "./solve.ts";
 
 // The types of `highs` describe a CommonJS module, but Node loads its ES module. Its loader is the default export of either form.
@@ -60,5 +63,41 @@ describe("the gap closed (MEAS2)", () => {
     expect(a.hi).toBeGreaterThanOrEqual(a.median);
     expect(bootstrapMedian(values, { runs: 2000 })).toEqual(a);
     expect(Number.isNaN(bootstrapMedian([]).median)).toBe(true);
+  });
+});
+
+describe("the stretch of the exact model and the rule of a run (MEAS2)", () => {
+  const corners = asRouter(getStrategy(STRATEGIES, "router", "corners")).route(wall);
+
+  it("gives a stretch near 1 for the routes of corners, and a larger stretch for a detour", () => {
+    const s = exactStretch(wall, corners.routes);
+    expect(s).toBeGreaterThanOrEqual(1);
+    expect(s).toBeLessThan(1.1);
+    const detour = corners.routes.map((r) => ({ ...r, points: [r.points[0]!, { x: 300, y: -400 }, r.points[r.points.length - 1]!] }));
+    expect(exactStretch(wall, detour)).toBeGreaterThan(1.5);
+  });
+
+  it("tells a run that mixes collections", () => {
+    const keyed: Graph = { ...wall, edges: wall.edges.map((e, i) => ({ ...e, data: { collection: i < 2 ? "a" : "b" } })) };
+    const run = (edges: string[]) => ({ ...corners, runs: [{ id: "r", key: "k", points: [], edges }] });
+    expect(mixesCollections(keyed, run(["e0", "e1"]))).toBe(false);
+    expect(mixesCollections(keyed, run(["e1", "e2"]))).toBe(true);
+    expect(mixesCollections(keyed, corners)).toBe(false);
+  });
+
+  it("gives the gap closed of the rule of the run, at the cap of the stretch of the model", () => {
+    const input = { id: "exact-v1/uniform/s0", hash: "h" };
+    const opt = (rule: "collection" | "all", b1: number, hash = "h"): ExactOptimum =>
+      ({ input: input.id, hash, class: "uniform", nodes: 7, edges: 3, rule, cap: 1.1, status: "optimal", proven: true, objective: 1, bound: 1, mipGap: 0, seconds: 1, binaries: 1, b1, modelB1: b1, b3max: 1, highways: 1 }) as ExactOptimum;
+    const optima = new Map([
+      [optimumKey(input.id, "collection", 1.1), opt("collection", 0.5)],
+      [optimumKey(input.id, "all", 1.1), opt("all", 0.6, "other")],
+    ]);
+    const v = gapValues(input, wall, corners, corners.routes, { collection: 0, all: 0 }, optima);
+    expect(v["gap.cap"]).toBe(1.1);
+    expect(v["gap.mixed"]).toBe(0);
+    expect(v["gap"]).toBeCloseTo(v["gap.collection"]!);
+    // The hash of the optimum of the rule `all` is not the hash of the input, so that rule has no value.
+    expect(v["gap.all"]).toBeUndefined();
   });
 });
