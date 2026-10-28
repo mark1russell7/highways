@@ -114,6 +114,7 @@ const V2_FAMILIES = screenFamilies(10, 10);
 /**
  * The screen set `screen-v2` (CORPUS-SEEDS): the 6 families of `screen-v1`, each with the 10 members 0 to 9, thus 60 boards.
  * Each family keeps the seed rule of `screen-v1`. Thus the members 0 to 2 are the boards of `screen-v1`, and the member 0 of `hub-chain` and `many-groups` is their board.
+ *
  * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
  * This set does not change. The tests compare it with the files in `corpus/screen-v2`.
  */
@@ -125,8 +126,8 @@ export const SCREEN_V2: ScreenSet = {
 };
 
 /**
- * The screen sets by id: `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS), the small boards with a known optimum `exact-v1` (MEAS2),
- * and the larger boards with bounds `exact-v1-bounds` (EXACT-BOUNDS).
+ * The screen sets by id. `screen-v1` and its larger version `screen-v2` (CORPUS-SEEDS) have the boards of the screen.
+ * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
  */
 export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
@@ -201,7 +202,7 @@ export function checkFamilies(manifest: LayoutCorpus, inputs: readonly LayoutInp
   return claim ? checkDeclared(inputs, declaresFamily, claim) : [];
 }
 
-/** This function gives the hash of the corpus of a manifest, with the shared hash of the contract: `corpusHashOf` of its input ids and input hashes. */
+/** This function gives the hash of the corpus of a manifest with the shared function `corpusHashOf` of the contract. It reads the input ids and the input hashes. */
 export function manifestHash(manifest: LayoutCorpus): string {
   return corpusHashOf(manifest.corpus, manifest.inputs);
 }
