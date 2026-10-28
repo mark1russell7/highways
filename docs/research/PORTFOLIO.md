@@ -6,6 +6,7 @@ This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A
 - The note gives the Pareto curve of the portfolio: the gain for each k, on seeds that the choice of the set did not see. It also gives the time of each set.
 - The script [`scripts/portfolio.ts`](../../packages/core/scripts/portfolio.ts) makes the tables from the records of CI. The test `src/bench/screen/portfolio.test.ts` examines its functions.
 - The section [The rule of the caller](#the-rule-of-the-caller-portfolio-rule) is the result of the item PORTFOLIO-RULE. The script also makes its tables, with the optima of `exact-v1`.
+- The section [The portfolio at each cap](#the-portfolio-at-each-cap-exact-bounds) is the result of the item EXACT-BOUNDS. It gives the greedy sets of each rule and cap.
 - The script [`scripts/portfolio-time.ts`](../../packages/core/scripts/portfolio-time.ts) times each strategy. The workflow `Portfolio` starts it in CI.
 
 ## Summary
