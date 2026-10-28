@@ -2,7 +2,7 @@
 // `pnpm exact --ladder --sizes 10,14,18 [--classes uniform,hubs] [--seeds 0,1,2] [--caps 1.5] [--rules collection,all] [--seconds 300] [--shard 0/8] --out ladder.jsonl`
 // solves boards of each size, to find the largest size with a proven optimum within the time limit.
 // `pnpm exact --set exact-v1 [--caps 1.1,1.25,1.5] [--rules collection,all] [--seconds 300] [--shard 0/8] --out optima.jsonl` solves each input of the set.
-// `pnpm exact --merge <dir> --set exact-v1 --out optima-exact-v1.json` joins the lines of each shard into the file of the optima.
+// `pnpm exact --merge <dir> --set exact-v1 --out optima-exact-v1.json` joins the lines of each shard into the file of the optima. `--shards` is for the workflow.
 // Each line has the input, its hash, the rule, the cap, the status, the proof, the objective, the bound, the MIP gap, the time, and B1 and the largest B3 of the plan.
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -25,7 +25,7 @@ const list = (name: string): string[] | undefined =>
     .map((x) => x.trim())
     .filter((x) => x.length > 0);
 const out = opt("--out") ?? "exact.jsonl";
-const setId = opt("--set") ?? "exact-v1";
+const setId = opt("--set") ?? (args.includes("--ladder") ? "exact-ladder" : "exact-v1");
 const run =
   process.env["GITHUB_RUN_ID"] !== undefined
     ? `${process.env["GITHUB_SERVER_URL"] ?? "https://github.com"}/${process.env["GITHUB_REPOSITORY"] ?? ""}/actions/runs/${process.env["GITHUB_RUN_ID"]}`

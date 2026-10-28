@@ -73,9 +73,9 @@ export function solveExact(highs: HighsLike, graph: Graph, o: { readonly stretch
   const m = highs.createModel({ format: "lp", data: model.lp });
   try {
     m.options.set({ time_limit: o.seconds, output_flag: false, mip_rel_gap: 0 });
-    const start = performance.now();
+    const start = Date.now();
     m.run();
-    const seconds = (performance.now() - start) / 1000;
+    const seconds = (Date.now() - start) / 1000;
     const code = m.getModelStatus();
     const statuses = highs.constants.modelStatus;
     const status = code === statuses.optimal ? "optimal" : code === statuses.timeLimit ? "time-limit" : `status-${code}`;

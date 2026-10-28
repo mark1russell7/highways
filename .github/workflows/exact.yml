@@ -1,39 +1,25 @@
 # The exact solves of MEAS2: fixed-charge network design (HWY-040), solved with HiGHS on small boards.
-# The mode `ladder` solves boards of each size, to find the largest size with a proven optimum within the time limit.
-# The mode `set` solves each input of a screen set, for example `exact-v1`, and gives the file of the optima as an artifact.
-# The solves run in shards of a matrix. The last job joins the lines of the shards and writes a summary.
+# `args` are the arguments of `pnpm exact` (packages/core/scripts/exact.ts), without --shard and --out. For example:
+#   --ladder --sizes 10,14,18,24,30,40 --seeds 0,1,2 --caps 1.5 --seconds 300 --shards 36
+#   --set exact-v1 --caps 1.1,1.25,1.5 --rules collection,all --seconds 300 --shards 40
+# The solves run in shards of a matrix (--shards, default 20). The last job joins the lines of the shards, writes a summary
+# and gives the file of the optima (or of the ladder) as an artifact. The workflow `Screen` calls this workflow with its input `exact`.
 name: Exact
 
 on:
+  workflow_call:
+    inputs:
+      args:
+        type: string
+        required: true
+      minutes:
+        type: string
+        default: "120"
   workflow_dispatch:
     inputs:
-      mode:
-        description: "ladder or set."
-        default: "ladder"
-      set:
-        description: "The screen set of the mode set."
-        default: "exact-v1"
-      sizes:
-        description: "The node counts of the mode ladder, with commas."
-        default: "10,14,18,24,30,40"
-      classes:
-        description: "The board classes of the mode ladder, with commas. Empty: each class."
-        default: ""
-      seeds:
-        description: "The seeds of the mode ladder, with commas."
-        default: "0,1,2"
-      caps:
-        description: "The stretch caps, with commas."
-        default: "1.1,1.25,1.5"
-      rules:
-        description: "The rules of the model, with commas: collection, all."
-        default: "collection,all"
-      seconds:
-        description: "The time limit of each solve, in seconds."
-        default: "300"
-      shards:
-        description: "The number of shards of the matrix."
-        default: "20"
+      args:
+        description: "The arguments of pnpm exact, without --shard and --out."
+        default: "--ladder --sizes 10,14,18 --caps 1.5 --seconds 300 --shards 20"
       minutes:
         description: "The time limit of each shard, in minutes."
         default: "120"
@@ -41,20 +27,21 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: exact-${{ github.ref }}-${{ inputs.mode }}-${{ inputs.set }}-${{ inputs.sizes }}-${{ inputs.caps }}-${{ inputs.rules }}
-  cancel-in-progress: true
-
 jobs:
   plan:
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.plan.outputs.shards }}
+      count: ${{ steps.plan.outputs.count }}
     steps:
       - id: plan
         env:
-          SHARDS: ${{ inputs.shards || '20' }}
-        run: echo "shards=$(seq -s, 0 $((SHARDS - 1)) | sed 's/^/[/; s/$/]/')" >> "$GITHUB_OUTPUT"
+          ARGS: ${{ inputs.args }}
+        run: |
+          n=$(printf '%s' "$ARGS" | sed -n 's/.*--shards \([0-9][0-9]*\).*/\1/p')
+          n=${n:-20}
+          echo "count=$n" >> "$GITHUB_OUTPUT"
+          echo "shards=[$(seq -s, 0 $((n - 1)))]" >> "$GITHUB_OUTPUT"
 
   solve:
     needs: plan
@@ -65,16 +52,9 @@ jobs:
       matrix:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     env:
-      MODE: ${{ inputs.mode || 'ladder' }}
-      SET: ${{ inputs.set || 'exact-v1' }}
-      SIZES: ${{ inputs.sizes || '10,14,18,24,30,40' }}
-      CLASSES: ${{ inputs.classes || '' }}
-      SEEDS: ${{ inputs.seeds || '0,1,2' }}
-      CAPS: ${{ inputs.caps || '1.1,1.25,1.5' }}
-      RULES: ${{ inputs.rules || 'collection,all' }}
-      SECONDS_EACH: ${{ inputs.seconds || '300' }}
-      SHARDS: ${{ inputs.shards || '20' }}
+      ARGS: ${{ inputs.args }}
       SHARD: ${{ matrix.shard }}
+      SHARDS: ${{ needs.plan.outputs.count }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -88,14 +68,8 @@ jobs:
       - name: Solve the shard
         run: |
           set -o pipefail
-          args=(--caps "$CAPS" --rules "$RULES" --seconds "$SECONDS_EACH" --shard "$SHARD/$SHARDS" --out "$GITHUB_WORKSPACE/exact-$SHARD.jsonl")
-          if [ "$MODE" = "ladder" ]; then
-            args+=(--ladder --sizes "$SIZES" --seeds "$SEEDS")
-            [ -n "$CLASSES" ] && args+=(--classes "$CLASSES")
-          else
-            args+=(--set "$SET")
-          fi
-          pnpm --filter @mark1russell7/highways exact "${args[@]}"
+          read -ra args <<< "$ARGS"
+          pnpm --filter @mark1russell7/highways exact "${args[@]}" --shard "$SHARD/$SHARDS" --out "$GITHUB_WORKSPACE/exact-$SHARD.jsonl"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -108,9 +82,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     env:
-      MODE: ${{ inputs.mode || 'ladder' }}
-      SET: ${{ inputs.set || 'exact-v1' }}
-      SECONDS_EACH: ${{ inputs.seconds || '300' }}
+      ARGS: ${{ inputs.args }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -128,16 +100,14 @@ jobs:
       - name: Join the shards
         run: |
           set -o pipefail
-          name="optima-$SET.json"
-          [ "$MODE" = "ladder" ] && name="ladder.json"
-          pnpm --filter @mark1russell7/highways exact --merge "$GITHUB_WORKSPACE/shards" --set "$SET" --seconds "$SECONDS_EACH" --out "$GITHUB_WORKSPACE/$name" --summary "$GITHUB_WORKSPACE/exact.md"
+          read -ra args <<< "$ARGS"
+          pnpm --filter @mark1russell7/highways exact "${args[@]}" --merge "$GITHUB_WORKSPACE/shards" --out "$GITHUB_WORKSPACE/optima.json" --summary "$GITHUB_WORKSPACE/exact.md"
           cat exact.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: exact-${{ inputs.mode || 'ladder' }}-${{ github.sha }}
+          name: exact-${{ github.sha }}
           path: |
-            ladder.json
-            optima-*.json
+            optima.json
             exact.md
           if-no-files-found: warn

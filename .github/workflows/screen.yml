@@ -30,18 +30,33 @@ on:
         description: "The number of seeded edits of each highway strategy, for the stability of its highways. 0: no edits."
         default: "0"
       minutes:
-        description: "The time limit of the job, in minutes."
+        description: "The time limit of the job, in minutes. With exact: the time limit of each shard."
         default: "15"
+      set:
+        description: "The screen set: screen-v1 or exact-v1. The set exact-v1 also gives the gap closed (MEAS2)."
+        default: "screen-v1"
+      exact:
+        description: "The arguments of pnpm exact for the exact solves of MEAS2, for example --set exact-v1 --shards 40. Empty: the screen runs."
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}
+  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.exact }}
   cancel-in-progress: true
 
 jobs:
+  # The exact solves of MEAS2 run in the workflow `Exact`, in shards.
+  exact:
+    if: ${{ inputs.exact }}
+    uses: ./.github/workflows/exact.yml
+    with:
+      args: ${{ inputs.exact }}
+      minutes: ${{ inputs.minutes || '120' }}
+
   screen:
+    if: ${{ !inputs.exact }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
     env:
@@ -52,6 +67,7 @@ jobs:
       WRAP: ${{ inputs.wrap || '' }}
       SHUFFLES: ${{ inputs.shuffles || '0' }}
       EDITS: ${{ inputs.edits || '0' }}
+      SET: ${{ inputs.set || 'screen-v1' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,7 +81,7 @@ jobs:
       - name: Run the screen
         run: |
           set -o pipefail
-          args=(--step "$STEP" --out "$GITHUB_WORKSPACE/screen.jsonl" --summary "$GITHUB_WORKSPACE/screen.md")
+          args=(--step "$STEP" --set "$SET" --out "$GITHUB_WORKSPACE/screen.jsonl" --summary "$GITHUB_WORKSPACE/screen.md")
           [ -n "$STRATEGY" ] && args+=(--strategy "$STRATEGY")
           if [ -n "$MODULE" ]; then
             modules=""
@@ -87,7 +103,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: screen-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
+          name: screen-${{ inputs.set || 'screen-v1' }}-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
           path: |
             screen.jsonl
             screen.md
