@@ -5,10 +5,13 @@ This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A
 - The score of the portfolio uses only the outputs. Thus the portfolio needs no prediction of the winner.
 - The note gives the Pareto curve of the portfolio: the gain for each k, on seeds that the choice of the set did not see. It also gives the time of each set.
 - The script [`scripts/portfolio.ts`](../../packages/core/scripts/portfolio.ts) makes the tables from the records of CI. The test `src/bench/screen/portfolio.test.ts` examines its functions.
+- The section [The rule of the caller](#the-rule-of-the-caller-portfolio-rule) is the result of the item PORTFOLIO-RULE. The script also makes its tables, with the optima of `exact-v1`.
 - The script [`scripts/portfolio-time.ts`](../../packages/core/scripts/portfolio-time.ts) times each strategy. The workflow `Portfolio` starts it in CI.
 
 ## Summary
 
+- **PORTFOLIO-RULE.** Each reversed pair has another rule or another cap. With the rule of the caller and the one cap 1.5, the whole pool reaches the oracle.
+  - At that cap, k = 3 keeps 47% of the oracle gain for `all`, and 12% for `collection`. k = 8 keeps 93% and 73%.
 - **The claim does not hold on `exact-v1`.** The oracle of [`ORACLE.md`](ORACLE.md) ranks by B10, and B10 needs the exact optimum. B10 is not a monotone map of B1 on one input. On 29 of 40 inputs, the run with the best B1 does not have the best B10.
 - **On `exact-v1`, a portfolio keeps little of the oracle gain.**
   - With the guard `q95`, the portfolio is worse than the best single strategy for each k. `shared` has a B3 q95 of 1 on 31 of 40 inputs, so almost no run passes the guard.
@@ -216,4 +219,109 @@ The prediction of the item was written before the work.
 - On `exact-v1`, no score of the output alone gives the choice of the oracle. B1 without the guard prefers outputs that mix collections, and the guard `q95` refuses almost each run.
 - A portfolio can use a better score of the output. One option is the B1 above the baseline of the rule of the run, divided by a bound of the rule that needs no solve. The item SELECT can test it.
 - The time is small for most strategies. A portfolio of 3 fast strategies fits 100 ms at 40 nodes, one after the other, on a CI machine.
+- The item adds no strategy and changes no default, so it needs no release.
+
+## The rule of the caller (PORTFOLIO-RULE)
+
+This section is the result of the item PORTFOLIO-RULE of the [roadmap](../ROADMAP.md). It uses the records of `exact-v1` of the run [40624133769](https://github.com/mark1russell7/highways/actions/runs/40624133769) again. It adds no strategy.
+
+### The cause of the reversed pairs
+
+For one input, one rule and one cap, B10 is `(B1 - b) / (o - b)`. The baseline `b` and the optimum `o` are constants, and `o` is more than `b`. Thus B10 is a monotone map of B1.
+
+- The rule of a run is `all` when a shared segment mixes collections. Else it is `collection`.
+- The cap of a run is the smallest cap at or above its stretch.
+
+| the two runs have | pairs | reversed | share |
+|---|---:|---:|---:|
+| the same rule and the same cap | 137708 | 0 | 0% |
+| the same rule and another cap | 147072 | 11209 | 8% |
+| another rule | 418833 | 64467 | 15% |
+| all | 703613 | 75676 | 11% |
+
+- No pair with the same rule and the same cap is reversed. The check skips each tie at `RECORD_EPS`, as above.
+- Of the pairs with another rule, 156778 have the same cap, and 34538 of them are reversed. 262055 have another cap, and 29929 of them are reversed.
+
+### The rule as a parameter
+
+The rule is a property of the output. Thus a caller can give it as a parameter: "collections can mix" (`all`) or "collections cannot mix" (`collection`).
+
+- With `collection`, the portfolio chooses by B1 only among the runs that do not mix collections. With `all`, each run obeys the rule, because a run that does not mix is also correct.
+- The value of a choice is the gap closed of the rule of the caller. The oracle is the best value of that rule over the runs that obey it, without a guard.
+- The forms:
+  - (input, rule): the value is at the cap of each run, as in the records.
+  - (input, rule, cap): the value is at the one cap 1.5 for each run. Each input has a proven optimum at 1.5 for each rule, so this cap applies to all runs. The guard `cap` already refuses each run above 1.5.
+  - The old form: the rule and the cap of each run, as in the sections above.
+- The guard is `cap`. The splits are the halves of the seeds, as above.
+- The best single strategy has the best median on the train inputs. On an input where it fails the guard or the rule, it falls back to `shared`.
+- The records do not hold the baseline of `all`. The script finds each baseline from the gap closed `g` of the runs: `b = (B1 - g × o) / (1 - g)`.
+  - For `collection`, this gives the B1 of `shared` on each input.
+  - At the cap 1.5, the value of the script is the value of the record for each of the 1007 runs at that cap. The largest difference is below 1e-16.
+
+The share of the oracle gain for each k, on the test inputs of both splits:
+
+| form | rule | cap | best single | oracle | oracle gain | k = 1 | k = 2 | k = 3 | k = 5 | k = 8 | all 261 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| the old form | the rule of each run | the cap of each run | 0.545 | 0.949 | 0.404 | -6% | 2% | 6% | 6% | 7% | 37% |
+| (input, rule) | `collection` | the cap of each run | 0.106 | 0.600 | 0.494 | 0% | 6% | 7% | 11% | 23% | 81% |
+| (input, rule, cap) | `collection` | 1.5 | 0.021 | 0.378 | 0.357 | 0% | 0% | 12% | 32% | 73% | 100% |
+| (input, rule) | `all` | the cap of each run | 0.521 | 0.863 | 0.342 | 0% | 9% | 14% | 14% | 15% | 51% |
+| (input, rule, cap) | `all` | 1.5 | 0.565 | 0.695 | 0.130 | 0% | 24% | 47% | 56% | 93% | 100% |
+
+- At the one cap, the whole pool reaches the oracle of each rule (100%). There the order by B1 is the order by B10. At the cap of each run, the whole pool keeps 81% for `collection` and 51% for `all`.
+- At the cap 1.5, k = 3 keeps 47% for `all` and 12% for `collection`. k = 8 keeps 93% and 73%.
+- At the cap of each run, k = 3 keeps 14% for `all` and 7% for `collection`. The cap changes with the stretch of the run. Thus a high B1 with a large stretch can give a low B10.
+- The rule `collection` has the larger oracle gain: 0.494 against 0.342 at the cap of each run, and 0.357 against 0.130 at the cap 1.5.
+  - Most strong strategies mix collections on some inputs. There the best single strategy falls back to `shared`, so its median is low: 0.106 and 0.021.
+  - In `ORACLE.md`, the pool of `collection` holds only the strategies that do not mix on any input. That pool has a smaller gain: 0.434 against 0.264, a gain of 0.170. Here each run that obeys the rule counts.
+- With `all` at the cap of each run, the sets and the medians of the portfolio are the same as in the old form. The best single strategy and the oracle are lower:
+  - A run that does not mix has the value of `all` in this form, so the oracle is lower.
+  - The best single strategy falls back to `shared`, so `w3b:growth-s0.3` is a candidate.
+- A check: with `all`, a choice only among the runs that mix (and `shared`) gives the same values for each k.
+
+The sets of each form:
+
+| form | k | set of the first split | set of the second split |
+|---|---:|---|---|
+| `collection`, the cap of each run | 1 | `corners-side` | `corners-side` |
+| | 2 | the set of 1, `hw:keys` | the set of 1, `w3a:mingle+stretch` |
+| | 3 | the set of 2, `hw:stubs` | the set of 2, `trunks-tree-bf02` |
+| | 5 | the set of 3, `w3a:diffusion-g2`, `w2c:level-links+stretch-b1.1` | the set of 3, `w2b:zipper-near2`, `hw:spiral` |
+| | 8 | the set of 5, `trunks-tree-bf08`, `hw:spiral`, `w3e:areas-keys` | the set of 5, `w3c:ridges-wide`, `hw:crossbars`, `trunks-gilbert-a05` |
+| `collection`, the cap 1.5 | 1 | `trunks-gilbert-a03` | `corners-side` |
+| | 2 | the set of 1, `w3e:areas-keys` | the set of 1, `w3a:mingle+stretch` |
+| | 3 | the set of 2, `trunks-tree-bf02` | the set of 2, `trunks-tree-bf02` |
+| | 5 | the set of 3, `w2b:zipper-a1`, `w3a:flow-clusters-t0.5` | the set of 3, `w2b:zipper-near2`, `hw:keys` |
+| | 8 | the set of 5, `w2c:level-links+stretch`, `w3a:spiral-a35`, `corners-side` | the set of 5, `w3e:areas-keys`, `hw:spiral`, `w2b:stubs-w15` |
+| `all`, the cap of each run | 1 | `w3b:growth-s0.3` | `w3d:kdeeb-routes` |
+| | 2 | the set of 1, `w3e:mlseb-routes` | the set of 1, `w3a:traclus-m2` |
+| | 3 | the set of 2, `hw:mlseb` | the set of 2, `w3e:sbeb-routes` |
+| | 5 | the set of 3, `w3d:kdeeb-routes`, `w3c:edge-paths-k1.5` | the set of 3, `w3a:traclus+stretch`, `w3c:edge-paths+stretch` |
+| | 8 | the set of 5, `w3e:mlseb-a0` (6 in all) | the set of 5, `w2c:level-links+stretch`, `w3a:traclus-e4` (7 in all) |
+| `all`, the cap 1.5 | 1 | `w3b:growth-s0.3` | `w3b:growth-s0.3` |
+| | 2 | the set of 1, `w3e:mlseb-a0` | the set of 1, `w3e:mlseb-parabola` |
+| | 3 | the set of 2, `w3e:mlseb-routes` | the set of 2, `hw:growth` |
+| | 5 | the set of 3, `w3c:edge-paths-k1.5`, `hw:growth` | the set of 3, `w3b:growth-input`, `hw:mlseb` |
+| | 8 | the set of 5, `hw:mlseb`, `w3e:mlseb-parabola` (7 in all) | the set of 5, `w3a:traclus-m2`, `w3e:mlseb-routes`, `hw:level-links` |
+
+- In each form, the best single strategy of each split is also the set of k = 1. Thus k = 1 keeps 0%.
+- At the cap 1.5, the sets of `all` hold the forms of `growth` and `mlseb` in both splits. The sets of `collection` share only `trunks-tree-bf02` at k = 3.
+
+### The prediction of PORTFOLIO-RULE
+
+The prediction was written before the work.
+
+| Claim | Result | Met |
+|---|---|---|
+| 1. Each reversed pair has another rule or another cap. No pair with the same rule and cap is reversed, except ties. | 0 of 137708 pairs with the same rule and the same cap are reversed. | Met |
+| 2. Per (input, rule, cap), k = 3 keeps 50% or more of the oracle gain of that rule. | 47% for `all` and 12% for `collection`, at the cap 1.5. | Not met |
+| 3. Per (input, rule) with the cap of each run, k = 3 keeps less than per (input, rule, cap). | 14% against 47% for `all`, and 7% against 12% for `collection`. | Met |
+| 4. The rule `collection` has a smaller oracle gain than `all`. | The gain of `collection` is larger: 0.494 against 0.342, and 0.357 against 0.130 at the cap 1.5. | Not met |
+
+### What the rule means
+
+- With the rule of the caller and one cap, B1 ranks the runs as the oracle ranks them. Thus the whole pool reaches the oracle, and a small set loses only the winners that it does not hold.
+- The rule of the caller and one cap give the score that `SELECT` needs. A selector can rank by B1 among the runs that obey the rule.
+- At the cap 1.5, a run with a small stretch gets no credit for it. A caller with a smaller stretch limit needs the optimum of that cap.
+- The rule `all` keeps 47% to 93% of its gain with a set of 3 to 8. The rule `collection` needs more strategies: k = 8 keeps 73%.
 - The item adds no strategy and changes no default, so it needs no release.
