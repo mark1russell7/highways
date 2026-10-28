@@ -34,39 +34,63 @@ Each change keeps each result. The tests of the digests and the hashes below sho
 ### The times
 
 The times are wall times in ms on `ubuntu-latest` with node 26. Each cell routes 3 times: the first route is cold, and "warm" is the median of the next 2 routes.
-The CPU of the runner is not the same in each cell, so compare the large changes only.
+The CPU of the runner is not the same in each cell, so compare the large changes only. The last column names the CPU.
 
-| Router | Commit | Cold | Warm | `checkProperties` | `measureQuality` | `exactStretches.use` |
-|---|---|---:|---:|---:|---:|---:|
-| `shared` | `main` | approximately 318 000 | | | | |
-| `shared` | `18095dc`, the signatures | 27 966 | 27 956 | 6 685 | 3 710 | 8 582 |
-| `shared` | `e387f66`, the lane order | 18 392 | 18 445 | 4 166 | 2 847 | 7 791 |
-| `shared-all` | `18095dc` | 41 945 | 40 196 | 8 891 | 3 180 | 8 534 |
-| `portfolio` | `18095dc` | 37 216 | 35 046 | 7 275 | 4 110 | 8 541 |
-| `corners` | `main` | 4 004 | 3 794 | 69 | 1 004 | 12 222 |
-| `corners` | `e387f66` | 3 502 | 3 412 | 67 | 932 | 7 770 |
-| `sections` | `main` | 2 741 | 2 540 | 158 | 906 | 8 294 |
-| `sections` | `e387f66` | 2 789 | 2 721 | 164 | 919 | 11 528 |
+| Router | Commit | Cold | Warm | `checkProperties` | `measureQuality` | `exactStretches.use` | CPU |
+|---|---|---:|---:|---:|---:|---:|---|
+| `shared` | `main` | 301 906 | 302 719 | 7 153 | 4 039 | 8 218 | EPYC 7763 |
+| `shared` | `18095dc`, the signatures | 27 966 | 27 956 | 6 685 | 3 710 | 8 582 | Xeon 8573C |
+| `shared` | `e387f66`, the lane order | 18 392 | 18 445 | 4 166 | 2 847 | 7 791 | Xeon 6973P-C |
+| `shared` | `418dc3a`, the head | 21 199 | 20 934 | 2 511 | 3 089 | 6 630 | EPYC 9V74 |
+| `portfolio` | `main` | 299 885 | 298 220 | 6 883 | 4 008 | 8 243 | EPYC 7763 |
+| `portfolio` | `418dc3a` | 27 732 | 27 061 | 3 472 | 3 994 | 9 314 | EPYC 7763 |
+| `shared-all` | `418dc3a` | 36 217 | 35 797 | 3 331 | 3 682 | 7 734 | Xeon 6973P-C |
+| `corners` | `main` | 4 004 | 3 794 | 69 | 1 004 | 12 222 | EPYC 7763 |
+| `corners` | `418dc3a` | 3 751 | 3 678 | 62 | 874 | 9 084 | Xeon 8573C |
+| `sections` | `main` | 2 741 | 2 540 | 158 | 906 | 8 294 | EPYC 7763 |
+| `sections` | `418dc3a` | 2 550 | 2 328 | 116 | 680 | 8 487 | Xeon 8573C |
 
-- The `main` row of `shared` is the time of the joint bench. The other rows come from the CI runs 40716219239, 40716722637 and 40717696580 of the workflow `Scale`.
-- On this board, `portfolio` runs only its base member `shared`. The key of the pick takes 362 ms.
-- After the signatures, the lane order takes 83% of a route of `shared`. The self time of `sig` is 0.3%.
+- The rows come from the CI runs 40716219239 (`main`), 40716722637, 40717696580 and 40728475746 of the workflow `Scale`.
+- The cells of `portfolio` ran on the same CPU. A route falls from 299.9 s to 27.7 s, 10.8 times faster.
+- On this board, `portfolio` runs only its base member `shared`. The key of the pick takes approximately 340 ms.
+- On `main`, the joint bench needed 27 min for the cell of `shared-all`. On the head, one route takes 36 s.
 
 The profile of a route of `shared`, by self time:
 
-| After the signatures | After the lane order |
-|---|---|
-| `dist` 40.1% | `partBefore` 39.3% |
-| `partBefore` 21.1% | `partAfter` 13.7% |
-| `partAfter` 6.5% | `dist` 8.6% |
-| `mergeSort` 6.1% | `mergeSort` 7.1% |
-| `indexOf` 4.9% | `indexOf` 5.3% |
+| `main` | After the signatures | The head |
+|---|---|---|
+| `sig` 72.3% | `dist` 40.1% | `partBefore` 43.3% |
+| `byText` 12.8% | `partBefore` 21.1% | `partAfter` 12.1% |
+| `dist` 6.5% | `partAfter` 6.5% | `dist` 10.3% |
+| `(program)` 2.2% | `mergeSort` 6.1% | `indexOf` 6.7% |
+| `partBefore` 2.0% | `indexOf` 4.9% | `mergeSort` 4.8% |
+
+- On `main`, `sig` and `byText` take 85% of the self time. After the signatures, `sig` takes 0.3%.
+- After the signatures, the lane order takes 83% of a route of `shared`.
 
 ### The output does not change
 
-- The route hash and the exact hash of each router on the board stay the same: `corners` `f3ccfe6861f93ffa`, `sections` `d8e7efc8f64bd7ca`, `shared` and `portfolio` `a624d2afe8f7ea08`.
-- The router screen gives 126 of 126 records equal to `main`, except `ms` and `commit`. The highway screen gives 784 of 784.
-- The CI of the pull request #132 runs the tests of the digests.
+- The route hash and the exact hash of each router on the board stay the same: `corners` `f3ccfe6861f93ffa`, `sections` `d8e7efc8f64bd7ca`, and `shared` and `portfolio` `a624d2afe8f7ea08`.
+- The workflow `Xplat` gives the same 51 route hashes and exact hashes as `main`, in each of the 4 cells. The runs are 40716110206 and 40728475149.
+- The router screen gives 126 of 126 records equal to `main`, except `ms` and `commit`. The highway screen gives 784 of 784. The runs are 40716114094, 40716118524 and 40728475194.
+- The tests of the digests pass in the CI of the pull request #132.
+
+The job `screen` of `Scale` runs the router screen of `main` and of the head in turn on one runner, 5 rounds each. The times are the median ms of the records of each router.
+
+| Router | `main` | Head | Change |
+|---|---:|---:|---:|
+| `straight` | 0.08 | 0.09 | +7.1% |
+| `plugs` | 0.68 | 0.68 | +0.1% |
+| `corners` | 8.60 | 8.50 | -1.2% |
+| `corners-smooth` | 9.08 | 9.23 | +1.6% |
+| `trunks` | 7.77 | 7.90 | +1.6% |
+| `shared` | 11.08 | 10.86 | -2.0% |
+| `shared-all` | 13.55 | 10.39 | -23.3% |
+| `sections` | 13.82 | 14.00 | +1.3% |
+| `sections-tree` | 13.45 | 14.21 | +5.7% |
+
+- The data comes from the run 40728475746 at `418dc3a`. An earlier run, 40718111347, gave changes from -20.1% to +8.5%.
+- The router screen uses small boards, so most changes are in the noise of one runner. Only `shared-all` is clearly faster.
 
 ### The next hot spots
 
