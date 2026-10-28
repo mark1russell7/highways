@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { byHash, byText, type Hashed } from "./compare.ts";
 import { rng } from "./fixtures.ts";
 import type { Point } from "./geom.ts";
-import { byBundle, byEdge, byRun, observeLanes, precedenceOrder, type Placed } from "./lane-order.ts";
+import { byBundle, byEdge, byRun, hasCycle, mergeSort, observeLanes, type Placed } from "./lane-order.ts";
 import type { Route } from "./model.ts";
-import { orderLanes, type RunOrder } from "./segments.ts";
+import { orderLanes } from "./segments.ts";
 
-// LANE-ORDER: the comparators of the core must be total orders, so that `Array.prototype.sort` gives the same result on each engine.
+// LANE-ORDER: a comparator of `Array.prototype.sort` must be a total order, so that the sort gives the same result on each engine.
 // The JavaScript specification does not define the result of a sort with a compare function that is not consistent.
+// The relations of the lane order are not total orders. Thus `orderLanes` sorts with the merge sort of the package.
 
 /** A pair or a triple of values that breaks a rule of a total order, with the name of the rule. */
 interface Counterexample<T> {
@@ -76,7 +77,7 @@ function permutations<T>(list: readonly T[]): T[][] {
 /** This function gives true when the relation `compare` on the lanes, in the order of their edges, has no cycle. */
 function acyclic(lanes: readonly Placed[], compare: (P: Placed, Q: Placed) => number): boolean {
   const sorted = [...lanes].sort(byEdge);
-  return precedenceOrder(sorted.length, (i, j) => compare(sorted[i]!, sorted[j]!)).breaks === 0;
+  return !hasCycle(sorted.length, (i, j) => compare(sorted[i]!, sorted[j]!));
 }
 
 describe("the named comparators", () => {
@@ -101,35 +102,35 @@ describe("the named comparators", () => {
     }
   });
 
-  it("byRun and byBundle are not transitive, so orderLanes does not give them to a sort", () => {
+  // The item LANE-STRETCH is to give one order to each stretch, and thus to remove the cycles.
+  it("byRun and byBundle are not transitive, so orderLanes does not give them to the sort of the engine", () => {
     for (const compare of [byRun, byBundle]) expect(counterexample(compare, (r) => randomPlaced(r, `e${Math.floor(r() * 1e6)}`))?.rule).toBe("transitive");
   });
 });
 
-describe("precedenceOrder", () => {
-  it("gives each item one time, and keeps each pair of a relation with no cycle", () => {
+describe("mergeSort and hasCycle", () => {
+  it("give the order of the sort of the engine, and no cycle, for a total order", () => {
     const r = rng(5);
     for (let t = 0; t < 500; t++) {
-      const n = 1 + Math.floor(r() * 9);
-      const keys = Array.from({ length: n }, () => r());
-      const cyclic = r() < 0.5;
-      const table = Array.from({ length: n }, () => Array.from({ length: n }, () => (r() < 0.5 ? -1 : 1)));
-      const before = (i: number, j: number): number => (cyclic ? table[i]![j]! : keys[i]! - keys[j]!);
-      const { order, breaks } = precedenceOrder(n, before);
-      expect([...order].sort((a, b) => a - b)).toEqual(Array.from({ length: n }, (_, i) => i));
-      if (!cyclic) {
-        expect(breaks).toBe(0);
-        expect(order).toEqual(Array.from({ length: n }, (_, i) => i).sort((a, b) => keys[a]! - keys[b]! || a - b));
-      }
+      const list = Array.from({ length: Math.floor(r() * 12) }, () => ({ key: Math.floor(r() * 5), id: Math.floor(r() * 1e6) }));
+      const compare = (a: (typeof list)[number], b: (typeof list)[number]): number => a.key - b.key || a.id - b.id;
+      expect(mergeSort(list, compare)).toEqual([...list].sort(compare));
+      expect(hasCycle(list.length, (i, j) => compare(list[i]!, list[j]!))).toBe(false);
     }
   });
 
-  it("breaks a cycle of 3 at the item with the fewest predecessors, then the smallest index", () => {
+  it("keep the input order of equal items", () => {
+    const list = [3, 1, 2, 1, 3, 2].map((key, id) => ({ key, id }));
+    expect(mergeSort(list, (a, b) => a.key - b.key).map((x) => x.id)).toEqual([1, 3, 2, 5, 0, 4]);
+  });
+
+  it("give one result for a cycle of 3, with the pairs in the order of the list", () => {
     // 0 before 1, 1 before 2, 2 before 0.
-    expect(precedenceOrder(3, (i, j) => (i === 0 && j === 2 ? 1 : -1))).toEqual({ order: [0, 1, 2], breaks: 1 });
-    // A cycle of 1, 2 and 3 after the item 0: the break drops only a pair of the cycle.
-    const cycle = (i: number, j: number): number => (i === 0 ? -1 : i === 1 && j === 3 ? 1 : -1);
-    expect(precedenceOrder(4, cycle)).toEqual({ order: [0, 1, 2, 3], breaks: 1 });
+    const before = (a: number, b: number): number => ((a + 1) % 3 === b ? -1 : 1);
+    const pairs: string[] = [];
+    expect(mergeSort([0, 1, 2], (a, b) => (pairs.push(`${a}${b}`), before(a, b)))).toEqual([0, 1, 2]);
+    expect(pairs).toEqual(["12", "01"]);
+    expect(hasCycle(3, before)).toBe(true);
   });
 });
 
@@ -146,39 +147,52 @@ describe("orderLanes as a whole", () => {
     expect(byRun(r, p)).toBeLessThan(0);
   });
 
-  it("gives a cyclic run the same order for each order of the input routes, and counts one broken cycle", () => {
-    const seen: number[] = [];
-    observeLanes((_, breaks) => seen.push(breaks));
+  it("gives a cyclic run a fixed order for each order of the input routes, without the sort of the engine", () => {
+    // The order on a cyclic run depends on the order of the input routes: the first route stays first. The merge sort gives these orders on each engine.
+    const expected: Record<string, string> = { pqr: "p,q,r", prq: "p,q,r", qpr: "q,r,p", qrp: "q,r,p", rpq: "r,p,q", rqp: "r,p,q" };
+    const seen: boolean[] = [];
+    observeLanes((start, compare, lanes) => seen.push(lanes.length === 3 && hasCycle(3, (i, j) => compare(start[i]!, start[j]!))));
+    const sort = Array.prototype.sort;
+    // The sort of the engine with a compare function must not run. The default sort of strings is a total order.
+    Array.prototype.sort = function (this: unknown[], compare?: (a: unknown, b: unknown) => number) {
+      if (compare !== undefined && compare !== byEdge) throw new Error("orderLanes called the sort of the engine");
+      return sort.call(this, compare);
+    } as typeof sort;
     try {
-      for (const order of ["run", "bundle"] as const) {
-        const results = new Set(permutations([p, q, r]).map((list) => orderLanes(RUN, list.map((x, i) => routeOf(x, i === 1)), order).join(",")));
-        expect([...results], order).toHaveLength(1);
+      for (const list of permutations([p, q, r])) {
+        const name = list.map((x) => x.edge).join("");
+        expect(orderLanes(RUN, list.map((x, i) => routeOf(x, i === 1)), "run").join(","), name).toBe(expected[name]);
       }
-      expect(orderLanes(RUN, [r, q, p].map((x) => routeOf(x, false)))).toEqual(["p", "q", "r"]);
+      // The order `bundle` starts from the order of the edges, so each order of the input routes gives one result. Its relation has no cycle here.
+      const bundle = new Set(permutations([p, q, r]).map((list) => orderLanes(RUN, list.map((x) => routeOf(x, false)), "bundle").join(",")));
+      expect([...bundle]).toEqual(["r,p,q"]);
     } finally {
+      Array.prototype.sort = sort;
       observeLanes(undefined);
     }
-    // The six orders of `run` each break one cycle. The relation of `bundle` has no cycle here: r, then p, then q.
-    expect(seen).toEqual([1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1]);
+    expect(seen).toEqual([true, true, true, true, true, true, false, false, false, false, false, false]);
   });
 
-  it("gives the same order for each order of the input routes, on random runs", () => {
+  it("gives the same order for each order of the input routes, on random runs with no cycle", () => {
     const rand = rng(11);
+    let checked = 0;
     for (let t = 0; t < 300; t++) {
       const n = 2 + Math.floor(rand() * 5);
       const lanes = Array.from({ length: n }, (_, i) => randomPlaced(rand, `e${i}${Math.floor(rand() * 100)}`));
-      for (const order of ["run", "bundle"] as RunOrder[]) {
-        const first = orderLanes(
-          RUN,
-          lanes.map((x) => routeOf(x, false)),
-          order,
-        );
+      for (const [order, compare] of [
+        ["run", byRun],
+        ["bundle", byBundle],
+      ] as const) {
+        if (!acyclic(lanes, compare)) continue;
+        checked++;
+        const first = orderLanes(RUN, lanes.map((x) => routeOf(x, false)), order);
         for (let k = 0; k < 4; k++) {
           const shuffled = lanes.map((x) => ({ x, key: rand() })).sort((a, b) => a.key - b.key).map((a) => a.x);
           expect(orderLanes(RUN, shuffled.map((x) => routeOf(x, rand() < 0.5)), order)).toEqual(first);
         }
       }
     }
+    expect(checked).toBeGreaterThan(400);
   });
 
   it("gives the order of the sort of before LANE-ORDER on each random run with no cycle", () => {

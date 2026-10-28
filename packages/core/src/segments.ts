@@ -212,10 +212,10 @@ export type RunOrder = "bundle" | "run";
  * When the two ends disagree, the two routes must cross. The end with the smaller x, then the smaller y, tells the side.
  * Thus each shared way of a common stretch gives two routes the same order, and the crossing is where they part.
  *
- * This relation of two lanes is not transitive, so three lanes can make a cycle. Thus the function does not sort with it (LANE-ORDER).
- * It gets the relation of each pair, and gives a total order with the algorithm of Kahn. Each step takes the free lane with the smallest edge id.
- * In a cycle, the step takes the lane with the fewest remaining predecessors, then the smallest edge id.
- * The order is the same on each JavaScript engine and for each order of `routes`. On a run with no cycle, it is the order of a sort.
+ * This relation of two lanes is not transitive, so three lanes can make a cycle. The sort of the engine then gives another order on another engine.
+ * Thus the function sorts with a merge sort of the package (LANE-ORDER). The order is the same on each JavaScript engine.
+ * On a run with no cycle, the order is the order of each correct sort, for each order of `routes`.
+ * On a run with a cycle, the order depends on the order of `routes`. The item LANE-STRETCH is to remove the cycles.
  */
 export function orderLanes(run: readonly Point[], routes: readonly Route[], order: RunOrder = "run"): string[] {
   const placed: Placed[] = [];

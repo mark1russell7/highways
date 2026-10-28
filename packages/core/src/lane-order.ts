@@ -62,7 +62,6 @@ function partBefore(P: Placed, Q: Placed): Parting | undefined {
   }
 }
 
-
 /** This function compares two placed routes by their edge ids. */
 export const byEdge = (P: Placed, Q: Placed): number => byText(P.edge, Q.edge);
 
@@ -71,7 +70,7 @@ const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.ab
 
 /**
  * This function is the relation of the order `run`: the side after the run, else the side before the run, else the order of the edges.
- * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle.
+ * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle. The item LANE-STRETCH removes the cycles.
  */
 export const byRun = (P: Placed, Q: Placed): number => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q);
 
@@ -86,80 +85,65 @@ export const byBundle = (P: Placed, Q: Placed): number => {
   return after?.side ?? before?.side ?? byEdge(P, Q);
 };
 
-/** The result of `precedenceOrder`. */
-export interface PrecedenceOrder {
-  /** The indexes of the items, in their order. */
-  readonly order: number[];
-  /** The count of the steps that broke a cycle. */
-  readonly breaks: number;
+/**
+ * This function sorts a list with a stable merge sort of the package, not with `Array.prototype.sort`.
+ * The pairs that it gives to `compare` depend only on the list and on the results of `compare`.
+ * Thus the result is the same on each JavaScript engine, also when `compare` is not a total order.
+ * A value of `compare(a, b)` above 0 puts `b` before `a`. Any other value (below 0, 0 or NaN) keeps `a` first.
+ */
+export function mergeSort<T>(list: readonly T[], compare: (a: T, b: T) => number): T[] {
+  if (list.length < 2) return [...list];
+  const mid = list.length >> 1;
+  const left = mergeSort(list.slice(0, mid), compare);
+  const right = mergeSort(list.slice(mid), compare);
+  const out: T[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < left.length && j < right.length) {
+    if (compare(left[i]!, right[j]!) > 0) out.push(right[j++]!);
+    else out.push(left[i++]!);
+  }
+  while (i < left.length) out.push(left[i++]!);
+  while (j < right.length) out.push(right[j++]!);
+  return out;
 }
 
 /**
- * This function gives a total order of `n` items from a relation of each pair, with the algorithm of Kahn.
- * The items are in the order of their ids. For `i < j`, a value of `before(i, j)` below 0 puts `i` before `j`.
- * A value above 0 puts `j` before `i`. Any other value (0 or NaN) puts `i` before `j`.
- * The function calls `before` one time for each pair, with `i < j`.
- *
- * Each step takes the free item with the smallest index. An item is free when no remaining item must come before it.
- * When no item is free, the remaining items hold a cycle. Then the step takes the remaining item with the fewest remaining predecessors, then the smallest index.
- * It drops the incoming constraints of that item. `breaks` counts these steps.
- * That item is in the source component of the remaining items, so the step drops only constraints inside a cycle.
- *
- * The result depends only on the relation. When the relation has no cycle, the result is the only order that keeps each pair.
+ * This function gives true when the relation of `n` items has a cycle. For `i < j`, a value of `before(i, j)` above 0 puts `j` before `i`.
+ * Any other value puts `i` before `j`. The relation has no cycle when the counts of the items that each item comes before are all different.
  */
-export function precedenceOrder(n: number, before: (i: number, j: number) => number): PrecedenceOrder {
-  const next: number[][] = Array.from({ length: n }, () => []);
-  const waits = new Int32Array(n);
-  for (let i = 0; i < n; i++)
-    for (let j = i + 1; j < n; j++) {
-      if (before(i, j) > 0) {
-        next[j]!.push(i);
-        waits[i]!++;
-      } else {
-        next[i]!.push(j);
-        waits[j]!++;
-      }
-    }
-  const done = new Uint8Array(n);
-  const order: number[] = [];
-  let breaks = 0;
-  for (let step = 0; step < n; step++) {
-    let pick = -1;
-    let fewest = -1;
-    for (let k = 0; k < n; k++) {
-      if (done[k]) continue;
-      if (waits[k] === 0) {
-        pick = k;
-        break;
-      }
-      if (fewest < 0 || waits[k]! < waits[fewest]!) fewest = k;
-    }
-    if (pick < 0) {
-      pick = fewest;
-      breaks++;
-    }
-    done[pick] = 1;
-    order.push(pick);
-    for (const k of next[pick]!) waits[k]!--;
-  }
-  return { order, breaks };
+export function hasCycle(n: number, before: (i: number, j: number) => number): boolean {
+  const wins = new Int32Array(n);
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) wins[before(i, j) > 0 ? j : i]!++;
+  const seen = new Uint8Array(n);
+  for (const w of wins) seen[w] = 1;
+  return seen.includes(0);
 }
 
-/** The function that `observeLanes` installs. It gets the count of the lanes of each run that `orderLanes` orders, and the count of the broken cycles. */
-export type LaneObserver = (lanes: number, breaks: number) => void;
+/**
+ * The function that `observeLanes` installs. It gets the lanes of each run in their start order, the relation, and the lane order.
+ * The measure scripts use it to compare the lane order with the sort of the engine.
+ */
+export type LaneObserver = <T>(start: readonly T[], compare: (a: T, b: T) => number, lanes: readonly T[]) => void;
 
 let observer: LaneObserver | undefined;
 
-/** This function installs an observer of `orderLanes`, or removes it with `undefined`. The measure scripts use it. The routes do not change. */
+/** This function installs an observer of the lane orders, or removes it with `undefined`. The measure scripts use it. The routes do not change. */
 export function observeLanes(fn: LaneObserver | undefined): void {
   observer = fn;
 }
 
-/** This function gives the lane order of the placed routes of a run. The routes are in any order. `order` selects the relation. */
+/** This function gives the lane order of a run: the merge sort of `start` with the relation `compare`. It tells the observer of `observeLanes`. */
+export function orderRun<T>(start: readonly T[], compare: (a: T, b: T) => number): T[] {
+  const lanes = mergeSort(start, compare);
+  observer?.(start, compare, lanes);
+  return lanes;
+}
+
+/**
+ * This function gives the lane order of the placed routes of a run. `order` selects the relation.
+ * With `run`, the sort starts from the order of `placed`. With `bundle`, it starts from the order of the edges, so that each run sorts the same edges the same way.
+ */
 export function orderPlaced(placed: readonly Placed[], order: "run" | "bundle"): Placed[] {
-  const compare = order === "run" ? byRun : byBundle;
-  const sorted = [...placed].sort(byEdge);
-  const { order: ranks, breaks } = precedenceOrder(sorted.length, (i, j) => compare(sorted[i]!, sorted[j]!));
-  observer?.(sorted.length, breaks);
-  return ranks.map((i) => sorted[i]!);
+  return order === "run" ? orderRun(placed, byRun) : orderRun([...placed].sort(byEdge), byBundle);
 }

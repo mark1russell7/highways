@@ -1,6 +1,7 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
+import { orderRun } from "../lane-order.ts";
 import { byText } from "../compare.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
@@ -375,5 +376,6 @@ function laneOrderOfRun(run: Run): string[] {
     }
     return byText(p.edge.id, q.edge.id);
   };
-  return [...run.ways].sort(compare).map((w) => w.edge.id);
+  // This relation is not transitive, so the merge sort of the package gives the same order on each engine (LANE-ORDER).
+  return orderRun(run.ways, compare).map((w) => w.edge.id);
 }

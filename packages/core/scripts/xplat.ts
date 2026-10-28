@@ -17,7 +17,9 @@
 // - `routes.jsonl`: one line for each input and router, with the hashes, the count of the Math calls and the hashes of the joint bench.
 // - `routes/<input>.<router>.txt.gz`: the exact result. Each line is `<key>\t<canonical JSON>`, with the numbers of `JSON.stringify` (each number round trips).
 //   The keys are `route <edge>` in the order of the edges, then `levels`, `bundles` and `runs`.
-//   The field `lanes` of a line counts the runs of 2 or more lanes that `orderLanes` orders, the runs with a cycle and the broken cycles (LANE-ORDER).
+//   The field `lanes` of a line (LANE-ORDER) counts the runs of 2 or more lanes, by the count of lanes (2 to 7, and 8 for 8 or more).
+//   For each size, it gives the runs, the runs with a cycle, and the runs where the sort of this engine gives another order than the merge sort.
+//   The field `ms` is the time of the second route, without the observer.
 // - With `XPLAT_CALLS=1`: `calls/<input>.<router>.txt.gz`. The script routes the graph a third time with a wrapper on each Math function of `TRACED`.
 //   Each line is the hash of 1000 calls in turn: the index of the function, the bits of each argument and the bits of the result.
 //   The wrapper is only in this script. The source of the core does not change.
@@ -33,7 +35,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { canonicalJson, outputHash, RECORD_EPS } from "@mark1russell7/layout-contract";
 import { asRouter, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
-import { observeLanes } from "../src/lane-order.ts";
+import { hasCycle, observeLanes } from "../src/lane-order.ts";
 
 /** The Math functions that the log wraps. The index of a name in this list is its id in the hash of a chunk. */
 export const TRACED = ["hypot", "atan2", "sin", "cos", "tan", "acos", "asin", "atan", "exp", "log", "pow"] as const;
@@ -317,26 +319,29 @@ async function main(): Promise<void> {
         console.log(`xplat: ${key}: ${log.near.length} calls of the chunks ${chunks.join(", ")}.`);
         continue;
       }
-      const lanes = { runs: 0, cyclic: 0, breaks: 0 };
-      observeLanes((n, breaks) => {
-        if (n < 2) return;
-        lanes.runs++;
-        if (breaks > 0) lanes.cyclic++;
-        lanes.breaks += breaks;
+      const lanes: Record<string, { runs: number; cyclic: number; changed: number }> = {};
+      observeLanes((start, compare, order) => {
+        if (start.length < 2) return;
+        const size = String(Math.min(start.length, 8));
+        const s = (lanes[size] ??= { runs: 0, cyclic: 0, changed: 0 });
+        s.runs++;
+        if (hasCycle(start.length, (i, j) => compare(start[i]!, start[j]!))) s.cyclic++;
+        const engine = [...start].sort(compare);
+        if (engine.some((x, i) => x !== order[i])) s.changed++;
       });
-      const t0 = performance.now();
       let first: Result;
       try {
         first = route(input.graph);
       } finally {
         observeLanes(undefined);
       }
-      const ms = performance.now() - t0;
       const hash = routeHash(first);
       const exact = exactLines(first);
       const exactHash = sha16(exact.join("\n"));
       writeFileSync(join(out, "routes", `${stem}.txt.gz`), gzipSync(exact.join("\n") + "\n"));
+      const t0 = performance.now();
       const again = routeHash(route(input.graph));
+      const ms = performance.now() - t0;
       let traced: string | null = null;
       let log: CallLog | undefined;
       if (calls) {
