@@ -9,6 +9,8 @@ import {
   PACKED_BOARD,
   PAGE_STEPS,
   parseHash,
+  pickFirst,
+  readPick,
   STEP_NAMES,
   type ComparePanels,
   type CompareState,
@@ -35,6 +37,18 @@ const AXIS_NAMES: Readonly<Record<string, string>> = { "R1.perEdge": "crossings 
 const NOUNS: Readonly<Record<Step, string>> = { group: "grouping rules", router: "routers", highway: "highway strategies", curve: "curves", room: "room strategies" };
 
 let state: CompareState = parseHash(location.hash);
+/** The names of the hash that the step does not have. The note of the pick tells them until the next change. */
+let unknown: readonly string[] = readPick(location.hash, state.step).unknown;
+/** The last panels of the worker, so a change of the pick shows them again with no new run. */
+let last: ComparePanels | undefined;
+/** With `true`, the next panels scroll to the first picked panel. A link with a pick does this one time. */
+let scrollToPick = (state.pick?.length ?? 0) > 0;
+
+/** This function tells if a strategy is picked. */
+const picked = (name: string): boolean => state.pick?.includes(name) ?? false;
+
+/** This function gives the hash of the state without the pick. Two states with the same text need the same run. */
+const runKey = (s: CompareState): string => formatHash({ step: s.step, board: s.board, options: s.options });
 
 $("intro").innerHTML = html(compareText.split(/\r?\n## /)[0]!.trim());
 $("howto-body").innerHTML = html(sectionOf(compareText, "How to read the panels"));
@@ -55,7 +69,10 @@ function startWorker(): Worker {
     }
     busy = false;
     $("panels").setAttribute("aria-busy", "false");
-    if (event.data.ok) show(event.data.panels);
+    if (event.data.ok) {
+      last = event.data.panels;
+      show(last);
+    }
     else $("status").textContent = `The worker stopped: ${event.data.error}`;
   });
   return w;
@@ -82,11 +99,22 @@ function run(): void {
 /** This function sets the state, writes the hash, and asks for the panels again. */
 function set(change: Partial<CompareState>): void {
   const step = change.step ?? state.step;
-  state = { step, board: change.board ?? state.board, options: cleanOptions(step, change.options ?? (change.step ? {} : state.options)) };
+  // The names of a pick are names of one step, so a new step clears the pick.
+  const pick = change.pick ?? (change.step && change.step !== state.step ? [] : (state.pick ?? []));
+  const before = runKey(state);
+  state = { step, board: change.board ?? state.board, options: cleanOptions(step, change.options ?? (change.step ? {} : state.options)), ...(pick.length > 0 ? { pick } : {}) };
+  unknown = [];
   const hash = formatHash(state);
   if (location.hash !== hash) history.replaceState(null, "", hash);
   controls();
-  run();
+  if (runKey(state) !== before || !last) run();
+  else show(last);
+}
+
+/** This function picks a strategy, or removes it from the pick. The panels do not run again. */
+function togglePick(name: string): void {
+  const pick = state.pick ?? [];
+  set({ pick: pick.includes(name) ? pick.filter((n) => n !== name) : [...pick, name] });
 }
 
 // The steps: a row of exit signs.
@@ -124,9 +152,13 @@ $("reset").addEventListener("click", () => set({ options: {} }));
 addEventListener("hashchange", () => {
   const parsed = parseHash(location.hash);
   if (formatHash(parsed) === formatHash(state)) return;
+  const again = runKey(parsed) !== runKey(state) || !last;
   state = parsed;
+  unknown = readPick(location.hash, state.step).unknown;
+  scrollToPick = (state.pick?.length ?? 0) > 0;
   controls();
-  run();
+  if (again) run();
+  else show(last!);
 });
 
 /** This function sets one option of one strategy. The value `undefined` sets the default. */
@@ -148,7 +180,9 @@ function controls(): void {
   const body = $("option-body");
   body.replaceChildren();
   let changed = 0;
-  for (const strategy of listStrategies(STRATEGIES, state.step) as readonly Strategy<Step, object>[]) {
+  // The options of the picked strategies come first.
+  const all = (listStrategies(STRATEGIES, state.step) as readonly Strategy<Step, object>[]).map((st) => ({ strategy: st.name, st }));
+  for (const { st: strategy } of pickFirst(all, state.pick)) {
     const group = optionSet("opt", strategy, state.options[strategy.name], (key, v) => setOption(strategy.name, key, v));
     if (!group) continue;
     body.append(group);
@@ -157,6 +191,18 @@ function controls(): void {
   if (body.childElementCount === 0) body.textContent = "The strategies of this step have no options.";
   $("option-count").textContent = changed > 0 ? `(${changed} changed)` : "";
   $<HTMLButtonElement>("reset").disabled = changed === 0;
+  pickNote();
+}
+
+/** This function writes the note of the pick: the picked strategies, and the names of the link that the step does not have. */
+function pickNote(): void {
+  const pick = state.pick ?? [];
+  const parts: string[] = [];
+  if (pick.length > 0) parts.push(`Picked: ${pick.map((n) => `<strong>${esc(n)}</strong>`).join(", ")}. The page shows them first.`);
+  if (unknown.length > 0) parts.push(`The step ${esc(STEP_NAMES[state.step])} has no strategy with the name ${unknown.map((n) => `<code>${esc(n)}</code>`).join(", ")}, so the page ignores ${unknown.length === 1 ? "it" : "them"}.`);
+  $("pick-text").innerHTML = parts.join(" ");
+  $("pick-clear").hidden = pick.length === 0;
+  $("pick-note").hidden = parts.length === 0;
 }
 
 /** This function draws one panel as SVG. */
@@ -170,8 +216,9 @@ function svgOf(p: Panel, board: string): string {
 
 /** This function writes the tags of a panel: the front and the faults of the hard rules. */
 function tagsOf(p: Panel): string {
-  if (p.skipped) return `<span class="tag">Skipped: ${esc(p.skipped)}</span>`;
   const tags: string[] = [];
+  if (picked(p.strategy)) tags.push(`<span class="tag picked">Picked</span>`);
+  if (p.skipped) return [...tags, `<span class="tag">Skipped: ${esc(p.skipped)}</span>`].join("");
   if (p.front) tags.push(`<span class="tag front">On the front</span>`);
   if (p.violations > 0) tags.push(`<span class="tag bad">${fmt.format(p.violations)} hard-rule ${p.violations === 1 ? "fault" : "faults"}</span>`);
   return tags.join("");
@@ -181,7 +228,8 @@ function tagsOf(p: Panel): string {
 const timeOf = (p: Panel): number => p.measures.find((m) => m.key === "ms")?.value ?? 0;
 
 /** This function shows the panels and the table of the measures. */
-function show(data: ComparePanels): void {
+function show(all: ComparePanels): void {
+  const data: ComparePanels = { ...all, panels: pickFirst(all.panels, state.pick) };
   const board = COMPARE_BOARDS.find((b) => b.id === data.board)!;
   const columns = COLUMNS[data.step];
   const front = data.panels.filter((p) => p.front).map((p) => `<strong>${esc(p.strategy)}</strong>`);
@@ -202,7 +250,8 @@ function show(data: ComparePanels): void {
       return `<td${m.best ? ' class="best"' : ""}>${esc(formatValue(m.value, c))}${m.best ? '<span class="star" aria-label="best"> ★</span>' : ""}<span class="bar" style="--f:${f.toFixed(3)}"></span></td>`;
     });
     const name = `<button type="button" class="table-pick" data-panel="${esc(p.strategy)}"><code>${esc(p.strategy)}</code></button>${p.front ? ' <span class="dot" title="On the Pareto front">◆</span>' : ""}`;
-    return `<tr${p.violations > 0 || p.skipped ? ' class="faulty"' : ""}><th scope="row">${name}</th>${cells.join("")}</tr>`;
+    const cls = [p.violations > 0 || p.skipped ? "faulty" : "", picked(p.strategy) ? "picked" : ""].filter(Boolean).join(" ");
+    return `<tr${cls ? ` class="${cls}"` : ""}><th scope="row">${name}</th>${cells.join("")}</tr>`;
   });
   $("table").innerHTML = `${head}<tbody>${rows.join("")}</tbody>`;
 
@@ -213,9 +262,11 @@ function show(data: ComparePanels): void {
         .map((m, i) => `<div${m.best ? ' class="best"' : ""} title="${esc(columns[i]!.describe)}"><dt>${esc(m.label)}</dt><dd>${esc(formatValue(m.value, columns[i]!))}${m.best ? '<span class="star" aria-label="best"> ★</span>' : ""}</dd></div>`)
         .join("");
       const options = Object.entries(p.options).map(([k, v]) => `<code>${esc(k)} ${esc(String(v))}</code>`).join(" ");
-      const cls = ["cmp-panel", p.front ? "front" : "", p.violations > 0 || p.skipped ? "faulty" : ""].filter(Boolean).join(" ");
+      const on = picked(p.strategy);
+      const cls = ["cmp-panel", p.front ? "front" : "", p.violations > 0 || p.skipped ? "faulty" : "", on ? "picked" : ""].filter(Boolean).join(" ");
+      const toggle = `<button type="button" class="link cmp-pick" data-pick="${esc(p.strategy)}" aria-pressed="${on}">${on ? "Remove the pick" : "Pick"}</button>`;
       return `<article class="${cls}" id="panel-${esc(p.strategy)}" aria-labelledby="title-${esc(p.strategy)}">
-        <header class="cmp-head"><h3 id="title-${esc(p.strategy)}">${esc(p.strategy)}</h3><div class="cmp-tags">${tagsOf(p)}</div></header>
+        <header class="cmp-head"><h3 id="title-${esc(p.strategy)}">${esc(p.strategy)}</h3><div class="cmp-tags">${tagsOf(p)}${toggle}</div></header>
         <p class="cmp-describe">${esc(p.describe)}${options ? `<br />Options: ${options}` : ""}</p>
         ${svgOf(p, board.name)}
         <dl class="cmp-measures">${measures}</dl>
@@ -223,7 +274,18 @@ function show(data: ComparePanels): void {
     })
     .join("");
   grid.classList.remove("stale");
+  const first = state.pick?.[0];
+  if (scrollToPick && first) {
+    scrollToPick = false;
+    document.getElementById(`panel-${first}`)?.scrollIntoView({ behavior: "auto", block: "start" });
+  }
 }
+
+$("panels").addEventListener("click", (e) => {
+  const button = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-pick]");
+  if (button) togglePick(button.dataset["pick"]!);
+});
+$("pick-clear").addEventListener("click", () => set({ pick: [] }));
 
 $("table").addEventListener("click", (e) => {
   const button = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-panel]");

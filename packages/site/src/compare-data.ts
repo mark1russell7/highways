@@ -155,6 +155,51 @@ export interface CompareState {
   readonly board: string;
   /** The options that differ from the defaults. */
   readonly options: OptionValues;
+  /** The picked strategies of the step, in the order of the link. The page shows them first and marks them. */
+  readonly pick?: readonly string[];
+}
+
+/** The strategies of the key `pick` of a hash: the names of the step, and the names that the step does not have. */
+export interface HashPick {
+  readonly pick: readonly string[];
+  readonly unknown: readonly string[];
+}
+
+/**
+ * This function reads the key `pick` of a URL hash, for example `#step=highway&pick=corridors,keys`.
+ * The key holds one name or more, with a comma between two names. The function keeps each name of the step one time, in the order of the hash.
+ * It reads the raw text, so a `+` of a name stays a `+`.
+ */
+export function readPick(hash: string, step: Step, registry: Registry = STRATEGIES): HashPick {
+  const raw = hash.replace(/^#/, "").split("&").find((part) => part.startsWith("pick="));
+  const text = raw === undefined ? "" : raw.slice("pick=".length);
+  const names = text.split(",").map((n) => {
+    try {
+      return decodeURIComponent(n).trim();
+    } catch {
+      return n.trim();
+    }
+  });
+  const known = new Set(listStrategies(registry, step).map((st) => st.name));
+  const pick: string[] = [];
+  const unknown: string[] = [];
+  for (const name of names) {
+    if (name === "" || pick.includes(name) || unknown.includes(name)) continue;
+    (known.has(name) ? pick : unknown).push(name);
+  }
+  return { pick, unknown };
+}
+
+/** This function puts the picked items first, in the order of the pick. The other items keep their order. */
+export function pickFirst<T extends { readonly strategy: string }>(items: readonly T[], pick: readonly string[] = []): T[] {
+  const rank = (name: string): number => {
+    const i = pick.indexOf(name);
+    return i < 0 ? pick.length : i;
+  };
+  return items
+    .map((item, i) => ({ item, i }))
+    .sort((a, b) => rank(a.item.strategy) - rank(b.item.strategy) || a.i - b.i)
+    .map((x) => x.item);
 }
 
 /** The first state of the page. */
@@ -179,7 +224,7 @@ export function cleanOptions(step: Step, options: OptionValues, registry: Regist
   return out;
 }
 
-/** This function reads the state of the page from the URL hash, for example `#step=curve&board=delivery&arc.radius=20`. */
+/** This function reads the state of the page from the URL hash, for example `#step=curve&board=delivery&arc.radius=20&pick=arc`. */
 export function parseHash(hash: string, registry: Registry = STRATEGIES): CompareState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const stepText = params.get("step");
@@ -195,14 +240,17 @@ export function parseHash(hash: string, registry: Registry = STRATEGIES): Compar
       if (v !== undefined) (options[strategy.name] ??= {})[o.key] = v;
     }
   }
-  return { step, board, options: cleanOptions(step, options, registry) };
+  const { pick } = readPick(hash, step, registry);
+  return { step, board, options: cleanOptions(step, options, registry), ...(pick.length > 0 ? { pick } : {}) };
 }
 
 /** This function writes the state of the page as a URL hash. The hash keeps only the options that differ from the defaults. */
 export function formatHash(state: CompareState): string {
   const params = new URLSearchParams({ step: state.step, board: state.board });
   for (const [name, values] of Object.entries(state.options)) for (const [key, v] of Object.entries(values)) params.set(`${name}.${key}`, String(v));
-  return `#${params.toString()}`;
+  // The names keep their commas and their `+`, so the link stays easy to read.
+  const pick = state.pick?.length ? `&pick=${state.pick.map((n) => encodeURIComponent(n).replace(/%2B/g, "+")).join(",")}` : "";
+  return `#${params.toString()}${pick}`;
 }
 
 /** One measure of a panel. */
