@@ -107,6 +107,8 @@ Two edges can go along several runs one after the other. The option `laneOrder` 
 - The default of `trunks` and `shared` is `bundle`. The default of `sections` is `run`, so its runs keep the lane order of version 0.2.0.
 - `orderLanes(run, routes, order)` gives the order of one run. Its default order is `run`.
 - The option changes only the lane order. The routes, the runs and their keys stay the same.
+- The option `stretchOrder` of `shared` and `shared-all` gives one order to each stretch of runs: `none` (the default), `consensus`, `periphery` or `sifting`. `siftPasses` sets the passes of `sifting`.
+- `stretchLaneOrders(runs, options?)` gives the order of each run. `laneStretches` gives the stretches. [One lane order for each stretch](../../docs/research/XPLAT.md#one-lane-order-for-each-stretch-lane-stretch) gives the numbers.
 
 The benchmark measures the lanes of `highwayCurves` on the case boards, with each lane order. A crossing in the body is between the middles of the first and the last leg of a bundle. An end crossing is near a merge or a split.
 
@@ -512,6 +514,14 @@ import { routePortfolio } from "@mark1russell7/highways";
 const { result, winner } = routePortfolio(graph, { rule: "all", cap: 1.25, k: 5, budgetMs: 50 });
 ```
 
+### The router `shared-stretch`
+
+The router `shared-stretch` is opt-in. It is `shared` with the stretch order `consensus`. It is not in `STRATEGIES`, so the default outputs do not change.
+
+- `sharedStretchStrategy` is the router strategy. Add it to a registry of your own to race it.
+- Its routes are the routes of `shared`. Only the lane order of the runs changes.
+- On `screen-v1`, the order `sifting` cuts the lane crossings and the broken pairs of `shared` from 21 to 16.
+
 ### Declarations of the options
 
 Each strategy declares its options in `schema`. A declaration tells the type, the range, the step and the meaning of one option. Tools make controls and sweeps from these declarations, with no other data.
@@ -621,6 +631,7 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
+- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run. Thus the 4 cells of `Xplat` agree.
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 
