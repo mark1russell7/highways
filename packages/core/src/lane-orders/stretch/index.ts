@@ -160,7 +160,7 @@ class Relation {
     this.pairs = edges.map(() => new Map<number, number>());
   }
 
-  /** This method sets the side of the edge `a` against the edge `b`: -1 when `a` is on the left of `b`, and 1 when it is on the right. */
+  /** This method sets the side of the edge `a` against the edge `b`. The value -1 puts `a` on the left of `b`, and 1 puts it on the right. */
   set(a: string, b: string, side: number): void {
     const i = this.index.get(a)!;
     const j = this.index.get(b)!;
@@ -330,7 +330,7 @@ export function laneStretches(runs: readonly LaneRun[], options: Partial<LaneStr
 /** The side of each pair of edges of a run, in the way of the root. The key is the two edges in the order of their ids. */
 type Sides = Map<string, number>;
 
-/** This function gives the sides of the pairs of a run with the way `turn` against the root: -1 when the first edge of the key is on the left. */
+/** This function gives the sides of the pairs of a run with the way `turn` against the root. The value -1 puts the first edge of the key on the left. */
 function sidesOf(run: Prepared, turn: 1 | -1): Sides {
   const out: Sides = new Map();
   const lanes = [...run.placed].sort(byEdge);
