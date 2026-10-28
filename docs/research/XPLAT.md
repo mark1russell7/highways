@@ -266,7 +266,7 @@ The workflow `Scale` routes the board of 1000 boxes and 4000 edges 3 times in on
 |---|---|---|---:|---:|
 | `shared` | 40748153040 | `a4304c6` | 21.19 | 1.00 |
 | `shared-stretch`, `consensus`, before the cache of the sides | 40749484343 | `a4304c6` | 735.42 | 34.7 |
-| `shared-stretch`, `sifting` (the default) | SCALE_SIFTING_RUN | SCALE_SIFTING_SHA | SCALE_SIFTING | SCALE_SIFTING_RATIO |
+| `shared-stretch`, `sifting` (the default), with the typed cache | 40763589512 | `6ef3038` | 538.82 | 25.4 |
 
 The jobs of two runs can use different machines. Thus the ratio has the noise of the runner.
 
@@ -274,6 +274,9 @@ The jobs of two runs can use different machines. Thus the ratio has the noise of
 - The fix keeps the sides of each run in a cache. Each run gets them one time. The orders do not change.
 - A first cache kept the sides in a map with text keys. On the dense board, it used the full heap of 4 GB after 180 s (Scale 40759116206).
 - The second cache keeps the sides of a run in a typed array of one byte for each pair. The key of a pair in a stretch is a number.
+- With the second cache, the route of `sifting` takes 538.82 s. The profile gives 60% to `partBefore` and 16% to `partAfter`.
+- The cost is the relation of each pair of each run: `n²/2` calls of `byBundle` for a run of `n` lanes. The merge sort of `shared` needs approximately `n log n` calls.
+- Thus `shared-stretch` is not for dense boards. A cheaper side of each pair is open work, together with LANE-WALK.
 
 ### The verdict
 
@@ -284,6 +287,7 @@ The jobs of two runs can use different machines. Thus the ratio has the noise of
 - The default of `shared-stretch` is `sifting`. The audit ran with each variant as an option, so the numbers do not change.
 - `consensus` makes the total of `shared-all` rise by 94%. Thus it is not the default.
 - `periphery` makes the total of `shared` rise by 5%.
+- On the board of 1000 boxes, `shared-stretch` takes 25.4 times the time of `shared`. Thus it is only for boards of small and medium size.
 
 ### The gap of the rule
 
@@ -309,4 +313,4 @@ The promotion rule cannot decide on the broken pairs.
 3. Met. `sifting` cuts the total of `shared` from 21 to 16 (−24%), and `B5` from 11 to 2.
 4. Not met. The gain test fails on `B5`, because the median ratio is 1.000. Length and bends tie.
 5. Met. The median time ratio of `sifting` against `shared` is 0.90 on `screen-v1`.
-6. SCORE_P6
+6. Not met. On the board of 1000 boxes, `sifting` takes 538.82 s against 21.19 s for `shared`: 25.4 times. The two runs used different machines.

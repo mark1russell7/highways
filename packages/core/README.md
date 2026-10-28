@@ -521,6 +521,7 @@ The router `shared-stretch` is opt-in. It is `shared` with the stretch order `si
 - `sharedStretchStrategy` is the router strategy. Add it to a registry of your own to race it.
 - Its routes are the routes of `shared`. Only the lane order of the runs changes.
 - On `screen-v1`, the order `sifting` cuts the lane crossings and the broken pairs of `shared` from 21 to 16.
+- Each run calculates the relation of each pair of its lanes. On a dense board of 1000 boxes, a route takes 25 times the time of `shared`.
 
 ### Declarations of the options
 
