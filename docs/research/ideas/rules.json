@@ -230,6 +230,25 @@
         "verdict": "dropped",
         "old": "dropped",
         "note": "With the strict rule, fdeb against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+      },
+      "activation": {
+        "date": "2026-10-28",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+        "candidates": [
+          "hw:fdeb",
+          "w3d:fdeb+stretch",
+          "w3d:fdeb-nobudget",
+          "w3d:fdeb-nopush"
+        ],
+        "exercised": [
+          "hw:fdeb",
+          "w3d:fdeb+stretch",
+          "w3d:fdeb-nobudget",
+          "w3d:fdeb-nopush"
+        ],
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
       }
     }
   },
@@ -1709,6 +1728,25 @@
         "verdict": "dropped",
         "old": "dropped",
         "note": "With the strict rule, kdeeb-routes against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+      },
+      "activation": {
+        "date": "2026-10-28",
+        "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+        "candidates": [
+          "hw:kdeeb",
+          "w3d:kdeeb+stretch",
+          "w3d:kdeeb-nomask",
+          "w3d:kdeeb-routes"
+        ],
+        "exercised": [
+          "hw:kdeeb",
+          "w3d:kdeeb+stretch",
+          "w3d:kdeeb-nomask",
+          "w3d:kdeeb-routes"
+        ],
+        "verdict": "dropped",
+        "old": "dropped",
+        "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
       }
     }
   },

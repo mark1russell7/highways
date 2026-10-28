@@ -35,8 +35,9 @@ This note joins the ideas of the five research notes into one catalog (IDEA0). B
 - `stage` is one of `cataloged`, `screened`, `prototyped`, `built`, `kept` and `dropped`.
 - `result` holds the screen result: the ids of the screen records, the measures that decided and the date. A `dropped` record must have a `result`.
   - `measures` gives each measure that decided as `{ base, new }`. A value is a number, or the numbers by board.
-  - `run` links the CI run of the screen. `verdict` is `kept`, `dropped` or `screened`. `note` tells the reason.
+  - `run` links the CI run of the screen. `verdict` is `kept`, `dropped`, `screened` or `not-exercised`. `note` tells the reason.
   - `strict` gives the verdict again with the strict wave rule of WIN-RES: the date, the board count, the new verdict and the old verdict.
+  - `activation` gives the verdict again with the activation rule of ACTIVATION. It holds the date, the run, the candidates, the exercised candidates, the new verdict and the old verdict. `oldStage` keeps the stage before the rule.
 
 ### How to change the catalog
 
@@ -222,6 +223,33 @@ Wave 3 holds the other ideas of the highway note. The ideas of tier 2 come first
 - **Expected wins.** `B1`, `B8`, `B2`, `B4`, `B7` and `R1`.
 - **The screen that decides.** The five boards of wave 2, with the same baselines.
 - **Cost.** 13 small, 27 medium and 3 large prototypes.
+
+### The activation rule
+
+A strategy that does not do its own move on any board was not tested. Its verdict tells nothing about the idea (ACTIVATION).
+
+- A verdict counts only when a candidate of the idea is exercised on one decision board or more.
+- A candidate is exercised when its own move count is above 0, or when its `outputHash` differs from the hash of its base.
+- The decision boards are `small-clustered`, `dense-groups`, `hub-chain` and `many-groups` of `screen-v1`.
+- Otherwise the verdict is `not-exercised`, with the reason when it is known. The idea goes back to the stage `prototyped` for a new build. It does not go to `dropped`.
+- An output group holds the candidates with the same hash on each decision input. The group counts one time in the counts of a wave, and its verdict applies to each member.
+- The field `result.activation` keeps the old verdict and the old stage.
+- [The activation report](../LAYOUT-RECORDS.md#the-activation-report) tells how the screen gives the counts and the groups.
+
+#### The silent strategies of waves 1 to 3
+
+The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/highways/actions/runs/40628435755)) examined 289 strategies on 8 decision inputs. 17 strategies are silent. 15 of them go to a rebuild wave. The reasons come from the move counts and the code. A diagnostic run has not yet confirmed each reason.
+
+| Strategies | Reason |
+|---|---|
+| `hw:power`, `w3e:power-near`, `w3e:power-saved1` | The finder makes 0 power edges on each decision input. Equal neighbour sets are rare, and the near match with Jaccard 0.8 is too strict. The scope `collection` fires. |
+| `w3e:power+stretch` | The gate has no edge to cut, because its base `hw:power` is silent. |
+| `hw:corridors+breakeven`, `hw:corridors+stretch`, `w2a:corridors+breakeven-a0`, `w2a:corridors+stretch-1.1`, `w2a:corridors+stretch-1.5`, `w2a:corridors+stretch+breakeven` | A corridor holds edges of one signature. Their routes stay in the stretch budget and break even, so the gate removes no edge. The same gates fire on `shared-ways`. |
+| `hw:corridors+ids`, `w2a:shared-ways+ids` | The gate `ids` acts only between two edits, and the static screen has no edits. The edit screen of `HWY-054` shows the move on 4 of 4 boards, so its verdict stays. |
+| `w3b:lanes-corridors` | The lanes change nothing on the plan of `corridors`. |
+| `w2c:flow-field+stretch`, `w3f:consensus+stretch`, `w3f:link-communities+stretch`, `w3f:scale-space+stretch` | No edge of these finders is longer than 1.2 times its route alone, so the gate cuts no edge. |
+
+The screen also found 16 output groups. Each group holds strategies with the same output on each decision input. For example, `hw:cubu` and `w3d:cubu-fft` are one group, and `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` are one group.
 
 ### Wave 4: the other new ideas (WILD)
 

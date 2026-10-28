@@ -166,6 +166,18 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 - `deterministic` is `true` when two runs of the same input give the same output. The screen runs each input two times.
 - `ms` is the time of the run. It is not a measure. Only the times of CI compare.
 - `skipped` gives the reason when a strategy did not run, for example an input over its `maxNodes`. Then the record has no measures.
+- `outputHash` is the hash of the output in the highways form (ACTIVATION). Two records with the same `outputHash` have the same output.
+- `trace` holds the trace measures of the run, as `{ id, measures }`. The screen writes the own move count of a strategy as `move.<name>`, for example `move.powerEdge`.
+
+### The output hash
+
+`outputHash(value, { grid })` of `bench/screen/activation.ts` gives the first 16 hex characters of `sha256Hex(canonicalJson(value))`. It is a copy of the function of the contract 0.2.5. The core has no run-time dependency, so it keeps the copy, and the test compares the two.
+
+- Each number goes to the nearest step of the grid, and -0 becomes 0. The default grid is `RECORD_EPS`, and the grid 0 keeps the exact numbers.
+- `NaN` and an infinite number cause a `RangeError` with the path of the number.
+- `canonicalJson` sorts the keys. Thus the order of the keys does not change the hash.
+- Each stage has its own form. The highways form of a router is `{ routes, levels, bundles, runs }`, with the routes sorted by edge. The grid is `RECORD_EPS`, so the hash agrees with `round3`.
+- A curve record hashes the curves, and a group record hashes the tree and the result.
 
 ### The hard rules of the router
 
@@ -192,7 +204,9 @@ A record of a packer counts the breaks of `no-overlap`, `in-container`, `locked-
 
 ## The shared contract
 
-The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.3 from npm as a development dependency. The core has no run-time dependency, so it keeps its own copy of each shared constant and function, and the test compares the two. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.5 from npm as a development dependency. The core has no run-time dependency, so it keeps its own copy of each shared constant and function, and the test compares the two. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+
+The test also compares the copy of `outputHash`, `outputGroups` and `exercised` in `activation.ts` with the contract. It uses the outputs of the built-in routers and seeded random values.
 
 The test also checks that [the floors](PROMOTION.md#the-floors) has no row of a `joint.*` or a `pack.*` measure. `JOINT_MEASURES` of the contract and `MEASURE_SPECS` of `packing` give these floors.
 
@@ -212,6 +226,7 @@ Each open gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typ
 | G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract | Closed by the contract 0.2.0. The `containerSize` values of `highways` are the values of the contract. |
 | G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both | Closed: `RECORD_EPS` of `bench/screen/hash.ts` has the value of the contract, and the test compares them. |
 | G10 | The contract 0.2.1 has no `compareMeasure` and no `minEffectOf`. `highways` has its own copy in `bench/screen/compare.ts`, and a test compares the copy with [the per-input classification](PROMOTION.md#the-per-input-classification). | The contract to `highways` | Closed by the contract 0.2.2: `highways` keeps its own copy, and the test compares it with the functions of the contract. The label type of the copy is `Verdict` of the contract. |
+| G11 | The contract record has no `trace`. `highways` writes the move counts there (ACTIVATION), and `RecordTrace` has the form of `StageTrace` of the contract. | `highways` to the contract | Open, until the contract has `trace` on a record. |
 
 ## The predictions
 
@@ -397,6 +412,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
 - The option `edits` measures each highway strategy over `edits` seeded edits of each input. The base routers do not get these measures.
+- The option `moves` counts the own move of each strategy on each input. The screen writes the counts in the `trace` of the record.
 
 The script `packages/core/scripts/screen.ts` writes `screen.jsonl` and `screen.md`:
 
@@ -409,6 +425,21 @@ The inputs `wrap`, `shuffles` and `edits` set the wrappers, the number of random
 
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f wrap=stable -f shuffles=20 -f minutes=60
+```
+
+### The activation report
+
+A strategy that does not do its own move on any input tells nothing about its idea (ACTIVATION). The flag `--activation <families>` adds the activation report to `screen.md`. The inputs of these families are the decision inputs. The value `all` takes each family.
+
+- A strategy is exercised when its own move count is above 0 on a decision input. It is also exercised when its output differs from the output of its base there. Otherwise it is not exercised.
+- The base of a highway finder is `hw:none`, the empty plan. The base of a gate or a wrapper is the strategy that it wraps. The base of a plan changer is the plan that it changes. `activationBase` gives each base.
+- An output group holds the candidates with the same `outputHash` on each decision input. A group counts one time in the counts of a wave, and its verdict applies to each member.
+- A cell group holds the candidates with the same hash on each input of one family. The report gives the cell groups only as a diagnostic.
+- The flag `--moves` counts the highways of each plan of the step `highway`. A module can export `moves`, a function that gives the counts by the name of the record.
+- The input `activation` of the workflow `Screen` sets the flag.
+
+```sh
+gh workflow run screen.yml --ref main -f step=router -f module=packages/core/scripts/screens/activation.ts -f activation=small-clustered,dense-groups,hub-chain,many-groups
 ```
 
 ### The screen set `screen-v1`

@@ -19,6 +19,9 @@ import { measureQuality } from "../quality.ts";
 import { sameData } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
 import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
+import { curvesHash, resultHash, type MoveCounter } from "./exercise.ts";
+import { outputHash } from "./activation.ts";
+import { RECORD_EPS } from "./hash.ts";
 import { formatGap, gapBaselines, gapValues, optimumKey, summarizeGap, type ExactOptimum, type GapRule, type GapSummary } from "./gap.ts";
 import { measureByName, measureName, namedObjectives } from "./measures.ts";
 import { SCREEN_V1, screenInputs, type ScreenSet } from "./set.ts";
@@ -104,6 +107,11 @@ export interface ScreenOptions {
    * Each run on an input with optima gets the largest B3 and the gap closed of each rule (B10). The summary then gets the gap table.
    */
   readonly optima?: readonly ExactOptimum[];
+  /**
+   * This function gives the own move counts of a strategy on an input (ACTIVATION), for example `{ "move.powerEdge": 3 }`.
+   * Each record of a strategy with counts gets them as the trace measures of its step. The default is no counts.
+   */
+  readonly moves?: MoveCounter;
   /** This function gets one line of progress for each input. */
   readonly log?: (line: string) => void;
 }
@@ -280,6 +288,27 @@ function rowRules(step: ScreenStep, graph: Graph, row: CompareRow, again: Compar
   return { hard: { ...countRules(rules, []), "same-twice": deterministic ? 0 : 1 }, deterministic };
 }
 
+/**
+ * This function gives the output hash of a row of `compareStep` (ACTIVATION), or `undefined` for a row without output.
+ * A router hashes its result with `resultHash`. The step `group` hashes its tree and its result, and the step `curve` hashes its curves.
+ */
+function rowHash(row: CompareRow): string | undefined {
+  try {
+    return rowHashOf(row);
+  } catch (e) {
+    // An output with NaN or an infinite number has no hash. The record then has no `outputHash`, and the script `screen` names it.
+    if (!(e instanceof RangeError)) throw e;
+    return undefined;
+  }
+}
+
+/** This function gives the output hash of a row. It throws a `RangeError` for an output with a number that is not finite. */
+function rowHashOf(row: CompareRow): string | undefined {
+  if (row.step === "curve") return row.curves && row.edges ? curvesHash(row.edges, row.curves) : undefined;
+  if (row.step === "group") return row.result || row.tree ? outputHash({ tree: row.tree, result: row.result }, { grid: RECORD_EPS }) : undefined;
+  return row.result ? resultHash(row.result) : undefined;
+}
+
 /** This function adds the router `<name>+<w>` for each router of the registry and each wrapper `w`. It gives the new registry and the new names. */
 function wrapRouters(registry: Registry, wraps: readonly ScreenWrap[]): { registry: Registry; added: string[] } {
   const routers = listStrategies(registry, "router");
@@ -402,7 +431,10 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
         const z = highwayEdits(graph, plan, own[row.strategy], edits, seed);
         Object.assign(values, { "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids });
       }
-      const record = { ...head, measures: named(values), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail };
+      const output = rowHash(row);
+      const counts = row.result ? options.moves?.(row.strategy, graph) : undefined;
+      const facts = { ...(output === undefined ? {} : { outputHash: output }), ...(counts === undefined ? {} : { trace: [{ id: head.step, measures: { ...counts } }] }) };
+      const record = { ...head, measures: named(values), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail, ...facts };
       records.push(record);
       if (givesRoutes(step) && input.base !== undefined && row.result) variants.push({ record, base: input.base, result: row.result });
     });

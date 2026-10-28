@@ -1,6 +1,8 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
 // [--options <file.json>] [--families <a,b>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
-// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--out screen.jsonl] [--summary screen.md]`.
+// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--out screen.jsonl] [--summary screen.md]`.
+// `--moves` counts the own move of each highway strategy of the step `highway`. A module can also export `moves`, a `MoveCounter` by the names of the records.
+// `--activation` adds the activation report (ACTIVATION) to the summary. The inputs of these families are the decision inputs. The value `all` takes each family.
 // `--edits` runs each highway strategy over this number of seeded edits, with its plan before each edit (BUILD-W2A).
 // `--wrap` adds the router `<name>+<w>` for each router and each wrapper. `--shuffles` measures the order fragility (W3) over this number of random orders.
 // `--strategy` names strategies of the registry. `--module` loads a prototype file and screens each export that is a strategy of the step,
@@ -13,7 +15,11 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
+  activationReport,
+  formatActivation,
   formatScreen,
+  highwayMoves,
+  type MoveCounter,
   parseLines,
   recordLines,
   screen,
@@ -26,6 +32,7 @@ import {
   type ScreenStep,
   type ScreenWrap,
 } from "../src/bench/screen/index.ts";
+import { highwayStrategies } from "../src/strategies/builtins.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 
 const args = process.argv.slice(2);
@@ -47,6 +54,7 @@ const isStrategy = (x: unknown): x is Strategy<ScreenStep> =>
 
 const strategies: (Strategy<ScreenStep> | string)[] = [...(list("--strategy") ?? [])];
 const only = list("--export");
+const counters: MoveCounter[] = [];
 for (const file of list("--module") ?? []) {
   const mod = (await import(pathToFileURL(resolve(file)).href)) as Record<string, unknown>;
   // An export can be a strategy or a list of strategies.
@@ -56,7 +64,14 @@ for (const file of list("--module") ?? []) {
     .filter(isStrategy);
   if (found.length === 0) throw new Error(`The file "${file}" exports no strategy of the step "${step}".`);
   for (const value of found) if (!strategies.includes(value)) strategies.push(value);
+  if (typeof mod["moves"] === "function") counters.push(mod["moves"] as MoveCounter);
 }
+if (args.includes("--moves") && step === "highway") {
+  const own = strategies.filter((s): s is Strategy<"highway", object> => typeof s !== "string" && s.step === "highway");
+  const builtins = Object.entries(highwayStrategies) as [string, Strategy<"highway", object>][];
+  counters.push(highwayMoves(Object.fromEntries([...builtins, ...own.map((s) => [s.name, s] as const)])));
+}
+const moves: MoveCounter | undefined = counters.length === 0 ? undefined : (name, graph) => counters.map((c) => c(name, graph)).find((m) => m !== undefined);
 
 const optionsFile = opt("--options");
 const options = optionsFile ? (JSON.parse(readFileSync(optionsFile, "utf8")) as Record<string, object>) : undefined;
@@ -109,11 +124,19 @@ const report = screen(step, strategies, {
   ...(wrap.length > 0 ? { wrap: wrap as ScreenWrap[] } : {}),
   ...(shuffles > 0 ? { shuffles } : {}),
   ...(edits > 0 ? { edits } : {}),
+  ...(moves ? { moves } : {}),
   log: (line) => process.stderr.write(line + "\n"),
 });
 const seconds = (performance.now() - start) / 1000;
 const out = opt("--out") ?? "screen.jsonl";
 writeFileSync(out, recordLines(report.records));
-const text = formatScreen(report.summary) + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
+const activation = list("--activation");
+const candidates = new Set(report.summary.strategies.filter((s) => s.candidate).map((s) => s.strategy));
+const decision = activation?.includes("all") ? {} : { families: activation ?? [] };
+const activationText = activation ? "\n" + formatActivation(activationReport(report.records, decision), candidates.size > 0 ? candidates : undefined) : "";
+// A record that is not skipped and has no output hash has no output, or a number in its output that is not finite.
+const unhashed = report.records.filter((r) => r.skipped === undefined && r.outputHash === undefined).map((r) => `${r.strategy} on ${r.input}`);
+const unhashedText = unhashed.length > 0 ? `\n${unhashed.length} records have no output hash: ${unhashed.slice(0, 20).join(", ")}.\n` : "";
+const text = formatScreen(report.summary) + activationText + unhashedText + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
 writeFileSync(opt("--summary") ?? "screen.md", text);
 console.log(text);

@@ -86,6 +86,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PORTFOLIO | [The portfolio of strategies](research/PORTFOLIO.md): `shared` and k more strategies, and the output with the best guarded B1. On `exact-v1`, k = 3 keeps 6% of the oracle gain, because B10 needs the optimum. On `screen-v1`, k = 3 keeps 72%, but at most 4.3% over the best single strategy on each board. At 40 nodes, it takes 42 ms one after the other. | 2026-10-27 | #101 |
 | PORTFOLIO-RULE | [The rule of the caller](research/PORTFOLIO.md#the-rule-of-the-caller-portfolio-rule): each reversed pair of B1 and B10 has another rule or another cap. With the rule of the caller and the one cap 1.5, the whole pool reaches the oracle. k = 3 keeps 47% of the gain for `all` and 12% for `collection`. | 2026-10-27 | #105 |
 | GUARDS | Two guards in [the promotion rule](PROMOTION.md#activation), with the same text as packing and layout-contract. A verdict counts only when the candidate is exercised. Candidates with the same `outputHash` on each decision input count as one output group. | 2026-10-28 | #102 |
+| ACTIVATION | Each screen record gets its `outputHash` and the move counts of its strategy. A verdict counts only when a candidate is exercised on a decision board. Of 289 strategies, 17 are silent on the static screen. 15 of them go to a rebuild wave. The edit screen of the gate `ids` shows its move. No verdict changes. | 2026-10-28 | #107 |
 
 ## Open
 
