@@ -679,3 +679,93 @@ This part is a design. The contract does not change in this item.
 | 3. The default runs a member other than `shared` at 64 and 100 nodes, with a median of 50 ms or less. | Partly met: at 64 nodes in 2 of 6 cells, at 39 and 46 ms. At 100 nodes, the fit is `shared` alone. |
 | 4. The share of the setup at 400 nodes stays above 50%. | Not met: 13% to 15%. |
 | 5. A cooperative budget keeps the q95 within 1.5 times `budgetMs`. | Not tested: this item gives only the design. |
+
+## The cost of each member (FIT-COST)
+
+This section is the result of the item FIT-COST of the [roadmap](../ROADMAP.md). The model of the fit counts the key on the output of each member.
+
+### The cost in the router
+
+The script `portfolio:time --member-cost` times each member alone and in the router, on the same board. It uses the 4 classes of `exact-v1`, 9 sizes from 10 to 128 nodes, the seeds 0 to 2 and 5 repeats (CI run [40670255629](https://github.com/mark1russell7/highways/actions/runs/40670255629)). The router runs each rule and cap with k = 8. In the router, the cost of a member is its run and the key on its output. Each cell is a median in ms. A ratio gives the median over the rows, then the q10 and the q90:
+
+| band | rows | run alone | key alone | hash | in the router | router / run alone | router / (run + key) alone |
+|---|---:|---:|---:|---:|---:|---|---|
+| n1-12 | 78 | 3.9 | 0.4 | 0.3 | 3.9 | 1.06 (0.92 to 1.21) | 0.97 (0.82 to 1.02) |
+| n13-24 | 68 | 4.9 | 0.6 | 0.5 | 5.7 | 1.12 (1.03 to 1.24) | 0.99 (0.94 to 1.02) |
+| n25-40 | 68 | 9.0 | 1.0 | 0.7 | 10.4 | 1.13 (1.06 to 1.23) | 1.01 (0.98 to 1.04) |
+| n41-64 | 21 | 18.0 | 2.1 | 1.5 | 21.0 | 1.17 (1.08 to 1.23) | 1.01 (1.00 to 1.04) |
+| n65-128 | 26 | 32.3 | 4.5 | 3.1 | 38.5 | 1.16 (1.10 to 1.25) | 1.03 (1.01 to 1.05) |
+
+- The key is the guard, the levels and the hash of the output. The hash is approximately 70% of the key.
+- In the router, a member takes 1.06 to 1.17 times its run alone. The ratio grows with the band, so one fixed factor does not fit each band.
+- With the measured key, the ratio is 0.97 to 1.03 in each band. So the fit uses the measured key of each member at each size.
+- The model of the whole pick, from the medians alone, gives 0.93 to 1.01 of the measured pick. Without the key, the model is 9% to 13% low above 12 nodes.
+- The old model counted the guard and the levels of each member, but not the hash.
+
+### The fit
+
+- `portfolio-times.json` keeps the run alone and the key of each member apart, with the schema `portfolio-times/2`.
+- A member stays in the pool of a band when its run and its key take 50 ms or less. The fit admits members while the model time is at or below `FIT_TARGET_MS`.
+- The model time is the time of `shared`, plus the setup of the key, plus the run and the key of each member.
+- The times come from one run on one CI machine: [40670252502](https://github.com/mark1russell7/highways/actions/runs/40670252502) (`portfolio:time --members`). Before this item, the times came from two runs.
+
+The router check runs the fit on the test seeds 5 to 9, at 8 sizes from 10 to 128 nodes, with 5 repeats. The highest median of the 48 cells, for each target, in ms:
+
+| `FIT_TARGET_MS` | first run | second run |
+|---:|---:|---:|
+| 50 | 54.4 ([40674619751](https://github.com/mark1russell7/highways/actions/runs/40674619751)) | - |
+| 45 | 48.2 ([40675156189](https://github.com/mark1russell7/highways/actions/runs/40675156189)) | 53.2 ([40675173532](https://github.com/mark1russell7/highways/actions/runs/40675173532)) |
+| 42 | 47.6 ([40675819975](https://github.com/mark1russell7/highways/actions/runs/40675819975)) | 39.1 ([40675823757](https://github.com/mark1russell7/highways/actions/runs/40675823757)) |
+| 40 | 47.3 ([40675813099](https://github.com/mark1russell7/highways/actions/runs/40675813099)) | 45.2 ([40675816377](https://github.com/mark1russell7/highways/actions/runs/40675816377)) |
+
+- Two runs of the same fit differ by up to 30% in one cell. Each run gets other CI machines.
+- A second run of the times ([40670281850](https://github.com/mark1russell7/highways/actions/runs/40670281850)) changes the fit at 50 ms in 2 cells, at 13 to 24 nodes.
+- So `FIT_TARGET_MS` is 42 ms. The fit at 40 ms has the same times, and it keeps less of the gain.
+
+The pool changes 5 sets:
+
+- `collection` 1.25, 65 to 128 nodes: `hw:lanes` replaces `hw:crossbars`.
+- `all` 1.25, 13 to 24 nodes: `w3e:mlseb+stretch` leaves the pool. The greedy choice then takes `w3d:kdeeb-nomask`, `w3b:growth-input` and `w3d:cubu+stretch` in place of `w3a:diffusion-l3` and `hw:cubu`.
+- `all` 1.25, 41 to 64 nodes, and `all` 1.25, 65 to 128 nodes: the order and the members change.
+- `all` 1.5, 13 to 24 nodes: `w3e:mlseb+stretch` leaves the pool.
+
+The fit changes in 15 of 30 cells. In 12 cells, a node limit goes down or a member leaves. In 1 cell, a member comes in. In the other 2 cells, the set changes.
+
+The time of the router with the new fit, from the run 40675819975. Each cell gives the median, then the q95, in ms:
+
+| rule | cap | 10 | 12 | 18 | 24 | 40 | 64 | 100 | 128 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `collection` | 1.1 | 40, 91 | 40, 54 | 42, 51 | 42, 52 | 31, 38 | 10, 15 | 18, 30 | 25, 36 |
+| `collection` | 1.25 | 34, 49 | 38, 50 | 42, 54 | 41, 52 | 39, 49 | 10, 14 | 18, 29 | 25, 36 |
+| `collection` | 1.5 | 33, 54 | 37, 46 | 37, 46 | 40, 53 | 36, 45 | 40, 55 | 18, 28 | 24, 38 |
+| `all` | 1.1 | 48, 79 | 39, 59 | 47, 64 | 37, 50 | 39, 48 | 10, 14 | 18, 29 | 25, 35 |
+| `all` | 1.25 | 39, 57 | 33, 48 | 45, 61 | 30, 44 | 6, 8 | 10, 14 | 18, 29 | 24, 36 |
+| `all` | 1.5 | 37, 64 | 23, 34 | 19, 24 | 24, 30 | 42, 49 | 10, 14 | 17, 28 | 24, 36 |
+
+- The median is 48 ms or less in each of the 48 cells, in the two runs.
+- The q95 is above 80 ms in 1 cell: `collection` 1.1 at 10 nodes, with 91 and 85 ms. 10 nodes is the first size that each shard times.
+
+The share of the oracle gain at the fit, on the test seeds 5 to 9, before and after this item (`portfolio:sets`, CI run [40675696325](https://github.com/mark1russell7/highways/actions/runs/40675696325)). A share of 0% tells that the fit gets the B1 of the best single strategy:
+
+| rule | cap | n1-12 | n13-24 | n25-40 | n41-64 | n65-128 |
+|---|---:|---|---|---|---|---|
+| `collection` | 1.1 | 58% | 4% | - | - | - |
+| `collection` | 1.25 | 19% | 44% to 38% | 36% | -88% | - |
+| `collection` | 1.5 | 70% | 51% | 86% | 0% | -1565% |
+| `all` | 1.1 | 95% | 89% to 83% | 3% | 0% | -9% |
+| `all` | 1.25 | 89% to 83% | 74% to 31% | 0% to -427% | -2376% | - |
+| `all` | 1.5 | 42% | 61% | 100% to 86% | 0% to -2349% | -1072% |
+
+- 23 of 30 shares do not change. No share goes up.
+- `all` 1.25 at 13 to 24 nodes loses 43 points. The new set causes most of the loss: with the target 50 ms, the share is 34%.
+- `all` 1.25 at 40 nodes loses `w3d:kdeeb-routes`. The fit there is `shared` alone, so it loses the gain of the best single strategy.
+- `all` 1.5 at 41 to 64 nodes loses `hw:growth`, the best single strategy of the band. With the target 50 ms, the fit keeps it, at a median of 47 ms.
+
+### The predictions of FIT-COST
+
+| Prediction | Result |
+|---|---|
+| 1. The cost ratio of a member in the router is 1.2 to 1.6 in each band. | Not met: 1.06 to 1.17 over the run alone, and 0.97 to 1.03 over the run and the key alone. |
+| 2. The 3 cells above 50 ms each lose one member, and the share falls by 10 points or less. | Not met: at 12 nodes, `all` 1.1 loses 3 members and `all` 1.25 loses 4. The shares fall by 0 and 6 points. At 40 nodes, `all` 1.25 loses its one member, and the fit is `shared` alone. |
+| 3. A fit from one clean run changes 1 set or more up to 40 nodes. | Met: 2 sets at 13 to 24 nodes, and the fit in 14 of 18 cells up to 40 nodes. |
+| 4. The router has a median of 50 ms or less and a q95 of 80 ms or less in each cell. | Partly met: the median is 48 ms or less in each of the 48 cells. The q95 is 91 ms in 1 cell. |
