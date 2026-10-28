@@ -37,6 +37,12 @@ class Board {
   }
 }
 
+/** The options of a case board with a seed: `hubChainBoard` and `manyGroupsBoard`. */
+export interface CaseSeedOptions {
+  /** The seed of the random links of the board. Each board has its own default. */
+  readonly seed?: number;
+}
+
 /**
  * This function makes a dense board: 150 nodes in tight clusters. At the far view, the boxes of the groups overlap.
  * Then a level link starts or ends in a group that another group covers.
@@ -49,9 +55,12 @@ export function denseGroupsBoard(): Graph {
  * This function makes a board of three rows of 32 cards. Each card links to the next card of its row.
  * Forty long links join cards far apart. The hub of a section is near the middle of its cards.
  * So a long link climbs to hubs behind its source or past its target, and comes back.
+ *
+ * The seed changes only the long links. The rows of cards, and thus the chain of hubs, do not change.
+ * The default seed is 3. Without options, the board does not change.
  */
-export function hubChainBoard(): Graph {
-  const R = rng(3);
+export function hubChainBoard(options: CaseSeedOptions = {}): Graph {
+  const R = rng(options.seed ?? 3);
   const b = new Board();
   const rows = 3;
   const cols = 32;
@@ -72,9 +81,12 @@ export function hubChainBoard(): Graph {
  * This function makes a board of 32 groups in 8 columns and 4 rows. Each group has 4 cards in a square.
  * The cards of a group link in a chain, and 96 random links join cards of two groups.
  * On a level with many groups, some level links go around the outer edge of the board.
+ *
+ * The seed changes only the 96 links between groups. The 32 groups and their chains do not change.
+ * The default seed is 7. Without options, the board does not change.
  */
-export function manyGroupsBoard(): Graph {
-  const R = rng(7);
+export function manyGroupsBoard(options: CaseSeedOptions = {}): Graph {
+  const R = rng(options.seed ?? 7);
   const b = new Board();
   const cols = 8;
   const rows = 4;
@@ -170,6 +182,6 @@ export function nestedGridBoard(): Graph {
 /** The case boards of the benchmark. Each board has a few hundred nodes at most, so the benchmark races them on each run. */
 export const CASES: readonly CaseBoard[] = [
   { name: "case-dense-groups", defect: "Groups overlap at the far view, and level links go through other groups.", make: denseGroupsBoard },
-  { name: "case-hub-chain", defect: "A route climbs a chain of hubs away from its target and comes back.", make: hubChainBoard },
-  { name: "case-many-groups", defect: "On a level with many groups, links go around the outer edge of the board.", make: manyGroupsBoard },
+  { name: "case-hub-chain", defect: "A route climbs a chain of hubs away from its target and comes back.", make: () => hubChainBoard() },
+  { name: "case-many-groups", defect: "On a level with many groups, links go around the outer edge of the board.", make: () => manyGroupsBoard() },
 ];

@@ -197,7 +197,7 @@ importers:
   packages/core:
     dependencies:
       '@mark1russell7/layout-contract':
-        specifier: ^0.2.8
+        specifier: ^0.2.9
         version: 0.2.9
     devDependencies:
       '@mark1russell7/cue':
