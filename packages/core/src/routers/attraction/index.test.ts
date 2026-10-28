@@ -4,7 +4,7 @@ import { clustered, hub } from "../../highways/fixtures.test-util.ts";
 import { checkOptions } from "../../strategies/options.ts";
 import { sharedRouter } from "../shared.ts";
 import { byCollection } from "../trunks.ts";
-import { ATTRACTION_DEFAULTS, attractionRouter, attractionStrategy } from "./index.ts";
+import { ATTRACTION_DEFAULTS, ATTRACTION_SCHEMA, attractionRouter, attractionStrategy } from "./index.ts";
 
 describe("the router attraction (HWY-044)", () => {
   it("gives the routes of shared with one pass, no pull and no capacity cost", () => {
@@ -30,6 +30,6 @@ describe("the router attraction (HWY-044)", () => {
 
   it("declares each option in its schema", () => {
     expect(checkOptions(attractionStrategy, ATTRACTION_DEFAULTS)).toEqual([]);
-    expect(Object.keys(attractionStrategy.schema).sort()).toEqual(Object.keys(ATTRACTION_DEFAULTS).sort());
+    expect(Object.keys(ATTRACTION_SCHEMA).sort()).toEqual(Object.keys(ATTRACTION_DEFAULTS).sort());
   });
 });

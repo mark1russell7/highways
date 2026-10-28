@@ -80,6 +80,7 @@ export function searchScore(graph: Graph, routes: readonly Route[], first: reado
  * This function gives the highways of a local search over the set of highways (HWY-059). The search starts at the plan of `from`.
  * Each move adds a highway of the pool, drops a highway, moves one edge to another highway, or moves one point of a spine.
  * The annealing keeps a worse plan with the chance `exp(delta / T)`. The best plan that the search measures is the result.
+ *
  * The score reads only this graph and its routes. Thus the search does not fit to the inputs of a screen.
  */
 export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): HighwayPlan {

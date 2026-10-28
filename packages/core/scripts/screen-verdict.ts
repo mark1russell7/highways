@@ -1,4 +1,5 @@
-// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot]`.
+// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--measures <names>]`.
+// The option `--measures` takes a comma list of measure names of a record, for example the named wins of an idea. They replace the guard measures.
 // It reads the records of one artifact of the workflow `Screen`. For each strategy of the step against the default, it gives the verdict of each guard measure.
 // The guard measures are the measures of the step in `docs/PROMOTION.md`. The tie is the `minEffect` of the measure, and the level is 0.05.
 // The script also gives the old verdict: the mean of the inputs, as the screen gives it today.
@@ -90,9 +91,9 @@ function stepOf(records: readonly LayoutRecord[]): string {
 }
 
 /** This function gives the verdicts of each strategy of the step against the strategy `base`, on each guard measure of the step. */
-function screenVerdicts(records: readonly LayoutRecord[], base: string): GuardVerdict[] {
+function screenVerdicts(records: readonly LayoutRecord[], base: string, measures?: readonly string[]): GuardVerdict[] {
   const step = stepOf(records);
-  const guards = GUARDS[step];
+  const guards = measures === undefined ? GUARDS[step] : measures.map((name) => ({ id: name, name }));
   if (guards === undefined) throw new Error(`The step "${step}" has no guard measures in this script.`);
   const strategies = [...new Set(records.filter((r) => r.step === step).map((r) => r.strategy))].filter((s) => s !== base);
   const out: GuardVerdict[] = [];
@@ -161,12 +162,13 @@ function main(): void {
   };
   const file = args[0];
   if (file === undefined || file.startsWith("--")) {
-    console.error("Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--run <id>] [--commit <sha>] [--date <YYYY-MM-DD>] [--core <version>]");
+    console.error("Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--measures <names>] [--run <id>] [--commit <sha>] [--date <YYYY-MM-DD>] [--core <version>]");
     process.exit(2);
   }
   const base = opt("--default") ?? "shared";
   const records = parseLines<LayoutRecord>(readFileSync(file, "utf8"));
-  const rows = screenVerdicts(records, base);
+  const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
+  const rows = screenVerdicts(records, base, measures);
   const step = stepOf(records);
   const set = records[0]?.set;
   const path = fromPath(file);

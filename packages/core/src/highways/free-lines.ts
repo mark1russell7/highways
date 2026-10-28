@@ -6,7 +6,7 @@ import { firstRoutes } from "./base.ts";
 import type { HighwayInput } from "./model.ts";
 import { edgePlugs } from "./stretches.ts";
 
-/** The source of the candidate streets: the middle lines of the gaps of the room step, or the lines through the corners of the corner graph. */
+/** The source of the candidate streets: the middle lines of the gaps of the room step, or the lines through the corners. */
 export type StreetSource = "room" | "corners";
 
 /** The values of `StreetSource`. */
@@ -26,11 +26,13 @@ export interface StreetEdge {
   readonly base: number;
 }
 
-/** The ride of one edge on one street: the points where it joins and leaves the street, the length on the street and the length of the two ramps. */
+/** The ride of one edge on one street. It has the points where the edge joins and leaves the street, and two lengths. */
 export interface StreetRide {
   readonly on: Point;
   readonly off: Point;
+  /** The length on the street. */
   readonly ride: number;
+  /** The length of the two ramps, to the street and from it. */
   readonly ramps: number;
 }
 
