@@ -492,8 +492,8 @@ The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outp
 - `routePortfolio(graph, options?)` runs the router `shared` first, then more members for the size band of the graph. It gives the output with the fewest guard breaks, then the most ink saved (B1).
 - The options are `rule` (`collection` or `all`), `cap` (1.1, 1.25 or 1.5), `k` (3, 5 or 8), `budgetMs` and `maxMembers`.
 - The size bands are 1 to 12, 13 to 24, 25 to 40, 41 to 64 and 65 to 128 nodes. An input above 128 nodes uses the last band.
-- Without `k`, the members are the fit of the band. Each member has a node limit, so the default is deterministic.
-- At 41 to 64 nodes, the fit runs one member at the cap 1.5. Above 64 nodes, the fit is `shared` alone.
+- Without `k`, the members are the fit of the band. Each member has a node limit, so the default is deterministic. The limits keep the model time at or below 42 ms, with the key on the output of each member.
+- At 41 to 64 nodes, the fit runs one member at the cap 1.5 under the rule `collection`. Above 64 nodes, the fit is `shared` alone.
 - With `k`, the members are the first `k` names of the greedy set of the band.
 - A member passes the guard when it has no more breaks of each hard rule than `shared`. It also has no edge with a stretch above the cap. Under the rule `collection`, it also has no shared segment with edges of two collections. The base `shared` always passes.
 - `budgetMs` is an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine.
