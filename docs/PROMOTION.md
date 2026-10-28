@@ -28,6 +28,7 @@ A change of this rule is a change of this note. The three projects agree on the 
 - `packing` makes its holdout seeds with its generators (`@mark1russell7/packing` 0.1.4 and later).
 - For `highways`, until CORPUS is in the screen, the holdout is the inputs of `screen-v1` outside the decision boards of the idea.
 
+<!-- shared:paired-ratio -->
 ## The paired ratio
 
 All tests use paired ratios. For each input and seed, the ratio of a measure is the value of the candidate divided by the value of the default. The two values come from the same input and the same seed.
@@ -35,7 +36,9 @@ All tests use paired ratios. For each input and seed, the ratio of a measure is 
 - A ratio is "worse" in the direction of the measure. For a measure where less is better, a ratio of 1.02 is 2% worse. For a measure where more is better, the test uses the inverse ratio.
 - When both values are 0, the ratio is 1.
 - A median of a measure is the median of its ratios, not a ratio of two medians. Thus the verdict does not change with the scale of the inputs.
+<!-- /shared:paired-ratio -->
 
+<!-- shared:floor-rule -->
 ### The floor rule
 
 Some measures have a floor: the best value that the measure can have. A measure with a floor of 0 gives no ratio when the default is at the floor. For example, a default with no merges has a largest merge angle of 0. Then each merge of the candidate is a loss without limit.
@@ -48,9 +51,11 @@ Some measures have a floor: the best value that the measure can have. A measure 
 - Each measure has its own floor and tolerance, as two named parameters. The floors of each step give them or name their source. A measure without them has a tolerance of 0.
 - A count has a tolerance of 0. Thus a count above 0 is beyond the tolerance.
 - The record of the test names, for each measure, the inputs where the floor rule applied.
+<!-- /shared:floor-rule -->
 
 A floor that is not 0 keeps the ratio, because the ratio has a value there. For example, `B3` has a floor of 1. A ratio of 1.09 at that floor is a real stretch of 9%, so the ratio test applies.
 
+<!-- shared:classification -->
 ### The per-input classification
 
 The sign test, the wins and the flips put each input, or each board, in one of three classes: `"better"`, `"worse"` or `"tie"`. A change smaller than the resolution of a measure is noise, not a result. Thus the classification uses a minimum effect.
@@ -71,9 +76,11 @@ The sign test, the wins and the flips put each input, or each board, in one of t
 - The hard-rule counts stay exact. Each new hard break is a loss.
 
 The tie applies only to the classification of each input and each board: the sign test, the wins and the flips. The median test, the tail test and the bootstrap read the raw values. Thus a steady loss below the resolution on each input still shows in the median test.
+<!-- /shared:classification -->
 
 [The minimum effects](#the-minimum-effects) gives the value of `minEffect` for each measure of `highways`.
 
+<!-- shared:win-test -->
 ## The win test
 
 The test compares the candidate with the current default on each input of the corpus. The guard measures are the guard measures of the step, which each repository lists. The win measures are the measures that the record of the idea names in `wins`.
@@ -89,8 +96,10 @@ The test compares the candidate with the current default on each input of the co
 
 Thus a candidate with a time of `timeFloorMs` or less passes the median test. Such a time is too small to be a cost to the user.
 
-CI does the time test, because other jobs on a local machine change the times.
+CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default on the same machine, in alternate runs.
+<!-- /shared:win-test -->
 
+<!-- shared:noise-guard -->
 ### The noise guard
 
 The screens test many ideas on one corpus, so some ideas pass by chance. The gain test has two guards against chance:
@@ -99,7 +108,9 @@ The screens test many ideas on one corpus, so some ideas pass by chance. The gai
 2. **The paired bootstrap.** On the holdout inputs, take `bootstrapRuns` samples of the inputs, with replacement, from a fixed seed. Calculate the median ratio of each sample. The `bootstrapLevel` interval of these medians does not include 1. The statistic is the median, not the mean, so a ratio of +Infinity does not make the interval endless. The median of the log ratios gives the same interval.
 
 The sign test replaces a fixed share of better inputs. A share of 60% of 20 inputs is not a signal, but 60% of 2000 inputs is a strong signal.
+<!-- /shared:noise-guard -->
 
+<!-- shared:confirmation-run -->
 ### The confirmation run
 
 The program screens many ideas. At a p-value of 0.05, 1 idea in 20 with no effect passes by chance. The confirmation run controls this, and it also finds an option that fits only the corpus.
@@ -109,7 +120,9 @@ The program screens many ideas. At a p-value of 0.05, 1 idea in 20 with no effec
 - For a rule of the selector, the fresh set has `cellMin` or more inputs in each cell of the rule.
 - The candidate passes the full win test on the fresh set, with the same parameters.
 - The record of the promotion names the fresh seeds. A later screen does not use them for a decision.
+<!-- /shared:confirmation-run -->
 
+<!-- shared:activation -->
 ### Activation
 
 A candidate is "exercised" on an input when one of these conditions is true:
@@ -120,13 +133,17 @@ A candidate is "exercised" on an input when one of these conditions is true:
 The base of an option is the same strategy without the option. The base of a highway finder is the same step with no highway. A packing strategy of the zoo has no base.
 
 A verdict counts only when the candidate is exercised on one or more decision inputs. Otherwise the verdict is `not-exercised`, with a reason. The idea then goes back to be built again. It does not go to dropped.
+<!-- /shared:activation -->
 
+<!-- shared:distinctness -->
 ### Distinctness
 
 Candidates with the same `outputHash` on each decision input make one "output group". The group id is the first candidate id in sort order. A group counts as one candidate in the counts of a wave and of a portfolio. The verdict of the group applies to each member.
 
 A "cell group" has the same `outputHash` on each input of one cell. Only a selector rule uses a cell group: in that cell, its members are one option. The screen shows the cell groups as diagnostics.
+<!-- /shared:distinctness -->
 
+<!-- shared:output-hash -->
 ### The output hash
 
 The `outputHash` of a record is the first 16 hexadecimal digits of the SHA-256 of the canonical JSON of the output. `outputHash` of layout-contract calculates it. Each stage sets the canonical form of its output:
@@ -136,10 +153,13 @@ The `outputHash` of a record is the first 16 hexadecimal digits of the SHA-256 o
 - The joint runner of layout-contract hashes the list of 2 hashes: the `outputHash` of the pack, then the `outputHash` of the routes. Each part uses the form of its stage.
 
 Groups compare hashes only in one stage. A number near a rounding boundary can split a group, and then a real copy counts two times. Two outputs with the same rounded hash have each number in one grid step of the other.
+<!-- /shared:output-hash -->
 
+<!-- shared:deterministic-defaults -->
 ### Deterministic defaults
 
 A default is deterministic. A portfolio limits its work by the member count and the input size, not by the wall time. A time budget is only an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine, so the record is not deterministic.
+<!-- /shared:deterministic-defaults -->
 
 ## The measures of each step
 
@@ -159,6 +179,7 @@ The ids are the ids of [the measure note](research/MEASURES.md). The ids of the 
 
 For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. The field `ms` of each record gives the time test. It is the median of `msRuns`.
 
+<!-- shared:bound-by-count -->
 ### A bound by count
 
 On mixed sizes, a lower bound by count is weak. It drops the largest items first, but a packer leaves out many small items. On the screen 3 of packing, the count bound was 1.5% of the overflow count. The area bound was 42% to 62% of the overflow area. Judge an overflow by the area excess (`pack.overflow.excessArea`), not by the count excess.
@@ -167,7 +188,9 @@ The `pack` step ranks its strategies in each cell in two levels. In a cell with 
 
 1. Rank by the area excess, with its `minEffect`.
 2. Compare `pack.fill` only between the strategies with a tie on the area excess. Use only the inputs that each compared strategy packs with no overflow. A cell is "thin" when these shared inputs are less than 30% of the cell.
+<!-- /shared:bound-by-count -->
 
+<!-- shared:selector -->
 ## The selector
 
 - The selector is a strategy that picks an option for each input. It reads only the cells of the input that are known before the step. The cells are `edgeDensity`, `edgeShape`, `groups` and `ports`, and the cells of the packer.
@@ -176,9 +199,11 @@ The `pack` step ranks its strategies in each cell in two levels. In a cell with 
 - **The regret.** For each input, the oracle is the best option for that input. The regret of the selector is the median gap between its option and the oracle. A new rule must decrease the regret of the full selector on the full corpus. Thus many small wins in cells do not make a worse selector.
 - **The flip rate.** Two inputs that are near the same, at the two sides of a cell edge, can get different options. Then the view jumps. The flip rate is the share of the change pairs where the option changes. A new rule keeps the flip rate at most `flipRate`.
 - The selector is off by default.
+<!-- /shared:selector -->
 
 In `highways`, the first rule of the selector makes a later item (SELECT).
 
+<!-- shared:joint-selector -->
 ## The joint selector
 
 `layout-stack` owns the joint selector and its docs. Its docs carry the shared blocks of this note from the contract.
@@ -188,7 +213,9 @@ In `highways`, the first rule of the selector makes a later item (SELECT).
 - The hard rules are the rules of the two stages, with the `tolerance` field of each record.
 - The cells are only the cells known before the placement. They are the dimensions of the packing taxonomy and the routing cells that do not use positions. These routing cells are `edgeDensity`, `edgeShape`, `groups` and `ports`.
 - The parameters are the parameters of this note.
+<!-- /shared:joint-selector -->
 
+<!-- shared:parameters -->
 ## The parameters
 
 Each threshold is a named parameter. A change of a value is a measured decision, as for a promotion. It has a prediction, a screen and a reason in this note.
@@ -209,6 +236,7 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 | `cellMin` | 10 | Selector |
 | `flipRate` | 0.05 | Selector |
 | `confirmInputs` | 200 | Confirmation |
+<!-- /shared:parameters -->
 
 ## The floors
 
@@ -240,14 +268,18 @@ This file does not copy the floors of the other projects:
 - The floor and the tolerance of each `pack.*` measure are in `MEASURE_SPECS` of `@mark1russell7/packing`, from version 0.1.7. Their reasons are in the section "The floors of the guards" of `docs/MEASURES.md` of `packing`.
 - The floor and the tolerance of each `joint.*` measure are in `JOINT_MEASURES` of `@mark1russell7/layout-contract`. Its table is in `docs/JOINT-MEASURES.md`.
 
+<!-- shared:order-of-promotions -->
 ## The order of promotions
 
 - Promote one option at a time. After each promotion, the screen compares the next candidate with the new default.
 - Two kept options of one step can change each other. Screen such a pair as a stack too, before the second promotion.
+<!-- /shared:order-of-promotions -->
 
+<!-- shared:demotion -->
 ## Demotion
 
 A later corpus can show that a default fails the win test against the option that it replaced. Then the old default comes back, with the same steps. The change of the default output is MINOR.
+<!-- /shared:demotion -->
 
 ## The record of a promotion
 
