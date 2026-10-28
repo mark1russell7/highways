@@ -99,7 +99,7 @@ describe("the minimum effects of MEASURES (WIN-RES)", () => {
   });
 });
 
-describe("the copy and the text of docs/PROMOTION.md agree (WIN-RES)", () => {
+describe("compareMeasure, minEffectOf and the text of docs/PROMOTION.md agree (WIN-RES)", () => {
   const text = readFileSync(new URL("../../../../../docs/PROMOTION.md", import.meta.url), "utf8");
 
   it("writes the formula of minEffectOf", () => {
