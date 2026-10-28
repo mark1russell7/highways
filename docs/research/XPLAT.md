@@ -273,7 +273,7 @@ The jobs of two runs can use different machines. Thus the ratio has the noise of
 - At `a4304c6`, the walk of the stretches calculated the sides of a run again for each test of the run. The profile gave 75% of the time to `sidesOf`, `partBefore` and `partAfter`.
 - The fix keeps the sides of each run in a cache. Each run gets them one time. The orders do not change.
 - A first cache kept the sides in a map with text keys. On the dense board, it used the full heap of 4 GB after 180 s (Scale 40759116206).
-- The cache now keeps the sides of a run in a typed array of one byte for each pair. The key of a pair in a stretch is a number.
+- The second cache keeps the sides of a run in a typed array of one byte for each pair. The key of a pair in a stretch is a number.
 
 ### The verdict
 
