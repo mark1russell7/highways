@@ -91,3 +91,17 @@ The script `scripts/check-math.mjs` counts the calls of the transcendental Math 
 - The check fails when the count of a file goes up, or when a new file has a call.
 - When a count goes down, the check asks for a lower baseline with `node scripts/check-math.mjs --write`.
 - This item found no Math function that gives a different result. But the result of such a function can change on another platform. A decision of the router must not depend on its last bit.
+
+## The lane order (LANE-ORDER)
+
+### The predictions of LANE-ORDER
+
+These predictions were written on 2026-10-28, before the CI runs.
+
+1. Each chosen candidate makes the 4 cells of the matrix agree on 51 of 51 routes (high, correctness).
+2. A test shows that the candidates give the order of today on each run with no cycle (high, correctness).
+3. The order of Kahn changes 13 or fewer of the 27 routes that differ, against the output of node 26 (0.5, risky).
+4. Fewer than 5% of the digest boards of the core tests change (0.4, risky).
+5. The lane crossings (`B5`) move by less than their `minEffect` on the corpus for the chosen candidate (medium, quality).
+6. The corpus has at least one broken cycle (0.6).
+7. The candidate `kahn-scc` makes 9 or fewer swaps on `case-many-groups` (0.4, risky). A local probe on node 24 ran before this prediction was written.
