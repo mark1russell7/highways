@@ -77,17 +77,35 @@ export function sharedStretches(ways: readonly KeyedWay[], o: Readonly<SharedStr
     readonly key: string;
     readonly points: readonly Point[];
     readonly members: { edge: string; forward: boolean; at: number }[];
+    /** The edges of `members`, so that the check of a member does not scan the list. */
+    readonly seen: Set<string>;
   }
   const stretches = new Map<string, Stretch>();
   const wayOf = new Map<string, readonly Point[]>();
+  // The signature of each link (ROUTE-SCALE): 0 for a link with fewer than `min` ways, else the number of the sorted list of its ways.
+  // Each link gets its signature one time. Two links get the same number only when they have the same sorted list, so the stretches do not change.
+  const texts = new Map<string, number>();
+  const sigs = new Map<string, number>();
+  const sigOf = (k: string): number => {
+    let n = sigs.get(k);
+    if (n !== undefined) return n;
+    const list = users.get(k) ?? [];
+    if (list.length < min) n = 0;
+    else {
+      const text = [...list].sort().join("\u0001");
+      n = texts.get(text);
+      if (n === undefined) texts.set(text, (n = texts.size + 1));
+    }
+    sigs.set(k, n);
+    return n;
+  };
   for (const w of clean) {
     wayOf.set(w.edge, w.points);
-    const sig = (i: number): string => {
+    const sig = (i: number): number => {
       const a = w.points[i]!;
       const b = w.points[i + 1]!;
-      if (!usable(a, b)) return "";
-      const list = users.get(`${w.key}\u0000${linkKey(pointKey(a), pointKey(b))}`) ?? [];
-      return list.length < min ? "" : [...list].sort().join("\u0001");
+      if (!usable(a, b)) return 0;
+      return sigOf(`${w.key}\u0000${linkKey(pointKey(a), pointKey(b))}`);
     };
     let start = 0;
     for (let i = 0; i < w.points.length - 1; i++) {
@@ -95,15 +113,18 @@ export function sharedStretches(ways: readonly KeyedWay[], o: Readonly<SharedStr
       if (i + 1 < w.points.length - 1 && sig(i + 1) === s) continue;
       const from = start;
       start = i + 1;
-      if (s === "") continue;
+      if (s === 0) continue;
       const a = pointKey(w.points[from]!);
       const b = pointKey(w.points[i + 1]!);
       if (a === b) continue;
       const id = `${w.key}\u0000${s}\u0000${linkKey(a, b)}`;
       const piece = w.points.slice(from, i + 2);
       let found = stretches.get(id);
-      if (!found) stretches.set(id, (found = { key: w.key, points: a < b ? piece : [...piece].reverse(), members: [] }));
-      if (!found.members.some((m) => m.edge === w.edge)) found.members.push({ edge: w.edge, forward: a < b, at: from });
+      if (!found) stretches.set(id, (found = { key: w.key, points: a < b ? piece : [...piece].reverse(), members: [], seen: new Set() }));
+      if (!found.seen.has(w.edge)) {
+        found.seen.add(w.edge);
+        found.members.push({ edge: w.edge, forward: a < b, at: from });
+      }
     }
   }
   // The order of the stretches of each way gives the `seq` of its members.

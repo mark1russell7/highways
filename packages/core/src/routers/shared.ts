@@ -238,19 +238,37 @@ export function sharedRouter(options: SharedOptions): Router {
       }
 
       // The users of each link, with the links to the ends. Two edges from one plug share the link from it.
-      const users = new Map<string, Map<string, string[]>>();
+      const N = corners.points.length + ends.size + 1;
+      const pairOf = (a: number, b: number): number => (a < b ? a * N + b : b * N + a);
+      const users = new Map<string, Map<number, string[]>>();
       for (const w of order) {
         if (!w.found) continue;
         let mine = users.get(w.key);
         if (!mine) users.set(w.key, (mine = new Map()));
         for (let i = 1; i < w.ids.length; i++) {
-          const a = w.ids[i - 1]!;
-          const b = w.ids[i]!;
-          const k = a < b ? `${a}:${b}` : `${b}:${a}`;
+          const k = pairOf(w.ids[i - 1]!, w.ids[i]!);
           const list = mine.get(k);
           if (list) list.push(w.edge.id);
           else mine.set(k, [w.edge.id]);
         }
+      }
+      // The signature of each link (ROUTE-SCALE): 0 for a link with fewer than 2 users, else the number of the sorted list of its users.
+      // Each link gets its signature one time. Two links get the same number only when they have the same sorted list, so the runs do not change.
+      const texts = new Map<string, number>();
+      const sigs = new Map<string, Map<number, number>>();
+      for (const [key, mine] of users) {
+        const own = new Map<number, number>();
+        for (const [k, list] of mine) {
+          if (list.length < 2) {
+            own.set(k, 0);
+            continue;
+          }
+          const text = [...list].sort(byText).join("\u0001");
+          let n = texts.get(text);
+          if (n === undefined) texts.set(text, (n = texts.size + 1));
+          own.set(k, n);
+        }
+        sigs.set(key, own);
       }
 
       // Each way breaks into stretches where the set of edges on the links stays the same.
@@ -259,13 +277,8 @@ export function sharedRouter(options: SharedOptions): Router {
       const points = new Map<string, Point[]>();
       for (const w of all) {
         if (!w.found) continue;
-        const used = users.get(w.key)!;
-        const sig = (i: number): string => {
-          const a = w.ids[i]!;
-          const b = w.ids[i + 1]!;
-          const list = used.get(a < b ? `${a}:${b}` : `${b}:${a}`)!;
-          return list.length < 2 ? "" : [...list].sort(byText).join("\u0001");
-        };
+        const own = sigs.get(w.key)!;
+        const sig = (i: number): number => own.get(pairOf(w.ids[i]!, w.ids[i + 1]!))!;
         const out: Point[] = [w.ps.point];
         const append = (piece: readonly Point[]): void => {
           for (const p of piece) if (dist(p, out[out.length - 1]!) > 1e-9) out.push(p);
@@ -275,7 +288,7 @@ export function sharedRouter(options: SharedOptions): Router {
           const s = sig(i);
           if (i + 1 < w.seq.length - 1 && sig(i + 1) === s) continue;
           const raw = w.seq.slice(start, i + 2);
-          if (s === "") append(corners.pull(raw));
+          if (s === 0) append(corners.pull(raw));
           else {
             const a = w.ids[start]!;
             const b = w.ids[i + 1]!;

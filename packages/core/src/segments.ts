@@ -174,6 +174,8 @@ export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<stri
 /** This function gives the route of each path, with the lanes of each segment at the spacing that `spacingOf` gives. */
 function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number): Route[] {
   const byId = new Map(graph.segments.map((s) => [s.id, s]));
+  // Each segment gets its spacing one time (ROUTE-SCALE). A key of `runKey` sorts the edges of the segment, and a busy segment is on many paths.
+  const spacings = new Map<Segment, number>();
   const routes: Route[] = [];
   for (const path of graph.paths) {
     const ends = pathPoints(graph, path);
@@ -181,7 +183,8 @@ function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number): Rout
     for (const ref of path.segments) {
       const s = byId.get(ref.segment);
       if (!s) continue;
-      const spacing = spacingOf(s);
+      let spacing = spacings.get(s);
+      if (spacing === undefined) spacings.set(s, (spacing = spacingOf(s)));
       const moved = offsetPolyline(s.points, ((s.count - 1) / 2 - ref.lane) * spacing);
       for (const q of ref.reverse ? moved.reverse() : moved) if (out.length === 0 || dist(q, out[out.length - 1]!) > SAME) out.push(q);
     }
