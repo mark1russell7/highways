@@ -10,9 +10,9 @@ This note is the result of the item ORACLE of the [roadmap](../ROADMAP.md). A se
 ## Summary
 
 - The bound is large. On `exact-v1`, the oracle closes a median of 0.947 of the gap (0.797 to 1.009). The best single strategy, `w3b:growth-s0.3`, closes 0.595. The gain is 0.352 (0.191 to 0.465).
-- On `screen-v1`, under the guard of the B3 q95 of `shared`, the oracle B1 is 39% to 534% above the best single strategy on each of the 4 boards that decide.
-- A realistic selector keeps little of this gain. On `exact-v1`, a choice for each class on half of the seeds is worse than the best single strategy: it keeps -32% of the oracle gain.
-- On `screen-v1`, a choice for each board keeps 76% of the gain against the best single strategy, but only 26% against the best single strategy with a fall back to `shared`. Only 8 inputs give these numbers.
+- On `screen-v1`, the guard is the B3 q95 of `shared`. Under it, the oracle B1 is 39% to 534% above the best single strategy on the 4 boards that decide.
+- A realistic selector keeps little of this gain. On `exact-v1`, a choice for each class on half of the seeds is worse than the best single strategy. It keeps -32% of the oracle gain.
+- On `screen-v1`, a choice for each board keeps 76% of the gain against the best single strategy. Against the best single strategy with a fall back to `shared`, it keeps only 26%. Only 8 inputs give these numbers.
 - The winners change from input to input in each class of `exact-v1`. The class does not tell the winner. On `screen-v1`, the kind of board goes with the winner, but each kind has only 1 to 3 inputs.
 - Most winners are dropped ideas or forms of `growth`. Most of them also mix collections. Without the strategies that mix collections, the bound is smaller.
 - The bound passes the limit of the item. The roadmap gets the item SELECT.
@@ -61,11 +61,11 @@ pnpm --filter @mark1russell7/highways oracle --exact <folder> --screen <folder,.
 | portfolio | inputs | best single | its median | oracle median | oracle interval | gain | gain interval |
 |---|---:|---|---:|---:|---|---:|---|
 | all 228 strategies | 37 | `w3b:growth-s0.3` | 0.595 | 0.947 | 0.797 to 1.009 | 0.352 | 0.191 to 0.465 |
-| the strategies that never mix collections | 27 | `trunks-tree-bf06` | 0.264 | 0.434 | 0.317 to 0.627 | 0.170 | 0.069 to 0.485 |
+| the strategies that do not mix collections | 27 | `trunks-tree-bf06` | 0.264 | 0.434 | 0.317 to 0.627 | 0.170 | 0.069 to 0.485 |
 
 - The oracle has a value on each of the 40 inputs. Its median over the 40 inputs is 0.933.
 - On 13 inputs, the oracle is above 1. There, a strategy saves more ink after its routes than the optimum of the exact model after `follow`. With each value clipped at 1, the median stays 0.933.
-- 40 of the 228 strategies never mix collections on `exact-v1`. Their oracle is 0.434, against 0.264 for their best single strategy.
+- 40 of the 228 strategies do not mix collections on any input of `exact-v1`. Their oracle is 0.434, against 0.264 for their best single strategy.
 
 | class | best single | oracle | gain |
 |---|---:|---:|---:|
@@ -131,7 +131,7 @@ Without the 188 strategies that mix collections on `exact-v1`:
 
 - On `small-clustered` and `dense-groups`, a choice on some seeds of the board works on the other seeds. The forms of `diffusion` win on both boards.
 - A board with 1 seed has no seed to learn from. The choice of the other boards fails the guard there, so it falls back to `shared` and gains nothing.
-- The share against the single strategy with a fall back is small, because `w3a:diffusion-g2` already gets most of the gain on the boards with 3 seeds.
+- The share against the single strategy with a fall back is small. On the boards with 3 seeds, `w3a:diffusion-g2` already gets most of the gain.
 - The split of 2 test inputs gives -479%: there the oracle gains almost nothing over `w3a:diffusion-g2`, so the share is not stable.
 
 ## `screen-v1`: each measure without a guard
@@ -160,7 +160,7 @@ The values are the medians over the 14 inputs. A strategy needs a value on each 
 | `route.bundle.lane-fidelity.max` | B9 | lower | `w2b:level-links-corridors` | 0.807 | 0.500 | 0.620 |
 
 - The table shows each measure with a ratio other than 1. The script also gives the other rows.
-- On R3, R4, R5, R6, R7, R9, R10, R13, R15, B3 q95, B4, B5, B6, B8 `runs`, M1, M4 and Z10, the best single strategy is at the floor (0 or 1). Thus the oracle gains nothing. Most of these floors come from `straight`, `plugs` or `corners`, which bundle nothing.
+- On 17 measures, the best single strategy is at the floor (0 or 1). These measures are R3 to R7, R9, R10, R13, R15, B3 q95, B4 to B6, B8 `runs`, M1, M4 and Z10. Thus the oracle gains nothing. Most of these floors come from `straight`, `plugs` or `corners`, which bundle nothing.
 - On the levels and the groups (Z3 to Z9, G1 to G8), only the strategies with zoom levels have a value on each input. The ratio is 1.
 - Without a guard, B1 gains only 2.3%, because `w3c:edge-paths-k3` saves the most ink on almost each input. It also stretches the routes much more than `shared`.
 - The large gains are on R2 min (2.03), B8 median (1.89), R14 (1.41) and B9 max (0.62). These measures have no strategy that is best on most inputs.

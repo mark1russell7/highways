@@ -445,7 +445,7 @@ export function oracleReport(exact: readonly OracleRecord[], screen: readonly Or
       `| portfolio | inputs | best single | its median | oracle median | oracle interval | gain | gain interval |`,
       `|---|---:|---|---:|---:|---|---:|---|`,
       `| all ${new Set(exact.map((r) => r.strategy)).size} strategies | ${paired.length} | ${code(single.strategy)} | ${f3(boot.b.median)} | ${f3(boot.a.median)} | ${f3(boot.a.lo)} to ${f3(boot.a.hi)} | ${f3(boot.diff.median)} | ${f3(boot.diff.lo)} to ${f3(boot.diff.hi)} |`,
-      `| the strategies that never mix collections | ${pairedNon.length} | ${code(singleNon.strategy)} | ${f3(bootNon.b.median)} | ${f3(bootNon.a.median)} | ${f3(bootNon.a.lo)} to ${f3(bootNon.a.hi)} | ${f3(bootNon.diff.median)} | ${f3(bootNon.diff.lo)} to ${f3(bootNon.diff.hi)} |`,
+      `| the strategies that do not mix collections | ${pairedNon.length} | ${code(singleNon.strategy)} | ${f3(bootNon.b.median)} | ${f3(bootNon.a.median)} | ${f3(bootNon.a.lo)} to ${f3(bootNon.a.hi)} | ${f3(bootNon.diff.median)} | ${f3(bootNon.diff.lo)} to ${f3(bootNon.diff.hi)} |`,
       "",
       `The oracle has a value on ${cells.size} of ${table.size} inputs. Its median over all of them is ${f3(quantile([...cells.values()].map((c) => c.value), 0.5))}.`,
       `On ${[...cells.values()].filter((c) => c.value > 1 + RECORD_EPS).length} inputs, the oracle is above 1. With each value clipped at 1, the median is ${f3(quantile([...cells.values()].map((c) => Math.min(1, c.value)), 0.5))}.`,
