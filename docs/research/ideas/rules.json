@@ -109,7 +109,7 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, against `trunks`: keep it if B1 is equal or better, B4 rises by 10% or less, and R9 = 0.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-002",
       "HWY-006",
@@ -123,7 +123,106 @@
     "wave": 3,
     "rules": "Ink, bundles, clearance from boxes, a stretch budget for each edge.",
     "hardRules": "project after each cycle, then RULE-046.",
-    "zoom": "warm and anchor. The compatibility uses the level links of each level."
+    "zoom": "warm and anchor. The compatibility uses the level links of each level.",
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/fdeb@007e9af",
+        "screen-v1/*/fdeb+stretch@007e9af",
+        "screen-v1/*/fdeb-nobudget@007e9af",
+        "screen-v1/*/fdeb-nopush@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.155,
+            "dense-groups": 0.174,
+            "hub-chain": 0.053,
+            "many-groups": 0.157
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.13,
+            "dense-groups": 1.158,
+            "hub-chain": 1,
+            "many-groups": 1.063
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.148,
+            "dense-groups": 0.161,
+            "hub-chain": 0.053,
+            "many-groups": 0.157
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.112,
+            "dense-groups": 1.107,
+            "hub-chain": 1,
+            "many-groups": 1.056
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.944,
+            "dense-groups": 0.959,
+            "hub-chain": 0.99,
+            "many-groups": 0.966
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.477,
+            "hub-chain": 0.084,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.745,
+            "dense-groups": 0.73,
+            "hub-chain": 0.118,
+            "many-groups": 0.508
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `fdeb` beats `shared` on 0 of the 4 boards, alone and with the gate `stretch`. The paired median ratios are 0.68 for B1 and 0.96 for the q95. B7 rises on each board, so the bundles do not use less area. B2 rises on each board, but B1 falls on 3 boards. The option `pullLimit` replaces the option `budget` of the record, because the gate `stretch` has an option `budget`."
+    }
   },
   {
     "id": "RULE-003",
@@ -1468,7 +1567,7 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` against `shared`: keep it if B1 is equal or better with R9 = 0 after the projection.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-006",
       "HWY-007",
@@ -1480,7 +1579,120 @@
     "wave": 3,
     "rules": "Ink, bundles, free space.",
     "hardRules": "project, then RULE-046.",
-    "zoom": "The kernel width h grows with the level, so the ridges nest."
+    "zoom": "The kernel width h grows with the level, so the ridges nest.",
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/kdeeb@007e9af",
+        "screen-v1/*/kdeeb+stretch@007e9af",
+        "screen-v1/*/kdeeb-nomask@007e9af",
+        "screen-v1/*/kdeeb-routes@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.259,
+            "dense-groups": 0.296,
+            "hub-chain": 0.303,
+            "many-groups": 0.375
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.176,
+            "dense-groups": 1.173,
+            "hub-chain": 1.021,
+            "many-groups": 1.13
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.241,
+            "dense-groups": 0.269,
+            "hub-chain": 0.303,
+            "many-groups": 0.35
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.133,
+            "dense-groups": 1.142,
+            "hub-chain": 1.021,
+            "many-groups": 1.104
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.477,
+            "hub-chain": 0.084,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.915,
+            "dense-groups": 0.927,
+            "hub-chain": 0.311,
+            "many-groups": 0.583
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.897,
+            "dense-groups": 0.912,
+            "hub-chain": 0.916,
+            "many-groups": 0.931
+          }
+        },
+        "B5 against shared": {
+          "base": {
+            "small-clustered": 0,
+            "dense-groups": 2,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 47,
+            "dense-groups": 131,
+            "hub-chain": 72,
+            "many-groups": 176
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `kdeeb` beats `shared` on 0 of the 4 boards alone. With the gate `stretch`, it wins 1 (small-clustered). B1 rises on 3 boards, with a paired median ratio of 1.15. But the q95 rises on 3 boards, to a paired maximum ratio of 1.13. B2 rises and B7 falls on each board. B5 rises to 47 to 176 lane crossings. The density of the first routes (`kdeeb-routes`) wins 2 (small-clustered, dense-groups). Without the mask, the q95 rises to 1.06 to 1.26."
+    }
   },
   {
     "id": "RULE-029",

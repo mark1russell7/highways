@@ -38,13 +38,141 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= sections at the same B3 q95 on 3 of 5 boards with R7 = 0. Drop if B4 > 1.2 x sections.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-052",
       "HWY-056",
       "HWY-041"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/hierarchy@007e9af",
+        "screen-v1/*/hierarchy+stretch@007e9af",
+        "screen-v1/*/hierarchy-hubs1@007e9af",
+        "screen-v1/*/hierarchy-b0.5@007e9af",
+        "screen-v1/*/hierarchy-kd@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.462,
+            "dense-groups": 0.507,
+            "hub-chain": 0.435,
+            "many-groups": 0.408
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 5.821,
+            "dense-groups": 7.802,
+            "hub-chain": 3.367,
+            "many-groups": 2.404
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.072,
+            "dense-groups": 0.092,
+            "hub-chain": 0.11,
+            "many-groups": 0.18
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.017,
+            "dense-groups": 1.026,
+            "hub-chain": 1,
+            "many-groups": 1.082
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.477,
+            "hub-chain": 0.084,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.83,
+            "dense-groups": 0.793,
+            "hub-chain": 0.252,
+            "many-groups": 0.535
+          }
+        },
+        "B8 runs against shared": {
+          "base": {
+            "small-clustered": 63,
+            "dense-groups": 131,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 200,
+            "dense-groups": 306,
+            "hub-chain": 59,
+            "many-groups": 120
+          }
+        },
+        "B8 median against shared": {
+          "base": {
+            "small-clustered": 2,
+            "dense-groups": 3,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 2,
+            "dense-groups": 2,
+            "hub-chain": 3,
+            "many-groups": 2
+          }
+        },
+        "B8 max against shared": {
+          "base": {
+            "small-clustered": 6,
+            "dense-groups": 10,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 21,
+            "dense-groups": 24,
+            "hub-chain": 11,
+            "many-groups": 16
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `hierarchy` beats `shared` on 0 of the 4 boards. B1 rises on each board, with a paired median ratio of 2.02. But the q95 is 2.4 to 7.8, with a paired median ratio of 4.86. With the gate `stretch`, it wins 1 (hub-chain), with ratios of 0.35 for B1 and 0.86 for the q95. The variants with 1 hub, with `beta` 0.5 and with the kd split win 0. The measures G8 and Z9 have no value in the screen."
+    }
   },
   {
     "id": "HWY-002",
@@ -86,7 +214,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if R9 = 0 after snapping and B1 > shared at B3 q95 within 10% on 3 of 5 boards. Drop if 1000 nodes takes > 5x shared.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-006",
       "HWY-028",
@@ -95,7 +223,106 @@
     "same": [
       "RULE-002"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/fdeb@007e9af",
+        "screen-v1/*/fdeb+stretch@007e9af",
+        "screen-v1/*/fdeb-nobudget@007e9af",
+        "screen-v1/*/fdeb-nopush@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.155,
+            "dense-groups": 0.174,
+            "hub-chain": 0.053,
+            "many-groups": 0.157
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.13,
+            "dense-groups": 1.158,
+            "hub-chain": 1,
+            "many-groups": 1.063
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.148,
+            "dense-groups": 0.161,
+            "hub-chain": 0.053,
+            "many-groups": 0.157
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.112,
+            "dense-groups": 1.107,
+            "hub-chain": 1,
+            "many-groups": 1.056
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.944,
+            "dense-groups": 0.959,
+            "hub-chain": 0.99,
+            "many-groups": 0.966
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.477,
+            "hub-chain": 0.084,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.745,
+            "dense-groups": 0.73,
+            "hub-chain": 0.118,
+            "many-groups": 0.508
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `fdeb` beats `shared` on 0 of the 4 boards, alone and with the gate `stretch`. The paired median ratios are 0.68 for B1 and 0.96 for the q95. B7 rises on each board, so the bundles do not use less area. B2 rises on each board, but B1 falls on 3 boards. The option `pullLimit` replaces the option `budget` of the record, because the gate `stretch` has an option `budget`."
+    }
   },
   {
     "id": "HWY-003",
@@ -358,12 +585,111 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Use the corner graph as the mesh. Keep if B1 > shared on 3 of 5 boards at R9 = 0.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-020",
       "HWY-057"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/mesh@007e9af",
+        "screen-v1/*/mesh+stretch@007e9af",
+        "screen-v1/*/mesh-c8@007e9af",
+        "screen-v1/*/mesh-cap16@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.209,
+            "dense-groups": 0.266,
+            "hub-chain": 0.553,
+            "many-groups": 0.455
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.145,
+            "dense-groups": 1.126,
+            "hub-chain": 1.037,
+            "many-groups": 1.093
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.199,
+            "dense-groups": 0.26,
+            "hub-chain": 0.553,
+            "many-groups": 0.455
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.111,
+            "dense-groups": 1.103,
+            "hub-chain": 1.037,
+            "many-groups": 1.093
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.935,
+            "dense-groups": 0.924,
+            "hub-chain": 0.88,
+            "many-groups": 0.911
+          }
+        },
+        "R1 against shared": {
+          "base": {
+            "small-clustered": 647,
+            "dense-groups": 1081,
+            "hub-chain": 68,
+            "many-groups": 790
+          },
+          "new": {
+            "small-clustered": 686,
+            "dense-groups": 1260,
+            "hub-chain": 30,
+            "many-groups": 327
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `mesh` beats `shared` on 0 of the 4 boards, alone and with the gate `stretch`. B1 rises to 0.553 and 0.455 on hub-chain and many-groups. But there the q95 rises to 1.037 and 1.093, where `shared` has 1.000. The paired median ratios are 0.98 for B1 and 0.96 for the q95. B7 and R1 fall on hub-chain and many-groups. The cell size 8 and the capacity 16 win 0."
+    }
   },
   {
     "id": "HWY-005",
@@ -649,7 +975,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared and R9 = 0 after the mask on 3 of 5 boards. Drop if the ridges need > 1 s at 1000 nodes in CI.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-007",
       "HWY-032",
@@ -659,7 +985,120 @@
       "RULE-028"
     ],
     "canonical": "RULE-028",
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/kdeeb@007e9af",
+        "screen-v1/*/kdeeb+stretch@007e9af",
+        "screen-v1/*/kdeeb-nomask@007e9af",
+        "screen-v1/*/kdeeb-routes@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.259,
+            "dense-groups": 0.296,
+            "hub-chain": 0.303,
+            "many-groups": 0.375
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.176,
+            "dense-groups": 1.173,
+            "hub-chain": 1.021,
+            "many-groups": 1.13
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.241,
+            "dense-groups": 0.269,
+            "hub-chain": 0.303,
+            "many-groups": 0.35
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.133,
+            "dense-groups": 1.142,
+            "hub-chain": 1.021,
+            "many-groups": 1.104
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "small-clustered": 0.51,
+            "dense-groups": 0.477,
+            "hub-chain": 0.084,
+            "many-groups": 0.353
+          },
+          "new": {
+            "small-clustered": 0.915,
+            "dense-groups": 0.927,
+            "hub-chain": 0.311,
+            "many-groups": 0.583
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.897,
+            "dense-groups": 0.912,
+            "hub-chain": 0.916,
+            "many-groups": 0.931
+          }
+        },
+        "B5 against shared": {
+          "base": {
+            "small-clustered": 0,
+            "dense-groups": 2,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 47,
+            "dense-groups": 131,
+            "hub-chain": 72,
+            "many-groups": 176
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `kdeeb` beats `shared` on 0 of the 4 boards alone. With the gate `stretch`, it wins 1 (small-clustered). B1 rises on 3 boards, with a paired median ratio of 1.15. But the q95 rises on 3 boards, to a paired maximum ratio of 1.13. B2 rises and B7 falls on each board. B5 rises to 47 to 176 lane crossings. The density of the first routes (`kdeeb-routes`) wins 2 (small-clustered, dense-groups). Without the mask, the q95 rises to 1.06 to 1.26."
+    }
   },
   {
     "id": "HWY-007",
@@ -701,12 +1140,96 @@
     "placementDependent": true,
     "screen": "Same as KDEEB. Keep only if KDEEB is kept and the FFT form gives the same B1 within 2% at 3x less time.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-006",
       "HWY-053"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/cubu@007e9af",
+        "screen-v1/*/cubu+stretch@007e9af",
+        "screen-v1/*/cubu-fft@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.292,
+            "dense-groups": 0.315,
+            "hub-chain": 0.306,
+            "many-groups": 0.423
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.17,
+            "dense-groups": 1.165,
+            "hub-chain": 1.015,
+            "many-groups": 1.121
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.27,
+            "dense-groups": 0.291,
+            "hub-chain": 0.306,
+            "many-groups": 0.416
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.121,
+            "dense-groups": 1.131,
+            "hub-chain": 1.015,
+            "many-groups": 1.11
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.882,
+            "dense-groups": 0.905,
+            "hub-chain": 0.915,
+            "many-groups": 0.911
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The strategy `cubu` beats `shared` on 1 of the 4 boards (dense-groups). With the gate `stretch`, it wins 1 (small-clustered). B1 rises and B7 falls on each board, with a paired median B1 ratio of 1.26. But the q95 rises on 3 boards, to 1.015 to 1.17. The FFT kernel gives the same values as the separable kernel. The grid is on the processor, not on a graphics card."
+    }
   },
   {
     "id": "HWY-008",
@@ -869,13 +1392,142 @@
     "placementDependent": false,
     "screen": "Boards with edges in both directions: case-many-groups, small-clustered. Keep if B5 drops by 20% at a B1 loss < 5%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "HWY-051",
       "HWY-016",
       "NAT-009"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40613675323",
+      "records": [
+        "screen-v1/*/shared@007e9af",
+        "screen-v1/*/divided@007e9af",
+        "screen-v1/*/divided+stretch@007e9af",
+        "screen-v1/*/shared-ways@007e9af",
+        "screen-v1/*/divided-gap2@007e9af",
+        "screen-v1/*/divided-left@007e9af",
+        "screen-v1/*/divided-corridors@007e9af"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.222,
+            "dense-groups": 0.303,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.209,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "B1 with the gate stretch": {
+          "base": {
+            "small-clustered": 0.21,
+            "dense-groups": 0.307,
+            "hub-chain": 0.078,
+            "many-groups": 0.083
+          },
+          "new": {
+            "small-clustered": 0.182,
+            "dense-groups": 0.234,
+            "hub-chain": 0.078,
+            "many-groups": 0.085
+          }
+        },
+        "B3q95 with the gate stretch": {
+          "base": {
+            "small-clustered": 1.152,
+            "dense-groups": 1.224,
+            "hub-chain": 1,
+            "many-groups": 1
+          },
+          "new": {
+            "small-clustered": 1.116,
+            "dense-groups": 1.137,
+            "hub-chain": 1,
+            "many-groups": 1
+          }
+        },
+        "B5 against shared": {
+          "base": {
+            "small-clustered": 0,
+            "dense-groups": 2,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 0,
+            "dense-groups": 7,
+            "hub-chain": 0,
+            "many-groups": 0
+          }
+        },
+        "B9 median against shared": {
+          "base": {
+            "small-clustered": 0.5,
+            "dense-groups": 0.613,
+            "hub-chain": null,
+            "many-groups": null
+          },
+          "new": {
+            "small-clustered": 0.501,
+            "dense-groups": 0.576,
+            "hub-chain": null,
+            "many-groups": null
+          }
+        },
+        "B9 max against shared": {
+          "base": {
+            "small-clustered": 0.833,
+            "dense-groups": 0.916,
+            "hub-chain": null,
+            "many-groups": null
+          },
+          "new": {
+            "small-clustered": 0.833,
+            "dense-groups": 0.875,
+            "hub-chain": null,
+            "many-groups": null
+          }
+        },
+        "R1 against shared": {
+          "base": {
+            "small-clustered": 647,
+            "dense-groups": 1081,
+            "hub-chain": 68,
+            "many-groups": 790
+          },
+          "new": {
+            "small-clustered": 659,
+            "dense-groups": 1229,
+            "hub-chain": 68,
+            "many-groups": 792
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The strategy `divided` beats `shared` on 3 of the 4 boards (small-clustered, hub-chain, many-groups), with 0 hard-rule breaks. The margins are very small. On small-clustered, the q95 is lower by only 3e-6. On hub-chain and many-groups, the values are ties, because `shared` has 0 runs there. The paired median ratios are 1.01 for B1 and 0.996 for the q95. The wins come from the base `shared-ways`, which wins 4 of 4 alone. On small-clustered and dense-groups, `divided` is worse than its base. B5 rises from 2 to 7 on dense-groups. With the gate `stretch`, it wins 2 of 4."
+    }
   },
   {
     "id": "HWY-012",
