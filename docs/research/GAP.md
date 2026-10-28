@@ -6,6 +6,7 @@ This note is the result of the item MEAS2 of the [roadmap](../ROADMAP.md). It ra
 - The optima come from the exact model of fixed-charge network design (HWY-040), solved with HiGHS. The file [`optima-exact-v1.json`](../../packages/core/src/bench/exact/optima-exact-v1.json) keeps them.
 - The tables come from the CI run [40617468092](https://github.com/mark1russell7/highways/actions/runs/40617468092) of the workflow `Screen`, at the commit `92d6640`. The run has 8120 records.
 - The run did not include the strategies of wave 3D (#93). The screen module `scripts/screens/meas2.ts` adds them at the next run.
+- The note [`ORACLE.md`](ORACLE.md) gives the best strategy of each input. Its oracle closes a median of 0.947 of the gap.
 
 ## Summary
 
