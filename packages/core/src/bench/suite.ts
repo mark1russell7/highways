@@ -196,14 +196,23 @@ export interface SuiteReport {
   readonly capped?: readonly CappedCell[];
 }
 
-/** The axes of the Pareto front of each step. The note MEAS0 asks for two to four scores. */
+/** The axes of the Pareto front of a step that gives routes. */
+const ROUTE_OBJECTIVES: readonly Objective[] = [
+  { key: "R1.perEdge", better: "min" },
+  { key: "R5.median", better: "min" },
+  { key: "B1.inkSaved", better: "max" },
+  { key: "R4.turn", better: "min" },
+];
+
+/**
+ * The axes of the Pareto front of each step. The note MEAS0 asks for two to four scores.
+ * The steps `plugs`, `levels` and `whole` run as routers (`stepRouterStrategy`), so they use the axes of the step `router`.
+ */
 export const FRONT_OBJECTIVES: Readonly<Record<Step, readonly Objective[]>> = {
-  router: [
-    { key: "R1.perEdge", better: "min" },
-    { key: "R5.median", better: "min" },
-    { key: "B1.inkSaved", better: "max" },
-    { key: "R4.turn", better: "min" },
-  ],
+  router: ROUTE_OBJECTIVES,
+  plugs: ROUTE_OBJECTIVES,
+  levels: ROUTE_OBJECTIVES,
+  whole: ROUTE_OBJECTIVES,
   curve: [
     { key: "C1.share", better: "min" },
     { key: "C2.median", better: "min" },
@@ -827,6 +836,9 @@ export const SUITE_COLUMNS: Readonly<Record<Step, readonly string[]>> = {
   curve: ["C1.share", "C1.max", "C2.median", "C3.median", "C3.q95", "C6.length"],
   room: ["M1.area", "M4.laneThrough", "crossings", "through", "room-order"],
   group: ["Z4.farItems", "G1.modularity", "G2.cut", "G6.balance", "G8.treeCost", "G9.ari", "Z7.position", "Z8.order", "Z3.through", "treeMs"],
+  plugs: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved"],
+  levels: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved"],
+  whole: ["R1.perEdge", "R2.angle", "R2.min", "B1.inkSaved", "R5.median", "R5.q95", "R4.turn", "R11.q05", "B4.ambiguity", "Z10.moved"],
 };
 
 /**

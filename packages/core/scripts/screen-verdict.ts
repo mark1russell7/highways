@@ -16,18 +16,25 @@ import { familyCell, SCREEN_FAMILY_BY } from "../src/bench/screen/set.ts";
 /** The significance level of each verdict. */
 const LEVEL = 0.05;
 
+/** The guard measures of the step `router`, by their names in a record. */
+const ROUTER_GUARDS: readonly { readonly id: string; readonly name: string }[] = [
+  { id: "R1", name: "route.crossings" },
+  { id: "R4", name: "route.turn.mean" },
+  { id: "R5 q0.95", name: "route.detour.q95" },
+  { id: "R11 min", name: "route.plug-spacing.min" },
+  { id: "B1", name: "route.bundle.ink-saved" },
+];
+
 /**
  * The guard measures of each step of `docs/PROMOTION.md`, by their names in a record.
  * A guard with a quantile or a limit, for example `R5` q0.95, uses the measure of that quantile or limit of each input.
+ * The steps `plugs`, `levels` and `whole` run as routers in the screen, so they use the guards of the step `router`.
  */
 const GUARDS: Readonly<Record<string, readonly { readonly id: string; readonly name: string }[]>> = {
-  router: [
-    { id: "R1", name: "route.crossings" },
-    { id: "R4", name: "route.turn.mean" },
-    { id: "R5 q0.95", name: "route.detour.q95" },
-    { id: "R11 min", name: "route.plug-spacing.min" },
-    { id: "B1", name: "route.bundle.ink-saved" },
-  ],
+  router: ROUTER_GUARDS,
+  plugs: ROUTER_GUARDS,
+  levels: ROUTER_GUARDS,
+  whole: ROUTER_GUARDS,
   highway: [
     { id: "R1", name: "route.crossings" },
     { id: "B1", name: "route.bundle.ink-saved" },

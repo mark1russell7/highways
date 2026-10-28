@@ -1,4 +1,4 @@
-import { FIXTURES, getStrategy, makeFixture, STRATEGIES, type BenchRow, type Graph, type Step, type Strategy } from "@mark1russell7/highways";
+import { FIXTURES, getStrategy, makeFixture, STRATEGIES, strategyKey, type BenchRow, type Graph, type Step, type Strategy } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
@@ -6,8 +6,9 @@ import noBenchText from "../content/nobench.md?raw";
 import readme from "../../../README.md?raw";
 import { benchLabel } from "./bench-label.ts";
 import { html, inline, README, sectionOf } from "./content.ts";
-import { demoPickers, groupKey, type DemoPick, type DemoPicker } from "./demo-data.ts";
+import { demoPickers, groupKey, PICK_LABELS, type DemoPick, type DemoPicker } from "./demo-data.ts";
 import { optionSet, type OptionValue } from "./option-control.ts";
+import { controlOptions } from "./options.ts";
 import type { RouteDone, RouteReply, RouteRequest } from "./protocol.ts";
 import "./style.css";
 import { MapView, type BundleView } from "./view.ts";
@@ -24,6 +25,8 @@ const DEMO_FIXTURES = FIXTURES.filter((f) => f.nodes <= 1000);
 const PICKERS = demoPickers();
 const pickerOf = (step: Step): DemoPicker => PICKERS.find((p) => p.step === step)!;
 const ROUTERS = pickerOf("router").names.map((name) => getStrategy(STRATEGIES, "router", name));
+// The steps whose rule a router reads with an option, for example the grouping rule of `sections`. Only such a router uses the pick.
+const RULE_STEPS = PICKERS.map((p) => p.step).filter((step): step is Exclude<Step, "router"> => step !== "router" && ROUTERS.some((r) => strategyKey(r, step)));
 const START = { fixture: "small-clustered", router: "shared" };
 const fmt = new Intl.NumberFormat("en-US");
 
@@ -34,7 +37,7 @@ const esc = (text: string): string =>
 interface State {
   fixture: string;
   router: string;
-  /** The pick of each step after the router: the highway plan, the grouping rule, the room strategy and the curve. An empty string is "none". */
+  /** The pick of each step other than the router, for example the highway plan, the grouping rule, the room strategy and the curve. An empty string is "none". */
   picks: Record<Exclude<Step, "router">, string>;
   /** The option values that differ from the defaults, by step, then by strategy. */
   options: Partial<Record<Step, Record<string, Record<string, number | boolean | string>>>>;
@@ -47,7 +50,10 @@ interface State {
 const state: State = {
   fixture: START.fixture,
   router: START.router,
-  picks: { group: pickerOf("group").names[0] ?? "", highway: "", room: "", curve: "straight" },
+  // A step that the demo can skip starts at "none". The curve starts at `straight`, and each other step at its first strategy.
+  picks: Object.fromEntries(
+    PICKERS.filter((p) => p.step !== "router").map((p) => [p.step, p.step === "curve" ? "straight" : p.none ? "" : (p.names[0] ?? "")]),
+  ) as Record<Exclude<Step, "router">, string>,
   options: {},
   bundles: "unpack",
   level: -1,
@@ -61,7 +67,10 @@ function pickOf(router: string = state.router, highway: string = state.picks.hig
     router,
     ...(highway ? { highway } : {}),
     ...(state.picks.group ? { group: state.picks.group } : {}),
+    ...(state.picks.plugs ? { plugs: state.picks.plugs } : {}),
+    ...(state.picks.levels ? { levels: state.picks.levels } : {}),
     ...(state.picks.room ? { room: state.picks.room } : {}),
+    ...(state.picks.whole ? { whole: state.picks.whole } : {}),
     options: state.options,
   };
 }
@@ -191,12 +200,29 @@ fixtureSelect.addEventListener("change", () => {
   update();
 });
 
-// A list for each step after the router: the highway plan, the grouping rule, the room strategy and the curve.
+/** This function gives the list of a step. A step without a list in the page gets a new field before the options. */
+function pickSelect(step: Step): HTMLSelectElement {
+  const old = document.getElementById(`pick-${step}`);
+  if (old) return old as HTMLSelectElement;
+  const field = document.createElement("div");
+  field.className = "field";
+  field.id = `pick-${step}-field`;
+  const label = document.createElement("label");
+  label.htmlFor = `pick-${step}`;
+  label.textContent = PICK_LABELS[step];
+  const select = document.createElement("select");
+  select.id = `pick-${step}`;
+  field.append(label, select);
+  $("demo-options").before(field);
+  return select;
+}
+
+// A list for each step other than the router, for example the highway plan, the grouping rule, the room strategy and the curve.
 const selects = new Map<Exclude<Step, "router">, HTMLSelectElement>();
 for (const picker of PICKERS) {
   if (picker.step === "router") continue;
   const step = picker.step;
-  const select = $<HTMLSelectElement>(`pick-${step}`);
+  const select = pickSelect(step);
   if (picker.none) select.append(new Option(picker.none, ""));
   for (const name of picker.names) {
     const o = new Option(name, name);
@@ -222,10 +248,13 @@ function chosen(): { step: Step; strategy: Strategy<Step, object> }[] {
   if (state.picks.highway) out.push({ step: "highway", strategy: getStrategy(STRATEGIES, "highway", state.picks.highway) });
   else {
     out.push({ step: "router", strategy: router });
-    if (groupKey(router) && state.picks.group) out.push({ step: "group", strategy: getStrategy(STRATEGIES, "group", state.picks.group) });
+    for (const step of RULE_STEPS) if (strategyKey(router, step) && state.picks[step]) out.push({ step, strategy: getStrategy(STRATEGIES, step, state.picks[step]) });
   }
   if (state.picks.room) out.push({ step: "room", strategy: getStrategy(STRATEGIES, "room", state.picks.room) });
   out.push({ step: "curve", strategy: getStrategy(STRATEGIES, "curve", state.picks.curve) });
+  // The whole strategy shows only its controls. The options of `pipeline` are the picks of the other lists.
+  const whole = state.picks.whole ? getStrategy(STRATEGIES, "whole", state.picks.whole) : undefined;
+  if (whole && controlOptions(whole).length > 0) out.push({ step: "whole", strategy: whole });
   return out;
 }
 
@@ -243,7 +272,7 @@ function setOption(step: Step, name: string, key: string, v: OptionValue): void 
 /** This function writes the pickers and the options of the chosen strategies. */
 function options(): void {
   const router = ROUTERS.find((r) => r.name === state.router)!;
-  $("pick-group-field").classList.toggle("off", !groupKey(router) || state.picks.highway !== "");
+  for (const step of RULE_STEPS) $(`pick-${step}-field`).classList.toggle("off", !strategyKey(router, step) || state.picks.highway !== "");
   $("pick-group-hint").textContent = state.picks.highway
     ? "The highway plan gives the routes, so the grouping rule does not act."
     : groupKey(router)

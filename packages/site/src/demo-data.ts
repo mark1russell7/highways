@@ -1,14 +1,12 @@
 import {
-  asRouter,
   fixtureGroupOptions,
   getStrategy,
   highwayRouterStrategy,
-  listOptions,
   listStrategies,
-  openGaps,
-  roomLinks,
   STEPS,
   STRATEGIES,
+  strategyKey,
+  wholeStrategies,
   type Graph,
   type Registry,
   type Result,
@@ -19,17 +17,35 @@ import {
 /** The option values of the demo, by step, then by the name of the strategy, then by the key of the option. */
 export type DemoOptions = Readonly<Partial<Record<Step, Readonly<Record<string, Readonly<Record<string, number | boolean | string>>>>>>>;
 
-/** What the demo routes: a router or a highway plan, a grouping rule, a room strategy and the options of each one. */
+/** What the demo routes: a router or a highway plan, the rules that the router reads, a room strategy, the whole strategy and the options of each one. */
 export interface DemoPick {
   readonly router: string;
   /** The highway strategy. With it, the plan of the strategy and `follow` give the routes, not the router. */
   readonly highway?: string;
   /** The grouping rule of a router that reads one, for example `sections`. */
   readonly group?: string;
+  /** The plug rule of a router that reads one, for example `corners`. Without it, the router places its plugs. */
+  readonly plugs?: string;
+  /** The level rule of a router that reads one, for example `sections`. Without it, the router makes its zoom levels. */
+  readonly levels?: string;
   /** The room strategy. With it, the demo opens the gaps of the board before the routes. */
   readonly room?: string;
+  /** The whole strategy that runs the other steps. The default is `pipeline`. */
+  readonly whole?: string;
   readonly options?: DemoOptions;
 }
+
+/** The label of the picker of each step in the demo. */
+export const PICK_LABELS: Readonly<Record<Step, string>> = {
+  group: "Grouping rule",
+  plugs: "Plug rule",
+  router: "Router",
+  highway: "Highway plan",
+  levels: "Level rule",
+  curve: "Curve",
+  room: "Room",
+  whole: "Whole",
+};
 
 /** One picker of the demo: the strategies of one step, from the registry. */
 export interface DemoPicker {
@@ -41,7 +57,12 @@ export interface DemoPicker {
 }
 
 /** The text of the choice "none" of each step that the demo can skip. */
-const NONE: Readonly<Partial<Record<Step, string>>> = { highway: "None: the router routes", room: "None: the board as it is" };
+const NONE: Readonly<Partial<Record<Step, string>>> = {
+  plugs: "None: the plugs of the router",
+  highway: "None: the router routes",
+  levels: "None: the levels of the router",
+  room: "None: the board as it is",
+};
 
 /**
  * This function gives a picker for each step of `STEPS`, with each strategy of the registry.
@@ -53,7 +74,7 @@ export function demoPickers(registry: Registry = STRATEGIES): DemoPicker[] {
 
 /** This function tells if a router reads a grouping rule: its schema has an option of the type `strategy` of the step `group`. */
 export function groupKey(router: Strategy<"router">): string | undefined {
-  return listOptions(router).find((o) => o.declaration.type === "strategy" && o.declaration.step === "group")?.key;
+  return strategyKey(router, "group");
 }
 
 /** The output of `demoRoute`: the board that the routes go on, and the routes. */
@@ -64,29 +85,33 @@ export interface DemoRoute {
 }
 
 /**
- * This function routes one board as the demo picks it. The room strategy opens the gaps of the board first (`openGaps`).
- * A highway strategy makes its plan, and `follow` routes the plan. Otherwise the router routes, with the grouping rule if the router reads one.
- * It throws an error for a board with more nodes than the `maxNodes` of the strategy.
+ * This function routes one board as the demo picks it, with the whole strategy of the pick (`pipeline` by default).
+ * The room strategy opens the gaps of the board first (`openGaps`). A highway strategy makes its plan, and `follow` routes the plan.
+ * Otherwise the router routes, with each rule of the steps `group`, `plugs` and `levels` that the router reads.
+ * It throws an error for a board with more nodes than the `maxNodes` of the router or the highway strategy.
  */
 export function demoRoute(graph: Graph, pick: DemoPick, registry: Registry = STRATEGIES): DemoRoute {
   const own = <S extends Step>(step: S, name: string): Readonly<Record<string, number | boolean | string>> | undefined => pick.options?.[step]?.[name];
-  let board = graph;
-  if (pick.room) {
-    const room = getStrategy(registry, "room", pick.room);
-    board = { nodes: openGaps(graph.nodes, room.run({ items: graph.nodes, links: roomLinks(graph) }, own("room", room.name))), edges: graph.edges };
-  }
-  let router: Strategy<"router">;
-  let options: object | undefined;
-  if (pick.highway) {
-    const highway = getStrategy(registry, "highway", pick.highway);
-    router = highwayRouterStrategy(highway) as Strategy<"router">;
-    options = own("highway", highway.name);
-  } else {
-    router = getStrategy(registry, "router", pick.router);
-    const key = groupKey(router);
-    const group = key && pick.group ? getStrategy(registry, "group", pick.group) : undefined;
-    options = group ? { ...own("router", router.name), [key!]: group, groupOptions: { ...fixtureGroupOptions(group.name, board), ...own("group", group.name) } } : own("router", router.name);
-  }
-  if (board.nodes.length > (router.maxNodes ?? Infinity)) throw new Error(`The strategy ${router.name} takes at most ${router.maxNodes} nodes.`);
-  return { graph: board, result: asRouter(router, options).route(board) };
+  const router = getStrategy(registry, "router", pick.router);
+  const highway = pick.highway ? getStrategy(registry, "highway", pick.highway) : undefined;
+  const room = pick.room ? getStrategy(registry, "room", pick.room) : undefined;
+  const group = pick.group ? getStrategy(registry, "group", pick.group) : undefined;
+  const plugs = pick.plugs ? getStrategy(registry, "plugs", pick.plugs) : undefined;
+  const levels = pick.levels ? getStrategy(registry, "levels", pick.levels) : undefined;
+  const whole = pick.whole ? getStrategy(registry, "whole", pick.whole) : wholeStrategies.pipeline;
+  const maxNodes = highway ? highwayRouterStrategy(highway).maxNodes : router.maxNodes;
+  const name = highway?.name ?? router.name;
+  if (graph.nodes.length > (maxNodes ?? Infinity)) throw new Error(`The strategy ${name} takes at most ${maxNodes} nodes.`);
+  // The room strategy does not change the number of the nodes, so the grouping options of the fixture fit the open board.
+  const options = {
+    router,
+    ...(own("router", router.name) ? { routerOptions: own("router", router.name) } : {}),
+    ...(highway ? { highway, highwayOptions: own("highway", highway.name) } : {}),
+    ...(group ? { group, groupOptions: { ...fixtureGroupOptions(group.name, graph), ...own("group", group.name) } } : {}),
+    ...(plugs ? { plugs, plugOptions: own("plugs", plugs.name) } : {}),
+    ...(levels ? { levels, levelOptions: own("levels", levels.name) } : {}),
+    ...(room ? { room, roomOptions: own("room", room.name) } : {}),
+    ...own("whole", whole.name),
+  };
+  return whole.run(graph, options);
 }

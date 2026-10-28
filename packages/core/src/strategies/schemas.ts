@@ -50,12 +50,14 @@ import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
 import type { WspdOptions } from "../highways/wspd/index.ts";
 import type { ZipperOptions } from "../highways/zipper/index.ts";
 import type { LaneStretchOptions } from "../lane-orders/stretch/index.ts";
+import type { DepthLevelOptions } from "../levels/depths/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
 import type { TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
 import type { WayOptions } from "../ways.ts";
+import type { PipelineOptions } from "../whole/pipeline/index.ts";
 import type { RunOrder } from "../segments.ts";
 import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
 import type { EnumOption, NumberOption, OptionSchema } from "./options.ts";
@@ -109,6 +111,8 @@ export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
     default: 0,
     describe: "With a gap above 0, the free plugs of a side keep their order and at least this gap (WILD-002). 0 keeps each plug where it is.",
   },
+  plug: { type: "strategy", step: "plugs", describe: "The plug rule: a strategy of the step `plugs`. Without it, the option `plugs` places the plugs." },
+  plugOptions: { type: "object", describe: "The options of the strategy `plug`." },
 };
 
 /** The declarations of the options of the router `trunks`. */
@@ -266,6 +270,8 @@ export const SECTIONS_SCHEMA: OptionSchema<RouterPreset<SectionsOptions>> = {
   group: { type: "strategy", step: "group", describe: "The grouping rule: a strategy of the step `group`. Without it, the router uses the quadtree." },
   groupOptions: { type: "object", describe: "The options of the strategy `group`." },
   levels: { type: "list", describe: "The depths of the tree that get a level with groups. Without it, each depth gets a level." },
+  level: { type: "strategy", step: "levels", describe: "The level rule: a strategy of the step `levels`. Without it, the router uses the strategy `depths`." },
+  levelOptions: { type: "object", describe: "The options of the strategy `level`. They go over the level options of the router." },
   laneOrder: RUN_LANE_ORDER,
 };
 
@@ -879,4 +885,30 @@ export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
   line: { type: "enum", values: ["routes", "lines"], default: "routes", describe: "The line of each edge: its first route, or the straight line between its plugs." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
   spine: GROUP_SPINE,
+};
+
+/** The declarations of the options of the level strategy `depths`: the limits of the level links, and the depths that get a level. */
+export const DEPTHS_SCHEMA: OptionSchema<DepthLevelOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  tightMargin: SECTIONS_SCHEMA.tightMargin,
+  plugInset: SECTIONS_SCHEMA.plugInset,
+  throughCost: SECTIONS_SCHEMA.throughCost,
+  levels: SECTIONS_SCHEMA.levels,
+};
+
+/** The declarations of the options of the whole strategy `pipeline`. */
+export const PIPELINE_SCHEMA: OptionSchema<PipelineOptions> = {
+  router: { type: "strategy", step: "router", describe: "The router. A highway plan takes its place." },
+  routerOptions: { type: "object", describe: "The options of the router." },
+  highway: { type: "strategy", step: "highway", describe: "The highway strategy. With it, the plan and `follow` give the routes. Without it, the router routes." },
+  highwayOptions: { type: "object", describe: "The options of the highway strategy." },
+  group: { type: "strategy", step: "group", describe: "The grouping rule of a router that reads one, for example `sections`." },
+  groupOptions: { type: "object", describe: "The options of the grouping rule." },
+  plugs: { type: "strategy", step: "plugs", describe: "The plug rule of a router that reads one, for example `corners`." },
+  plugOptions: { type: "object", describe: "The options of the plug rule." },
+  levels: { type: "strategy", step: "levels", describe: "The level rule of a router that reads one, for example `sections`." },
+  levelOptions: { type: "object", describe: "The options of the level rule." },
+  room: { type: "strategy", step: "room", describe: "The room strategy. With it, the gaps of the board open before the routes. Without it, the board stays." },
+  roomOptions: { type: "object", describe: "The options of the room strategy." },
 };

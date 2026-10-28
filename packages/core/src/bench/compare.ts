@@ -3,10 +3,12 @@ import { polylineLength, type Box } from "../geom.ts";
 import { highwayRouterStrategy } from "../highways/router.ts";
 import type { Graph, LevelLink, Node, Result } from "../model.ts";
 import { openGaps, roomLinks } from "../room/index.ts";
+import { cornersRouter } from "../routers/corners.ts";
+import { sectionsRouter } from "../routers/sections.ts";
 import type { Section } from "../sections.ts";
 import { runKey, segmentsOf } from "../segments.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { asRouter, createRegistry, getStrategy, listStrategies, STEPS, type AnyStrategy, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
+import { asRouter, createRegistry, defineStrategy, getStrategy, listStrategies, STEPS, type AnyStrategy, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { peakCurvature } from "./curves.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
@@ -47,10 +49,22 @@ function laneBoard(result: Result, lanes: { readonly width: number; readonly max
 }
 
 /**
- * The steps that `compareStep` compares. The step `room` takes a packed board, not a graph, so it is not in the list.
- * The step `highway` gives a plan, not routes. The screen routes each plan with `follow` and compares it as a router.
+ * The steps whose strategies give no routes alone. `compareAnyStep` and the screen compare each strategy of these steps as a router (`stepRouterStrategy`).
+ * The step `highway` gives a plan, the step `plugs` gives the plugs, the step `levels` gives the zoom levels, and the step `whole` gives a board with its routes.
  */
-export type CompareStep = Exclude<Step, "room" | "highway">;
+export type RoutedStep = "plugs" | "highway" | "levels" | "whole";
+
+/** The steps of `RoutedStep`, in the order of the pipeline. */
+export const ROUTED_STEPS: readonly RoutedStep[] = ["plugs", "highway", "levels", "whole"];
+
+/** This function tells if a step is a step of `RoutedStep`. */
+export const isRoutedStep = (step: Step): step is RoutedStep => (ROUTED_STEPS as readonly Step[]).includes(step);
+
+/**
+ * The steps that `compareStep` compares. The step `room` takes a packed board, not a graph, so it is not in the list.
+ * The steps of `RoutedStep` give no routes alone, so they are not in the list. `compareAnyStep` compares them as routers.
+ */
+export type CompareStep = Exclude<Step, "room" | RoutedStep>;
 
 /** The steps that `compareStep` compares, in the order of the pipeline. */
 export const COMPARE_STEPS: readonly CompareStep[] = ["group", "router", "curve"];
@@ -198,6 +212,36 @@ export function highwayRouters(registry: Registry): Strategy<"router">[] {
   return listStrategies(registry, "highway").map((s) => highwayRouterStrategy(s) as Strategy<"router">);
 }
 
+/**
+ * This function gives a router strategy that runs a strategy of a step of `RoutedStep`. The router has the name, the options and the schema of the strategy.
+ * - A highway strategy makes its plan, and `follow` routes the plan (`highwayRouterStrategy`).
+ * - A plug rule gives the plugs of the router `corners` (its option `plug`).
+ * - A level rule gives the zoom levels of the router `sections` (its option `level`).
+ * - A whole strategy gives the routes of its output. A room strategy in its options can change the board, but the measures read the input graph.
+ */
+export function stepRouterStrategy(strategy: Strategy<RoutedStep>): Strategy<"router"> {
+  if (strategy.step === "highway") return highwayRouterStrategy(strategy as Strategy<"highway">) as Strategy<"router">;
+  const { name, describe, defaults } = strategy;
+  const own = (maxNodes: number | undefined, route: (graph: Graph, options: object) => Result): Strategy<"router"> =>
+    defineStrategy<"router", object>({
+      step: "router",
+      name,
+      describe,
+      defaults,
+      ...(strategy.schema === undefined ? {} : { schema: strategy.schema }),
+      ...(maxNodes === undefined ? {} : { maxNodes }),
+      run: route,
+    });
+  if (strategy.step === "plugs") return own(strategy.maxNodes ?? 10_000, (graph, o) => cornersRouter({ name, plug: strategy as Strategy<"plugs">, plugOptions: o }).route(graph));
+  if (strategy.step === "levels") return own(strategy.maxNodes ?? 100_000, (graph, o) => sectionsRouter({ name, level: strategy as Strategy<"levels">, levelOptions: o }).route(graph));
+  return own(strategy.maxNodes, (graph, o) => (strategy as Strategy<"whole">).run(graph, o).result);
+}
+
+/** This function gives a router for each strategy of one step of `RoutedStep` in a registry, in the order of the registry (`stepRouterStrategy`). */
+export function stepRouters(registry: Registry, step: RoutedStep): Strategy<"router">[] {
+  return (listStrategies(registry, step) as readonly Strategy<RoutedStep>[]).map((s) => stepRouterStrategy(s));
+}
+
 /** One strategy of any step on one graph: a row of `compareStep`, or a row of the steps `highway` and `room`. */
 export interface AnyCompareRow extends Omit<CompareRow, "step"> {
   readonly step: Step;
@@ -263,8 +307,8 @@ function roomRow(strategy: Strategy<"room">, graph: Graph, options: object | und
 /** This function runs one strategy of one step on one graph, as `compareAnyStep` does. */
 function compareOne(step: Step, strategy: AnyStrategy, graph: Graph, registry: Registry, options: CompareOptions): AnyCompareRow {
   if (step === "room") return roomRow(strategy as Strategy<"room">, graph, options.options?.[strategy.name]);
-  if (step === "highway") {
-    const one = createRegistry([highwayRouterStrategy(strategy as Strategy<"highway">)]);
+  if (isRoutedStep(step)) {
+    const one = createRegistry([stepRouterStrategy(strategy as Strategy<RoutedStep>) as AnyStrategy]);
     return { ...compareStep("router", graph, { ...options, registry: one }).rows[0]!, step };
   }
   const curveRouter = step === "curve" ? [getStrategy(registry, "router", options.curveRouter ?? "corners") as AnyStrategy] : [];
@@ -275,6 +319,7 @@ function compareOne(step: Step, strategy: AnyStrategy, graph: Graph, registry: R
  * This function runs each strategy of any step of `STEPS` on one graph and measures it. Then it gives the Pareto front of `FRONT_OBJECTIVES`.
  * The steps `group`, `router` and `curve` give the rows of `compareStep`.
  * The step `highway` makes the plan of each strategy and routes it with `follow`, as the screen does. It measures the routes as the step `router`.
+ * The steps `plugs`, `levels` and `whole` also run each strategy as a router (`stepRouterStrategy`), and measure the routes as the step `router`.
  * The step `room` opens the gaps of the board with each strategy (`openGaps`). It measures the open board as the step `room` of `runSuite`.
  * The step `room` expects a packed board, for example `packedGridBoard`. On a board with wide gaps, a gap opens only when its links need more room.
  *

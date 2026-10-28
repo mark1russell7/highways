@@ -35,6 +35,9 @@ function madeUp(step: Step): AnyStrategy {
   if (step === "router") return defineStrategy({ ...base, step, run: (g: Graph) => straightRouter.route(g) });
   if (step === "highway") return defineStrategy({ ...base, step, run: (input) => getStrategy(STRATEGIES, "highway", "corridors").run(input) });
   if (step === "curve") return defineStrategy({ ...base, step, run: (input) => getStrategy(STRATEGIES, "curve", "straight").run(input) });
+  if (step === "plugs") return defineStrategy({ ...base, step, run: (input) => getStrategy(STRATEGIES, "plugs", "facing").run(input) });
+  if (step === "levels") return defineStrategy({ ...base, step, run: (input) => getStrategy(STRATEGIES, "levels", "depths").run(input) });
+  if (step === "whole") return defineStrategy({ ...base, step, run: (g: Graph) => getStrategy(STRATEGIES, "whole", "pipeline").run(g) });
   return defineStrategy({ ...base, step: "room", run: (input) => getStrategy(STRATEGIES, "room", "lines").run(input) });
 }
 
@@ -100,6 +103,12 @@ describe("each step and each strategy on the pages (COMPARE-ALL)", () => {
     for (const router of of("router")) expect(demoRoute(graph, { router }).result.routes.length, router).toBeGreaterThan(0);
     for (const highway of of("highway")) expect(demoRoute(graph, { router: "corners", highway }).result.routes.length, highway).toBeGreaterThan(0);
     for (const group of of("group")) expect(demoRoute(graph, { router: "sections", group }).result.levels?.length, group).toBeGreaterThan(0);
+    // The default rules of the steps `plugs` and `levels` and the default whole strategy give the routes of the router alone.
+    for (const plugs of of("plugs")) expect(demoRoute(graph, { router: "corners", plugs }).result.routes.length, plugs).toBeGreaterThan(0);
+    for (const levels of of("levels")) expect(demoRoute(graph, { router: "sections", levels }).result.levels?.length, levels).toBeGreaterThan(0);
+    for (const whole of of("whole")) expect(demoRoute(graph, { router: "corners", whole }).result.routes.length, whole).toBeGreaterThan(0);
+    expect(demoRoute(graph, { router: "corners", plugs: "facing" }).result).toEqual(demoRoute(graph, { router: "corners" }).result);
+    expect(demoRoute(graph, { router: "sections", levels: "depths" }).result).toEqual(demoRoute(graph, { router: "sections" }).result);
     for (const room of of("room")) {
       const open = demoRoute(graph, { router: "corners", room });
       expect(open.graph.nodes, room).toHaveLength(graph.nodes.length);

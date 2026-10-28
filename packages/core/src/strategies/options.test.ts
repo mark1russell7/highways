@@ -7,6 +7,7 @@ import { FIXTURES, makeFixture } from "../fixtures.ts";
 import type { Graph } from "../model.ts";
 import { roomLinks } from "../room/index.ts";
 import { ROUTERS } from "../routers/index.ts";
+import { buildSections } from "../sections.ts";
 import {
   BUILT_IN_STRATEGIES,
   checkOptions,
@@ -47,6 +48,15 @@ function runOn(s: AnyStrategy, options?: object): unknown[] {
       const grid = packedGridBoard();
       return [s.run({ items: grid.nodes, links: roomLinks(grid) }, options)];
     }
+    case "plugs":
+      return [tiny, board("case-hub-chain")].map((graph) => s.run({ graph }, options));
+    case "levels":
+      return [tiny, board("case-hub-chain")].map((graph) => {
+        const routes = ROUTERS.find((r) => r.name === "corners")!.route(graph).routes;
+        return s.run({ graph, root: buildSections(graph.nodes), routes }, options);
+      });
+    case "whole":
+      return [tiny, board("case-hub-chain")].map((g) => s.run(g, options));
   }
 }
 

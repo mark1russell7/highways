@@ -3,7 +3,7 @@ import { stableOrderStrategy } from "../../order/index.ts";
 import { repairStrategy } from "../../repair/index.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
-import { compareStep, highwayRouters, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
+import { compareStep, highwayRouters, isRoutedStep, stepRouters, type CompareRow, type CompareStep, type RoutedStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
 import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
@@ -26,13 +26,14 @@ import { measureByName, measureName, namedObjectives } from "./measures.ts";
 import { SCREEN_V1, screenInputs, type ScreenSet } from "./set.ts";
 
 /**
- * The steps of the screen: the steps of `compareStep` and the step `highway`.
+ * The steps of the screen: the steps of `compareStep` and the steps of `RoutedStep`.
  * The screen of the step `highway` routes the plan of each strategy with `follow`, and measures the routes as the routes of a router.
+ * The screen of the steps `plugs`, `levels` and `whole` runs each strategy as a router (`stepRouterStrategy`), and measures the routes as the routes of a router.
  */
-export type ScreenStep = CompareStep | "highway";
+export type ScreenStep = CompareStep | RoutedStep;
 
 /** The steps of the screen, in the order of the pipeline. */
-export const SCREEN_STEPS: readonly ScreenStep[] = ["group", "router", "highway", "curve"];
+export const SCREEN_STEPS: readonly ScreenStep[] = ["group", "plugs", "router", "highway", "levels", "curve", "whole"];
 
 /** The routers that the screen of the step `highway` also runs by default. They are the baselines of the note on highways. */
 export const HIGHWAY_BASE_ROUTERS: readonly string[] = ["corners", "shared", "trunks"];
@@ -53,6 +54,9 @@ const ROUTE_RULES: readonly string[] = ["complete", "ends-at-plugs", "fixed-plug
 export const SCREEN_RULES: Readonly<Record<ScreenStep, readonly string[]>> = {
   router: ROUTE_RULES,
   highway: ROUTE_RULES,
+  plugs: ROUTE_RULES,
+  levels: ROUTE_RULES,
+  whole: ROUTE_RULES,
   group: ["sections", "counts-sum", "link-ends", "same-twice"],
   curve: ["same-twice"],
 };
@@ -220,8 +224,8 @@ function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenS
   return { registry: createRegistry([...others, ...(own as readonly AnyStrategy[])]), candidates };
 }
 
-/** This function tells if a step of the screen gives routes. The step `router` gives routes, and the step `highway` gives routes after `follow`. */
-const givesRoutes = (step: ScreenStep): step is "router" | "highway" => step === "router" || step === "highway";
+/** This function tells if a step of the screen gives routes. The step `router` gives routes, and each step of `RoutedStep` gives routes as a router. */
+const givesRoutes = (step: ScreenStep): step is "router" | RoutedStep => step === "router" || isRoutedStep(step);
 
 /**
  * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
@@ -346,14 +350,17 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   const candidates = screened.candidates;
   // The step `highway` runs as the step `router`. Each highway strategy with `follow` is a router, after the base routers.
   const base = step === "highway" ? (options.baseRouters ?? HIGHWAY_BASE_ROUTERS).map((name) => getStrategy(STRATEGIES, "router", name)) : [];
+  // The steps `plugs`, `levels` and `whole` run each strategy as one router, with no base routers.
   const unwrapped =
     step === "highway"
       ? createRegistry([...base, ...highwayRouters(screened.registry)] as readonly AnyStrategy[])
-      : screened.registry;
+      : isRoutedStep(step)
+        ? createRegistry(stepRouters(screened.registry, step) as readonly AnyStrategy[])
+        : screened.registry;
   const wrapped = givesRoutes(step) ? wrapRouters(unwrapped, options.wrap ?? []) : { registry: unwrapped, added: [] };
   const registry = wrapped.registry;
   for (const name of wrapped.added) candidates.add(name);
-  const compareAs: CompareStep = step === "highway" ? "router" : step;
+  const compareAs: CompareStep = isRoutedStep(step) ? "router" : step;
   const baseNames = new Set(base.map((s) => s.name));
   const stepOf = (name: string): ScreenStep => (baseNames.has(unwrappedName(name)) ? "router" : step);
   // A wrapped router gets the options of its router, unless the call gives its own.

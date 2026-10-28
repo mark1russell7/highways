@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadIdeas, type Idea } from "../../../scripts/ideas.ts";
 import { builders, strategyIdeas } from "../../../scripts/strategy-ideas.ts";
-import { STRATEGIES, listStrategies } from "../../strategies/index.ts";
+import { STEPS, STRATEGIES, listStrategies } from "../../strategies/index.ts";
 import { buildQueue, committedQueue, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openTargets, queueText, readQueue, spearman, type QueueSnapshot } from "../../../scripts/queue.ts";
 
 const ideas = loadIdeas();
@@ -62,7 +62,7 @@ describe("the idea queue (IDEA-QUEUE)", () => {
 
   it("maps only registered strategies to ideas that exist", () => {
     const map = strategyIdeas();
-    const names = (["group", "router", "highway", "curve", "room"] as const).flatMap((step) => listStrategies(STRATEGIES, step).map((s) => `${step}:${s.name}`));
+    const names = STEPS.flatMap((step) => listStrategies(STRATEGIES, step).map((s) => `${step}:${s.name}`));
     expect(map.map((m) => `${m.step}:${m.strategy}`).sort()).toEqual([...names].sort());
     const ids = new Set(ideas.map((r) => r.id));
     for (const m of map) for (const id of m.ideas) expect(ids.has(id), `${m.strategy} names ${id}, which does not exist`).toBe(true);
