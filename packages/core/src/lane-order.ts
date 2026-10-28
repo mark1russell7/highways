@@ -61,7 +61,7 @@ export function precedenceOrder(n: number, before: (i: number, j: number) => num
   if (breaks > 0 && laneSort === "rank") {
     // MEASURE-ONLY: the rank by the count of the items that each item comes before, then the index.
     const wins = new Int32Array(n);
-    for (let i = 0; i < n; i++) for (const k of next[i]!) wins[i]!++;
+    for (let i = 0; i < n; i++) wins[i] = next[i]!.length;
     const ranked = Array.from({ length: n }, (_, i) => i).sort((a, b) => wins[b]! - wins[a]! || a - b);
     return { order: ranked, breaks };
   }
