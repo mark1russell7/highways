@@ -83,12 +83,13 @@ Status: `done`, `active`, `blocked`, `later`.
 | G10 | The contract 0.2.2 has `compareMeasure` and `minEffectOf`. The core has `layout-contract` ^0.2.3 as a development dependency and keeps its own copy. A test shows that the copy and the contract give the same result on the cases of `compare.test.ts` and on 5000 seeded random pairs. | 2026-10-27 | #99 |
 | ORACLE | [The oracle bound](research/ORACLE.md): the best strategy of each input, over 228 strategies. On `exact-v1`, the oracle closes 0.947 of the gap, against 0.595 for the best single strategy. On `screen-v1`, the guarded oracle B1 is 39% to 534% above the best single strategy on 4 of 4 boards. A selector by class keeps -32% of the gain on `exact-v1`. | 2026-10-27 | #100 |
 | BUILD-W3F | Seven highway finders: `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub` and `scale-space`. No finder beats `shared` on more than 2 of 4 boards, alone or with the gate `stretch`. All seven are dropped. `p-hub` closes 0.356 of the gap on tiny-uniform. | 2026-10-27 | #95 |
+| PORTFOLIO | [The portfolio of strategies](research/PORTFOLIO.md): `shared` and k more strategies, and the output with the best guarded B1. On `exact-v1`, k = 3 keeps 6% of the oracle gain, because B10 needs the optimum. On `screen-v1`, k = 3 keeps 72%, but at most 4.3% over the best single strategy on each board. At 40 nodes, it takes 42 ms one after the other. | 2026-10-27 | #101 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. | `later` | ORACLE | P1 |
+| SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. A portfolio with a score of the output alone keeps 6% on `exact-v1` (PORTFOLIO), so the selector needs a score that knows the rule of the run. | `later` | ORACLE | P1 |
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
 | MEAS-FLAT | Z2 is 0 on each record, and B8 `runs` is degenerate where `shared` has 0. Correct each definition, or mark it inactive with its reason. | `later` | MEAS3A | P2 |
 | CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
