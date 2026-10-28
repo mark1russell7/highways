@@ -15,7 +15,8 @@
 //
 // The route hash is `routeHash` of `scripts/xplat.ts`. `exact` is the first 16 hex digits of the SHA-256 of the exact lines of the result.
 // Two equal hashes of the same router before and after a change show that the change keeps each byte of the output.
-// With `--profile <file>`, the script keeps a CPU profile of the first route and prints the 25 functions with the most self time.
+// With `--profile <file>`, the script keeps a CPU profile of the first route in `<file>` and a CPU profile of the steps in a file with the suffix `.steps.cpuprofile`.
+// For each profile, it prints the 25 functions with the most self time.
 import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { Session } from "node:inspector/promises";
@@ -31,6 +32,11 @@ interface ProfileNode {
   id: number;
   callFrame: { functionName: string; url: string; lineNumber: number };
   hitCount?: number;
+}
+
+/** A CPU profile of the inspector. */
+interface Profile {
+  readonly nodes: ProfileNode[];
 }
 
 /** The time of one step, in milliseconds, with one decimal. */
@@ -109,21 +115,26 @@ async function main(): Promise<void> {
   const env = { os: platform(), arch: arch(), cpu: (cpus()[0]?.model ?? "").trim(), node: process.version, highways: pkg.version };
   console.log(`scale: ${name} on ${doc.manifestId ?? file} (${graph.nodes.length} nodes, ${graph.edges.length} edges), ${env.os} ${env.arch} node ${env.node}, ${env.cpu}.`);
 
-  let session: Session | undefined;
-  if (profileFile !== undefined) {
-    session = new Session();
+  // With `--profile`, a CPU profile covers the first route, and a second profile covers the steps.
+  const profiler = async (): Promise<() => Promise<Profile>> => {
+    const session = new Session();
     session.connect();
     await session.post("Profiler.enable");
     await session.post("Profiler.setSamplingInterval", { interval: 1000 });
     await session.post("Profiler.start");
-  }
+    return async () => {
+      const { profile } = (await session.post("Profiler.stop")) as { profile: Profile };
+      session.disconnect();
+      return profile;
+    };
+  };
+  const keep = (path: string, what: string, profile: Profile): void => {
+    writeFileSync(path, JSON.stringify(profile));
+    console.log(`\nThe profile of ${what}:\n\n${topSelf(profile.nodes)}\n`);
+  };
+  const stopRoute = profileFile === undefined ? undefined : await profiler();
   const first = route(graph);
-  if (session !== undefined) {
-    const { profile } = (await session.post("Profiler.stop")) as { profile: { nodes: ProfileNode[] } };
-    session.disconnect();
-    writeFileSync(profileFile!, JSON.stringify(profile));
-    console.log(`\nThe profile of the first route of ${name} (${ms(first.ms)} ms, with the profiler):\n\n${topSelf(profile.nodes)}\n`);
-  }
+  if (stopRoute !== undefined) keep(profileFile!, `the first route of ${name} (${ms(first.ms)} ms, with the profiler)`, await stopRoute());
   console.log(`scale: ${name}: route 1 of ${repeat}: ${ms(first.ms)} ms.`);
   const runs = [first.ms];
   const hashes = new Set<string>();
@@ -145,10 +156,12 @@ async function main(): Promise<void> {
     console.log(`scale: ${name}: ${step}: ${steps[step]} ms.`);
     return v;
   };
+  const stopSteps = profileFile === undefined ? undefined : await profiler();
   const violations = time("checkProperties", () => checkProperties(graph, result, 1_000_000)).length;
   time("measureQuality", () => measureQuality(graph, result));
   const stretches = time("exactStretches.build", () => exactStretches(graph));
   time("exactStretches.use", () => stretches(result.routes));
+  if (stopSteps !== undefined) keep(profileFile!.replace(/\.cpuprofile$/, "") + ".steps.cpuprofile", `the steps of ${name}, with the profiler`, await stopSteps());
   if (first.key !== undefined) steps["portfolio.key"] = ms(first.key);
 
   const row = {
