@@ -4,10 +4,14 @@ import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
 import type { DiffusionOptions } from "../highways/diffusion/index.ts";
+import type { EdgePathOptions } from "../highways/edge-paths/index.ts";
 import type { FlowClusterOptions } from "../highways/flow-clusters/index.ts";
 import type { FlowFieldOptions } from "../highways/flow-field/index.ts";
 import type { GrowthOptions } from "../highways/growth/index.ts";
 import type { GroupSpine } from "../highways/grouped.ts";
+import type { HdbscanOptions } from "../highways/hdbscan/index.ts";
+import type { HoughOptions } from "../highways/hough/index.ts";
+import type { HubArcOptions } from "../highways/hub-arcs/index.ts";
 import type { LanesOptions } from "../highways/lanes/index.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
@@ -15,8 +19,10 @@ import type { MingleOptions } from "../highways/mingle/index.ts";
 import type { NestedOptions } from "../highways/nested/index.ts";
 import type { OdCellOptions } from "../highways/od-cells/index.ts";
 import type { QuickBundlesOptions } from "../highways/quickbundles/index.ts";
+import type { RidgeOptions } from "../highways/ridges/index.ts";
 import type { RoadClassOptions } from "../highways/road-classes/index.ts";
 import type { SelectOptions } from "../highways/select/index.ts";
+import type { SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import type { SpiralOptions } from "../highways/spiral/index.ts";
 import type { StubOptions } from "../highways/stubs/index.ts";
 import type { TraclusOptions } from "../highways/traclus/index.ts";
@@ -514,4 +520,66 @@ export const GROWTH_SCHEMA: OptionSchema<GrowthOptions> = {
   extendLanes: { type: "integer", min: 2, max: 8, step: 1, default: 3, describe: "A spine end extends when this number of its lanes or more go on together." },
   extendRadius: { type: "number", min: 0.5, max: 6, step: 0.5, default: 2, describe: "The lanes go on together when their ends are this distance from their center or nearer, in units of the board." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway with this number of edges or more stays in the plan." },
+};
+
+/** The declarations of the options of the highway strategy `edge-paths` (HWY-012). */
+export const EDGE_PATH_SCHEMA: OptionSchema<EdgePathOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  distortion: { type: "number", min: 1.1, max: 4, step: 0.1, marks: [1.5, 2, 3], default: 2, describe: "An edge takes a path of other edges only when the path is this many times its own length or less." },
+  power: { type: "number", min: 1, max: 4, step: 0.5, default: 2, describe: "The weight of a link in the search is its length to this power." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `soft-keys` (HWY-019). */
+export const SOFT_KEY_SCHEMA: OptionSchema<SoftKeyOptions> = {
+  rule: { type: "function", describe: "The rule that gives the key of each edge. Two different keys add the distance `lambda`." },
+  lambda: { type: "number", min: 0, max: 2, step: 0.05, marks: [0, 0.25, 1], default: 0.25, describe: "The distance that two different keys add. A very large value keeps the keys apart." },
+  tau: { type: "number", min: 0.1, max: 1.5, step: 0.05, marks: [0.3, 0.5, 1], default: 0.5, describe: "Two clusters join while their distance is this value or less." },
+  attributes: { type: "list", default: [], describe: "The names of number fields of `data` that add a distance." },
+  weight: { type: "number", min: 0, max: 2, step: 0.25, default: 1, describe: "The weight of each field of `attributes`." },
+  linkage: { type: "enum", values: ["average", "complete", "single"], default: "average", describe: "The distance of two clusters: the mean, the largest or the smallest distance of their edges." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: { ...GROUP_SPINE, default: "shared" },
+};
+
+/** The declarations of the options of the highway strategy `hough` (HWY-024). */
+export const HOUGH_SCHEMA: OptionSchema<HoughOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  dTheta: { type: "number", min: 2, max: 20, step: 1, marks: [4, 8, 12], default: 8, describe: "The width of the votes in the angle, in degrees." },
+  dRho: { type: "number", min: 4, max: 40, step: 2, marks: [8, 12, 24], default: 12, describe: "The width of the votes in the offset, in units of the board." },
+  minVotes: { type: "integer", min: 2, max: 16, step: 1, default: 3, describe: "A peak with fewer edges than this number is not a corridor." },
+  orthogonal: { type: "boolean", default: false, describe: "With this option, the peaks are only horizontal or vertical lines." },
+};
+
+/** The declarations of the options of the highway strategy `ridges` (HWY-032). */
+export const RIDGE_SCHEMA: OptionSchema<RidgeOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  source: { type: "enum", values: ["lines", "routes"], default: "lines", describe: "The lines of the density: the straight lines of the edges, or their first routes." },
+  cell: { type: "number", min: 2, max: 32, step: 1, marks: [4, 8, 16], default: 8, describe: "The size of a cell of the density image, in units of the board." },
+  bandwidth: { type: "number", min: 4, max: 64, step: 2, marks: [8, 16, 32], default: 16, describe: "The width of the blur of the density, in units of the board." },
+  strength: { type: "number", min: 0, max: 1, step: 0.05, default: 0.15, describe: "A cell is part of a ridge only when its strength is this share of the largest strength or more." },
+  minLength: { type: "number", min: 10, max: 300, step: 10, marks: [30, 60, 120], default: 60, describe: "A ridge has this length or more, in units of the board." },
+  snap: { type: "number", min: 2, max: 64, step: 2, marks: [8, 16, 32], default: 16, describe: "An edge snaps to a ridge where it is this distance from the ridge or nearer." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A ridge with this number of edges or more gets a highway." },
+};
+
+/** The declarations of the options of the highway strategy `hdbscan` (HWY-028). */
+export const HDBSCAN_SCHEMA: OptionSchema<HdbscanOptions> = {
+  minClusterSize: { type: "integer", min: 2, max: 16, step: 1, default: 3, describe: "A cluster has this number of edges or more." },
+  minSamples: { type: "integer", min: 1, max: 16, step: 1, default: 3, describe: "The core distance of an edge is the distance to its neighbour of this rank." },
+  distance: { type: "enum", values: ["compatibility", "flow"], default: "compatibility", describe: "The distance of two edges: 1 less their compatibility, or the flow distance of the ends." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `hub-arcs` (HWY-042). */
+export const HUB_ARC_SCHEMA: OptionSchema<HubArcOptions> = {
+  q: { type: "integer", min: 0, max: 64, step: 1, marks: [4, 12, 32], default: 12, describe: "The largest number of arcs." },
+  alpha: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.3, 0.5, 0.8], default: 0.5, describe: "The cost of a length on an arc against a length off the arcs." },
+  stretch: { type: "number", min: 1, max: 2, step: 0.05, marks: [1.25], default: 1.25, describe: "An edge rides an arc only when its way is this many times its first route or less." },
+  swaps: { type: "integer", min: 0, max: 5, step: 1, default: 1, describe: "The number of passes of the local search with one swap." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "An arc with fewer edges than this number is not a highway." },
+  generators: { type: "list", default: ["runs", "corridors", "road-classes"], describe: "The generators of the candidate arcs." },
 };

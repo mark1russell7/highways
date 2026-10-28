@@ -20,6 +20,12 @@ import { gateStrategy } from "../highways/gates/model.ts";
 import { stretchGate, type StretchOptions } from "../highways/gates/stretch/index.ts";
 import { DIFFUSION_DEFAULTS, diffusionPlan, type DiffusionOptions } from "../highways/diffusion/index.ts";
 import { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, type FlowClusterOptions } from "../highways/flow-clusters/index.ts";
+import { EDGE_PATH_DEFAULTS, edgePathPlan, type EdgePathOptions } from "../highways/edge-paths/index.ts";
+import { HDBSCAN_DEFAULTS, hdbscanPlan, type HdbscanOptions } from "../highways/hdbscan/index.ts";
+import { HOUGH_DEFAULTS, houghPlan, type HoughOptions } from "../highways/hough/index.ts";
+import { HUB_ARC_DEFAULTS, hubArcPlan, type HubArcOptions } from "../highways/hub-arcs/index.ts";
+import { RIDGE_DEFAULTS, ridgePlan, type RidgeOptions } from "../highways/ridges/index.ts";
+import { SOFT_KEY_DEFAULTS, softKeyPlan, type SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
 import { keysPlan, type KeysOptions } from "../highways/keys/index.ts";
 import { LEVEL_HIGHWAY_DEFAULTS, levelHighwayPlan, type LevelHighwayOptions } from "../highways/level-links/index.ts";
@@ -52,7 +58,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, EDGE_PATH_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -405,6 +411,12 @@ export const highwayStrategies: {
   readonly nested: Strategy<"highway", NestedOptions>;
   readonly lanes: Strategy<"highway", LanesOptions>;
   readonly growth: Strategy<"highway", GrowthOptions>;
+  readonly "edge-paths": Strategy<"highway", EdgePathOptions>;
+  readonly "soft-keys": Strategy<"highway", SoftKeyOptions>;
+  readonly hough: Strategy<"highway", HoughOptions>;
+  readonly ridges: Strategy<"highway", RidgeOptions>;
+  readonly hdbscan: Strategy<"highway", HdbscanOptions>;
+  readonly "hub-arcs": Strategy<"highway", HubArcOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -600,6 +612,60 @@ export const highwayStrategies: {
     schema: GROWTH_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<GrowthOptions>) => growthPlan(input, o),
+  }),
+  "edge-paths": defineStrategy({
+    step: "highway",
+    name: "edge-paths",
+    describe: "Edge-path bundling (HWY-012). An edge with a short path of other edges follows their ways, and the shared stretches become highways.",
+    defaults: { ...EDGE_PATH_DEFAULTS } as EdgePathOptions,
+    schema: EDGE_PATH_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<EdgePathOptions>) => edgePathPlan(input, o),
+  }),
+  "soft-keys": defineStrategy({
+    step: "highway",
+    name: "soft-keys",
+    describe: "Soft keys (HWY-019). The key of an edge adds a distance to the flow distance, and a hierarchical clustering makes the highways.",
+    defaults: { ...SOFT_KEY_DEFAULTS } as SoftKeyOptions,
+    schema: SOFT_KEY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SoftKeyOptions>) => softKeyPlan(input, o),
+  }),
+  hough: defineStrategy({
+    step: "highway",
+    name: "hough",
+    describe: "Hough votes (HWY-024). The straight lines of the edges vote for corridors, and each peak of the votes becomes a highway.",
+    defaults: { ...HOUGH_DEFAULTS } as HoughOptions,
+    schema: HOUGH_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<HoughOptions>) => houghPlan(input, o),
+  }),
+  ridges: defineStrategy({
+    step: "highway",
+    name: "ridges",
+    describe: "Ridges of the line density (HWY-032). The ridges of the blurred density of the edges become highways, and near edges snap to them.",
+    defaults: { ...RIDGE_DEFAULTS } as RidgeOptions,
+    schema: RIDGE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<RidgeOptions>) => ridgePlan(input, o),
+  }),
+  hdbscan: defineStrategy({
+    step: "highway",
+    name: "hdbscan",
+    describe: "HDBSCAN on edges (HWY-028). The density clusters of the edges that live over a long range become highways.",
+    defaults: { ...HDBSCAN_DEFAULTS } as HdbscanOptions,
+    schema: HDBSCAN_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<HdbscanOptions>) => hdbscanPlan(input, o),
+  }),
+  "hub-arcs": defineStrategy({
+    step: "highway",
+    name: "hub-arcs",
+    describe: "Hub arc location (HWY-042). A greedy pass with swaps chooses at most q arcs from the candidates, and each edge rides its best arc.",
+    defaults: { ...HUB_ARC_DEFAULTS } as HubArcOptions,
+    schema: HUB_ARC_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<HubArcOptions>) => hubArcPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

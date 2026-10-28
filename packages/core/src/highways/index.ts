@@ -21,10 +21,17 @@ export { OD_CELL_DEFAULTS, odCellPlan, odGroups, type OdCellOptions } from "./od
 export { CANDIDATE_SOURCES, candidatePlan, candidateScore, SELECT_DEFAULTS, selectPlan, type CandidateSource, type SelectOptions } from "./select/index.ts";
 export { MINGLE_DEFAULTS, mingleBundles, minglePlan, type MingleOptions } from "./mingle/index.ts";
 export { SPIRAL_DEFAULTS, spiralJoin, spiralPlan, spiralTree, type SpiralNode, type SpiralOptions } from "./spiral/index.ts";
-export { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, flowClusters, flowDistance, LINKAGES, type FlowClusterOptions, type Linkage } from "./flow-clusters/index.ts";
+export { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, flowClusters, flowDistance, chainClusters, LINKAGES, type FlowClusterOptions, type Linkage } from "./flow-clusters/index.ts";
 export { characteristicPoints, representative, segmentClusters, segmentDistance, TRACLUS_DEFAULTS, traclusPlan, type RouteSegment, type TraclusOptions } from "./traclus/index.ts";
 export { DIFFUSION_DEFAULTS, diffusionPlan, linkDensity, type DiffusionOptions } from "./diffusion/index.ts";
 export { NESTED_DEFAULTS, nestedGroups, nestedPlan, nestingViolations, type NestedOptions } from "./nested/index.ts";
 export { channelOverflows, LANES_DEFAULTS, lanesPlan, type LanesOptions } from "./lanes/index.ts";
 export { GROWTH_DEFAULTS, growthPlan, type GrowthOptions, type GrowthOrder } from "./growth/index.ts";
+export { EDGE_PATH_DEFAULTS, edgePathPlan, edgePaths, type EdgePathOptions, type PathStep } from "./edge-paths/index.ts";
+export { SOFT_KEY_DEFAULTS, softDistance, softKeyClusters, softKeyPlan, type SoftKeyOptions } from "./soft-keys/index.ts";
+export { linePoint, snapPlan, spinePart, type SnapLine, type SnapMember, type SnapOptions } from "./snap.ts";
+export { HOUGH_DEFAULTS, houghLines, houghPeaks, houghPlan, type HoughOptions, type HoughPeak } from "./hough/index.ts";
+export { densityRidges, lineDensity, RIDGE_DEFAULTS, ridgeLines, ridgePlan, type DensityImage, type Ridge, type RidgeOptions, type RidgeSource } from "./ridges/index.ts";
+export { compatibility, EDGE_DISTANCES, HDBSCAN_DEFAULTS, hdbscanClusters, hdbscanLabels, hdbscanPlan, type EdgeDistance, type HdbscanOptions } from "./hdbscan/index.ts";
+export { ARC_SOURCES, candidateArcs, HUB_ARC_DEFAULTS, hubArcPlan, type ArcSource, type HubArcOptions } from "./hub-arcs/index.ts";
 export * from "./gates/index.ts";

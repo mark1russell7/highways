@@ -45,7 +45,7 @@ export function flowDistance(s1: Point, t1: Point, s2: Point, t2: Point, directe
  * This function clusters the points of a distance matrix with the chain of nearest neighbours. The linkage is reducible, so the chain gives the same tree as the greedy order.
  * The clusters join while their distance is `tau` or less. The function gives the cluster of each point, as the index of a point of the cluster.
  */
-function chainClusters(n: number, d: Float64Array, tau: number, linkage: Linkage): Int32Array {
+export function chainClusters(n: number, d: Float64Array, tau: number, linkage: Linkage): Int32Array {
   const size = new Int32Array(n).fill(1);
   const alive = new Uint8Array(n).fill(1);
   const parent = new Int32Array(n);
