@@ -127,7 +127,41 @@
         "run": { "type": "string", "minLength": 1, "description": "The link of the CI run of the screen." },
         "verdict": { "enum": ["kept", "dropped", "screened"], "description": "The decision of the screen." },
         "note": { "type": "string", "minLength": 1 },
-        "summary": { "type": "string", "minLength": 1 }
+        "summary": { "type": "string", "minLength": 1 },
+        "rescreen": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["date", "runs"],
+          "description": "A second screen on new measures. It does not change the stage or the verdict.",
+          "properties": {
+            "item": { "type": "string", "minLength": 1, "description": "The roadmap item of the second screen." },
+            "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+            "runs": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 },
+              "description": "The links of the CI runs of the second screen."
+            },
+            "beats": {
+              "type": "object",
+              "description": "The boards where the idea is at least as good as its baseline on each part of a win, by comparison and win."
+            },
+            "gapClosed": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["rule", "median", "values"],
+              "description": "The part of the gap between the baseline and the exact optimum B1 that the idea closes, on the boards `tiny-uniform`.",
+              "properties": {
+                "strategy": { "type": "string", "minLength": 1 },
+                "rule": { "enum": ["collection", "all"] },
+                "cap": { "type": "object", "description": "The stretch cap of each board." },
+                "median": { "description": "The median over the boards with a value, or `null` when no board has a value." },
+                "values": { "type": "object", "description": "The gap closed of each board, or `null` when it has no value." }
+              }
+            },
+            "note": { "type": "string", "minLength": 1 }
+          }
+        }
       }
     }
   }

@@ -25,9 +25,9 @@ const corners = asRouter(getStrategy(STRATEGIES, "router", "corners"));
 const base = new WeakMap<Graph, Map<string, number>>();
 const logged = new Set<string>();
 
-/** This function gives the key of a board: its node count, its edge count and the id of its first edge. */
+/** This function gives the key of a board: its node count, its edge count and the place of its first node. */
 function boardOf(graph: Graph): string {
-  return `${graph.nodes.length}/${graph.edges.length}/${graph.edges[0]?.id ?? ""}`;
+  return `${graph.nodes.length}/${graph.edges.length}/${graph.nodes[0]?.box.x ?? ""},${graph.nodes[0]?.box.y ?? ""}`;
 }
 
 /** This function gives the length of the route of `corners` for each edge of a graph. */
