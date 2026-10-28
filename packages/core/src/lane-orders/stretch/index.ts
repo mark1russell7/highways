@@ -85,7 +85,8 @@ function shared(a: Prepared, b: Prepared): number {
 
 /**
  * This function gives the links between the runs. Two runs are linked when a route goes through one and then the other, with no shared run between them,
- * and when they share two edges or more. The edges and the runs are taken in a fixed order, so the links do not depend on the order of the input.
+ * and when they share two edges or more. Each such route gives a vote for the way of one run against the other.
+ * A link joins two runs only when all the votes agree. The links are a forest. The edges and the runs are taken in a fixed order, so the links do not depend on the order of the input.
  */
 function linksOf(prepared: readonly Prepared[], keyOrder: readonly number[]): Link[][] {
   const visits = new Map<string, { run: number; at: number; dir: 1 | -1 }[]>();
@@ -99,26 +100,49 @@ function linksOf(prepared: readonly Prepared[], keyOrder: readonly number[]): Li
       else visits.set(p.edge, [v]);
     }
   }
-  const links: Link[][] = prepared.map(() => []);
-  const seen = new Set<string>();
   const rank = new Map(keyOrder.map((i, r) => [i, r] as const));
+  // The votes of each pair of runs, with the run of the smaller rank first.
+  const votes = new Map<string, { a: number; b: number; plus: number; minus: number }>();
   for (const edge of [...visits.keys()].sort(byText)) {
     const list = visits.get(edge)!;
     list.sort((u, v) => u.at - v.at || rank.get(u.run)! - rank.get(v.run)!);
     for (let k = 1; k < list.length; k++) {
       const u = list[k - 1]!;
       const v = list[k]!;
-      if (u.run === v.run) continue;
-      const pair = u.run < v.run ? `${u.run},${v.run}` : `${v.run},${u.run}`;
-      if (seen.has(pair)) continue;
-      seen.add(pair);
-      if (shared(prepared[u.run]!, prepared[v.run]!) < 2) continue;
-      const turn = u.dir === v.dir ? (1 as const) : (-1 as const);
-      links[u.run]!.push({ to: v.run, turn });
-      links[v.run]!.push({ to: u.run, turn });
+      if (u.run === v.run || prepared[u.run]!.twice || prepared[v.run]!.twice) continue;
+      const [a, b] = rank.get(u.run)! < rank.get(v.run)! ? [u.run, v.run] : [v.run, u.run];
+      const key = `${a},${b}`;
+      let vote = votes.get(key);
+      if (!vote) {
+        if (shared(prepared[a]!, prepared[b]!) < 2) continue;
+        vote = { a, b, plus: 0, minus: 0 };
+        votes.set(key, vote);
+      }
+      if (u.dir === v.dir) vote.plus++;
+      else vote.minus++;
     }
   }
-  for (const list of links) list.sort((x, y) => rank.get(x.to)! - rank.get(y.to)!);
+  // The links with the most votes go first. A link that closes a cycle of links does not join: the links are a forest, so the ways of the runs of a stretch agree.
+  const list = [...votes.values()]
+    .filter((v) => v.plus === 0 || v.minus === 0)
+    .sort((x, y) => y.plus + y.minus - (x.plus + x.minus) || rank.get(x.a)! - rank.get(y.a)! || rank.get(x.b)! - rank.get(y.b)!);
+  const parent = prepared.map((_, i) => i);
+  const find = (i: number): number => {
+    let r = i;
+    while (parent[r] !== r) r = parent[r]!;
+    return r;
+  };
+  const links: Link[][] = prepared.map(() => []);
+  for (const v of list) {
+    const ra = find(v.a);
+    const rb = find(v.b);
+    if (ra === rb) continue;
+    parent[rb] = ra;
+    const turn = v.minus === 0 ? (1 as const) : (-1 as const);
+    links[v.a]!.push({ to: v.b, turn });
+    links[v.b]!.push({ to: v.a, turn });
+  }
+  for (const l of links) l.sort((x, y) => rank.get(x.to)! - rank.get(y.to)!);
   return links;
 }
 
