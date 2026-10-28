@@ -51,7 +51,7 @@ export function precedenceOrder(n: number, before: (i: number, j: number) => num
       }
     }
     if (pick < 0) {
-      pick = breakRule === "fewest" ? fewest : first;
+      pick = breakRule === "fewest" ? fewest : breakRule === "scc" ? Math.min(...sourceComponent(next, done)) : first;
       breaks++;
     }
     done[pick] = 1;
@@ -66,6 +66,59 @@ export function precedenceOrder(n: number, before: (i: number, j: number) => num
     return { order: ranked, breaks };
   }
   return { order, breaks };
+}
+
+/**
+ * This function gives the items of the source component of the items that are not `done`, with the algorithm of Tarjan.
+ * `next[i]` holds the items that come after the item `i`. The source component is the strong component with no predecessor outside itself.
+ * Tarjan gives the components in the reverse order of a topological sort, so the last component is a source.
+ */
+export function sourceComponent(next: readonly (readonly number[])[], done: Uint8Array): number[] {
+  const n = next.length;
+  const index = new Int32Array(n).fill(-1);
+  const low = new Int32Array(n);
+  const on = new Uint8Array(n);
+  const stack: number[] = [];
+  let counter = 0;
+  let last: number[] = [];
+  for (let root = 0; root < n; root++) {
+    if (done[root] || index[root]! >= 0) continue;
+    const frames: [number, number][] = [[root, 0]];
+    index[root] = low[root] = counter++;
+    stack.push(root);
+    on[root] = 1;
+    while (frames.length > 0) {
+      const frame = frames[frames.length - 1]!;
+      const v = frame[0];
+      const out = next[v]!;
+      if (frame[1] < out.length) {
+        const w = out[frame[1]++]!;
+        if (done[w]) continue;
+        if (index[w]! < 0) {
+          index[w] = low[w] = counter++;
+          stack.push(w);
+          on[w] = 1;
+          frames.push([w, 0]);
+        } else if (on[w]) low[v] = Math.min(low[v]!, index[w]!);
+        continue;
+      }
+      frames.pop();
+      if (frames.length > 0) {
+        const u = frames[frames.length - 1]![0];
+        low[u] = Math.min(low[u]!, low[v]!);
+      }
+      if (low[v] === index[v]) {
+        last = [];
+        let w: number;
+        do {
+          w = stack.pop()!;
+          on[w] = 0;
+          last.push(w);
+        } while (w !== v);
+      }
+    }
+  }
+  return last;
 }
 
 /** The function that `observeLanes` installs. It gets the count of the lanes of each run that `orderLanes` orders, and the count of the broken cycles. */
@@ -85,16 +138,18 @@ export function laneObserver(): LaneObserver | undefined {
 
 // MEASURE-ONLY: the switch of the candidates of LANE-ORDER. The final change removes it.
 /** The candidates of LANE-ORDER: the sort of the engine (before), a merge sort of the package, and the order of Kahn. */
-export type LaneSort = "engine" | "merge" | "kahn" | "kahn-fewest" | "rank";
+export type LaneSort = "engine" | "merge" | "kahn" | "kahn-fewest" | "kahn-scc" | "rank";
+const SORTS: readonly string[] = ["engine", "merge", "kahn", "kahn-fewest", "kahn-scc", "rank"];
 
 const fromEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.["HIGHWAYS_LANE_SORT"];
-let laneSort: LaneSort = fromEnv === "engine" || fromEnv === "merge" || fromEnv === "kahn-fewest" || fromEnv === "rank" ? fromEnv : "kahn";
-let breakRule: "first" | "fewest" = laneSort === "kahn-fewest" ? "fewest" : "first";
+let laneSort: LaneSort = fromEnv !== undefined && SORTS.includes(fromEnv) ? (fromEnv as LaneSort) : "kahn";
+const ruleOf = (s: LaneSort): "first" | "fewest" | "scc" => (s === "kahn-fewest" ? "fewest" : s === "kahn-scc" ? "scc" : "first");
+let breakRule = ruleOf(laneSort);
 
 /** This function sets the candidate. */
 export function setLaneSort(s: LaneSort): void {
   laneSort = s;
-  breakRule = s === "kahn-fewest" ? "fewest" : "first";
+  breakRule = ruleOf(s);
 }
 
 /** This function gives the candidate. */

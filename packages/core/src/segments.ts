@@ -300,7 +300,7 @@ export function orderLanes(run: readonly Point[], routes: readonly Route[], orde
   const compare = order === "run" ? byRun : byBundle;
   let lanes: Placed[];
   const sort = currentLaneSort();
-  if (sort === "kahn" || sort === "kahn-fewest" || sort === "rank") {
+  if (sort !== "engine" && sort !== "merge") {
     placed.sort(byEdge);
     const { order: ranks, breaks } = precedenceOrder(placed.length, (i, j) => compare(placed[i]!, placed[j]!));
     laneObserver()?.(placed.length, breaks);

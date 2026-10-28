@@ -27,7 +27,7 @@ function swaps(graph: SegmentGraph): number {
   return count;
 }
 
-for (const mode of ["engine", "merge", "kahn", "kahn-fewest", "rank"] as LaneSort[]) {
+for (const mode of ["engine", "merge", "kahn", "kahn-fewest", "kahn-scc", "rank"] as LaneSort[]) {
   setLaneSort(mode);
   const row: string[] = [];
   for (const c of CASES) {
