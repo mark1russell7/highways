@@ -1,4 +1,4 @@
-import { FIXTURES, listStrategies, makeFixture, STRATEGIES, type BenchRow, type Graph } from "@mark1russell7/highways";
+import { FIXTURES, getStrategy, makeFixture, STRATEGIES, type BenchRow, type Graph, type Step, type Strategy } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
@@ -6,6 +6,8 @@ import noBenchText from "../content/nobench.md?raw";
 import readme from "../../../README.md?raw";
 import { benchLabel } from "./bench-label.ts";
 import { html, inline, README, sectionOf } from "./content.ts";
+import { demoPickers, groupKey, type DemoPick, type DemoPicker } from "./demo-data.ts";
+import { optionSet, type OptionValue } from "./option-control.ts";
 import type { RouteDone, RouteReply, RouteRequest } from "./protocol.ts";
 import "./style.css";
 import { MapView, type BundleView } from "./view.ts";
@@ -18,9 +20,10 @@ const $ = <T extends HTMLElement>(id: string): T => {
 
 // The fixtures of the demo: all fixtures that a browser routes in a few seconds.
 const DEMO_FIXTURES = FIXTURES.filter((f) => f.nodes <= 1000);
-// The registry of the core gives the routers and the curve types, so a new strategy shows up here with no edit.
-const ROUTERS = listStrategies(STRATEGIES, "router");
-const CURVES = listStrategies(STRATEGIES, "curve");
+// The registry of the core gives a picker for each step, so a new strategy or step shows up here with no edit.
+const PICKERS = demoPickers();
+const pickerOf = (step: Step): DemoPicker => PICKERS.find((p) => p.step === step)!;
+const ROUTERS = pickerOf("router").names.map((name) => getStrategy(STRATEGIES, "router", name));
 const START = { fixture: "small-clustered", router: "shared" };
 const fmt = new Intl.NumberFormat("en-US");
 
@@ -31,14 +34,37 @@ const esc = (text: string): string =>
 interface State {
   fixture: string;
   router: string;
+  /** The pick of each step after the router: the highway plan, the grouping rule, the room strategy and the curve. An empty string is "none". */
+  picks: Record<Exclude<Step, "router">, string>;
+  /** The option values that differ from the defaults, by step, then by strategy. */
+  options: Partial<Record<Step, Record<string, Record<string, number | boolean | string>>>>;
   bundles: BundleView;
-  curve: string;
   level: number;
   follow: boolean;
   selected: string | undefined;
 }
 
-const state: State = { fixture: START.fixture, router: START.router, bundles: "unpack", curve: "straight", level: -1, follow: true, selected: undefined };
+const state: State = {
+  fixture: START.fixture,
+  router: START.router,
+  picks: { group: pickerOf("group").names[0] ?? "", highway: "", room: "", curve: "straight" },
+  options: {},
+  bundles: "unpack",
+  level: -1,
+  follow: true,
+  selected: undefined,
+};
+
+/** This function gives the pick of the state for the worker. A pick of "none" stays out. */
+function pickOf(router: string = state.router, highway: string = state.picks.highway): DemoPick {
+  return {
+    router,
+    ...(highway ? { highway } : {}),
+    ...(state.picks.group ? { group: state.picks.group } : {}),
+    ...(state.picks.room ? { room: state.picks.room } : {}),
+    options: state.options,
+  };
+}
 
 // The worker routes one request at a time. A request of the visitor goes before the requests that fill the cache.
 const worker = new Worker(new URL("./route.worker.ts", import.meta.url), { type: "module" });
@@ -64,19 +90,22 @@ function pump(): void {
   worker.postMessage(job.req);
 }
 
-function route(fixture: string, router: string, urgent: boolean): Promise<RouteReply> {
-  const key = `${fixture}|${router}`;
+/** This function gives the key of a route in the cache: the fixture and each part of the pick. */
+const keyOf = (fixture: string, pick: DemoPick): string => JSON.stringify([fixture, pick]);
+
+function route(fixture: string, pick: DemoPick, urgent: boolean): Promise<RouteReply> {
+  const key = keyOf(fixture, pick);
   const hit = cache.get(key);
   if (hit) {
     // A wanted route moves to the front of the queue.
     if (urgent) {
-      const i = waiting.findIndex((w) => w.req.fixture === fixture && w.req.router === router);
+      const i = waiting.findIndex((w) => keyOf(w.req.fixture, w.req.pick) === key);
       if (i > 0) waiting.unshift(...waiting.splice(i, 1));
     }
     return hit;
   }
   const p = new Promise<RouteReply>((resolve) => {
-    const job = { req: { id: nextId++, fixture, router }, resolve, urgent };
+    const job = { req: { id: nextId++, fixture, pick }, resolve, urgent };
     if (urgent) waiting.unshift(job);
     else waiting.push(job);
   });
@@ -162,18 +191,80 @@ fixtureSelect.addEventListener("change", () => {
   update();
 });
 
-const curveSelect = $<HTMLSelectElement>("curve");
-for (const c of CURVES) {
-  const o = document.createElement("option");
-  o.value = c.name;
-  o.textContent = c.name;
-  o.title = c.describe;
-  curveSelect.append(o);
+// A list for each step after the router: the highway plan, the grouping rule, the room strategy and the curve.
+const selects = new Map<Exclude<Step, "router">, HTMLSelectElement>();
+for (const picker of PICKERS) {
+  if (picker.step === "router") continue;
+  const step = picker.step;
+  const select = $<HTMLSelectElement>(`pick-${step}`);
+  if (picker.none) select.append(new Option(picker.none, ""));
+  for (const name of picker.names) {
+    const o = new Option(name, name);
+    o.title = getStrategy(STRATEGIES, step, name).describe;
+    select.append(o);
+  }
+  select.value = state.picks[step];
+  select.addEventListener("change", () => {
+    state.picks[step] = select.value;
+    // The curve changes only the drawing. The other steps change the routes.
+    if (step === "curve") {
+      options();
+      render();
+    } else update();
+  });
+  selects.set(step, select);
 }
-curveSelect.value = state.curve;
-curveSelect.addEventListener("change", () => {
-  state.curve = curveSelect.value;
-  render();
+
+/** This function gives the strategies of the state whose options the panel shows, with the step of each one. */
+function chosen(): { step: Step; strategy: Strategy<Step, object> }[] {
+  const out: { step: Step; strategy: Strategy<Step, object> }[] = [];
+  const router = ROUTERS.find((r) => r.name === state.router)!;
+  if (state.picks.highway) out.push({ step: "highway", strategy: getStrategy(STRATEGIES, "highway", state.picks.highway) });
+  else {
+    out.push({ step: "router", strategy: router });
+    if (groupKey(router) && state.picks.group) out.push({ step: "group", strategy: getStrategy(STRATEGIES, "group", state.picks.group) });
+  }
+  if (state.picks.room) out.push({ step: "room", strategy: getStrategy(STRATEGIES, "room", state.picks.room) });
+  out.push({ step: "curve", strategy: getStrategy(STRATEGIES, "curve", state.picks.curve) });
+  return out;
+}
+
+/** This function sets one option of one strategy. The value `undefined` sets the default. A curve option changes only the drawing. */
+function setOption(step: Step, name: string, key: string, v: OptionValue): void {
+  const own = { ...state.options[step]?.[name] };
+  if (v === undefined) delete own[key];
+  else own[key] = v;
+  state.options = { ...state.options, [step]: { ...state.options[step], [name]: own } };
+  options();
+  if (step === "curve") render();
+  else update();
+}
+
+/** This function writes the pickers and the options of the chosen strategies. */
+function options(): void {
+  const router = ROUTERS.find((r) => r.name === state.router)!;
+  $("pick-group-field").classList.toggle("off", !groupKey(router) || state.picks.highway !== "");
+  $("pick-group-hint").textContent = state.picks.highway
+    ? "The highway plan gives the routes, so the grouping rule does not act."
+    : groupKey(router)
+      ? `The router ${router.name} makes its zoom levels from this rule.`
+      : "Only a router with zoom levels from a rule reads it, for example sections.";
+  const body = $("demo-option-body");
+  body.replaceChildren();
+  let changed = 0;
+  for (const { step, strategy } of chosen()) {
+    const set = optionSet(`demo-${step}`, strategy, state.options[step]?.[strategy.name], (key, v) => setOption(step, strategy.name, key, v), `${step}: ${strategy.name}`);
+    if (set) body.append(set);
+    changed += Object.keys(state.options[step]?.[strategy.name] ?? {}).length;
+  }
+  if (body.childElementCount === 0) body.textContent = "The chosen strategies have no options.";
+  $("demo-option-count").textContent = changed > 0 ? `(${changed} changed)` : "";
+  $<HTMLButtonElement>("demo-reset").disabled = changed === 0;
+}
+$("demo-reset").addEventListener("click", () => {
+  state.options = {};
+  options();
+  update();
 });
 
 for (const input of document.querySelectorAll<HTMLInputElement>('input[name="bundles"]'))
@@ -204,11 +295,26 @@ let control: RouteDone | undefined;
 let ticket = 0;
 
 function pickRouter(name: string): void {
-  // Only the name of a router of the core goes into the state.
+  // Only the name of a router of the core goes into the state. A router picks no highway plan.
   const router = ROUTERS.find((r) => r.name === name);
   if (!router) return;
   state.router = router.name;
+  state.picks.highway = "";
+  selects.get("highway")!.value = "";
   update();
+}
+
+/** The board of each reply: the fixture, or the board that a room strategy opened. The same reply gives the same board. */
+const boards = new WeakMap<RouteDone, Graph>();
+function boardOf(done: RouteDone | undefined): Graph {
+  const graph = graphOf(state.fixture);
+  if (!done?.nodes) return graph;
+  let board = boards.get(done);
+  if (!board) {
+    board = { nodes: done.nodes, edges: graph.edges };
+    boards.set(done, board);
+  }
+  return board;
 }
 
 /** This function routes the chosen fixture with the chosen router, then draws the result. */
@@ -216,7 +322,7 @@ async function update(): Promise<void> {
   const mine = ++ticket;
   const graph = graphOf(state.fixture);
   for (const b of routerRow.querySelectorAll<HTMLButtonElement>(".exit")) {
-    const on = b.dataset["router"] === state.router;
+    const on = b.dataset["router"] === state.router && state.picks.highway === "";
     b.setAttribute("aria-checked", String(on));
     b.tabIndex = on ? 0 : -1;
     // On a phone, the row scrolls so that the chosen router is in view.
@@ -225,15 +331,18 @@ async function update(): Promise<void> {
   }
   const method = $("method");
   const title = document.createElement("strong");
-  title.textContent = state.router;
+  const name = state.picks.highway || state.router;
+  title.textContent = name;
   method.replaceChildren(title);
-  method.insertAdjacentHTML("beforeend", inline(README.methods.get(state.router) ?? ""));
+  if (state.picks.highway) method.insertAdjacentHTML("beforeend", ` ${esc(getStrategy(STRATEGIES, "highway", name).describe)} The function <code>follow</code> routes the plan.`);
+  else method.insertAdjacentHTML("beforeend", inline(README.methods.get(state.router) ?? ""));
+  options();
   const status = $("status");
-  status.textContent = `Routing ${fmt.format(graph.edges.length)} edges with ${state.router}…`;
+  status.textContent = `Routing ${fmt.format(graph.edges.length)} edges with ${name}…`;
   status.hidden = false;
   current = undefined;
   render();
-  const [reply, straight] = await Promise.all([route(state.fixture, state.router, true), route(state.fixture, "straight", true)]);
+  const [reply, straight] = await Promise.all([route(state.fixture, pickOf(), true), route(state.fixture, pickOf("straight", ""), true)]);
   if (mine !== ticket) return;
   if (!reply.ok) {
     status.textContent = `The router failed: ${reply.error}`;
@@ -254,12 +363,12 @@ async function update(): Promise<void> {
 /** This function routes the other routers of a small fixture in the background, so that a change of router is fast. */
 function prefetch(graph: Graph): void {
   if (graph.nodes.length > 400) return;
-  for (const r of ROUTERS) void route(state.fixture, r.name, false);
+  for (const r of ROUTERS) void route(state.fixture, pickOf(r.name, ""), false);
 }
 
 function render(): void {
-  const graph = graphOf(state.fixture);
   const done = current;
+  const graph = boardOf(done);
   const shared = done?.segments !== undefined;
   const levels = done?.result.levels;
   $("bundle-field").classList.toggle("off", !shared);
@@ -271,7 +380,8 @@ function render(): void {
   levelInput.disabled = !levels;
   follow.disabled = !levels;
   if (levels && !state.follow) levelInput.value = String(state.level);
-  view.set({ graph, done, bundles: state.bundles, curve: state.curve, level: state.follow ? "auto" : state.level, selected: state.selected });
+  const curveOptions = state.options.curve?.[state.picks.curve];
+  view.set({ graph, done, bundles: state.bundles, curve: state.picks.curve, ...(curveOptions ? { curveOptions } : {}), level: state.follow ? "auto" : state.level, selected: state.selected });
   if (!levels) {
     $("level-name").textContent = "This router gives no zoom levels.";
     $("level-badge").hidden = true;
@@ -294,7 +404,7 @@ function showLevel(level: number): void {
 }
 
 function delta(value: number, base: number | undefined, unit: string, fewer = "less"): string {
-  if (base === undefined || base === 0 || state.router === "straight") return "";
+  if (base === undefined || base === 0 || (state.router === "straight" && !state.picks.highway)) return "";
   const p = Math.round((1 - value / base) * 100);
   if (p === 0) return `<span class="delta">the same as straight lines</span>`;
   return `<span class="delta ${p > 0 ? "good" : "bad"}">${Math.abs(p)}% ${p > 0 ? fewer : "more"} ${unit} than straight lines</span>`;

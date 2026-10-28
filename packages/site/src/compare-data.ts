@@ -1,31 +1,33 @@
 import {
   checkOptions,
   clampOptions,
-  compareStep,
-  COMPARE_STEPS,
+  compareAnyStep,
+  COMPARE_ALL_STEPS,
   farLevel,
   FIXTURES,
   laneRoutes,
-  listOptions,
   listStrategies,
   makeFixture,
+  packedGridBoard,
   runKey,
   segmentsOf,
   STRATEGIES,
   toSvgPath,
-  type AnyOption,
+  type AnyCompareRow,
   type Box,
-  type CompareRow,
-  type CompareStep,
   type Graph,
   type Objective,
   type Point,
   type Registry,
   type Result,
   type Route,
+  type Step,
   type Strategy,
 } from "@mark1russell7/highways";
 import { BOARDS } from "./boards.ts";
+import { controlOptions, readValue } from "./options.ts";
+
+export { controlOptions, type ControlOption } from "./options.ts";
 
 /** The largest board of the compare page, in nodes. Each strategy of a step runs on the board, so the board stays small. */
 export const COMPARE_MAX_NODES = 100;
@@ -39,10 +41,17 @@ export interface CompareBoard {
   readonly graph: Graph;
 }
 
-/** The boards of the compare page: the example boards, then the fixtures up to `COMPARE_MAX_NODES` nodes. */
+/** The id of the packed board: the boxes touch, as after a host layout packs them. The step `room` opens its gaps. */
+export const PACKED_BOARD = "packed-grid";
+
+/**
+ * The boards of the compare page: the example boards, the fixtures up to `COMPARE_MAX_NODES` nodes, and the packed board of the step `room` (`packedGridBoard`).
+ * The example boards and the fixtures have free space between the boxes, so they are not packed.
+ */
 export const COMPARE_BOARDS: readonly CompareBoard[] = [
   ...BOARDS.map((make) => make()).map((b) => ({ id: b.id, name: b.name, graph: b.graph })),
   ...FIXTURES.filter((f) => f.nodes <= COMPARE_MAX_NODES).map((f) => ({ id: f.name, name: `Fixture ${f.name}`, graph: makeFixture(f) })),
+  { id: PACKED_BOARD, name: "Packed grid", graph: packedGridBoard() },
 ]
   .filter((b) => b.graph.nodes.length <= COMPARE_MAX_NODES)
   .map((b) => ({ ...b, nodes: b.graph.nodes.length, edges: b.graph.edges.length }));
@@ -57,8 +66,11 @@ export const CURVE_ROUTER = "shared";
  */
 export const LANES = { width: 5, maxWidth: 30 } as const;
 
+/** The steps of the page: each step of the pipeline, in its order. */
+export const PAGE_STEPS: readonly Step[] = COMPARE_ALL_STEPS;
+
 /** The names of the steps on the page. */
-export const STEP_NAMES: Readonly<Record<CompareStep, string>> = { group: "Grouping", router: "Router", curve: "Curve" };
+export const STEP_NAMES: Readonly<Record<Step, string>> = { group: "Grouping", router: "Router", highway: "Highway", curve: "Curve", room: "Room" };
 
 /** The kind of a measure value: a count, a share from 0 to 1, a time or a plain number. */
 export type MeasureKind = "count" | "share" | "ms" | "number";
@@ -78,19 +90,34 @@ export interface MeasureColumn {
 
 const TIME: MeasureColumn = { key: "ms", label: "Time", describe: "The time of the step on this device.", better: "min", kind: "ms" };
 
+/** The measures of the routes, for the steps `router` and `highway`. */
+const ROUTE_COLUMNS: readonly MeasureColumn[] = [
+  { key: "R9.through", label: "Through", describe: "Routes that go through a box that is not an end.", better: "min", kind: "count" },
+  { key: "R1.crossings", label: "Crossings", describe: "Points where two routes cross.", better: "min", kind: "count" },
+  { key: "R6.worstDetour", label: "Worst detour", describe: "The longest route, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
+  { key: "ink", label: "Total length", describe: "The length of all routes. A shared part counts one time.", better: "min", kind: "number", digits: 0 },
+  { key: "R5.median", label: "Median detour", describe: "The median route length, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
+  { key: "R4.turn", label: "Mean turn", describe: "The mean total turn of a route, in half turns.", better: "min", kind: "number", digits: 2 },
+  { key: "B1.inkSaved", label: "Ink saved", describe: "The share of the length that the shared parts save.", better: "max", kind: "share" },
+];
+
 /** The measures of each step, in the order of the page. Each key is a key of the suite, so the page and the benchmark agree. */
-export const COLUMNS: Readonly<Record<CompareStep, readonly MeasureColumn[]>> = {
+export const COLUMNS: Readonly<Record<Step, readonly MeasureColumn[]>> = {
   router: [
-    { key: "R9.through", label: "Through", describe: "Routes that go through a box that is not an end.", better: "min", kind: "count" },
-    { key: "R1.crossings", label: "Crossings", describe: "Points where two routes cross.", better: "min", kind: "count" },
-    { key: "R6.worstDetour", label: "Worst detour", describe: "The longest route, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
-    { key: "ink", label: "Total length", describe: "The length of all routes. A shared part counts one time.", better: "min", kind: "number", digits: 0 },
-    { key: "R5.median", label: "Median detour", describe: "The median route length, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
-    { key: "R4.turn", label: "Mean turn", describe: "The mean total turn of a route, in half turns.", better: "min", kind: "number", digits: 2 },
-    { key: "B1.inkSaved", label: "Ink saved", describe: "The share of the length that the shared parts save.", better: "max", kind: "share" },
+    ...ROUTE_COLUMNS,
     { key: "Z3.through", label: "Level through", describe: "Links of the zoom levels that go through a box. Only a router with zoom levels has them.", better: "min", kind: "count" },
     { key: "Z3.length", label: "Level length", describe: "The length of all links of the zoom levels. Only a router with zoom levels has them.", better: "min", kind: "number", digits: 0 },
     TIME,
+  ],
+  highway: [...ROUTE_COLUMNS, { ...TIME, describe: "The time of the plan and of `follow` on this device." }],
+  room: [
+    { key: "M1.area", label: "Area", describe: "The area of the open board, divided by the area of the board before the step.", better: "min", kind: "number", digits: 3 },
+    { key: "M4.laneThrough", label: "Lane through", describe: "Lane routes of the router `sections` that go through a box.", better: "min", kind: "count" },
+    { key: "crossings", label: "Crossings", describe: "Points where two links of the far view cross.", better: "min", kind: "count" },
+    { key: "through", label: "Through", describe: "Links of the far view that go through a box.", better: "min", kind: "count" },
+    { key: "R6.worstDetour", label: "Worst detour", describe: "The longest link of the far view, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
+    { key: "room-order", label: "Order faults", describe: "Pairs of boxes whose order or alignment changes.", better: "min", kind: "count" },
+    { ...TIME, describe: "The time of the room strategy and of the open board on this device." },
   ],
   curve: [
     { key: "C1.share", label: "Sharp curves", describe: "The share of curves with a tangent break of more than 0.5 degrees.", better: "min", kind: "share" },
@@ -124,7 +151,7 @@ export type OptionValues = Readonly<Record<string, Readonly<Record<string, numbe
 
 /** The state of the page. The URL hash keeps it. */
 export interface CompareState {
-  readonly step: CompareStep;
+  readonly step: Step;
   readonly board: string;
   /** The options that differ from the defaults. */
   readonly options: OptionValues;
@@ -133,31 +160,13 @@ export interface CompareState {
 /** The first state of the page. */
 export const START: CompareState = { step: "router", board: "delivery", options: {} };
 
-/** An option that a control can set: a number, a whole number, a boolean or a value of a list. */
-export type ControlOption = Extract<AnyOption, { readonly type: "number" | "integer" | "boolean" | "enum" }>;
-
-const isControl = (d: AnyOption): d is ControlOption => d.type === "number" || d.type === "integer" || d.type === "boolean" || d.type === "enum";
-
-/** This function gives the options of a strategy that a control can set, with the default value of each one. */
-export function controlOptions(strategy: Strategy<CompareStep, object>): { readonly key: string; readonly declaration: ControlOption; readonly value: unknown }[] {
-  return listOptions(strategy).filter((o): o is typeof o & { declaration: ControlOption } => isControl(o.declaration));
-}
-
-/** This function reads one option value from the text of the hash. It gives `undefined` for text that does not fit the declaration. */
-function readValue(text: string, d: ControlOption): number | boolean | string | undefined {
-  if (d.type === "boolean") return text === "true" ? true : text === "false" ? false : undefined;
-  if (d.type === "enum") return d.values.includes(text) ? text : undefined;
-  const v = Number(text);
-  return Number.isNaN(v) || text.trim() === "" ? undefined : v;
-}
-
 /**
  * This function keeps the options that a strategy of the step declares, with the values that fit the declaration.
  * It moves a number into its range. It drops an unknown key, a value of the wrong type and a value that equals the default.
  */
-export function cleanOptions(step: CompareStep, options: OptionValues, registry: Registry = STRATEGIES): OptionValues {
+export function cleanOptions(step: Step, options: OptionValues, registry: Registry = STRATEGIES): OptionValues {
   const out: Record<string, Record<string, number | boolean | string>> = {};
-  for (const strategy of listStrategies(registry, step) as readonly Strategy<CompareStep, object>[]) {
+  for (const strategy of listStrategies(registry, step) as readonly Strategy<Step, object>[]) {
     const given = options[strategy.name];
     if (!given) continue;
     const controls = new Map(controlOptions(strategy).map((o) => [o.key, o]));
@@ -174,11 +183,11 @@ export function cleanOptions(step: CompareStep, options: OptionValues, registry:
 export function parseHash(hash: string, registry: Registry = STRATEGIES): CompareState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const stepText = params.get("step");
-  const step = COMPARE_STEPS.find((s) => s === stepText) ?? START.step;
+  const step = PAGE_STEPS.find((s) => s === stepText) ?? START.step;
   const boardText = params.get("board");
   const board = COMPARE_BOARDS.some((b) => b.id === boardText) ? boardText! : START.board;
   const options: Record<string, Record<string, number | boolean | string>> = {};
-  for (const strategy of listStrategies(registry, step) as readonly Strategy<CompareStep, object>[]) {
+  for (const strategy of listStrategies(registry, step) as readonly Strategy<Step, object>[]) {
     for (const o of controlOptions(strategy)) {
       const text = params.get(`${strategy.name}.${o.key}`);
       if (text === null) continue;
@@ -238,7 +247,7 @@ export interface Panel {
 
 /** The panels of one step on one board. */
 export interface ComparePanels {
-  readonly step: CompareStep;
+  readonly step: Step;
   readonly board: string;
   readonly nodes: number;
   readonly edges: number;
@@ -275,12 +284,20 @@ function lanesOf(result: Result): readonly Route[] {
   return open.size === 0 ? result.routes : laneRoutes(graph, open, LANES.width, LANES.maxWidth);
 }
 
-/** This function gives the drawing of one row: the routes, the curves, or the groups and the links of the far view. */
-function drawingOf(graph: Graph, row: CompareRow): Drawing {
+/**
+ * This function gives the drawing of one row: the routes, the curves, the groups and the links of the far view, or the open board and its links.
+ * A strategy that did not run gives the boxes of the board only.
+ */
+function drawingOf(graph: Graph, row: AnyCompareRow): Drawing {
+  if (row.step === "room") {
+    const boxes = row.boxes ?? graph.nodes.map((n) => n.box);
+    const paths = (row.links ?? []).map((l) => ({ d: polylinePath(l.points), width: Math.min(6, 1 + Math.log2(l.count)) }));
+    return { view: viewOf(boxes), boxes, groups: [], paths };
+  }
   const boxes = graph.nodes.map((n) => n.box);
   const view = viewOf(boxes);
   if (row.step === "curve") return { view, boxes, groups: [], paths: (row.curves ?? []).map((c) => ({ d: toSvgPath(c, 1), width: 1 })) };
-  if (row.step === "router") return { view, boxes, groups: [], paths: (row.result ? lanesOf(row.result) : []).map((r) => ({ d: polylinePath(r.points), width: 1 })) };
+  if (row.step === "router" || row.step === "highway") return { view, boxes, groups: [], paths: (row.result ? lanesOf(row.result) : []).map((r) => ({ d: polylinePath(r.points), width: 1 })) };
   const far = farLevel(row.result?.levels ?? []);
   const groups = (far?.items ?? []).filter((i) => i.nodes.length > 1).map((i) => i.box);
   const paths = (far?.links ?? []).map((l) => ({ d: polylinePath(l.points), width: Math.min(6, 1 + Math.log2(l.count)) }));
@@ -294,7 +311,7 @@ const same = (v: number, best: number): boolean => v === best || Math.abs(v - be
  * This function gives the best value of each measure of the step, over the rows without a violation. It skips a value that is not a number.
  * A measure without a direction, or without a finite best value, gets no entry.
  */
-export function bestValues(step: CompareStep, rows: readonly CompareRow[]): Map<string, number> {
+export function bestValues(step: Step, rows: readonly Pick<AnyCompareRow, "violations" | "skipped" | "values">[]): Map<string, number> {
   const fair = rows.filter((r) => r.violations === 0 && r.skipped === undefined);
   const out = new Map<string, number>();
   for (const c of COLUMNS[step]) {
@@ -307,10 +324,20 @@ export function bestValues(step: CompareStep, rows: readonly CompareRow[]): Map<
   return out;
 }
 
+/** The progress of `computePanels`: the strategy that is done, its time, and the counts of the strategies. */
+export interface PanelProgress {
+  readonly strategy: string;
+  readonly ms: number;
+  readonly done: number;
+  readonly total: number;
+}
+
 /** The options of `computePanels`. */
 export interface PanelOptions {
   /** The strategies of each step. The default is the registry of the built-in strategies. */
   readonly registry?: Registry;
+  /** This function gets the progress after each strategy. The worker of the page sends it to the page. */
+  readonly progress?: (p: PanelProgress) => void;
 }
 
 /**
@@ -323,7 +350,17 @@ export function computePanels(state: CompareState, options: PanelOptions = {}): 
   const board = COMPARE_BOARDS.find((b) => b.id === state.board) ?? COMPARE_BOARDS[0]!;
   const own = cleanOptions(state.step, state.options, registry);
   const t0 = performance.now();
-  const result = compareStep(state.step, board.graph, { registry, options: own, name: board.id, curveRouter: CURVE_ROUTER, lanes: LANES });
+  const progress = options.progress;
+  const result = compareAnyStep(state.step, board.graph, {
+    registry,
+    options: own,
+    name: board.id,
+    curveRouter: CURVE_ROUTER,
+    lanes: LANES,
+    // The page shows no measure of the route stability (Z10), so the routers do not route a changed board again.
+    stabilityMax: 0,
+    ...(progress ? { onRow: (row: AnyCompareRow, done: number, total: number) => progress({ strategy: row.strategy, ms: row.ms, done, total }) } : {}),
+  });
   const ms = performance.now() - t0;
   const best = bestValues(state.step, result.rows);
   const describe = new Map(listStrategies(registry, state.step).map((s) => [s.name, s.describe]));

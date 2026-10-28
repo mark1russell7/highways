@@ -1,20 +1,21 @@
-import { COMPARE_STEPS, listStrategies, STRATEGIES, type CompareStep, type Strategy } from "@mark1russell7/highways";
+import { listStrategies, STRATEGIES, type Step, type Strategy } from "@mark1russell7/highways";
 import compareText from "../content/compare.md?raw";
 import {
   cleanOptions,
   COLUMNS,
   COMPARE_BOARDS,
-  controlOptions,
   formatHash,
   formatValue,
+  PACKED_BOARD,
+  PAGE_STEPS,
   parseHash,
   STEP_NAMES,
   type ComparePanels,
   type CompareState,
-  type ControlOption,
   type Panel,
 } from "./compare-data.ts";
 import { html, sectionOf } from "./content.ts";
+import { optionSet } from "./option-control.ts";
 import type { CompareReply, CompareRequest } from "./protocol.ts";
 import "./style.css";
 
@@ -31,7 +32,7 @@ const fmt = new Intl.NumberFormat("en-US");
 const AXIS_NAMES: Readonly<Record<string, string>> = { "R1.perEdge": "crossings per edge" };
 
 /** The noun of the strategies of each step. */
-const NOUNS: Readonly<Record<CompareStep, string>> = { group: "grouping rules", router: "routers", curve: "curves" };
+const NOUNS: Readonly<Record<Step, string>> = { group: "grouping rules", router: "routers", highway: "highway strategies", curve: "curves", room: "room strategies" };
 
 let state: CompareState = parseHash(location.hash);
 
@@ -47,6 +48,11 @@ function startWorker(): Worker {
   const w = new Worker(new URL("./compare.worker.ts", import.meta.url), { type: "module" });
   w.addEventListener("message", (event: MessageEvent<CompareReply>) => {
     if (event.data.id !== next) return;
+    if (event.data.ok === "progress") {
+      const p = event.data.progress;
+      $("status").textContent = `The worker ran ${p.done} of ${p.total} ${NOUNS[state.step]}. The last one, ${p.strategy}, took ${fmt.format(Math.round(p.ms))} ms…`;
+      return;
+    }
     busy = false;
     $("panels").setAttribute("aria-busy", "false");
     if (event.data.ok) show(event.data.panels);
@@ -85,7 +91,7 @@ function set(change: Partial<CompareState>): void {
 
 // The steps: a row of exit signs.
 const stepRow = $("steps");
-for (const step of COMPARE_STEPS) {
+for (const step of PAGE_STEPS) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "exit";
@@ -99,8 +105,8 @@ for (const step of COMPARE_STEPS) {
 }
 stepRow.addEventListener("keydown", (e) => {
   if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-  const i = COMPARE_STEPS.indexOf(state.step);
-  const step = COMPARE_STEPS[(i + (e.key === "ArrowRight" ? 1 : COMPARE_STEPS.length - 1)) % COMPARE_STEPS.length]!;
+  const i = PAGE_STEPS.indexOf(state.step);
+  const step = PAGE_STEPS[(i + (e.key === "ArrowRight" ? 1 : PAGE_STEPS.length - 1)) % PAGE_STEPS.length]!;
   set({ step });
   stepRow.querySelector<HTMLButtonElement>(`[data-step="${step}"]`)?.focus();
   e.preventDefault();
@@ -123,50 +129,12 @@ addEventListener("hashchange", () => {
   run();
 });
 
-/** This function gives the control of one option of one strategy. */
-function control(strategy: string, key: string, d: ControlOption, fallback: unknown): HTMLElement {
-  const id = `opt-${strategy}-${key}`;
-  const value = state.options[strategy]?.[key] ?? fallback;
-  const wrap = document.createElement("div");
-  wrap.className = d.type === "boolean" ? "cmp-option check" : "cmp-option";
-  wrap.title = d.describe;
-  const label = document.createElement("label");
-  label.htmlFor = id;
-  label.textContent = key;
-  const changed = (v: unknown): void => {
-    const own: Record<string, unknown> = { ...state.options[strategy] };
-    if (v === undefined) delete own[key];
-    else own[key] = v;
-    set({ options: { ...state.options, [strategy]: own as Record<string, number | boolean | string> } });
-  };
-  let input: HTMLInputElement | HTMLSelectElement;
-  if (d.type === "boolean") {
-    const box = document.createElement("input");
-    box.type = "checkbox";
-    box.checked = value === true;
-    box.addEventListener("change", () => changed(box.checked));
-    input = box;
-    wrap.append(box, label);
-  } else if (d.type === "enum") {
-    const select = document.createElement("select");
-    for (const v of d.values) select.append(new Option(v, v, false, v === value));
-    select.addEventListener("change", () => changed(select.value));
-    input = select;
-    wrap.append(label, select);
-  } else {
-    const num = document.createElement("input");
-    num.type = "number";
-    num.min = String(d.min);
-    num.max = String(d.max);
-    num.step = String(d.step ?? (d.type === "integer" ? 1 : "any"));
-    if (typeof value === "number" && Number.isFinite(value)) num.value = String(value);
-    else num.placeholder = typeof value === "number" ? (value > 0 ? "∞" : "−∞") : "";
-    num.addEventListener("change", () => changed(num.value.trim() === "" ? undefined : Number(num.value)));
-    input = num;
-    wrap.append(label, num);
-  }
-  input.id = id;
-  return wrap;
+/** This function sets one option of one strategy. The value `undefined` sets the default. */
+function setOption(strategy: string, key: string, v: number | boolean | string | undefined): void {
+  const own: Record<string, unknown> = { ...state.options[strategy] };
+  if (v === undefined) delete own[key];
+  else own[key] = v;
+  set({ options: { ...state.options, [strategy]: own as Record<string, number | boolean | string> } });
 }
 
 /** This function writes the controls of the state: the step, the board and the options of each strategy. */
@@ -180,18 +148,13 @@ function controls(): void {
   const body = $("option-body");
   body.replaceChildren();
   let changed = 0;
-  for (const strategy of listStrategies(STRATEGIES, state.step) as readonly Strategy<CompareStep, object>[]) {
-    const options = controlOptions(strategy);
-    if (options.length === 0) continue;
-    const group = document.createElement("fieldset");
-    group.className = "cmp-option-set";
-    const legend = document.createElement("legend");
-    legend.textContent = strategy.name;
-    group.append(legend, ...options.map((o) => control(strategy.name, o.key, o.declaration, o.value)));
+  for (const strategy of listStrategies(STRATEGIES, state.step) as readonly Strategy<Step, object>[]) {
+    const group = optionSet("opt", strategy, state.options[strategy.name], (key, v) => setOption(strategy.name, key, v));
+    if (!group) continue;
     body.append(group);
     changed += Object.keys(state.options[strategy.name] ?? {}).length;
   }
-  if (body.childElementCount === 0) body.textContent = "The strategies of this step have no options that a control can set.";
+  if (body.childElementCount === 0) body.textContent = "The strategies of this step have no options.";
   $("option-count").textContent = changed > 0 ? `(${changed} changed)` : "";
   $<HTMLButtonElement>("reset").disabled = changed === 0;
 }
@@ -214,13 +177,19 @@ function tagsOf(p: Panel): string {
   return tags.join("");
 }
 
+/** This function gives the time of a panel, in milliseconds. */
+const timeOf = (p: Panel): number => p.measures.find((m) => m.key === "ms")?.value ?? 0;
+
 /** This function shows the panels and the table of the measures. */
 function show(data: ComparePanels): void {
   const board = COMPARE_BOARDS.find((b) => b.id === data.board)!;
   const columns = COLUMNS[data.step];
   const front = data.panels.filter((p) => p.front).map((p) => `<strong>${esc(p.strategy)}</strong>`);
   const axes = data.objectives.map((o) => `${AXIS_NAMES[o.key] ?? columns.find((c) => c.key === o.key)?.label.toLowerCase() ?? o.key} ${o.better === "min" ? "↓" : "↑"}`);
-  $("status").textContent = `${data.panels.length} ${NOUNS[data.step]} on ${board.name} (${fmt.format(data.nodes)} nodes, ${fmt.format(data.edges)} edges): ${fmt.format(Math.round(data.ms))} ms on this device.`;
+  // The slowest strategies, when the step has many strategies: their time is most of the time of the step.
+  const slow = data.panels.length > 10 ? [...data.panels].sort((a, b) => timeOf(b) - timeOf(a)).slice(0, 3).map((p) => `${p.strategy} ${fmt.format(Math.round(timeOf(p)))} ms`) : [];
+  const room = data.step === "room" && data.board !== PACKED_BOARD ? " This board is not packed, so a gap opens only when its links need more room. Choose Packed grid for a packed board." : "";
+  $("status").textContent = `${data.panels.length} ${NOUNS[data.step]} on ${board.name} (${fmt.format(data.nodes)} nodes, ${fmt.format(data.edges)} edges): ${fmt.format(Math.round(data.ms))} ms on this device.${slow.length ? ` The slowest: ${slow.join(", ")}.` : ""}${room}`;
   $("front").innerHTML = `Pareto front: ${front.join(", ") || "no strategy"}. Its axes: ${esc(axes.join(", "))}.`;
 
   // The table: one row for each strategy, one column for each measure, with a bar of the value against the largest value.

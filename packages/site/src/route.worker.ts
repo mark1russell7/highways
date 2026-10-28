@@ -1,14 +1,13 @@
 import {
   checkProperties,
-  findStrategy,
   FIXTURES,
   makeFixture,
   measureQuality,
   pullApart,
   segmentsOf,
-  STRATEGIES,
   type Graph,
 } from "@mark1russell7/highways";
+import { demoRoute } from "./demo-data.ts";
 import type { RouteReply, RouteRequest } from "./protocol.ts";
 
 // The routing runs here, so the page stays responsive while a router works on 1 000 nodes.
@@ -28,14 +27,11 @@ const graphOf = (name: string): Graph => {
 const now = (): number => performance.now();
 
 self.addEventListener("message", (event: MessageEvent<RouteRequest>) => {
-  const { id, fixture, router: name } = event.data;
+  const { id, fixture, pick } = event.data;
   let reply: RouteReply;
   try {
-    const router = findStrategy(STRATEGIES, "router", name);
-    if (!router) throw new Error(`There is no router "${name}".`);
-    const graph = graphOf(fixture);
     const t0 = now();
-    const result = router.run(graph);
+    const { graph, result } = demoRoute(graphOf(fixture), pick);
     const ms = now() - t0;
     const shared = (result.runs?.length ?? 0) + (result.bundles?.length ?? 0) > 0;
     const segments = shared ? segmentsOf(result) : undefined;
@@ -47,6 +43,7 @@ self.addEventListener("message", (event: MessageEvent<RouteRequest>) => {
       ms,
       quality: measureQuality(graph, result),
       violations: checkProperties(graph, result, 1000).length,
+      ...(pick.room ? { nodes: graph.nodes } : {}),
       ...(segments ? { segments } : {}),
       ...(apart ? { apart } : {}),
     };
