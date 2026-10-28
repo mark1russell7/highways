@@ -4,6 +4,7 @@ import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
 import noBenchText from "../content/nobench.md?raw";
 import readme from "../../../README.md?raw";
+import { benchLabel } from "./bench-label.ts";
 import { html, inline, README, sectionOf } from "./content.ts";
 import type { RouteDone, RouteReply, RouteRequest } from "./protocol.ts";
 import "./style.css";
@@ -359,12 +360,12 @@ async function bench(): Promise<void> {
     return;
   }
   $("bench-intro").innerHTML = html(benchText);
-  if (meta.sha) {
-    const sha = esc(meta.sha);
-    const short = sha.slice(0, 7);
-    const run = typeof meta.run === "number" ? ` in the run <a href="https://github.com/mark1russell7/highways/actions/runs/${meta.run}">${meta.run}</a> of the workflow <code>Bench</code>` : "";
-    $("bench-meta").innerHTML = `Raced on a GitHub runner${run}${meta.date ? ` on ${esc(meta.date)}` : ""}, at commit <a href="https://github.com/mark1russell7/highways/commit/${sha}"><code>${short}</code></a>.`;
-  }
+  // The label always shows the run and the date of the snapshot. The build puts its date in the attribute `data-build-date`.
+  const label = benchLabel(meta, $("bench-meta").dataset["buildDate"] ?? "");
+  $("bench-meta").innerHTML = label.html;
+  const warn = $("bench-stale");
+  warn.innerHTML = label.warning;
+  warn.hidden = label.warning === "";
   const fixtures = [...new Set(rows.map((r) => r.fixture))];
   const tabs = $("bench-tabs");
   let pick = fixtures.includes("mid-fanout") ? "mid-fanout" : fixtures[fixtures.length - 1]!;
