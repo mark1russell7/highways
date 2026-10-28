@@ -109,6 +109,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | CORPUS-SEEDS | [The corpus `screen-v2`](research/CATALOG.md#the-corpus-screen-v2-corpus-seeds): the 6 families of `screen-v1` with 10 seeds each, and the split file `corpus-split/1`, which holds out the seeds 7 to 9. The seeds 0 to 2 give the boards and the records of `screen-v1`. With 10 seeds, `territories` leaves the highway front. | 2026-10-28 | #136 |
 | VERDICT | The shared block "The verdict over families" from layout-contract #49. The family is the unit of a verdict, and a verdict counts only when it holds under both weightings. Step 1 of SCREEN-WEIGHT. | 2026-10-28 | #139 |
 | SCREEN-WEIGHT | [The verdict over families of the screens](research/CATALOG.md#the-verdict-over-families-of-the-screens-screen-weight). The manifests of `screen-v1` and `screen-v2` get `familyBy`. `scripts/screen-verdict.ts` scores both screens again. 145 of 145 verdicts with a side keep it from `screen-v1` to `screen-v2`. No option has a promotion yet, so the guard count is 0. | 2026-10-28 | #140 |
+| SITE-LIVE | The [results page](https://mark1russell7.github.io/highways/results.html) reads only committed files: the verdict snapshots of [`research/verdicts/`](research/verdicts/README.md), the idea records and this roadmap. It shows the verdict grid, the 40 `better` verdicts with families against them, the ideas and the newest items. The Pages build starts no race. It reads a committed benchmark snapshot, and it adds the Status and Releases pages. | 2026-10-28 | #143 |
 
 ## Calibration
 
