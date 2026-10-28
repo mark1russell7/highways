@@ -920,3 +920,26 @@ Version 0.6.0 changes the default output of `routePortfolio`. This table gives t
 | `collection` | 1.5 | n25-40 | `shared-p3` (40), `hw:lanes` (32), `shared-wind-p2-r1-e2` (32) | `shared-p3` (40), `hw:lanes` (40), `shared-wind-p2-r1-e2` (32) |
 | `collection` | 1.5 | n41-64 | `shared` alone (no band) | `shared-flow-a06-p3` (64) |
 | `collection` | 1.5 | n65-128 | `shared` alone (no band) | `shared` alone |
+
+## The defaults of 0.6.0 and 0.7.0
+
+Version 0.7.0 changes the default output of `routePortfolio` again. HASH-LAZY (#127) took the hash out of the key of each member, and the fit target went from 42 to 45 ms.
+
+- The trace of a pick has fewer `outputHash` fields. Only member 0 and the winner carry one, and only when the pick moves. The option `hashes: "all"` gives the old trace.
+- 13 of 30 fits change. Each change adds a member or raises a node limit, and no member leaves. This table gives only the cells that change.
+
+| Rule | Cap | Band | 0.6.0 | 0.7.0 |
+|---|---|---|---|---|
+| `all` | 1.1 | n1-12 | `w2b:zipper-p2` (12), `hw:cubu` (12), `w3d:kdeeb+stretch` (12), `w3c:hough-wide` (12), `w3d:kdeeb-routes` (12), `hw:stubs` (10), `hw:spiral` (10), `w3b:growth-s0.7` (10) | `w2b:zipper-p2` (12), `hw:cubu` (12), `w3d:kdeeb+stretch` (12), `w3c:hough-wide` (12), `w3d:kdeeb-routes` (12), `hw:stubs` (12), `hw:spiral` (12), `w3b:growth-s0.7` (10) |
+| `all` | 1.1 | n13-24 | `w3e:frechet-e0.5` (24), `w3a:diffusion-wide` (24), `w2c:zipper+stretch-b1.1` (24), `w3d:cubu+stretch` (18) | `w3e:frechet-e0.5` (24), `w3a:diffusion-wide` (24), `w2c:zipper+stretch-b1.1` (24), `w3d:cubu+stretch` (18), `w3a:spiral-a15` (18) |
+| `all` | 1.1 | n41-64 | `shared` alone | `hw:diffusion` (64) |
+| `all` | 1.25 | n1-12 | `w3d:kdeeb-routes` (12), `w3e:mlseb+stretch` (12), `hw:growth` (12), `hw:level-links` (10), `w3b:growth-input` (10), `w3e:confluent+stretch` (10) | `w3d:kdeeb-routes` (12), `w3e:mlseb+stretch` (12), `hw:growth` (12), `hw:level-links` (12), `w3b:growth-input` (10), `w3e:confluent+stretch` (10), `w3d:kdeeb-nomask` (10) |
+| `all` | 1.25 | n13-24 | `w3d:kdeeb-routes` (24), `w3f:p-hub-a0.2` (18), `w3d:kdeeb-nomask` (18) | `w3d:kdeeb-routes` (24), `w3f:p-hub-a0.2` (24), `w3d:kdeeb-nomask` (18), `w3a:spiral-n3` (18) |
+| `all` | 1.25 | n25-40 | `shared` alone | `w3d:kdeeb-routes` (32) |
+| `all` | 1.5 | n25-40 | `hw:growth` (40), `w3b:growth-s0.7` (40) | `hw:growth` (40), `w3b:growth-s0.7` (40), `w3b:growth-s0.3` (32) |
+| `collection` | 1.1 | n13-24 | `w3e:crossbars+stretch` (24), `trunks-tree-bf08` (24), `corners-side` (24), `shared-p2` (24), `w2c:zipper+stretch-b1.1` (18) | `w3e:crossbars+stretch` (24), `trunks-tree-bf08` (24), `corners-side` (24), `shared-p2` (24), `w2c:zipper+stretch-b1.1` (18), `hw:weiszfeld` (18), `trunks-gilbert-a07` (18) |
+| `collection` | 1.1 | n25-40 | `w2a:shared-ways+breakeven` (40), `w2b:weiszfeld-a1` (32) | `w2a:shared-ways+breakeven` (40), `w2b:weiszfeld-a1` (40) |
+| `collection` | 1.25 | n13-24 | `w2a:shared-ways+stretch` (24), `shared-p3` (24), `trunks-gilbert-a07` (24), `w3e:crossbars+stretch` (24), `trunks-tree-bf06` (24), `w3c:hdbscan+stretch` (18), `shared-wind-p2-r1-e2` (18) | `w2a:shared-ways+stretch` (24), `shared-p3` (24), `trunks-gilbert-a07` (24), `w3e:crossbars+stretch` (24), `trunks-tree-bf06` (24), `w3c:hdbscan+stretch` (18), `shared-wind-p2-r1-e2` (18), `hw:stubs` (18) |
+| `collection` | 1.25 | n25-40 | `w2a:shared-ways+stretch` (40), `shared-p3` (40), `shared-order-shortest` (32) | `w2a:shared-ways+stretch` (40), `shared-p3` (40), `shared-order-shortest` (40), `w2b:weiszfeld-a1` (32) |
+| `collection` | 1.5 | n13-24 | `shared-wind-p2-r0.5` (24), `trunks-gilbert-a03` (24), `w3e:crossbars+stretch` (24), `shared-wind-p2-r1-e2` (24), `trunks-tree-bf06` (24), `shared-flow-a06-p3` (24), `shared-wind-p3-r1` (18), `trunks-gilbert-a07` (18) | `shared-wind-p2-r0.5` (24), `trunks-gilbert-a03` (24), `w3e:crossbars+stretch` (24), `shared-wind-p2-r1-e2` (24), `trunks-tree-bf06` (24), `shared-flow-a06-p3` (24), `shared-wind-p3-r1` (24), `trunks-gilbert-a07` (24) |
+| `collection` | 1.5 | n25-40 | `shared-p3` (40), `hw:lanes` (40), `shared-wind-p2-r1-e2` (32) | `shared-p3` (40), `hw:lanes` (40), `shared-wind-p2-r1-e2` (40), `hw:crossbars` (32) |
