@@ -82,6 +82,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W3E | Seven highway finders: `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars` and `frechet`. No finder wins more than 2 of 4 boards against `shared`, alone or with the gate `stretch`. Each win of `power` and `areas` is a tie on a board where `shared` has 0 runs. HWY-008, HWY-009, HWY-010, HWY-013, HWY-014, HWY-022 and HWY-027 are dropped. | 2026-10-27 | #97 |
 | G10 | The contract 0.2.2 has `compareMeasure` and `minEffectOf`. The core has `layout-contract` ^0.2.3 as a development dependency and keeps its own copy. A test shows that the copy and the contract give the same result on the cases of `compare.test.ts` and on 5000 seeded random pairs. | 2026-10-27 | #99 |
 | ORACLE | [The oracle bound](research/ORACLE.md): the best strategy of each input, over 228 strategies. On `exact-v1`, the oracle closes 0.947 of the gap, against 0.595 for the best single strategy. On `screen-v1`, the guarded oracle B1 is 39% to 534% above the best single strategy on 4 of 4 boards. A selector by class keeps -32% of the gain on `exact-v1`. | 2026-10-27 | #100 |
+| BUILD-W3F | Seven highway finders: `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub` and `scale-space`. No finder beats `shared` on more than 2 of 4 boards, alone or with the gate `stretch`. All seven are dropped. `p-hub` closes 0.356 of the gap on tiny-uniform. | 2026-10-27 | #95 |
 
 ## Open
 
