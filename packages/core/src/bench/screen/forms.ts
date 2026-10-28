@@ -186,6 +186,20 @@ export interface LayoutRecord {
   readonly commit?: string;
   /** The reason when the strategy did not run, for example an input over its `maxNodes`. Then the record has no measures. */
   readonly skipped?: string;
+  /**
+   * The first 16 hex characters of the SHA-256 of the output in the highways form (ACTIVATION). `resultHash` gives it for a router.
+   * Two records with the same hash have the same output, at the precision `RECORD_EPS`.
+   */
+  readonly outputHash?: string;
+  /** The facts of the stages of the run. The trace measures `move.<name>` count the own move of the strategy (ACTIVATION). */
+  readonly trace?: readonly RecordTrace[];
+}
+
+/** The facts of one stage of a run, as the `StageTrace` of the contract: its id, its time and its trace measures. */
+export interface RecordTrace {
+  readonly id: string;
+  readonly ms?: number;
+  readonly measures?: Readonly<Record<string, number>>;
 }
 
 /** The comparison of a prediction. Without it, `<=` applies to a measure where lower is better, and `>=` to the other measures. */

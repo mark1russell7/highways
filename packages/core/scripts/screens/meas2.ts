@@ -19,16 +19,16 @@ import * as w3c from "./build-w3c.ts";
 import * as w3d from "./build-w3d.ts";
 import * as w3e from "./build-w3e.ts";
 
-type AnyOf = Strategy<"highway", object> | Strategy<"router", object>;
+export type AnyOf = Strategy<"highway", object> | Strategy<"router", object>;
 
 /** This function tells if a value is a strategy of the step `highway` or `router`. */
-function isStrategy(value: unknown): value is AnyOf {
+export function isStrategy(value: unknown): value is AnyOf {
   const s = value as { step?: unknown; name?: unknown; run?: unknown };
   return typeof s === "object" && s !== null && (s.step === "highway" || s.step === "router") && typeof s.name === "string" && typeof s.run === "function";
 }
 
 /** This function gives a strategy as a router strategy with the name `name`. A highway strategy routes along its plan with `follow`. */
-function asRouterStrategy(s: AnyOf, name: string): Strategy<"router", object> {
+export function asRouterStrategy(s: AnyOf, name: string): Strategy<"router", object> {
   const router = s.step === "highway" ? highwayRouterStrategy(s as Strategy<"highway", object>) : (s as Strategy<"router", object>);
   return defineStrategy({
     step: "router",
@@ -41,7 +41,18 @@ function asRouterStrategy(s: AnyOf, name: string): Strategy<"router", object> {
   });
 }
 
-const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d, w3e };
+export const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d, w3e };
+
+/** The highway strategies of the gap screen, by the names of the records: `hw:<name>` and `<wave>:<name>`. The activation test counts their moves. */
+export const highwaysByName: Readonly<Record<string, Strategy<"highway", object>>> = Object.fromEntries([
+  ...Object.entries(highwayStrategies).map(([name, s]) => [`hw:${name}`, s as Strategy<"highway", object>] as const),
+  ["hw:shared-ways-all", sharedWaysAll as Strategy<"highway", object>] as const,
+  ...Object.entries(waves).flatMap(([wave, mod]) =>
+    Object.values(mod)
+      .filter(isStrategy)
+      .flatMap((s) => (s.step === "highway" ? [[`${wave}:${s.name}`, s as Strategy<"highway", object>] as const] : [])),
+  ),
+]);
 
 /** The strategies of the gap screen: the built-in highway strategies, `shared-ways-all`, and the options of each wave. */
 export const strategies: readonly Strategy<"router", object>[] = [

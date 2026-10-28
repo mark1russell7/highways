@@ -22,6 +22,7 @@ import {
   type LayoutPort,
   type LayoutRecord,
   type LayoutSide,
+  type RecordTrace,
   type Region,
   type RouteInput,
 } from "./forms.ts";
@@ -114,6 +115,13 @@ holds<Has<C.LayoutInput, "generator">>();
 holds<Has<C.LayoutInput, "cell">>();
 holds<Has<C.LayoutInput, "step">>();
 holds<Has<C.LayoutRecord, "skipped">>();
+// The two records have `outputHash` (ACTIVATION).
+holds<Has<C.LayoutRecord, "outputHash">>();
+holds<Has<LayoutRecord, "outputHash">>();
+holds<Fits<RecordTrace, C.StageTrace>>();
+holds<Fits<C.StageTrace, RecordTrace>>();
+// @ts-expect-error G11: the contract record has no `trace` with the move counts. The contract has `StageTrace` only on the output of a packer.
+holds<Has<C.LayoutRecord, "trace">>();
 
 /** The floor and the tolerance of each row of the table "The floors" in `docs/PROMOTION.md`, by the name of the measure. */
 function promotionFloors(): Map<string, { floor: number; tol: number }> {
