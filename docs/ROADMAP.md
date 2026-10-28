@@ -92,6 +92,41 @@ Status: `done`, `active`, `blocked`, `later`.
 | PORTFOLIO-API | [The opt-in portfolio router](research/PORTFOLIO.md#the-portfolio-router-portfolio-api) `portfolio`: `shared` and the greedy set of the size band, rule and cap of the caller, with the shared combinator of layout-contract. On the held-out seeds, k = 5 keeps 4% to 100% of the oracle gain. At 40 nodes, k = 3 takes 51 to 176 ms. | 2026-10-28 | #112 |
 | PORTFOLIO-FIT | [One key and a deterministic default](research/PORTFOLIO.md#the-fit-of-the-router-portfolio-fit) for the router `portfolio`. The router and the offline choice use one guard and `selectBest`: 0 of 3 740 winners differ. The core imports layout-contract. Without `k`, the router runs a fit with a node limit for each member, at 6 to 46 ms (median) up to 40 nodes. | 2026-10-28 | #114 |
 | PORTFOLIO-SPEED | [A cheaper key and two bands above 40 nodes](research/PORTFOLIO.md#the-speed-of-the-router-portfolio-speed) for the router `portfolio`. One A* search for each terminal gives the same stretch, to 1e-15. The setup at 100 nodes goes from 172 to 25 ms. At 41 to 64 nodes, the fit runs one member at the cap 1.5, at 39 to 46 ms. | 2026-10-28 | #118 |
+| CALIBRATION | [A Brier score of the predictions](#calibration): 229 claims of 54 items score 0.177. Quality and size claims hit less than their confidence, and correctness and build claims hit more. | 2026-10-28 | #120 |
+
+## Calibration
+
+On 2026-10-28, 229 prediction claims of 54 items have a confidence and a result. Their Brier score is 0.177. A score of 0 is a perfect forecast.
+
+- A claim gets 1 when it is met, 0.5 when it is partly met and 0 when it is not met. A claim with no test does not count.
+- A high claim counts as 0.9, a medium claim as 0.6 and a low claim as 0.3. The results of 4 claims have no verdict word, so their outcome comes from the numbers.
+- The live tracker keeps the table of each claim, with its confidence, its outcome and its area.
+
+| Confidence | Claims | Hit rate | Brier |
+|---|---|---|---|
+| high (0.9) | 49 | 0.90 | 0.081 |
+| medium (0.6) | 133 | 0.67 | 0.207 |
+| low (0.3) | 47 | 0.37 | 0.191 |
+| none | 25 | 0.78 | not scored |
+
+| Area of the claim | Claims | Hit rate | Mean confidence |
+|---|---|---|---|
+| Correctness: equal outputs, 0 digest changes, tests, the SemVer step | 56 | 0.97 | 0.80 |
+| Build: a measure, an option, a page or a note exists | 56 | 0.94 | 0.64 |
+| Speed and time | 16 | 0.75 | 0.58 |
+| Wins: the number of ideas that win the wave rule | 12 | 0.54 | 0.53 |
+| Quality: B1, gap closed, keep-rate, crossings, spacing, detour | 107 | 0.41 | 0.51 |
+| Size and scaling: the effect of more nodes | 7 | 0.07 | 0.47 |
+
+The three levels are calibrated as a whole, but the areas are not. Quality and size claims were too optimistic: the high quality claims hit 0.56, and 1 of 7 size claims hit. Correctness and build claims were too modest: the medium build claims hit 0.95. The hit rate fell from 0.76 on 2026-10-27 to 0.48 on 2026-10-28, when most claims were on the gains of the portfolio.
+
+The rule for the next predictions:
+
+- The base rates are high 0.90, medium 0.67 and low 0.37.
+- Give a new claim the level whose base rate is nearest to the hit rate of its area.
+- Start a quality claim or a size claim at low, and a speed claim or a wins claim at medium.
+- Start a correctness claim or a build claim at high.
+- Raise a claim by one level only with a measured reason, for example a scratch run on the same inputs.
 
 ## Open
 
