@@ -1006,7 +1006,7 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 | HWY-058 `streets` | R14 `better` 0 of 6 (1 tie), B1 `better` 0 of 6 (1 tie), R3 `worse` 1 of 6 | R14 `better` 0 of 6 (1 tie), B1 `better` 1 of 6 (1 tie), R3 `worse` 1 of 6 | 1.741 / 39.10 | 1.105 / 1.376 | 2.25 | 0 | `screened` |
 | HWY-059 `search` | B1 `depends on the mix` 2 of 6, B3 q95 `better` 1 of 6, B4 `depends on the mix` 2 of 6, B6 `better` 0 of 6 | B1 `no verdict` 2 of 6, B3 q95 `better` 1 of 6, B4 `no verdict` 3 of 6, B6 `better` 1 of 6 | 1.000 / 19.72 | 1.000 / 1.028 | 19.4 | 0 | `dropped` |
 | HWY-060 `interchanges` | B1 `better` 0 of 6 (1 tie), B8 runs `worse` 0 of 6 (1 tie) | B1 `better` 0 of 6 (1 tie), B8 runs `worse` 0 of 6 (1 tie) | 1.450 / 28.75 | 1.019 / 1.298 | 3.03 | 0 | `screened` |
-| HWY-044 `attraction` | B1 `better` 0 of 6 (3 ties), B8 runs `worse` 0 of 6 (3 ties), M4 `no verdict` 1 of 6 | The run of `screen-v2` gives it. | 1.011 / 3.460 (`screen-v1`) | 1.000 / 1.032 (`screen-v1`) | 2.63 (`screen-v1`) | 0 | The run of `screen-v2` decides. |
+| HWY-044 `attraction` | B1 `better` 0 of 6 (3 ties), B8 runs `worse` 0 of 6 (3 ties), M4 `no verdict` 1 of 6 | B1 `better` 0 of 6 (3 ties), B8 runs `worse` 0 of 6 (3 ties), M4 `no verdict` 0 of 6 | 1.000 / 3.460 | 1.000 / 1.033 | 2.76 | 0 | `screened` |
 
 - `steiner` gives the most B1 of the wave, but it adds routes through boxes on `packed-grid`. With the gate `stretch`, the breaks go to 0, and B1 has no verdict with 4 of 6 families against.
 - `gaps` raises M4 from 0 to 32.3 on `many-groups`. Thus its named win M4 fails. With `minSize: 2`, the labels stay the same.
@@ -1014,12 +1014,14 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 - `search` starts at `corridors`. Against `corridors`, its median B1 ratio is 1.000, and 0.998 with 48 evaluations at 45 times the time of `shared`. Its `better` B3 q95 and B6 come from the start plan.
 - `search` reads only the graph and the routes of its input. Its score does not read the records of a screen. The option `evaluations` (0 to 400, default 16) sets its budget.
 - On both sets, `interchanges` gets B1 `better` with 0 families against. Its only loss is B8 runs.
+- On both sets, `attraction` gets B1 and R1 `better` with 0 families against. The B1 gain is 0.003 on the mean of the families. B8 runs is `worse`, and R4, R5 and the B3 q95 are a little worse on `screen-v2`.
+- The time of `attraction` is 2.63 times `shared` on `screen-v1`. Thus the workflow `Scale` times it on the dense board of 1000 boxes.
 
 ### The snapshots of the verdicts
 
-The snapshots of [`verdicts/`](verdicts/README.md) hold the highway screens of this wave, with all the built-in strategies and the strategies of the wave.
+The snapshots of [`verdicts/`](verdicts/README.md) hold the screens of this wave, with all the built-in strategies and the strategies of the wave.
 
-- Over all the `better` verdicts of `screen-v2`, 61 of 125 have 1 or more families against them. Over all the `better` and `worse` verdicts, 132 of 270 have.
+- Over all the `better` verdicts of `screen-v2`, 61 of 139 have 1 or more families against them. Over all the `better` and `worse` verdicts, 132 of 294 have.
 - The results page reads these counts. A new screen in a snapshot changes them.
 
 ### The measures with no value

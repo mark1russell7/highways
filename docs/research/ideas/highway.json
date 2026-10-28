@@ -9173,7 +9173,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > shared by 5% with M4 <= shared on 3 of 5 boards.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-039",
       "HWY-005",
@@ -9181,7 +9181,123 @@
       "HWY-016",
       "NAT-005"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40767715430",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/attraction@a32522f",
+        "screen-v2/*/attraction-p2@a32522f",
+        "screen-v2/*/attraction-p5@a32522f",
+        "screen-v2/*/attraction-a0.25@a32522f",
+        "screen-v2/*/attraction-a1@a32522f",
+        "screen-v2/*/attraction-b0@a32522f",
+        "screen-v2/*/attraction-b4@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/attraction@a32522f",
+        "screen-v1/*/attraction-p2@a32522f",
+        "screen-v1/*/attraction-p5@a32522f",
+        "screen-v1/*/attraction-a0.25@a32522f",
+        "screen-v1/*/attraction-a1@a32522f",
+        "screen-v1/*/attraction-b0@a32522f",
+        "screen-v1/*/attraction-b4@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.02,
+            "small-clustered": 0.233,
+            "dense-groups": 0.33,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          }
+        },
+        "B8 against shared": {
+          "base": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 66.2,
+            "dense-groups": 137.2,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.6,
+            "small-clustered": 69.4,
+            "dense-groups": 141.1,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0
+          }
+        },
+        "M4 against shared": {
+          "base": {
+            "tiny-uniform": 0,
+            "small-clustered": 10.5,
+            "dense-groups": 37.8,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 92.4
+          },
+          "new": {
+            "tiny-uniform": 0,
+            "small-clustered": 10.8,
+            "dense-groups": 38,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 92.4
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.211,
+            "dense-groups": 1.267,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          }
+        },
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.6,
+            "small-clustered": 624.7,
+            "dense-groups": 1042.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40767715430 and the screen-v1 run 40766283584, at a32522f. On both sets, attraction is better on B1 and on R1 with 0 families against. The B1 gain is small: 0.003 on the mean of the families. B8 runs is worse on both sets, and M4 has no verdict. The B3 q95, R4 and R5 are a little worse on screen-v2. The median time is 2.76 times shared on screen-v2 and 2.63 times on screen-v1. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "HWY-045",
