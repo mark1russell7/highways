@@ -69,7 +69,7 @@ export const byEdge = (P: Placed, Q: Placed): number => byText(P.edge, Q.edge);
 const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.abs(a.x - b.x) <= SAME && a.y < b.y);
 
 /**
- * This function is the relation of the order `run`: the side after the run, else the side before the run, else the order of the edges.
+ * This function is the relation of the order `run`. The side after the run tells the order first, then the side before the run, then the edges.
  * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle.
  */
 export const byRun = (P: Placed, Q: Placed): number => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q);
