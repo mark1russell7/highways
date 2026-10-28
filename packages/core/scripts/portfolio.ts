@@ -539,6 +539,8 @@ export interface RuleForm {
   readonly singles: readonly (string | undefined)[];
   /** The greedy sets on all inputs of the splits, for each size of `API_KS`. Only the forms at one cap have them. */
   readonly sets: readonly { readonly k: number; readonly set: readonly string[] }[];
+  /** The inputs of the form. At one cap, an input counts only when the baseline has a gap closed there: the optimum at the cap is above the baseline of the rule. */
+  readonly inputs: number;
 }
 
 /**
@@ -568,10 +570,13 @@ export function ruleForms(
     for (const v of values) {
       const ct = v.cap === undefined ? rt : capTable(rt, v.cap);
       const fb = fallbackValue(ct, v.value, "cap");
-      const curve = paretoCurve(ct, splits, pool, "cap", v.value, { singleBy: fb, singleOf: fb, full: o.full ?? true, ...(o.ks === undefined ? {} : { ks: o.ks }) });
-      const singles = splits.map((sp) => singleBest(ct, sp.train, pool, fb, { minShare: 1 }));
-      const sets = v.cap === undefined ? [] : (o.apiKs ?? API_KS).map((k) => ({ k, set: greedySet(ct, all, pool, k, "cap", v.value) }));
-      forms.push({ rule, ...(v.cap === undefined ? {} : { cap: v.cap }), curve, singles, sets });
+      const ok = (i: string): boolean => v.cap === undefined || fb(i, PORTFOLIO_BASE) !== undefined;
+      const sp = splits.map((x) => ({ ...x, train: x.train.filter(ok), test: x.test.filter(ok) }));
+      const mine = all.filter(ok);
+      const curve = paretoCurve(ct, sp, pool, "cap", v.value, { singleBy: fb, singleOf: fb, full: o.full ?? true, ...(o.ks === undefined ? {} : { ks: o.ks }) });
+      const singles = sp.map((x) => singleBest(ct, x.train, pool, fb, { minShare: 1 }));
+      const sets = v.cap === undefined ? [] : (o.apiKs ?? API_KS).map((k) => ({ k, set: greedySet(ct, mine, pool, k, "cap", v.value) }));
+      forms.push({ rule, ...(v.cap === undefined ? {} : { cap: v.cap }), curve, singles, sets, inputs: mine.length });
     }
   }
   return forms;
@@ -702,12 +707,12 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
         "",
         "The greedy choice on all inputs, with the guard `cap`, for the rule and the cap of the caller. Each set also runs `shared`. The item PORTFOLIO-API builds a strategy from these sets.",
         "",
-        "| rule | cap | k | oracle gain | set |",
-        "|---|---:|---:|---:|---|",
+        "| rule | cap | inputs | k | oracle gain | set |",
+        "|---|---:|---:|---:|---:|---|",
         ...capForms.flatMap((f) => {
           const p0 = f.curve[0]!;
           const gain = quantile(p0.oracle, 0.5) - quantile(p0.single, 0.5);
-          return f.sets.map((x) => `| ${code(f.rule)} | ${f.cap} | ${x.k} | ${f3(gain)} | ${setText(x.set)} |`);
+          return f.sets.map((x) => `| ${code(f.rule)} | ${f.cap} | ${f.inputs} | ${x.k} | ${f3(gain)} | ${setText(x.set)} |`);
         }),
         "",
       );

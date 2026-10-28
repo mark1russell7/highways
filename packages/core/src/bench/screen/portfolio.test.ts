@@ -288,5 +288,6 @@ describe("the portfolio with the rule of the caller (PORTFOLIO-RULE)", () => {
     expect(forms.find((f) => f.rule === "all" && f.cap === 1.25)!.sets[0]).toEqual({ k: 1, set: ["a"] });
     expect(forms.find((f) => f.rule === "all" && f.cap === 1.5)!.sets[0]).toEqual({ k: 1, set: ["e"] });
     for (const f of forms.filter((x) => x.cap === undefined)) expect(f.sets).toEqual([]);
+    for (const f of forms) expect(f.inputs).toBe(IN.length);
   });
 });
