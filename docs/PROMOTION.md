@@ -157,7 +157,7 @@ The ids are the ids of [the measure note](research/MEASURES.md). The ids of the 
 | `pack`, on change pairs | `pack.stability.mean`, `pack.stability.q95`, `pack.stability.moved` |
 | all routing steps, on change pairs | `Z10` |
 
-For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. `pack.search.ms` gives the time test.
+For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. The field `ms` of each record gives the time test. It is the median of `msRuns`.
 
 ### A bound by count
 
