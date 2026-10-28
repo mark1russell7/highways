@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { GAP_CAPS, GAP_RULES, optimumKey, type ExactOptimaFile } from "./gap.ts";
 import { EXACT_CLASSES, EXACT_V1, EXACT_V1_SEEDS, EXACT_V1_SIZES, exactSeed } from "./exact-set.ts";
 import { documentHash } from "./hash.ts";
 import { formatInput, inputGraph, type LayoutInput } from "./forms.ts";
@@ -36,5 +37,26 @@ describe("the screen set exact-v1 (MEAS2)", () => {
     }
     const manifest = JSON.parse(readFileSync(new URL("corpus.json", root), "utf8")) as LayoutCorpus;
     expect(manifest).toEqual(corpusManifest("exact-v1", inputs));
+  });
+});
+
+describe("the optima of exact-v1 (MEAS2)", () => {
+  const file = JSON.parse(readFileSync(new URL("../exact/optima-exact-v1.json", import.meta.url), "utf8")) as ExactOptimaFile;
+
+  it("has one proven optimum for each input, rule and cap, with the hash of its input", () => {
+    expect(file.schema).toBe("exact-optima/1");
+    expect(file.set).toBe("exact-v1");
+    const byKey = new Map(file.optima.map((o) => [optimumKey(o.input, o.rule, o.cap), o]));
+    expect(byKey.size).toBe(file.optima.length);
+    expect(file.optima.length).toBe(inputs.length * GAP_RULES.length * GAP_CAPS.length);
+    for (const input of inputs)
+      for (const rule of GAP_RULES)
+        for (const cap of GAP_CAPS) {
+          const o = byKey.get(optimumKey(input.id, rule, cap));
+          expect(o, `${input.id} ${rule} ${cap}`).toBeDefined();
+          expect(o!.hash, input.id).toBe(input.hash);
+          expect(o!.proven, `${input.id} ${rule} ${cap}`).toBe(true);
+          expect(o!.b1, `${input.id} ${rule} ${cap}`).not.toBeNull();
+        }
   });
 });
