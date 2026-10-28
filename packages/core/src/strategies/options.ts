@@ -26,6 +26,11 @@ export interface NumberOption extends OptionBase {
   readonly special?: readonly number[];
   /** These values are the notable values of the option: the default and the values of the sweeps of the benchmark. */
   readonly marks?: readonly number[];
+  /**
+   * These values are the only valid values of the option, in the order of a control. A control shows them as a list, and a sweep gives them.
+   * Without them, each value on the range is valid.
+   */
+  readonly values?: readonly number[];
   /** The strategy uses this value when the caller and `defaults` give no value. */
   readonly default?: number;
 }
@@ -42,6 +47,11 @@ export interface EnumOption<V extends string = string> extends OptionBase {
   readonly type: "enum";
   /** The values of the option, in the order of a control. */
   readonly values: readonly V[];
+  /**
+   * With `function`, the option also takes a rule of the caller in place of a name. A control sets only the names.
+   * Each name is a known rule of the strategy.
+   */
+  readonly custom?: "function";
   /** The strategy uses this value when the caller and `defaults` give no value. */
   readonly default?: V;
 }
@@ -61,8 +71,19 @@ export interface ValueOption<V = unknown> extends OptionBase {
 /** The declaration of one option of any type. */
 export type AnyOption = NumberOption | BooleanOption | EnumOption | ValueOption;
 
-/** The declaration that fits the type of an option value: numbers, booleans, string unions or other values. */
-export type OptionDeclaration<V> = [V] extends [number] ? NumberOption : [V] extends [boolean] ? BooleanOption : [V] extends [string] ? EnumOption<V> : ValueOption<V>;
+/**
+ * The declaration that fits the type of an option value: numbers, booleans, string unions or other values.
+ * A union of strings and other values takes an enum of the strings or a value declaration. An example is a rule or the name of a rule.
+ */
+export type OptionDeclaration<V> = [V] extends [number]
+  ? NumberOption
+  : [V] extends [boolean]
+    ? BooleanOption
+    : [V] extends [string]
+      ? EnumOption<V>
+      : [Extract<V, string>] extends [never]
+        ? ValueOption<V>
+        : EnumOption<Extract<V, string>> | ValueOption<V>;
 
 /** The declarations of the options of a strategy. The schema has one declaration for each key of the options type, and no other key. */
 export type OptionSchema<O> = { readonly [K in keyof O]-?: OptionDeclaration<NonNullable<O[K]>> };
@@ -139,6 +160,7 @@ function issueOf(key: string, value: unknown, d: AnyOption): OptionIssue | undef
     case "integer": {
       if (typeof value !== "number" || Number.isNaN(value)) return issue("type", `The option "${key}" takes a number.`);
       if (isSpecial(d, value)) return undefined;
+      if (d.values !== undefined && !d.values.includes(value)) return issue("value", `The option "${key}" takes ${d.values.join(", ")}, not ${value}.`);
       if (value < d.min || value > d.max) return issue("range", `The option "${key}" is ${value}, out of the range ${d.min} to ${d.max}.`);
       if (d.type === "integer" && !Number.isInteger(value)) return issue("integer", `The option "${key}" takes a whole number, not ${value}.`);
       return undefined;
@@ -146,6 +168,7 @@ function issueOf(key: string, value: unknown, d: AnyOption): OptionIssue | undef
     case "boolean":
       return typeof value === "boolean" ? undefined : issue("type", `The option "${key}" takes true or false.`);
     case "enum":
+      if (d.custom === "function" && typeof value === "function") return undefined;
       return d.values.includes(value as string) ? undefined : issue("value", `The option "${key}" takes ${d.values.join(", ")}, not ${String(value)}.`);
     case "function":
       return typeof value === "function" ? undefined : issue("type", `The option "${key}" takes a function.`);
@@ -176,7 +199,7 @@ export function checkOptions<S extends Step, O extends object>(strategy: Strateg
 
 /**
  * This function moves each number option into the range of its declaration, for a control. An integer option gets the nearest whole number.
- * A special value stays. The function keeps each other value as it is. `checkOptions` reports the values that this function cannot correct.
+ * An option with a list of `values` gets the nearest value of the list. A special value stays. The function keeps each other value as it is. `checkOptions` reports the values that this function cannot correct.
  */
 export function clampOptions<S extends Step, O extends object>(strategy: Strategy<S, O>, options: Partial<O>): Partial<O> {
   const schema = schemaOf(strategy);
@@ -184,6 +207,10 @@ export function clampOptions<S extends Step, O extends object>(strategy: Strateg
   for (const [key, value] of Object.entries(options)) {
     const d = schema[key];
     if (!d || (d.type !== "number" && d.type !== "integer") || typeof value !== "number" || Number.isNaN(value) || isSpecial(d, value)) continue;
+    if (d.values !== undefined && d.values.length > 0) {
+      out[key] = d.values.reduce((best, v) => (Math.abs(v - value) < Math.abs(best - value) ? v : best));
+      continue;
+    }
     const v = Math.min(d.max, Math.max(d.min, value));
     out[key] = d.type === "integer" ? Math.min(d.max, Math.max(d.min, Math.round(v))) : v;
   }
@@ -211,7 +238,7 @@ function rangeValues(d: NumberOption, count: number): number[] {
 
 /**
  * This function gives the values of a sweep of one option declaration.
- * A number option gives its `marks`, or `count` values on its range and its scale. A boolean gives `false` and `true`. An enum gives its values.
+ * A number option gives its `marks`, or its list of `values`, or `count` values on its range and its scale. A boolean gives `false` and `true`. An enum gives its values.
  * An option of another type has no sweep, so the function throws an error.
  */
 export function sweepValues(declaration: AnyOption, options: SweepOptions = {}): unknown[] {
@@ -219,6 +246,7 @@ export function sweepValues(declaration: AnyOption, options: SweepOptions = {}):
     case "number":
     case "integer": {
       if (options.count === undefined && declaration.marks !== undefined) return [...declaration.marks];
+      if (declaration.values !== undefined) return [...declaration.values];
       const values = rangeValues(declaration, options.count ?? SWEEP_COUNT);
       return options.special ? [...values, ...(declaration.special ?? []).filter((s) => !values.includes(s))] : values;
     }
@@ -268,6 +296,10 @@ function declarationIssues(key: string, d: AnyOption): string[] {
     if (d.type === "integer" && (!Number.isInteger(d.min) || !Number.isInteger(d.max))) out.push(`The integer option "${key}" has a range that is not whole.`);
     if (d.step !== undefined && !(d.step > 0)) out.push(`The option "${key}" has the step ${d.step}. A step is more than 0.`);
     if (d.scale === "log" && !(d.min > 0)) out.push(`The option "${key}" has the scale log and the min ${d.min}. The scale log needs a min above 0.`);
+    if (d.values !== undefined && d.values.length === 0) out.push(`The number option "${key}" has an empty list of values.`);
+    for (const v of d.values ?? []) {
+      if (v < d.min || v > d.max || (d.type === "integer" && !Number.isInteger(v))) out.push(`The value ${v} of the option "${key}" is not on its range ${d.min} to ${d.max}.`);
+    }
     for (const v of [...(d.marks ?? []), ...(d.default === undefined ? [] : [d.default])]) {
       const issue = issueOf(key, v, d);
       if (issue) out.push(issue.message);

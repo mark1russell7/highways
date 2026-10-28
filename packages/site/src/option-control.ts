@@ -26,6 +26,14 @@ export function optionControl(id: string, key: string, d: ControlOption, value: 
     select.addEventListener("change", () => changed(select.value));
     input = select;
     wrap.append(label, select);
+  } else if (d.values !== undefined) {
+    // A number option with a list of values gets a list. Without a value, the first entry keeps the default of the strategy.
+    const select = document.createElement("select");
+    if (typeof value !== "number" || !d.values.includes(value)) select.append(new Option("default", "", false, true));
+    for (const v of d.values) select.append(new Option(String(v), String(v), false, v === value));
+    select.addEventListener("change", () => changed(select.value === "" ? undefined : Number(select.value)));
+    input = select;
+    wrap.append(label, select);
   } else {
     const num = document.createElement("input");
     num.type = "number";

@@ -538,6 +538,7 @@ The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outp
 - The result has the output, the winner, the trace of the pick and the move count `move.pick`.
 - `exactStretches(graph, options?)` gives a function from the routes to the stretch of each edge in the exact model. The router uses it for the cap. `exactStretch` gives the largest stretch.
 - `portfolioRouter(options?)` gives a `Router`, and `portfolioStrategy` is the router strategy. Add `portfolioStrategy` to a registry of your own to race it.
+- `portfolioStrategy.schema` declares each option except the clock `now` (SCHEMA-GAPS). The lists of `rule`, `cap`, `k` and `hashes` come from `PORTFOLIO_RULES`, `PORTFOLIO_CAPS`, `PORTFOLIO_KS_API` and `PORTFOLIO_HASHES`.
 
 ```ts
 import { routePortfolio } from "@mark1russell7/highways";
@@ -560,9 +561,9 @@ Each strategy declares its options in `schema`. A declaration tells the type, th
 
 | Type | Fields | Values |
 |---|---|---|
-| `number`, `integer` | `min`, `max`, `step`, `scale`, `special`, `marks` | A number. An `integer` takes only whole numbers. |
+| `number`, `integer` | `min`, `max`, `step`, `scale`, `special`, `marks`, `values` | A number. An `integer` takes only whole numbers. With `values`, only one of `values`. |
 | `boolean` | | `false` or `true`. |
-| `enum` | `values` | One of `values`. |
+| `enum` | `values`, `custom` | One of `values`. With `custom: "function"`, also a rule of the caller. |
 | `function`, `strategy`, `list`, `object` | `step` (for `strategy`) | A rule, a strategy, an array or an object. A sweep cannot set them. |
 
 Each declaration has a `describe` sentence and an optional `default`.
@@ -571,18 +572,27 @@ Each declaration has a `describe` sentence and an optional `default`.
 - The `scale` is `linear` or `log`. A sweep on the scale `log` gives values with equal ratios.
 - The `special` values are valid outside the range. `Infinity` sets no limit.
 - The `marks` are the notable values: the default and the values of the sweeps of the benchmark.
+- The `values` of a number option are its only valid values. A control shows them as a list, and a sweep gives them. The `cap` of the portfolio router uses them.
+- An enum with `custom: "function"` names the known rules of an option that also takes a rule. A control sets the names, and a caller can still give its own rule.
 - The `default` is the value that the strategy uses when the caller and `defaults` give no value. A value of `defaults` comes first.
 
 The type `OptionSchema<O>` needs one declaration for each key of the options, and no other key. A number option needs a number declaration, and an enum declaration takes only the values of its type.
+An option of a rule or its name, for example `GroupRule | "collection" | "all"`, takes an enum of the names or a declaration of the rule.
+
+The option `rule` of the routers `trunks`, `shared` and `shared-all`, and of the highway strategies `keys`, `shared-ways` and `soft-keys`, takes a name (SCHEMA-GAPS):
+
+- With `collection`, the rule is `byCollection`. It is the default of each strategy except `shared-all`.
+- With `all`, each edge has one key. For the router `shared`, it is the same as no rule, so it is the default of `shared-all`.
+- A rule of the caller stays valid. The name `collection` gives the same output as the rule `byCollection`.
 
 The helpers read the declarations:
 
 - `optionDefaults(strategy)` gives the effective default of each option. The strategy gives the same output with this object as with no options.
 - `listOptions(strategy)` gives each option with its key, its declaration and its default, in the order of the schema.
-- `checkOptions(strategy, options)` reports each value without a declaration, of the wrong type, out of the range or not a whole number. It changes no value.
-- `clampOptions(strategy, options)` moves each number into its range, for a control. A special value stays.
+- `checkOptions(strategy, options)` reports each value without a declaration, of the wrong type, out of the range, not a whole number or not one of `values`. It changes no value.
+- `clampOptions(strategy, options)` moves each number into its range, for a control. A number with `values` moves to the nearest value. A special value stays.
 - `checkSchema(strategy)` reports each option of `defaults` without a declaration, and each bad declaration.
-- `sweepValues(declaration, { count, special })` gives the values of a sweep. Without `count`, a number option gives its `marks`.
+- `sweepValues(declaration, { count, special })` gives the values of a sweep. Without `count`, a number option gives its `marks`. Else, a number option with `values` gives its `values`.
 - `sweepOf(strategy, key, options)` gives one setting for each value of a sweep. The name of a setting is the key and the value.
 - `sweepGrid(strategy, keys, options)` gives one setting for each combination of the values of the keys.
 

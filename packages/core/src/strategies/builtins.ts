@@ -76,7 +76,7 @@ import { plugsRouter } from "../routers/plugs.ts";
 import { sectionsRouter, type SectionsOptions } from "../routers/sections.ts";
 import { sharedRouter, type SharedOptions } from "../routers/shared.ts";
 import { straightRouter } from "../routers/straight.ts";
-import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
+import { trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { runPipeline, type PipelineOptions } from "../whole/pipeline/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
@@ -142,7 +142,7 @@ export const routerStrategies: {
     "trunks",
     "A rule puts edges in groups. The edges of a group leave one plug of one node on one trunk. At a split point, each edge goes on to its target.",
     10_000,
-    { rule: byCollection },
+    { rule: "collection" },
     trunksRouter,
     TRUNKS_SCHEMA,
   ),
@@ -150,7 +150,7 @@ export const routerStrategies: {
     "shared",
     "The edges of one collection share their ways through the corner graph. A link that the group uses already costs half.",
     10_000,
-    { rule: byCollection },
+    { rule: "collection" },
     sharedRouter,
     SHARED_SCHEMA,
   ),
@@ -472,7 +472,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "keys",
     describe: "The highways of the router `trunks`. The edges from one plug with one key share a trunk, and the edges that go on together share a run past it.",
-    defaults: { rule: byCollection } as KeysOptions,
+    defaults: { rule: "collection" } as KeysOptions,
     schema: TRUNKS_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<KeysOptions>) => keysPlan(input, o),
@@ -481,7 +481,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "shared-ways",
     describe: "The highways of the router `shared`. The edges of one key share their ways through the corner graph, and each shared stretch is a highway.",
-    defaults: { rule: byCollection } as SharedWaysOptions,
+    defaults: { rule: "collection" } as SharedWaysOptions,
     schema: SHARED_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SharedWaysOptions>) => sharedWaysPlan(input, o),
@@ -671,7 +671,7 @@ export const highwayStrategies: {
     step: "highway",
     name: "soft-keys",
     describe: "Soft keys (HWY-019). The key of an edge adds a distance to the flow distance, and a hierarchical clustering makes the highways.",
-    defaults: { ...SOFT_KEY_DEFAULTS } as SoftKeyOptions,
+    defaults: { ...SOFT_KEY_DEFAULTS, rule: "collection" } as SoftKeyOptions,
     schema: SOFT_KEY_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SoftKeyOptions>) => softKeyPlan(input, o),

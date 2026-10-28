@@ -4,6 +4,7 @@
 import { pickMoves, portfolio, type Member, type PortfolioTrace } from "../bench/screen/portfolio-pick.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { asRouter, defineStrategy, type Strategy } from "../strategies/model.ts";
+import type { OptionSchema } from "../strategies/options.ts";
 import { PORTFOLIO_CAPS, PORTFOLIO_KS_API, PORTFOLIO_RULES, portfolioBand, type PortfolioCap, type PortfolioRule } from "./bands.ts";
 import { PORTFOLIO_FIT } from "./fit.ts";
 import { portfolioKey } from "./key.ts";
@@ -135,6 +136,47 @@ export function portfolioRouter(options: PortfolioRouterOptions = {}): Router {
   return { name: portfolioName(options), maxNodes: 10_000, route: (graph) => routePortfolio(graph, options).result };
 }
 
+/** The largest count of members after the base: the largest list of the fit and of the sets. */
+const MAX_AFTER_BASE = Math.max(...PORTFOLIO_KS_API, ...Object.values(PORTFOLIO_FIT).map((l) => l.length), ...Object.values(PORTFOLIO_SETS).map((l) => l.length));
+
+/**
+ * The declarations of the options of the portfolio router (SCHEMA-GAPS). The lists of values come from the constants, so a new rule or cap needs no change here.
+ * The option `now` has no declaration. It is a clock for the tests, not a choice of the layout, and no control or sweep can set a function.
+ */
+const PORTFOLIO_SCHEMA: OptionSchema<Omit<PortfolioRouterOptions, "now">> = {
+  rule: { type: "enum", values: PORTFOLIO_RULES, default: "collection", describe: "With `collection`, a shared segment holds edges of one collection only. With `all`, collections can mix." },
+  cap: {
+    type: "number",
+    min: Math.min(...PORTFOLIO_CAPS),
+    max: Math.max(...PORTFOLIO_CAPS),
+    values: PORTFOLIO_CAPS,
+    default: 1.5,
+    describe: "The stretch cap. An output with an edge above the cap does not win.",
+  },
+  k: {
+    type: "integer",
+    min: Math.min(...PORTFOLIO_KS_API),
+    max: Math.max(...PORTFOLIO_KS_API),
+    values: PORTFOLIO_KS_API,
+    describe: "The count of members after the base. Without it, the router uses the fit of the size band.",
+  },
+  budgetMs: {
+    type: "integer",
+    min: 0,
+    max: 10_000,
+    step: 10,
+    describe: "The time limit of the pick in milliseconds. Without it, there is no limit. A cut by the limit makes the output depend on the machine.",
+  },
+  maxMembers: {
+    type: "integer",
+    min: 1,
+    max: 1 + MAX_AFTER_BASE,
+    step: 1,
+    describe: "The largest count of members that run, with the base. Without it, each member of the pick runs.",
+  },
+  hashes: { type: "enum", values: PORTFOLIO_HASHES, default: "pick", describe: "With `pick`, only the base and the winner get an output hash in the trace. With `all`, each member gets one." },
+};
+
 /**
  * The portfolio router as a router strategy. It is not in the registry `STRATEGIES`, so the benchmark and the site do not race it by default.
  * A caller adds it to a registry of its own, or calls `routePortfolio` for the trace.
@@ -144,6 +186,8 @@ export const portfolioStrategy: Strategy<"router", PortfolioRouterOptions> = def
   name: "portfolio",
   describe: "The portfolio router (PORTFOLIO-API). It runs `shared` and the fit of the size band, and gives the output with the most ink saved inside the rule and the cap.",
   defaults: { rule: "collection", cap: 1.5 },
+  // The schema leaves out the clock `now`, so its type is the options without `now`.
+  schema: PORTFOLIO_SCHEMA as OptionSchema<PortfolioRouterOptions>,
   maxNodes: 10_000,
   run: (graph, options) => routePortfolio(graph, options).result,
 });

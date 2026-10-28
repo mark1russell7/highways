@@ -6,8 +6,12 @@ import { curveSpace } from "../curves/index.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import type { Graph } from "../model.ts";
 import { roomLinks } from "../room/index.ts";
+import { resultHash } from "../bench/screen/exercise.ts";
+import { keysPlan } from "../highways/keys/index.ts";
+import { sharedWaysPlan } from "../highways/shared-ways/index.ts";
 import { ROUTERS } from "../routers/index.ts";
 import { buildSections } from "../sections.ts";
+import { byCollection, GROUP_RULE_NAMES, groupRuleOf } from "../routers/trunks.ts";
 import {
   BUILT_IN_STRATEGIES,
   checkOptions,
@@ -16,6 +20,7 @@ import {
   curveStrategies,
   defineStrategy,
   groupStrategies,
+  highwayStrategies,
   listOptions,
   optionDefaults,
   roomStrategies,
@@ -86,7 +91,9 @@ describe("the declarations of the built-in strategies (OPTS)", () => {
     expect(routerStrategies["sections-tree"].defaults).toEqual({ stretch: Infinity });
     expect(roomStrategies.routes.defaults).toEqual({});
     expect(optionDefaults(routerStrategies["sections-tree"])).toMatchObject({ stretch: Infinity, hubSlack: 80, cap: 8, margin: 5 });
-    expect(optionDefaults(routerStrategies["shared-all"])).not.toHaveProperty("rule");
+    // The router `shared-all` sets no rule. Its schema gives the name `all`, which is the same as no rule (SCHEMA-GAPS).
+    expect(routerStrategies["shared-all"].defaults).toEqual({});
+    expect(optionDefaults(routerStrategies["shared-all"])).toHaveProperty("rule", "all");
     expect(optionDefaults(routerStrategies["corners-smooth"])).toEqual({ margin: 5, k: 8, smooth: true, plugs: "facing", plugGap: 0 });
   });
 
@@ -170,6 +177,41 @@ describe("the checks of the option values", () => {
   });
 });
 
+describe("the named rules of the edges (SCHEMA-GAPS)", () => {
+  // Each strategy whose option `rule` takes a name of `GROUP_RULE_NAMES` or a rule of the caller.
+  const named = BUILT_IN_STRATEGIES.filter((s) => listOptions(s).some((o) => o.key === "rule" && o.declaration.type === "enum" && o.declaration.custom === "function"));
+
+  it("declare the option rule of each strategy that groups the edges as a list of names", () => {
+    expect(named.map((s) => `${s.step} ${s.name}`)).toEqual(["router trunks", "router shared", "router shared-all", "highway keys", "highway shared-ways", "highway soft-keys"]);
+    for (const s of named) {
+      expect(listOptions(s).find((o) => o.key === "rule")!.declaration, s.name).toMatchObject({ type: "enum", values: GROUP_RULE_NAMES, custom: "function" });
+      // The old value form stays valid: a rule of the caller.
+      expect(checkOptions(s, { rule: byCollection } as object), s.name).toEqual([]);
+      expect(checkOptions(s, { rule: "any" } as object).map((i) => i.problem), s.name).toEqual(["value"]);
+    }
+    expect(() => groupRuleOf("any" as "all")).toThrow(RangeError);
+  });
+
+  it("give a valid run for each name, and the name collection gives the output of the rule byCollection", () => {
+    for (const s of named) {
+      for (const rule of GROUP_RULE_NAMES) expect(runOn(s, { rule }).length, `${s.name} ${rule}`).toBeGreaterThan(0);
+      expect(sameData(runOn(s, { rule: "collection" }), runOn(s, { rule: byCollection })), s.name).toBe(true);
+    }
+    expect(sameData(runOn(routerStrategies.shared, { rule: "all" }), runOn(routerStrategies["shared-all"])), "shared all").toBe(true);
+  }, 30_000);
+
+  it("keep the default output of the old path, with the rule byCollection", () => {
+    for (const graph of [tiny, board("case-hub-chain")]) {
+      for (const name of ["trunks", "shared", "shared-all"] as const) {
+        const old = ROUTERS.find((r) => r.name === name)!;
+        expect(resultHash(routerStrategies[name].run(graph)), name).toBe(resultHash(old.route(graph)));
+      }
+      expect(sameData(highwayStrategies.keys.run({ graph }), keysPlan({ graph }, { rule: byCollection })), "keys").toBe(true);
+      expect(sameData(highwayStrategies["shared-ways"].run({ graph }), sharedWaysPlan({ graph }, { rule: byCollection })), "shared-ways").toBe(true);
+    }
+  });
+});
+
 describe("the types of the declarations", () => {
   it("match the keys and the value types of the options", () => {
     const good: OptionSchema<{ readonly n?: number; readonly on: boolean; readonly turn: "x" | "y" }> = {
@@ -189,6 +231,11 @@ describe("the types of the declarations", () => {
     const wrong: OptionSchema<{ readonly n: number }> = { n: { type: "enum", values: ["a"], describe: "A number." } };
     // @ts-expect-error The value "z" is not a value of the option.
     const value: OptionSchema<{ readonly turn: "x" | "y" }> = { turn: { type: "enum", values: ["x", "z"], describe: "An axis." } };
-    expect([missing, extra, wrong, value]).toHaveLength(4);
+    // A union of a rule and its names takes an enum of the names or a declaration of the rule.
+    const named: OptionSchema<{ readonly rule: ((x: number) => string) | "a" | "b" }> = { rule: { type: "enum", values: ["a", "b"], custom: "function", describe: "A rule." } };
+    const rule: OptionSchema<{ readonly rule: ((x: number) => string) | "a" | "b" }> = { rule: { type: "function", describe: "A rule." } };
+    // @ts-expect-error The value "c" is not a name of the rule.
+    const unnamed: OptionSchema<{ readonly rule: ((x: number) => string) | "a" | "b" }> = { rule: { type: "enum", values: ["c"], describe: "A rule." } };
+    expect([missing, extra, wrong, value, named, rule, unnamed]).toHaveLength(7);
   });
 });

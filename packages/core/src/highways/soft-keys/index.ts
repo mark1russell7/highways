@@ -1,5 +1,5 @@
 import type { GroupRule } from "../../model.ts";
-import { byCollection } from "../../routers/trunks.ts";
+import { byCollection, groupRuleOf, type GroupRuleName } from "../../routers/trunks.ts";
 import { chainClusters, flowDistance, type Linkage } from "../flow-clusters/index.ts";
 import { groupedPlan, type EdgeGroup, type GroupSpine } from "../grouped.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
@@ -7,8 +7,11 @@ import { edgePlugs } from "../stretches.ts";
 
 /** The options of the highway strategy `soft-keys` (HWY-019 of the note on highways). */
 export interface SoftKeyOptions {
-  /** The rule that gives the key of each edge. The default is `byCollection`: the string `data.collection`. */
-  readonly rule: GroupRule;
+  /**
+   * The rule that gives the key of each edge, or the name of a built-in rule (`GROUP_RULE_NAMES`). The default is `byCollection`: the string `data.collection`.
+   * With `all`, each edge has one key, so the keys add no distance.
+   */
+  readonly rule: GroupRule | GroupRuleName;
   /** The distance that two different keys add. `Infinity` keeps the edges of two keys apart, as the hard keys do. The default is 0.25. */
   readonly lambda: number;
   /** Two clusters join while their distance is this value or less. The default is 0.5. */
@@ -54,11 +57,12 @@ export function softDistance(geom: number, keyA: string | undefined, keyB: strin
  * Each edge of a cluster gets the key of the cluster. It gets `flip` when it goes opposite to the first edge of the cluster.
  */
 export function softKeyClusters(input: HighwayInput, o: Readonly<SoftKeyOptions>): Map<string, EdgeGroup> {
+  const rule = groupRuleOf(o.rule);
   const ends = edgePlugs(input.graph).map(({ edge, ps, pt }) => ({
     edge: edge.id,
     s: ps.point,
     t: pt.point,
-    key: o.rule(edge),
+    key: rule(edge),
     values: o.attributes.map((a) => {
       const v = edge.data?.[a];
       return typeof v === "number" && Number.isFinite(v) ? v : undefined;
