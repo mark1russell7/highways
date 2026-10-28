@@ -10,6 +10,7 @@ import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
+import type { ConsensusOptions } from "../highways/consensus/index.ts";
 import type { CubuOptions } from "../highways/cubu/index.ts";
 import type { DiffusionOptions } from "../highways/diffusion/index.ts";
 import type { DividedOptions } from "../highways/divided/index.ts";
@@ -26,18 +27,24 @@ import type { HubArcOptions } from "../highways/hub-arcs/index.ts";
 import type { KdeebOptions } from "../highways/kdeeb/index.ts";
 import type { LanesOptions } from "../highways/lanes/index.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
+import type { LinkCommunityOptions } from "../highways/link-communities/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
 import type { MeshOptions } from "../highways/mesh/index.ts";
 import type { MingleOptions } from "../highways/mingle/index.ts";
 import type { NestedOptions } from "../highways/nested/index.ts";
 import type { OdCellOptions } from "../highways/od-cells/index.ts";
+import type { PHubOptions } from "../highways/p-hub/index.ts";
 import type { QuickBundlesOptions } from "../highways/quickbundles/index.ts";
+import type { ResistanceOptions } from "../highways/resistance/index.ts";
 import type { RidgeOptions } from "../highways/ridges/index.ts";
 import type { RoadClassOptions } from "../highways/road-classes/index.ts";
+import type { ScaleSpaceOptions } from "../highways/scale-space/index.ts";
 import type { SelectOptions } from "../highways/select/index.ts";
 import type { SoftKeyOptions } from "../highways/soft-keys/index.ts";
+import type { SpectralOptions } from "../highways/spectral/index.ts";
 import type { SpiralOptions } from "../highways/spiral/index.ts";
 import type { StubOptions } from "../highways/stubs/index.ts";
+import type { TerritoryOptions } from "../highways/territories/index.ts";
 import type { TraclusOptions } from "../highways/traclus/index.ts";
 import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
 import type { WspdOptions } from "../highways/wspd/index.ts";
@@ -789,4 +796,67 @@ export const FRECHET_SCHEMA: OptionSchema<FrechetOptions> = {
   minLength: { type: "number", min: 0.5, max: 16, step: 0.5, marks: [2, 4], default: 2, describe: "The reference part of a bundle is this length or longer, as a multiple of the median short side of the boxes." },
   step: { type: "number", min: 0.1, max: 2, step: 0.1, marks: [0.5], default: 0.5, describe: "The distance between two samples of a route, as a multiple of the median short side of the boxes." },
   stride: { type: "integer", min: 1, max: 8, step: 1, marks: [1, 2, 4], default: 2, describe: "A search starts at each sample of this number along each route." },
+/** The declarations of the options of the highway strategy `spectral` (HWY-029). */
+export const SPECTRAL_SCHEMA: OptionSchema<SpectralOptions> = {
+  c0: { type: "number", min: 0.05, max: 0.95, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "Two edges are a pair of the graph only when their compatibility is this value or more." },
+  clusters: { type: "integer", min: 0, max: 32, step: 1, default: 0, describe: "The number of clusters of each part of the graph. The value 0 lets the largest eigengap choose it." },
+  kMax: { type: "integer", min: 2, max: 32, step: 1, marks: [8, 16], default: 16, describe: "The eigengap chooses at most this number of clusters in each part of the graph." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: { ...GROUP_SPINE, default: "trunk" },
+};
+
+/** The declarations of the options of the highway strategy `resistance` (HWY-021). */
+export const RESISTANCE_SCHEMA: OptionSchema<ResistanceOptions> = {
+  ...SPECTRAL_SCHEMA,
+  projections: { type: "integer", min: 1, max: 64, step: 1, marks: [8, 16, 32], default: 16, describe: "The number of random projections of the estimate of the resistance." },
+  weight: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.5, 1], default: 0.5, describe: "The weight of the resistance. A pair gets the weight `C (1 - weight R_e R_f)`." },
+  sparsify: { type: "boolean", default: false, describe: "With `true`, an edge with a resistance of 0.99 or more (a bridge) gets no pair." },
+};
+
+/** The declarations of the options of the highway strategy `link-communities` (HWY-030). */
+export const LINK_COMMUNITY_SCHEMA: OptionSchema<LinkCommunityOptions> = {
+  threshold: { type: "number", min: 0, max: 1, step: 0.05, marks: [0, 0.3, 0.5], default: 0, describe: "The cut of the tree of the edges. The value 0 cuts at the best partition density." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A community with this number of edges or more gets highways, after the check of the geometry." },
+  spread: { type: "number", min: 1, max: 20, step: 1, marks: [3, 6, 12], default: 6, describe: "The largest distance of an end of an edge to the Weber point of its end of the community, in units of the board." },
+  spine: GROUP_SPINE,
+};
+
+/** The declarations of the options of the highway strategy `territories` (HWY-033). */
+export const TERRITORY_SCHEMA: OptionSchema<TerritoryOptions> = {
+  radius: { type: "number", min: 1, max: 20, step: 0.5, marks: [2, 4, 8], default: 4, describe: "The radius of a group of points, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A flow between two cells becomes a highway when this number of edges or more cross it." },
+  points: { type: "enum", values: ["plugs", "bends", "both"], default: "both", describe: "The characteristic points: the plugs, the bends of the first routes, or both." },
+};
+
+/** The declarations of the options of the highway strategy `consensus` (HWY-035). */
+export const CONSENSUS_SCHEMA: OptionSchema<ConsensusOptions> = {
+  members: { type: "list", default: ["corridors", "quickbundles", "wspd", "road-classes"], describe: "The finders that vote." },
+  cut: { type: "number", min: 0.1, max: 0.9, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "Two clusters join while their distance `1 - A` is below this value." },
+  linkage: { type: "enum", values: ["average", "single"], default: "average", describe: "The linkage of the clusters: the mean distance of the pairs, or the nearest pair." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: GROUP_SPINE,
+};
+
+/** The declarations of the options of the highway strategy `p-hub` (HWY-041). */
+export const P_HUB_SCHEMA: OptionSchema<PHubOptions> = {
+  p: { type: "integer", min: 0, max: 32, step: 1, marks: [0, 4, 8], default: 0, describe: "The number of hubs. The value 0 gives the root of the number of nodes, rounded." },
+  alpha: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.2, 0.5, 0.8], default: 0.5, describe: "The cost of a length on a link between two hubs against a length off the links." },
+  allocation: { type: "enum", values: ["single", "multiple"], default: "single", describe: "The allocation: each node to its nearest hub, or each edge to its best pair of hubs." },
+  candidates: { type: "enum", values: ["corners", "sections"], default: "corners", describe: "The candidate points of the hubs: the corners of the corner graph, or the centres of the sections." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5], default: 1.25, describe: "An edge rides a link only when its way through the two hubs is this many times its first route or less." },
+  swaps: { type: "integer", min: 0, max: 4, step: 1, default: 1, describe: "The number of passes of the local search with one swap of a hub." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A link with fewer edges than this number is not a highway." },
+};
+
+/** The declarations of the options of the highway strategy `scale-space` (HWY-053). */
+export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
+  theta: { type: "number", min: 0.5, max: 6, step: 0.5, marks: [1.5, 3], default: 1.5, describe: "The first scale, in units of the board." },
+  ratio: { type: "number", min: 1.1, max: 3, step: 0.1, marks: [1.5, 2], default: Math.SQRT2, describe: "The scale of each next scale is this value times the scale before it." },
+  scales: { type: "integer", min: 2, max: 16, step: 1, marks: [4, 8], default: 8, describe: "The number of scales." },
+  level: { type: "integer", min: 0, max: 15, step: 1, marks: [2, 4, 6], default: 2, describe: "The scale of the plan, from 0 (the first scale)." },
+  p0: { type: "number", min: 0, max: 3, step: 0.1, marks: [0.3, 0.6, 1.2], default: 0.6, describe: "A cluster gets highways only when its persistence (the log of the ratio of its last scale to its first scale) is this value or more." },
+  points: { type: "integer", min: 6, max: 24, step: 2, default: 12, describe: "The number of points of each line after the resampling." },
+  line: { type: "enum", values: ["routes", "lines"], default: "routes", describe: "The line of each edge: its first route, or the straight line between its plugs." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A cluster with this number of edges or more gets highways." },
+  spine: GROUP_SPINE,
 };
