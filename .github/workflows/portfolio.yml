@@ -134,8 +134,11 @@ jobs:
             flag=${words[i]}
             dirs=""
             IFS=',' read -ra ids <<< "${words[i + 1]}"
+            # A run of the times also has the file of each shard. Only the joined file counts.
+            pattern="screen-*"
+            [ "$flag" = "--time" ] && pattern="portfolio-time-*"
             for id in "${ids[@]}"; do
-              gh run download "$id" -D "$GITHUB_WORKSPACE/runs/$id"
+              gh run download "$id" -p "$pattern" -D "$GITHUB_WORKSPACE/runs/$id"
               dirs="${dirs:+$dirs,}$GITHUB_WORKSPACE/runs/$id"
             done
             args+=("$flag" "$dirs")

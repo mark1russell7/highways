@@ -152,8 +152,17 @@ export function greedySet(table: RunTable, inputs: readonly string[], pool: read
   return set;
 }
 
-/** This function gives the strategy with the best median of `value` on `inputs`. With `strict`, the strategy must pass the guard on each input. */
-export function singleBest(table: RunTable, inputs: readonly string[], pool: readonly string[], value: ValueOf, o: { readonly strict?: Guard } = {}): string | undefined {
+/**
+ * This function gives the strategy with the best median of `value` on `inputs`. With `strict`, the strategy must pass the guard on each input.
+ * The strategy needs a value on at least `minShare` of the inputs (default 0.5).
+ */
+export function singleBest(
+  table: RunTable,
+  inputs: readonly string[],
+  pool: readonly string[],
+  value: ValueOf,
+  o: { readonly strict?: Guard; readonly minShare?: number } = {},
+): string | undefined {
   let best: { s: string; m: number } | undefined;
   for (const s of [...pool].sort()) {
     const ok = (i: string): boolean => {
@@ -164,7 +173,7 @@ export function singleBest(table: RunTable, inputs: readonly string[], pool: rea
     };
     if (o.strict !== undefined && !inputs.every(ok)) continue;
     const v = defined(inputs.map((i) => value(i, s)));
-    if (v.length === 0 || v.length < 0.5 * inputs.length) continue;
+    if (v.length === 0 || v.length < (o.minShare ?? 0.5) * inputs.length) continue;
     const m = quantile(v, 0.5);
     if (best === undefined || m > best.m) best = { s, m };
   }
@@ -213,7 +222,8 @@ export function shareOf(portfolio: number, single: number, oracleMedian: number)
 
 /**
  * This function gives the Pareto curve of the portfolio: for each k, it chooses the set on the train inputs of each split and tests it on the test inputs.
- * The best single strategy of a split is the one with the best median on its train inputs. With `strict`, it must pass the guard on each train input.
+ * The best single strategy of a split is the one with the best median on its train inputs, with a value on `singleShare` of them (default 1).
+ * With `strict`, it must pass the guard on each train input. On a test input, its value is `singleOf` (default `value`).
  * The oracle of a test input is the best value of `oracleOf` over the pool. An input without each of the three values is not in the test.
  */
 export function paretoCurve(
@@ -222,10 +232,18 @@ export function paretoCurve(
   pool: readonly string[],
   guard: Guard,
   value: ValueOf,
-  o: { readonly ks?: readonly number[]; readonly strict?: Guard; readonly oracleOf?: ValueOf; readonly full?: boolean } = {},
+  o: {
+    readonly ks?: readonly number[];
+    readonly strict?: Guard;
+    readonly oracleOf?: ValueOf;
+    readonly singleOf?: ValueOf;
+    readonly singleShare?: number;
+    readonly full?: boolean;
+  } = {},
 ): CurvePoint[] {
   const ks = [...(o.ks ?? PORTFOLIO_KS), ...(o.full ? [pool.length] : [])];
   const oracleOf = o.oracleOf ?? value;
+  const singleOf = o.singleOf ?? value;
   return ks.map((k) => {
     const sets: string[][] = [];
     const pf: number[] = [];
@@ -236,12 +254,12 @@ export function paretoCurve(
     for (const sp of splits) {
       const set = k >= pool.length ? pool.filter((s) => s !== PORTFOLIO_BASE) : greedySet(table, sp.train, pool, k, guard, value);
       sets.push(set);
-      const single = singleBest(table, sp.train, pool, value, o.strict === undefined ? {} : { strict: o.strict });
+      const single = singleBest(table, sp.train, pool, value, { minShare: o.singleShare ?? 1, ...(o.strict === undefined ? {} : { strict: o.strict }) });
       const vals = portfolioValues(table, sp.test, set, guard, value);
       const mine = { pf: [] as number[], one: [] as number[], orc: [] as number[] };
       sp.test.forEach((i, n) => {
         const p = vals[n];
-        const s = single === undefined ? undefined : value(i, single);
+        const s = single === undefined ? undefined : singleOf(i, single);
         const q = oracleValue(i, pool, oracleOf);
         if (p === undefined || s === undefined || q === undefined) return;
         mine.pf.push(p);
@@ -427,6 +445,8 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
       lines.push(
         `## \`exact-v1\`: the gap closed (B10) of the portfolio with the guard \`${guard}\``,
         "",
+        `The best single strategy of each split has a value on each of its train inputs: ${splits.map((sp) => code(singleBest(table, sp.train, pool, value, { minShare: 1 }) ?? "-")).join(" and ")}.`,
+        "",
         "| k | test inputs | portfolio median | interval | best single | gain over the single | gain interval | oracle | share of the oracle gain | share of each split | set of the first split | set of the second split |",
         "|---:|---:|---:|---|---:|---:|---|---:|---:|---|---|---|",
         ...curve.map((p) => {
@@ -456,11 +476,11 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
       return passes(r, b, "q95") ? ratio(i, s) : 1;
     };
     const splits = screenSplits(inputs);
-    const curve = paretoCurve(table, splits, pool, "q95", ratio, { strict: "q95", oracleOf: guarded, full: true });
+    const curve = paretoCurve(table, splits, pool, "q95", ratio, { strict: "q95", oracleOf: guarded, singleOf: guarded, full: true });
     lines.push(
       "## `screen-v1`: the guarded B1 of the portfolio",
       "",
-      "The values are ratios to the B1 of `shared`. The best single strategy passes the guard on each train input.",
+      "The values are ratios to the B1 of `shared`. The best single strategy passes the guard on each train input. On a test input where it fails the guard, it falls back to `shared` (ratio 1).",
       "",
       "| k | test inputs | portfolio / `shared` | best single / `shared` | oracle / `shared` | share of the oracle gain | share of each split | set of the first split | set of the second split |",
       "|---:|---:|---:|---:|---:|---:|---|---|---|",
@@ -491,7 +511,7 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
     // The sets of `exact-v1` on `screen-v1`: does a set of one corpus work on the other?
     const transfer = fullSets.filter((f) => f.corpus === "exact-v1");
     if (transfer.length > 0) {
-      const single = singleBest(table, decision, pool, ratio, { strict: "q95" });
+      const single = singleBest(table, decision, pool, ratio, { strict: "q95", minShare: 1 });
       lines.push(
         "The sets that `exact-v1` chooses on all of its inputs, on the boards that decide of `screen-v1`:",
         "",
