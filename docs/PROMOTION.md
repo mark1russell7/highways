@@ -149,6 +149,15 @@ The ids are the ids of [the measure note](research/MEASURES.md). The ids of the 
 
 For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. `pack.search.ms` gives the time test.
 
+### A bound by count
+
+On mixed sizes, a lower bound by count is weak. It drops the largest items first, but a packer leaves out many small items. On the screen 3 of packing, the count bound was 1.5% of the overflow count, but the area bound was 42% to 62% of the overflow area. Judge an overflow by the area excess (`pack.overflow.excessArea`), not by the count excess.
+
+The `pack` step ranks its strategies in fixed cells in two levels:
+
+1. Rank by the area excess, with its `minEffect`.
+2. Compare `pack.fill` only between the strategies with a tie on the area excess. Use only the inputs that each compared strategy packs with no overflow. A cell is "thin" when these shared inputs are less than 30% of the cell.
+
 ## The selector
 
 - The selector is a strategy that picks an option for each input. It reads only the cells of the input that are known before the step. The cells are `edgeDensity`, `edgeShape`, `groups` and `ports`, and the cells of the packer.
