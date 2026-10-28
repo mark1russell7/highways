@@ -85,7 +85,7 @@ A renderer uses these segments for the three views of a bundle:
 
 The [examples page](https://mark1russell7.github.io/highways/examples.html) shows these views on boards of made-up data.
 
-The [compare page](https://mark1russell7.github.io/highways/compare.html) puts the strategies of one step side by side. Each panel shows the output of a strategy and its measures, and a mark shows the best value of each measure.
+The [compare page](https://mark1russell7.github.io/highways/compare.html) puts the strategies of one step side by side. Each panel shows the output of a strategy and its measures, and a mark shows the best value of each measure. The page covers each step of the pipeline and each strategy of the registry.
 
 ## The curve types
 

@@ -1,10 +1,9 @@
-import { highwayRouterStrategy } from "../../highways/router.ts";
 import type { Graph, Result, Route } from "../../model.ts";
 import { stableOrderStrategy } from "../../order/index.ts";
 import { repairStrategy } from "../../repair/index.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
-import { compareStep, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
+import { compareStep, highwayRouters, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
 import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
@@ -349,7 +348,7 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   const base = step === "highway" ? (options.baseRouters ?? HIGHWAY_BASE_ROUTERS).map((name) => getStrategy(STRATEGIES, "router", name)) : [];
   const unwrapped =
     step === "highway"
-      ? createRegistry([...base, ...listStrategies(screened.registry, "highway").map((s) => highwayRouterStrategy(s))] as readonly AnyStrategy[])
+      ? createRegistry([...base, ...highwayRouters(screened.registry)] as readonly AnyStrategy[])
       : screened.registry;
   const wrapped = givesRoutes(step) ? wrapRouters(unwrapped, options.wrap ?? []) : { registry: unwrapped, added: [] };
   const registry = wrapped.registry;

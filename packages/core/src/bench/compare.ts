@@ -1,15 +1,19 @@
 import type { CurveSegment } from "../curves/model.ts";
-import { polylineLength } from "../geom.ts";
-import type { Graph, Result } from "../model.ts";
+import { polylineLength, type Box } from "../geom.ts";
+import { highwayRouterStrategy } from "../highways/router.ts";
+import type { Graph, LevelLink, Node, Result } from "../model.ts";
+import { openGaps, roomLinks } from "../room/index.ts";
 import type { Section } from "../sections.ts";
 import { runKey, segmentsOf } from "../segments.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { asRouter, getStrategy, listStrategies, type LaneBoard, type Registry, type Step } from "../strategies/model.ts";
+import { asRouter, createRegistry, getStrategy, listStrategies, STEPS, type AnyStrategy, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { peakCurvature } from "./curves.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
+import { roomOrderFaults } from "./measures/room.ts";
 import { boardUnit } from "./measures/routes.ts";
 import { changeGraph, routeStability } from "./measures/stability.ts";
+import { farLinks, measureBoard } from "./room.ts";
 import { benchRun } from "./run.ts";
 import { curveRuns, fixtureGroupOptions, FRONT_OBJECTIVES, groupRun, routeMeasures } from "./suite.ts";
 
@@ -167,6 +171,125 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
       const values = { ...run.row.values, ms };
       return { step, strategy: strategy.name, violations: run.row.violations, ms, values, tree: run.tree, ...(run.result ? { result: run.result } : {}) };
     });
+  }
+  const objectives = FRONT_OBJECTIVES[step];
+  const fair = rows.filter((r) => r.violations === 0 && r.skipped === undefined);
+  return {
+    step,
+    rows,
+    objectives,
+    front: paretoFront(fair, (r) => r.values, objectives).map((r) => r.strategy),
+    excluded: rows.filter((r) => !fair.includes(r)).map((r) => r.strategy),
+  };
+}
+
+// The core runs in any host, so it reads the clock without the types of Node or the browser.
+const now = (): number => (globalThis as { performance?: { now(): number } }).performance?.now() ?? Date.now();
+
+/** The steps that `compareAnyStep` compares: each step of `STEPS`, in the order of the pipeline. */
+export const COMPARE_ALL_STEPS: readonly Step[] = STEPS;
+
+/**
+ * This function gives a router for each highway strategy of a registry, in the order of the registry.
+ * Each router makes the plan of its strategy and routes the plan with `follow` (`highwayRouterStrategy`).
+ * The screen and `compareAnyStep` compare the highway strategies as these routers.
+ */
+export function highwayRouters(registry: Registry): Strategy<"router">[] {
+  return listStrategies(registry, "highway").map((s) => highwayRouterStrategy(s) as Strategy<"router">);
+}
+
+/** One strategy of any step on one graph: a row of `compareStep`, or a row of the steps `highway` and `room`. */
+export interface AnyCompareRow extends Omit<CompareRow, "step"> {
+  readonly step: Step;
+  /** The boxes of the board that the room strategy opens, in the order of the nodes, for the step `room`. */
+  readonly boxes?: readonly Box[];
+  /** The links of the far view on the board that the room strategy opens, for the step `room`. */
+  readonly links?: readonly LevelLink[];
+}
+
+/** The comparison of the strategies of any step on one graph. */
+export interface AnyStepComparison extends Omit<StepComparison, "step" | "rows"> {
+  readonly step: Step;
+  /** One row for each strategy of the step, in the order of the registry. */
+  readonly rows: readonly AnyCompareRow[];
+}
+
+/** The options of `compareAnyStep`. */
+export interface AnyCompareOptions extends CompareOptions {
+  /** This function gets each row when its strategy is done, with the number of rows that are done and the number of all rows. A host can show the progress. */
+  readonly onRow?: (row: AnyCompareRow, done: number, total: number) => void;
+}
+
+/** This function gives the area of the bounding box of the nodes. */
+function boundsArea(nodes: readonly Node[]): number {
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const n of nodes) {
+    x0 = Math.min(x0, n.box.x);
+    y0 = Math.min(y0, n.box.y);
+    x1 = Math.max(x1, n.box.x + n.box.w);
+    y1 = Math.max(y1, n.box.y + n.box.h);
+  }
+  return nodes.length ? (x1 - x0) * (y1 - y0) : 0;
+}
+
+/**
+ * This function gives the measures of a board that a room strategy opened.
+ * It uses the keys and the lane spacing 4 of the step `room` of `runSuite`.
+ * The measures are the area against the board before (`M1.area`), the lane routes through a box (`M4.laneThrough`), the faults of the far view and `room-order`.
+ */
+export function roomValues(graph: Graph, open: readonly Node[]): Record<string, number> {
+  const area0 = boundsArea(graph.nodes);
+  const m = measureBoard({ nodes: open, edges: graph.edges }, 4);
+  return {
+    "M1.area": area0 > 0 ? boundsArea(open) / area0 : 1,
+    "M4.laneThrough": m.laneThrough,
+    crossings: m.crossings,
+    through: m.faults.through,
+    "R6.worstDetour": m.faults.worstDetour,
+    "room-order": roomOrderFaults(graph.nodes, open),
+  };
+}
+
+/** This function runs one room strategy on the boxes of a graph, opens the gaps of the board and measures the open board. */
+function roomRow(strategy: Strategy<"room">, graph: Graph, options: object | undefined): AnyCompareRow {
+  const t0 = now();
+  const gaps = strategy.run({ items: graph.nodes, links: roomLinks(graph) }, options);
+  const open = openGaps(graph.nodes, gaps);
+  const ms = now() - t0;
+  const values = { ...roomValues(graph, open), ms };
+  return { step: "room", strategy: strategy.name, violations: 0, ms, values, boxes: open.map((n) => n.box), links: farLinks({ nodes: open, edges: graph.edges }) };
+}
+
+/** This function runs one strategy of one step on one graph, as `compareAnyStep` does. */
+function compareOne(step: Step, strategy: AnyStrategy, graph: Graph, registry: Registry, options: CompareOptions): AnyCompareRow {
+  if (step === "room") return roomRow(strategy as Strategy<"room">, graph, options.options?.[strategy.name]);
+  if (step === "highway") {
+    const one = createRegistry([highwayRouterStrategy(strategy as Strategy<"highway">)]);
+    return { ...compareStep("router", graph, { ...options, registry: one }).rows[0]!, step };
+  }
+  const curveRouter = step === "curve" ? [getStrategy(registry, "router", options.curveRouter ?? "corners") as AnyStrategy] : [];
+  return compareStep(step, graph, { ...options, registry: createRegistry([...curveRouter, strategy]) }).rows[0]!;
+}
+
+/**
+ * This function runs each strategy of any step of `STEPS` on one graph and measures it. Then it gives the Pareto front of `FRONT_OBJECTIVES`.
+ * The steps `group`, `router` and `curve` give the rows of `compareStep`.
+ * The step `highway` makes the plan of each strategy and routes it with `follow`, as the screen does. It measures the routes as the step `router`.
+ * The step `room` opens the gaps of the board with each strategy (`openGaps`). It measures the open board as the step `room` of `runSuite`.
+ * The step `room` expects a packed board, for example `packedGridBoard`. On a board with wide gaps, a gap opens only when its links need more room.
+ *
+ * The function runs one strategy at a time and gives each row to `onRow`. The same graph and the same options give the same measures. Only the times change.
+ */
+export function compareAnyStep(step: Step, graph: Graph, options: AnyCompareOptions = {}): AnyStepComparison {
+  const registry = options.registry ?? STRATEGIES;
+  const { onRow, ...rest } = options;
+  const strategies = listStrategies(registry, step) as readonly AnyStrategy[];
+  const rows: AnyCompareRow[] = [];
+  for (const strategy of strategies) {
+    const over = graph.nodes.length > (strategy.maxNodes ?? Infinity);
+    const row: AnyCompareRow = over ? { step, strategy: strategy.name, violations: 0, ms: 0, values: {}, skipped: `over ${strategy.maxNodes} nodes` } : compareOne(step, strategy, graph, registry, rest);
+    rows.push(row);
+    onRow?.(row, rows.length, strategies.length);
   }
   const objectives = FRONT_OBJECTIVES[step];
   const fair = rows.filter((r) => r.violations === 0 && r.skipped === undefined);

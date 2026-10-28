@@ -53,9 +53,27 @@
               <select id="fixture"></select>
             </div>
             <div class="field">
-              <label for="curve">Curve</label>
-              <select id="curve"></select>
+              <label for="pick-highway">Highway plan</label>
+              <select id="pick-highway"></select>
             </div>
+            <div class="field" id="pick-group-field">
+              <label for="pick-group">Grouping rule</label>
+              <select id="pick-group"></select>
+              <p class="hint" id="pick-group-hint"></p>
+            </div>
+            <div class="field">
+              <label for="pick-room">Room</label>
+              <select id="pick-room"></select>
+            </div>
+            <div class="field">
+              <label for="pick-curve">Curve</label>
+              <select id="pick-curve"></select>
+            </div>
+            <details class="cmp-options demo-options" id="demo-options">
+              <summary>Options <span class="cmp-count" id="demo-option-count"></span></summary>
+              <div class="cmp-option-grid" id="demo-option-body"></div>
+              <button type="button" class="link" id="demo-reset">Reset each option</button>
+            </details>
             <fieldset class="field" id="bundle-field">
               <legend>Bundles</legend>
               <div class="seg">

@@ -10,6 +10,7 @@ import {
   type CurveSegment,
   type CurveSpace,
   type Graph,
+  type HighwayOptions,
   type Level,
   type Node,
   type Point,
@@ -52,6 +53,8 @@ export interface Scene {
   readonly selected: string | undefined;
   /** The curve type of the routes. The default is `straight`. The links of a level stay polylines. */
   readonly curve?: string;
+  /** The options of the curve type. Without them, the curve has its defaults. */
+  readonly curveOptions?: Readonly<Record<string, number | boolean | string>>;
   /**
    * The keys (`runKey`) of the open runs. With this set, the "unpack" view puts a count badge on each shared run.
    * An open run shows one lane for each edge.
@@ -167,7 +170,10 @@ export class MapView {
   set(scene: Scene): void {
     const newGraph = this.scene?.graph !== scene.graph;
     if (this.scene?.done !== scene.done) this.sizes = scene.done?.result.levels ? itemSizes(scene.done.result.levels) : [];
-    if (newGraph || this.scene?.curve !== scene.curve) this.curves = new WeakMap();
+    if (newGraph || this.scene?.curve !== scene.curve || this.scene?.curveOptions !== scene.curveOptions) {
+      this.curves = new WeakMap();
+      this.lanes = undefined;
+    }
     if (newGraph) {
       this.space = curveSpace(scene.graph.nodes.map((n) => n.box));
       this.nodeById = new Map(scene.graph.nodes.map((n) => [n.id, n]));
@@ -400,7 +406,7 @@ export class MapView {
     if (curve) {
       let segments = this.curves.get(points);
       if (!segments) {
-        segments = curve.run(this.space ? { points, space: this.space } : { points });
+        segments = curve.run(this.space ? { points, space: this.space } : { points }, this.scene?.curveOptions);
         this.curves.set(points, segments);
       }
       const X = (p: Point): number => p.x * this.s + this.tx;
@@ -512,7 +518,7 @@ export class MapView {
     // The curve `highway` bends the lanes of a bundle as one. So it gives the curves of all the lanes together.
     const first = this.lanes.routes[0];
     if (this.scene?.curve === "highway" && first && !this.curves.has(first.points)) {
-      const curves = highwayCurves(graph, open, width, { maxWidth: LANE_MAX, ...(this.space ? { space: this.space } : {}) });
+      const curves = highwayCurves(graph, open, width, { ...(this.scene?.curveOptions as HighwayOptions | undefined), maxWidth: LANE_MAX, ...(this.space ? { space: this.space } : {}) });
       this.lanes.routes.forEach((r, i) => this.curves.set(r.points, curves[i]!.segments));
     }
     const inOpen = new Set<string>();

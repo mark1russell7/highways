@@ -596,7 +596,13 @@ The script `bench` takes `--seeds <n>` and `--report <file>`. A family with more
 
 The workflow `Bench` runs the suite in parts. Each part writes its report, and `joinReports` joins the reports into the report of one run.
 
-`compareStep` runs each strategy of one step on one board, with the measures of the suite. It gives one row for each strategy and the Pareto front of the step. The options give each strategy its own options. The compare page of the site uses it.
+`compareStep` runs each strategy of one step on one board, with the measures of the suite. It gives one row for each strategy and the Pareto front of the step. The options give each strategy its own options.
+
+`compareAnyStep` does the same for each step of `COMPARE_ALL_STEPS`, which is `STEPS`. The compare page of the site uses it.
+
+- The step `highway` makes the plan of each strategy, and `follow` routes the plan, as in the screen. `highwayRouters` gives these routers.
+- The step `room` opens the gaps of a packed board with each strategy and measures the open board with `roomValues`.
+- The option `onRow` gets each row when its strategy is done, so a host can show the progress.
 
 With the option `lanes`, the step `curve` opens each shared way of the routes of `curveRouter` into lanes, and each curve draws the lanes. Each input then has its `lane`, so the curve `highway` bends the lanes of a bundle as one with each of its options.
 

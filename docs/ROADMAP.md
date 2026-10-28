@@ -110,6 +110,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | VERDICT | The shared block "The verdict over families" from layout-contract #49. The family is the unit of a verdict, and a verdict counts only when it holds under both weightings. Step 1 of SCREEN-WEIGHT. | 2026-10-28 | #139 |
 | SCREEN-WEIGHT | [The verdict over families of the screens](research/CATALOG.md#the-verdict-over-families-of-the-screens-screen-weight). The manifests of `screen-v1` and `screen-v2` get `familyBy`. `scripts/screen-verdict.ts` scores both screens again. 145 of 145 verdicts with a side keep it from `screen-v1` to `screen-v2`. No option has a promotion yet, so the guard count is 0. | 2026-10-28 | #140 |
 | SITE-LIVE | The [results page](https://mark1russell7.github.io/highways/results.html) reads only committed files: the verdict snapshots of [`research/verdicts/`](research/verdicts/README.md), the idea records and this roadmap. It shows the verdict grid, the 40 `better` verdicts with families against them, the ideas and the newest items. The Pages build starts no race. It reads a committed benchmark snapshot, and it adds the Status and Releases pages. | 2026-10-28 | #143 |
+| COMPARE-ALL | The compare page and the demo show each step of the pipeline and each strategy of the registry: 4 grouping rules, 9 routers, 53 highways, 7 curves and 3 room strategies. A highway plan goes through `follow`, as in the screen. Each room strategy opens the board "Packed grid". A test fails when a step or a strategy is missing. | 2026-10-28 | #146 |
 
 ## Calibration
 
@@ -163,6 +164,7 @@ The rule for the next predictions:
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
+| COMPARE-PIPELINE | Compare picks a whole pipeline from `routeSpace`. Waits for STAGE-DATA. | `later` | STAGE-DATA | P2 |
 | BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at two holes of the portfolio first. The first hole is the rule `collection` at the cap 1.1 on large boards: there the base `shared` wins on 18 of 20 test inputs. The second hole is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. After them, the waves aim at the rule `collection`, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item

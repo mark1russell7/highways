@@ -1060,6 +1060,30 @@ pre code {
   accent-color: var(--sign);
 }
 
+/* An option without a range: its default value as text, with no control. */
+.cmp-option.fixed {
+  color: var(--muted);
+}
+
+.cmp-option.fixed code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The pickers of the demo for the steps after the router: a highway plan, a grouping rule and a room strategy. */
+.demo-options {
+  margin-top: 4px;
+}
+
+.demo-options .cmp-option-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.field.off select {
+  opacity: 0.55;
+}
+
 .link:disabled {
   color: var(--muted);
   text-decoration: none;

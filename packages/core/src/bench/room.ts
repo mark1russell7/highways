@@ -85,7 +85,7 @@ export function measureBoard(graph: Graph, spacing: number, order?: LaneOrder): 
 }
 
 /** This function gives the links of the far view of a board: `levelLinks` with each node as one item. */
-function farLinks(graph: Graph): LevelLink[] {
+export function farLinks(graph: Graph): LevelLink[] {
   const items = graph.nodes.map((n) => ({ id: n.id, box: n.box, nodes: [n.id] }));
   return levelLinks(
     items,
