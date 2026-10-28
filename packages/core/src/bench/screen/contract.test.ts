@@ -25,7 +25,8 @@ import {
   type Region,
   type RouteInput,
 } from "./forms.ts";
-import { RECORD_EPS, round3 } from "./hash.ts";
+import { compareMeasure, minEffectOf, type CompareSpec, type MeasureCompare, type MinEffect } from "./compare.ts";
+import { mulberry32, RECORD_EPS, round3 } from "./hash.ts";
 import { screen } from "./screen.ts";
 import { screenInputs } from "./set.ts";
 
@@ -93,10 +94,20 @@ holds<Has<LayoutBox, "turnable">>();
 holds<Has<LayoutContainer, "inset">>();
 // @ts-expect-error G7: highways has no `aspectWeight` on a container.
 holds<Has<LayoutContainer, "aspectWeight">>();
-// @ts-expect-error G10: the contract 0.2.1 has no `compareMeasure`. highways has its own copy in `compare.ts`.
-void C.compareMeasure;
-// @ts-expect-error G10: the contract 0.2.1 has no `minEffectOf`.
-void C.minEffectOf;
+// G10 is closed: the contract has `compareMeasure` and `minEffectOf` from 0.2.2. highways keeps its own copy in `compare.ts`.
+// The label of a compare is the `Verdict` of the contract.
+holds<Fits<MeasureCompare, C.Verdict>>();
+holds<Fits<C.Verdict, MeasureCompare>>();
+// The spec of a compare of highways is the part of `MeasureSpec` that the contract reads.
+holds<Fits<CompareSpec, Parameters<typeof C.compareMeasure>[2]>>();
+holds<Fits<Parameters<typeof C.compareMeasure>[2], CompareSpec>>();
+holds<Fits<MinEffect, NonNullable<C.MeasureSpec["minEffect"]>>>();
+holds<Fits<NonNullable<C.MeasureSpec["minEffect"]>, MinEffect>>();
+// The two functions have the same types.
+holds<Fits<typeof compareMeasure, typeof C.compareMeasure>>();
+holds<Fits<typeof C.compareMeasure, typeof compareMeasure>>();
+holds<Fits<typeof minEffectOf, typeof C.minEffectOf>>();
+holds<Fits<typeof C.minEffectOf, typeof minEffectOf>>();
 // G8 is closed: the contract has `data` on a box, `generator`, `cell` and `step` on an input, and `skipped` on a record.
 holds<Has<C.LayoutBox, "data">>();
 holds<Has<C.LayoutInput, "generator">>();
@@ -181,6 +192,134 @@ describe("the fit of highways to layout-contract", () => {
       for (const n of Object.values(record.hard)) expect(Number.isInteger(n) && n >= 0).toBe(true);
       // The contract names the measures of a router `route.*`.
       for (const key of Object.keys(record.measures)) expect(key.startsWith("route.")).toBe(true);
+    }
+  });
+});
+
+/** The result of a call, or the name of its error. */
+function outcome<T>(f: () => T): T | string {
+  try {
+    return f();
+  } catch (e) {
+    return e instanceof Error ? e.name : "error";
+  }
+}
+
+/** The cases of `compare.test.ts`: the values `a` and `b` and a spec. */
+const COMPARE_CASES: readonly [number, number, CompareSpec][] = (() => {
+  const lower: CompareSpec = { direction: "lower" };
+  const higher: CompareSpec = { direction: "higher" };
+  const rel: CompareSpec = { direction: "lower", minEffect: { rel: 0.01 } };
+  const cases: [number, number, CompareSpec][] = [
+    [1.152043, 1.152046, lower],
+    [1, 1 + RECORD_EPS, lower],
+    [100, 101, rel],
+    [1.148957, 1.152046, lower],
+    [1.148957, 1.152046, higher],
+    [0.22239, 0.209678, higher],
+    [0.22239, 0.209678, lower],
+    [100, 102.5, rel],
+    [Infinity, Infinity, lower],
+    [-Infinity, -Infinity, higher],
+    [5, Infinity, lower],
+    [Infinity, 5, rel],
+    [Number.NaN, 1, lower],
+    [1, Number.NaN, lower],
+  ];
+  const specs: CompareSpec[] = [lower, higher, rel, { direction: "higher", minEffect: 0.2 }];
+  const pairs: [number, number][] = [[1, 1.0005], [1, 1.5], [100, 101], [100, 103], [0, 0.3], [-2, 2]];
+  for (const spec of specs) for (const [a, b] of pairs) cases.push([a, b, spec], [b, a, spec]);
+  return cases;
+})();
+
+/** The cases of `minEffectOf` in `compare.test.ts`: a spec and the values `a` and `b`. */
+const MIN_EFFECT_CASES: readonly [CompareSpec["minEffect"], number, number][] = [
+  [undefined, 0, 0],
+  [0, 0, 0],
+  [0.0001, 0, 0],
+  [0.5, 3, 4],
+  [{ rel: 0.01 }, 100, 200],
+  [{ rel: 0.01 }, 200, 100],
+  [{ rel: 0.01 }, -300, 10],
+  [{ rel: 0.01 }, 0.01, 0.02],
+  [{ rel: 0.01 }, Infinity, 1],
+  [{ rel: 0.01 }, 1, Number.NaN],
+];
+
+/** This function gives `count` seeded random pairs with a spec. The pairs include ties, values at the threshold, infinite values and integers. */
+function randomCompareCases(seed: number, count: number): [number, number, CompareSpec][] {
+  const r = mulberry32(seed);
+  const pick = <T>(xs: readonly T[]): T => xs[Math.floor(r() * xs.length)]!;
+  const value = (): number => {
+    const u = r();
+    if (u < 0.1) return pick([0, Infinity, -Infinity, RECORD_EPS, -RECORD_EPS, 1]);
+    if (u < 0.3) return Math.floor(r() * 11) - 5;
+    const v = (r() < 0.2 ? -1 : 1) * 10 ** (r() * 10 - 4);
+    return r() < 0.5 ? round3(v) : v;
+  };
+  const minEffect = (): MinEffect | undefined => {
+    const u = r();
+    if (u < 0.15) return undefined;
+    if (u < 0.25) return pick([0, 1, 2, Infinity, -1, Number.NaN, RECORD_EPS]);
+    if (u < 0.55) return 10 ** (r() * 7 - 5);
+    if (u < 0.65) return { rel: pick([0, 1, Infinity, -0.01]) };
+    return { rel: 10 ** (r() * 4 - 4) };
+  };
+  const cases: [number, number, CompareSpec][] = [];
+  for (let i = 0; i < count; i++) {
+    const m = minEffect();
+    const direction = r() < 0.5 ? "lower" : "higher";
+    const spec: CompareSpec = m === undefined ? { direction } : { direction, minEffect: m };
+    const a = value();
+    const u = r();
+    let b: number;
+    if (u < 0.15) b = a;
+    else if (u < 0.5) {
+      // A value near the threshold of the compare, on one of the two sides.
+      const t = minEffectOf(spec, a, a);
+      b = a + (r() < 0.5 ? -1 : 1) * t * pick([0.5, 0.999, 1, 1.001, 2]);
+    } else b = value();
+    cases.push([a, b, spec]);
+  }
+  return cases;
+}
+
+describe("the copy of compareMeasure and minEffectOf in highways agrees with layout-contract (G10)", () => {
+  it("gives the results of the contract for the cases of compare.test.ts", () => {
+    for (const [a, b, spec] of COMPARE_CASES) {
+      expect(outcome(() => compareMeasure(a, b, spec)), `compareMeasure(${a}, ${b}, ${JSON.stringify(spec)})`).toBe(outcome(() => C.compareMeasure(a, b, spec)));
+    }
+    for (const [m, a, b] of MIN_EFFECT_CASES) {
+      const spec = m === undefined ? {} : { minEffect: m };
+      expect(minEffectOf(spec, a, b), `minEffectOf(${JSON.stringify(spec)}, ${a}, ${b})`).toBe(C.minEffectOf(spec, a, b));
+    }
+    expect(minEffectOf({})).toBe(C.minEffectOf({}));
+  });
+
+  it("gives the results of the contract for 5000 seeded random pairs, in the two directions and after a swap", () => {
+    const seen = new Map<string, number>();
+    const differences: string[] = [];
+    for (const [a, b, spec] of randomCompareCases(20261027, 5000)) {
+      for (const direction of ["lower", "higher"] as const) {
+        const s: CompareSpec = { ...spec, direction };
+        for (const [x, y] of [[a, b], [b, a]] as const) {
+          const own = outcome(() => compareMeasure(x, y, s));
+          const theirs = outcome(() => C.compareMeasure(x, y, s));
+          seen.set(String(own), (seen.get(String(own)) ?? 0) + 1);
+          if (own !== theirs) differences.push(`compareMeasure(${x}, ${y}, ${JSON.stringify(s)}): ${String(own)} and ${String(theirs)}`);
+          if (!Object.is(minEffectOf(s, x, y), C.minEffectOf(s, x, y))) differences.push(`minEffectOf(${JSON.stringify(s)}, ${x}, ${y})`);
+        }
+      }
+    }
+    expect(differences).toEqual([]);
+    // The pairs reach each result.
+    for (const label of ["better", "worse", "tie"]) expect(seen.get(label) ?? 0).toBeGreaterThan(1000);
+  });
+
+  it("refuses NaN in the two functions", () => {
+    for (const [a, b] of [[Number.NaN, 1], [1, Number.NaN], [Number.NaN, Number.NaN]] as const) {
+      expect(() => compareMeasure(a, b, { direction: "lower" })).toThrow(RangeError);
+      expect(() => C.compareMeasure(a, b, { direction: "lower" })).toThrow(RangeError);
     }
   });
 });

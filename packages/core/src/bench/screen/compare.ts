@@ -21,7 +21,7 @@ export interface CompareSpec {
  * The threshold is `max(RECORD_EPS, m)` for a number `m`, or `max(RECORD_EPS, m.rel * max(|a|, |b|))` for a relative `m`.
  * The larger value of the two makes the threshold the same after a swap of `a` and `b`.
  * A product that is not finite gives `RECORD_EPS`.
- * This copy follows `docs/PROMOTION.md`. The contract `@mark1russell7/layout-contract` 0.2.2 adds the same function.
+ * This copy follows `docs/PROMOTION.md`. The contract `@mark1russell7/layout-contract` has the same function from 0.2.2, and `contract.test.ts` compares the two.
  */
 export function minEffectOf(spec: { readonly minEffect?: MinEffect }, a = 0, b = 0): number {
   const m = spec.minEffect ?? 0;
