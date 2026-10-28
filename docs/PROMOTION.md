@@ -176,7 +176,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 | Units | `minEffect` | Reason |
 |---|---|---|
-| `0 to 1`, `-1 to 1`, `-0.5 to 1` | none, so `RECORD_EPS` | A share has the precision of a written file. |
+| `0 to 1`, `-1 to 1`, `-0.5 to 1`, `share of the gap`, `0 or 1` | none, so `RECORD_EPS` | A share or a flag of 0 or 1 has the precision of a written file. |
 | `ratio`, `IQR over the median`, `no unit`, `half turns for each route`, `curvature times the unit of the board` | none, so `RECORD_EPS` | A stretch or another value without a unit has the precision of a written file. |
 | `count`, `count for each edge`, `count for each route` | 0, so `RECORD_EPS` | A count changes in steps. A change of 1 counts. |
 | `units`, `units of the board` | `{ rel: 0.01 }` | A length in pixels moves with each small move of a point. A change of 1% or less is not visible. |

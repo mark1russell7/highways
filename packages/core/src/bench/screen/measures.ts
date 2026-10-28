@@ -40,9 +40,9 @@ export interface MinEffectRule {
  */
 export const MIN_EFFECTS: readonly MinEffectRule[] = Object.freeze([
   {
-    units: ["0 to 1", "-1 to 1", "-0.5 to 1"],
+    units: ["0 to 1", "-1 to 1", "-0.5 to 1", "share of the gap", "0 or 1"],
     minEffect: undefined,
-    reason: "A share has the precision of a written file. Thus the threshold is `RECORD_EPS`.",
+    reason: "A share or a flag of 0 or 1 has the precision of a written file. Thus the threshold is `RECORD_EPS`.",
   },
   {
     units: ["ratio", "IQR over the median", "no unit", "half turns for each route", "curvature times the unit of the board"],
