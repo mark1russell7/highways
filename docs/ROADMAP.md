@@ -88,6 +88,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | GUARDS | Two guards in [the promotion rule](PROMOTION.md#activation), with the same text as packing and layout-contract. A verdict counts only when the candidate is exercised. Candidates with the same `outputHash` on each decision input count as one output group. | 2026-10-28 | #102 |
 | ACTIVATION | Each screen record gets its `outputHash` and the move counts of its strategy. A verdict counts only when a candidate is exercised on a decision board. Of 289 strategies, 17 are silent on the static screen. 15 of them go to a rebuild wave. The edit screen of the gate `ids` shows its move. No verdict changes. | 2026-10-28 | #107 |
 | EXACT-BOUNDS | [The bounds of the gap closed](research/BOUNDS.md) at 18, 24 and 40 nodes and at the caps 1.1, 1.25 and 1.5, from 720 solves. The intervals are narrow: the median width of the first 5 is 0.1 or less. The [portfolio](research/PORTFOLIO.md#the-portfolio-at-each-cap-exact-bounds) gets a curve and greedy sets for each rule and cap. | 2026-10-28 | #110 |
+| PORTFOLIO-API | [The opt-in portfolio router](research/PORTFOLIO.md#the-portfolio-router-portfolio-api) `portfolio`: `shared` and the greedy set of the size band, rule and cap of the caller, with the shared combinator of layout-contract. On the held-out seeds, k = 5 keeps 4% to 100% of the oracle gain. At 40 nodes, k = 3 takes 51 to 176 ms. | 2026-10-28 | #112 |
 
 ## Open
 
