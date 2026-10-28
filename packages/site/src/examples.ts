@@ -1,10 +1,11 @@
-import { runKey, sectionsRouter, segmentsOf, type Graph, type Point, type SegmentGraph } from "@mark1russell7/highways";
+import { cornersRouter, runKey, sectionsRouter, segmentsOf, type Graph, type Point, type Result, type SegmentGraph } from "@mark1russell7/highways";
 import coursesText from "../content/examples/courses.md?raw";
 import deliveryText from "../content/examples/delivery.md?raw";
 import howtoText from "../content/examples/howto.md?raw";
 import introText from "../content/examples/intro.md?raw";
+import ordersText from "../content/examples/orders.md?raw";
 import servicesText from "../content/examples/services.md?raw";
-import { BOARDS, type Board } from "./boards.ts";
+import { EXAMPLE_BOARDS, type Board } from "./boards.ts";
 import { html, sectionOf } from "./content.ts";
 import { genPanel } from "./gen-controls.ts";
 import { cleanGen, genFamily, NAMED_GENS, readGen, START_GEN, writeGen, type GenSpec } from "./generated.ts";
@@ -19,13 +20,23 @@ const $ = <T extends HTMLElement>(id: string): T => {
 };
 
 const fmt = new Intl.NumberFormat("en-US");
-const TEXT: Readonly<Record<string, string>> = { delivery: deliveryText, services: servicesText, courses: coursesText };
+const TEXT: Readonly<Record<string, string>> = { delivery: deliveryText, services: servicesText, courses: coursesText, orders: ordersText };
 
 /** The space between a road and a card. This margin puts the roads in the middle of the free space between two cards. */
 const MARGIN = 20;
 
 /** The router of the boards. */
 const router = sectionsRouter({ name: "sections", margin: MARGIN, stretch: 3, cap: 6 });
+
+/** The router of the inner edges of a card with rows (INTERIOR-ROUTE). The router `sections` gives no route for an inner edge. */
+const inner = cornersRouter({ name: "corners", margin: 6 });
+
+/** This function routes a board: the outer edges with `sections`, then the inner edges of each frame with `corners`. */
+function routeBoard(graph: Graph): Result {
+  const outer = router.route(graph);
+  if (!graph.nodes.some((n) => n.parent !== undefined)) return outer;
+  return { ...outer, routes: [...outer.routes, ...inner.route(graph).routes.filter((r) => r.frame !== undefined)] };
+}
 
 /** The id of the tab of the generated board (CORPUS-GEN). */
 const GENERATED = "generated";
@@ -43,7 +54,7 @@ interface Shown {
   readonly home: { readonly minScale: number; readonly focus?: Point };
 }
 
-const boards = BOARDS.map((make) => make());
+const boards = EXAMPLE_BOARDS.map((make) => make());
 const shown = new Map<string, Shown>();
 
 /** This function gives the shown form of a routed board. */
@@ -60,7 +71,7 @@ function routed(board: Board): Shown {
   let s = shown.get(board.id);
   if (!s) {
     const t0 = performance.now();
-    const result = router.route(board.graph);
+    const result = routeBoard(board.graph);
     const segments = segmentsOf(result);
     s = shownOf(board, { result, segments }, performance.now() - t0);
     shown.set(board.id, s);

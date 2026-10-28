@@ -125,6 +125,19 @@ export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   },
   plug: { type: "strategy", step: "plugs", describe: "The plug rule: a strategy of the step `plugs`. Without it, the option `plugs` places the plugs." },
   plugOptions: { type: "object", describe: "The options of the strategy `plug`." },
+  outside: {
+    type: "enum",
+    values: ["throw", "skip", "clamp"],
+    default: "throw",
+    describe: "The rule for a box outside the box of its frame: throw a `RangeError`, skip the box and its inner edges, or cut the box to the bounds.",
+  },
+  frameInset: {
+    type: "number",
+    min: 0,
+    max: 20,
+    step: 1,
+    describe: "The distance from the walls of a frame to the bounds of its inner routes. Without a value, the inset is the margin.",
+  },
 };
 
 /** The declarations of the options of the router `trunks`. */

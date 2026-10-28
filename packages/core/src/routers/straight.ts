@@ -1,5 +1,5 @@
 import { center, type Box, type Point } from "../geom.ts";
-import { fixedPortPoint, nodeIndex, resolvePorts, type Graph, type Result, type Route, type Router } from "../model.ts";
+import { fixedPortPoint, nodeIndex, outerGraph, type Graph, type Result, type Route, type Router } from "../model.ts";
 
 /** This function gives the point where the ray from the center of the box to `toward` leaves the box. */
 export function boxExit(box: Box, toward: Point): Point {
@@ -20,7 +20,7 @@ export function boxExit(box: Box, toward: Point): Point {
 export const straightRouter: Router = {
   name: "straight",
   route(input: Graph): Result {
-    const graph = resolvePorts(input);
+    const graph = outerGraph(input);
     const byId = nodeIndex(graph);
     const routes: Route[] = [];
     for (const e of graph.edges) {

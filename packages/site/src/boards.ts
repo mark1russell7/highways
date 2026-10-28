@@ -1,4 +1,4 @@
-import type { Edge, Graph, Node } from "@mark1russell7/highways";
+import type { Edge, Graph, Node, Port } from "@mark1russell7/highways";
 import type { CardText } from "./view.ts";
 
 /** The text on a card of a board. A strong card is a hub of the board. */
@@ -51,6 +51,25 @@ class Builder {
     this.#kinds.set(id, kind);
     this.cards.set(id, card);
     return id;
+  }
+
+  /** This method adds a row inside the card `parent`. The card is the frame of the row. */
+  row(id: string, parent: string, x: number, y: number, w: number, h: number, card: Card): string {
+    this.nodes.push({ id, parent, box: { x, y, w, h } });
+    this.cards.set(id, card);
+    return id;
+  }
+
+  /** This method gives the card `id` the plugs `ports` on its walls. */
+  plugs(id: string, ports: readonly Port[]): void {
+    const i = this.nodes.findIndex((n) => n.id === id);
+    this.nodes[i] = { ...this.nodes[i]!, ports };
+  }
+
+  /** This method adds an edge with a plug at one end or at both ends. */
+  wire(source: string, sourcePort: string | undefined, target: string, targetPort: string | undefined): void {
+    const end = (node: string, port: string | undefined): Edge["source"] => (port === undefined ? { node } : { node, port });
+    this.edges.push({ id: `e${this.edges.length}`, source: end(source, sourcePort), target: end(target, targetPort) });
   }
 
   /** This method adds an edge. It gives false and adds nothing for a loop or for a second edge between the same two cards. */
@@ -289,3 +308,49 @@ export function coursesBoard(): Board {
 
 /** The example boards, in the order of the page. */
 export const BOARDS: readonly (() => Board)[] = [deliveryBoard, servicesBoard, coursesBoard];
+
+/** The rows of the table card of the board `orders`: an id and a title. */
+const ORDER_ROWS: readonly [string, string][] = [
+  ["id", "order id"],
+  ["customer", "customer id"],
+  ["product", "product id"],
+  ["quantity", "quantity"],
+  ["total", "invoice id"],
+  ["status", "shipment id"],
+];
+
+/**
+ * This function makes the board `orders`: one table card with 6 rows and 4 plugs on its walls, and 4 other tables.
+ * Each outer edge goes from a table to a plug of the wall. Each inner edge goes from a row to a plug, inside the card (INTERIOR-ROUTE).
+ */
+export function ordersBoard(): Board {
+  const b = new Builder();
+  const card = { x: 260, y: 0, w: 240, h: 236 };
+  b.card("orders", card.x, card.y, card.w, card.h, { title: "Orders", strong: true }, "orders");
+  ORDER_ROWS.forEach(([id, title], i) => b.row(`orders.${id}`, "orders", card.x + 20, card.y + 40 + i * 30, card.w - 40, 24, { title }));
+  b.plugs("orders", [
+    { id: "w1", side: "west", along: 0.25 },
+    { id: "w2", side: "west", along: 0.75 },
+    { id: "e1", side: "east", along: 0.25 },
+    { id: "e2", side: "east", along: 0.75 },
+  ]);
+  const tables: [string, string, number, number][] = [
+    ["customers", "Customers", 0, 30],
+    ["invoices", "Invoices", 0, 150],
+    ["products", "Products", 590, 30],
+    ["shipments", "Shipments", 590, 150],
+  ];
+  for (const [id, title, x, y] of tables) b.card(id, x, y, 170, 56, { title, sub: "table" }, "tables");
+  b.wire("customers", undefined, "orders", "w1");
+  b.wire("invoices", undefined, "orders", "w2");
+  b.wire("orders", "e1", "products", undefined);
+  b.wire("orders", "e2", "shipments", undefined);
+  b.wire("orders.customer", undefined, "orders", "w1");
+  b.wire("orders.total", undefined, "orders", "w2");
+  b.wire("orders", "e1", "orders.product", undefined);
+  b.wire("orders", "e2", "orders.status", undefined);
+  return b.board("orders", "Table rows", "tables", "references", "orders");
+}
+
+/** The boards of the examples page: the boards of `BOARDS`, then the board with a frame. The compare page shows only `BOARDS`. */
+export const EXAMPLE_BOARDS: readonly (() => Board)[] = [...BOARDS, ordersBoard];
