@@ -490,9 +490,10 @@ const result = repairStrategy(shared).run(graph); // The router `shared+stable+r
 The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change. [`PORTFOLIO.md`](../../docs/research/PORTFOLIO.md#the-portfolio-router-portfolio-api) gives its tables.
 
 - `routePortfolio(graph, options?)` runs the router `shared` first, then more members for the size band of the graph. It gives the output with the fewest guard breaks, then the most ink saved (B1).
-- The options are `rule` (`collection` or `all`), `cap` (1.1, 1.25 or 1.5), `k` (3, 5 or 8), `budgetMs` and `maxMembers`.
+- The options are `rule` (`collection` or `all`), `cap` (1.1, 1.25 or 1.5), `k` (3, 5 or 8), `budgetMs`, `maxMembers` and `hashes`.
+- `hashes` sets the members with an `outputHash` in the trace. With `pick` (the default), only the base and the winner get a hash, and only when the winner is not the base. With `all`, each member that ran gets a hash. The output and the winner do not change. [The hash of the router](../../docs/research/PORTFOLIO.md#the-hash-of-the-router-hash-lazy) gives the times.
 - The size bands are 1 to 12, 13 to 24, 25 to 40, 41 to 64 and 65 to 128 nodes. An input above 128 nodes uses the last band.
-- Without `k`, the members are the fit of the band. Each member has a node limit, so the default is deterministic. The limits keep the model time at or below 42 ms, with the key on the output of each member.
+- Without `k`, the members are the fit of the band. Each member has a node limit, so the default is deterministic. The limits keep the model time at or below 45 ms. The model counts the key on the output of each member, and the hashes of a pick that moves.
 - At 41 to 64 nodes, the fit runs one member at the cap 1.5 under the rule `collection`. Above 64 nodes, the fit is `shared` alone.
 - With `k`, the members are the first `k` names of the greedy set of the band.
 - A member passes the guard when it has no more breaks of each hard rule than `shared`. It also has no edge with a stretch above the cap. Under the rule `collection`, it also has no shared segment with edges of two collections. The base `shared` always passes.

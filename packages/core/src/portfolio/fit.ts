@@ -4,33 +4,33 @@ import type { PortfolioCap, PortfolioRule } from "./bands.ts";
 
 /**
  * The fit of each rule, cap and size band, by the key `<rule>|<cap>|<band>`: the members of the default of the portfolio router, in their order.
- * Each member has a node limit: it runs only on an input with that many nodes or fewer. The limits keep the model time at or below 42 ms.
+ * Each member has a node limit: it runs only on an input with that many nodes or fewer. The limits keep the model time at or below 45 ms.
  * The base `shared` is not in a fit: the portfolio always runs it first.
  */
 export const PORTFOLIO_FIT: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|${string}`, readonly (readonly [string, number])[]>> = {
   "collection|1.1|n1-12": [["corners-side", 12], ["w2c:select+stretch", 12], ["trunks-gilbert-a05", 12], ["w3a:spiral-a15", 12], ["trunks-tree-bf08", 12], ["hw:zipper", 12], ["w2c:level-links+stretch-b1.1", 12], ["hw:stubs", 12]],
-  "collection|1.1|n13-24": [["w3e:crossbars+stretch", 24], ["trunks-tree-bf08", 24], ["corners-side", 24], ["shared-p2", 24], ["w2c:zipper+stretch-b1.1", 18]],
-  "collection|1.1|n25-40": [["w2a:shared-ways+breakeven", 40], ["w2b:weiszfeld-a1", 32]],
+  "collection|1.1|n13-24": [["w3e:crossbars+stretch", 24], ["trunks-tree-bf08", 24], ["corners-side", 24], ["shared-p2", 24], ["w2c:zipper+stretch-b1.1", 18], ["hw:weiszfeld", 18], ["trunks-gilbert-a07", 18]],
+  "collection|1.1|n25-40": [["w2a:shared-ways+breakeven", 40], ["w2b:weiszfeld-a1", 40]],
   "collection|1.1|n41-64": [],
   "collection|1.1|n65-128": [],
   "collection|1.25|n1-12": [["corners-side", 12], ["trunks-tree-bf06", 12], ["w3f:p-hub-a0.2", 12], ["hw:stubs", 12], ["hw:p-hub", 12], ["hw:spiral", 12], ["w2c:level-links+stretch", 12], ["w3f:spectral-c0.3", 12]],
   "collection|1.25|n13-24": [["w2a:shared-ways+stretch", 24], ["shared-p3", 24], ["trunks-gilbert-a07", 24], ["w3e:crossbars+stretch", 24], ["trunks-tree-bf06", 24], ["w3c:hdbscan+stretch", 18], ["shared-wind-p2-r1-e2", 18], ["hw:stubs", 18]],
-  "collection|1.25|n25-40": [["w2a:shared-ways+stretch", 40], ["shared-p3", 40], ["shared-order-shortest", 32]],
+  "collection|1.25|n25-40": [["w2a:shared-ways+stretch", 40], ["shared-p3", 40], ["shared-order-shortest", 40], ["w2b:weiszfeld-a1", 32]],
   "collection|1.25|n41-64": [],
   "collection|1.25|n65-128": [],
   "collection|1.5|n1-12": [["trunks-gilbert-a03", 12], ["w3e:areas-keys", 12], ["trunks-tree-bf02", 12], ["w3f:p-hub-a0.2", 12], ["w2b:zipper-a1", 12], ["w3a:spiral-a35", 12], ["w3f:spectral-c0.3", 12], ["w2c:level-links+stretch", 12]],
-  "collection|1.5|n13-24": [["shared-wind-p2-r0.5", 24], ["trunks-gilbert-a03", 24], ["w3e:crossbars+stretch", 24], ["shared-wind-p2-r1-e2", 24], ["trunks-tree-bf06", 24], ["shared-flow-a06-p3", 24], ["shared-wind-p3-r1", 24], ["trunks-gilbert-a07", 18]],
-  "collection|1.5|n25-40": [["shared-p3", 40], ["hw:lanes", 40], ["shared-wind-p2-r1-e2", 40]],
+  "collection|1.5|n13-24": [["shared-wind-p2-r0.5", 24], ["trunks-gilbert-a03", 24], ["w3e:crossbars+stretch", 24], ["shared-wind-p2-r1-e2", 24], ["trunks-tree-bf06", 24], ["shared-flow-a06-p3", 24], ["shared-wind-p3-r1", 24], ["trunks-gilbert-a07", 24]],
+  "collection|1.5|n25-40": [["shared-p3", 40], ["hw:lanes", 40], ["shared-wind-p2-r1-e2", 40], ["hw:crossbars", 32]],
   "collection|1.5|n41-64": [["shared-flow-a06-p3", 64]],
   "collection|1.5|n65-128": [],
-  "all|1.1|n1-12": [["w2b:zipper-p2", 12], ["hw:cubu", 12], ["w3d:kdeeb+stretch", 12], ["w3c:hough-wide", 12], ["w3d:kdeeb-routes", 12], ["hw:stubs", 12], ["hw:spiral", 10], ["w3b:growth-s0.7", 10]],
+  "all|1.1|n1-12": [["w2b:zipper-p2", 12], ["hw:cubu", 12], ["w3d:kdeeb+stretch", 12], ["w3c:hough-wide", 12], ["w3d:kdeeb-routes", 12], ["hw:stubs", 12], ["hw:spiral", 12], ["w3b:growth-s0.7", 10]],
   "all|1.1|n13-24": [["w3e:frechet-e0.5", 24], ["w3a:diffusion-wide", 24], ["w2c:zipper+stretch-b1.1", 24], ["w3d:cubu+stretch", 18], ["w3a:spiral-a15", 18]],
   "all|1.1|n25-40": [["w2c:zipper+stretch-b1.1", 40], ["w3a:spiral-a15", 32]],
-  "all|1.1|n41-64": [],
+  "all|1.1|n41-64": [["hw:diffusion", 64]],
   "all|1.1|n65-128": [],
-  "all|1.25|n1-12": [["w3d:kdeeb-routes", 12], ["w3e:mlseb+stretch", 12], ["hw:growth", 12], ["hw:level-links", 12], ["w3b:growth-input", 10], ["w3e:confluent+stretch", 10]],
-  "all|1.25|n13-24": [["w3d:kdeeb-routes", 24], ["w3f:p-hub-a0.2", 18], ["w3d:kdeeb-nomask", 18]],
-  "all|1.25|n25-40": [],
+  "all|1.25|n1-12": [["w3d:kdeeb-routes", 12], ["w3e:mlseb+stretch", 12], ["hw:growth", 12], ["hw:level-links", 12], ["w3b:growth-input", 10], ["w3e:confluent+stretch", 10], ["w3d:kdeeb-nomask", 10]],
+  "all|1.25|n13-24": [["w3d:kdeeb-routes", 24], ["w3f:p-hub-a0.2", 24], ["w3d:kdeeb-nomask", 18], ["w3a:spiral-n3", 18]],
+  "all|1.25|n25-40": [["w3d:kdeeb-routes", 32]],
   "all|1.25|n41-64": [],
   "all|1.25|n65-128": [],
   "all|1.5|n1-12": [["w3b:growth-s0.3", 12], ["w3e:mlseb-a0", 12], ["w3e:mlseb-routes", 10], ["w3c:edge-paths-k1.5", 10], ["w3f:territories-r2", 10]],

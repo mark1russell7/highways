@@ -98,6 +98,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | FIT-COST | [The cost of each member](research/PORTFOLIO.md#the-cost-of-each-member-fit-cost) in the fit of the router `portfolio`. In the router, a member takes 1.06 to 1.17 times its run alone, and 0.97 to 1.03 times its run and its key. The fit uses the measured key at the target 42 ms. On the test seeds, the median is 48 ms or less in each of 48 cells. | 2026-10-28 | #123 |
 | REL12 | Version 0.6.0 on npm. MINOR: the default of `routePortfolio` changes (#118, #119, #123). [The defaults of 0.5.1 and 0.6.0](research/PORTFOLIO.md#the-defaults-of-051-and-060) gives the old and the new members. New export `exactStretches`. | 2026-10-28 | #124 |
 | PROFILES | The shared block "Caller profiles" from layout-contract #30: a guard applies only to the inputs that declare its property. highways has only the profile `all`. | 2026-10-28 | #125 |
+| HASH-LAZY | [The hash of the router](research/PORTFOLIO.md#the-hash-of-the-router-hash-lazy) `portfolio`. With the new default `hashes: "pick"`, only a pick that moves hashes the base and the winner. A member takes 1.01 to 1.07 times its run alone. The fit target goes to 45 ms. 5 shares get their value of 0.5.1 again. | 2026-10-28 | #127 |
 
 ## Calibration
 

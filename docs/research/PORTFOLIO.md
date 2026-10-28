@@ -770,6 +770,115 @@ The share of the oracle gain at the fit, on the test seeds 5 to 9, before and af
 | 3. A fit from one clean run changes 1 set or more up to 40 nodes. | Met: 2 sets at 13 to 24 nodes, and the fit in 14 of 18 cells up to 40 nodes. |
 | 4. The router has a median of 50 ms or less and a q95 of 80 ms or less in each cell. | Partly met: the median is 48 ms or less in each of the 48 cells. The q95 is 91 ms in 1 cell. |
 
+## The hash of the router (HASH-LAZY)
+
+This section is the result of the item HASH-LAZY of the [roadmap](../ROADMAP.md). The router hashes only the outputs of a pick that moves.
+
+### The option `hashes`
+
+- layout-contract 0.2.8 gives `portfolio()` the option `hashes`. `routePortfolio` passes it on.
+- With `pick` (the default), the router computes the guard and the levels of each member, without a hash.
+- After the pick, the router hashes the base and the winner, but only when the winner is not the base. Then `picked` compares the two hashes.
+- With `all`, each member that ran gets a hash, as before this item.
+- The test `hashes.test.ts` runs the board of `router.test.ts` and the test seeds 5 to 9 of each band. The output, the winner, `winnerIndex`, `kept` and `picked` are equal under `pick` and `all`.
+- Under `pick`, at most 2 members of a trace have an `outputHash`.
+- The bench and the records do not read `outputHash`. They hash the outputs themselves, so they use the default.
+
+### The cost in the router
+
+The script `portfolio:time --member-cost` times each member alone and in the router, as in FIT-COST (CI run [40681245872](https://github.com/mark1russell7/highways/actions/runs/40681245872)). After this item, the key has no hash. The column `hash` gives the hash of the output alone. The rows do not use the last member of each pick, because the time after it holds the pick and the two hashes. Each cell is a median in ms:
+
+| band | rows | run alone | key alone | hash | in the router | router / run alone | router / (run + key) alone |
+|---|---:|---:|---:|---:|---:|---|---|
+| n1-12 | 72 | 3.1 | 0.1 | 0.2 | 3.1 | 1.01 (0.90 to 1.05) | 0.98 (0.88 to 1.03) |
+| n13-24 | 58 | 4.5 | 0.1 | 0.4 | 4.5 | 1.02 (0.95 to 1.09) | 0.99 (0.91 to 1.03) |
+| n25-40 | 58 | 7.9 | 0.3 | 0.6 | 8.1 | 1.04 (0.99 to 1.07) | 0.99 (0.97 to 1.03) |
+| n41-64 | 16 | 16.5 | 0.5 | 1.4 | 17.1 | 1.04 (1.00 to 1.08) | 1.00 (0.97 to 1.04) |
+| n65-128 | 16 | 27.9 | 1.2 | 2.9 | 29.9 | 1.07 (1.04 to 1.08) | 1.02 (1.00 to 1.04) |
+
+- In the router, a member takes 1.01 to 1.07 times its run alone. With FIT-COST, the ratio was 1.06 to 1.17.
+- Without the hash, the key is 0.1 to 1.2 ms. With the hash, it was 0.4 to 4.5 ms.
+- The model of the whole pick adds the hashes of the base and the winner when the pick moves. It gives 1.01 of the measured pick in each band.
+
+### The times
+
+- `portfolio-times.json` keeps the hash of each member apart from its key, with the schema `portfolio-times/3`.
+- The model time of the fit is the time of `shared`, the setup of the key, and the run and the key of each member. It also adds the hash of the base and the largest hash of the members.
+- The largest hash is the worst case: the pick moves to the slowest hash of the set.
+- Each shard of `portfolio:time` runs its first board once before it starts the clock. So each time is a warm median.
+- The times come from one run on one CI machine: [40681241949](https://github.com/mark1russell7/highways/actions/runs/40681241949) (`portfolio:time --members`).
+
+### The target of the fit
+
+The router check runs the fit on the test seeds 5 to 9, at 8 sizes from 10 to 128 nodes, with 5 repeats. The highest median of the 48 cells, for each target, in ms:
+
+| `FIT_TARGET_MS` | fit | first run | second run |
+|---:|---|---:|---:|
+| 50 | [40684785728](https://github.com/mark1russell7/highways/actions/runs/40684785728) | 53.7 ([40684977648](https://github.com/mark1russell7/highways/actions/runs/40684977648)) | 54.5 ([40684981137](https://github.com/mark1russell7/highways/actions/runs/40684981137)) |
+| 45 | [40684782540](https://github.com/mark1russell7/highways/actions/runs/40684782540) | 49.8 ([40684970091](https://github.com/mark1russell7/highways/actions/runs/40684970091)) | 49.0 ([40684974034](https://github.com/mark1russell7/highways/actions/runs/40684974034)) |
+| 42 | [40684779080](https://github.com/mark1russell7/highways/actions/runs/40684779080) | 47.7 ([40684962277](https://github.com/mark1russell7/highways/actions/runs/40684962277)) | 39.8 ([40684966052](https://github.com/mark1russell7/highways/actions/runs/40684966052)) |
+
+- `FIT_TARGET_MS` is 45 ms. It is the highest target with a median of 50 ms or less in each of the 48 cells, in the two runs.
+- The margin to 50 ms is small: 0.2 ms in the first run. The next change of the members or of the key needs a new check.
+
+The fit changes in 13 of 30 cells. In each of them, a node limit goes up or a member comes in. No member leaves:
+
+- `collection` 1.1, 13 to 24 nodes: `hw:weiszfeld` (18) and `trunks-gilbert-a07` (18) come in.
+- `collection` 1.1, 25 to 40 nodes: `w2b:weiszfeld-a1` goes from 32 to 40.
+- `collection` 1.25, 13 to 24 nodes: `hw:stubs` (18) comes in.
+- `collection` 1.25, 25 to 40 nodes: `shared-order-shortest` goes from 32 to 40, and `w2b:weiszfeld-a1` (32) comes in.
+- `collection` 1.5, 13 to 24 nodes: `shared-wind-p3-r1` and `trunks-gilbert-a07` go from 18 to 24.
+- `collection` 1.5, 25 to 40 nodes: `shared-wind-p2-r1-e2` goes from 32 to 40, and `hw:crossbars` (32) comes in.
+- `all` 1.1, 1 to 12 nodes: `hw:stubs` and `hw:spiral` go from 10 to 12.
+- `all` 1.1, 13 to 24 nodes: `w3a:spiral-a15` (18) comes in.
+- `all` 1.1, 41 to 64 nodes: `hw:diffusion` (64) comes in. Before, the fit was `shared` alone.
+- `all` 1.25, 1 to 12 nodes: `hw:level-links` goes from 10 to 12, and `w3d:kdeeb-nomask` (10) comes in.
+- `all` 1.25, 13 to 24 nodes: `w3f:p-hub-a0.2` goes from 18 to 24, and `w3a:spiral-n3` (18) comes in.
+- `all` 1.25, 25 to 40 nodes: `w3d:kdeeb-routes` (32) comes back. Before, the fit was `shared` alone.
+- `all` 1.5, 25 to 40 nodes: `w3b:growth-s0.3` (32) comes in.
+
+The pool does not change, so `sets.ts` does not change.
+
+The time of the router with the fit at 45 ms, from the run 40684970091. Each cell gives the median, then the q95, in ms:
+
+| rule | cap | 10 | 12 | 18 | 24 | 40 | 64 | 100 | 128 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `collection` | 1.1 | 38, 47 | 42, 53 | 50, 65 | 41, 48 | 45, 53 | 10, 13 | 16, 25 | 22, 32 |
+| `collection` | 1.25 | 32, 40 | 38, 47 | 46, 55 | 41, 49 | 45, 58 | 9, 13 | 16, 25 | 22, 32 |
+| `collection` | 1.5 | 34, 45 | 38, 44 | 35, 43 | 47, 60 | 45, 54 | 42, 54 | 16, 25 | 22, 31 |
+| `all` | 1.1 | 44, 64 | 49, 65 | 49, 62 | 40, 50 | 40, 46 | 46, 54 | 16, 25 | 23, 33 |
+| `all` | 1.25 | 46, 69 | 42, 64 | 49, 62 | 46, 57 | 5, 7 | 10, 13 | 16, 25 | 22, 33 |
+| `all` | 1.5 | 41, 64 | 26, 40 | 18, 21 | 24, 30 | 42, 48 | 9, 13 | 16, 25 | 23, 32 |
+
+- The median is 50 ms or less in each of the 48 cells, in the two runs. The highest q95 is 69 ms and 67 ms.
+- With the warm-up, `collection` 1.1 at 10 nodes has a q95 of 47 ms in the two runs. With FIT-COST, it was 91 ms and 85 ms.
+
+The share of the oracle gain at the fit, on the test seeds 5 to 9 (`portfolio:sets`, CI run [40684782540](https://github.com/mark1russell7/highways/actions/runs/40684782540)). A cell with 3 values gives 0.5.1, 0.6.0 and this item:
+
+| rule | cap | n1-12 | n13-24 | n25-40 | n41-64 | n65-128 |
+|---|---:|---|---|---|---|---|
+| `collection` | 1.1 | 58% | 4% | - | - | - |
+| `collection` | 1.25 | 19% | 44%, 38%, 44% | 36% | -88% | - |
+| `collection` | 1.5 | 70% | 51% | 86% | 0% | -1565% |
+| `all` | 1.1 | 95% | 89%, 83%, 89% | 3% | 0% | -9% |
+| `all` | 1.25 | 89%, 83%, 89% | 74%, 31%, 31% | 0%, -427%, 0% | -2376% | - |
+| `all` | 1.5 | 42% | 61% | 100%, 86%, 100% | 0%, -2349%, -2349% | -1072% |
+
+- 5 shares go up, and they get their value of 0.5.1 again. 25 of 30 shares do not change. No share goes down.
+- 2 shares stay below 0.5.1. `all` 1.25 at 13 to 24 nodes keeps 31%. `all` 1.5 at 41 to 64 nodes keeps -2349%.
+- At 41 to 64 nodes, `all` 1.5 gets `hw:growth` only with the target 50 ms. That target fails the router check.
+- `all` 1.1 at 41 to 64 nodes gets `hw:diffusion`, but the share stays 0%.
+
+### The predictions of HASH-LAZY
+
+| Prediction | Result |
+|---|---|
+| 1. The pick traces are the same under `pick` and `all`. | Met: the output, the winner, `winnerIndex`, `kept` and `picked` are equal on each board, rule, cap and form of the test. |
+| 2. The cost of a member in the router is 1.00 to 1.06 of its run alone in each band. | Partly met: 1.01 to 1.04 in 4 bands, and 1.07 at 65 to 128 nodes. |
+| 3. After the refit at 42 ms, 4 or more of the 7 shares that FIT-COST lowered come back to within 3 points of 0.5.1. | Not met: 3 of 7 at 42 ms. At the chosen 45 ms, 5 of 7 come back. |
+| 4. `all` 1.5 at 41 to 64 nodes keeps `hw:growth` again. | Not met: the fit keeps it only at 50 ms, and that target fails the router check. |
+| 5. With the warm-up, the q95 of `collection` 1.1 at 10 nodes is 60 ms or less. | Met: 44 and 42 ms at 42 ms, and 47 and 47 ms at 45 ms. |
+
 ## The defaults of 0.5.1 and 0.6.0
 
 Version 0.6.0 changes the default output of `routePortfolio`. This table gives the default of each rule, cap and band in the two versions. A default is the base `shared`, then the members of the fit, in their order. The number after each member is its node limit.
@@ -777,6 +886,7 @@ Version 0.6.0 changes the default output of `routePortfolio`. This table gives t
 - PORTFOLIO-SPEED (#118) added the bands n41-64 and n65-128. In 0.5.1, an input above 40 nodes used `shared` alone.
 - TIE-GRID (#119) took the tie rule of layout-contract 0.2.7. It moved one member of `collection|1.1|n13-24`.
 - FIT-COST (#123) counts the key of each member, and sets the target of the fit to 42 ms.
+- HASH-LAZY (#127) changes the fit after 0.6.0, in 13 cells. [The hash of the router](#the-hash-of-the-router-hash-lazy) gives each change.
 
 | Rule | Cap | Band | 0.5.1 | 0.6.0 |
 |---|---|---|---|---|

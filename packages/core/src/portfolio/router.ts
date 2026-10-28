@@ -97,7 +97,7 @@ export function portfolioMembers(nodes: number, options: PortfolioRouterOptions 
  * The key is `portfolioKey`: a member wins only when it passes the guard against the base. Of those members, the winner has the most ink saved.
  * A tie within the `minEffect` of B1 goes to the first member (`selectBest`). A member that throws does not win.
  * The result carries the trace of the pick and the move count `move.pick`.
- * With the option `hashes` "pick" (the default), the trace has an `outputHash` only for the base and the winner, and only when the winner is not the base.
+ * With the option `hashes` "pick" (the default), only the base and the winner get an `outputHash` in the trace. They get it only when the winner is not the base.
  */
 export function routePortfolio(graph: Graph, options: PortfolioRouterOptions = {}): PortfolioRoute {
   // A member with a node limit below the size of the graph does not run. The base `shared` has no such limit below the limit of the router.

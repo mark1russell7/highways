@@ -147,9 +147,9 @@ export const BAND_BUDGET_MS = 50;
 /**
  * The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key, each member with the key on its output,
  * and the hashes of a pick that moves (HASH-LAZY).
- * The margin of 8 ms below `BAND_BUDGET_MS` covers the noise between two CI machines (FIT-COST).
+ * The margin of 5 ms below `BAND_BUDGET_MS` covers the noise between two CI machines. HASH-LAZY sets 45 ms, from two router checks in CI.
  */
-export const FIT_TARGET_MS = 42;
+export const FIT_TARGET_MS = 45;
 
 /** The summary of the times of the members (`portfolio-times/3`): the median time of each strategy at each size on the CI runner. */
 export interface MemberTimes {
