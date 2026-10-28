@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
-import { createRegistry, defineStrategy, listStrategies, STEPS, STRATEGIES, BUILT_IN_STRATEGIES } from "@mark1russell7/highways";
+import { createRegistry, defineStrategy, listStrategies, STEPS, STRATEGIES, BUILT_IN_STRATEGIES, type Step } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
-import { benchTimes, breadthText, cardId, guaranteeOf, rangeText, statusCounts, statusOf, valueText } from "./strategies-data.ts";
+import { benchTimes, breadthText, cardId, guaranteeOf, rangeText, STEP_DEFAULTS, statusCounts, statusOf, valueText } from "./strategies-data.ts";
 import { readStrategies } from "./strategies-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -68,6 +68,7 @@ describe("the parts of a card", () => {
 
   it("give the status of a strategy", () => {
     expect(statusOf("router", "shared", [], true)).toBe("default");
+    for (const [step, name] of Object.entries(STEP_DEFAULTS)) expect(listStrategies(STRATEGIES, step as Step).map((s) => s.name), `${step} has no strategy ${name}`).toContain(name);
     expect(statusOf("highway", "x", ["screened", "kept"], true)).toBe("kept");
     expect(statusOf("highway", "x", ["dropped", "prototyped"], true)).toBe("dropped");
     expect(statusOf("highway", "x", ["prototyped"], true)).toBe("screened");

@@ -105,8 +105,11 @@ export const STATUSES: readonly { readonly id: CardStatus; readonly text: string
   { id: "built", text: "built, not screened" },
 ];
 
-/** The default strategy of each step. The steps `highway` and `curve` have no default: a caller picks one. */
-export const STEP_DEFAULTS: Readonly<Record<string, string>> = { group: "quadtree", router: "shared", room: "routes" };
+/**
+ * The default strategy of each step. The steps `highway` and `curve` have no default: a caller picks one.
+ * The defaults of `plugs`, `levels` and `whole` come from STEP-SLOTS: they give the output of the steps before the slots.
+ */
+export const STEP_DEFAULTS: Readonly<Record<string, string>> = { group: "quadtree", plugs: "facing", router: "shared", levels: "depths", room: "routes", whole: "pipeline" };
 
 /** The place of part 2 of the cards: the curves of one option at a time and the Sobol indices. */
 export const SWEEPS_LINE = "Sweeps: waits for STAGE-DATA and PASS-GRID.";
