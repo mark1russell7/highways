@@ -231,7 +231,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
 
-`highways` imports `compareMeasure` and `minEffectOf` from the contract `@mark1russell7/layout-contract` (0.2.6 or later). The contract has no dependencies, so the import adds only the contract to the core. A test checks that the functions agree with this note.
+`highways` imports `compareMeasure` and `minEffectOf` from the contract `@mark1russell7/layout-contract` (0.2.7 or later). The contract has no dependencies, so the import adds only the contract to the core. A test checks that the functions agree with this note.
 
 This file does not copy the floors of the other projects:
 

@@ -483,7 +483,7 @@ This section is the result of the item PORTFOLIO-FIT of the [roadmap](../ROADMAP
 
 ### The decision: the core imports the contract
 
-The core imports the shared functions from `@mark1russell7/layout-contract` (0.2.6 or later):
+The core imports the shared functions from `@mark1russell7/layout-contract` (0.2.7 or later):
 
 - `portfolio`, `selectBest` and `pickMoves`
 - `compareMeasure`, `minEffectOf` and `RECORD_EPS`
