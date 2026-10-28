@@ -1724,6 +1724,33 @@
             }
           },
           "note": "`shared-flow-a06` is at least as good as `shared` on each new win on `dense-groups`, `hub-chain`, `many-groups`. It is better on `dense-groups`, `many-groups` and equal on `hub-chain`. `shared-all-flow-a07` is at least as good as `shared-all` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. The option `shared-all-flow-a07` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-flow-a05",
+            "shared-flow-a06",
+            "shared-flow-a07",
+            "shared-flow-a08",
+            "shared-all-flow-a05",
+            "shared-all-flow-a06",
+            "shared-all-flow-a07",
+            "shared-all-flow-a08"
+          ],
+          "exercised": [
+            "shared-flow-a05",
+            "shared-flow-a06",
+            "shared-flow-a07",
+            "shared-flow-a08",
+            "shared-all-flow-a05",
+            "shared-all-flow-a06",
+            "shared-all-flow-a07",
+            "shared-all-flow-a08"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "8 of 8 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -1872,6 +1899,23 @@
             }
           },
           "note": "The option `trunks-gilbert-a03` closes a median of 0.22 of the gap, with the rule `collection`. The option `trunks-gilbert-a07` closes a median of 0.209 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "trunks-gilbert-a03",
+            "trunks-gilbert-a05",
+            "trunks-gilbert-a07"
+          ],
+          "exercised": [
+            "trunks-gilbert-a03",
+            "trunks-gilbert-a05",
+            "trunks-gilbert-a07"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -2198,6 +2242,27 @@
             }
           },
           "note": "`od-cells` is at least as good as `shared` on each new win on no board. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:od-cells",
+            "w2c:od-cells+stretch",
+            "w2c:od-cells-l1",
+            "w2c:od-cells-l3",
+            "w2c:od-cells-shared"
+          ],
+          "exercised": [
+            "hw:od-cells",
+            "w2c:od-cells+stretch",
+            "w2c:od-cells-l1",
+            "w2c:od-cells-l3",
+            "w2c:od-cells-shared"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -2444,6 +2509,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:spiral",
+            "w3a:spiral+stretch",
+            "w3a:spiral-a15",
+            "w3a:spiral-a35",
+            "w3a:spiral-n3"
+          ],
+          "exercised": [
+            "hw:spiral",
+            "w3a:spiral+stretch",
+            "w3a:spiral-a15",
+            "w3a:spiral-a35",
+            "w3a:spiral-n3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -3076,6 +3162,22 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:flow-field",
+            "w2c:flow-field+stretch",
+            "w2c:flow-field-source"
+          ],
+          "exercised": [
+            "hw:flow-field",
+            "w2c:flow-field-source"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "2 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -3487,6 +3589,25 @@
             }
           },
           "note": "`road-classes` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:road-classes",
+            "w2c:road-classes+stretch",
+            "w2c:road-classes-q0.8",
+            "w2c:road-classes-d0.3"
+          ],
+          "exercised": [
+            "hw:road-classes",
+            "w2c:road-classes+stretch",
+            "w2c:road-classes-q0.8",
+            "w2c:road-classes-d0.3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -3721,6 +3842,27 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, hierarchy+stretch against shared wins 1 of 4 boards (1 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:hierarchy",
+            "w3d:hierarchy+stretch",
+            "w3d:hierarchy-hubs1",
+            "w3d:hierarchy-b0.5",
+            "w3d:hierarchy-kd"
+          ],
+          "exercised": [
+            "hw:hierarchy",
+            "w3d:hierarchy+stretch",
+            "w3d:hierarchy-hubs1",
+            "w3d:hierarchy-b0.5",
+            "w3d:hierarchy-kd"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -3880,6 +4022,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, fdeb against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:fdeb",
+            "w3d:fdeb+stretch",
+            "w3d:fdeb-nobudget",
+            "w3d:fdeb-nopush"
+          ],
+          "exercised": [
+            "hw:fdeb",
+            "w3d:fdeb+stretch",
+            "w3d:fdeb-nobudget",
+            "w3d:fdeb-nopush"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -4115,6 +4276,29 @@
             }
           },
           "note": "`mingle` is at least as good as `shared` on each new win on no board. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:mingle",
+            "w3a:mingle+stretch",
+            "w3a:mingle-shared",
+            "w3a:mingle-t25",
+            "w3a:mingle-t60",
+            "w3a:mingle-l2"
+          ],
+          "exercised": [
+            "hw:mingle",
+            "w3a:mingle+stretch",
+            "w3a:mingle-shared",
+            "w3a:mingle-t25",
+            "w3a:mingle-t60",
+            "w3a:mingle-l2"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "6 of 6 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -4265,6 +4449,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, mesh against shared wins 1 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:mesh",
+            "w3d:mesh+stretch",
+            "w3d:mesh-c8",
+            "w3d:mesh-cap16"
+          ],
+          "exercised": [
+            "hw:mesh",
+            "w3d:mesh+stretch",
+            "w3d:mesh-c8",
+            "w3d:mesh-cap16"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -4520,6 +4723,31 @@
             }
           },
           "note": "`shared-wind-p2-r1` is at least as good as `shared` on each new win on `hub-chain`, `many-groups`. It is better on no board and equal on `hub-chain`, `many-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-p2",
+            "shared-wind-p2-r0.5",
+            "shared-wind-p2-r1",
+            "shared-wind-p2-r2",
+            "shared-wind-p3-r1",
+            "shared-wind-p2-r1-e2",
+            "shared-all-wind-p2-r1"
+          ],
+          "exercised": [
+            "shared-p2",
+            "shared-wind-p2-r0.5",
+            "shared-wind-p2-r1",
+            "shared-wind-p2-r2",
+            "shared-wind-p3-r1",
+            "shared-wind-p2-r1-e2",
+            "shared-all-wind-p2-r1"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "7 of 7 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -4692,6 +4920,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, kdeeb-routes against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:kdeeb",
+            "w3d:kdeeb+stretch",
+            "w3d:kdeeb-nomask",
+            "w3d:kdeeb-routes"
+          ],
+          "exercised": [
+            "hw:kdeeb",
+            "w3d:kdeeb+stretch",
+            "w3d:kdeeb-nomask",
+            "w3d:kdeeb-routes"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -4832,6 +5079,23 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, cubu against shared wins 1 of 4 boards (1 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:cubu",
+            "w3d:cubu+stretch",
+            "w3d:cubu-fft"
+          ],
+          "exercised": [
+            "hw:cubu",
+            "w3d:cubu+stretch",
+            "w3d:cubu-fft"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5021,6 +5285,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0.508."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:mlseb",
+            "w3e:mlseb+stretch",
+            "w3e:mlseb-parabola",
+            "w3e:mlseb-routes",
+            "w3e:mlseb-a0"
+          ],
+          "exercised": [
+            "hw:mlseb",
+            "w3e:mlseb+stretch",
+            "w3e:mlseb-parabola",
+            "w3e:mlseb-routes",
+            "w3e:mlseb-a0"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5212,6 +5497,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0.343."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:sbeb",
+            "w3e:sbeb+stretch",
+            "w3e:sbeb-mean",
+            "w3e:sbeb-keys",
+            "w3e:sbeb-routes"
+          ],
+          "exercised": [
+            "hw:sbeb",
+            "w3e:sbeb+stretch",
+            "w3e:sbeb-mean",
+            "w3e:sbeb-keys",
+            "w3e:sbeb-routes"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5370,6 +5676,25 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0.047."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:areas",
+            "w3e:areas+stretch",
+            "w3e:areas-count",
+            "w3e:areas-keys"
+          ],
+          "exercised": [
+            "hw:areas",
+            "w3e:areas+stretch",
+            "w3e:areas-count",
+            "w3e:areas-keys"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5548,6 +5873,27 @@
           "verdict": "dropped",
           "old": "kept",
           "note": "With the strict rule, divided against shared wins 2 of 4 boards (3 with the old rule). On small-clustered, B1 rises 0.210 to 0.222, but the q95 changes by 3e-6, a tie. On hub-chain, B1 and the q95 are ties, because shared has 0 runs there. Thus hub-chain is not a win. On many-groups, B1 rises 0.083 to 0.085. Thus the record is dropped."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:divided",
+            "w3d:divided+stretch",
+            "w3d:divided-gap2",
+            "w3d:divided-left",
+            "w3d:divided-corridors"
+          ],
+          "exercised": [
+            "hw:divided",
+            "w3d:divided+stretch",
+            "w3d:divided-gap2",
+            "w3d:divided-left",
+            "w3d:divided-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5728,6 +6074,25 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:edge-paths",
+            "w3c:edge-paths+stretch",
+            "w3c:edge-paths-k1.5",
+            "w3c:edge-paths-k3"
+          ],
+          "exercised": [
+            "hw:edge-paths",
+            "w3c:edge-paths+stretch",
+            "w3c:edge-paths-k1.5",
+            "w3c:edge-paths-k3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -5916,6 +6281,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:confluent",
+            "w3e:confluent+stretch",
+            "w3e:confluent-min6",
+            "w3e:confluent-collection",
+            "w3e:confluent-legs"
+          ],
+          "exercised": [
+            "hw:confluent",
+            "w3e:confluent+stretch",
+            "w3e:confluent-min6",
+            "w3e:confluent-collection",
+            "w3e:confluent-legs"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -6104,6 +6490,23 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:power",
+            "w3e:power+stretch",
+            "w3e:power-near",
+            "w3e:power-saved1",
+            "w3e:power-collection"
+          ],
+          "exercised": [
+            "w3e:power-collection"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "1 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -6311,6 +6714,27 @@
             }
           },
           "note": "The option `stubs-source` closes a median of 0 of the gap, with the rule `all`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:stubs",
+            "w2b:stubs-source",
+            "w2b:stubs-w15",
+            "w2b:stubs-none",
+            "w2b:stubs-corridors"
+          ],
+          "exercised": [
+            "hw:stubs",
+            "w2b:stubs-source",
+            "w2b:stubs-w15",
+            "w2b:stubs-none",
+            "w2b:stubs-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -6582,6 +7006,27 @@
             }
           },
           "note": "`shared-cap-1` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered` and equal on `dense-groups`, `hub-chain`, `many-groups`. `shared-cap-3` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered` and equal on `dense-groups`, `hub-chain`, `many-groups`. The option `shared-cap-3` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-cap-1",
+            "shared-cap-3",
+            "shared-cap-1-run",
+            "shared-cap-1-w6",
+            "shared-all-cap-1"
+          ],
+          "exercised": [
+            "shared-cap-1",
+            "shared-cap-3",
+            "shared-cap-1-run",
+            "shared-cap-1-w6",
+            "shared-all-cap-1"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -6783,6 +7228,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:spiral",
+            "w3a:spiral+stretch",
+            "w3a:spiral-a15",
+            "w3a:spiral-a35",
+            "w3a:spiral-n3"
+          ],
+          "exercised": [
+            "hw:spiral",
+            "w3a:spiral+stretch",
+            "w3a:spiral-a15",
+            "w3a:spiral-a35",
+            "w3a:spiral-n3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7030,6 +7496,27 @@
             }
           },
           "note": "`wspd` is at least as good as `shared` on each new win on no board. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:wspd",
+            "w2c:wspd+stretch",
+            "w2c:wspd-shared",
+            "w2c:wspd-s1",
+            "w2c:wspd-s4"
+          ],
+          "exercised": [
+            "hw:wspd",
+            "w2c:wspd+stretch",
+            "w2c:wspd-shared",
+            "w2c:wspd-s1",
+            "w2c:wspd-s4"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7200,6 +7687,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:soft-keys",
+            "w3c:soft-keys+stretch",
+            "w3c:soft-keys-l0",
+            "w3c:soft-keys-hard",
+            "w3c:soft-keys-t1"
+          ],
+          "exercised": [
+            "hw:soft-keys",
+            "w3c:soft-keys+stretch",
+            "w3c:soft-keys-l0",
+            "w3c:soft-keys-hard",
+            "w3c:soft-keys-t1"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7375,6 +7883,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:diffusion",
+            "w3a:diffusion+stretch",
+            "w3a:diffusion-l3",
+            "w3a:diffusion-wide",
+            "w3a:diffusion-g2"
+          ],
+          "exercised": [
+            "hw:diffusion",
+            "w3a:diffusion+stretch",
+            "w3a:diffusion-l3",
+            "w3a:diffusion-wide",
+            "w3a:diffusion-g2"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7531,6 +8060,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, resistance against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:resistance",
+            "w3f:resistance+stretch",
+            "w3f:resistance-w1",
+            "w3f:resistance-sparse"
+          ],
+          "exercised": [
+            "hw:resistance",
+            "w3f:resistance+stretch",
+            "w3f:resistance-w1",
+            "w3f:resistance-sparse"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7738,6 +8286,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:crossbars",
+            "w3e:crossbars+stretch",
+            "w3e:crossbars-corridors",
+            "w3e:crossbars-none",
+            "w3e:crossbars-t30"
+          ],
+          "exercised": [
+            "hw:crossbars",
+            "w3e:crossbars+stretch",
+            "w3e:crossbars-corridors",
+            "w3e:crossbars-none",
+            "w3e:crossbars-t30"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -7919,6 +8488,29 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:flow-clusters",
+            "w3a:flow-clusters+stretch",
+            "w3a:flow-clusters-shared",
+            "w3a:flow-clusters-t0.15",
+            "w3a:flow-clusters-t0.5",
+            "w3a:flow-clusters-complete"
+          ],
+          "exercised": [
+            "hw:flow-clusters",
+            "w3a:flow-clusters+stretch",
+            "w3a:flow-clusters-shared",
+            "w3a:flow-clusters-t0.15",
+            "w3a:flow-clusters-t0.5",
+            "w3a:flow-clusters-complete"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "6 of 6 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -8108,6 +8700,25 @@
             }
           },
           "note": "`hough` is at least as good as `shared` on each new win on `many-groups`. It is better on `many-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:hough",
+            "w3c:hough+stretch",
+            "w3c:hough-ortho",
+            "w3c:hough-wide"
+          ],
+          "exercised": [
+            "hw:hough",
+            "w3c:hough+stretch",
+            "w3c:hough-ortho",
+            "w3c:hough-wide"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -8353,6 +8964,27 @@
             }
           },
           "note": "`traclus` is at least as good as `shared` on each new win on no board. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. B9 has no value where the baseline has no shared segment. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:traclus",
+            "w3a:traclus+stretch",
+            "w3a:traclus-e1",
+            "w3a:traclus-e4",
+            "w3a:traclus-m2"
+          ],
+          "exercised": [
+            "hw:traclus",
+            "w3a:traclus+stretch",
+            "w3a:traclus-e1",
+            "w3a:traclus-e4",
+            "w3a:traclus-m2"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -8544,6 +9176,31 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:quickbundles",
+            "w2c:quickbundles+stretch",
+            "w2c:quickbundles-trunk",
+            "w2c:quickbundles-lines",
+            "w2c:quickbundles-t1.5",
+            "w2c:quickbundles-t6",
+            "w3b:quickbundles-t6"
+          ],
+          "exercised": [
+            "hw:quickbundles",
+            "w2c:quickbundles+stretch",
+            "w2c:quickbundles-trunk",
+            "w2c:quickbundles-lines",
+            "w2c:quickbundles-t1.5",
+            "w2c:quickbundles-t6",
+            "w3b:quickbundles-t6"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "7 of 7 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -8731,6 +9388,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict. With the gate `stretch`, the median is 0.404."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:frechet",
+            "w3e:frechet+stretch",
+            "w3e:frechet-e0.5",
+            "w3e:frechet-e2",
+            "w3e:frechet-s1"
+          ],
+          "exercised": [
+            "hw:frechet",
+            "w3e:frechet+stretch",
+            "w3e:frechet-e0.5",
+            "w3e:frechet-e2",
+            "w3e:frechet-s1"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -8956,6 +9634,25 @@
             }
           },
           "note": "`hdbscan` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:hdbscan",
+            "w3c:hdbscan+stretch",
+            "w3c:hdbscan-flow",
+            "w3c:hdbscan-m2"
+          ],
+          "exercised": [
+            "hw:hdbscan",
+            "w3c:hdbscan+stretch",
+            "w3c:hdbscan-flow",
+            "w3c:hdbscan-m2"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -9110,6 +9807,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, spectral against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:spectral",
+            "w3f:spectral+stretch",
+            "w3f:spectral-c0.3",
+            "w3f:spectral-shared"
+          ],
+          "exercised": [
+            "hw:spectral",
+            "w3f:spectral+stretch",
+            "w3f:spectral-c0.3",
+            "w3f:spectral-shared"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -9265,6 +9981,24 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, link-communities against shared wins 1 of 4 boards (2 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:link-communities",
+            "w3f:link-communities+stretch",
+            "w3f:link-communities-t0.3",
+            "w3f:link-communities-trunk"
+          ],
+          "exercised": [
+            "hw:link-communities",
+            "w3f:link-communities-t0.3",
+            "w3f:link-communities-trunk"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -9507,6 +10241,25 @@
             }
           },
           "note": "`ridges` is at least as good as `shared` on each new win on `many-groups`. It is better on `many-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:ridges",
+            "w3c:ridges+stretch",
+            "w3c:ridges-routes",
+            "w3c:ridges-wide"
+          ],
+          "exercised": [
+            "hw:ridges",
+            "w3c:ridges+stretch",
+            "w3c:ridges-routes",
+            "w3c:ridges-wide"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -9644,6 +10397,27 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, territories+stretch against shared wins 1 of 4 boards (1 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:territories",
+            "w3f:territories+stretch",
+            "w3f:territories-r2",
+            "w3f:territories-r8",
+            "w3f:territories-plugs"
+          ],
+          "exercised": [
+            "hw:territories",
+            "w3f:territories+stretch",
+            "w3f:territories-r2",
+            "w3f:territories-r8",
+            "w3f:territories-plugs"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -9919,6 +10693,25 @@
             }
           },
           "note": "`road-classes` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:road-classes",
+            "w2c:road-classes+stretch",
+            "w2c:road-classes-q0.8",
+            "w2c:road-classes-d0.3"
+          ],
+          "exercised": [
+            "hw:road-classes",
+            "w2c:road-classes+stretch",
+            "w2c:road-classes-q0.8",
+            "w2c:road-classes-d0.3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -10092,6 +10885,26 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, consensus against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:consensus",
+            "w3f:consensus+stretch",
+            "w3f:consensus-single",
+            "w3f:consensus-c0.3",
+            "w3f:consensus-c0.7"
+          ],
+          "exercised": [
+            "hw:consensus",
+            "w3f:consensus-single",
+            "w3f:consensus-c0.3",
+            "w3f:consensus-c0.7"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -10328,6 +11141,22 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:flow-field",
+            "w2c:flow-field+stretch",
+            "w2c:flow-field-source"
+          ],
+          "exercised": [
+            "hw:flow-field",
+            "w2c:flow-field-source"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "2 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -10538,6 +11367,33 @@
             }
           },
           "note": "`shared-flow-a06` is at least as good as `shared` on each new win on `hub-chain`, `many-groups`. It is better on no board and equal on `hub-chain`, `many-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-flow-a05",
+            "shared-flow-a06",
+            "shared-flow-a07",
+            "shared-flow-a08",
+            "shared-all-flow-a05",
+            "shared-all-flow-a06",
+            "shared-all-flow-a07",
+            "shared-all-flow-a08"
+          ],
+          "exercised": [
+            "shared-flow-a05",
+            "shared-flow-a06",
+            "shared-flow-a07",
+            "shared-flow-a08",
+            "shared-all-flow-a05",
+            "shared-all-flow-a06",
+            "shared-all-flow-a07",
+            "shared-all-flow-a08"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "8 of 8 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -10834,6 +11690,25 @@
             }
           },
           "note": "`shared-all-p3` is at least as good as `shared-all` on each new win on no board. `shared-p3` is at least as good as `shared` on each new win on `hub-chain`, `many-groups`. It is better on no board and equal on `hub-chain`, `many-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The option `shared-all-p3` closes a median of 0 of the gap, with the rule `all`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-p3",
+            "shared-flow-a06-p3",
+            "shared-all-p3",
+            "shared-all-flow-a06-p3"
+          ],
+          "exercised": [
+            "shared-p3",
+            "shared-flow-a06-p3",
+            "shared-all-p3",
+            "shared-all-flow-a06-p3"
+          ],
+          "verdict": "kept",
+          "old": "kept",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -11118,6 +11993,27 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, p-hub against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:p-hub",
+            "w3f:p-hub+stretch",
+            "w3f:p-hub-multiple",
+            "w3f:p-hub-sections",
+            "w3f:p-hub-a0.2"
+          ],
+          "exercised": [
+            "hw:p-hub",
+            "w3f:p-hub+stretch",
+            "w3f:p-hub-multiple",
+            "w3f:p-hub-sections",
+            "w3f:p-hub-a0.2"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -11334,6 +12230,27 @@
             }
           },
           "note": "`hub-arcs` is at least as good as `shared` on each new win on `dense-groups`. It is better on `dense-groups`. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:hub-arcs",
+            "w3c:hub-arcs+stretch",
+            "w3f:hub-arcs+stretch",
+            "w3c:hub-arcs-q4",
+            "w3c:hub-arcs-a0.3"
+          ],
+          "exercised": [
+            "hw:hub-arcs",
+            "w3c:hub-arcs+stretch",
+            "w3f:hub-arcs+stretch",
+            "w3c:hub-arcs-q4",
+            "w3c:hub-arcs-a0.3"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -11533,6 +12450,25 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:weiszfeld",
+            "w2b:weiszfeld-a0",
+            "w2b:weiszfeld-a1",
+            "w2b:weiszfeld-corridors"
+          ],
+          "exercised": [
+            "hw:weiszfeld",
+            "w2b:weiszfeld-a0",
+            "w2b:weiszfeld-a1",
+            "w2b:weiszfeld-corridors"
+          ],
+          "verdict": "kept",
+          "old": "kept",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -11758,6 +12694,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:select",
+            "w2c:select+stretch",
+            "w2c:select-l0.5",
+            "w2c:select-l2",
+            "w2c:select-all"
+          ],
+          "exercised": [
+            "hw:select",
+            "w2c:select+stretch",
+            "w2c:select-l0.5",
+            "w2c:select-l2",
+            "w2c:select-all"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12071,6 +13028,23 @@
             }
           },
           "note": "`corridors+hysteresis` is at least as good as `corridors` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. `shared-ways+hysteresis` is at least as good as `shared-ways` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups` and equal on `hub-chain`, `many-groups`. The option `shared-ways+hysteresis` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:corridors+hysteresis",
+            "w2a:corridors-min3",
+            "w2a:shared-ways+hysteresis"
+          ],
+          "exercised": [
+            "hw:corridors+hysteresis",
+            "w2a:corridors-min3",
+            "w2a:shared-ways+hysteresis"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12236,6 +13210,20 @@
             }
           },
           "note": "The option `shared-ways+breakeven` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:corridors+breakeven",
+            "w2a:shared-ways+breakeven"
+          ],
+          "exercised": [
+            "w2a:shared-ways+breakeven"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "1 of 2 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12402,6 +13390,20 @@
             }
           },
           "note": "The option `shared-ways+stretch` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:corridors+stretch",
+            "w2a:shared-ways+stretch"
+          ],
+          "exercised": [
+            "w2a:shared-ways+stretch"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "1 of 2 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12545,6 +13547,23 @@
             }
           },
           "note": "The option `shared-ways+ambiguity` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:corridors+ambiguity",
+            "w2a:corridors+ambiguity-any",
+            "w2a:shared-ways+ambiguity"
+          ],
+          "exercised": [
+            "hw:corridors+ambiguity",
+            "w2a:corridors+ambiguity-any",
+            "w2a:shared-ways+ambiguity"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 3 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12741,6 +13760,25 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:meet",
+            "w2b:meet-near4",
+            "w2b:meet-near16",
+            "w2b:meet-corridors"
+          ],
+          "exercised": [
+            "hw:meet",
+            "w2b:meet-near4",
+            "w2b:meet-near16",
+            "w2b:meet-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -12981,6 +14019,24 @@
             }
           },
           "note": "`lanes` is at least as good as `shared-ways` on each new win on `small-clustered`, `dense-groups`. It is better on no board and equal on `small-clustered`, `dense-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:lanes",
+            "w3b:lanes-shared-ways",
+            "w3b:lanes-corridors",
+            "w3b:lanes-w16"
+          ],
+          "exercised": [
+            "hw:lanes",
+            "w3b:lanes-shared-ways",
+            "w3b:lanes-w16"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "3 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -13152,6 +14208,25 @@
             }
           },
           "note": "`nested` is at least as good as `shared` on each new win on no board. Z9 has no value, because the results of `follow` have no levels. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:nested",
+            "w3b:nested-l0",
+            "w3b:nested-l1",
+            "w3b:nested-l2"
+          ],
+          "exercised": [
+            "hw:nested",
+            "w3b:nested-l0",
+            "w3b:nested-l1",
+            "w3b:nested-l2"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -13326,6 +14401,26 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, scale-space against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:scale-space",
+            "w3f:scale-space+stretch",
+            "w3f:scale-space-p0",
+            "w3f:scale-space-l4",
+            "w3f:scale-space-l6"
+          ],
+          "exercised": [
+            "hw:scale-space",
+            "w3f:scale-space-p0",
+            "w3f:scale-space-l4",
+            "w3f:scale-space-l6"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -13469,6 +14564,21 @@
             }
           },
           "note": "The option `shared-ways+ids` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:corridors+ids",
+            "w2a:shared-ways+ids"
+          ],
+          "exercised": [
+            "hw:corridors+ids",
+            "w2a:shared-ways+ids"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "The static screen has no edits, so the two candidates give the output of their bases there. The gate acts only between two edits. The edit screen of this record (run 40573673912) shows the own move on 4 of 4 boards: each matched highway keeps its id, 1.000 against 0.087 to 0.692 for the base. So the candidates are exercised, and the verdict does not change."
         }
       }
     },
@@ -13637,6 +14747,27 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:growth",
+            "w3b:growth-s0.3",
+            "w3b:growth-s0.7",
+            "w3b:growth-t1.2",
+            "w3b:growth-input"
+          ],
+          "exercised": [
+            "hw:growth",
+            "w3b:growth-s0.3",
+            "w3b:growth-s0.7",
+            "w3b:growth-t1.2",
+            "w3b:growth-input"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -13883,6 +15014,25 @@
             }
           },
           "note": "`level-links` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:level-links",
+            "w2b:level-links-d2",
+            "w2b:level-links-none",
+            "w2b:level-links-corridors"
+          ],
+          "exercised": [
+            "hw:level-links",
+            "w2b:level-links-d2",
+            "w2b:level-links-none",
+            "w2b:level-links-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -14471,6 +15621,31 @@
             }
           },
           "note": "`shared-all-wind-p2-r1` is at least as good as `shared-all` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-p2",
+            "shared-wind-p2-r0.5",
+            "shared-wind-p2-r1",
+            "shared-wind-p2-r2",
+            "shared-wind-p3-r1",
+            "shared-wind-p2-r1-e2",
+            "shared-all-wind-p2-r1"
+          ],
+          "exercised": [
+            "shared-p2",
+            "shared-wind-p2-r0.5",
+            "shared-wind-p2-r1",
+            "shared-wind-p2-r2",
+            "shared-wind-p3-r1",
+            "shared-wind-p2-r1-e2",
+            "shared-all-wind-p2-r1"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "7 of 7 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -15205,6 +16380,25 @@
             }
           },
           "note": "The option `trunks-tree-bf04` closes a median of 0.071 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "trunks-tree-bf02",
+            "trunks-tree-bf04",
+            "trunks-tree-bf06",
+            "trunks-tree-bf08"
+          ],
+          "exercised": [
+            "trunks-tree-bf02",
+            "trunks-tree-bf04",
+            "trunks-tree-bf06",
+            "trunks-tree-bf08"
+          ],
+          "verdict": "screened",
+          "old": "screened",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -15714,6 +16908,29 @@
             }
           },
           "note": "`zipper` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `hub-chain`. It is better on `small-clustered`, `dense-groups`, `hub-chain`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:zipper",
+            "w2b:zipper-a1",
+            "w2b:zipper-near2",
+            "w2b:zipper-p2",
+            "w2b:zipper-none",
+            "w2b:zipper-corridors"
+          ],
+          "exercised": [
+            "hw:zipper",
+            "w2b:zipper-a1",
+            "w2b:zipper-near2",
+            "w2b:zipper-p2",
+            "w2b:zipper-none",
+            "w2b:zipper-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "6 of 6 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -15916,6 +17133,21 @@
           "verdict": "kept",
           "old": "kept",
           "note": "The screen field of the record decides on B1 against the order input, not on the board count of B1 and the B3 q95. With the strict rule, B1 of the order span is better on 3 of 4 boards and worse on many-groups (0.718 against 0.722). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-order-input",
+            "shared-all-order-input"
+          ],
+          "exercised": [
+            "shared-order-input",
+            "shared-all-order-input"
+          ],
+          "verdict": "kept",
+          "old": "kept",
+          "note": "2 of 2 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -16361,6 +17593,19 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "corners-gap8"
+          ],
+          "exercised": [
+            "corners-gap8"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "1 of 1 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -16687,6 +17932,25 @@
             }
           },
           "note": "The option `shared-all-snell` closes a median of -0.004 of the gap, with the rule `all`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-snell",
+            "shared-flow-a06-snell",
+            "shared-all-snell",
+            "shared-all-flow-a06-snell"
+          ],
+          "exercised": [
+            "shared-snell",
+            "shared-flow-a06-snell",
+            "shared-all-snell",
+            "shared-all-flow-a06-snell"
+          ],
+          "verdict": "kept",
+          "old": "kept",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -17596,6 +18860,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, fdeb against shared wins 0 of 4 boards (0 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:fdeb",
+            "w3d:fdeb+stretch",
+            "w3d:fdeb-nobudget",
+            "w3d:fdeb-nopush"
+          ],
+          "exercised": [
+            "hw:fdeb",
+            "w3d:fdeb+stretch",
+            "w3d:fdeb-nobudget",
+            "w3d:fdeb-nopush"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -19075,6 +20358,25 @@
           "verdict": "dropped",
           "old": "dropped",
           "note": "With the strict rule, kdeeb-routes against shared wins 2 of 4 boards (2 with the old rule). The verdict does not change."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:kdeeb",
+            "w3d:kdeeb+stretch",
+            "w3d:kdeeb-nomask",
+            "w3d:kdeeb-routes"
+          ],
+          "exercised": [
+            "hw:kdeeb",
+            "w3d:kdeeb+stretch",
+            "w3d:kdeeb-nomask",
+            "w3d:kdeeb-routes"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -20526,6 +21828,19 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "corners-side"
+          ],
+          "exercised": [
+            "corners-side"
+          ],
+          "verdict": "kept",
+          "old": "kept",
+          "note": "1 of 1 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -20666,6 +21981,19 @@
             }
           },
           "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "corners-gap6"
+          ],
+          "exercised": [
+            "corners-gap6"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "1 of 1 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -20997,6 +22325,27 @@
             }
           },
           "note": "`stubs` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `many-groups`. The option `stubs-source` closes a median of 0 of the gap, with the rule `all`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:stubs",
+            "w2b:stubs-source",
+            "w2b:stubs-w15",
+            "w2b:stubs-none",
+            "w2b:stubs-corridors"
+          ],
+          "exercised": [
+            "hw:stubs",
+            "w2b:stubs-source",
+            "w2b:stubs-w15",
+            "w2b:stubs-none",
+            "w2b:stubs-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -21798,6 +23147,21 @@
             }
           },
           "note": "The option `shared-all-order-shortest` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "shared-order-shortest",
+            "shared-all-order-shortest"
+          ],
+          "exercised": [
+            "shared-order-shortest",
+            "shared-all-order-shortest"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "2 of 2 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -22436,6 +23800,27 @@
             }
           },
           "note": "`od-cells` is at least as good as `shared` on each new win on no board. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:od-cells",
+            "w2c:od-cells+stretch",
+            "w2c:od-cells-l1",
+            "w2c:od-cells-l3",
+            "w2c:od-cells-shared"
+          ],
+          "exercised": [
+            "hw:od-cells",
+            "w2c:od-cells+stretch",
+            "w2c:od-cells-l1",
+            "w2c:od-cells-l3",
+            "w2c:od-cells-shared"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "5 of 5 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -22730,6 +24115,25 @@
             }
           },
           "note": "`level-links` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:level-links",
+            "w2b:level-links-d2",
+            "w2b:level-links-none",
+            "w2b:level-links-corridors"
+          ],
+          "exercised": [
+            "hw:level-links",
+            "w2b:level-links-d2",
+            "w2b:level-links-none",
+            "w2b:level-links-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "4 of 4 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },
@@ -23089,6 +24493,29 @@
             }
           },
           "note": "`zipper` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+        },
+        "activation": {
+          "date": "2026-10-28",
+          "run": "https://github.com/mark1russell7/highways/actions/runs/40628435755",
+          "candidates": [
+            "hw:zipper",
+            "w2b:zipper-a1",
+            "w2b:zipper-near2",
+            "w2b:zipper-p2",
+            "w2b:zipper-none",
+            "w2b:zipper-corridors"
+          ],
+          "exercised": [
+            "hw:zipper",
+            "w2b:zipper-a1",
+            "w2b:zipper-near2",
+            "w2b:zipper-p2",
+            "w2b:zipper-none",
+            "w2b:zipper-corridors"
+          ],
+          "verdict": "dropped",
+          "old": "dropped",
+          "note": "6 of 6 candidates are exercised on a decision board. The verdict does not change."
         }
       }
     },

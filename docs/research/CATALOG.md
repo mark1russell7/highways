@@ -238,14 +238,14 @@ A strategy that does not do its own move on any board was not tested. Its verdic
 
 #### The silent strategies of waves 1 to 3
 
-The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/highways/actions/runs/40628435755)) examined 289 strategies on 8 decision inputs. 17 strategies are silent. They go to a rebuild wave. The reasons come from the move counts and the code. A diagnostic run has not yet confirmed each reason.
+The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/highways/actions/runs/40628435755)) examined 289 strategies on 8 decision inputs. 17 strategies are silent. 15 of them go to a rebuild wave. The reasons come from the move counts and the code. A diagnostic run has not yet confirmed each reason.
 
 | Strategies | Reason |
 |---|---|
 | `hw:power`, `w3e:power-near`, `w3e:power-saved1` | The finder makes 0 power edges on each decision input. Equal neighbour sets are rare, and the near match with Jaccard 0.8 is too strict. The scope `collection` fires. |
 | `w3e:power+stretch` | The gate has no edge to cut, because its base `hw:power` is silent. |
 | `hw:corridors+breakeven`, `hw:corridors+stretch`, `w2a:corridors+breakeven-a0`, `w2a:corridors+stretch-1.1`, `w2a:corridors+stretch-1.5`, `w2a:corridors+stretch+breakeven` | A corridor holds edges of one signature. Their routes stay in the stretch budget and break even, so the gate removes no edge. The same gates fire on `shared-ways`. |
-| `hw:corridors+ids`, `w2a:shared-ways+ids` | The gate `ids` acts only between two edits. The static screen has no edits. This silence comes from the measurement, so `HWY-054` needs an edit screen. |
+| `hw:corridors+ids`, `w2a:shared-ways+ids` | The gate `ids` acts only between two edits, and the static screen has no edits. The edit screen of `HWY-054` shows the move on 4 of 4 boards, so its verdict stays. |
 | `w3b:lanes-corridors` | The lanes change nothing on the plan of `corridors`. |
 | `w2c:flow-field+stretch`, `w3f:consensus+stretch`, `w3f:link-communities+stretch`, `w3f:scale-space+stretch` | No edge of these finders is longer than 1.2 times its route alone, so the gate cuts no edge. |
 
