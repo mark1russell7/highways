@@ -1,11 +1,12 @@
 # The screen: the cheap test of each new idea before a full build. It runs the strategies of one step on the screen set
 # and keeps one JSON record for each run (screen.jsonl) and a short summary (screen.md) as an artifact.
-# A pull request that changes the screen runs the screen of the routers, so the time of a full screen stays known.
+# A pull request that changes the core source or the screen runs the screens of the routers and of the highways.
+# Thus the records of each change are known, and the pull request needs no manual dispatch.
 name: Screen
 
 on:
   pull_request:
-    paths: ["packages/core/src/bench/screen/**", "packages/core/scripts/screen.ts", "corpus/**", ".github/workflows/screen.yml"]
+    paths: ["packages/core/src/**", "packages/core/scripts/screen.ts", "corpus/**", ".github/workflows/screen.yml"]
   workflow_dispatch:
     inputs:
       step:
@@ -83,8 +84,13 @@ jobs:
     if: ${{ !inputs.exact && !inputs.time && !inputs.report }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # A pull request screens both steps. A dispatch screens its own step.
+        step: ${{ fromJSON(github.event_name == 'pull_request' && '["router","highway"]' || format('["{0}"]', inputs.step || 'router')) }}
     env:
-      STEP: ${{ inputs.step || 'router' }}
+      STEP: ${{ matrix.step }}
       STRATEGY: ${{ inputs.strategy || '' }}
       MODULE: ${{ inputs.module || '' }}
       FAMILIES: ${{ inputs.families || '' }}
@@ -129,7 +135,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: screen-${{ inputs.set || 'screen-v1' }}-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
+          name: screen-${{ inputs.set || 'screen-v1' }}-${{ matrix.step }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
           path: |
             screen.jsonl
             screen.md
