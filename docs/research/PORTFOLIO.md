@@ -329,7 +329,7 @@ The prediction was written before the work.
 
 ## The portfolio at each cap (EXACT-BOUNDS)
 
-This section is the result of the item EXACT-BOUNDS of the [roadmap](../ROADMAP.md). The curve of PORTFOLIO-RULE now runs at each cap: 1.1, 1.25 and 1.5. [`BOUNDS.md`](BOUNDS.md) gives the bounds past 10 nodes.
+This section is the result of the item EXACT-BOUNDS of the [roadmap](../ROADMAP.md). The curve of PORTFOLIO-RULE also runs at each cap: 1.1, 1.25 and 1.5. [`BOUNDS.md`](BOUNDS.md) gives the bounds past 10 nodes.
 
 - The records come from the CI run [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) of the workflow `Screen` on `exact-v1`. The run has 11880 records of 297 strategies, with wave 3F.
 - The report comes from the CI run [40633116748](https://github.com/mark1russell7/highways/actions/runs/40633116748) of the workflow `Portfolio`.

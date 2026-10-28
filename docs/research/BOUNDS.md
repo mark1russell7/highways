@@ -40,7 +40,7 @@ Above 10 nodes, HiGHS proves few optima in 300 s. A solve without a proof gives 
 The objective of the model is the ink plus a small cost of the length (0.001 for each unit). Thus the ratio of the bound to the objective is approximately a ratio of the ink.
 
 - The interval of the optimum B1 is from `b` to `1 - (1 - b) × bound / objective`.
-- The low end is a plan that exists. The high end supposes that the ink of the optimum is at least `bound / objective` times the ink of the incumbent, with the same length of the routes.
+- The low end is a plan that exists. The high end supposes that the ink of the optimum is at least `bound / objective` times the ink of the incumbent. It also supposes the same length of the routes.
 - Without a positive bound, the high end is 1. At a proven optimum, the two ends are equal.
 - The high end is an estimate, not a proof. A plan with other route lengths can have a different ratio of ink.
 
@@ -169,7 +169,7 @@ The prediction of the item was written before the work.
 |---|---|---|
 | 1. At 18 and 24 nodes, the first 5 are the first 5 at 10 nodes, in any order. | 1 of 12 cells: `all` at 1.25 and 18 nodes. With `all` at 1.25 and 1.5, 4 of 5 stay. With `collection`, 0 of 5 stay. | Not met |
 | 2. At 40 nodes, the median width of the first 5 is 0.3 or more. | 0.000 to 0.100. The largest is `all` at the cap 1.1. | Not met |
-| 3. Under the rule `all`, `growth` is first at each size where the intervals rank. | The intervals rank at each size. At the cap 1.5, `growth` is first at 18, 24 and 40 nodes, but `w3e:mlseb-parabola` is first at 10 nodes. At 1.1 and 1.25, `growth` is never first. | Not met |
+| 3. Under the rule `all`, `growth` is first at each size where the intervals rank. | The intervals rank at each size. At the cap 1.5, `growth` is first at 18, 24 and 40 nodes, but `w3e:mlseb-parabola` is first at 10 nodes. At 1.1 and 1.25, `growth` is not first at any size. | Not met |
 | 4. At the cap 1.1, the oracle gain of `collection` is larger than at the cap 1.5. | 0.325 at 1.1, against 0.370 at 1.5 ([`PORTFOLIO.md`](PORTFOLIO.md#the-portfolio-at-each-cap-exact-bounds)). | Not met |
 | 5. No default output changes, so no release. | The item adds data, scripts and docs. No default changes. | Met |
 
