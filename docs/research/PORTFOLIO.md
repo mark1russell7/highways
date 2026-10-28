@@ -464,6 +464,7 @@ The median time of the router, one member after the other, on a CI machine. `sha
 - At 40 nodes and k = 3, the router takes 51 to 176 ms. The members take most of it: the records of EXACT-BOUNDS give 33 to 164 ms for `shared` and the same 3 members. The key adds approximately 10 to 20 ms.
 - The set of `all` at the cap 1.25 holds `w3d:kdeeb-routes` and `w3e:mlseb+stretch`. They are the slowest members.
 - On `screen-v1`, the boards of 96 to 150 nodes take 0.4 to 1.8 s (median), against 20 ms for `shared`. The sets come from boards of 40 nodes or fewer. Above 40 nodes, set `budgetMs` to keep the time in a limit.
+- The workflow `Bench` races the router with its defaults in the part `opt-in`. In the run [40651207340](https://github.com/mark1russell7/highways/actions/runs/40651207340), the router took 1.1 s at 100 nodes, 32 s at 400 nodes and 546 s at 1 000 nodes. So the part stops at 400 nodes.
 
 ### The predictions of PORTFOLIO-API
 
