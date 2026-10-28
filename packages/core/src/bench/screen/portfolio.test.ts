@@ -271,6 +271,10 @@ describe("the portfolio with the rule of the caller (PORTFOLIO-RULE)", () => {
   it("chooses only among the runs at or below the cap, and gives the greedy sets of each rule and cap on all inputs (EXACT-BOUNDS)", () => {
     const table = runTable(RULE_RECORDS);
     expect([...capTable(table, 1.25).get("t/x/s0")!.keys()].sort()).toEqual(["a", "d", "f", "shared"]);
+    // The baseline `shared` stays as the fallback output, also above the cap, and it keeps its value there.
+    const wide = runTable(RULE_RECORDS.map((r) => (r.strategy === "shared" ? { ...r, measures: { ...r.measures, [MODEL_STRETCH]: 1.2 } } : r)));
+    expect([...capTable(wide, 1.1).get("t/x/s0")!.keys()].sort()).toEqual(["a", "d", "f", "shared"]);
+    expect(capValue(wide, "collection", 1.1, OPTIMA, ruleBaselines(table, OPTIMA))("t/x/s0", "shared")).toBeCloseTo(0);
     expect(API_KS).toEqual([3, 5, 8]);
     const pool = Object.keys(RUNS).sort();
     const forms = ruleForms(table, seedSplits(IN), pool, OPTIMA, { ks: [1], apiKs: [1, 2] });

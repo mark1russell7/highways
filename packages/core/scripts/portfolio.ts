@@ -384,6 +384,7 @@ export function ruleBaselines(table: RunTable, optima: readonly ExactOptimum[]):
 /**
  * This function gives the gap closed of the rule `rule` at the one cap `cap` for each run: `(b1 - base) / (the optimum at the cap - base)`.
  * A run with a stretch above the cap has no value. A run that does not obey the rule, or an input without a proven optimum at the cap, has no value.
+ * The baseline `shared` is the fallback output of the portfolio. Thus it has a value at each cap, also when its own stretch is above the cap.
  * For one input, the value is a linear map of B1 with a positive slope. Thus the best B1 also has the best value.
  */
 export function capValue(table: RunTable, rule: GapRule, cap: number, optima: readonly ExactOptimum[], bases: ReadonlyMap<string, Partial<Record<GapRule, number>>>): ValueOf {
@@ -392,7 +393,8 @@ export function capValue(table: RunTable, rule: GapRule, cap: number, optima: re
     const r = table.get(input)?.get(strategy);
     const o = opt.get(input);
     const base = bases.get(input)?.[rule];
-    if (r === undefined || !obeys(r, rule) || o === undefined || base === undefined || r.stretch === undefined || r.stretch > cap + 1e-9) return undefined;
+    if (r === undefined || !obeys(r, rule) || o === undefined || base === undefined) return undefined;
+    if (strategy !== PORTFOLIO_BASE && (r.stretch === undefined || r.stretch > cap + 1e-9)) return undefined;
     return gapClosed(r.b1, base, o);
   };
 }
@@ -522,10 +524,10 @@ export const API_KS: readonly number[] = [3, 5, 8];
 
 /**
  * This function gives the run table with only the runs at or below the cap `cap`. The portfolio of the cap chooses only among these runs.
- * A run without a stretch has no value at a cap, so it is not in the table.
+ * A run without a stretch has no value at a cap, so it is not in the table. The baseline `shared` stays in the table as the fallback output, also above the cap.
  */
 export function capTable(table: RunTable, cap: number): Map<string, Map<string, Run>> {
-  return new Map([...table].map(([i, row]) => [i, new Map([...row].filter(([, r]) => r.stretch !== undefined && r.stretch <= cap + 1e-9))]));
+  return new Map([...table].map(([i, row]) => [i, new Map([...row].filter(([s, r]) => s === PORTFOLIO_BASE || (r.stretch !== undefined && r.stretch <= cap + 1e-9)))]));
 }
 
 /** One form of the portfolio of PORTFOLIO-RULE: the rule of the caller, and the cap of the value (`undefined` for the cap of each run). */
