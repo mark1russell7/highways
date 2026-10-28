@@ -22,7 +22,8 @@ describe("the idea catalog (IDEA0)", () => {
   });
 
   it("finds the faults that it must find", () => {
-    const base = ideas.find((r) => r.id === "HWY-001")!;
+    // The copy has no result, so the stage "dropped" is a fault.
+    const base = Object.fromEntries(Object.entries(ideas.find((r) => r.id === "HWY-001")!).filter(([k]) => k !== "result")) as Idea;
     const bad: Idea[] = [
       { ...base, id: "HWY-999", stage: "dropped", related: ["HWY-998"], wins: ["Q7"], screen: "B99 falls" },
       { ...base, id: "HWY-999", kind: "guess" },
