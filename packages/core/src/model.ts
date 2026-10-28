@@ -1,3 +1,4 @@
+import { portPoint } from "@mark1russell7/layout-contract";
 import type { Box, Point } from "./geom.ts";
 
 /** A side of a node box. */
@@ -5,7 +6,8 @@ export type Side = "north" | "east" | "south" | "west";
 
 /**
  * A plug of a node: a place where edges go into the node.
- * A plug with `at` is fixed. The router does not move it. A plug without `at` is free: the router places it.
+ * A plug with `at` is fixed. The router does not move it. A plug with `side` and `along` is fixed too.
+ * Another plug is free: the router places it.
  */
 export interface Port {
   readonly id: string;
@@ -13,6 +15,12 @@ export interface Port {
   readonly at?: Point;
   /** This side is where a free plug goes. Without it, the router picks the side. */
   readonly side?: Side;
+  /**
+   * This fraction from 0 to 1 fixes the plug on its `side`. The plug is at the side start plus `along` times the side length.
+   * The start of `north` and `south` is the left end. The start of `east` and `west` is the top end.
+   * A plug with `along` needs a `side` and has no `at`. `resolvePorts` throws a `RangeError` for a bad value.
+   */
+  readonly along?: number;
 }
 
 /** A node: a box that routes must not go through. */
@@ -131,10 +139,58 @@ export function nodeIndex(g: Graph): Map<string, Node> {
   return m;
 }
 
-/** This function gives the absolute place of a fixed plug, or `undefined` for a free plug or no plug. */
+/** The names of the sides in `@mark1russell7/layout-contract`. */
+const CONTRACT_SIDE = { north: "top", east: "right", south: "bottom", west: "left" } as const;
+
+/**
+ * This function gives the place of a fixed plug, relative to the top-left corner of the node box, or `undefined` for a free plug.
+ * A plug with `at` gives `at`. A plug with `side` and `along` gives the point of `portPoint` of `@mark1russell7/layout-contract`.
+ */
+export function portOffset(box: Box, port: Port): Point | undefined {
+  if (port.at !== undefined) return port.at;
+  if (port.side === undefined || port.along === undefined) return undefined;
+  return portPoint(box, { id: port.id, side: CONTRACT_SIDE[port.side], along: port.along });
+}
+
+/** This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`. */
+export function checkPort(node: Node, port: Port): void {
+  if (port.along === undefined) return;
+  const at = `The plug "${port.id}" of the node "${node.id}"`;
+  if (typeof port.along !== "number" || !Number.isFinite(port.along) || port.along < 0 || port.along > 1)
+    throw new RangeError(`${at} has the along value ${String(port.along)}. It must be a finite number from 0 to 1.`);
+  if (port.side === undefined) throw new RangeError(`${at} has an along value and no side. A plug with along needs a side.`);
+  if (port.at !== undefined) throw new RangeError(`${at} has an along value and an at point. Give one of the two.`);
+}
+
+/**
+ * This function checks the plugs of a graph, and gives each plug with `side` and `along` a fixed `at`. The plug keeps its `side`.
+ * Each router calls it at the start of `route`, so all routers agree. A graph without `along` comes back as the same object.
+ * It throws a `RangeError` for a bad `along` (`checkPort`).
+ */
+export function resolvePorts(graph: Graph): Graph {
+  let found = false;
+  for (const n of graph.nodes)
+    for (const p of n.ports ?? []) {
+      checkPort(n, p);
+      if (p.along !== undefined) found = true;
+    }
+  if (!found) return graph;
+  const nodes = graph.nodes.map((n): Node => {
+    if (!n.ports?.some((p) => p.along !== undefined)) return n;
+    const ports = n.ports.map((p): Port => {
+      if (p.along === undefined) return p;
+      return { id: p.id, side: p.side!, at: portOffset(n.box, p)! };
+    });
+    return { ...n, ports };
+  });
+  return { ...graph, nodes };
+}
+
+/** This function gives the absolute place of a fixed plug, or `undefined` for a free plug or no plug. A plug with `side` and `along` is fixed. */
 export function fixedPortPoint(node: Node, end: End): Point | undefined {
   if (end.port === undefined) return undefined;
   const p = node.ports?.find((q) => q.id === end.port);
-  if (p?.at === undefined) return undefined;
-  return { x: node.box.x + p.at.x, y: node.box.y + p.at.y };
+  const at = p === undefined ? undefined : portOffset(node.box, p);
+  if (at === undefined) return undefined;
+  return { x: node.box.x + at.x, y: node.box.y + at.y };
 }

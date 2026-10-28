@@ -12,6 +12,8 @@ export interface LayoutPort {
   /** The fixed place of the port, from the top-left corner of the box. The router does not move a port with `x` and `y`. */
   readonly x?: number;
   readonly y?: number;
+  /** The fixed place of the port on its `side`: a fraction from 0 to 1, from the top end or the left end of the side. */
+  readonly along?: number;
 }
 
 /** A point of a region: `[x, y]`. The y axis points down. */
@@ -238,18 +240,20 @@ function sideAt(p: { x: number; y: number }, w: number, h: number): LayoutSide {
 const num = round3;
 
 function portToFile(p: Port, n: Node): LayoutPort {
+  if (p.along !== undefined) return { id: p.id, ...(p.side ? { side: TO_FILE[p.side] } : {}), along: p.along };
   const side = p.side ? TO_FILE[p.side] : p.at ? sideAt(p.at, n.box.w, n.box.h) : undefined;
   return { id: p.id, ...(side ? { side } : {}), ...(p.at ? { x: num(p.at.x), y: num(p.at.y) } : {}) };
 }
 
 function portToModel(p: LayoutPort): Port {
+  if (p.along !== undefined) return { id: p.id, ...(p.side ? { side: TO_MODEL[p.side] } : {}), along: p.along };
   if (p.x !== undefined && p.y !== undefined) return { id: p.id, at: { x: p.x, y: p.y } };
   return { id: p.id, ...(p.side ? { side: TO_MODEL[p.side] } : {}) };
 }
 
 /**
  * This function writes a graph as an input file of the form `layout-input/1`, with its hash.
- * A fixed plug gets `x`, `y` and the side that holds it. `inputGraph` reads the file back.
+ * A fixed plug gets `x`, `y` and the side that holds it. A plug with `along` keeps its `side` and `along`. `inputGraph` reads the file back.
  */
 export function graphInput(graph: Graph, head: LayoutInputHead): LayoutInput {
   const boxes = graph.nodes.map(
