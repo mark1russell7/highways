@@ -2,30 +2,6 @@
   "description": "MEAS3: the measures that the ideas need and that the MEASURES table of the screen does not have. meas0 holds the ids of MEASURES.md. proposed holds new measures.",
   "meas0": [
     {
-      "id": "R12",
-      "name": "Lane separation"
-    },
-    {
-      "id": "R14",
-      "name": "Orthogonality"
-    },
-    {
-      "id": "B5",
-      "name": "Lane crossings"
-    },
-    {
-      "id": "B7",
-      "name": "Occupied area"
-    },
-    {
-      "id": "B8",
-      "name": "Run profile"
-    },
-    {
-      "id": "B9",
-      "name": "Lane fidelity"
-    },
-    {
       "id": "C4",
       "name": "Curvature variation"
     },
@@ -54,20 +30,8 @@
       "name": "Counts sum"
     },
     {
-      "id": "Z2",
-      "name": "Link ends"
-    },
-    {
       "id": "Z5",
       "name": "Level ratio"
-    },
-    {
-      "id": "Z9",
-      "name": "Link agreement"
-    },
-    {
-      "id": "M1",
-      "name": "Area"
     },
     {
       "id": "M2",
@@ -76,10 +40,6 @@
     {
       "id": "M3",
       "name": "Displacement"
-    },
-    {
-      "id": "M4",
-      "name": "Lane routes through boxes"
     },
     {
       "id": "M5",

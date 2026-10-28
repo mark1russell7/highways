@@ -209,6 +209,43 @@ describe("screen", () => {
     expect(m["route.bundle.stretch.median"]).toBe(1);
   });
 
+  it("writes the measures of MEAS3A for each router record", () => {
+    const r = one.records[0]!;
+    const names = ["route.lane.separation", "route.orthogonality", "route.bundle.lane-crossings", "route.bundle.occupied-area", "route.bundle.runs", "route.bundle.run-edges.median", "route.bundle.run-edges.max", "route.lane.area", "route.lane.through", "route.level.link-ends"];
+    for (const name of names) expect(r.measures[name], name).toBeTypeOf("number");
+    // corners gives no run, so it has no lane to open, no lane fidelity and no lane crossing.
+    expect(r.measures["route.bundle.runs"]).toBe(0);
+    expect(r.measures["route.bundle.lane-crossings"]).toBe(0);
+    expect(r.measures["route.bundle.lane-fidelity.median"]).toBeUndefined();
+    expect(r.measures["route.level.link-ends"]).toBe(r.hard["link-ends"]);
+  });
+
+  it("counts the breaks of `link-ends` as Z2, and gives Z9 for a result with zoom levels", () => {
+    const corners = getStrategy(STRATEGIES, "router", "corners");
+    // One level with two groups: the first two nodes in the box of the first node, and the other nodes in the box of the third node.
+    // The link joins the centers of the two boxes, so it breaks `link-ends`.
+    const proto = defineStrategy({
+      step: "router",
+      name: "proto-levels",
+      describe: "corners, with one level whose link starts and ends inside its items.",
+      defaults: {},
+      run: (graph) => {
+        const result = corners.run(graph);
+        const [a, , c] = graph.nodes;
+        const items = [
+          { id: "g1", box: a!.box, nodes: graph.nodes.slice(0, 2).map((n) => n.id) },
+          { id: "g2", box: c!.box, nodes: graph.nodes.slice(2).map((n) => n.id) },
+        ];
+        const mid = (b: (typeof items)[number]["box"]) => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 });
+        return { ...result, levels: [{ depth: 0, items, links: [{ source: "g1", target: "g2", count: 1, points: [mid(a!.box), mid(c!.box)] }] }] };
+      },
+    });
+    const m = screen("router", [proto], { inputs: [tiny], baseline: false }).records[0]!.measures;
+    expect(m["route.level.link-ends"]).toBe(1);
+    expect(m["route.level.link-agreement"]).toBeTypeOf("number");
+    expect(one.records[0]!.measures["route.level.link-agreement"]).toBeUndefined();
+  });
+
   it("adds the wrapped routers of `wrap`, and the order fragility of `shuffles`", () => {
     const report = screen("router", ["corners"], { inputs: [tiny], baseline: false, wrap: ["stable", "repair"], shuffles: 3 });
     expect(report.records.map((r) => r.strategy)).toEqual(["corners", "corners+stable", "corners+repair"]);

@@ -1,5 +1,5 @@
-import { center, dist } from "../../geom.ts";
-import type { Graph, Level } from "../../model.ts";
+import { center, dist, pointBoxDistance, polylineLength, type Box, type Point } from "../../geom.ts";
+import type { Graph, Level, Route } from "../../model.ts";
 import { kendallTau } from "./stats.ts";
 
 /** This function gives the levels in the order of their depth, from the far view to the near view. */
@@ -100,4 +100,88 @@ export function orderStability(graph: Graph, levels: readonly Level[]): number {
     n++;
   }
   return n ? sum / n : 1;
+}
+
+/** This function gives the points of a polyline at most `step` apart: each vertex, and evenly spaced points on each longer segment. */
+function samplePolyline(p: readonly Point[], step: number): Point[] {
+  const out: Point[] = [];
+  for (let i = 0; i < p.length; i++) {
+    const b = p[i]!;
+    if (i > 0) {
+      const a = p[i - 1]!;
+      const n = Math.ceil(dist(a, b) / step);
+      for (let k = 1; k < n; k++) out.push({ x: a.x + ((b.x - a.x) * k) / n, y: a.y + ((b.y - a.y) * k) / n });
+    }
+    out.push(b);
+  }
+  return out;
+}
+
+/** This function gives the Hausdorff distance between two sets of points. Both sets have one point or more. */
+function hausdorff(a: readonly Point[], b: readonly Point[]): number {
+  const directed = (p: readonly Point[], q: readonly Point[]): number => {
+    let worst = 0;
+    for (const x of p) {
+      let best = Number.POSITIVE_INFINITY;
+      for (const y of q) best = Math.min(best, dist(x, y));
+      worst = Math.max(worst, best);
+    }
+    return worst;
+  };
+  return Math.max(directed(a, b), directed(b, a));
+}
+
+/** The number of points of the sample of one polyline for the link agreement, at most. */
+const AGREEMENT_SAMPLES = 64;
+
+/**
+ * This function gives the link agreement of the levels with groups (Z9 of MEAS0).
+ * `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u`, with `u` the argument `unit`.
+ * The edges of a link are the edges between a node of one item and a node of the other item, in either direction.
+ *
+ * The function samples each polyline at points `u / 4` apart, with at most 64 points for each polyline. It keeps the points outside the boxes of the two items.
+ * A link without such points on both sides does not count. It gives `undefined` when no link counts.
+ * The value has no unit, and lower is better. The cost is quadratic in the points of each link.
+ */
+export function linkAgreement(graph: Graph, levels: readonly Level[], routes: readonly Route[], unit: number): number | undefined {
+  const u = unit > 0 ? unit : 1;
+  const endsOf = new Map(graph.edges.map((e) => [e.id, [e.source.node, e.target.node] as const]));
+  const sample = (p: readonly Point[], boxes: readonly Box[]): Point[] => {
+    const step = Math.max(u / 4, polylineLength(p) / AGREEMENT_SAMPLES);
+    return samplePolyline(p, step).filter((q) => boxes.every((b) => pointBoxDistance(q, b) > 0));
+  };
+  let sum = 0;
+  let n = 0;
+  for (const level of levels) {
+    if (!level.items.some((i) => i.nodes.length > 1)) continue;
+    const itemOf = itemIndex(level);
+    const indexOf = new Map(level.items.map((it, i) => [it.id, i] as const));
+    // The edges between each pair of items, by the key of the pair.
+    const between = new Map<string, Route[]>();
+    for (const r of routes) {
+      const ends = endsOf.get(r.edge);
+      if (!ends) continue;
+      const i = itemOf.get(ends[0]);
+      const j = itemOf.get(ends[1]);
+      if (i === undefined || j === undefined || i === j) continue;
+      const key = i < j ? `${i},${j}` : `${j},${i}`;
+      const list = between.get(key);
+      if (list) list.push(r);
+      else between.set(key, [r]);
+    }
+    for (const link of level.links) {
+      const i = indexOf.get(link.source);
+      const j = indexOf.get(link.target);
+      if (i === undefined || j === undefined || i === j) continue;
+      const mine = between.get(i < j ? `${i},${j}` : `${j},${i}`);
+      if (!mine) continue;
+      const boxes = [level.items[i]!.box, level.items[j]!.box];
+      const a = sample(link.points, boxes);
+      const b = mine.flatMap((r) => sample(r.points, boxes));
+      if (a.length === 0 || b.length === 0) continue;
+      sum += hausdorff(a, b) / u;
+      n++;
+    }
+  }
+  return n > 0 ? sum / n : undefined;
 }
