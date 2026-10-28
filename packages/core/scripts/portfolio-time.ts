@@ -9,11 +9,15 @@
 // Then `--shard` splits the boards, not the strategies. `pnpm portfolio:time --summary <path,...>` writes the table of such lines, and times nothing.
 // With `--check-stretch`, the script times nothing. It routes each input of `exact-v1`, `exact-v1-bounds` and `screen-v1` with each strategy of the pool.
 // Then it compares the stretch of each edge of `exactStretches` with the stretch of `exactStretchesReference` (`stretchCheck`). The summary counts each difference above `RECORD_EPS`.
+// With `--guard-records`, the script times nothing. It routes the boards of `exact-v1` at the sizes `--sizes` with each member of the portfolio router (`guardRecord`).
+// Each line is a record with the values of the guard: B1, the stretch of the model, the flag of mixed collections and the hard breaks. The sizes above 40 nodes have no optima.
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
+import { B1, MIXED, type OracleRecord } from "./oracle.ts";
+import { MODEL_STRETCH } from "./portfolio.ts";
 import { exactStretches, exactStretchesReference } from "../src/bench/exact/index.ts";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { checkProperties } from "../src/bench/properties.ts";
@@ -227,6 +231,34 @@ export function stretchCheckSummary(lines: readonly StretchCheck[]): string {
   return out.join("\n") + "\n";
 }
 
+/** The id of a board of `--guard-records`: `exact-large/<class>-n<nodes>/s<seed>`. The set has the boards of `exact-v1` at sizes without optima. */
+export function largeInputId(cls: string, nodes: number, seed: number): string {
+  return `exact-large/${cls}-n${nodes}/s${seed}`;
+}
+
+/** This function counts the breaks of each hard rule in a list of breaks. */
+function ruleCounts(breaks: readonly { readonly rule: string }[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const b of breaks) out[b.rule] = (out[b.rule] ?? 0) + 1;
+  return out;
+}
+
+/**
+ * This function gives the record of the guard of one strategy on one board (`--guard-records`): B1, the largest stretch of the model, the flag of mixed collections and the hard breaks.
+ * The values are the values of the key of the router (`portfolioKey`). A strategy above its node limit gives a skipped record.
+ */
+export function guardRecord(strategy: Strategy<"router", object>, input: string, seed: number, graph: Graph): OracleRecord & { readonly nodes: number } {
+  const head = { strategy: strategy.name, input, seed, nodes: graph.nodes.length };
+  if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) return { ...head, measures: {}, skipped: `over ${strategy.maxNodes} nodes` };
+  const result = asRouter(strategy).route(graph);
+  const stretch = Math.max(1, ...exactStretches(graph)(result.routes).values());
+  return {
+    ...head,
+    measures: { [B1]: inkSaved(result.routes), [MODEL_STRETCH]: stretch, [MIXED]: mixedSegments(graph, result) > 0 ? 1 : 0 },
+    hard: ruleCounts(checkProperties(graph, result, 1_000_000)),
+  };
+}
+
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
   const i = args.indexOf(name);
@@ -257,6 +289,18 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     const mine = boards.filter((_, i) => i % shards === shard);
     process.stderr.write(`${mine.length} of ${boards.length} boards in the shard ${shard}/${shards}.\n`);
     const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
+    writeFileSync(out, lines.join("\n") + "\n");
+    process.exit(0);
+  }
+  if (args.includes("--guard-records")) {
+    const pool = memberStrategies().filter((_, i) => i % shards === shard);
+    const boards = sizes.flatMap((n) => EXACT_CLASSES.flatMap((cls: ExactClass) => seeds.map((k) => ({ id: largeInputId(cls, n, k), k, graph: exactBoard(cls, n, k) }))));
+    process.stderr.write(`${pool.length} members and ${boards.length} boards in the shard ${shard}/${shards}.\n`);
+    const lines: string[] = [];
+    for (const s of pool) {
+      for (const b of boards) lines.push(JSON.stringify(guardRecord(s, b.id, b.k, b.graph)));
+      process.stderr.write(`${s.name}: done\n`);
+    }
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
