@@ -108,6 +108,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL15 | Version 0.8.1 on npm. PATCH: ROUTE-SCALE (#132) routes a dense board of 1000 boxes approximately 10 times faster with `shared`, `shared-all` and `portfolio`. The output does not change. | 2026-10-28 | #135 |
 | CORPUS-SEEDS | [The corpus `screen-v2`](research/CATALOG.md#the-corpus-screen-v2-corpus-seeds): the 6 families of `screen-v1` with 10 seeds each, and the split file `corpus-split/1`, which holds out the seeds 7 to 9. The seeds 0 to 2 give the boards and the records of `screen-v1`. With 10 seeds, `territories` leaves the highway front. | 2026-10-28 | #136 |
 | VERDICT | The shared block "The verdict over families" from layout-contract #49. The family is the unit of a verdict, and a verdict counts only when it holds under both weightings. Step 1 of SCREEN-WEIGHT. | 2026-10-28 | #139 |
+| SCREEN-WEIGHT | [The verdict over families of the screens](research/CATALOG.md#the-verdict-over-families-of-the-screens-screen-weight). The manifests of `screen-v1` and `screen-v2` get `familyBy`. `scripts/screen-verdict.ts` scores both screens again. 145 of 145 verdicts with a side keep it from `screen-v1` to `screen-v2`. No option has a promotion yet, so the guard count is 0. | 2026-10-28 | #140 |
 
 ## Calibration
 

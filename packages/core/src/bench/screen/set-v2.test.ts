@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { checkSplit, corpusHashOf, declaredClaimOf, splitFolds } from "@mark1russell7/layout-contract";
+import { checkDeclared, checkSplit, corpusHashOf, declaredClaimOf, familyOf, splitFolds } from "@mark1russell7/layout-contract";
 import { describe, expect, it } from "vitest";
 import { hubChainBoard, manyGroupsBoard } from "../../cases.ts";
 import { documentHash } from "./hash.ts";
@@ -7,7 +7,10 @@ import { formatInput, graphInput, type LayoutInput } from "./forms.ts";
 import {
   caseSeed,
   checkFamilies,
+  declaresFamily,
+  familyCell,
   manifestHash,
+  SCREEN_FAMILY_BY,
   SCREEN_SETS,
   SCREEN_V1,
   SCREEN_V2,
@@ -95,18 +98,33 @@ describe("the screen set screen-v2 (CORPUS-SEEDS)", () => {
       expect(JSON.parse(formatInput(input))).toEqual(input);
     }
     expect(readJson("screen-v2/corpus.json")).toEqual(setManifest(SCREEN_V2, v2));
-    expect(readJson("screen-v1/corpus.json")).not.toHaveProperty("claims");
+    expect(readJson("screen-v1/corpus.json")).toEqual(setManifest(SCREEN_V1, v1));
   });
 
   it("passes the claim declared of its manifest with checkDeclared, and the check finds a wrong count", () => {
     const manifest = readJson("screen-v2/corpus.json") as LayoutCorpus;
-    expect(declaredClaimOf(manifest)).toEqual({ minCount: 10, thin: [], counts: Object.fromEntries(SCREEN_V2.families.map((f) => [f.name, 10])) });
+    const counts = Object.fromEntries(SCREEN_V2.families.map((f) => [f.name, 10]));
+    expect(declaredClaimOf(manifest)).toEqual({ minCount: 10, thin: [], counts, familyBy: { "*": [] }, familyMin: 10 });
     expect(checkFamilies(manifest, v2)).toEqual([]);
     expect(checkFamilies(manifest, v2.slice(1)).map((b) => b.detail)).toEqual([
       'the property "tiny-uniform" has the count 10, but the inputs give 9',
       'the property "tiny-uniform" has 9 inputs, below minCount 10, and it is not in thin',
+      'the family "tiny-uniform" has 9 inputs, below familyMin 10',
     ]);
-    expect(checkFamilies(setManifest(SCREEN_V1, v1), v1)).toEqual([]);
+    const v1Manifest = readJson("screen-v1/corpus.json") as LayoutCorpus;
+    expect(declaredClaimOf(v1Manifest)).toEqual({ minCount: 3, thin: ["hub-chain", "many-groups"], counts: { "tiny-uniform": 3, "small-clustered": 3, "dense-groups": 3, "hub-chain": 1, "many-groups": 1, "packed-grid": 3 }, familyBy: { "*": [] } });
+    expect(checkFamilies(v1Manifest, v1)).toEqual([]);
+  });
+
+  it("gives each input the key of its family with familyBy, and needs the family as the kind (SCREEN-WEIGHT)", () => {
+    for (const input of [...v1, ...v2]) expect(familyOf(familyCell(input), SCREEN_FAMILY_BY), input.id).toBe(input.family);
+    // The cells have no kind. Without the hook familyCell, the map form finds no kind.
+    const claim = declaredClaimOf(readJson("screen-v2/corpus.json") as LayoutCorpus)!;
+    expect(checkDeclared(v2, declaresFamily, claim).map((b) => b.detail)).toEqual(["60 inputs have a cell without kind, which the map form of familyBy needs"]);
+    // Two families have the same cell. Thus a key from the dimensions of the cell gives 5 families, not 6.
+    const dims = Object.keys(v2[0]!.cell!);
+    expect(new Set(v2.map((i) => familyOf({ ...i.cell }, dims))).size).toBe(5);
+    expect(byId(v2, "screen-v2/dense-groups/s0").cell).toEqual(byId(v2, "screen-v2/many-groups/s0").cell);
   });
 
   it("passes checkSplit on its split file, and holds out the seeds 7 to 9 of each family", () => {
