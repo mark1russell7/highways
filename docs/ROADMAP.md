@@ -75,7 +75,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | MEAS3A | The screen gives ten more measures of MEAS0: `R12`, `R14`, `B5`, `B7`, `B8`, `B9`, `M1`, `M4`, `Z2` and `Z9`. On screen-v1, `R14` is 0.07 to 0.89 and `M4` is 0 on 21 of 70 records. `M1` stays at 1 to 1.005. | 2026-10-27 | #88 |
 | BUILD-W3C | Six highway finders: `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan` and `hub-arcs`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `hub-arcs` (HWY-042) with the gate wins 2: the paired B1 ratio is 1.07 and the q95 ratio 0.96. HWY-012, HWY-019, HWY-024, HWY-032, HWY-028 and HWY-042 are dropped. | 2026-10-27 | #89 |
 | REL10 | Version 0.5.0 on npm: the strategies of wave 3, the exact reference, the measures of MEAS3A and the types of layout-contract 0.2.0. MINOR: `LayoutCell.containerSize` gets the values `freeHeight` and `freeArea`, and `locked` widens to `boolean`. The default routes do not change. | 2026-10-28 | this PR |
-| RESCREEN-M3A | The ideas of waves 1 to 3 again, on the wins of MEAS3A. 8 of 27 records are at least as good as their baseline on 3 or more boards. No stage or verdict changes. Each built strategy also gets the part of the gap to the exact B1 that it closes on `tiny-uniform`. `growth` closes the most of the built-ins, a median of 0.51. | 2026-10-27 | #PRNUM |
+| RESCREEN-M3A | The ideas of waves 1 to 3 again, on the wins of MEAS3A. 8 of 27 records are at least as good as their baseline on 3 or more boards. No stage or verdict changes. Each built strategy also gets the part of the gap to the exact B1 that it closes on `tiny-uniform`. `growth` closes the most of the built-ins, a median of 0.51. | 2026-10-27 | #92 |
 
 ## Open
 
