@@ -1,0 +1,219 @@
+# The portfolio of strategies
+
+This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A portfolio runs `shared` and k more strategies on an input. Then it keeps the output with the best guarded B1.
+
+- The score of the portfolio uses only the outputs. Thus the portfolio needs no prediction of the winner.
+- The note gives the Pareto curve of the portfolio: the gain for each k, on seeds that the choice of the set did not see. It also gives the time of each set.
+- The script [`scripts/portfolio.ts`](../../packages/core/scripts/portfolio.ts) makes the tables from the records of CI. The test `src/bench/screen/portfolio.test.ts` examines its functions.
+- The script [`scripts/portfolio-time.ts`](../../packages/core/scripts/portfolio-time.ts) times each strategy. The workflow `Portfolio` starts it in CI.
+
+## Summary
+
+- **The claim does not hold on `exact-v1`.** The oracle of [`ORACLE.md`](ORACLE.md) ranks by B10, and B10 needs the exact optimum. B10 is not a monotone map of B1 on one input. On 29 of 40 inputs, the run with the best B1 does not have the best B10.
+- **On `exact-v1`, a portfolio keeps little of the oracle gain.**
+  - With the guard `q95`, the portfolio is worse than the best single strategy for each k. `shared` has a B3 q95 of 1 on 31 of 40 inputs, so almost no run passes the guard.
+  - With the guard `cap`, k = 3 keeps 6% of the oracle gain, and k = 8 keeps 7%. The whole pool keeps only 37%.
+- **On `screen-v1`, the claim holds.** There the oracle ranks by guarded B1, which the portfolio computes. The whole pool reaches the oracle (100%).
+  - A greedy set of 2 or 3 keeps 72% of the oracle gain over the best single strategy, on 8 test inputs.
+  - But on each board, the set of k = 3 is at most 4.3% above the best single strategy. It gains nothing on `hub-chain` and `many-groups`, because those boards have 1 seed.
+- **Time.** Most strategies take 1 to 5 times the time of `shared`. At 40 nodes, the set of k = 3 of `screen-v1` takes 37 ms one after the other, and 11 ms in parallel, on a CI machine.
+
+## The data
+
+| Set | CI run | Records | Commit |
+|---|---|---:|---|
+| `exact-v1` | [40624133769](https://github.com/mark1russell7/highways/actions/runs/40624133769) | 10480 | `725206f` |
+| `screen-v1`, `small-clustered` | [40624136019](https://github.com/mark1russell7/highways/actions/runs/40624136019) | 786 | `725206f` |
+| `screen-v1`, `dense-groups` | [40624138382](https://github.com/mark1russell7/highways/actions/runs/40624138382) | 786 | `725206f` |
+| `screen-v1`, `hub-chain` | [40624140683](https://github.com/mark1russell7/highways/actions/runs/40624140683) | 262 | `725206f` |
+| `screen-v1`, `many-groups` | [40624142811](https://github.com/mark1russell7/highways/actions/runs/40624142811) | 262 | `725206f` |
+| `screen-v1`, `tiny-uniform` | [40624145062](https://github.com/mark1russell7/highways/actions/runs/40624145062) | 786 | `725206f` |
+| `screen-v1`, `packed-grid` | [40624147552](https://github.com/mark1russell7/highways/actions/runs/40624147552) | 786 | `725206f` |
+| the times | [40624849185](https://github.com/mark1russell7/highways/actions/runs/40624849185) | 47160 | branch `portfolio` |
+| the report | [40626512090](https://github.com/mark1russell7/highways/actions/runs/40626512090) | | branch `portfolio` |
+
+- The pool is the 262 strategies of the screen module `scripts/screens/meas2.ts` at `725206f`, with the built-in routers. It has the strategies of wave 3E. Wave 3F is not on `main`, so it is not in the pool.
+- The records of `ORACLE.md` came from `cc6f8e0`, before wave 3E. Thus this note screens the whole pool again, at one commit.
+- Each dropped strategy stays in the pool, for example `w3d:kdeeb-routes`.
+- The commands:
+
+```sh
+gh workflow run screen.yml --ref <branch> -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
+gh workflow run screen.yml --ref <branch> -f step=router -f set=screen-v1 -f module=packages/core/scripts/screens/meas2.ts -f families=<family>
+gh workflow run screen.yml --ref <branch> -f time="--sizes 10,24,40 --seeds 0,1,2 --repeats 5 --shards 16"
+gh workflow run screen.yml --ref <branch> -f report="--exact <id> --screen <id,...> --time <id>"
+```
+
+## The method
+
+- **The portfolio.** The portfolio runs `shared` and each strategy of its set. It keeps the output with the best B1 among the outputs that pass the guard. `shared` always passes, so it is the fall back. A tie within `RECORD_EPS` goes to `shared`, then to the order of the set.
+- **The guard `q95`.** A run passes when its B3 q95 is at most the B3 q95 of `shared`, and each hard count is at most the count of `shared`. This is the guard of `ORACLE.md`, with the hard rules.
+- **The guard `cap`.** A run passes when each hard count is at most the count of `shared`. It has no B3 condition.
+- **The cap of the stretch.** On `exact-v1`, each guard also needs the largest stretch at or below 1.5, the largest cap of the gap closed. Thus each choice has a gap closed. The stretch is a measure of the output.
+- **The greedy set.** On the train inputs, each step adds the strategy that gives the best median of the portfolio, then the best mean. The choice stops when no strategy improves the score. Thus some sets have fewer than k strategies.
+- **The splits.**
+  - On `exact-v1`, the halves are the seeds 0 to 4 and 5 to 9 of each class. Each input is a test input one time.
+  - On `screen-v1`, the first split trains on the seeds 0 and 1 of the 4 boards that decide, and tests on the seed 2. The second split is the reverse. `hub-chain` and `many-groups` have only the seed 0, so they are test inputs only in the second split.
+- **The best single strategy.** It has the best median on the train inputs of the split, with a value on each train input. On `screen-v1`, it also passes the guard on each train input. On a test input where it fails the guard, it falls back to `shared`.
+- **The oracle.** On `exact-v1`, it is the best B10 of the pool, without a guard, as in `ORACLE.md`. On `screen-v1`, it is the best guarded ratio of the pool.
+- **The share of the oracle gain.** The share is `(portfolio - best single) / (oracle - best single)`, from the medians over the test inputs of both splits.
+- **The interval.** The interval is the 95% paired bootstrap interval of `ORACLE.md`.
+- **The time.** Each strategy routes each board of the classes of `exact-v1` at 10, 24 and 40 nodes, with the seeds 0, 1 and 2. That is 12 boards at each size. One run warms the code, then 5 runs are timed.
+  - The time of a set adds the time of `corners` (the base of B3), of `shared` and of each strategy, with the score of each output. The score is B1, B3 q95 and the hard rules.
+  - For each board, a strategy takes the median of its 5 runs. One after the other is the sum of the runs. In parallel is the longest run.
+  - The table gives the median and the q95 over the 12 boards. The column `× shared` divides by the time of `shared` on the same machine.
+
+## The check of the claim
+
+The claim of the item: guarded B1 uses only the output, and B10 is a linear map of B1 on each input. Thus the best B1 is also the best B10, and a portfolio reaches the oracle.
+
+| check on `exact-v1` | value |
+|---|---:|
+| pairs of runs on one input with a strict order by B1 and by B10 | 703613 |
+| pairs where the order by B10 is the reverse of the order by B1 | 75676 (11%) |
+| inputs where the run with the best B1 does not have the best B10 | 29 of 40 |
+| inputs where `shared` has a B3 q95 of 1 | 31 of 40 |
+| median count of strategies that pass the guard `q95` with more B1 than `shared` | 4 |
+
+- B10 is `(B1 - B1 of the baseline) / (the optimum B1 - B1 of the baseline)`. The baseline and the optimum change with the run:
+  - A run that mixes collections gets the rule `all`: the baseline `shared-ways-all` and the optimum without a rule.
+  - The cap of the optimum is the smallest cap at or above the largest stretch of the run.
+- Thus two runs on one input can have different scales of B10. B10 is a linear map of B1 only for runs with the same rule and the same cap.
+- The oracle of `ORACLE.md` ranks by B10. A portfolio cannot compute B10, because B10 needs the optimum. This note ranks by B1, which the portfolio computes, and measures the choice by B10.
+- On `screen-v1`, the oracle ranks by the guarded ratio of B1. That score is the score of the portfolio. Thus the claim holds there.
+
+## `exact-v1`: the gap closed (B10)
+
+The best single strategy of both splits is `w3d:kdeeb-routes`. `w3b:growth-s0.3` has no value on 3 inputs, so it is not a candidate.
+
+With the guard `cap`:
+
+| k | test inputs | portfolio median | interval | best single | gain over the single | gain interval | oracle | share of the oracle gain | share of each split |
+|---:|---:|---:|---|---:|---:|---|---:|---:|---|
+| 1 | 40 | 0.521 | 0.481 to 0.589 | 0.545 | -0.024 | -0.137 to 0.067 | 0.949 | -6% | -34% / 0% |
+| 2 | 40 | 0.553 | 0.493 to 0.611 | 0.545 | 0.007 | -0.121 to 0.100 | 0.949 | 2% | -11% / -4% |
+| 3 | 40 | 0.569 | 0.511 to 0.628 | 0.545 | 0.024 | -0.102 to 0.125 | 0.949 | 6% | 0% / -4% |
+| 5 | 40 | 0.569 | 0.511 to 0.628 | 0.545 | 0.024 | -0.102 to 0.125 | 0.949 | 6% | 0% / -4% |
+| 8 | 40 | 0.572 | 0.528 to 0.628 | 0.545 | 0.027 | -0.101 to 0.134 | 0.949 | 7% | 6% / 1% |
+| all 261 | 40 | 0.696 | 0.686 to 0.716 | 0.545 | 0.151 | 0.025 to 0.249 | 0.949 | 37% | 30% / 46% |
+
+| k | set of the first split | set of the second split |
+|---:|---|---|
+| 1 | `w3b:growth-s0.3` | `w3d:kdeeb-routes` |
+| 2 | `w3b:growth-s0.3`, `w3e:mlseb-routes` | `w3d:kdeeb-routes`, `w3a:traclus-m2` |
+| 3 | `w3b:growth-s0.3`, `w3e:mlseb-routes`, `hw:mlseb` | `w3d:kdeeb-routes`, `w3a:traclus-m2`, `w3e:sbeb-routes` |
+| 5 | the set of 3, `w3d:kdeeb-routes`, `w3c:edge-paths-k1.5` | the set of 3, `w3a:traclus+stretch`, `w3c:edge-paths+stretch` |
+| 8 | the set of 5, `w3e:mlseb-a0` | the set of 5, `w2c:level-links+stretch`, `w3a:traclus-e4` |
+
+With the guard `q95`:
+
+| k | test inputs | portfolio median | interval | best single | share of the oracle gain | set of the first split | set of the second split |
+|---:|---:|---:|---|---:|---:|---|---|
+| 1 | 40 | 0.068 | 0.000 to 0.131 | 0.545 | -118% | `corners-side` | `corners-side` |
+| 2 | 40 | 0.106 | 0.036 to 0.139 | 0.545 | -109% | `corners-side`, `w2b:zipper-p2` | `corners-side`, `hw:crossbars` |
+| 3 | 40 | 0.106 | 0.036 to 0.139 | 0.545 | -109% | the set of 2, `w3c:hough+stretch` | the set of 2, `w2b:zipper-a1` |
+| 5 | 40 | 0.106 | 0.036 to 0.139 | 0.545 | -109% | the set of 3, `hw:stubs`, `hw:kdeeb` | the set of 3, `w3d:hierarchy+stretch`, `hw:flow-field` |
+| 8 | 40 | 0.106 | 0.036 to 0.139 | 0.545 | -109% | the set of 5 | the set of 5 |
+| all 261 | 39 | 0.104 | 0.028 to 0.158 | 0.562 | -118% | all | all |
+
+- With the guard `q95`, the portfolio is far below the best single strategy. `shared` does not stretch the routes at the q95 on 31 of 40 inputs. The strategies that save much ink stretch some routes, so they fail the guard.
+- With the guard `cap`, the portfolio keeps the run with the most ink saved. But the run with the most ink saved often mixes collections, and the rule `all` has a larger optimum. Thus a high B1 can give a low B10.
+- The whole pool with the guard `cap` closes 0.696 of the gap, against 0.949 for the oracle. The difference is the cost of a score without the optimum.
+- The greedy sets differ between the splits. Only `w3d:kdeeb-routes` is in both, from k = 5 in the first split and from k = 1 in the second split.
+
+## `screen-v1`: the guarded B1
+
+The values are ratios to the B1 of `shared`.
+
+| k | test inputs | portfolio / `shared` | best single / `shared` | oracle / `shared` | share of the oracle gain | share of each split | set of the first split | set of the second split |
+|---:|---:|---:|---:|---:|---:|---|---|---|
+| 1 | 8 | 1.314 | 1.096 | 1.605 | 43% | 49% / 0% | `w2b:zipper-a1` | `w3a:diffusion-g2` |
+| 2 | 8 | 1.462 | 1.096 | 1.605 | 72% | 77% / 8% | `w2b:zipper-a1`, `w3a:diffusion-l3` | `w3a:diffusion-g2`, `w3a:diffusion-l3` |
+| 3 | 8 | 1.462 | 1.096 | 1.605 | 72% | 77% / 8% | the set of 2, `w2c:od-cells-shared` | the set of 2 |
+| 5 | 8 | 1.462 | 1.096 | 1.605 | 72% | 77% / 8% | the set of 3, `w2b:zipper-corridors`, `w3a:diffusion-wide` | the set of 2 |
+| 8 | 8 | 1.462 | 1.096 | 1.605 | 72% | 77% / 8% | the set of 5, `w3b:growth-s0.7` | the set of 2 |
+| all 261 | 8 | 1.605 | 1.096 | 1.605 | 100% | 100% / 100% | all | all |
+
+The portfolio over the best single strategy on each board, on the test inputs:
+
+| k | `small-clustered` | `dense-groups` | `hub-chain` | `many-groups` | boards at 15% or more |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 1.000 | 1.000 | 1.000 | 1.000 | 0 of 4 |
+| 2 to 8 | 1.009 | 1.043 | 1.000 | 1.000 | 0 of 4 |
+| all 261 | 1.454 | 1.043 | 6.338 | 1.679 | 3 of 4 |
+
+The portfolio over `shared` on each board, on the test inputs:
+
+| k | `small-clustered` | `dense-groups` | `hub-chain` | `many-groups` | boards at 15% or more |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 1.450 | 1.420 | 1.000 | 1.000 | 2 of 4 |
+| 2 to 8 | 1.450 | 1.480 | 1.000 | 1.000 | 2 of 4 |
+| all 261 | 1.673 | 1.480 | 6.338 | 1.679 | 4 of 4 |
+
+- On `screen-v1`, the whole pool reaches the oracle, as the claim expects. The guarded ratio is the score of the portfolio.
+- A small set keeps most of the gain over all test inputs, because 6 of the 8 test inputs are on the clustered boards. There the forms of `diffusion` win, and a set of 2 holds them.
+- On each board, the best single strategy of the split is often also a form of `diffusion`. Thus the set of k = 3 is at most 4.3% above it.
+- `hub-chain` and `many-groups` are test inputs only when the train inputs are the seed 2 of the clustered boards. Their winners (`w2b:zipper-corridors` and `w2c:od-cells-shared`) are not in that set, so the portfolio falls back to `shared`.
+- The sets that `exact-v1` chooses do not carry over. With the guard `cap`, they give 1.000 on the boards that decide. With the guard `q95`, the set of 8 gives 1.304, against 1.069 for `hw:shared-ways`.
+
+## The time
+
+The times are from one CI machine (`ubuntu-latest`). They are not the times of the UI machine. Thus the column `× shared` gives each time relative to `shared` on the same machine.
+
+| size | strategies under 16 ms | strategies under 100 ms | median of the medians | `shared` median | `shared` q95 |
+|---:|---:|---:|---:|---:|---:|
+| 10 | 262 of 262 | 262 of 262 | 1.99 ms | 0.94 ms | 1.41 ms |
+| 24 | 240 of 262 | 262 of 262 | 5.89 ms | 2.65 ms | 4.01 ms |
+| 40 | 199 of 262 | 261 of 262 | 10 ms | 4.96 ms | 7.19 ms |
+
+The time of the sets that each corpus chooses on all of its inputs, at 40 nodes:
+
+| corpus | guard | k | set | one after the other: median | q95 | × shared | in parallel: median | q95 | × shared |
+|---|---|---:|---|---:|---:|---:|---:|---:|---:|
+| `screen-v1` | `q95` | 1 | `w3a:diffusion-g2` | 19 ms | 23 ms | 3.7 | 9.1 ms | 10 ms | 1.7 |
+| `screen-v1` | `q95` | 3 | the set of 1, `w2c:od-cells-shared`, `w3a:diffusion-l3` | 37 ms | 42 ms | 7.0 | 11 ms | 13 ms | 2.1 |
+| `screen-v1` | `q95` | 8 | the set of 3, `w2b:zipper-corridors`, `w3a:diffusion-wide`, `w3b:growth-s0.7` (6 in all) | 77 ms | 87 ms | 14.7 | 17 ms | 20 ms | 3.3 |
+| `exact-v1` | `q95` | 3 | `corners-side`, `hw:zipper`, `hw:crossbars` | 67 ms | 73 ms | 12.7 | 23 ms | 25 ms | 4.5 |
+| `exact-v1` | `q95` | 8 | the set of 3 and 5 more | 152 ms | 171 ms | 29.0 | 40 ms | 49 ms | 7.6 |
+| `exact-v1` | `cap` | 1 | `w3b:growth-s0.3` | 22 ms | 26 ms | 4.3 | 12 ms | 14 ms | 2.3 |
+| `exact-v1` | `cap` | 3 | the set of 1, `w3e:mlseb-parabola`, `w3e:mlseb-routes` | 212 ms | 291 ms | 40.4 | 98 ms | 141 ms | 18.7 |
+| `exact-v1` | `cap` | 8 | the set of 3 and 5 more | 435 ms | 583 ms | 83.0 | 104 ms | 143 ms | 19.8 |
+
+The largest k that fits each budget, by the q95 of the time:
+
+| corpus | guard | size | 16 ms, one after the other | 16 ms, in parallel | 100 ms, one after the other | 100 ms, in parallel |
+|---|---|---:|---:|---:|---:|---:|
+| `screen-v1` | `q95` | 10 | 3 | 8 | 8 | 8 |
+| `screen-v1` | `q95` | 24 | 1 | 8 | 8 | 8 |
+| `screen-v1` | `q95` | 40 | none | 3 | 8 | 8 |
+| `exact-v1` | `q95` | 10 | 2 | 8 | 8 | 8 |
+| `exact-v1` | `q95` | 24 | none | 5 | 5 | 8 |
+| `exact-v1` | `q95` | 40 | none | none | 3 | 8 |
+| `exact-v1` | `cap` | 10 | 1 | 1 | 8 | 8 |
+| `exact-v1` | `cap` | 24 | 1 | 1 | 1 | 5 |
+| `exact-v1` | `cap` | 40 | none | 1 | 1 | 1 |
+
+- The forms of `mlseb` are the slow strategies of the sets: 83 to 102 ms at 40 nodes, 17 to 21 times `shared`. A set with them does not fit 100 ms at 40 nodes.
+- Without `mlseb`, each strategy of the sets takes 1 to 9 times `shared`. The score of an output takes about 0.3 ms at 40 nodes.
+- In parallel, the time is the time of the slowest strategy. Thus the parallel set of k = 3 of `screen-v1` fits 16 ms at 40 nodes on this machine.
+- The full tables, with each set at each size, are in the artifact of the report run.
+
+## The prediction
+
+The prediction of the item was written before the work.
+
+| Claim | Result | Met |
+|---|---|---|
+| 1. k = 3 keeps 60% to 80% of the oracle gain on the held-out half of `exact-v1`. | 6% with the guard `cap`, and -109% with the guard `q95`. | Not met |
+| 2. `w3d:kdeeb-routes` is in the greedy set for k of 3 or more on `exact-v1`. | In the second split for each k, and in the first split from k = 5, with the guard `cap`. It is not in the sets of the guard `q95`, nor in the sets on all inputs. | Partly met |
+| 3. k = 8 keeps 85% or more. | 7% with the guard `cap`. The whole pool keeps 37%. | Not met |
+| 4. At 40 nodes, the set of k = 3 fits 100 ms but not 16 ms, one after the other. | Met for the sets of `screen-v1` (42 ms q95) and of `exact-v1` with the guard `q95` (73 ms q95). The set of the guard `cap` holds 2 forms of `mlseb` and takes 291 ms. | Partly met |
+| 5. On `screen-v1`, k = 3 is 15% or more above the strict single on 3 or more of 4 boards. | 0 of 4. The set is at most 4.3% above the best single strategy of its split. Against `shared`, it is 45% or more above on 2 of 4 boards. | Not met |
+
+## What this means
+
+- On `screen-v1`, the score of the portfolio is the score of the oracle. A portfolio of the whole pool reaches the oracle, but a small greedy set does not carry the winners of the boards with 1 seed.
+- On `exact-v1`, no score of the output alone gives the choice of the oracle. B1 without the guard prefers runs that mix collections, and the guard `q95` refuses almost each run.
+- A portfolio can use a better score of the output. One option is the B1 above the baseline of the rule of the run, divided by a bound of the rule that needs no solve. The item SELECT can test it.
+- The time is small for most strategies. A portfolio of 3 fast strategies fits 100 ms at 40 nodes, one after the other, on a CI machine.
+- The item adds no strategy and changes no default, so it needs no release.
