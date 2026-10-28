@@ -145,14 +145,15 @@ export function midValue(table: RunTable, short: ShortRuns, rule: GapRule, cap: 
 export const BAND_BUDGET_MS = 50;
 
 /**
- * The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key, and each member with the key on its output.
+ * The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key, each member with the key on its output,
+ * and the hashes of a pick that moves (HASH-LAZY).
  * The margin of 8 ms below `BAND_BUDGET_MS` covers the noise between two CI machines (FIT-COST).
  */
 export const FIT_TARGET_MS = 42;
 
-/** The summary of the times of the members (`portfolio-times/2`): the median time of each strategy at each size on the CI runner. */
+/** The summary of the times of the members (`portfolio-times/3`): the median time of each strategy at each size on the CI runner. */
 export interface MemberTimes {
-  readonly schema: "portfolio-times/2";
+  readonly schema: "portfolio-times/3";
   /** The CI run of the times. */
   readonly source: string;
   readonly sizes: readonly number[];
@@ -164,14 +165,19 @@ export interface MemberTimes {
   readonly ms: Readonly<Record<string, Readonly<Record<string, number>>>>;
   /**
    * The median time of the key of the router on the output of each strategy, at each node count, in ms, with 2 decimals (FIT-COST).
-   * The key is the guard with the facts of the output, the B1 and the hash. For `shared`, it is the B1 and the hash.
+   * The key is the guard with the facts of the output and the B1. For `shared`, it is the B1. The key has no hash (HASH-LAZY).
    */
   readonly keyMs: Readonly<Record<string, Readonly<Record<string, number>>>>;
+  /**
+   * The median time of the hash of the output of each strategy, at each node count, in ms, with 2 decimals (HASH-LAZY).
+   * The router hashes only the base and the winner, and only when the pick moves.
+   */
+  readonly hashMs: Readonly<Record<string, Readonly<Record<string, number>>>>;
 }
 
 /** This function gives the summary of the times of the lines of `portfolio:time --members`: the median over the boards of the median over the repeats. */
 export function memberTimes(records: readonly TimeRecord[], source: string): MemberTimes {
-  const runs = new Map<string, [number, number][]>();
+  const runs = new Map<string, [number, number, number][]>();
   const skipped = new Set<string>();
   for (const r of records) {
     const size = `${r.strategy}|${r.nodes}`;
@@ -181,28 +187,34 @@ export function memberTimes(records: readonly TimeRecord[], source: string): Mem
     }
     const board = `${size}|${r.cls}|${r.seed}`;
     if (!runs.has(board)) runs.set(board, []);
-    runs.get(board)!.push([r.ms, r.keyMs ?? 0]);
+    runs.get(board)!.push([r.ms, r.keyMs ?? 0, r.hashMs ?? 0]);
   }
-  const boards = new Map<string, [number, number][]>();
+  const boards = new Map<string, [number, number, number][]>();
   for (const [board, xs] of runs) {
     const size = board.split("|").slice(0, 2).join("|");
     if (!boards.has(size)) boards.set(size, []);
-    boards.get(size)!.push([quantile(xs.map((x) => x[0]), 0.5), quantile(xs.map((x) => x[1]), 0.5)]);
+    boards.get(size)!.push([quantile(xs.map((x) => x[0]), 0.5), quantile(xs.map((x) => x[1]), 0.5), quantile(xs.map((x) => x[2]), 0.5)]);
   }
   const ms: Record<string, Record<string, number>> = {};
   const keyMs: Record<string, Record<string, number>> = {};
+  const hashMs: Record<string, Record<string, number>> = {};
   const r2 = (v: number): number => Math.round(v * 100) / 100;
   for (const [size, xs] of [...boards].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
     if (skipped.has(size)) continue;
     const [strategy, nodes] = size.split("|") as [string, string];
     (ms[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[0]), 0.5));
-    if (strategy !== KEY_SETUP) (keyMs[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[1]), 0.5));
+    if (strategy === KEY_SETUP) continue;
+    (keyMs[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[1]), 0.5));
+    (hashMs[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[2]), 0.5));
   }
   const sizes = [...new Set(records.map((r) => r.nodes))].sort((a, b) => a - b);
-  return { schema: "portfolio-times/2", source, sizes, ms, keyMs };
+  return { schema: "portfolio-times/3", source, sizes, ms, keyMs, hashMs };
 }
 
-/** This function gives the cost of a strategy in the router at `nodes` nodes: its route alone and the key on its output. A size without a time gives `undefined`. */
+/**
+ * This function gives the cost of a strategy in the router at `nodes` nodes: its route alone and the key on its output, with no hash (HASH-LAZY).
+ * A size without a time gives `undefined`.
+ */
 export function costIn(times: MemberTimes, strategy: string, nodes: number): number | undefined {
   const t = times.ms[strategy]?.[String(nodes)];
   return t === undefined ? undefined : t + (times.keyMs?.[strategy]?.[String(nodes)] ?? 0);
@@ -237,10 +249,16 @@ export function fastIn(times: MemberTimes, strategy: string, band: PortfolioBand
   return t !== undefined && t <= BAND_BUDGET_MS;
 }
 
+/** This function gives the time of the hash of the output of a strategy at `nodes` nodes. A size without a time gives `undefined`. */
+export function hashIn(times: MemberTimes, strategy: string, nodes: number): number | undefined {
+  return times.hashMs?.[strategy]?.[String(nodes)];
+}
+
 /**
  * This function gives the fit of a set in a band: the members of the default of the router, each with its node limit.
  * At each size of the band, the prefix of the set runs while the model time stays at or below `FIT_TARGET_MS`.
  * The model time is the base, plus the setup of the key with the first member, plus each member. Each strategy counts its route alone and the key on its output (`costIn`).
+ * The model also counts the hashes of a pick that moves (HASH-LAZY): the hash of the base and the largest hash of the members of the prefix.
  * A member leaves at the first size where it is not in the prefix. Its node limit is the last size where it is in the prefix. A member with no such size is not in the fit.
  */
 export function fitOf(set: readonly string[], times: MemberTimes, band: PortfolioBand, bands: readonly PortfolioBand[] = PORTFOLIO_BANDS): [string, number][] {
@@ -249,16 +267,21 @@ export function fitOf(set: readonly string[], times: MemberTimes, band: Portfoli
   for (const n of bandSizes(times, band, bands)) {
     const at = (s: string): number | undefined => (s === KEY_SETUP ? times.ms[s]?.[String(n)] : costIn(times, s, n));
     let total = at(PORTFOLIO_BASE) ?? Infinity;
+    // A pick that moves hashes the base and the winner. The winner can be each member of the prefix, so the model takes the largest hash.
+    const baseHash = hashIn(times, PORTFOLIO_BASE, n) ?? 0;
+    let winnerHash = 0;
     let open = true;
     for (const [j, s] of set.entries()) {
       const t = at(s);
       const add = t === undefined ? Infinity : t + (j === 0 ? (at(KEY_SETUP) ?? Infinity) : 0);
-      if (!open || !alive.has(s) || total + add > FIT_TARGET_MS) {
+      const hash = Math.max(winnerHash, hashIn(times, s, n) ?? 0);
+      if (!open || !alive.has(s) || total + add + baseHash + hash > FIT_TARGET_MS) {
         open = false;
         alive.delete(s);
         continue;
       }
       total += add;
+      winnerHash = hash;
       limit.set(s, n);
     }
   }
