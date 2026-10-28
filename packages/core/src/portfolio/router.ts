@@ -30,7 +30,19 @@ export interface PortfolioRouterOptions {
   readonly maxMembers?: number;
   /** The clock in milliseconds. The default is `performance.now`. */
   readonly now?: () => number;
+  /**
+   * The members that get an output hash in the trace (HASH-LAZY). The pick does not use the hashes, so the winner and the output do not change.
+   * - With `pick` (the default), only the base and the winner get a hash, and only when the winner is not the base.
+   * - With `all`, each member that ran gets a hash, as before HASH-LAZY. Use it when you need the `outputHash` of each member.
+   */
+  readonly hashes?: PortfolioHashes;
 }
+
+/** The values of the option `hashes` of the portfolio router. */
+export type PortfolioHashes = "all" | "pick";
+
+/** The values of the option `hashes`, in order. The default is `pick`. */
+export const PORTFOLIO_HASHES: readonly PortfolioHashes[] = ["pick", "all"];
 
 /** The base member of each portfolio: the router `shared` with the rule `byCollection`. It is the fallback output above the cap. */
 export const PORTFOLIO_BASE_MEMBER = "shared";
@@ -49,14 +61,16 @@ export interface PortfolioRoute {
 }
 
 /** This function checks the options of the portfolio router, and gives them with their defaults. It throws a `RangeError` for a bad value. */
-function checked(o: PortfolioRouterOptions): { rule: PortfolioRule; cap: PortfolioCap; k: 3 | 5 | 8 | undefined } {
+function checked(o: PortfolioRouterOptions): { rule: PortfolioRule; cap: PortfolioCap; k: 3 | 5 | 8 | undefined; hashes: PortfolioHashes } {
   const rule = o.rule ?? "collection";
   const cap = o.cap ?? 1.5;
   const k = o.k;
+  const hashes = o.hashes ?? "pick";
   if (!PORTFOLIO_RULES.includes(rule)) throw new RangeError(`The portfolio router has the rule "${String(rule)}". It must be ${PORTFOLIO_RULES.join(" or ")}.`);
   if (!PORTFOLIO_CAPS.includes(cap)) throw new RangeError(`The portfolio router has the cap ${String(cap)}. It must be ${PORTFOLIO_CAPS.join(", ")}.`);
   if (k !== undefined && !PORTFOLIO_KS_API.includes(k)) throw new RangeError(`The portfolio router has the k ${String(k)}. It must be ${PORTFOLIO_KS_API.join(", ")}.`);
-  return { rule, cap, k };
+  if (!PORTFOLIO_HASHES.includes(hashes)) throw new RangeError(`The portfolio router has the hashes "${String(hashes)}". It must be ${PORTFOLIO_HASHES.join(" or ")}.`);
+  return { rule, cap, k, hashes };
 }
 
 /** This function gives the name of the portfolio router with the options `options`: `portfolio-<rule>-<cap>-k<k>`, or `portfolio-<rule>-<cap>-fit` without `k`. */
@@ -83,11 +97,12 @@ export function portfolioMembers(nodes: number, options: PortfolioRouterOptions 
  * The key is `portfolioKey`: a member wins only when it passes the guard against the base. Of those members, the winner has the most ink saved.
  * A tie within the `minEffect` of B1 goes to the first member (`selectBest`). A member that throws does not win.
  * The result carries the trace of the pick and the move count `move.pick`.
+ * With the option `hashes` "pick" (the default), only the base and the winner get an `outputHash` in the trace. They get it only when the winner is not the base.
  */
 export function routePortfolio(graph: Graph, options: PortfolioRouterOptions = {}): PortfolioRoute {
   // A member with a node limit below the size of the graph does not run. The base `shared` has no such limit below the limit of the router.
   const names = portfolioMembers(graph.nodes.length, options).filter((name) => name === PORTFOLIO_BASE_MEMBER || (portfolioMember(name)?.maxNodes ?? Infinity) >= graph.nodes.length);
-  const { rule, cap } = checked(options);
+  const { rule, cap, hashes } = checked(options);
   // The key compares each member with the output of the base, so the run of the base keeps its output.
   let base: Result | undefined;
   const members: Member<Graph, Result>[] = names.map((name) => {
@@ -104,6 +119,7 @@ export function routePortfolio(graph: Graph, options: PortfolioRouterOptions = {
     };
   });
   const p = portfolio(portfolioName(options), members, portfolioKey(graph, rule, cap, () => base), {
+    hashes,
     ...(options.budgetMs === undefined ? {} : { budgetMs: options.budgetMs }),
     ...(options.maxMembers === undefined ? {} : { maxMembers: options.maxMembers }),
     ...(options.now === undefined ? {} : { now: options.now }),

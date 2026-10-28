@@ -3,7 +3,9 @@
 // It writes one line for each timed run: the strategy, the board, the time of the route and the time of the score of the portfolio (B1, B3 q95 and the hard rules).
 // A run slower than `--slow` ms gets no more repeats. Start it only in CI, with the workflow `Portfolio`, because the times of a busy machine are not true.
 // With `--members` (PORTFOLIO-FIT), the script times the members of the portfolio router (`MEMBER_FORMS`) instead, and the key of the router on each output (`keyMs`).
-// The key is `portfolioKey` as the router calls it (FIT-COST): the guard with the facts of the output, the B1 and the hash (`hashMs`).
+// The key is `portfolioKey` as the router calls it (FIT-COST): the guard with the facts of the output and the B1. The router hashes only a pick that moves (HASH-LAZY).
+// So `keyMs` has no hash, and `hashMs` is the time of the hash of the output alone.
+// Each shard runs its first board once and keeps no line of it (HASH-LAZY). So the first timed board is warm, and each time is a warm median.
 // Then each board also gets one line of the strategy `@key-setup`: the time to build the network of the stretch and to read the facts of the output of `shared`.
 // After a size where the median time of a strategy is above `--stop` ms, the strategy skips the larger sizes.
 // With `--breakdown` (PORTFOLIO-SPEED), the script times the parts of the setup of the key and the router on each board instead (`breakdownLines`).
@@ -52,11 +54,11 @@ export interface TimeRecord {
   /** The time of the score of the portfolio on the output, in ms: B1, B3 q95 against `corners`, and the hard rules. */
   readonly scoreMs: number;
   /**
-   * With `--members`: the time of the key of the portfolio router on the output, in ms: the guard with the facts of the output, the B1 and the hash.
+   * With `--members`: the time of the key of the portfolio router on the output, in ms: the guard with the facts of the output and the B1 (HASH-LAZY: no hash).
    * The network of the stretch and the facts of the base are already built. For the base `shared`, the guard is 0 at once, as in the router.
    */
   readonly keyMs?: number;
-  /** With `--members`: the time of the hash of the output, in ms. It is a part of `keyMs`. */
+  /** With `--members`: the time of the hash of the output, in ms. It is not a part of `keyMs`. The router hashes the base and the winner of a pick that moves. */
   readonly hashMs?: number;
   readonly skipped?: string;
 }
@@ -64,16 +66,19 @@ export interface TimeRecord {
 /** The name of the lines of the setup of the key: the network of the stretch, and the facts of the output of `shared`. */
 export const KEY_SETUP = "@key-setup";
 
-/** The time of the key of the router on one output, in ms, and the part of the hash. */
+/** The time of the key of the router on one output, in ms, and the time of the hash of the output. */
 export interface KeyTime {
+  /** The guard and the B1. It has no hash (HASH-LAZY). */
   readonly keyMs: number;
+  /** The hash of the output alone. */
   readonly hashMs: number;
 }
 
 /**
  * This function gives a timer of the key of the router on the graph `graph`, against the output `base` of `shared` (FIT-COST).
  * It builds the network of the stretch and the facts of the base first, as the router does before the second member.
- * The timer calls the key as the router does: the guard, the B1 and the hash. With `isBase`, the output is the base, so the guard is 0 at once.
+ * The timer calls the key as the router does: the guard and the B1. With `isBase`, the output is the base, so the guard is 0 at once.
+ * Then it times the hash of the output apart. The router with the option `hashes` "pick" hashes only the base and the winner of a pick that moves (HASH-LAZY).
  */
 export function keyTimer(graph: Graph, base: Result): (result: Result, isBase: boolean) => KeyTime {
   const key = portfolioKey(graph, "collection", 1.5, () => base);
@@ -87,7 +92,7 @@ export function keyTimer(graph: Graph, base: Result): (result: Result, isBase: b
     const h = performance.now();
     k.hash!(result);
     const end = performance.now();
-    return { keyMs: end - t, hashMs: end - h };
+    return { keyMs: h - t, hashMs: end - h };
   };
 }
 
@@ -258,12 +263,20 @@ export interface CostRecord {
   readonly rep: number;
   /** The time of the run of the member, of the setup or of the pick, in ms. */
   readonly runMs: number;
-  /** The time of the key on the output of the member, in ms. In the router, it is the time from the end of the run to the start of the next member. */
+  /**
+   * The time of the key on the output of the member, in ms. In the router, it is the time from the end of the run to the start of the next member.
+   * The key has no hash (HASH-LAZY). For the last member of a pick, the time also holds the choice and the hashes of a pick that moves.
+   */
   readonly keyMs: number;
-  /** For `alone`: the part of the hash in `keyMs`. */
+  /** For `alone`: the time of the hash of the output. It is not a part of `keyMs`. */
   readonly hashMs?: number;
   /** For `pick`: the count of the members that ran, with the base. */
   readonly members?: number;
+  /** For `pick`: the index of the winner, and `true` when the pick moves. Then the router hashes the base and the winner. */
+  readonly winnerIndex?: number;
+  readonly picked?: boolean;
+  /** For `router`: `true` for the last member that ran in the pick. */
+  readonly last?: boolean;
 }
 
 /**
@@ -308,15 +321,17 @@ export function costLines(head: { readonly cls: string; readonly seed: number; r
       const r = routePortfolio(graph, { ...form.options, now });
       const ms = performance.now() - t;
       const ran = r.trace.members.filter((m) => m.status !== "cut");
-      out.push({ kind: "pick", strategy: form.id, form: form.id, ...at, rep, runMs: ms, keyMs: 0, members: ran.length });
+      const { winnerIndex, picked } = r.trace;
+      out.push({ kind: "pick", strategy: form.id, form: form.id, ...at, rep, runMs: ms, keyMs: 0, members: ran.length, winnerIndex, picked });
       // The reads: the start, then two reads for each member that is not cut, then the end.
       let j = 1;
+      const lastIndex = r.trace.members.findLastIndex((m) => m.status !== "cut");
       r.trace.members.forEach((m, index) => {
         if (m.status === "cut") return;
         const runMs = reads[j + 1]! - reads[j]!;
         const keyMs = reads[j + 2]! - reads[j + 1]!;
         j += 2;
-        if (m.status === "ran") out.push({ kind: "router", strategy: m.id, form: form.id, index, ...at, rep, runMs, keyMs });
+        if (m.status === "ran") out.push({ kind: "router", strategy: m.id, form: form.id, index, ...at, rep, runMs, keyMs, ...(index === lastIndex ? { last: true } : {}) });
       });
       if (ms > slow) break;
     }
@@ -331,10 +346,10 @@ export interface CostRow {
   readonly band: string;
   /** The run alone. */
   readonly alone: number;
-  /** The key of the router on the output alone, and its part of the hash. */
+  /** The key of the router on the output alone (no hash), and the hash of the output alone. */
   readonly key: number;
   readonly hash: number;
-  /** The run and the key in the router. For the member at 1, the setup of the board is subtracted. */
+  /** The run and the key in the router. For the member at 1, the setup of the board is subtracted. The last member of a pick is not in the row. */
   readonly router: number;
 }
 
@@ -364,12 +379,15 @@ function setupOf(lines: readonly CostRecord[]): Map<string, number> {
   );
 }
 
-/** This function gives the rows of the lines of `--member-cost`: each member other than the base, at each node count with lines in the router. */
+/**
+ * This function gives the rows of the lines of `--member-cost`: each member other than the base, at each node count with lines in the router.
+ * The time after the last member of a pick also holds the choice and the hashes of a pick that moves (HASH-LAZY), so the rows do not use it.
+ */
 export function costRows(lines: readonly CostRecord[]): CostRow[] {
   const setup = setupOf(lines);
   const sn = (l: CostRecord): string => `${l.strategy}|${l.nodes}`;
   const alone = lines.filter((l) => l.kind === "alone");
-  const inRouter = lines.filter((l) => l.kind === "router" && l.strategy !== PORTFOLIO_BASE_MEMBER);
+  const inRouter = lines.filter((l) => l.kind === "router" && l.strategy !== PORTFOLIO_BASE_MEMBER && l.last !== true);
   const run = medianOf(alone, sn, boardOf, (l) => l.runMs);
   const key = medianOf(alone, sn, boardOf, (l) => l.keyMs);
   const hash = medianOf(alone, sn, boardOf, (l) => l.hashMs ?? 0);
@@ -392,9 +410,12 @@ export interface CostPick {
   readonly nodes: number;
   readonly band: string;
   readonly ms: number;
-  /** The model with the key: the base and its key, the setup, and each member and its key, from the medians alone on the same board. */
+  /**
+   * The model with the key: the base and its key, the setup, and each member and its key, from the medians alone on the same board.
+   * A pick that moves also hashes the base and the winner (HASH-LAZY), so the model of such a pick has their hashes.
+   */
   readonly model: number;
-  /** The model without the key of each output: the base, the setup and each member. */
+  /** The model without the key of each output and without the hashes: the base, the setup and each member. */
   readonly runs: number;
 }
 
@@ -405,20 +426,24 @@ export function costPicks(lines: readonly CostRecord[]): CostPick[] {
   const alone = lines.filter((l) => l.kind === "alone");
   const run = medianOf(alone, sb, () => "", (l) => l.runMs);
   const key = medianOf(alone, sb, () => "", (l) => l.keyMs);
-  const members = new Map<string, string[]>();
+  const hash = medianOf(alone, sb, () => "", (l) => l.hashMs ?? 0);
+  const members = new Map<string, Map<number, string>>();
   for (const l of lines) {
     if (l.kind !== "router") continue;
     const k = `${l.form}|${boardOf(l)}|${l.rep}`;
-    if (!members.has(k)) members.set(k, []);
-    members.get(k)!.push(l.strategy);
+    if (!members.has(k)) members.set(k, new Map());
+    members.get(k)!.set(l.index ?? members.get(k)!.size, l.strategy);
   }
   const out: CostPick[] = [];
   for (const l of lines) {
     if (l.kind !== "pick") continue;
     const b = boardOf(l);
-    const names = members.get(`${l.form}|${b}|${l.rep}`) ?? [];
+    const ran = members.get(`${l.form}|${b}|${l.rep}`) ?? new Map<number, string>();
+    const names = [...ran.values()];
     const runs = names.reduce((sum, s) => sum + (run.get(`${s}|${b}`) ?? NaN), 0) + (names.length > 1 ? (setup.get(b) ?? NaN) : 0);
-    const model = runs + names.reduce((sum, s) => sum + (key.get(`${s}|${b}`) ?? NaN), 0);
+    const winner = l.winnerIndex === undefined ? undefined : ran.get(l.winnerIndex);
+    const hashes = l.picked === true && winner !== undefined ? (hash.get(`${PORTFOLIO_BASE_MEMBER}|${b}`) ?? NaN) + (hash.get(`${winner}|${b}`) ?? NaN) : 0;
+    const model = runs + names.reduce((sum, s) => sum + (key.get(`${s}|${b}`) ?? NaN), 0) + hashes;
     if (Number.isFinite(model)) out.push({ form: l.form!, nodes: l.nodes, band: portfolioBand(l.nodes).id, ms: l.runMs, model, runs });
   }
   return out;
@@ -426,7 +451,7 @@ export function costPicks(lines: readonly CostRecord[]): CostPick[] {
 
 /**
  * This function writes the table of the lines of `--member-cost` as Markdown (FIT-COST). For each band, it gives:
- * - the medians of the run alone, the key alone, the hash and the cost in the router, over the members and the node counts
+ * - the medians of the run alone, the key alone (no hash), the hash and the cost in the router, over the members and the node counts
  * - the ratio of the cost in the router to the run alone, and to the run and the key alone: the median, with the q10 and the q90
  * - the ratio of each pick to the model of the fit, with the key and without it.
  */
@@ -442,6 +467,8 @@ export function costSummary(lines: readonly CostRecord[]): string {
     "## The cost of each member in the router (FIT-COST)",
     "",
     "Each row is one member at one node count. The values are medians over the boards, in ms. A ratio gives the median over the rows, with the q10 and the q90.",
+    "",
+    "The key has no hash (HASH-LAZY). The column `hash` is the hash of the output alone. The rows do not use the last member of a pick.",
     "",
     "| band | rows | run alone | key alone | hash | in the router | router / run alone | router / (run + key) alone |",
     "|---|---:|---:|---:|---:|---:|---|---|",
@@ -459,6 +486,7 @@ export function costSummary(lines: readonly CostRecord[]): string {
     "## Each pick against the model of the fit",
     "",
     "The model adds the medians alone on the same board: the base, the setup and each member that ran, with the key of each output or without it.",
+    "The model with the key also adds the hashes of the base and the winner when the pick moves.",
     "",
     "| band | picks | pick (median ms) | pick / model with the key | pick / model without the key |",
     "|---|---:|---:|---|---|",
@@ -590,6 +618,9 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     process.stderr.write(`${mine.length} of ${boards.length} boards in the shard ${shard}/${shards}.\n`);
     const only = opt("--forms");
     const forms = only === undefined ? BREAKDOWN_FORMS : BREAKDOWN_FORMS.filter((f) => f.id.endsWith(`-${only}`));
+    // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept. So the first timed board is warm.
+    const first = mine[0];
+    if (first !== undefined) breakdownLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow, forms);
     const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow, forms).map((l) => JSON.stringify(l)));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
@@ -598,6 +629,9 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     const boards = sizes.flatMap((n) => EXACT_CLASSES.flatMap((cls: ExactClass) => seeds.map((k) => ({ cls, n, k }))));
     const mine = boards.filter((_, i) => i % shards === shard);
     process.stderr.write(`${mine.length} of ${boards.length} boards in the shard ${shard}/${shards}.\n`);
+    // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept.
+    const first = mine[0];
+    if (first !== undefined) costLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow);
     const lines = mine.flatMap((b) => costLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
@@ -636,6 +670,13 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   // With `--members`, each board has the timer of the key, warmed on the output of `shared`. Shard 0 writes the lines of the setup.
   const keys = new Map<(typeof boards)[number], (result: Result, isBase: boolean) => KeyTime>();
   const lines: string[] = [];
+  // The warm-up (HASH-LAZY): the setup and the key run one time on the first board, with no line. Each strategy also runs one time on each board before its timed runs.
+  if (members && boards[0] !== undefined) {
+    const g = boards[0].graph;
+    const o = shared.route(g);
+    portfolioFacts(g)(o);
+    keyTimer(g, o)(o, true);
+  }
   if (members)
     for (const b of boards) {
       const out0 = shared.route(b.graph);
