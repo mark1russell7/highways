@@ -9,8 +9,8 @@ import { balancedFan, fanPath, gilbertPoint } from "./fan.ts";
 export interface TrunksOptions extends WayOptions {
   /** The name in the benchmark. */
   readonly name: string;
-  /** The grouping rule. The edges from one plug with one key share a trunk. */
-  readonly rule: GroupRule;
+  /** The grouping rule, or the name of a built-in rule (`GROUP_RULE_NAMES`). The edges from one plug with one key share a trunk. */
+  readonly rule: GroupRule | GroupRuleName;
   /** The split point is at this share of the way to the center of the targets. The default is 0.5. */
   readonly split?: number;
   /** A group with fewer edges stays unbundled. The default is 2. */
@@ -54,6 +54,23 @@ export const byCollection: GroupRule = (e) => {
   const c = e.data?.["collection"];
   return typeof c === "string" ? c : undefined;
 };
+
+/** The names of the built-in grouping rules of the edges. With `collection`, the rule is `byCollection`. With `all`, each edge has one key. */
+export type GroupRuleName = "collection" | "all";
+
+/** The names of the built-in grouping rules, in the order of a control. */
+export const GROUP_RULE_NAMES: readonly GroupRuleName[] = ["collection", "all"];
+
+/** The rule `all`: each edge has the same key. */
+const allEdges: GroupRule = () => "*";
+
+/** This function gives the rule of a name of `GROUP_RULE_NAMES`. It gives a rule of the caller as it is. It throws a `RangeError` for an unknown name. */
+export function groupRuleOf(rule: GroupRule | GroupRuleName): GroupRule {
+  if (typeof rule === "function") return rule;
+  if (rule === "collection") return byCollection;
+  if (rule === "all") return allEdges;
+  throw new RangeError(`There is no grouping rule "${String(rule)}". The names are ${GROUP_RULE_NAMES.join(" and ")}.`);
+}
 
 /**
  * This function groups the edges by their source plug and their key. Each group keeps the order of the edges.
@@ -189,6 +206,7 @@ export function sharedWays(routes: readonly Route[], from: number): { points: Po
  * The edges outside the groups go as in the corner router.
  */
 export function trunksRouter(options: TrunksOptions): Router {
+  const rule = groupRuleOf(options.rule);
   const router: Router = {
     name: options.name,
     route(graph: Graph): Result {
@@ -200,7 +218,7 @@ export function trunksRouter(options: TrunksOptions): Router {
       const part = (options.leave ?? "part") === "part";
       // A branch leaves the trunk early only on a line that keeps out of the boxes as far as the corner graph does.
       const clear = (a: Point, b: Point): boolean => ways.obstacles.clear(a, b, ways.margin / 2);
-      for (const [id, group] of groupEdges(graph.edges, options.rule, options.minSize ?? 2)) {
+      for (const [id, group] of groupEdges(graph.edges, rule, options.minSize ?? 2)) {
         const first = group[0]!;
         const s = byId.get(first.source.node);
         const targets = group.map((e) => byId.get(e.target.node));

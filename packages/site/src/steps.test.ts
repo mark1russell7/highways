@@ -96,6 +96,13 @@ describe("each step and each strategy on the pages (COMPARE-ALL)", () => {
     console.log(`COMPARE-ALL: ${controls} controls, ${texts} options shown as text`);
   });
 
+  it("shows the rule byCollection of the defaults as its name collection in the control (SCHEMA-GAPS)", () => {
+    const rule = (step: Step, name: string): unknown => controlOptions(getStrategy(STRATEGIES, step, name) as Strategy<Step, object>).find((o) => o.key === "rule")?.value;
+    for (const name of ["trunks", "shared"]) expect(rule("router", name), name).toBe("collection");
+    for (const name of ["keys", "shared-ways", "soft-keys"]) expect(rule("highway", name), name).toBe("collection");
+    expect(rule("router", "shared-all")).toBeUndefined();
+  });
+
   it("routes the demo with each pick of each step, on the smallest fixture", () => {
     const graph = makeFixture(FIXTURES.find((f) => f.name === TINY)!);
     const pickers = demoPickers();

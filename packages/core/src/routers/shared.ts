@@ -9,6 +9,7 @@ import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { snellMerges } from "./snell.ts";
+import { groupRuleOf, type GroupRuleName } from "./trunks.ts";
 
 /** The cost of a link that edges of one key share: a fixed discount, or the flow cost `len * f^alpha` (EDA-029). */
 export type ShareCost = "fixed" | "flow";
@@ -23,8 +24,11 @@ export type ShareMerge = "corner" | "snell";
 export interface SharedOptions extends WayOptions {
   /** The name in the benchmark. */
   readonly name: string;
-  /** The edges with one key share their ways. Without a rule, all edges share. An edge without a key shares with no edge. */
-  readonly rule?: GroupRule;
+  /**
+   * The edges with one key share their ways. The option takes a rule or the name of a built-in rule (`GROUP_RULE_NAMES`).
+   * Without a rule, or with `all`, all edges share. An edge without a key shares with no edge.
+   */
+  readonly rule?: GroupRule | GroupRuleName;
   /** The cost of a link that an edge with the same key uses already, as a share of its length. The default is 0.5. */
   readonly discount?: number;
   /** The lane order of the runs. With `bundle`, the default, two edges keep one order on each run of their common stretch. With `run`, each run gets its order alone. */
@@ -121,9 +125,11 @@ export function sharedRouter(options: SharedOptions): Router {
   const reuseExponent = Math.max(0, options.reuseExponent ?? 1);
   const capacity = Math.max(0, options.capacity ?? 0);
   const laneWidth = Math.max(0, options.laneWidth ?? 4);
+  // The name `all` is the same as no rule.
+  const rule = options.rule === undefined || options.rule === "all" ? undefined : groupRuleOf(options.rule);
   const keyOf = (e: Edge): string => {
-    if (!options.rule) return "*";
-    return options.rule(e) ?? `\u0000${e.id}`;
+    if (!rule) return "*";
+    return rule(e) ?? `\u0000${e.id}`;
   };
   const router: Router = {
     name: options.name,

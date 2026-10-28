@@ -54,7 +54,7 @@ import type { DepthLevelOptions } from "../levels/depths/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
-import type { TrunksOptions } from "../routers/trunks.ts";
+import { GROUP_RULE_NAMES, type GroupRuleName, type TrunksOptions } from "../routers/trunks.ts";
 import type { SectionOptions } from "../sections.ts";
 import type { WayOptions } from "../ways.ts";
 import type { PipelineOptions } from "../whole/pipeline/index.ts";
@@ -82,6 +82,13 @@ export const LANE_STRETCH_SCHEMA: OptionSchema<LaneStretchOptions> = {
   },
   passes: { type: "integer", min: 1, max: 4, step: 1, default: 2, describe: "The number of passes of the method `sifting`. In each pass, each edge moves to its best place." },
 };
+
+/**
+ * The declaration of the grouping rule of the edges: a name of `GROUP_RULE_NAMES`. A new name of the list needs no change here.
+ * The option also takes a rule of the caller (`custom`), so the old value form stays valid.
+ * The `defaults` of a strategy keep the rule `byCollection`, and the declaration gives its name `collection` as its `default`.
+ */
+const EDGE_RULE: EnumOption<GroupRuleName> = { type: "enum", values: GROUP_RULE_NAMES, custom: "function", describe: "The grouping rule." };
 
 /** The declaration of the lane order of the shared ways of the routers `trunks` and `shared`. */
 const LANE_ORDER: EnumOption<RunOrder> = {
@@ -118,7 +125,7 @@ export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
 /** The declarations of the options of the router `trunks`. */
 export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
   ...WAY_SCHEMA,
-  rule: { type: "function", describe: "The grouping rule. The edges from one plug with one key share a trunk." },
+  rule: { ...EDGE_RULE, default: "collection", describe: "The grouping rule. The edges from one plug with one key share a trunk. With `all`, each edge has one key." },
   split: { type: "number", min: 0.1, max: 0.9, step: 0.05, default: 0.5, describe: "The split point is at this share of the way to the center of the targets." },
   minSize: { type: "integer", min: 1, max: 8, step: 1, default: 2, describe: "A group with fewer edges stays unbundled." },
   laneOrder: LANE_ORDER,
@@ -144,10 +151,10 @@ export const TRUNKS_SCHEMA: OptionSchema<RouterPreset<TrunksOptions>> = {
   bf: { type: "number", min: 0, max: 1, step: 0.05, default: 0.4, describe: "The balancing factor of the fan `tree`. 0 gives the least ink, and a larger factor gives more direct routes." },
 };
 
-/** The declarations of the options of the routers `shared` and `shared-all`. */
+/** The declarations of the options of the router `shared` and of the highway strategy `shared-ways`. */
 export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
   ...WAY_SCHEMA,
-  rule: { type: "function", describe: "The edges with one key share their ways. Without a rule, all edges share." },
+  rule: { ...EDGE_RULE, default: "collection", describe: "The edges with one key share their ways. With `collection`, the key is `data.collection`. With `all`, all edges share." },
   discount: {
     type: "number",
     min: 0.05,
@@ -201,6 +208,12 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     describe: "With `none`, each run gets its lane order alone. With the other values, the runs that follow each other share one order (LANE-STRETCH).",
   },
   siftPasses: LANE_STRETCH_SCHEMA.passes,
+};
+
+/** The declarations of the options of the router `shared-all`. It sets no rule, so all edges share. Thus its rule has no `default`. */
+export const SHARED_ALL_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
+  ...SHARED_SCHEMA,
+  rule: { ...EDGE_RULE, describe: "The edges with one key share their ways. Without a rule, or with `all`, all edges share. With `collection`, the key is `data.collection`." },
 };
 
 /** The declarations of the options of the highway strategy `corridors` (HWY-031). */
@@ -577,7 +590,7 @@ export const EDGE_PATH_SCHEMA: OptionSchema<EdgePathOptions> = {
 
 /** The declarations of the options of the highway strategy `soft-keys` (HWY-019). */
 export const SOFT_KEY_SCHEMA: OptionSchema<SoftKeyOptions> = {
-  rule: { type: "function", describe: "The rule that gives the key of each edge. Two different keys add the distance `lambda`." },
+  rule: { ...EDGE_RULE, default: "collection", describe: "The rule that gives the key of each edge. Two different keys add the distance `lambda`. With `all`, the keys add no distance." },
   lambda: { type: "number", min: 0, max: 2, step: 0.05, marks: [0, 0.25, 1], default: 0.25, describe: "The distance that two different keys add. A very large value keeps the keys apart." },
   tau: { type: "number", min: 0.1, max: 1.5, step: 0.05, marks: [0.3, 0.5, 1], default: 0.5, describe: "Two clusters join while their distance is this value or less." },
   attributes: { type: "list", default: [], describe: "The names of number fields of `data` that add a distance." },

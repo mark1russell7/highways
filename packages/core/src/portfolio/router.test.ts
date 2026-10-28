@@ -6,11 +6,12 @@ import { resultHash } from "../bench/screen/exercise.ts";
 import { mixedSegments } from "../bench/screen/gap.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { listStrategies } from "../strategies/model.ts";
-import { portfolioBand } from "./bands.ts";
+import { checkOptions, checkSchema, clampOptions, listOptions, optionDefaults, sweepValues } from "../strategies/options.ts";
+import { PORTFOLIO_CAPS, PORTFOLIO_KS_API, PORTFOLIO_RULES, portfolioBand } from "./bands.ts";
 import { PORTFOLIO_FIT } from "./fit.ts";
 import { guardBreaks, portfolioKey, type PortfolioFacts } from "./key.ts";
 import { portfolioMember } from "./members.ts";
-import { portfolioMembers, portfolioName, portfolioRouter, portfolioStrategy, routePortfolio } from "./router.ts";
+import { PORTFOLIO_HASHES, portfolioMembers, portfolioName, portfolioRouter, portfolioStrategy, routePortfolio, type PortfolioRouterOptions } from "./router.ts";
 import { PORTFOLIO_SETS } from "./sets.ts";
 
 const board = exactBoard("clustered", 10, 3);
@@ -123,5 +124,47 @@ describe("the portfolio router", () => {
     expect(portfolioRouter({ rule: "all", cap: 1.1, k: 8 }).name).toBe("portfolio-all-1.1-k8");
     expect(portfolioRouter().name).toBe("portfolio-collection-1.5-fit");
     expect(resultHash(portfolioStrategy.run(board, portfolioStrategy.defaults))).toBe(resultHash(routePortfolio(board).result));
+  });
+});
+
+describe("the schema of the portfolio router (SCHEMA-GAPS)", () => {
+  // The record has each key of the options except the clock `now`. The type fails for a missing key or for a key that the options do not have.
+  const declared: Record<Exclude<keyof PortfolioRouterOptions, "now">, true> = { rule: true, cap: true, k: true, budgetMs: true, maxMembers: true, hashes: true };
+
+  it("declares each option except the clock now, with a good schema", () => {
+    expect(Object.keys(portfolioStrategy.schema ?? {}).sort()).toEqual(Object.keys(declared).sort());
+    expect(checkSchema(portfolioStrategy)).toEqual([]);
+    expect(optionDefaults(portfolioStrategy)).toEqual({ rule: "collection", cap: 1.5, hashes: "pick" });
+    expect(checkOptions(portfolioStrategy, { now: () => 0 }).map((i) => i.problem)).toEqual(["unknown"]);
+  });
+
+  it("takes its lists of values from the constants", () => {
+    const of = (key: string): unknown[] => sweepValues(listOptions(portfolioStrategy).find((o) => o.key === key)!.declaration);
+    expect(of("rule")).toEqual([...PORTFOLIO_RULES]);
+    expect(of("cap")).toEqual([...PORTFOLIO_CAPS]);
+    expect(of("k")).toEqual([...PORTFOLIO_KS_API]);
+    expect(of("hashes")).toEqual([...PORTFOLIO_HASHES]);
+    expect(checkOptions(portfolioStrategy, { cap: 1.3 as 1.5, k: 4 as 3 }).map((i) => [i.key, i.problem])).toEqual([
+      ["cap", "value"],
+      ["k", "value"],
+    ]);
+    expect(clampOptions(portfolioStrategy, { cap: 1.3 as 1.5, k: 4 as 3, maxMembers: 99 })).toEqual({ cap: 1.25, k: 3, maxMembers: 9 });
+  });
+
+  it("gives a valid run for each value of each list", () => {
+    for (const { key, declaration } of listOptions(portfolioStrategy)) {
+      const list = declaration.type === "enum" || ((declaration.type === "number" || declaration.type === "integer") && declaration.values !== undefined);
+      if (!list) continue;
+      for (const value of sweepValues(declaration)) {
+        const options = { [key]: value } as Partial<PortfolioRouterOptions>;
+        expect(checkOptions(portfolioStrategy, options), `${key} ${String(value)}`).toEqual([]);
+        expect(portfolioStrategy.run(board, options).routes.length, `${key} ${String(value)}`).toBe(board.edges.length);
+      }
+    }
+  }, 60_000);
+
+  it("keeps the default output", () => {
+    expect(resultHash(portfolioStrategy.run(board))).toBe(resultHash(routePortfolio(board).result));
+    expect(resultHash(portfolioStrategy.run(board, optionDefaults(portfolioStrategy)))).toBe(resultHash(routePortfolio(board).result));
   });
 });
