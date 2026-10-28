@@ -184,7 +184,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
 
-`highways` has its own copy of `compareMeasure` and `minEffectOf` in `bench/screen/compare.ts`. The contract `@mark1russell7/layout-contract` adds the two functions in 0.2.2. After that release, `highways` uses the functions of the contract. A test checks that the copy agrees with this note.
+`highways` has its own copy of `compareMeasure` and `minEffectOf` in `bench/screen/compare.ts`. The contract `@mark1russell7/layout-contract` has the two functions from 0.2.2. The core has no run-time dependency, so it keeps its copy. A test checks that the copy agrees with this note, and a test compares the copy with the functions of the contract.
 
 This file does not copy the floors of the other projects:
 
