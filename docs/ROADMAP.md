@@ -92,6 +92,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PORTFOLIO-API | [The opt-in portfolio router](research/PORTFOLIO.md#the-portfolio-router-portfolio-api) `portfolio`: `shared` and the greedy set of the size band, rule and cap of the caller, with the shared combinator of layout-contract. On the held-out seeds, k = 5 keeps 4% to 100% of the oracle gain. At 40 nodes, k = 3 takes 51 to 176 ms. | 2026-10-28 | #112 |
 | PORTFOLIO-FIT | [One key and a deterministic default](research/PORTFOLIO.md#the-fit-of-the-router-portfolio-fit) for the router `portfolio`. The router and the offline choice use one guard and `selectBest`: 0 of 3 740 winners differ. The core imports layout-contract. Without `k`, the router runs a fit with a node limit for each member, at 6 to 46 ms (median) up to 40 nodes. | 2026-10-28 | #114 |
 | PORTFOLIO-SPEED | [A cheaper key and two bands above 40 nodes](research/PORTFOLIO.md#the-speed-of-the-router-portfolio-speed) for the router `portfolio`. One A* search for each terminal gives the same stretch, to 1e-15. The setup at 100 nodes goes from 172 to 25 ms. At 41 to 64 nodes, the fit runs one member at the cap 1.5, at 39 to 46 ms. | 2026-10-28 | #118 |
+| CALIBRATION | [A Brier score of the predictions](#calibration): 229 claims of 54 items score 0.177. Quality and size claims hit less than their confidence, and correctness and build claims hit more. | 2026-10-28 | #120 |
 
 ## Calibration
 
