@@ -19,7 +19,7 @@ const RESULTS_ID = "virtual:results";
 /**
  * This plugin gives the data of the results page from the committed files, at build time. The page reads no file and no network at run time.
  * It also puts the data line (the core release, the commit and the date of the build) in each page.
- * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build runs no benchmark.
+ * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
  */
 function committedResults(): Plugin {
   const line = dataLineHtml(buildInfo(root, env));

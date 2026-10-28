@@ -12,7 +12,7 @@ const $ = <T extends HTMLElement>(id: string): T => {
 const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const REPO = "https://github.com/mark1russell7/highways";
 
-/** The mark of each label. The page never shows a label by its color only. */
+/** The mark of each label. The page does not show a label by its color only. */
 const GLYPH: Readonly<Record<VerdictLabel, string>> = { better: "▲", worse: "▼", "depends on the mix": "◆", "no verdict": "○" };
 /** The class of each label. */
 const CLS: Readonly<Record<VerdictLabel, string>> = { better: "lab-better", worse: "lab-worse", "depends on the mix": "lab-mix", "no verdict": "lab-none" };

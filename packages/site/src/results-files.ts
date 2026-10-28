@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // The build reads the committed files of the results page with these functions. Only `vite.config.ts` and the tests use them.
 // They read the repository on disk. They never use the network.
 import { execFileSync } from "node:child_process";
