@@ -2,7 +2,7 @@
 // `pnpm portfolio:sets [--records <path,...>] [--runs <file>] [--time <path,...> --time-source <id>] [--sets <file>] [--fit <file>] [--out portfolio-sets.md] [--json portfolio-sets.json]`.
 // The script chooses the greedy set of each rule, cap and size band, and writes them to `src/portfolio/sets.ts`.
 // With `--time`, it reads the times of the members from the workflow `Portfolio` (`portfolio:time --members`), and writes the summary of the times (`TIMES_PATH`).
-// Without `--time`, it reads that summary. The greedy pool of a band has only the members that take 50 ms or less alone. The fit goes to `src/portfolio/fit.ts`.
+// Without `--time`, it reads that summary. The greedy pool of a band has only the members that take 50 ms or less with the key on their output. The fit goes to `src/portfolio/fit.ts`.
 // With `--records`, it reads the records of the workflow `Screen` on `exact-v1` and `exact-v1-bounds`, and writes the short table of the runs (`--runs`).
 // Without `--records`, it reads the short table of the runs. The test `src/portfolio/sets.test.ts` checks that `src/portfolio/sets.ts` is current.
 // With `--large`, it adds the records of `portfolio:time --guard-records` to the short table (PORTFOLIO-SPEED). Those boards have more than 40 nodes and no optima.
@@ -144,26 +144,34 @@ export function midValue(table: RunTable, short: ShortRuns, rule: GapRule, cap: 
 /** The time budget of one route of the portfolio router on the CI runner, in ms. A member that takes more alone at the top size of a band is not in the pool of the band. */
 export const BAND_BUDGET_MS = 50;
 
-/** The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key and the members. It is below `BAND_BUDGET_MS` as a margin. */
-export const FIT_TARGET_MS = 40;
+/**
+ * The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key, and each member with the key on its output.
+ * Without a margin, it is `BAND_BUDGET_MS`. A margin below it covers the noise between two CI runs (FIT-COST).
+ */
+export const FIT_TARGET_MS = 50;
 
-/** The summary of the times of the members (`portfolio-times/1`): the median time of each strategy at each size on the CI runner. */
+/** The summary of the times of the members (`portfolio-times/2`): the median time of each strategy at each size on the CI runner. */
 export interface MemberTimes {
-  readonly schema: "portfolio-times/1";
+  readonly schema: "portfolio-times/2";
   /** The CI run of the times. */
   readonly source: string;
   readonly sizes: readonly number[];
   /**
-   * The median time of each strategy at each node count, in ms, with 2 decimals. The time of a member is its route and the key on its output.
-   * The time of `shared` is its route. The time of `@key-setup` builds the network of the stretch and reads the facts of the output of `shared`.
+   * The median time of the route of each strategy alone at each node count, in ms, with 2 decimals.
+   * The time of `@key-setup` builds the network of the stretch and reads the facts of the output of `shared`.
    * A size without a time is a size that the strategy skipped: above its node limit, or after a size where it was slow.
    */
   readonly ms: Readonly<Record<string, Readonly<Record<string, number>>>>;
+  /**
+   * The median time of the key of the router on the output of each strategy, at each node count, in ms, with 2 decimals (FIT-COST).
+   * The key is the guard with the facts of the output, the B1 and the hash. For `shared`, it is the B1 and the hash.
+   */
+  readonly keyMs: Readonly<Record<string, Readonly<Record<string, number>>>>;
 }
 
 /** This function gives the summary of the times of the lines of `portfolio:time --members`: the median over the boards of the median over the repeats. */
 export function memberTimes(records: readonly TimeRecord[], source: string): MemberTimes {
-  const runs = new Map<string, number[]>();
+  const runs = new Map<string, [number, number][]>();
   const skipped = new Set<string>();
   for (const r of records) {
     const size = `${r.strategy}|${r.nodes}`;
@@ -173,22 +181,31 @@ export function memberTimes(records: readonly TimeRecord[], source: string): Mem
     }
     const board = `${size}|${r.cls}|${r.seed}`;
     if (!runs.has(board)) runs.set(board, []);
-    runs.get(board)!.push(r.ms + (r.keyMs ?? 0));
+    runs.get(board)!.push([r.ms, r.keyMs ?? 0]);
   }
-  const boards = new Map<string, number[]>();
+  const boards = new Map<string, [number, number][]>();
   for (const [board, xs] of runs) {
     const size = board.split("|").slice(0, 2).join("|");
     if (!boards.has(size)) boards.set(size, []);
-    boards.get(size)!.push(quantile(xs, 0.5));
+    boards.get(size)!.push([quantile(xs.map((x) => x[0]), 0.5), quantile(xs.map((x) => x[1]), 0.5)]);
   }
   const ms: Record<string, Record<string, number>> = {};
+  const keyMs: Record<string, Record<string, number>> = {};
+  const r2 = (v: number): number => Math.round(v * 100) / 100;
   for (const [size, xs] of [...boards].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
     if (skipped.has(size)) continue;
     const [strategy, nodes] = size.split("|") as [string, string];
-    (ms[strategy] ??= {})[nodes] = Math.round(quantile(xs, 0.5) * 100) / 100;
+    (ms[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[0]), 0.5));
+    if (strategy !== KEY_SETUP) (keyMs[strategy] ??= {})[nodes] = r2(quantile(xs.map((x) => x[1]), 0.5));
   }
   const sizes = [...new Set(records.map((r) => r.nodes))].sort((a, b) => a - b);
-  return { schema: "portfolio-times/1", source, sizes, ms };
+  return { schema: "portfolio-times/2", source, sizes, ms, keyMs };
+}
+
+/** This function gives the cost of a strategy in the router at `nodes` nodes: its route alone and the key on its output. A size without a time gives `undefined`. */
+export function costIn(times: MemberTimes, strategy: string, nodes: number): number | undefined {
+  const t = times.ms[strategy]?.[String(nodes)];
+  return t === undefined ? undefined : t + (times.keyMs?.[strategy]?.[String(nodes)] ?? 0);
 }
 
 /**
@@ -209,25 +226,28 @@ function bandSizes(times: MemberTimes, band: PortfolioBand, bands: readonly Port
   return times.sizes.filter((n) => n > lo && (last || n <= band.maxNodes));
 }
 
-/** This function tells if a strategy takes `BAND_BUDGET_MS` or less alone at the top size of the band, at or below `maxNodes`. A strategy without a time there does not. */
+/**
+ * This function tells if a strategy takes `BAND_BUDGET_MS` or less at the top size of the band, at or below `maxNodes`, with the key on its output (`costIn`).
+ * A strategy without a time there does not.
+ */
 export function fastIn(times: MemberTimes, strategy: string, band: PortfolioBand, bands: readonly PortfolioBand[] = PORTFOLIO_BANDS): boolean {
   const sizes = bandSizes(times, band, bands).filter((n) => n <= band.maxNodes);
   if (sizes.length === 0) return false;
-  const t = times.ms[strategy]?.[String(Math.max(...sizes))];
+  const t = costIn(times, strategy, Math.max(...sizes));
   return t !== undefined && t <= BAND_BUDGET_MS;
 }
 
 /**
  * This function gives the fit of a set in a band: the members of the default of the router, each with its node limit.
  * At each size of the band, the prefix of the set runs while the model time stays at or below `FIT_TARGET_MS`.
- * The model time is the base, plus the setup of the key with the first member, plus each member. A member leaves at the first size where it is not in the prefix.
- * Its node limit is the last size where it is in the prefix. A member with no such size is not in the fit.
+ * The model time is the base, plus the setup of the key with the first member, plus each member. Each strategy counts its route alone and the key on its output (`costIn`).
+ * A member leaves at the first size where it is not in the prefix. Its node limit is the last size where it is in the prefix. A member with no such size is not in the fit.
  */
 export function fitOf(set: readonly string[], times: MemberTimes, band: PortfolioBand, bands: readonly PortfolioBand[] = PORTFOLIO_BANDS): [string, number][] {
   const alive = new Set(set);
   const limit = new Map<string, number>();
   for (const n of bandSizes(times, band, bands)) {
-    const at = (s: string): number | undefined => times.ms[s]?.[String(n)];
+    const at = (s: string): number | undefined => (s === KEY_SETUP ? times.ms[s]?.[String(n)] : costIn(times, s, n));
     let total = at(PORTFOLIO_BASE) ?? Infinity;
     let open = true;
     for (const [j, s] of set.entries()) {
@@ -280,7 +300,7 @@ export interface BandChoice {
   readonly tests: readonly SetTest[];
   /** The median gap closed of the base `shared` on the test inputs. */
   readonly base: number;
-  /** The members of the pool that take more than `BAND_BUDGET_MS` alone in the band. They are not in the pool of the greedy choice. */
+  /** The members of the pool that take more than `BAND_BUDGET_MS` in the band, with the key on their output. They are not in the pool of the greedy choice. */
   readonly slow: readonly string[];
   /** With the times: the fit of the set (`fitOf`), and its test on the test inputs. */
   readonly fit?: { readonly members: readonly (readonly [string, number])[]; readonly test: SetTest };
@@ -427,7 +447,7 @@ export function setsReport(choices: readonly BandChoice[], ks: readonly number[]
     lines.push(
       "## The fit of the default",
       "",
-      `Each member runs up to its node limit. The model time of the fit is at or below ${FIT_TARGET_MS} ms. The column \`slow\` counts the members that take more than ${BAND_BUDGET_MS} ms alone in the band.`,
+      `Each member runs up to its node limit. The model time of the fit is at or below ${FIT_TARGET_MS} ms. The column \`slow\` counts the members that take more than ${BAND_BUDGET_MS} ms in the band, with the key on their output.`,
       "",
       "| band | rule | cap | slow | members (node limit) | share at the fit | share at k = 5 |",
       "|---|---|---:|---:|---|---:|---:|",
