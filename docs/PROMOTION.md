@@ -45,7 +45,7 @@ Some measures have a floor: the best value that the measure can have. A measure 
 - Otherwise, the ratio of the input is +Infinity. It is not a veto. It goes into the median, the tail and the sign test as each other ratio does.
 - The sign test drops each tie. The record counts the ties in the inputs where the floor rule applied.
 - A win measure at the floor cannot win on that input. The default is at its best value, so the candidate can only tie or lose.
-- Each measure has its own floor and tolerance, as two named parameters. [The floors](#the-floors) gives them or names their source. A measure without them has a tolerance of 0.
+- Each measure has its own floor and tolerance, as two named parameters. The floors of each step give them or name their source. A measure without them has a tolerance of 0.
 - A count has a tolerance of 0. Thus a count above 0 is beyond the tolerance.
 - The record of the test names, for each measure, the inputs where the floor rule applied.
 
@@ -55,7 +55,7 @@ A floor that is not 0 keeps the ratio, because the ratio has a value there. For 
 
 The sign test, the wins and the flips put each input, or each board, in one of three classes: `"better"`, `"worse"` or `"tie"`. A change smaller than the resolution of a measure is noise, not a result. Thus the classification uses a minimum effect.
 
-- `MeasureSpec` gets an optional field `minEffect?: number | { rel: number }`. It is separate from `tol`. `tol` is the slack above a floor, and it can be much larger than the resolution. For example, `B6.tol` is 60 degrees.
+- `MeasureSpec` gets an optional field `minEffect?: number | { rel: number }`. It is separate from `tol`. `tol` is the slack above a floor, and it can be much larger than the resolution.
 - The threshold, with `m = spec.minEffect ?? 0`, is `threshold(a, b) = max(RECORD_EPS, typeof m === "number" ? m : m.rel * max(|a|, |b|))`.
 - A non-finite `rel` product falls back to `RECORD_EPS`.
 - The threshold scales with the two values, not with the baseline alone. Thus the rule is symmetric.
@@ -76,7 +76,7 @@ The tie applies only to the classification of each input and each board: the sig
 
 ## The win test
 
-The test compares the candidate with the current default on each input of the corpus. The guard measures are the measures of the step in [The measures of each step](#the-measures-of-each-step). The win measures are the measures that the record of the idea names in `wins`.
+The test compares the candidate with the current default on each input of the corpus. The guard measures are the guard measures of the step, which each repository lists. The win measures are the measures that the record of the idea names in `wins`.
 
 | Test | Rule |
 |---|---|
@@ -102,7 +102,7 @@ The sign test replaces a fixed share of better inputs. A share of 60% of 20 inpu
 
 ### The confirmation run
 
-The program screens approximately 250 ideas. At a p-value of 0.05, approximately 12 ideas can pass by chance. The confirmation run controls this, and it also finds an option that fits only the corpus.
+The program screens many ideas. At a p-value of 0.05, 1 idea in 20 with no effect passes by chance. The confirmation run controls this, and it also finds an option that fits only the corpus.
 
 - The generators make a fresh set of inputs after the win test passes. No screen used these seeds before.
 - The fresh set has `confirmInputs` or more inputs, in the same cells as the corpus.
@@ -157,7 +157,7 @@ The ids are the ids of [the measure note](research/MEASURES.md). The ids of the 
 | `pack`, on change pairs | `pack.stability.mean`, `pack.stability.q95`, `pack.stability.moved` |
 | all routing steps, on change pairs | `Z10` |
 
-For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. `pack.search.ms` gives the time test.
+For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. The field `ms` of each record gives the time test. It is the median of `msRuns`.
 
 ### A bound by count
 
@@ -175,11 +175,13 @@ The `pack` step ranks its strategies in each cell in two levels. In a cell with 
 - A cell with fewer inputs gets more inputs from the generators before the decision.
 - **The regret.** For each input, the oracle is the best option for that input. The regret of the selector is the median gap between its option and the oracle. A new rule must decrease the regret of the full selector on the full corpus. Thus many small wins in cells do not make a worse selector.
 - **The flip rate.** Two inputs that are near the same, at the two sides of a cell edge, can get different options. Then the view jumps. The flip rate is the share of the change pairs where the option changes. A new rule keeps the flip rate at most `flipRate`.
-- The selector is off by default. Its first rule makes a later item (SELECT).
+- The selector is off by default.
+
+In `highways`, the first rule of the selector makes a later item (SELECT).
 
 ## The joint selector
 
-`layout-stack` owns the joint selector and its docs. Its docs refer to this note and do not copy it.
+`layout-stack` owns the joint selector and its docs. Its docs carry the shared blocks of this note from the contract.
 
 - The guards are the `joint.*` measures, the `pack.*` guards and the `route.*` guards.
 - The `pack.*` guards are `pack.area`, `pack.fill`, `pack.aspectError` and `pack.order.inversions`.
