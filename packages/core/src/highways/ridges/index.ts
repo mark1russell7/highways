@@ -255,7 +255,8 @@ export function nearPart(s: Point, t: Point, r: Ridge, snap: number): [number, n
 
 /**
  * This function gives the lines of the ridges (HWY-032), each with the edges that snap to it.
- * An edge snaps to a ridge when the part of its line near the ridge is half of `minLength` or longer, and the angle to the ridge is 30 degrees or less.
+ * An edge snaps to a ridge when the part of its line near the ridge is half of `minLength` or longer.
+ * The angle between the edge and the ridge is 30 degrees or less.
  * The edge joins and leaves the ridge at the ends of that part. When two ridges hold one part of an edge, only the longer part rides.
  */
 export function ridgeLines(input: HighwayInput, o: Readonly<RidgeOptions>): SnapLine[] {

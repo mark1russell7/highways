@@ -59,7 +59,7 @@ export function edgePaths(input: HighwayInput, o: Readonly<Pick<EdgePathOptions,
   return paths;
 }
 
-/** This function gives the shortest path (Dijkstra) from the node `from` to the node `to` over the links that do not skip, or `undefined` when its length is more than `limit`. */
+/** This function gives the shortest path (Dijkstra) from the node `from` to the node `to` over the links that do not skip. It gives `undefined` when the length is more than `limit`. */
 function shortest(
   from: string,
   to: string,

@@ -46,7 +46,7 @@ export function compatibility(p0: Point, p1: Point, q0: Point, q1: Point): numbe
   return ca * cs * cp * cv;
 }
 
-/** This function gives the visibility of the edge `q` from the edge `p` of FDEB: `max(1 - 2 |pm - im| / |i0 i1|, 0)`, with `i` the projection of `q` on the line of `p`. */
+/** This function gives the visibility of the edge `q` from the edge `p` of FDEB: `max(1 - 2 |pm - im| / |i0 i1|, 0)`. The points `i` are the projection of `q` on the line of `p`. */
 function visibility(p0: Point, p1: Point, q0: Point, q1: Point): number {
   const dx = p1.x - p0.x;
   const dy = p1.y - p0.y;

@@ -50,10 +50,10 @@ export const parallel: Graph = {
 };
 
 /**
- * This function adds the common tests of a highway strategy: it is in the registry, it gives a correct plan the same each time,
- * and its routes break no hard rule after `follow`.
+ * This function adds the common tests of a highway strategy. The strategy is in the registry, and it gives a correct plan the same each time.
+ * Its routes break no hard rule after `follow`.
  */
-export function commonTests<O>(name: string, defaults: O, plan: (input: HighwayInput, o: O) => HighwayPlan, graphs: readonly Graph[]): void {
+export function commonTests<O extends object>(name: string, defaults: O, plan: (input: HighwayInput, o: O) => HighwayPlan, graphs: readonly Graph[]): void {
   it("is in the registry, and gives a correct plan, the same each time", () => {
     const strategy = getStrategy(STRATEGIES, "highway", name);
     for (const graph of [...graphs, hub, clustered]) {
