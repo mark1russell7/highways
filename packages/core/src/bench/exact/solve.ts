@@ -64,7 +64,8 @@ function infoNumber(model: HighsModelLike, name: string): number | null {
 }
 
 /**
- * This function makes the exact model of a graph and solves it with HiGHS, with the relative MIP gap 0 and a time limit of `seconds`.
+ * This function makes the exact model of a graph and solves it with HiGHS.
+ * The relative MIP gap is 0, and the time limit is `seconds`.
  * It gives the status, the proof, the bound, the gap, the time and the plan of the best solution.
  */
 export function solveExact(highs: HighsLike, graph: Graph, o: { readonly stretch: number; readonly rule: ExactRule; readonly seconds: number }): ExactSolve {

@@ -18,8 +18,8 @@ export type GapRule = "collection" | "all";
 export const GAP_RULES: readonly GapRule[] = ["collection", "all"];
 
 /**
- * A view of the gap closed: one rule, or `chosen`. The view `chosen` takes the rule `all` for a run when a shared segment of the run
- * holds edges of two collections, and the rule `collection` when it does not.
+ * A view of the gap closed: one rule, or `chosen`. The view `chosen` takes a rule for each run.
+ * It takes `all` when a shared segment of the run holds edges of two collections. Else it takes `collection`.
  */
 export type GapView = GapRule | "chosen";
 
@@ -196,7 +196,11 @@ export function gapNames(view: GapView): { readonly gap: string; readonly cap: s
 /** This function gives the family of an input id `<set>/<family>/s<seed>`. */
 const familyOf = (input: string): string => input.split("/")[1] ?? input;
 
-/** This function gives the gap closed of each strategy and view over records, sorted by the view and then by the median, from high to low. */
+/**
+ * This function gives the gap closed of each strategy and view over records.
+ * It sorts them by the view and then by the median, from high to low.
+ * A strategy with a value on fewer than half of its runs comes after the others, because its median shows only a few inputs.
+ */
 export function summarizeGap(
   records: readonly { readonly strategy: string; readonly input: string; readonly skipped?: string; readonly measures: Readonly<Record<string, number>> }[],
 ): GapSummary[] {
@@ -221,7 +225,8 @@ export function summarizeGap(
       const mixed = ran.filter((r) => r.measures["route.bundle.gap-closed.mixed"] === 1).length;
       rows.push({ strategy, rule, runs: ran.length, values: values.length, median: boot.median, lo: boot.lo, hi: boot.hi, byClass, caps, builds, mixed });
     }
-    rows.sort((a, b) => (Number.isNaN(b.median) ? -Infinity : b.median) - (Number.isNaN(a.median) ? -Infinity : a.median) || (a.strategy < b.strategy ? -1 : 1));
+    const few = (r: GapSummary): number => (2 * r.values < r.runs ? 1 : 0);
+    rows.sort((a, b) => few(a) - few(b) || (Number.isNaN(b.median) ? -Infinity : b.median) - (Number.isNaN(a.median) ? -Infinity : a.median) || (a.strategy < b.strategy ? -1 : 1));
     out.push(...rows);
   }
   return out;
@@ -244,6 +249,7 @@ export function formatGap(rows: readonly GapSummary[]): string {
       "The value of an input is `(B1 - B1 of the baseline) / (the optimum B1 - B1 of the baseline)`, at the smallest cap at or above the largest stretch of the routes.",
       "The stretch is the stretch of the exact model: the length of a route without its plug ends, divided by the shortest way in the network of the model.",
       "The interval is the 95% paired bootstrap interval of the median, with 10000 samples.",
+      "A strategy with a value on fewer than half of its runs comes after the others. Above the largest cap, a run has no value.",
       "",
       `| strategy | runs | builds | mixed | values | median | interval | ${classes.join(" | ")} | caps 1.1 / 1.25 / 1.5 |`,
       `|---|---:|---:|---:|---:|---:|---|${classes.map(() => "---:").join("|")}|---|`,
@@ -267,8 +273,11 @@ export function mixesCollections(graph: Graph, result: Result): boolean {
  * This function gives the gap measures of the result of one run on an input with optima, by the keys of `MEASURES`.
  * `B3.max` is the largest stretch against the routes of `corners`. `gap.stretch` is the largest stretch as the exact model counts it (`exactStretch`).
  * The cap is the smallest cap at or above `gap.stretch`, so both sides of the gap have the same stretch limit.
- * `gap.<rule>` is the gap closed at the cap `gap.cap.<rule>`. `gap` is the gap closed of the rule of the run: `all` when `gap.mixed` is 1, else `collection`.
- * A rule has no value above the largest cap, without a proven optimum at the cap, or when the hash of the optimum is not the hash of the input.
+ *
+ * `gap.<rule>` is the gap closed at the cap `gap.cap.<rule>`. `gap` is the gap closed of the rule of the run.
+ * That rule is `all` when `gap.mixed` is 1, else `collection`.
+ * A rule has no value above the largest cap or without a proven optimum at the cap.
+ * It also has no value when the hash of the optimum is not the hash of the input.
  */
 export function gapValues(
   input: { readonly id: string; readonly hash: string },

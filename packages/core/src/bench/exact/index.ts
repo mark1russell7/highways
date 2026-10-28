@@ -220,8 +220,9 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
 }
 
 /**
- * This function gives the largest stretch of routes as the exact model counts it: the length of a route without its two plug ends,
- * divided by the shortest way in the network of the model. The cap of the model is a limit on this value.
+ * This function gives the largest stretch of routes as the exact model counts it.
+ * The stretch of a route is its length without its two plug ends, divided by the shortest way in the network of the model.
+ * The cap of the model is a limit on this value.
  * An edge without a route or without a way in the network does not count. Without such an edge, the value is 1.
  */
 export function exactStretch(graph: Graph, routes: readonly Route[], o: Readonly<WayOptions> = {}): number {
