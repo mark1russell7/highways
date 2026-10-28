@@ -7528,7 +7528,7 @@
     "placementDependent": true,
     "screen": "Boards: mid-fanout, case-hub-chain. Keep if B1 > trunks by 10% with R7 = 0 and B3 q95 < 1.5.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-037",
       "HWY-017",
@@ -7538,7 +7538,99 @@
     "same": [
       "EDA-015"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40761862381",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/steiner@a32522f",
+        "screen-v2/*/steiner-octilinear@a32522f",
+        "screen-v2/*/steiner-key@a32522f",
+        "screen-v2/*/steiner+stretch@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/steiner@a32522f",
+        "screen-v1/*/steiner-octilinear@a32522f",
+        "screen-v1/*/steiner-key@a32522f",
+        "screen-v1/*/steiner+stretch@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.167,
+            "small-clustered": 0.242,
+            "dense-groups": 0.237,
+            "hub-chain": 0.153,
+            "many-groups": 0.183,
+            "packed-grid": 0.109
+          }
+        },
+        "R14 against shared": {
+          "base": {
+            "tiny-uniform": 0.142,
+            "small-clustered": 0.11,
+            "dense-groups": 0.114,
+            "hub-chain": 0.775,
+            "many-groups": 0.449,
+            "packed-grid": 0.166
+          },
+          "new": {
+            "tiny-uniform": 0.419,
+            "small-clustered": 0.321,
+            "dense-groups": 0.286,
+            "hub-chain": 0.736,
+            "many-groups": 0.555,
+            "packed-grid": 0.177
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "tiny-uniform": 0.18,
+            "small-clustered": 0.542,
+            "dense-groups": 0.504,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006
+          },
+          "new": {
+            "tiny-uniform": 0.46,
+            "small-clustered": 0.693,
+            "dense-groups": 0.653,
+            "hub-chain": 0.393,
+            "many-groups": 0.434,
+            "packed-grid": 0.191
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.325,
+            "small-clustered": 1.379,
+            "dense-groups": 1.381,
+            "hub-chain": 1.03,
+            "many-groups": 1.204,
+            "packed-grid": 1.109
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On screen-v2, steiner is better on B1 with 1 of 6 families against, on R14 with 1 against, and on B2 with 0 against. The median B1 ratio over shared is 2.108, and the B3 q95 ratio is 1.146. Steiner adds 10 pass-through breaks on 6 inputs of packed-grid, and 2 on screen-v1. With the gate stretch, the breaks go to 0, but B1 has no verdict. Thus the idea stays screened."
+    }
   },
   {
     "id": "HWY-037",
@@ -11636,7 +11728,7 @@
     "placementDependent": true,
     "screen": "Boards: packedGridBoard, grid-400, nestedGridBoard. Keep if B1 >= shared and M4 = 0 on 2 of 3 boards.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-016",
       "HWY-051",
@@ -11644,7 +11736,99 @@
       "NAT-034",
       "EDA-008"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40761862381",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/gaps@a32522f",
+        "screen-v2/*/gaps-corners@a32522f",
+        "screen-v2/*/gaps-k2@a32522f",
+        "screen-v2/*/gaps+stretch@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/gaps@a32522f",
+        "screen-v1/*/gaps-corners@a32522f",
+        "screen-v1/*/gaps-k2@a32522f",
+        "screen-v1/*/gaps+stretch@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.259,
+            "small-clustered": 0.327,
+            "dense-groups": 0.353,
+            "hub-chain": 0.634,
+            "many-groups": 0.581,
+            "packed-grid": 0
+          }
+        },
+        "R14 against shared": {
+          "base": {
+            "tiny-uniform": 0.142,
+            "small-clustered": 0.11,
+            "dense-groups": 0.114,
+            "hub-chain": 0.775,
+            "many-groups": 0.449,
+            "packed-grid": 0.166
+          },
+          "new": {
+            "tiny-uniform": 0.462,
+            "small-clustered": 0.482,
+            "dense-groups": 0.477,
+            "hub-chain": 0.987,
+            "many-groups": 0.922,
+            "packed-grid": 0.166
+          }
+        },
+        "M4 against shared": {
+          "base": {
+            "tiny-uniform": 0,
+            "small-clustered": 10.5,
+            "dense-groups": 37.8,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 92.4
+          },
+          "new": {
+            "tiny-uniform": 0.2,
+            "small-clustered": 8.3,
+            "dense-groups": 19,
+            "hub-chain": 0.3,
+            "many-groups": 32.3,
+            "packed-grid": 92.4
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.275,
+            "small-clustered": 1.33,
+            "dense-groups": 1.318,
+            "hub-chain": 1.077,
+            "many-groups": 1.262,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On both sets, gaps is better on B1 and on R14 with 0 families against. M4 has no verdict, with 2 of 6 families against on screen-v2. M4 rises from 0 to 32.3 on many-groups, so the keep rule of M4 fails. The median B1 ratio is 5.282, and the B3 q95 ratio is 1.084. Gaps adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "HWY-058",
@@ -11686,13 +11870,105 @@
     "placementDependent": true,
     "screen": "Boards: grid-400, packedGridBoard. Keep if R14 > 0.9 and B1 >= shared at B3 q95 <= 1.3.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-024",
       "HWY-057",
       "HWY-036"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40761862381",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/streets@a32522f",
+        "screen-v2/*/streets-room@a32522f",
+        "screen-v2/*/streets-g1.5@a32522f",
+        "screen-v2/*/streets+stretch@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/streets@a32522f",
+        "screen-v1/*/streets-room@a32522f",
+        "screen-v1/*/streets-g1.5@a32522f",
+        "screen-v1/*/streets+stretch@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.24,
+            "small-clustered": 0.302,
+            "dense-groups": 0.32,
+            "hub-chain": 0.175,
+            "many-groups": 0.551,
+            "packed-grid": 0
+          }
+        },
+        "R14 against shared": {
+          "base": {
+            "tiny-uniform": 0.142,
+            "small-clustered": 0.11,
+            "dense-groups": 0.114,
+            "hub-chain": 0.775,
+            "many-groups": 0.449,
+            "packed-grid": 0.166
+          },
+          "new": {
+            "tiny-uniform": 0.301,
+            "small-clustered": 0.194,
+            "dense-groups": 0.162,
+            "hub-chain": 0.916,
+            "many-groups": 0.783,
+            "packed-grid": 0.166
+          }
+        },
+        "R3 against shared": {
+          "base": {
+            "tiny-uniform": 2.493,
+            "small-clustered": 3.99,
+            "dense-groups": 4.737,
+            "hub-chain": 0.974,
+            "many-groups": 2.944,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 3.573,
+            "small-clustered": 5.419,
+            "dense-groups": 5.878,
+            "hub-chain": 1.454,
+            "many-groups": 2.846,
+            "packed-grid": 0
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.269,
+            "small-clustered": 1.293,
+            "dense-groups": 1.282,
+            "hub-chain": 1.119,
+            "many-groups": 1.271,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On both sets, streets is better on R14 with 0 families against, and on B1 with 0 or 1 against. R3 is worse on both sets. The bends rise by 24% to 49% on 4 of 5 families with bends. R14 stays under 0.9 on 5 of 6 families. The median B1 ratio is 1.741, and the B3 q95 ratio is 1.105. Streets adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "HWY-059",
@@ -11729,13 +12005,107 @@
     "placementDependent": true,
     "screen": "Boards: the 3 case boards. Keep if it gains 5% on the score over its start set. It also gives an upper bound for the fast rules.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "HWY-045",
       "HWY-040",
       "NAT-043"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40761862381",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/corridors@a32522f",
+        "screen-v2/*/search@a32522f",
+        "screen-v2/*/search-e0@a32522f",
+        "screen-v2/*/search-e48@a32522f",
+        "screen-v2/*/search+stretch@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/corridors@a32522f",
+        "screen-v1/*/search@a32522f",
+        "screen-v1/*/search-e0@a32522f",
+        "screen-v1/*/search-e48@a32522f",
+        "screen-v1/*/search+stretch@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.027,
+            "small-clustered": 0.087,
+            "dense-groups": 0.111,
+            "hub-chain": 0.349,
+            "many-groups": 0.195,
+            "packed-grid": 0
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.003,
+            "small-clustered": 1.004,
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.014,
+            "packed-grid": 1
+          }
+        },
+        "B4 against shared": {
+          "base": {
+            "tiny-uniform": 0.063,
+            "small-clustered": 0.689,
+            "dense-groups": 0.795,
+            "hub-chain": 0.029,
+            "many-groups": 0.329,
+            "packed-grid": 0.011
+          },
+          "new": {
+            "tiny-uniform": 0.042,
+            "small-clustered": 0.391,
+            "dense-groups": 0.453,
+            "hub-chain": 0.509,
+            "many-groups": 0.576,
+            "packed-grid": 0.011
+          }
+        },
+        "B6 against shared": {
+          "base": {
+            "tiny-uniform": 36.351,
+            "small-clustered": 135.289,
+            "dense-groups": 152.659,
+            "hub-chain": 41.549,
+            "many-groups": 88.952,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 27.751,
+            "small-clustered": 95.577,
+            "dense-groups": 85.589,
+            "hub-chain": 45.402,
+            "many-groups": 89.165,
+            "packed-grid": 0
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. The search starts at corridors. Against corridors, the median B1 ratio is 1.000 and the B3 q95 ratio is 1.000. With 48 evaluations, B1 is 0.998 at 45 times the time of shared. Against shared, B1 and B4 have no verdict on screen-v2, and they depend on the mix on screen-v1. The better B3 q95 and B6 come from the start plan. The search does not gain 5% over its start, so the idea is dropped."
+    }
   },
   {
     "id": "HWY-060",
@@ -11772,12 +12142,86 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 > the best single-highway rule by 5% at B3 q95 within 5% on 3 of 5 boards.",
     "prototype": "L",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-041",
       "HWY-033",
       "HWY-042"
     ],
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40761862381",
+      "records": [
+        "screen-v2/*/shared@a32522f",
+        "screen-v2/*/interchanges@a32522f",
+        "screen-v2/*/interchanges-p3@a32522f",
+        "screen-v2/*/interchanges-c0@a32522f",
+        "screen-v2/*/interchanges+stretch@a32522f",
+        "screen-v1/*/shared@a32522f",
+        "screen-v1/*/interchanges@a32522f",
+        "screen-v1/*/interchanges-p3@a32522f",
+        "screen-v1/*/interchanges-c0@a32522f",
+        "screen-v1/*/interchanges+stretch@a32522f"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.033,
+            "small-clustered": 0.286,
+            "dense-groups": 0.385,
+            "hub-chain": 0.607,
+            "many-groups": 0.559,
+            "packed-grid": 0
+          }
+        },
+        "B8 against shared": {
+          "base": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 66.2,
+            "dense-groups": 137.2,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 93,
+            "dense-groups": 182.4,
+            "hub-chain": 24.7,
+            "many-groups": 81.9,
+            "packed-grid": 0.1
+          }
+        },
+        "B3q95 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.009,
+            "small-clustered": 1.24,
+            "dense-groups": 1.263,
+            "hub-chain": 1.072,
+            "many-groups": 1.227,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40761862381 and the screen-v1 run 40764832307, at a32522f. On both sets, interchanges is better on B1 with 0 families against. The median B1 ratio is 1.450, and the B3 q95 ratio is 1.019. B8 runs is worse on both sets, but B8 runs is 0 for shared on hub-chain and many-groups (MEAS-FLAT). Z9 has no value for a highway plan. The time is 3.03 times shared. It adds 0 hard-rule breaks."
+    }
   }
 ]

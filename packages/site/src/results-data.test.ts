@@ -71,7 +71,9 @@ describe("the committed files of the results page", () => {
     const data = readResults(root);
     expect(data.tables).toHaveLength(files.length);
     expect(data.splitSet).toBe("screen-v2");
-    expect(data.split.length).toBe(40);
+    const catalog = readFileSync(join(root, "docs/research/CATALOG.md"), "utf8");
+    const m = /Over all the `better` verdicts of `screen-v2`, (\d+) of (\d+) have 1 or more families against them/.exec(catalog);
+    expect(data.split.length).toBe(Number(m?.[1]));
     expect(data.ideas.total).toBe(ideaRecords(root).length);
     expect(data.ideas.stages.reduce((n, s) => n + s.count, 0)).toBe(data.ideas.total);
     expect(data.ideas.kept.length).toBeGreaterThan(0);

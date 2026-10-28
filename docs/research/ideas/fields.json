@@ -789,7 +789,7 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout and case-dense-groups: B1 and the total trunk length against the split of today. Keep if B1 rises >= 5% with R9 = 0 after an obstacle repair.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "EDA-030",
       "EDA-035",

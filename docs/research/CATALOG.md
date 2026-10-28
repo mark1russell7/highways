@@ -782,7 +782,7 @@ The guard is a test that refuses a promotion when a family loses beyond the tie.
 
 - The promotion rule has promoted no option yet. `docs/PROMOTION.md` and the roadmap list no promotion, and no record of the catalog has the field `promotion`. Thus the guard count is 0 of 0.
 - Take as a proxy each strategy with 1 or more `better` guards and no `worse` guard on `screen-v2`. These are `shared-ways`, `lanes` and `soft-keys`, all of the step `highway`. Only `soft-keys` has families against it: its B1 is `better`, but 3 of 6 families are against it.
-- Over all the `better` verdicts of `screen-v2`, 40 of 94 have 1 or more families against them. Over all the `better` and `worse` verdicts, 93 of 201 have.
+- At SCREEN-WEIGHT, 40 of the 94 `better` verdicts of `screen-v2` have 1 or more families against them. Of the 201 `better` and `worse` verdicts, 93 have.
 
 ### The prediction
 
@@ -977,6 +977,56 @@ BUILD-QUEUE takes the ideas from the top of the queue (direction 10). Each build
 - The gate `stretch` removes no member, so `corridors+stretch` has the same labels.
 - No variant gives B1 a side. The near links within one lane (`near` 4) have the best B1 of the variants (stratified mean +0.034 on `screen-v2`, p 0.16). The signature with 128 hashes in 16 bands finds fewer pairs, and it is `worse` on B1.
 - The idea is not `better` on B1, so it is not kept. No named win is `worse`, so it is not dropped. Its stage is `screened`.
+
+## Wave 3G (BUILD-W3G)
+
+Wave 3G builds six ideas: `steiner` (HWY-036), `attraction` (HWY-044), `gaps` (HWY-057), `streets` (HWY-058), `search` (HWY-059) and `interchanges` (HWY-060).
+Each strategy is screened alone, with the gate `stretch`, and with one or two changes of its options. The verdict is the verdict over families of `scripts/screen-verdict.ts` against `shared`, on the named wins of the idea.
+
+The records are the runs at `a32522f`:
+
+- The step `highway`: [40764832307](https://github.com/mark1russell7/highways/actions/runs/40764832307) on `screen-v1` and [40761862381](https://github.com/mark1russell7/highways/actions/runs/40761862381) on `screen-v2`.
+- The step `router`: [40766283584](https://github.com/mark1russell7/highways/actions/runs/40766283584) on `screen-v1` and [40767715430](https://github.com/mark1russell7/highways/actions/runs/40767715430) on `screen-v2`.
+
+### The rule of the stage
+
+- An idea is `kept` when each named win with a value is `better` on `screen-v2` with 0 families against it. It also has no `worse` named win on `screen-v1`, and 0 new hard-rule breaks.
+- An idea is `dropped` when the screen shows that its own move gives no gain over its start.
+- Each other idea stays `screened`.
+- A new hard-rule break is a break on an input where `shared` has fewer breaks of the same rule.
+
+### The results
+
+A cell gives the label and the breadth: the families against, of 6, and the ties. The ratios are the paired ratios of the candidate over `shared` on `screen-v2`, as the median and the maximum. An input where `shared` has 0 gives no ratio. The time ratio is the median time over the median time of `shared` on `screen-v2`.
+
+| Idea | Named wins on `screen-v1` | Named wins on `screen-v2` | B1 ratio | B3 q95 ratio | Time | New hard-rule breaks | Stage |
+|---|---|---|---:|---:|---:|---|---|
+| HWY-036 `steiner` | B1 `no verdict` 2 of 6, R14 `better` 2 of 6, B2 `better` 0 of 6 | B1 `better` 1 of 6, R14 `better` 1 of 6, B2 `better` 0 of 6 | 2.108 / 388.5 | 1.146 / 1.418 | 2.30 | 10 `no-pass-through` on 6 inputs of `packed-grid` (2 on `screen-v1`) | `screened` |
+| HWY-057 `gaps` | R14 `better` 0 of 6 (1 tie), M4 `depends on the mix` 2 of 6, B1 `better` 0 of 6 (1 tie) | R14 `better` 0 of 6 (1 tie), M4 `no verdict` 2 of 6, B1 `better` 0 of 6 (1 tie) | 5.282 / 30.16 | 1.084 / 1.347 | 1.95 | 0 | `screened` |
+| HWY-058 `streets` | R14 `better` 0 of 6 (1 tie), B1 `better` 0 of 6 (1 tie), R3 `worse` 1 of 6 | R14 `better` 0 of 6 (1 tie), B1 `better` 1 of 6 (1 tie), R3 `worse` 1 of 6 | 1.741 / 39.10 | 1.105 / 1.376 | 2.25 | 0 | `screened` |
+| HWY-059 `search` | B1 `depends on the mix` 2 of 6, B3 q95 `better` 1 of 6, B4 `depends on the mix` 2 of 6, B6 `better` 0 of 6 | B1 `no verdict` 2 of 6, B3 q95 `better` 1 of 6, B4 `no verdict` 3 of 6, B6 `better` 1 of 6 | 1.000 / 19.72 | 1.000 / 1.028 | 19.4 | 0 | `dropped` |
+| HWY-060 `interchanges` | B1 `better` 0 of 6 (1 tie), B8 runs `worse` 0 of 6 (1 tie) | B1 `better` 0 of 6 (1 tie), B8 runs `worse` 0 of 6 (1 tie) | 1.450 / 28.75 | 1.019 / 1.298 | 3.03 | 0 | `screened` |
+| HWY-044 `attraction` | B1 `better` 0 of 6 (3 ties), B8 runs `worse` 0 of 6 (3 ties), M4 `no verdict` 1 of 6 | The run of `screen-v2` gives it. | 1.011 / 3.460 (`screen-v1`) | 1.000 / 1.032 (`screen-v1`) | 2.63 (`screen-v1`) | 0 | The run of `screen-v2` decides. |
+
+- `steiner` gives the most B1 of the wave, but it adds routes through boxes on `packed-grid`. With the gate `stretch`, the breaks go to 0, and B1 has no verdict with 4 of 6 families against.
+- `gaps` raises M4 from 0 to 32.3 on `many-groups`. Thus its named win M4 fails. With `minSize: 2`, the labels stay the same.
+- `streets` raises the bends (R3) by 24% to 49% on 4 of 5 families with bends.
+- `search` starts at `corridors`. Against `corridors`, its median B1 ratio is 1.000, and 0.998 with 48 evaluations at 45 times the time of `shared`. Its `better` B3 q95 and B6 come from the start plan.
+- `search` reads only the graph and the routes of its input. Its score does not read the records of a screen. The option `evaluations` (0 to 400, default 16) sets its budget.
+- On both sets, `interchanges` gets B1 `better` with 0 families against. Its only loss is B8 runs.
+
+### The snapshots of the verdicts
+
+The snapshots of [`verdicts/`](verdicts/README.md) hold the highway screens of this wave, with all the built-in strategies and the strategies of the wave.
+
+- Over all the `better` verdicts of `screen-v2`, 61 of 125 have 1 or more families against them. Over all the `better` and `worse` verdicts, 132 of 270 have.
+- The results page reads these counts. A new screen in a snapshot changes them.
+
+### The measures with no value
+
+- Z9 has no value for a plan of the step `highway`. The records have no `route.level.link-agreement`.
+- Z2 is 0 on each record.
+- B8 runs is 0 for `shared` on `hub-chain` and `many-groups` (MEAS-FLAT). Thus each strategy that makes a run there is `worse` on B8 runs.
 
 ## Gaps
 
