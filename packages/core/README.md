@@ -500,6 +500,7 @@ The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outp
 - `budgetMs` is an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine.
 - `budgetMs` is a soft limit between members. The router examines it only before each member, so a slow member runs to its end. With `budgetMs: 50`, the median on large boards was 142 to 239 ms.
 - Version 0.6.0 changes the default of `routePortfolio`. [The defaults of 0.5.1 and 0.6.0](../../docs/research/PORTFOLIO.md#the-defaults-of-051-and-060) gives the old and the new members of each band.
+- Version 0.7.0 changes it again. [The defaults of 0.6.0 and 0.7.0](../../docs/research/PORTFOLIO.md#the-defaults-of-060-and-070) gives the members that change.
 - The router picks with `selectBest` of `@mark1russell7/layout-contract`, the one run-time dependency of the core.
 - The result has the output, the winner, the trace of the pick and the move count `move.pick`.
 - `exactStretches(graph, options?)` gives a function from the routes to the stretch of each edge in the exact model. The router uses it for the cap. `exactStretch` gives the largest stretch.
