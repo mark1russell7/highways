@@ -61,6 +61,8 @@ jobs:
     timeout-minutes: 150
     strategy:
       fail-fast: false
+      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
+      max-parallel: 6
       matrix:
         router: ${{ fromJSON(needs.routers.outputs.list) }}
     env:
