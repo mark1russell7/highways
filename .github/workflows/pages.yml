@@ -1,7 +1,9 @@
 # Builds packages/site and publishes it to GitHub Pages at https://mark1russell7.github.io/highways/, with
 # the shared Pages workflow of mark1russell7 (reusable-pages.yml of mark1russell7/template, its CI.md).
 # The Pages source of the repository is "GitHub Actions" (Settings > Pages).
-# Before the build, the benchmark races the routers on the fixtures to 1 000 nodes. The site shows that table.
+# The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/,
+# the verdict snapshots of docs/research/verdicts/, the idea records and the roadmap (SITE-LIVE).
+# The shared site-pages action adds the Status page (from docs/ROADMAP.md) and the Releases page (from npm).
 name: Pages
 
 on:
@@ -31,16 +33,14 @@ jobs:
       pages: write
       id-token: write
     with:
-      # The benchmark rows (bench.json) and their commit go into the public folder of the site, then the site builds.
-      # A router that is not deterministic makes the benchmark fail. The site still deploys, with a warning.
-      build: |
-        mkdir -p packages/site/public
-        pnpm --filter @mark1russell7/highways bench --max 1000 --json "$PWD/packages/site/public/bench.json" \
-          || echo "::warning::The benchmark failed or found a router that is not deterministic."
-        printf '{"sha":"%s","date":"%s"}\n' "$(git rev-parse HEAD)" "$(date -u +%F)" > packages/site/public/bench-meta.json
-        pnpm --filter @highways/site run build
+      # The site reads the committed snapshots, so the build takes a few minutes. The workflow Bench races the routers.
+      build: pnpm --filter @highways/site run build
       out: packages/site/dist
       env: '{"SITE_BASE": "/${{ github.event.repository.name }}"}'
-      # The site has no npm packages and no roadmap file, so it needs no Releases page and no Status page.
-      site-pages: false
-      timeout-minutes: 30
+      # The Releases page and the Status page (releases/, status/ and their data/*.json), at deploy time.
+      # The package has no changelog file. The Releases page takes the versions from npm.
+      site-pages: true
+      roadmap: docs/ROADMAP.md
+      packages: "@mark1russell7/highways"
+      site-name: highways
+      timeout-minutes: 15

@@ -6,6 +6,8 @@ The core is plain TypeScript. It knows no renderer. It takes boxes and edges, an
 
 The site [mark1russell7.github.io/highways](https://mark1russell7.github.io/highways/) shows a live map. Pick a router and a fixture, and your browser routes the graph. The site also shows the benchmark.
 
+The [results page](https://mark1russell7.github.io/highways/results.html) shows the committed verdicts of the screens, the ideas and the newest items of the roadmap. Each merge to `main` builds it again.
+
 ## The idea
 
 - A tree of sections divides the plane. Each section has a highway that bends around the nodes in it.

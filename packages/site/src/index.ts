@@ -341,11 +341,11 @@ function road(): void {
     .join("");
 }
 
-// The benchmark table, from the rows that the Pages workflow wrote at deploy time.
+// The benchmark table, from the committed snapshot of one run of the workflow `Bench`. The build copies it into the site.
 async function bench(): Promise<void> {
   const base = import.meta.env.BASE_URL;
   let rows: BenchRow[] = [];
-  let meta: { sha?: string; date?: string } = {};
+  let meta: { sha?: string; date?: string; run?: number } = {};
   try {
     const r = await fetch(`${base}bench.json`);
     if (r.ok) rows = (await r.json()) as BenchRow[];
@@ -362,7 +362,8 @@ async function bench(): Promise<void> {
   if (meta.sha) {
     const sha = esc(meta.sha);
     const short = sha.slice(0, 7);
-    $("bench-meta").innerHTML = `Raced on a GitHub runner${meta.date ? ` on ${esc(meta.date)}` : ""}, at commit <a href="https://github.com/mark1russell7/highways/commit/${sha}"><code>${short}</code></a>.`;
+    const run = typeof meta.run === "number" ? ` in the run <a href="https://github.com/mark1russell7/highways/actions/runs/${meta.run}">${meta.run}</a> of the workflow <code>Bench</code>` : "";
+    $("bench-meta").innerHTML = `Raced on a GitHub runner${run}${meta.date ? ` on ${esc(meta.date)}` : ""}, at commit <a href="https://github.com/mark1russell7/highways/commit/${sha}"><code>${short}</code></a>.`;
   }
   const fixtures = [...new Set(rows.map((r) => r.fixture))];
   const tabs = $("bench-tabs");

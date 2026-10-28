@@ -36,3 +36,7 @@ Write all prose of this repository in the style of ASD-STE100 Simplified Technic
 - The core knows no renderer. It takes boxes and edges, and it gives polylines and zoom levels.
 - Each strategy of a step has its own folder, its tests and a row in the benchmark.
 - `pnpm --filter @mark1russell7/highways bench` races the routers. Start the large fixtures only in CI, with the workflow `Bench`.
+
+## Site
+
+- An item that changes a strategy, a measure, a verdict or a corpus commits its verdict snapshot and the records that the site reads.
