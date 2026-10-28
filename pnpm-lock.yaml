@@ -201,7 +201,7 @@ importers:
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/layout-contract':
         specifier: ^0.2.1
-        version: 0.2.1
+        version: 0.2.3
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.5
@@ -444,8 +444,8 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/layout-contract@0.2.1':
-    resolution: {integrity: sha512-onnnEgm+Z4TZX7Qcycyb/ZNPBtmZaHzWwQp4XH52jGynFnf1V4ywFwYZdMawcoDnWp9RGnsjwQP3OMG2MZaGUQ==}
+  '@mark1russell7/layout-contract@0.2.3':
+    resolution: {integrity: sha512-eodi6RkxhOcueXRh60lgl3dNmy1ysD5WuikMGmYUQ3edk5xaeSJC/s3d0qhvP9ASuh/rVc44Yy+phu3b2YaI8Q==}
     engines: {node: '>=22.12'}
 
   '@mark1russell7/ste-lint@https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db':
@@ -1534,7 +1534,7 @@ snapshots:
 
   '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8': {}
 
-  '@mark1russell7/layout-contract@0.2.1': {}
+  '@mark1russell7/layout-contract@0.2.3': {}
 
   '@mark1russell7/ste-lint@https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db':
     dependencies:
