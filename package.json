@@ -10,8 +10,9 @@
   "scripts": {
     "package": "template package",
     "template": "template repo",
-    "test": "pnpm -r run test && pnpm run test:ai-review && pnpm run test:shared",
+    "test": "pnpm -r run test && pnpm run test:ai-review && pnpm run test:shared && pnpm run test:math",
     "test:shared": "node scripts/check-shared.mjs",
+    "test:math": "node scripts/check-math.mjs",
     "test:ai-review": "node --test \"scripts/ai-review/*.test.mjs\"",
     "typecheck": "pnpm -r run typecheck",
     "lint:ste": "ste-lint",

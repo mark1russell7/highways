@@ -1,0 +1,195 @@
+# The same routes on each platform (XPLAT-HASH). Each cell of the matrix (a system and a node version) routes the inputs of the joint bench
+# of layout-contract with `scripts/xplat.ts`: the route hash, the exact routes and the hashes of the Math calls. The job locate finds the first chunk
+# of 1000 calls that differs between two cells. The job near routes those inputs again and writes each call of those chunks in full.
+# The last job compares the cells with `scripts/xplat-summary.ts` and writes the summary. The note `docs/research/XPLAT.md` gives the result.
+name: Xplat
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Also route the 24 inputs of the artifact xplat-graphs of the layout-contract run below. With false, only the 3 inputs of packages/core/scripts/data/xplat."
+        default: "true"
+      run:
+        description: "The id of the layout-contract run with the artifact xplat-graphs."
+        default: "40688908137"
+  pull_request:
+    paths:
+      - .github/workflows/xplat.yml
+      - packages/core/scripts/xplat.ts
+      - packages/core/scripts/xplat-summary.ts
+      - packages/core/scripts/data/xplat/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: xplat-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  inputs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      ALL: ${{ inputs.all || 'true' }}
+      RUN: ${{ inputs.run || '40688908137' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Collect the inputs
+        run: |
+          mkdir -p inputs
+          cp packages/core/scripts/data/xplat/*.json.gz inputs/
+          if [ "$ALL" = "true" ]; then
+            # The artifact of another public repository. When the token cannot read it, the 3 inputs of the repository stay.
+            if gh run download "$RUN" -R mark1russell7/layout-contract -n xplat-graphs -D inputs/all; then
+              echo "The job downloaded the artifact xplat-graphs of the layout-contract run $RUN." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "The job could not download the artifact xplat-graphs of the layout-contract run $RUN. Only the 3 inputs of the repository go to the matrix." >> "$GITHUB_STEP_SUMMARY"
+              rm -rf inputs/all
+            fi
+          fi
+          echo "The inputs: $(find inputs -name '*.json*' | sed 's#.*/##; s#\.json.*##' | sort -u | wc -l) graphs." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: xplat-inputs
+          path: inputs/
+
+  trace:
+    needs: inputs
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [24, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: xplat-inputs
+          path: inputs
+      - name: Trace the routes
+        env:
+          XPLAT_CALLS: "1"
+        run: |
+          set -o pipefail
+          node --version
+          cd packages/core
+          node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/trace"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: xplat-trace-${{ matrix.os }}-node${{ matrix.node }}
+          path: trace/
+          if-no-files-found: warn
+
+  locate:
+    needs: trace
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: xplat-trace-*
+          path: cells
+      - name: Find the first chunk of calls that differs
+        run: node packages/core/scripts/xplat-summary.ts --cells cells --targets targets.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: xplat-targets
+          path: targets.json
+
+  near:
+    needs: locate
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [24, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: xplat-inputs
+          path: inputs
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: xplat-targets
+          path: targets
+      - name: Log the calls of the chunks that differ
+        run: |
+          set -o pipefail
+          cd packages/core
+          XPLAT_NEAR="$GITHUB_WORKSPACE/targets/targets.json" node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/near"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: xplat-near-${{ matrix.os }}-node${{ matrix.node }}
+          path: near/
+          if-no-files-found: warn
+
+  summary:
+    needs: near
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: xplat-trace-*
+          path: cells
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: xplat-near-*
+          path: near
+      - name: Write the summary
+        run: |
+          mkdir -p near
+          node packages/core/scripts/xplat-summary.ts --cells cells --near near --out xplat.md --json xplat.json
+          cat xplat.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: xplat-summary
+          path: |
+            xplat.md
+            xplat.json
