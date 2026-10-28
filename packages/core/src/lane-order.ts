@@ -2,6 +2,7 @@
 // The package index does not export this module.
 import { byText } from "./compare.ts";
 import { dist, type Point } from "./geom.ts";
+import type { Route } from "./model.ts";
 
 /** Two points nearer than this distance are the same point. The value is the same as in `segments.ts`. */
 const SAME = 1e-6;
@@ -12,6 +13,42 @@ export interface Placed {
   readonly p: readonly Point[];
   readonly s: number;
   readonly e: number;
+}
+
+/** A placed route with the way that it goes through the run. */
+export interface PlacedRoute extends Placed {
+  /** This value is true when the route goes from the last point of the run to its first point. Then `p` holds the points of the route in reverse. */
+  readonly reversed: boolean;
+}
+
+/** This function gives the index where `p` holds the points of `part` in a row, from `from` on, or -1. */
+export function findRun(p: readonly Point[], part: readonly Point[], from: number): number {
+  for (let i = from; i + part.length <= p.length; i++) {
+    let ok = true;
+    for (let j = 0; ok && j < part.length; j++) ok = dist(p[i + j]!, part[j]!) <= SAME;
+    if (ok) return i;
+  }
+  return -1;
+}
+
+/**
+ * This function places the routes on the run `run`. A route holds the points of the run in a row, in either direction.
+ * The list `lost` holds the edges of the routes that do not hold the run, in the order of `routes`.
+ */
+export function placeRoutes(run: readonly Point[], routes: readonly Route[]): { readonly placed: PlacedRoute[]; readonly lost: string[] } {
+  const placed: PlacedRoute[] = [];
+  const lost: string[] = [];
+  for (const r of routes) {
+    let at = findRun(r.points, run, 0);
+    if (at >= 0) placed.push({ edge: r.edge, p: r.points, s: at, e: at + run.length - 1, reversed: false });
+    else {
+      const p = [...r.points].reverse();
+      at = findRun(p, run, 0);
+      if (at >= 0) placed.push({ edge: r.edge, p, s: at, e: at + run.length - 1, reversed: true });
+      else lost.push(r.edge);
+    }
+  }
+  return { placed, lost };
 }
 
 /** The place where two routes part past one end of their common stretch, and the side of the first route there. */

@@ -1,4 +1,4 @@
-// The trace of XPLAT-HASH: `node scripts/xplat.ts --inputs <dir>[,<dir>...] --out <dir> [--routers shared,sections,corners]`.
+// The trace of XPLAT-HASH: `node scripts/xplat.ts --inputs <dir>[,<dir>...] --out <dir> [--routers shared,sections,corners] [--extra shared-stretch]`.
 // It routes each graph of the inputs with each router, and writes the route hash, the exact routes and, with an env flag, a log of the Math calls.
 // The workflow `Xplat` (.github/workflows/xplat.yml) starts it on each cell of a matrix of systems and node versions. `scripts/xplat-summary.ts` compares the cells.
 //
@@ -6,6 +6,7 @@
 // `graph` is the routed graph. `routes[]` has the hashes of the joint bench for each router (the hashes of linux node 26 and of win32 node 24).
 // When a `.json` and a `.json.gz` file have the same name, the script reads the `.json.gz` file only.
 // The routers are the routers of `routes[]` of the input and `corners`, or the list of `--routers`.
+// `--extra` adds opt-in routers after them, for example `shared-stretch` (LANE-STRETCH). The joint bench has no hash of an opt-in router.
 //
 // The route hash is `routeHash` of the joint runner of layout-contract: `outputHash({ routes sorted by edge, levels, bundles, runs }, { grid: RECORD_EPS })`.
 // The router is `asRouter(routerStrategies[name]).route(graph)` with the default options, as the joint runner calls it.
@@ -34,7 +35,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { canonicalJson, outputHash, RECORD_EPS } from "@mark1russell7/layout-contract";
-import { asRouter, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { asRouter, routerStrategies, sharedStretchStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { hasCycle, observeLanes } from "../src/lane-order.ts";
 
 /** The Math functions that the log wraps. The index of a name in this list is its id in the hash of a chunk. */
@@ -247,9 +248,12 @@ function readInput(name: string, path: string): XplatInput | undefined {
   return { name, manifestId: doc.manifestId ?? name, routes: doc.routes ?? [], graph: doc.graph };
 }
 
+/** The opt-in routers that `--extra` can add. They are not in the registry `STRATEGIES`. */
+const OPT_IN: Readonly<Record<string, Strategy<"router", object>>> = { "shared-stretch": sharedStretchStrategy as unknown as Strategy<"router", object> };
+
 /** This function gives the router of a name, as the joint runner of layout-contract gives it. */
 function routerOf(name: string): (graph: Graph) => Result {
-  const s = (routerStrategies as unknown as Readonly<Record<string, Strategy<"router", object>>>)[name];
+  const s = (routerStrategies as unknown as Readonly<Record<string, Strategy<"router", object>>>)[name] ?? OPT_IN[name];
   if (s === undefined) throw new RangeError(`There is no router "${name}".`);
   const router = asRouter(s);
   return (graph) => router.route(graph);
@@ -277,6 +281,8 @@ async function main(): Promise<void> {
   const inputs = (opt("--inputs") ?? fileURLToPath(new URL("./data/xplat", import.meta.url))).split(",");
   const out = resolve(opt("--out") ?? "xplat-out");
   const routersArg = opt("--routers")?.split(",");
+  const extra = opt("--extra")?.split(",") ?? [];
+  for (const name of extra) if (OPT_IN[name] === undefined) throw new RangeError(`There is no opt-in router "${name}".`);
   const calls = process.env["XPLAT_CALLS"] === "1";
   const nearFile = process.env["XPLAT_NEAR"];
   const targets: Record<string, readonly number[]> | undefined = nearFile ? (JSON.parse(readFileSync(nearFile, "utf8")) as Record<string, readonly number[]>) : undefined;
@@ -297,7 +303,7 @@ async function main(): Promise<void> {
   for (const [name, path] of files) {
     const input = readInput(name, path);
     if (input === undefined) continue;
-    const routers = routersArg ?? [...new Set([...input.routes.map((r) => r.router), "corners"])];
+    const routers = [...new Set([...(routersArg ?? [...input.routes.map((r) => r.router), "corners"]), ...extra])];
     for (const router of routers) {
       const key = `${name}/${router}`;
       const route = routerOf(router);

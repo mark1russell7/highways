@@ -49,6 +49,7 @@ import type { TraclusOptions } from "../highways/traclus/index.ts";
 import type { WeiszfeldOptions } from "../highways/weiszfeld/index.ts";
 import type { WspdOptions } from "../highways/wspd/index.ts";
 import type { ZipperOptions } from "../highways/zipper/index.ts";
+import type { LaneStretchOptions } from "../lane-orders/stretch/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
@@ -67,6 +68,17 @@ const WAY_SCHEMA: OptionSchema<WayOptions> = {
   margin: { type: "number", min: 1, max: 20, step: 1, default: 5, describe: "The distance from a box to the corners of the graph." },
   k: { type: "integer", min: 2, max: 16, step: 1, default: 8, describe: "The number of visible neighbours of each corner." },
   smooth: { type: "boolean", default: false, describe: "With `true`, a way in clear view uses the inflection rule, and the other ways get round corners." },
+};
+
+/** The declarations of the options of the stretch order (LANE-STRETCH): the method and the passes of `sifting`. A generator can list each value. */
+export const LANE_STRETCH_SCHEMA: OptionSchema<LaneStretchOptions> = {
+  method: {
+    type: "enum",
+    values: ["none", "consensus", "periphery", "sifting"],
+    default: "sifting",
+    describe: "The order of each stretch: the order of each run alone, the order of the pair relation, the order of the largest run, or the order of the pair relation after sifting.",
+  },
+  passes: { type: "integer", min: 1, max: 4, step: 1, default: 2, describe: "The number of passes of the method `sifting`. In each pass, each edge moves to its best place." },
 };
 
 /** The declaration of the lane order of the shared ways of the routers `trunks` and `shared`. */
@@ -179,6 +191,12 @@ export const SHARED_SCHEMA: OptionSchema<RouterPreset<SharedOptions>> = {
     default: "corner",
     describe: "With `corner`, a route joins a run at a corner of the graph. With `snell`, it joins at the angle `acos(d)` (NAT-035).",
   },
+  stretchOrder: {
+    ...LANE_STRETCH_SCHEMA.method,
+    default: "none",
+    describe: "With `none`, each run gets its lane order alone. With the other values, the runs that follow each other share one order (LANE-STRETCH).",
+  },
+  siftPasses: LANE_STRETCH_SCHEMA.passes,
 };
 
 /** The declarations of the options of the highway strategy `corridors` (HWY-031). */
