@@ -1,16 +1,18 @@
-// The command line of the portfolio (PORTFOLIO): `pnpm portfolio --exact <path,...> --screen <path,...> [--time <path,...>] [--out portfolio.md] [--json portfolio.json]`.
+// The command line of the portfolio (PORTFOLIO): `pnpm portfolio --exact <path,...> --screen <path,...> [--time <path,...>] [--optima <file>] [--out portfolio.md] [--json portfolio.json]`.
 // A portfolio runs `shared` and k more strategies on an input, and keeps the output with the best guarded B1. Its score needs only the outputs.
 // The script reads the records of the workflow `Screen` and the times of the workflow `Portfolio`, and writes the tables of `docs/research/PORTFOLIO.md`.
 // It chooses each set of k strategies greedily on one half of the seeds and tests it on the other half.
+// PORTFOLIO-RULE adds the forms with the rule of the caller: the portfolio chooses only among the runs that obey the rule, and measures against the oracle of that rule.
+// The optima of `--optima` (default `src/bench/exact/optima-exact-v1.json`) give the gap closed at one cap for each run.
 // The script reads only records, so it runs locally in a few seconds. The screens and the times run in CI.
 // The test `src/bench/screen/portfolio.test.ts` examines the functions of this file on a small set of records.
-import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
-import { GAP_CAPS } from "../src/bench/screen/gap.ts";
+import { GAP_CAPS, GAP_RULES, gapCap, gapClosed, optimumKey, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
 import { RECORD_EPS } from "../src/bench/screen/hash.ts";
-import { B1, B10, B3_Q95, DECISION_BOARDS, familyOf, halfFolds, pairedBootstrap, readRecords, type OracleRecord } from "./oracle.ts";
+import { B1, B10, B3_Q95, DECISION_BOARDS, familyOf, halfFolds, MIXED, pairedBootstrap, readRecords, type OracleRecord } from "./oracle.ts";
 import type { TimeRecord } from "./portfolio-time.ts";
 
 /** The name of the largest stretch of the routes, in the units of the exact model, in a record of `exact-v1`. */
@@ -24,6 +26,10 @@ export interface Run {
   readonly stretch?: number;
   /** The gap closed (B10) with the rule of the run. Only the runs of `exact-v1` have it. */
   readonly b10?: number;
+  /** This value is `true` when a shared segment of the run holds edges of two collections. Then the rule of the run is `all`. Only the runs of `exact-v1` have it. */
+  readonly mixed?: boolean;
+  /** The gap closed of each rule at the cap of the run. Only the runs of `exact-v1` have it. */
+  readonly gaps?: Readonly<Partial<Record<GapRule, number>>>;
   readonly hard: Readonly<Record<string, number>>;
 }
 
@@ -47,6 +53,9 @@ export const PORTFOLIO_KS: readonly number[] = [1, 2, 3, 5, 8];
 /** The frame budgets of the time table, in ms. */
 export const FRAME_BUDGETS: readonly number[] = [16, 100];
 
+/** This function gives the name of the gap closed of the rule `rule` at the cap of the run, in a record of `exact-v1`. */
+export const ruleGapName = (rule: GapRule): string => `${B10}.${rule}`;
+
 /** This function gives the run table of records. A skipped run and a run without B1 are not in the table. */
 export function runTable(records: readonly OracleRecord[]): Map<string, Map<string, Run>> {
   const table = new Map<string, Map<string, Run>>();
@@ -60,6 +69,10 @@ export function runTable(records: readonly OracleRecord[]): Map<string, Map<stri
       ...(m[B3_Q95] === undefined ? {} : { q95: m[B3_Q95] }),
       ...(m[MODEL_STRETCH] === undefined ? {} : { stretch: m[MODEL_STRETCH] }),
       ...(m[B10] === undefined ? {} : { b10: m[B10] }),
+      ...(m[MIXED] === undefined ? {} : { mixed: m[MIXED] === 1 }),
+      ...(GAP_RULES.some((g) => m[ruleGapName(g)] !== undefined)
+        ? { gaps: Object.fromEntries(GAP_RULES.flatMap((g) => (m[ruleGapName(g)] === undefined ? [] : [[g, m[ruleGapName(g)]!]]))) }
+        : {}),
       hard: r.hard ?? {},
     });
   }
@@ -222,7 +235,7 @@ export function shareOf(portfolio: number, single: number, oracleMedian: number)
 
 /**
  * This function gives the Pareto curve of the portfolio: for each k, it chooses the set on the train inputs of each split and tests it on the test inputs.
- * The best single strategy of a split is the one with the best median on its train inputs, with a value on `singleShare` of them (default 1).
+ * The best single strategy of a split is the one with the best median of `singleBy` (default `value`) on its train inputs, with a value on `singleShare` of them (default 1).
  * With `strict`, it must pass the guard on each train input. On a test input, its value is `singleOf` (default `value`).
  * The oracle of a test input is the best value of `oracleOf` over the pool. An input without each of the three values is not in the test.
  */
@@ -237,6 +250,7 @@ export function paretoCurve(
     readonly strict?: Guard;
     readonly oracleOf?: ValueOf;
     readonly singleOf?: ValueOf;
+    readonly singleBy?: ValueOf;
     readonly singleShare?: number;
     readonly full?: boolean;
   } = {},
@@ -254,7 +268,7 @@ export function paretoCurve(
     for (const sp of splits) {
       const set = k >= pool.length ? pool.filter((s) => s !== PORTFOLIO_BASE) : greedySet(table, sp.train, pool, k, guard, value);
       sets.push(set);
-      const single = singleBest(table, sp.train, pool, value, { minShare: o.singleShare ?? 1, ...(o.strict === undefined ? {} : { strict: o.strict }) });
+      const single = singleBest(table, sp.train, pool, o.singleBy ?? value, { minShare: o.singleShare ?? 1, ...(o.strict === undefined ? {} : { strict: o.strict }) });
       const vals = portfolioValues(table, sp.test, set, guard, value);
       const mine = { pf: [] as number[], one: [] as number[], orc: [] as number[] };
       sp.test.forEach((i, n) => {
@@ -290,6 +304,107 @@ export function discordance(row: ReadonlyMap<string, Run>): { readonly pairs: nu
       if (Math.sign(d1) !== Math.sign(d10)) reversed++;
     }
   return { pairs, reversed };
+}
+
+/** The causes of a reversed pair: the two runs have the same rule and the same cap, the same rule and another cap, or another rule. */
+export type ReversalCause = "same" | "cap" | "rule";
+
+/** The rule of a run on `exact-v1`: `all` when a shared segment holds edges of two collections, else `collection`. */
+export const ruleOf = (run: Run): GapRule => (run.mixed === true ? "all" : "collection");
+
+/**
+ * This function counts the pairs of `discordance` by cause. The cap of a run is the smallest cap at or above its stretch.
+ * For one input, one rule and one cap, B10 is a linear map of B1 with a positive slope. Thus the cause `same` has no reversed pair.
+ */
+export function discordanceByCause(row: ReadonlyMap<string, Run>): Record<ReversalCause, { pairs: number; reversed: number }> {
+  const out: Record<ReversalCause, { pairs: number; reversed: number }> = { same: { pairs: 0, reversed: 0 }, cap: { pairs: 0, reversed: 0 }, rule: { pairs: 0, reversed: 0 } };
+  const runs = [...row.values()].filter((r) => r.b10 !== undefined);
+  for (let a = 0; a < runs.length; a++)
+    for (let b = a + 1; b < runs.length; b++) {
+      const x = runs[a]!;
+      const y = runs[b]!;
+      const d1 = x.b1 - y.b1;
+      const d10 = x.b10! - y.b10!;
+      if (Math.abs(d1) <= RECORD_EPS || Math.abs(d10) <= RECORD_EPS) continue;
+      const cause: ReversalCause = ruleOf(x) !== ruleOf(y) ? "rule" : gapCap(x.stretch ?? Infinity) !== gapCap(y.stretch ?? Infinity) ? "cap" : "same";
+      out[cause].pairs++;
+      if (Math.sign(d1) !== Math.sign(d10)) out[cause].reversed++;
+    }
+  return out;
+}
+
+/**
+ * This function tells if a run obeys the rule of a caller. The rule is a parameter of the caller:
+ * - `collection`: collections cannot mix. A run obeys when no shared segment holds edges of two collections.
+ * - `all`: collections can mix. Each run obeys.
+ */
+export function obeys(run: Run, rule: GapRule): boolean {
+  return rule === "all" || run.mixed !== true;
+}
+
+/** This function gives the run table with only the runs that obey the rule `rule`. The portfolio of the rule chooses only among these runs. */
+export function ruleTable(table: RunTable, rule: GapRule): Map<string, Map<string, Run>> {
+  return new Map([...table].map(([i, row]) => [i, new Map([...row].filter(([, r]) => obeys(r, rule)))]));
+}
+
+/** This function gives the gap closed of the rule `rule` at the cap of each run. A run that does not obey the rule has no value. */
+export const ruleValue =
+  (table: RunTable, rule: GapRule): ValueOf =>
+  (input, strategy) => {
+    const r = table.get(input)?.get(strategy);
+    return r === undefined || !obeys(r, rule) ? undefined : r.gaps?.[rule];
+  };
+
+/**
+ * This function gives the B1 of the baseline of each rule on each input, from the gap closed of the runs: `base = (b1 - g * optimum) / (1 - g)`.
+ * It takes the median over the runs with `|1 - g|` of 0.5 or more, at the cap of each run. The records do not hold the baseline of `all`.
+ */
+export function ruleBaselines(table: RunTable, optima: readonly ExactOptimum[]): Map<string, Partial<Record<GapRule, number>>> {
+  const opt = new Map(optima.map((o) => [optimumKey(o.input, o.rule, o.cap), o]));
+  const out = new Map<string, Partial<Record<GapRule, number>>>();
+  for (const [input, row] of table) {
+    const bases: Partial<Record<GapRule, number>> = {};
+    for (const rule of GAP_RULES) {
+      const xs: number[] = [];
+      for (const r of row.values()) {
+        const g = r.gaps?.[rule];
+        const cap = r.stretch === undefined ? undefined : gapCap(r.stretch);
+        const o = cap === undefined ? undefined : opt.get(optimumKey(input, rule, cap));
+        if (g === undefined || o === undefined || o.b1 === null || Math.abs(1 - g) < 0.5) continue;
+        xs.push((r.b1 - g * o.b1) / (1 - g));
+      }
+      if (xs.length > 0) bases[rule] = quantile(xs, 0.5);
+    }
+    out.set(input, bases);
+  }
+  return out;
+}
+
+/**
+ * This function gives the gap closed of the rule `rule` at the one cap `cap` for each run: `(b1 - base) / (the optimum at the cap - base)`.
+ * A run with a stretch above the cap has no value. A run that does not obey the rule, or an input without a proven optimum at the cap, has no value.
+ * For one input, the value is a linear map of B1 with a positive slope. Thus the best B1 also has the best value.
+ */
+export function capValue(table: RunTable, rule: GapRule, cap: number, optima: readonly ExactOptimum[], bases: ReadonlyMap<string, Partial<Record<GapRule, number>>>): ValueOf {
+  const opt = new Map(optima.filter((o) => o.rule === rule && Math.abs(o.cap - cap) <= 1e-9 && o.proven && o.b1 !== null).map((o) => [o.input, o.b1!]));
+  return (input, strategy) => {
+    const r = table.get(input)?.get(strategy);
+    const o = opt.get(input);
+    const base = bases.get(input)?.[rule];
+    if (r === undefined || !obeys(r, rule) || o === undefined || base === undefined || r.stretch === undefined || r.stretch > cap + 1e-9) return undefined;
+    return gapClosed(r.b1, base, o);
+  };
+}
+
+/** This function gives the value of a run when it passes the guard, else the value of the baseline on the same input. A missing run falls back too. */
+export function fallbackValue(table: RunTable, value: ValueOf, guard: Guard): ValueOf {
+  return (input, strategy) => {
+    const row = table.get(input);
+    const r = row?.get(strategy);
+    const b = row?.get(PORTFOLIO_BASE);
+    if (b === undefined) return undefined;
+    return r !== undefined && (strategy === PORTFOLIO_BASE || passes(r, b, guard)) ? value(input, strategy) : value(input, PORTFOLIO_BASE);
+  };
 }
 
 /** The time of a set of strategies at one size: the median and the q95 over the boards, one after the other and in parallel. */
@@ -395,8 +510,51 @@ export interface PortfolioReport {
   readonly data: Record<string, unknown>;
 }
 
-/** This function makes the tables of the portfolio for the records of `exact-v1` and of `screen-v1`, and the times of the workflow `Portfolio`. */
-export function portfolioReport(exact: readonly OracleRecord[], screen: readonly OracleRecord[], times: readonly TimeRecord[] = []): PortfolioReport {
+/** The one cap of the forms of PORTFOLIO-RULE: the largest cap of the gap closed. The guard `cap` already refuses each run above it. */
+export const RULE_CAP = GAP_CAPS[GAP_CAPS.length - 1]!;
+
+/** One form of the portfolio of PORTFOLIO-RULE: the rule of the caller, and the cap of the value (`undefined` for the cap of each run). */
+export interface RuleForm {
+  readonly rule: GapRule;
+  readonly cap?: number;
+  readonly curve: readonly CurvePoint[];
+  /** The best single strategy of each split. */
+  readonly singles: readonly (string | undefined)[];
+}
+
+/**
+ * This function gives the Pareto curves of the forms of PORTFOLIO-RULE on `exact-v1`, with the guard `cap`.
+ * For each rule, the portfolio chooses by B1 only among the runs that obey the rule. It measures the choice by the gap closed of that rule, against the oracle of that rule.
+ * The value is at the cap of each run, and also at the one cap `RULE_CAP` when `optima` holds the optima.
+ * The best single strategy of a split falls back to `shared` on an input where it fails the guard or the rule.
+ */
+export function ruleForms(
+  table: RunTable,
+  splits: readonly Split[],
+  pool: readonly string[],
+  optima: readonly ExactOptimum[] = [],
+  o: { readonly ks?: readonly number[]; readonly full?: boolean } = {},
+): RuleForm[] {
+  const bases = optima.length > 0 ? ruleBaselines(table, optima) : new Map<string, Partial<Record<GapRule, number>>>();
+  const forms: RuleForm[] = [];
+  for (const rule of GAP_RULES) {
+    const rt = ruleTable(table, rule);
+    const values: { cap?: number; value: ValueOf }[] = [
+      { value: ruleValue(table, rule) },
+      ...(optima.length > 0 ? [{ cap: RULE_CAP, value: capValue(table, rule, RULE_CAP, optima, bases) }] : []),
+    ];
+    for (const v of values) {
+      const fb = fallbackValue(rt, v.value, "cap");
+      const curve = paretoCurve(rt, splits, pool, "cap", v.value, { singleBy: fb, singleOf: fb, full: o.full ?? true, ...(o.ks === undefined ? {} : { ks: o.ks }) });
+      const singles = splits.map((sp) => singleBest(rt, sp.train, pool, fb, { minShare: 1 }));
+      forms.push({ rule, ...(v.cap === undefined ? {} : { cap: v.cap }), curve, singles });
+    }
+  }
+  return forms;
+}
+
+/** This function makes the tables of the portfolio for the records of `exact-v1` and of `screen-v1`, and the times of the workflow `Portfolio`. The optima give the forms at one cap. */
+export function portfolioReport(exact: readonly OracleRecord[], screen: readonly OracleRecord[], times: readonly TimeRecord[] = [], optima: readonly ExactOptimum[] = []): PortfolioReport {
   const lines: string[] = [];
   const data: Record<string, unknown> = {};
   const fullSets: { corpus: string; guard: Guard; k: number; set: string[] }[] = [];
@@ -440,8 +598,10 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
     data["claim"] = { pairs, reversed, argmaxDiffer, q95Pass };
 
     const splits = seedSplits(inputs);
+    let capCurve: CurvePoint[] = [];
     for (const guard of ["q95", "cap"] as const) {
       const curve = paretoCurve(table, splits, pool, guard, value, { full: true });
+      if (guard === "cap") capCurve = curve;
       lines.push(
         `## \`exact-v1\`: the gap closed (B10) of the portfolio with the guard \`${guard}\``,
         "",
@@ -460,6 +620,58 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
       data[`exact-${guard}`] = curve;
       for (const k of PORTFOLIO_KS) fullSets.push({ corpus: "exact-v1", guard, k, set: greedySet(table, inputs, pool, k, guard, value) });
     }
+
+    // PORTFOLIO-RULE: the reversed pairs by cause, and the portfolio with the rule of the caller.
+    const causes = inputs.map((i) => discordanceByCause(table.get(i)!));
+    const sum = (c: ReversalCause, f: "pairs" | "reversed"): number => causes.reduce((a, d) => a + d[c][f], 0);
+    const causeText: Record<ReversalCause, string> = { same: "the same rule and the same cap", cap: "the same rule and another cap", rule: "another rule" };
+    lines.push(
+      "## `exact-v1`: the reversed pairs by cause (PORTFOLIO-RULE)",
+      "",
+      "| the two runs have | pairs | reversed | share |",
+      "|---|---:|---:|---:|",
+      ...(["same", "cap", "rule"] as const).map((c) => `| ${causeText[c]} | ${sum(c, "pairs")} | ${sum(c, "reversed")} | ${pct(sum(c, "reversed") / sum(c, "pairs"))} |`),
+      "",
+    );
+    data["causes"] = Object.fromEntries((["same", "cap", "rule"] as const).map((c) => [c, { pairs: sum(c, "pairs"), reversed: sum(c, "reversed") }]));
+    const forms = ruleForms(table, splits, pool, optima);
+    const proven = (rule: GapRule): number =>
+      new Set(optima.filter((x) => x.rule === rule && Math.abs(x.cap - RULE_CAP) <= 1e-9 && x.proven && x.b1 !== null).map((x) => x.input)).size;
+    const capText = (f: { cap?: number }): string => (f.cap === undefined ? "the cap of each run" : `the cap ${f.cap}`);
+    const kOf = (p: CurvePoint): string => (p.k >= pool.length ? `all ${pool.length - 1}` : String(p.k));
+    const rows = [
+      { name: "the old form", rule: "the rule of each run", cap: "the cap of each run", curve: capCurve },
+      ...forms.map((f) => ({ name: f.cap === undefined ? "(input, rule)" : "(input, rule, cap)", rule: code(f.rule), cap: capText(f), curve: f.curve })),
+    ];
+    lines.push(
+      "## `exact-v1`: the portfolio with the rule of the caller (PORTFOLIO-RULE)",
+      "",
+      `The guard is \`cap\`. The inputs with a proven optimum at the cap ${RULE_CAP}: ${GAP_RULES.map((r) => `${proven(r)} of ${inputs.length} for ${code(r)}`).join(", ")}.`,
+      "",
+      `| form | rule | cap | best single | oracle | oracle gain | ${[...PORTFOLIO_KS.map((k) => `k = ${k}`), "all"].join(" | ")} |`,
+      `|---|---|---|---:|---:|---:|${[...PORTFOLIO_KS, 0].map(() => "---:").join("|")}|`,
+      ...rows.map((r) => {
+        const p0 = r.curve[0]!;
+        const single = quantile(p0.single, 0.5);
+        const orc = quantile(p0.oracle, 0.5);
+        return `| ${r.name} | ${r.rule} | ${r.cap} | ${f3(single)} | ${f3(orc)} | ${f3(orc - single)} | ${r.curve.map((p) => pct(p.share)).join(" | ")} |`;
+      }),
+      "",
+      ...forms.flatMap((f) => [
+        `### The rule ${code(f.rule)} at ${capText(f)}`,
+        "",
+        `The best single strategy of each split: ${f.singles.map((x) => code(x ?? "-")).join(" and ")}.`,
+        "",
+        "| k | test inputs | portfolio median | best single | oracle | share of the oracle gain | share of each split | set of the first split | set of the second split |",
+        "|---:|---:|---:|---:|---:|---:|---|---|---|",
+        ...f.curve.map((p) => {
+          const sets = p.k >= pool.length ? ["all", "all"] : p.sets.map(setText);
+          return `| ${kOf(p)} | ${p.inputs.length} | ${f3(quantile(p.portfolio, 0.5))} | ${f3(quantile(p.single, 0.5))} | ${f3(quantile(p.oracle, 0.5))} | ${pct(p.share)} | ${p.shares.map(pct).join(" / ")} | ${sets[0]} | ${sets[1]} |`;
+        }),
+        "",
+      ]),
+    );
+    data["ruleForms"] = forms;
   }
 
   if (screen.length > 0) {
@@ -612,7 +824,9 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     return i >= 0 ? args[i + 1] : undefined;
   };
   const paths = (name: string): string[] => (opt(name) ?? "").split(",").filter((p) => p.length > 0);
-  const report = portfolioReport(readRecords(paths("--exact")), readRecords(paths("--screen")), readTimes(paths("--time")));
+  const optimaPath = opt("--optima") ?? join(dirname(fileURLToPath(import.meta.url)), "../src/bench/exact/optima-exact-v1.json");
+  const optima = optimaPath !== "none" && existsSync(optimaPath) ? (JSON.parse(readFileSync(optimaPath, "utf8")) as ExactOptimaFile).optima : [];
+  const report = portfolioReport(readRecords(paths("--exact")), readRecords(paths("--screen")), readTimes(paths("--time")), optima);
   writeFileSync(opt("--out") ?? "portfolio.md", report.markdown + "\n");
   if (opt("--json")) writeFileSync(opt("--json")!, JSON.stringify(report.data, null, 1));
   console.log(report.markdown);

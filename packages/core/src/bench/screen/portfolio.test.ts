@@ -1,16 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { B1, B10, B3_Q95, type OracleRecord } from "../../../scripts/oracle.ts";
+import { B1, B10, B3_Q95, MIXED, type OracleRecord } from "../../../scripts/oracle.ts";
 import {
+  capValue,
   choose,
   discordance,
+  discordanceByCause,
+  fallbackValue,
   gapValue,
   greedySet,
   MODEL_STRETCH,
+  obeys,
   paretoCurve,
   passes,
   portfolioReport,
   portfolioValues,
   ratioValue,
+  RULE_CAP,
+  ruleBaselines,
+  ruleForms,
+  ruleGapName,
+  ruleTable,
+  ruleValue,
   runTable,
   screenSplits,
   seedSplits,
@@ -20,6 +30,7 @@ import {
   strategyTimes,
 } from "../../../scripts/portfolio.ts";
 import type { TimeRecord } from "../../../scripts/portfolio-time.ts";
+import { GAP_CAPS, GAP_RULES, gapCap, type ExactOptimum, type GapRule } from "./gap.ts";
 
 /** This function makes a record of the strategy `strategy` on the input `input`, with the measures `measures`. */
 const rec = (strategy: string, input: string, measures: Record<string, number>, hard: Record<string, number> = {}): OracleRecord => ({
@@ -140,5 +151,116 @@ describe("the portfolio (PORTFOLIO)", () => {
     expect(report.markdown).toContain("## `screen-v1`: the guarded B1 of the portfolio");
     expect(report.markdown).toContain("## The time of each set");
     expect(report.data["sets"]).toBeDefined();
+  });
+});
+
+// A small hand-made screen of `exact-v1` with the rule of each run (PORTFOLIO-RULE).
+// The baseline of `collection` is the B1 of `shared` (0.1), and the baseline of `all` is 0.05. Each cap has its own optimum.
+const OPT: Record<GapRule, Record<string, number>> = { collection: { "1.1": 0.5, "1.25": 0.6, "1.5": 0.8 }, all: { "1.1": 0.7, "1.25": 0.8, "1.5": 1 } };
+const BASE: Record<GapRule, number> = { collection: 0.1, all: 0.05 };
+// Each run: B1, the largest stretch of the model and the flag of a shared segment with two collections.
+const RUNS: Record<string, [number, number, boolean]> = {
+  shared: [0.1, 1.05, false],
+  a: [0.6, 1.05, true],
+  c: [0.45, 1.3, false],
+  d: [0.4, 1.05, false],
+  e: [0.7, 1.3, true],
+  f: [0.3, 1.05, false],
+};
+const OPTIMA: ExactOptimum[] = IN.flatMap((input) =>
+  GAP_RULES.flatMap((rule) =>
+    GAP_CAPS.map((cap) => ({
+      input,
+      hash: "h",
+      class: "x",
+      nodes: 10,
+      edges: 15,
+      rule,
+      cap,
+      status: "optimal",
+      proven: true,
+      objective: 0,
+      bound: 0,
+      mipGap: 0,
+      seconds: 0,
+      binaries: 0,
+      b1: OPT[rule][String(cap)]!,
+      modelB1: null,
+      b3max: null,
+      highways: 0,
+    })),
+  ),
+);
+/** This function makes a record of a run with the gap closed of each rule at the cap of its stretch. */
+const gapRecord = (strategy: string, input: string, [b1, stretch, mixed]: [number, number, boolean]): OracleRecord => {
+  const cap = gapCap(stretch);
+  const m: Record<string, number> = { [B1]: b1, [B3_Q95]: 1, [MODEL_STRETCH]: stretch, [MIXED]: mixed ? 1 : 0 };
+  if (cap !== undefined) {
+    for (const rule of GAP_RULES) m[ruleGapName(rule)] = (b1 - BASE[rule]) / (OPT[rule][String(cap)]! - BASE[rule]);
+    m[B10] = m[ruleGapName(mixed ? "all" : "collection")]!;
+  }
+  return rec(strategy, input, m);
+};
+const RULE_RECORDS: OracleRecord[] = Object.entries(RUNS).flatMap(([s, run]) => IN.map((i) => gapRecord(s, i, run)));
+
+describe("the portfolio with the rule of the caller (PORTFOLIO-RULE)", () => {
+  it("counts the reversed pairs by cause, and finds none for the same rule and the same cap", () => {
+    const row = runTable(RULE_RECORDS).get("t/x/s0")!;
+    // `c` and `f` tie by B10, so 14 of the 15 pairs count. `c`-`d` and `a`-`e` reverse with another cap, and `d`-`e` with another rule.
+    expect(discordanceByCause(row)).toEqual({ same: { pairs: 3, reversed: 0 }, cap: { pairs: 3, reversed: 2 }, rule: { pairs: 8, reversed: 1 } });
+    expect(discordance(row)).toEqual({ pairs: 14, reversed: 3 });
+  });
+
+  it("keeps only the runs that obey the rule, and gives the gap closed of the rule", () => {
+    const table = runTable(RULE_RECORDS);
+    const a = table.get("t/x/s0")!.get("a")!;
+    expect(obeys(a, "collection")).toBe(false);
+    expect(obeys(a, "all")).toBe(true);
+    expect([...ruleTable(table, "collection").get("t/x/s0")!.keys()].sort()).toEqual(["c", "d", "f", "shared"]);
+    expect(ruleTable(table, "all").get("t/x/s0")!.size).toBe(6);
+    expect(ruleValue(table, "collection")("t/x/s0", "a")).toBeUndefined();
+    expect(ruleValue(table, "collection")("t/x/s0", "d")).toBeCloseTo(0.75);
+    expect(ruleValue(table, "all")("t/x/s0", "d")).toBeCloseTo(0.35 / 0.65);
+    // `a` fails the rule `collection`, so it falls back to `shared`.
+    expect(fallbackValue(ruleTable(table, "collection"), ruleValue(table, "collection"), "cap")("t/x/s0", "a")).toBeCloseTo(0);
+  });
+
+  it("finds the baseline of each rule from the runs, and gives the gap closed at one cap", () => {
+    const table = runTable([...RULE_RECORDS, gapRecord("g", "t/x/s0", [0.9, 1.6, false])]);
+    const bases = ruleBaselines(table, OPTIMA);
+    expect(bases.get("t/x/s0")!.collection).toBeCloseTo(0.1);
+    expect(bases.get("t/x/s0")!.all).toBeCloseTo(0.05);
+    const coll = capValue(table, "collection", RULE_CAP, OPTIMA, bases);
+    // At one cap, the order by the gap closed is the order by B1: `c` is now above `d`.
+    expect(coll("t/x/s0", "c")).toBeCloseTo(0.5);
+    expect(coll("t/x/s0", "d")).toBeCloseTo(0.3 / 0.7);
+    expect(coll("t/x/s0", "a")).toBeUndefined();
+    // A stretch above the cap has no value.
+    expect(coll("t/x/s0", "g")).toBeUndefined();
+    expect(capValue(table, "all", RULE_CAP, OPTIMA, bases)("t/x/s0", "a")).toBeCloseTo(0.55 / 0.95);
+  });
+
+  it("gives a curve for each rule and cap, and the whole pool at one cap reaches the oracle", () => {
+    const table = runTable(RULE_RECORDS);
+    const pool = Object.keys(RUNS).sort();
+    const forms = ruleForms(table, seedSplits(IN), pool, OPTIMA, { ks: [1] });
+    expect(forms.map((f) => [f.rule, f.cap])).toEqual([
+      ["collection", undefined],
+      ["collection", RULE_CAP],
+      ["all", undefined],
+      ["all", RULE_CAP],
+    ]);
+    for (const f of forms.filter((x) => x.cap !== undefined)) {
+      const whole = f.curve[f.curve.length - 1]!;
+      whole.portfolio.forEach((v, n) => expect(v).toBeCloseTo(whole.oracle[n]!));
+    }
+    // At the cap of each run, the best B1 of the rule `collection` (`c`) does not give the best gap closed (`d`).
+    const collection = forms[0]!.curve[forms[0]!.curve.length - 1]!;
+    expect(collection.portfolio[0]).toBeCloseTo(0.5);
+    expect(collection.oracle[0]).toBeCloseTo(0.75);
+    const report = portfolioReport(RULE_RECORDS.map((r) => ({ ...r, input: r.input.replace("t/", "exact-v1/") })), [], [], OPTIMA.map((o) => ({ ...o, input: o.input.replace("t/", "exact-v1/") })));
+    expect(report.markdown).toContain("## `exact-v1`: the reversed pairs by cause (PORTFOLIO-RULE)");
+    expect(report.markdown).toContain("## `exact-v1`: the portfolio with the rule of the caller (PORTFOLIO-RULE)");
+    expect(report.data["causes"]).toEqual({ same: { pairs: 12, reversed: 0 }, cap: { pairs: 12, reversed: 8 }, rule: { pairs: 32, reversed: 4 } });
   });
 });
