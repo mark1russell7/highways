@@ -12,7 +12,7 @@ export interface LayoutPort {
   /** The fixed place of the port, from the top-left corner of the box. The router does not move a port with `x` and `y`. */
   readonly x?: number;
   readonly y?: number;
-  /** The fixed place of the port on its `side`: a fraction from 0 to 1, from the top end or the left end of the side. */
+  /** The fixed place of the port on its `side`: a fraction from 0 to 1. The start is the top end or the left end of the side. */
   readonly along?: number;
 }
 
