@@ -41,12 +41,15 @@ on:
       time:
         description: "The arguments of pnpm portfolio:time for the times of the portfolio (PORTFOLIO), for example --sizes 10,24,40 --shards 16. Empty: the screen runs."
         default: ""
+      report:
+        description: "The ids of CI runs for the report of the portfolio: --exact <id> --screen <id,...> --time <id>. Empty: the screen runs."
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.exact }}-${{ inputs.time }}
+  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}
   cancel-in-progress: true
 
 jobs:
@@ -60,14 +63,18 @@ jobs:
 
   # The times of the portfolio run in the workflow `Portfolio`, in shards.
   time:
-    if: ${{ inputs.time }}
+    if: ${{ inputs.time || inputs.report }}
     uses: ./.github/workflows/portfolio.yml
+    permissions:
+      contents: read
+      actions: read
     with:
       args: ${{ inputs.time }}
+      report: ${{ inputs.report }}
       minutes: ${{ inputs.minutes || '60' }}
 
   screen:
-    if: ${{ !inputs.exact && !inputs.time }}
+    if: ${{ !inputs.exact && !inputs.time && !inputs.report }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
     env:
