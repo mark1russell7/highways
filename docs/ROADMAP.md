@@ -105,6 +105,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL14 | Version 0.8.0 on npm. MINOR: the default lane order of shared runs changes, so each engine gives the same order (#130). No route point moves. [The lane order](research/XPLAT.md#the-lane-order-lane-order) gives the changes. | 2026-10-28 | #131 |
 | CI-AUTO | A pull request that changes the core source starts the `xplat` matrix and the screens of the routers and of the highways by itself. Thus it needs no manual dispatch. | 2026-10-28 | #134 |
 | ROUTE-SCALE | [The dense board](research/SCALE.md#the-dense-board-route-scale). A route of `shared` on 1000 boxes and 4000 edges goes from 302 s to 21 s, and `portfolio` from 300 s to 28 s on the same CPU. Each sorted list of link users gets a number one time, and the lane order skips the distance of a point to itself. No output byte changes. | 2026-10-28 | #132 |
+| REL15 | Version 0.8.1 on npm. PATCH: ROUTE-SCALE (#132) routes a dense board of 1000 boxes approximately 10 times faster with `shared`, `shared-all` and `portfolio`. The output does not change. | 2026-10-28 | #135 |
 
 ## Calibration
 
@@ -144,6 +145,8 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| LANE-WALK | The lane order of a dense run without a walk for each compare. After ROUTE-SCALE, `partBefore` and `partAfter` take approximately 55% of a `shared` route on the dense board. The lane order stays the same. | `later` | ROUTE-SCALE | P2 |
+| BENCH-STEPS | Cheaper measures on a dense board: `exactStretches` (a landmark guide for `distancesTo`), `measureQuality` and `checkProperties`. The values stay the same. | `later` | ROUTE-SCALE | P3 |
 | SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. A portfolio with a score of the output alone keeps 6% on `exact-v1` (PORTFOLIO), so the selector needs a score that knows the rule of the run. PORTFOLIO-RULE gives that score: B1 among the runs that obey the rule of the caller, at one cap. | `later` | ORACLE | P1 |
 | CORPUS-SEEDS | 10 or more seeds for each board kind of `screen-v1`. Today `hub-chain` and `many-groups` have 1 seed, so a choice of a set cannot hold out their winners. | `later` | SCREEN | P1 |
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
