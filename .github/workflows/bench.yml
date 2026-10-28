@@ -101,6 +101,8 @@ jobs:
     timeout-minutes: ${{ matrix.part.timeout }}
     strategy:
       fail-fast: false
+      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
+      max-parallel: 6
       matrix:
         part: ${{ fromJSON(needs.plan.outputs.parts) }}
     env:
