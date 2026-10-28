@@ -3,6 +3,7 @@ import { nodeIndex, type Edge, type Graph, type Node, type Result, type Route, t
 import { placePlug, type Plug } from "../plugs.ts";
 import { justifyPlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
+import type { PlugPair, Strategy } from "../strategies/model.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 
 /** The ways to place a free plug of the corner router. */
@@ -24,6 +25,13 @@ export interface CornersOptions extends WayOptions {
    * Above 0, the free plugs of each side keep their order and move the least distance (`justifyPlugs`, WILD-002).
    */
   readonly plugGap?: number;
+  /**
+   * The plug rule: a strategy of the step `plugs` that places the plugs of each edge. It takes the place of the option `plugs`.
+   * Without it, the router places the plugs with the option `plugs`. An edge without plugs from the strategy gets the plugs of `facing`.
+   */
+  readonly plug?: Strategy<"plugs">;
+  /** The options of the strategy `plug`. The strategy gets its `defaults` for each option that this object does not give. */
+  readonly plugOptions?: object;
 }
 
 /**
@@ -38,7 +46,7 @@ export function cornersRouter(options: CornersOptions): Router {
       const byId = nodeIndex(graph);
       const ways = new WayFinder(graph.nodes, options);
       const routes: Route[] = [];
-      if ((options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
+      if (!options.plug && (options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
         for (const e of graph.edges) {
           const s = byId.get(e.source.node);
           const t = byId.get(e.target.node);
@@ -51,12 +59,17 @@ export function cornersRouter(options: CornersOptions): Router {
       }
       // First the plugs of each edge, then the gaps of the plugs of each side, then the ways between the plugs.
       const ends: [Edge, Node, Node, Plug, Plug][] = [];
+      const placed = options.plug ? plugsByEdge(options.plug.run({ graph, ways }, options.plugOptions)) : undefined;
       for (const e of graph.edges) {
         const s = byId.get(e.source.node);
         const t = byId.get(e.target.node);
         if (!s || !t) continue;
-        const [ps, pt] =
-          options.plugs === "side" ? sidePlugs(ways, s, e.source, t, e.target) : [placePlug(s, e.source, center(t.box)), placePlug(t, e.target, center(s.box))];
+        const own = placed?.get(e.id)?.shift();
+        const [ps, pt]: [Plug, Plug] = own
+          ? [own.source, own.target]
+          : options.plugs === "side" && !placed
+            ? sidePlugs(ways, s, e.source, t, e.target)
+            : [placePlug(s, e.source, center(t.box)), placePlug(t, e.target, center(s.box))];
         ends.push([e, s, t, ps, pt]);
       }
       if ((options.plugGap ?? 0) > 0) spacePlugs(ends, options.plugGap!);
@@ -65,6 +78,17 @@ export function cornersRouter(options: CornersOptions): Router {
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
+}
+
+/** This function gives the plugs of a plug strategy by the edge id. Two edges with one id take the entries of that id in order. */
+function plugsByEdge(list: readonly PlugPair[]): Map<string, PlugPair[]> {
+  const out = new Map<string, PlugPair[]>();
+  for (const p of list) {
+    const own = out.get(p.edge);
+    if (own) own.push(p);
+    else out.set(p.edge, [p]);
+  }
+  return out;
 }
 
 /**

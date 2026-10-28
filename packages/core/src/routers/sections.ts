@@ -1,9 +1,10 @@
 import { BACKTRACK_MIN, goesOutAndBack } from "../bench/links.ts";
 import { center, dist, pointSegmentDistance, polylineLength, type Point } from "../geom.ts";
-import { LEVEL_LINK_DEFAULTS, levelLinks, type ItemPair, type LevelLinkOptions } from "../levels.ts";
+import { LEVEL_LINK_DEFAULTS, type LevelLinkOptions } from "../levels.ts";
+import { depthLevels, type DepthLevelOptions } from "../levels/depths/index.ts";
 import { nodeIndex, type Graph, type Level, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
-import { allSections, buildSections, checkSections, levelCut, SECTION_DEFAULTS, treeDepth, type Section, type SectionOptions } from "../sections.ts";
+import { allSections, buildSections, checkSections, SECTION_DEFAULTS, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { WayFinder } from "../ways.ts";
@@ -45,6 +46,14 @@ export interface SectionsOptions extends LevelLinkOptions, SectionOptions {
    * The default is each depth, from 0 to the depth of the deepest section.
    */
   readonly levels?: readonly number[];
+  /**
+   * The level rule: a strategy of the step `levels` that makes the zoom levels from the tree and the routes.
+   * Without it, the router uses the strategy `depths` (`depthLevels`). The strategy gets the options `levels`, `margin`, `k`, `tightMargin`, `plugInset` and `throughCost` of the router,
+   * and then `levelOptions`.
+   */
+  readonly level?: Strategy<"levels">;
+  /** The options of the strategy `level`. They go over the level options of the router. */
+  readonly levelOptions?: object;
   /** The lane order of the runs. With `run`, the default, each run gets its order alone. With `bundle`, two edges keep one order on each run of their common stretch. */
   readonly laneOrder?: RunOrder;
   /** The benchmark skips a fixture with more nodes. */
@@ -210,7 +219,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         if (list.length < 2 || p.length < 2) continue;
         runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!), options.laneOrder) });
       }
-      return { routes, runs, levels: makeLevels(graph, root, routeOf, options) };
+      return { routes, runs, levels: makeLevels(graph, root, routes, options) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
@@ -224,43 +233,16 @@ function groupNodes(graph: Graph, options: SectionsOptions): Section {
   return root;
 }
 
+/** The keys of the router options that the level rule gets. */
+const LEVEL_KEYS = ["levels", "margin", "k", "tightMargin", "plugInset", "throughCost"] as const;
+
 /**
- * This function gives one zoom level for each depth of the tree, and a last level with each node alone.
- * With the option `levels`, only those depths get a level with groups.
- * At depth d, a section of depth d is one item. A link joins two items and counts the edges between them.
- * In a level with groups, a link goes around the boxes of the other items (`levelLinks`).
- * In the last level, the points of a link are the route of its first edge.
+ * This function gives the zoom levels of the router: the levels of the strategy `level`, or else the levels of `depthLevels`.
+ * The strategy gets the level options of the router that have a value, and then `levelOptions`.
  */
-function makeLevels(graph: Graph, root: Section, routeOf: ReadonlyMap<string, Route>, options: SectionsOptions): Level[] {
-  const indexOfNode = new Map(graph.nodes.map((n, i) => [n.id, i]));
-  const levels: Level[] = [];
-  const deepest = treeDepth(root);
-  const shown = options.levels && new Set(options.levels);
-  for (let d = 0; d <= deepest + 1; d++) {
-    if (shown && d <= deepest && !shown.has(d)) continue;
-    const { items, owner } = levelCut(graph.nodes, root, d);
-    const links = new Map<string, { source: string; target: string; count: number; edge: string }>();
-    for (const e of graph.edges) {
-      const iu = indexOfNode.get(e.source.node);
-      const iv = indexOfNode.get(e.target.node);
-      if (iu === undefined || iv === undefined) continue;
-      const a = owner[iu]!;
-      const b = owner[iv]!;
-      if (a === b) continue;
-      const ida = items[a]!.id;
-      const idb = items[b]!.id;
-      const key = `${ida}\u0000${idb}`;
-      const link = links.get(key);
-      if (link) {
-        link.count++;
-        continue;
-      }
-      links.set(key, { source: ida, target: idb, count: 1, edge: e.id });
-    }
-    const pairs: ItemPair[] = [...links.values()].map(({ source, target, count }) => ({ source, target, count }));
-    if (d > deepest)
-      levels.push({ depth: d, items, links: [...links.values()].map(({ edge, ...l }) => ({ ...l, points: routeOf.get(edge)?.points ?? [] })) });
-    else levels.push({ depth: d, items, links: levelLinks(items, pairs, options) });
-  }
-  return levels;
+function makeLevels(graph: Graph, root: Section, routes: readonly Route[], options: SectionsOptions): Level[] {
+  if (!options.level) return depthLevels({ graph, root, routes }, options);
+  const own: Record<string, unknown> = {};
+  for (const key of LEVEL_KEYS) if (options[key] !== undefined) own[key] = options[key];
+  return options.level.run({ graph, root, routes }, { ...(own as DepthLevelOptions), ...options.levelOptions });
 }

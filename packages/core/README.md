@@ -347,10 +347,19 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
+| `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline` |
+
+`STEPS` gives the steps in the order of the pipeline: `group`, `plugs`, `router`, `highway`, `levels`, `curve`, `room`, `whole`.
+
+- The plugs come before the router, because the router finds its ways between the plugs.
+- The levels come after the routes, because the last level uses the routes.
+- The step `whole` runs the other steps, so it comes last.
 
 A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the method `run(input, options?)`. The type of the options comes from `defaults`. Each option that a call does not give gets its default value.
 
@@ -359,7 +368,29 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
-- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `routerStrategies`, `highwayStrategies`, `curveStrategies` and `roomStrategies` give each built-in strategy with its typed options.
+- `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `plugStrategies`, `routerStrategies`, `highwayStrategies`, `levelStrategies`, `curveStrategies`, `roomStrategies` and `wholeStrategies` give each built-in strategy with its typed options.
+
+### The steps `plugs`, `levels` and `whole`
+
+Each of these steps has one default strategy. The default gives the output of the code before the step, so each route stays the same.
+
+- `facing` (the step `plugs`) puts each free plug on the side that faces the other end of its edge. The router `corners` uses it by default.
+  The option `plug` of `corners` takes a plug strategy, and `plugOptions` gives its options.
+- `depths` (the step `levels`) makes one zoom level for each depth of the tree, and a last level with each node alone (`depthLevels`).
+  The option `level` of `sections` takes a level strategy, and `levelOptions` gives its options. The strategy also gets the level options of the router.
+- `pipeline` (the step `whole`) runs a room strategy, then a router or a highway plan, with the rules that the router reads (`runPipeline`).
+  Without options, it routes with `corners`. The demo of the site runs it. It does not draw the curves.
+- `strategyKey(router, step)` gives the option of a router that takes a strategy of the step. `pipeline` uses it for the steps `group`, `plugs` and `levels`.
+- `stepRouterStrategy(strategy)` runs a strategy of a step of `RoutedStep` as a router. `stepRouters(registry, step)` gives one router for each strategy of the step.
+
+```ts
+import { asRouter, CASES, plugStrategies, routerStrategies, wholeStrategies } from "@mark1russell7/highways";
+
+const graph = CASES.find((c) => c.name === "case-hub-chain")!.make();
+// The two calls give the routes of `corners` with no option.
+const a = asRouter(routerStrategies.corners, { plug: plugStrategies.facing }).route(graph);
+const b = wholeStrategies.pipeline.run(graph).result;
+```
 
 ### The step `highway`
 
@@ -567,7 +598,7 @@ const rows = sweepSections("case-hub-chain", graph, sweepOf(routerStrategies.sec
 
 A test examines each built-in strategy with `checkSchema`. Thus an option of `defaults` without a declaration makes the test fail.
 
-The plugs have one strategy, so they have no step yet. The step `group` gives the grouping rule of the zoom levels.
+The step `plugs` gives the plugs of the router `corners`. The step `group` gives the grouping rule of the zoom levels, and the step `levels` makes the levels.
 
 ## Measures and the report
 
@@ -618,6 +649,7 @@ Three options of `runSuite` keep each part short (BENCH-GREEN):
 `compareAnyStep` does the same for each step of `COMPARE_ALL_STEPS`, which is `STEPS`. The compare page of the site uses it.
 
 - The step `highway` makes the plan of each strategy, and `follow` routes the plan, as in the screen. `highwayRouters` gives these routers.
+- The steps `plugs`, `levels` and `whole` run each strategy as a router (`stepRouterStrategy`), and measure the routes as the step `router`.
 - The step `room` opens the gaps of a packed board with each strategy and measures the open board with `roomValues`.
 - The option `onRow` gets each row when its strategy is done, so a host can show the progress.
 

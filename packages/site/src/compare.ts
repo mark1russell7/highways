@@ -34,7 +34,16 @@ const fmt = new Intl.NumberFormat("en-US");
 const AXIS_NAMES: Readonly<Record<string, string>> = { "R1.perEdge": "crossings per edge" };
 
 /** The noun of the strategies of each step. */
-const NOUNS: Readonly<Record<Step, string>> = { group: "grouping rules", router: "routers", highway: "highway strategies", curve: "curves", room: "room strategies" };
+const NOUNS: Readonly<Record<Step, string>> = {
+  group: "grouping rules",
+  plugs: "plug rules",
+  router: "routers",
+  highway: "highway strategies",
+  levels: "level rules",
+  curve: "curves",
+  room: "room strategies",
+  whole: "whole strategies",
+};
 
 let state: CompareState = parseHash(location.hash);
 /** The names of the hash that the step does not have. The note of the pick tells them until the next change. */

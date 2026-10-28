@@ -195,7 +195,8 @@ describe("a consumer strategy", () => {
     expect(listStrategies(old, "group")).toEqual([]);
     expect(listStrategies(old, "highway")).toEqual([]);
     expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag-like"]);
-    expect(STEPS).toEqual(["group", "router", "highway", "curve", "room"]);
+    for (const step of ["plugs", "levels", "whole"] as const) expect(listStrategies(old, step)).toEqual([]);
+    expect(STEPS).toEqual(["group", "plugs", "router", "highway", "levels", "curve", "room", "whole"]);
   });
 
   it("must have a name that no other strategy of its step has", () => {

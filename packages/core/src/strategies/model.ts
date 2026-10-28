@@ -2,10 +2,12 @@ import type { CurveSegment } from "../curves/model.ts";
 import type { CurveSpace } from "../curves/space.ts";
 import type { Point } from "../geom.ts";
 import type { HighwayInput, HighwayPlan } from "../highways/model.ts";
-import type { Graph, Result, Router } from "../model.ts";
+import type { Graph, Level, Result, Route, Router } from "../model.ts";
+import type { Plug } from "../plugs.ts";
 import type { Boxed, Gap, RoomLink } from "../room/index.ts";
 import type { Section } from "../sections.ts";
 import type { SegmentGraph } from "../segments.ts";
+import type { WayFinder } from "../ways.ts";
 import type { OptionSchema } from "./options.ts";
 
 /** The input of a curve strategy: one polyline and the context of its route. */
@@ -48,21 +50,57 @@ export interface RoomInput {
   readonly sections?: Section;
 }
 
+/** The input of a plug strategy: the graph, and optionally the way finder of the router that reads the plugs. */
+export interface PlugInput {
+  readonly graph: Graph;
+  /** The ways around the nodes of the graph, for a strategy that reads the free space. The default strategy `facing` does not read it. */
+  readonly ways?: WayFinder;
+}
+
+/** The plugs of the two ends of one edge: the output of a plug strategy for that edge. */
+export interface PlugPair {
+  readonly edge: string;
+  readonly source: Plug;
+  readonly target: Plug;
+}
+
+/** The input of a level strategy: the graph, the tree of sections of its grouping rule and the routes of the router. */
+export interface LevelInput {
+  readonly graph: Graph;
+  /** The tree of sections. The indices of its nodes are the indices of `graph.nodes`. */
+  readonly root: Section;
+  /** The routes of the router. The default strategy `depths` gives the links of the last level the points of these routes. */
+  readonly routes: readonly Route[];
+}
+
+/** The output of a strategy of the step `whole`: the board that the routes go on, and the routes. */
+export interface WholeOutput {
+  /** The board: the graph, or the graph with the gaps that a room strategy opened. It has the edges of the input. */
+  readonly graph: Graph;
+  readonly result: Result;
+}
+
 /**
  * The steps that have strategies, with the fixed input and output type of each step.
  *
  * - `group`: a graph in, the tree of sections out. The router `sections` makes its hubs and its zoom levels from this tree.
+ * - `plugs`: a graph in, the plugs of the two ends of each edge out. The router `corners` routes between these plugs.
  * - `router`: a graph in, the routes (and the `levels`, `bundles` and `runs`) out.
  * - `highway`: a graph and optionally its first routes in, a highway plan out. `follow` routes the edges along the plan.
+ * - `levels`: a graph, its tree of sections and its routes in, the zoom levels out. The router `sections` gives them in its result.
  * - `curve`: a polyline in, the segments of a curve out.
  * - `room`: the boxes and links of a board in, the gaps of the board with their need out.
+ * - `whole`: a graph in, the board and its routes out. A strategy of this step runs the other steps.
  */
 export interface StepTypes {
   readonly group: { readonly input: Graph; readonly output: Section };
+  readonly plugs: { readonly input: PlugInput; readonly output: PlugPair[] };
   readonly router: { readonly input: Graph; readonly output: Result };
   readonly highway: { readonly input: HighwayInput; readonly output: HighwayPlan };
+  readonly levels: { readonly input: LevelInput; readonly output: Level[] };
   readonly curve: { readonly input: CurveInput; readonly output: CurveSegment[] };
   readonly room: { readonly input: RoomInput; readonly output: Gap[] };
+  readonly whole: { readonly input: Graph; readonly output: WholeOutput };
 }
 
 /** The name of a step that has strategies. */
@@ -74,8 +112,12 @@ export type StepInput<S extends Step> = StepTypes[S]["input"];
 /** The output type of a step. */
 export type StepOutput<S extends Step> = StepTypes[S]["output"];
 
-/** The steps that have strategies, in the order of the pipeline. */
-export const STEPS: readonly Step[] = ["group", "router", "highway", "curve", "room"];
+/**
+ * The steps that have strategies, in the order of the pipeline.
+ * The plugs come before the router, because the router searches its ways between them. The levels come after the routes, because the last level reads them.
+ * The step `whole` runs the other steps, so it comes last.
+ */
+export const STEPS: readonly Step[] = ["group", "plugs", "router", "highway", "levels", "curve", "room", "whole"];
 
 /**
  * A strategy: one way to do one step, with a name and a description.
@@ -147,16 +189,16 @@ export function defineStrategy<S extends Step, O extends object>(definition: Str
 /**
  * A registry: the strategies of each step, in order. A registry is data. No import changes it.
  * A consumer makes its own registry with `createRegistry`, and adds a strategy with `register`.
- * The lists `group` and `highway` are optional in the type, so a registry from version 0.1.5 or 0.3.0 stays a registry. `createRegistry` always gives them.
+ * The lists `group`, `highway`, `plugs`, `levels` and `whole` are optional in the type, so a registry of an older version stays a registry. `createRegistry` always gives them.
  */
-export type Registry = { readonly [S in Exclude<Step, "group" | "highway">]: readonly Strategy<S>[] } & {
-  readonly group?: readonly Strategy<"group">[];
-  readonly highway?: readonly Strategy<"highway">[];
-};
+export type Registry = { readonly [S in Exclude<Step, OptionalStep>]: readonly Strategy<S>[] } & { readonly [S in OptionalStep]?: readonly Strategy<S>[] };
+
+/** The steps whose lists are optional in a `Registry`: the steps that came after version 0.1.5. */
+type OptionalStep = "group" | "highway" | "plugs" | "levels" | "whole";
 
 /** This function makes a registry from a list of strategies. It keeps their order. Two strategies with one step and one name are an error. */
 export function createRegistry(strategies: readonly AnyStrategy[]): Registry {
-  const out: { [S in Step]: Strategy<S>[] } = { group: [], router: [], highway: [], curve: [], room: [] };
+  const out: { [S in Step]: Strategy<S>[] } = { group: [], plugs: [], router: [], highway: [], levels: [], curve: [], room: [], whole: [] };
   for (const s of strategies) {
     const list = out[s.step] as AnyStrategy[] | undefined;
     if (!list) throw new Error(`There is no step "${String(s.step)}". The steps are ${STEPS.join(", ")}.`);
@@ -165,16 +207,19 @@ export function createRegistry(strategies: readonly AnyStrategy[]): Registry {
   }
   return Object.freeze({
     group: Object.freeze(out.group),
+    plugs: Object.freeze(out.plugs),
     router: Object.freeze(out.router),
     highway: Object.freeze(out.highway),
+    levels: Object.freeze(out.levels),
     curve: Object.freeze(out.curve),
     room: Object.freeze(out.room),
+    whole: Object.freeze(out.whole),
   });
 }
 
 /** This function gives a new registry with the strategies of `registry` and then `strategies`. It does not change `registry`. */
 export function register(registry: Registry, ...strategies: readonly AnyStrategy[]): Registry {
-  return createRegistry([...(registry.group ?? []), ...registry.router, ...(registry.highway ?? []), ...registry.curve, ...registry.room, ...strategies]);
+  return createRegistry([...STEPS.flatMap((step) => listStrategies(registry, step) as readonly AnyStrategy[]), ...strategies]);
 }
 
 /** This function gives the strategies of one step of a registry, in order. */
