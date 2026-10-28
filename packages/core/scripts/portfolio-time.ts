@@ -169,10 +169,21 @@ export function breakdownSummary(lines: readonly BreakdownRecord[]): string {
     const key = med(k3, n, (l) => l.ms - (l.baseMs ?? 0) - (l.membersMs ?? 0));
     out.push(`| ${n} | ${f1(med("@shared", n))} | ${parts.map(f1).join(" | ")} | ${f1(setup)} | ${f1(pick)} | ${f1(key)} | ${pct(setup === undefined || pick === undefined ? undefined : setup / pick)} |`);
   }
-  out.push("", "## The router (median ms, and the median count of the members that ran)", "", `| form | ${sizes.join(" | ")} |`, `|---|${sizes.map(() => "---:").join("|")}|`);
+  // The q95 of a pick is over each timed pick of the size: each board and each repeat.
+  const q95 = (part: string, n: number): number | undefined => {
+    const xs = lines.filter((l) => l.part === part && l.nodes === n).map((l) => l.ms);
+    return xs.length === 0 ? undefined : quantile(xs, 0.95);
+  };
+  out.push(
+    "",
+    "## The router (median ms, q95 ms, and the median count of the members that ran)",
+    "",
+    `| form | ${sizes.join(" | ")} |`,
+    `|---|${sizes.map(() => "---:").join("|")}|`,
+  );
   for (const form of BREAKDOWN_FORMS) {
     const part = `@router:${form.id}`;
-    out.push(`| \`${form.id}\` | ${sizes.map((n) => `${f1(med(part, n))} (${f1(med(part, n, (l) => l.members ?? 0))})`).join(" | ")} |`);
+    out.push(`| \`${form.id}\` | ${sizes.map((n) => `${f1(med(part, n))}, ${f1(q95(part, n))} (${f1(med(part, n, (l) => l.members ?? 0))})`).join(" | ")} |`);
   }
   return out.join("\n") + "\n";
 }
