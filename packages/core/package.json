@@ -48,6 +48,7 @@
     "portfolio": "node scripts/portfolio.ts",
     "portfolio:time": "node scripts/portfolio-time.ts",
     "portfolio:sets": "node scripts/portfolio-sets.ts",
+    "portfolio:api": "node scripts/portfolio-api-report.ts",
     "bounds": "node scripts/bounds.ts",
     "screen:inputs": "node scripts/screen-inputs.ts",
     "test:watch": "vitest",

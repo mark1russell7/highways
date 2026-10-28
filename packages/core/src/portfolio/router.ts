@@ -60,7 +60,7 @@ function checked(o: PortfolioRouterOptions): { rule: PortfolioRule; cap: Portfol
   return { rule, cap, k };
 }
 
-/** This function gives the names of the members of the portfolio router for an input with `nodes` nodes: the base, then the first `k` names of the set of the band. */
+/** This function gives the names of the members for an input with `nodes` nodes. The base comes first, then the first `k` names of the set of the band. */
 export function portfolioMembers(nodes: number, options: PortfolioRouterOptions = {}): string[] {
   const { rule, cap, k } = checked(options);
   const set = PORTFOLIO_SETS[`${rule}|${cap}|${portfolioBand(nodes).id}`] ?? [];
@@ -69,7 +69,7 @@ export function portfolioMembers(nodes: number, options: PortfolioRouterOptions 
 
 /**
  * This function gives the key of the portfolio router on the graph `graph`.
- * - `hard` counts the breaks of the hard rules of the routes (`checkProperties`), plus each edge with a stretch above the cap, as the exact model counts it.
+ * - `hard` counts the breaks of the hard rules of the routes (`checkProperties`). It also counts each edge with a stretch above the cap in the exact model.
  *   Under the rule `collection`, it also counts each shared segment that holds edges of two collections.
  * - The one level `B1` is the ink saved (higher is better), with the `minEffect` of the table `MEASURES`.
  * - The hash is `resultHash`.
@@ -98,7 +98,8 @@ export function portfolioKey(graph: Graph, options: PortfolioRouterOptions = {})
  * A member that throws does not win. The result carries the trace of the pick and the move count `move.pick`.
  */
 export function routePortfolio(graph: Graph, options: PortfolioRouterOptions = {}): PortfolioRoute {
-  const names = portfolioMembers(graph.nodes.length, options);
+  // A member with a node limit below the size of the graph does not run. The base `shared` has no such limit below the limit of the router.
+  const names = portfolioMembers(graph.nodes.length, options).filter((name) => name === PORTFOLIO_BASE_MEMBER || (portfolioMember(name)?.maxNodes ?? Infinity) >= graph.nodes.length);
   const members: Member<Graph, Result>[] = names.map((name) => {
     const s = portfolioMember(name);
     if (s === undefined) throw new Error(`The portfolio router has no member "${name}".`);

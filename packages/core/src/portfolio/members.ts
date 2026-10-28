@@ -114,9 +114,9 @@ export const MEMBER_FORMS: Readonly<Record<string, MemberForm>> = {
 
 const GATES = { stretch: stretchGate, breakeven: breakEvenGate, ambiguity: ambiguityGate } as const;
 
-/** This function gives a highway strategy with no options: it runs `run`. As in the screen, `follow` then gets no way options. */
-function fixedHighway(name: string, run: (input: HighwayInput) => HighwayPlan): Strategy<"highway", object> {
-  return defineStrategy({ step: "highway", name, describe: `The member ${name} of the portfolio router.`, defaults: {}, schema: {}, maxNodes: 10_000, run });
+/** This function gives a highway strategy with no options: it runs `run`, with the node limit `maxNodes`. As in the screen, `follow` then gets no way options. */
+function fixedHighway(name: string, run: (input: HighwayInput) => HighwayPlan, maxNodes: number | undefined): Strategy<"highway", object> {
+  return defineStrategy({ step: "highway", name, describe: `The member ${name} of the portfolio router.`, defaults: {}, schema: {}, maxNodes: maxNodes ?? 10_000, run });
 }
 
 /** This function gives a router strategy with no options: it runs `route`. */
@@ -150,12 +150,12 @@ export function memberStrategy(name: string, form: MemberForm): Strategy<"router
       const budget = form[3];
       if (budget === undefined) return highway(gated);
       const options = { ...gated.defaults, budget };
-      return highway(fixedHighway(name, (input) => gated.run(input, options)));
+      return highway(fixedHighway(name, (input) => gated.run(input, options), gated.maxNodes));
     }
     case "plan": {
       const base = highwayStrategies[form[1]] as Strategy<"highway", object>;
       const options = { ...base.defaults, ...form[2] };
-      return highway(fixedHighway(name, (input) => base.run(input, options)));
+      return highway(fixedHighway(name, (input) => base.run(input, options), base.maxNodes));
     }
   }
 }

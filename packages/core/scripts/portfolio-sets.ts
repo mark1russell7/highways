@@ -130,6 +130,8 @@ export interface SetTest {
   /** The share of the set of the band up to 12 nodes, on the same test inputs. Only the larger bands have it. */
   readonly smallShare?: number;
   readonly smallPortfolio?: number;
+  /** The share of the oracle gain of the set on its own train inputs (in sample). */
+  readonly trainShare: number;
 }
 
 /** The choice of one band, rule and cap: the set of up to 8 strategies, the best single strategy, and the test of each k. */
@@ -179,11 +181,14 @@ export function chooseSets(short: ShortRuns, optima: readonly ExactOptimum[], o:
         const singleMed = med(test.map((i) => (single === undefined ? undefined : fb(i, single))));
         const oracleMed = med(test.map((i) => oracleValue(i, pool, value)));
         const small = sets.get(bands[0]!.id);
+        const trainSingle = med(train.map((i) => (single === undefined ? undefined : fb(i, single))));
+        const trainOracle = med(train.map((i) => oracleValue(i, pool, value)));
         const tests = ks.map((k): SetTest => {
           const s = set.slice(0, k);
           const p = med(portfolioValues(ct, test, s, "cap", value));
           const baseWins = test.filter((i) => choose(ct.get(i)!, s, "cap") === PORTFOLIO_BASE).length;
-          const t: SetTest = { k, set: s, portfolio: p, single: singleMed, oracle: oracleMed, share: shareOf(p, singleMed, oracleMed), baseWins };
+          const trainShare = shareOf(med(portfolioValues(ct, train, s, "cap", value)), trainSingle, trainOracle);
+          const t: SetTest = { k, set: s, portfolio: p, single: singleMed, oracle: oracleMed, share: shareOf(p, singleMed, oracleMed), baseWins, trainShare };
           if (band.id === bands[0]!.id || small === undefined) return t;
           const sp = med(portfolioValues(ct, test, small.slice(0, k), "cap", value));
           return { ...t, smallPortfolio: sp, smallShare: shareOf(sp, singleMed, oracleMed) };
@@ -233,6 +238,12 @@ export function setsReport(choices: readonly BandChoice[], ks: readonly number[]
       const t0 = c.tests[0]!;
       return `| ${c.band} | ${code(c.rule)} | ${c.cap} | ${c.train} | ${c.test} | ${f3(c.base)} | ${f3(t0.single)} | ${f3(t0.oracle)} | ${c.tests.map((t) => `${pct(t.share)} | ${pct(t.smallShare)}`).join(" | ")} | ${c.tests[Math.floor(c.tests.length / 2)]!.baseWins} of ${c.test} |`;
     }),
+    "",
+    "## The share of the oracle gain on the train seeds (0 to 4, in sample)",
+    "",
+    `| band | rule | cap | train | ${ks.map((k) => `k = ${k}`).join(" | ")} |`,
+    `|---|---|---:|---:|${ks.map(() => "---:").join("|")}|`,
+    ...choices.map((c) => `| ${c.band} | ${code(c.rule)} | ${c.cap} | ${c.train} | ${c.tests.map((t) => pct(t.trainShare)).join(" | ")} |`),
     "",
     "## The sets",
     "",
