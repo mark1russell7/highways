@@ -34,7 +34,7 @@ export interface GapInterval {
 
 /**
  * This function gives the interval of the gap closed `(b1 - base) / (optimum - base)` over the interval of the optimum.
- * For a run above the baseline, the high end of the optimum gives the low end of the gap closed, and the low end of the optimum gives the high end.
+ * For a run above the baseline, the high end of the optimum gives the low end of the gap closed. The low end of the optimum gives the high end.
  * It gives `undefined` when the low end of the optimum is at the baseline or below it, because then the gap closed has no limit.
  */
 export function gapInterval(b1: number, base: number, optimum: { readonly lo: number; readonly hi: number }): GapInterval | undefined {
@@ -85,7 +85,7 @@ export interface BoundsCell {
 
 /**
  * This function gives the gap closed of each strategy for each size, rule and cap of the optima.
- * A run has a value when it obeys the rule, when its stretch is at or below the cap, and when the solve has a solution.
+ * A run has a value when it obeys the rule and when its stretch is at or below the cap. The solve must also have a solution.
  * The rule `collection` refuses a run with a shared segment that holds edges of two collections.
  * The baseline of each rule is the run of `GAP_BASELINES` on the same input, with the prefix `hw:` for a highway strategy.
  * The rows sort by the median of the midpoint, from high to low. A strategy with a value on fewer than half of the inputs comes after the others.
