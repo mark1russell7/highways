@@ -3,6 +3,7 @@
   "extends": "@mark1russell7/cue/ts/config/vite.json",
   "compilerOptions": {
     "noEmit": true,
+    "rootDir": "..",
     "allowImportingTsExtensions": true,
     "composite": false,
     "incremental": false,

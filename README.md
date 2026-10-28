@@ -8,7 +8,7 @@ The site [mark1russell7.github.io/highways](https://mark1russell7.github.io/high
 
 The [results page](https://mark1russell7.github.io/highways/results.html) shows the committed verdicts of the screens, the ideas and the newest items of the roadmap. Each merge to `main` builds it again.
 
-The [strategies page](https://mark1russell7.github.io/highways/strategies.html) has a card for each strategy of the registry. A card shows the ideas that the strategy builds, with their papers, math and cost. It also shows the options, the verdicts and the time in the benchmark. The map [`built.json`](docs/research/ideas/built.json) links each strategy to its idea records, and a test checks it against the registry.
+The [strategies page](https://mark1russell7.github.io/highways/strategies.html) has a card for each strategy of the registry. A card shows the ideas that the strategy builds, with their papers, math and cost. It also shows the options, the verdicts and the time in the benchmark. The map [`strategy-ideas.ts`](packages/core/scripts/strategy-ideas.ts) links each strategy and its options to their idea records. It reads the ids in the text `describe`, and a test checks each id.
 
 ## The idea
 

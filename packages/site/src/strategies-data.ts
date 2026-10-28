@@ -5,15 +5,15 @@ import type { Snapshot, VerdictLabel } from "./results-data.ts";
 /** This pattern finds the id of an idea record in a text, for example `HWY-031`. */
 export const IDEA_ID = /\b(?:HWY|WILD|EDA|NAT|RULE)-\d{3}\b/g;
 
-/** The map `docs/research/ideas/built.json`: the idea records that each registered strategy builds. The keys are `<step>/<name>`. */
+/**
+ * The idea records that each registered strategy builds, from `strategyIdeas()` of `packages/core/scripts/strategy-ideas.ts`.
+ * The keys are `<step>/<name>`.
+ */
 export interface BuiltMap {
-  readonly description?: string;
   /** The ideas that the strategy is. */
   readonly strategies: Readonly<Record<string, readonly string[]>>;
   /** The ideas that an option of the strategy builds, by the key of the option. */
   readonly options: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>;
-  /** The strategies with no idea record. */
-  readonly noRecord: readonly string[];
 }
 
 /** One source of an idea record. */
@@ -229,15 +229,28 @@ export function statusOf(step: string, name: string, stages: readonly string[], 
   return hasVerdicts ? "screened" : "built";
 }
 
+/** This function gives the riders of each canonical idea: the records whose field `canonical` names it. */
+export function ridersOf(records: readonly { readonly id: string; readonly canonical?: string }[]): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const r of records) if (r.canonical !== undefined && r.canonical !== r.id) out.set(r.canonical, [...(out.get(r.canonical) ?? []), r.id]);
+  return out;
+}
+
+/** This function gives the ids, each one followed by its riders, each id one time. A strategy that builds an idea builds its riders too. */
+export function withRiders(ids: readonly string[], riders: ReadonlyMap<string, readonly string[]>): string[] {
+  return [...new Set(ids.flatMap((id) => [id, ...(riders.get(id) ?? [])]))];
+}
+
 /** This function makes the data of the strategies page: one card for each strategy of the registry, in the order of the steps. */
 export function strategiesData(input: StrategiesInput): StrategiesData {
   const records = new Map(input.records.map((r) => [r.id, r]));
+  const riders = ridersOf(input.records);
   const times = benchTimes(input.bench);
   const used = new Set<string>();
   const cards = input.strategies.map((s): StrategyCard => {
     const key = `${s.step}/${s.name}`;
-    const ideas = [...(input.built.strategies[key] ?? [])];
-    const byOption = input.built.options[key] ?? {};
+    const ideas = withRiders(input.built.strategies[key] ?? [], riders);
+    const byOption = Object.fromEntries(Object.entries(input.built.options[key] ?? {}).map(([k, ids]) => [k, withRiders(ids, riders)]));
     const optionIdeas = [...new Set(Object.values(byOption).flat())].filter((id) => !ideas.includes(id));
     for (const id of [...ideas, ...optionIdeas]) used.add(id);
     const sets = input.snapshots
