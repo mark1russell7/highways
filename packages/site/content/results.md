@@ -26,6 +26,10 @@ The queue puts each idea that is not built in the order of its score. The score 
 
 An enabler is an item that removes a block. Its score is the sum of the scores of the ideas that it unblocks, divided by its cost. The enablers and the ideas are on one list. The back test compares the predicted gain with the measured gain of the ideas that are built. The [catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md#the-build-queue) tells the formula, and [`queue.json`](https://github.com/mark1russell7/highways/blob/main/docs/research/queue.json) has all the rows.
 
+## The measures
+
+Each record of a screen has a value for each measure of its step. The verdicts compare these values. The table shows the definition of each measure that has one in the core. The column headers of the verdicts show it too. [`MEASURES.md`](https://github.com/mark1russell7/highways/blob/main/docs/research/MEASURES.md) has the definition of each measure id.
+
 ## What is new
 
 The last items of the [roadmap](https://github.com/mark1russell7/highways/blob/main/docs/ROADMAP.md), the newest first.

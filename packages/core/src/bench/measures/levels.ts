@@ -185,3 +185,27 @@ export function linkAgreement(graph: Graph, levels: readonly Level[], routes: re
   }
   return n > 0 ? sum / n : undefined;
 }
+
+/** The level ratio of a result (Z5 of MEAS0): the largest step and the spread of the steps from level to level. */
+export interface LevelRatio {
+  /** The largest `lr_d = items_(d+1) / items_d`. */
+  readonly max: number;
+  /** The standard deviation of `log(lr_d)` over the steps. A value of 0 is steps of equal ratio. */
+  readonly spread: number;
+}
+
+/**
+ * This function gives the level ratio of the levels (Z5 of MEAS0, Mondal 2018): `lr_d = items_(d+1) / items_d`, in the order of depth.
+ * A level without items does not count. Fewer than 2 levels give `undefined`. Lower is better for both values. The cost is linear.
+ */
+export function levelRatio(levels: readonly Level[]): LevelRatio | undefined {
+  const counts = byDepth(levels)
+    .map((l) => l.items.length)
+    .filter((n) => n > 0);
+  if (counts.length < 2) return undefined;
+  const ratios = counts.slice(1).map((n, d) => n / counts[d]!);
+  const logs = ratios.map((r) => Math.log(r));
+  const mean = logs.reduce((s, x) => s + x, 0) / logs.length;
+  const spread = Math.sqrt(logs.reduce((s, x) => s + (x - mean) ** 2, 0) / logs.length);
+  return { max: Math.max(...ratios), spread };
+}

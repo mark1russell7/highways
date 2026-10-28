@@ -52,9 +52,9 @@ export interface Enabler {
 
 /**
  * The enablers of the queue. Each one is an open item of `docs/ROADMAP.md`.
- * A built enabler leaves the list. `STEP-SLOTS` (#154) removed each block `step:`, so it is not on the list.
+ * A built enabler leaves the list. `STEP-SLOTS` (#154) removed each block `step:`, and SCREEN-MEASURES removed the 11 blocks `measure:`. Thus the list is empty.
  */
-export const ENABLERS: readonly Enabler[] = [{ id: "SCREEN-MEASURES", name: "The measures that the screen does not have", removes: ["measure:"], size: "L" }];
+export const ENABLERS: readonly Enabler[] = [];
 
 /** The fields of a verdict snapshot that the queue reads. */
 export interface QueueSnapshot {

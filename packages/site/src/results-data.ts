@@ -306,6 +306,20 @@ export interface ResultsData {
   readonly shipped: readonly ShippedRow[];
   /** The text of the page as HTML, by the headings of `content/results.md`. */
   readonly text: Readonly<Record<string, string>>;
+  /** The measures of the records, in the sequence of `MEASURES` of the core. */
+  readonly measures: readonly MeasureRow[];
+}
+
+/** One measure of the records, as `MEASURES` of the core gives it. The page shows the definition with the name. */
+export interface MeasureRow {
+  /** The id of the measure in MEAS0, for example `C4`. */
+  readonly id: string;
+  /** The name in a record, for example `route.curve.c4.median`. */
+  readonly name: string;
+  readonly unit: string;
+  readonly better: "lower" | "higher";
+  /** The definition of the measure. The value is empty when the core has no definition for it. */
+  readonly definition: string;
 }
 
 /** The inputs of `resultsData`: the texts of the committed files. */
@@ -318,6 +332,8 @@ export interface ResultsInput {
   readonly text: Readonly<Record<string, string>>;
   /** The text of `docs/research/queue.json`. */
   readonly queue: string;
+  /** The measures of the records, from `MEASURES` of the core. */
+  readonly measures?: readonly MeasureRow[];
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -359,6 +375,7 @@ export function resultsData(input: ResultsInput): ResultsData {
       .reverse()
       .map((r) => ({ ...r, item: input.inline(absoluteLinks(r.item)), link: linkHtml(r.link) })),
     text: input.text,
+    measures: input.measures ?? [],
   };
 }
 

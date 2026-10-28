@@ -12,13 +12,14 @@
     "log",
     "pow"
   ],
-  "total": 187,
+  "total": 188,
   "files": {
     "packages/core/src/bench/curves.ts": 16,
     "packages/core/src/bench/measures/bundles.ts": 1,
     "packages/core/src/bench/measures/curves.ts": 5,
     "packages/core/src/bench/measures/groups.ts": 2,
     "packages/core/src/bench/measures/lanes.ts": 4,
+    "packages/core/src/bench/measures/levels.ts": 1,
     "packages/core/src/bench/measures/order.ts": 1,
     "packages/core/src/bench/measures/routes.ts": 3,
     "packages/core/src/bench/quality.ts": 2,

@@ -177,7 +177,7 @@ describe("the measure table", () => {
     expect(new Set(MEASURES.map((m) => m.name)).size).toBe(MEASURES.length);
     for (const m of MEASURES) {
       expect(m.name).toMatch(/^route(\.[a-z0-9-]+)+$/);
-      expect(m.id).toMatch(/^[RBCGZMW]\d+$/);
+      expect(m.id).toMatch(/^[RBCGZMWH]\d+$/);
       expect(m.unit.length).toBeGreaterThan(0);
       expect(["lower", "higher"]).toContain(m.better);
       expect(typeof m.placementDependent).toBe("boolean");

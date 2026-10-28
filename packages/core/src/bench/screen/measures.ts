@@ -24,6 +24,8 @@ export interface MeasureInfo {
    * A measure without this field has the threshold `RECORD_EPS`.
    */
   readonly minEffect?: MinEffect;
+  /** The definition of the measure in one or two sentences: what it counts, and when its value is good. The site shows it. */
+  readonly definition?: string;
 }
 
 /** One rule of `MIN_EFFECTS`: the units, the minimum effect of a measure with one of these units, and the reason. */
@@ -69,7 +71,7 @@ export const MIN_EFFECTS: readonly MinEffectRule[] = Object.freeze([
 const MIN_EFFECT_BY_UNIT: ReadonlyMap<string, MinEffectRule> = new Map(MIN_EFFECTS.flatMap((r) => r.units.map((u) => [u, r] as const)));
 
 /** The text of a row of `MEASURES`: the key, the id, the name, the unit, the better side and the placement dependence. */
-type Row = readonly [key: string, id: string, name: string, unit: string, better: "lower" | "higher", placement: boolean];
+type Row = readonly [key: string, id: string, name: string, unit: string, better: "lower" | "higher", placement: boolean, definition?: string];
 
 const ROWS: readonly Row[] = [
   // The routes. A placement makes crossings, plugs on short sides and boxes that touch, so these measures depend on it.
@@ -127,6 +129,12 @@ const ROWS: readonly Row[] = [
   // The step `room` of `runSuite` gives the same keys for the boards that a room strategy opens.
   ["M1.area", "M1", "route.lane.area", "ratio", "lower", false],
   ["M4.laneThrough", "M4", "route.lane.through", "count", "lower", true],
+  // SCREEN-MEASURES: M2, M3 and M5 of the step `whole` compare the board of the output with the input board. A whole strategy without a room strategy gives 0.
+  ["M2.order", "M2", "route.room.order", "count", "lower", false, "The number of pairs of boxes whose order or alignment on an axis changes when the boxes move. 0 is correct."],
+  ["M3.displacement", "M3", "route.room.displacement", "no unit", "lower", false, "The mean distance that the center of a box moves, divided by the unit of the board."],
+  ["M5.stress", "M5", "route.room.distortion", "0 to 1", "lower", false, "The stress of the distances from each box to its 4 nearest boxes, after the best change of scale. 0 is a board that only changes its scale."],
+  // SCREEN-MEASURES: H3 is the symmetry of the routes on a board of fixed boxes.
+  ["H3.share", "H3", "route.symmetry", "0 to 1", "higher", true, "The share of the routes that a mirror or a half turn of the board sends onto a route, for the best of the three maps."],
   // The order fragility (W3 of MEAS3, from WILD-056): the spread of a measure over random orders of the edges. The placement can move it.
   ["W3.crossings", "W3", "route.order.crossings", "IQR over the median", "lower", true],
   ["W3.detour", "W3", "route.order.detour", "IQR over the median", "lower", true],
@@ -156,11 +164,35 @@ const ROWS: readonly Row[] = [
   ["Z4.farItems", "Z4", "route.level.far-items", "count", "lower", true],
   ["Z7.position", "Z7", "route.level.position", "no unit", "lower", true],
   ["Z8.order", "Z8", "route.level.order", "-1 to 1", "higher", true],
+  // SCREEN-MEASURES: Z1 is the count of the hard rule `counts-sum`, as Z2. Z5 is the ratio of the item counts from level to level.
+  ["Z1.countsSum", "Z1", "route.level.counts-sum", "count", "lower", false, "The faults of the hard rule `counts-sum`: a level whose items miss a node, or whose links miss an edge. 0 is correct."],
+  ["Z5.max", "Z5", "route.level.ratio.max", "ratio", "lower", true, "The largest ratio of the item counts of two levels in sequence. A large ratio is a sudden jump of the zoom."],
+  [
+    "Z5.spread",
+    "Z5",
+    "route.level.ratio.spread",
+    "no unit",
+    "lower",
+    true,
+    "The standard deviation of the log of the ratios of the item counts of the levels. 0 is a zoom with steps of equal size.",
+  ],
   ["G1.modularity", "G1", "route.group.modularity", "-0.5 to 1", "higher", true],
   ["G2.cut", "G2", "route.group.cut", "0 to 1", "lower", true],
   ["G6.balance", "G6", "route.group.balance", "0 to 1", "higher", true],
   ["G8.treeCost", "G8", "route.group.tree-cost", "0 to 1", "lower", true],
   ["G9.ari", "G9", "route.group.stability", "-1 to 1", "higher", true],
+  // SCREEN-MEASURES: G4, G5 and G7 read the boxes of the items of the levels.
+  ["G4.fill", "G4", "route.group.fill", "0 to 1", "higher", true, "The mean share of the box of a group of the far view that the boxes of its nodes fill. A full group box is 1."],
+  ["G5.overlaps", "G5", "route.group.overlaps", "count", "lower", true, "The number of pairs of items of one level whose boxes overlap. 0 is correct."],
+  [
+    "G7.silhouette",
+    "G7",
+    "route.group.silhouette",
+    "-1 to 1",
+    "higher",
+    true,
+    "The mean silhouette of the nodes of the far view: how much nearer a node is to its group than to the nearest other group.",
+  ],
   // The curves. A curve draws a fixed polyline, so no measure of a curve depends on the placement.
   ["C1.max", "C1", "route.curve.c1.max", "degrees", "lower", false],
   ["C1.share", "C1", "route.curve.c1.share", "0 to 1", "lower", false],
@@ -168,6 +200,11 @@ const ROWS: readonly Row[] = [
   ["C2.max", "C2", "route.curve.c2.max", "no unit", "lower", false],
   ["C3.median", "C3", "route.curve.c3.median", "no unit", "lower", false],
   ["C3.q95", "C3", "route.curve.c3.q95", "no unit", "lower", false],
+  // SCREEN-MEASURES: C4 is the change of the curvature along a curve. C8 is the distance of a curve from its route.
+  ["C4.median", "C4", "route.curve.c4.median", "no unit", "lower", false, "The median curvature variation of the curves, without a unit. A circle or a straight line is 0. A sudden change of the curvature is large."],
+  ["C4.q95", "C4", "route.curve.c4.q95", "no unit", "lower", false, "The 0.95 quantile of the curvature variation of the curves. It shows the worst curves."],
+  ["C8.median", "C8", "route.curve.c8.median", "no unit", "lower", false, "The median Fréchet distance of a curve from the polyline of its route, divided by the unit of the board."],
+  ["C8.max", "C8", "route.curve.c8.max", "no unit", "lower", false, "The largest Fréchet distance of a curve from the polyline of its route, divided by the unit of the board."],
   ["C5.peak", "C5", "route.curve.c5.peak", "curvature times the unit of the board", "lower", false],
   ["C6.length", "C6", "route.curve.c6.length", "ratio", "lower", false],
   ["curve-clear", "C7", "route.curve.rule.clear", "count", "lower", false],
@@ -182,10 +219,10 @@ const ROWS: readonly Row[] = [
  * It compares a measure with the value `true` only between runs on the same input.
  */
 export const MEASURES: readonly MeasureInfo[] = Object.freeze(
-  ROWS.map(([key, id, name, unit, better, placementDependent]) => {
+  ROWS.map(([key, id, name, unit, better, placementDependent, definition]) => {
     const rule = MIN_EFFECT_BY_UNIT.get(unit);
     if (!rule) throw new Error(`MEASURES: the unit "${unit}" of ${key} has no rule in MIN_EFFECTS`);
-    const info: MeasureInfo = { key, id, name, unit, better, placementDependent };
+    const info: MeasureInfo = { key, id, name, unit, better, placementDependent, ...(definition === undefined ? {} : { definition }) };
     return Object.freeze(rule.minEffect === undefined ? info : { ...info, minEffect: rule.minEffect });
   }),
 );
