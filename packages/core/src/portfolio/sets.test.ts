@@ -15,13 +15,14 @@ describe("the sets of the portfolio router", () => {
     expect(readFileSync(FIT_PATH, "utf8").replace(/\r\n/g, "\n")).toBe(fitSource(choices, times.source));
   }, 60_000);
 
+  // A band above 40 nodes can have an empty set: there, no member of the train seeds gives more B1 than the base under the guard.
   it("has a set for each rule, cap and band, with no base and no repeat, and a fit that is a prefix of the set", () => {
     for (const rule of PORTFOLIO_RULES)
       for (const cap of PORTFOLIO_CAPS)
         for (const band of PORTFOLIO_BANDS) {
           const set = PORTFOLIO_SETS[`${rule}|${cap}|${band.id}`];
           expect(set, `${rule} ${cap} ${band.id}`).toBeDefined();
-          expect(set!.length).toBeGreaterThan(0);
+          if (band.maxNodes <= 40) expect(set!.length).toBeGreaterThan(0);
           expect(set!.length).toBeLessThanOrEqual(8);
           expect(set).not.toContain("shared");
           expect(new Set(set).size).toBe(set!.length);
