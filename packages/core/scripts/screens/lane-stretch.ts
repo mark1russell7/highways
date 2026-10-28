@@ -1,6 +1,6 @@
 // The variants of the screen of LANE-STRETCH: the router `shared` and `shared-all` with each stretch order.
-// Start: `pnpm screen --step router --strategy shared,shared-all --module packages/core/scripts/screens/lane-stretch.ts`. The baselines are `shared` and `shared-all`.
-// At the exit, the script writes an audit of the set `screen-v1` for each variant: the lane crossings (B5), the broken pairs and the route time.
+// Start: `pnpm screen --step router --strategy shared,shared-all --module scripts/screens/lane-stretch.ts` in `packages/core`. The baselines are `shared` and `shared-all`.
+// At the exit, the script writes an audit of the set `screen-v1` for each variant: the lane crossings (B5), the broken pairs, their total and the route time.
 // A broken pair is a pair of lanes of a run in the order against the relation `bundle`. Its lanes cross at an end of the run, and B5 does not count it.
 import { laneCrossings } from "../../src/bench/measures/lanes.ts";
 import { inputGraph } from "../../src/bench/screen/forms.ts";
@@ -39,9 +39,13 @@ function runsOf(result: Result): { runs: LaneRun[]; orders: (readonly string[])[
   return { runs, orders: (result.runs ?? []).map((run) => run.edges) };
 }
 
-/** This function counts the pairs of lanes of each run in the order against the relation `bundle`. */
-function brokenPairs(runs: readonly LaneRun[], orders: readonly (readonly string[])[]): number {
-  let broken = 0;
+/**
+ * This function counts the pairs of lanes of each run in the order against the relation `bundle`. It also gives the distinct pairs of edges of these pairs.
+ * A distinct pair counts one time on a board, as B5 counts a pair.
+ */
+function brokenPairs(runs: readonly LaneRun[], orders: readonly (readonly string[])[]): { readonly count: number; readonly distinct: number } {
+  let count = 0;
+  const distinct = new Set<string>();
   runs.forEach((run, i) => {
     const { placed } = placeRoutes(run.points, run.routes);
     const lane = new Map(orders[i]!.map((e, k) => [e, k] as const));
@@ -51,10 +55,12 @@ function brokenPairs(runs: readonly LaneRun[], orders: readonly (readonly string
         const b = placed[y]!;
         const left = byBundle(a, b) > 0 ? b : a;
         const right = left === a ? b : a;
-        if (lane.get(left.edge)! > lane.get(right.edge)!) broken++;
+        if (lane.get(left.edge)! < lane.get(right.edge)!) continue;
+        count++;
+        distinct.add(a.edge < b.edge ? `${a.edge}\u0000${b.edge}` : `${b.edge}\u0000${a.edge}`);
       }
   });
-  return broken;
+  return { count, distinct: distinct.size };
 }
 
 /** The audit of one variant on the set: the sums over the inputs, and the route time of each input. */
@@ -62,6 +68,7 @@ interface Audit {
   inputs: number;
   laneCrossings: number;
   brokenPairs: number;
+  brokenDistinct: number;
   stretches: number;
   joinedRuns: number;
   ms: number[];
@@ -74,14 +81,14 @@ const median = (xs: readonly number[]): number => {
 };
 
 /** This function routes each input of the set with each variant, and gives the audit by variant and the B5 of each input. */
-function audit(): { totals: Record<string, Omit<Audit, "ms"> & { msMedian: number; msSum: number }>; perInput: Record<string, Record<string, number>> } {
+function audit(): { totals: Record<string, Omit<Audit, "ms"> & { total: number; msMedian: number; msSum: number }>; perInput: Record<string, Record<string, number>> } {
   const inputs = screenInputs(SCREEN_V1).map((input) => ({ id: input.id, graph: inputGraph(input) }));
-  const totals: Record<string, Omit<Audit, "ms"> & { msMedian: number; msSum: number }> = {};
+  const totals: Record<string, Omit<Audit, "ms"> & { total: number; msMedian: number; msSum: number }> = {};
   const perInput: Record<string, Record<string, number>> = {};
   for (const all of [false, true]) {
     for (const method of ["none", "consensus", "periphery", "sifting"] as const) {
       const name = `${all ? "shared-all" : "shared"}${method === "none" ? "" : `-stretch-${method}`}`;
-      const a: Audit = { inputs: 0, laneCrossings: 0, brokenPairs: 0, stretches: 0, joinedRuns: 0, ms: [] };
+      const a: Audit = { inputs: 0, laneCrossings: 0, brokenPairs: 0, brokenDistinct: 0, stretches: 0, joinedRuns: 0, ms: [] };
       for (const { id, graph } of inputs) {
         const router = sharedRouter(optionsOf(name, all, method));
         router.route(graph);
@@ -96,7 +103,9 @@ function audit(): { totals: Record<string, Omit<Audit, "ms"> & { msMedian: numbe
         const b5 = laneCrossings(segmentsOf(result!));
         a.inputs++;
         a.laneCrossings += b5;
-        a.brokenPairs += brokenPairs(runs, orders);
+        const broken = brokenPairs(runs, orders);
+        a.brokenPairs += broken.count;
+        a.brokenDistinct += broken.distinct;
         for (const s of laneStretches(runs, { method: method === "none" ? "consensus" : method })) {
           if (s.runs.length < 2) continue;
           a.stretches++;
@@ -105,7 +114,7 @@ function audit(): { totals: Record<string, Omit<Audit, "ms"> & { msMedian: numbe
         a.ms.push(median(times));
         (perInput[id] ??= {})[name] = b5;
       }
-      totals[name] = { inputs: a.inputs, laneCrossings: a.laneCrossings, brokenPairs: a.brokenPairs, stretches: a.stretches, joinedRuns: a.joinedRuns, msMedian: median(a.ms), msSum: a.ms.reduce((x, y) => x + y, 0) };
+      totals[name] = { inputs: a.inputs, laneCrossings: a.laneCrossings, brokenPairs: a.brokenPairs, brokenDistinct: a.brokenDistinct, total: a.laneCrossings + a.brokenDistinct, stretches: a.stretches, joinedRuns: a.joinedRuns, msMedian: median(a.ms), msSum: a.ms.reduce((x, y) => x + y, 0) };
     }
   }
   return { totals, perInput };

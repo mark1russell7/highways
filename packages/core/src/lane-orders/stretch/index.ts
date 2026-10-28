@@ -151,8 +151,6 @@ class Relation {
   /** The index of each edge of the stretch. The indexes follow the order of the edge ids. */
   readonly index: ReadonlyMap<string, number>;
   readonly edges: readonly string[];
-  /** For the pair `a < b`, the key `a * n + b` gives -1 when `a` is on the left of `b`, and 1 when it is on the right. */
-  private readonly sides = new Map<number, number>();
   /** The pairs of each edge: the other edge and the side of the edge against it (-1: on the left). */
   readonly pairs: Map<number, number>[];
 
@@ -162,26 +160,12 @@ class Relation {
     this.pairs = edges.map(() => new Map<number, number>());
   }
 
-  /**
-   * This method adds the pairs of a run with the way `turn` against the root. A pair that the stretch knows already keeps its side.
-   * The relation `bundle` gives two edges the same side on each run of their common stretch, so the first run of a pair is enough.
-   */
-  add(run: Prepared, turn: 1 | -1): void {
-    const n = this.edges.length;
-    const lanes = run.placed.map((p) => ({ p, i: this.index.get(p.edge)! })).sort((x, y) => x.i - y.i);
-    for (let x = 0; x < lanes.length; x++) {
-      for (let y = x + 1; y < lanes.length; y++) {
-        const a = lanes[x]!;
-        const b = lanes[y]!;
-        const key = a.i * n + b.i;
-        if (this.sides.has(key)) continue;
-        const v = byBundle(a.p, b.p);
-        const side = (v > 0 ? 1 : -1) * turn;
-        this.sides.set(key, side);
-        this.pairs[a.i]!.set(b.i, side);
-        this.pairs[b.i]!.set(a.i, -side);
-      }
-    }
+  /** This method sets the side of the edge `a` against the edge `b`: -1 when `a` is on the left of `b`, and 1 when it is on the right. */
+  set(a: string, b: string, side: number): void {
+    const i = this.index.get(a)!;
+    const j = this.index.get(b)!;
+    this.pairs[i]!.set(j, side);
+    this.pairs[j]!.set(i, -side);
   }
 
   /** This method gives -1 when the edge `a` is on the left of the edge `b`, and 1 when it is on the right. It gives 0 when the two edges share no run. */
@@ -343,27 +327,49 @@ export function laneStretches(runs: readonly LaneRun[], options: Partial<LaneStr
   return stretchesOf(prepare(runs), { ...LANE_STRETCH_DEFAULTS, ...options });
 }
 
-/** This function gives the stretches of the prepared runs, with the order of each stretch. */
+/** The side of each pair of edges of a run, in the way of the root. The key is the two edges in the order of their ids. */
+type Sides = Map<string, number>;
+
+/** This function gives the sides of the pairs of a run with the way `turn` against the root: -1 when the first edge of the key is on the left. */
+function sidesOf(run: Prepared, turn: 1 | -1): Sides {
+  const out: Sides = new Map();
+  const lanes = [...run.placed].sort(byEdge);
+  for (let x = 0; x < lanes.length; x++)
+    for (let y = x + 1; y < lanes.length; y++) {
+      const v = byBundle(lanes[x]!, lanes[y]!);
+      out.set(`${lanes[x]!.edge}\u0000${lanes[y]!.edge}`, (v > 0 ? 1 : -1) * turn);
+    }
+  return out;
+}
+
+/**
+ * This function gives the stretches of the prepared runs, with the order of each stretch.
+ * A run joins a stretch only when the relation of each pair of its edges agrees with the runs of the stretch.
+ * Thus one order of the stretch can keep the side of each pair on each run, apart from the cycles of the relation.
+ */
 function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretchOptions>): LaneStretch[] {
   const keyOrder = prepared.map((_, i) => i).sort((a, b) => byText(prepared[a]!.key, prepared[b]!.key));
   const links = linksOf(prepared, keyOrder);
   const rank = new Map(keyOrder.map((i, r) => [i, r] as const));
   const done = new Uint8Array(prepared.length);
   const out: LaneStretch[] = [];
-  for (const start of keyOrder) {
-    if (done[start]) continue;
-    // The runs of the stretch, and the root: the run with the most lanes, then the first key.
-    const members: number[] = [];
-    const queue = [start];
-    done[start] = 1;
-    for (let q = 0; q < queue.length; q++) {
-      const i = queue[q]!;
-      members.push(i);
+  // Each loop makes one stretch and marks its runs. A run that the walk does not take stays for a later stretch.
+  for (let p = 0; p < keyOrder.length; ) {
+    const start = keyOrder[p]!;
+    if (done[start]) {
+      p++;
+      continue;
+    }
+    // The runs that the links join to `start`, and the root: the run with the most lanes, then the first key.
+    const members = [start];
+    const seen = new Set(members);
+    for (let q = 0; q < members.length; q++) {
+      const i = members[q]!;
       if (prepared[i]!.twice) continue;
       for (const l of links[i]!) {
-        if (done[l.to] || prepared[l.to]!.twice) continue;
-        done[l.to] = 1;
-        queue.push(l.to);
+        if (done[l.to] || seen.has(l.to) || prepared[l.to]!.twice) continue;
+        seen.add(l.to);
+        members.push(l.to);
       }
     }
     const root = members.reduce((best, i) => {
@@ -374,31 +380,40 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
     const runsOf: number[] = [root];
     const turns: (1 | -1)[] = [1];
     const turnOf = new Map<number, 1 | -1>([[root, 1]]);
+    const sides = sidesOf(prepared[root]!, 1);
+    done[root] = 1;
     for (let k = 0; k < runsOf.length; k++) {
       const i = runsOf[k]!;
       if (prepared[i]!.twice) continue;
       for (const l of links[i]!) {
-        if (turnOf.has(l.to) || prepared[l.to]!.twice) continue;
+        if (done[l.to] || prepared[l.to]!.twice) continue;
         const t = (turnOf.get(i)! * l.turn) as 1 | -1;
+        const own = sidesOf(prepared[l.to]!, t);
+        let agrees = true;
+        for (const [key, side] of own) if ((sides.get(key) ?? side) !== side) agrees = false;
+        if (!agrees) continue;
+        for (const [key, side] of own) sides.set(key, side);
+        done[l.to] = 1;
         turnOf.set(l.to, t);
         runsOf.push(l.to);
         turns.push(t);
       }
     }
-    // A run that goes two times through one edge is a stretch alone.
-    for (const i of members) if (!turnOf.has(i)) out.push({ runs: [i], turns: [1], order: bundleOrder(prepared[i]!) });
-    out.push({ runs: runsOf, turns, order: orderOf(prepared, runsOf, turns, options) });
+    out.push({ runs: runsOf, turns, order: orderOf(prepared, runsOf, turns, sides, options) });
   }
   return out;
 }
 
 /** This function gives the order of the edges of one stretch, from left to right in the way of its root. */
-function orderOf(prepared: readonly Prepared[], runs: readonly number[], turns: readonly (1 | -1)[], options: Readonly<LaneStretchOptions>): string[] {
+function orderOf(prepared: readonly Prepared[], runs: readonly number[], turns: readonly (1 | -1)[], sides: Sides, options: Readonly<LaneStretchOptions>): string[] {
   // A stretch of one run keeps the order `bundle` of the run. The method `none` keeps the order of each run.
   if (runs.length === 1 || options.method === "none") return bundleOrder(prepared[runs[0]!]!);
   const edges = [...new Set(runs.flatMap((i) => prepared[i]!.placed.map((p) => p.edge)))].sort(byText);
   const rel = new Relation(edges);
-  runs.forEach((i, r) => rel.add(prepared[i]!, turns[r]!));
+  for (const [key, side] of sides) {
+    const [a, b] = key.split("\u0000") as [string, string];
+    rel.set(a, b, side);
+  }
   let order: number[];
   if (options.method === "periphery") order = peripheryOrder(rel, prepared, runs, turns);
   else {
