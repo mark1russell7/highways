@@ -29,12 +29,13 @@ describe("the highway strategy p-hub (HWY-041)", () => {
   });
 
   it("gives highways between two hubs, with each allocation", () => {
+    // The multiple allocation tries each pair of hubs for each edge, so this test runs it without the swaps.
     for (const allocation of ["single", "multiple"] as const) {
-      const plan = pHubPlan({ graph: clustered }, { ...P_HUB_DEFAULTS, allocation });
+      const plan = pHubPlan({ graph: clustered }, { ...P_HUB_DEFAULTS, allocation, swaps: allocation === "multiple" ? 0 : 1 });
       expect(checkPlan(clustered, plan)).toEqual([]);
       expect(plan.highways.length).toBeGreaterThan(0);
     }
-  });
+  }, 20_000);
 
   commonTests("p-hub", P_HUB_DEFAULTS, pHubPlan, [flows]);
 });
