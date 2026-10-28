@@ -171,7 +171,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 ### The output hash
 
-`outputHash(value, { grid })` of `bench/screen/activation.ts` gives the first 16 hex characters of `sha256Hex(canonicalJson(value))`. It is a copy of the function of the contract 0.2.5. The core has no run-time dependency, so it keeps the copy, and the test compares the two.
+`outputHash(value, { grid })` gives the first 16 hex characters of `sha256Hex(canonicalJson(value))`. The core imports it from the contract, and `bench/screen/activation.ts` exports it again.
 
 - Each number goes to the nearest step of the grid, and -0 becomes 0. The default grid is `RECORD_EPS`, and the grid 0 keeps the exact numbers.
 - `NaN` and an infinite number cause a `RangeError` with the path of the number.
@@ -204,9 +204,7 @@ A record of a packer counts the breaks of `no-overlap`, `in-container`, `locked-
 
 ## The shared contract
 
-The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.5 from npm as a development dependency. The core has no run-time dependency, so it keeps its own copy of each shared constant and function, and the test compares the two. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
-
-The test also compares the copy of `outputHash`, `outputGroups` and `exercised` in `activation.ts` with the contract. It uses the outputs of the built-in routers and seeded random values.
+The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has the contract (0.2.6 or later) as its one run-time dependency. The core imports the shared constants and functions from it. The core keeps a function only when the contract has no equal function. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
 
 The test also checks that [the floors](PROMOTION.md#the-floors) has no row of a `joint.*` or a `pack.*` measure. `JOINT_MEASURES` of the contract and `MEASURE_SPECS` of `packing` give these floors.
 
@@ -225,7 +223,7 @@ Each open gap has a `@ts-expect-error` with its id. When a gap closes, `pnpm typ
 | G7 | `highways` has no `margin` or `turnable` on a box, and no `inset` or `aspectWeight` on a container. | The contract to `highways` | Open, until the item MARGIN-BOX. |
 | G8 | The contract has no `data` on a box, no `generator`, `cell` or `step` on an input, and no `skipped` on a record. | `highways` to the contract | Closed by the contract 0.2.0. The `containerSize` values of `highways` are the values of the contract. |
 | G9 | `highways` has no constant for the epsilon of a file. `round3` rounds to 0.001, the value of `RECORD_EPS`. | Both | Closed: `RECORD_EPS` of `bench/screen/hash.ts` has the value of the contract, and the test compares them. |
-| G10 | The contract 0.2.1 has no `compareMeasure` and no `minEffectOf`. `highways` has its own copy in `bench/screen/compare.ts`, and a test compares the copy with [the per-input classification](PROMOTION.md#the-per-input-classification). | The contract to `highways` | Closed by the contract 0.2.2: `highways` keeps its own copy, and the test compares it with the functions of the contract. The label type of the copy is `Verdict` of the contract. |
+| G10 | The contract 0.2.1 has no `compareMeasure` and no `minEffectOf`. `highways` has its own copy in `bench/screen/compare.ts`, and a test compares the copy with [the per-input classification](PROMOTION.md#the-per-input-classification). | The contract to `highways` | Closed by the contract 0.2.2. Since PORTFOLIO-FIT, `highways` imports the two functions from the contract. The label type is `Verdict` of the contract. |
 | G11 | The contract record has no `trace`. `highways` writes the move counts there (ACTIVATION), and `RecordTrace` has the form of `StageTrace` of the contract. | `highways` to the contract | Open, until the contract has `trace` on a record. |
 
 ## The predictions

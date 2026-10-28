@@ -377,7 +377,7 @@ This section is the result of the item PORTFOLIO-API of the [roadmap](../ROADMAP
 
 - `routePortfolio(graph, { rule, cap, k, budgetMs, maxMembers })` runs the base `shared`, then the first k members of the set of its rule, cap and size band.
 - The rule is `collection` (the default) or `all`. The cap is 1.1, 1.25 or 1.5 (the default). k is 3 (the default), 5 or 8.
-- The combinator is a local copy of `portfolio` of `@mark1russell7/layout-contract` 0.2.6, in `src/bench/screen/portfolio-pick.ts`. The test `portfolio-pick.test.ts` runs 2 000 seeded cases through the copy and the contract. The picks, the errors and the clock reads are equal on each case. `selectBest` and `pickMoves` are also equal.
+- The combinator was a local copy of `portfolio` of `@mark1russell7/layout-contract` 0.2.6. A test compared the copy and the contract on 2 000 seeded cases. Since PORTFOLIO-FIT, the core imports the combinator from the contract.
 - The key of the pick:
   - `hard` counts the breaks of the hard rules, plus each edge with a stretch above the cap. Under `collection`, it also counts each shared segment that holds edges of two collections.
   - The one level `B1` is the ink saved (higher is better), with the `minEffect` of the table `MEASURES`.
@@ -464,7 +464,7 @@ The median time of the router, one member after the other, on a CI machine. `sha
 - At 40 nodes and k = 3, the router takes 51 to 176 ms. The members take most of it: the records of EXACT-BOUNDS give 33 to 164 ms for `shared` and the same 3 members. The key adds approximately 10 to 20 ms.
 - The set of `all` at the cap 1.25 holds `w3d:kdeeb-routes` and `w3e:mlseb+stretch`. They are the slowest members.
 - On `screen-v1`, the boards of 96 to 150 nodes take 0.4 to 1.8 s (median), against 20 ms for `shared`. The sets come from boards of 40 nodes or fewer. Above 40 nodes, set `budgetMs` to keep the time in a limit.
-- The workflow `Bench` races the router with its defaults in the part `opt-in`. In the run [40651207340](https://github.com/mark1russell7/highways/actions/runs/40651207340), the router took 1.1 s at 100 nodes, 32 s at 400 nodes and 546 s at 1 000 nodes. So the part stops at 400 nodes.
+- The workflow `Bench` races the router with its defaults in the part `opt-in`. In the run [40651207340](https://github.com/mark1russell7/highways/actions/runs/40651207340), the router took 1.1 s at 100 nodes, 32 s at 400 nodes and 546 s at 1 000 nodes. So the part stops at 400 nodes. Since PORTFOLIO-FIT, the default is the fit. The section [The fit of the router](#the-fit-of-the-router-portfolio-fit) has its new times.
 
 ### The predictions of PORTFOLIO-API
 
@@ -476,3 +476,106 @@ The median time of the router, one member after the other, on a CI machine. `sha
 | 6. At 13 to 24 and 25 to 40 nodes, the band set at k = 5 beats the 10-node set in each rule and cap, by 10 points or more in at least half of the 12 cells. | medium | Not met: it beats the 10-node set in 10 of 12 cells, and by 10 points or more in 9. It loses under `all` at 1.25 and 13 to 24 nodes (74% against 100%). At 25 to 40 nodes under `collection` at 1.1, no set has a gain. |
 | 7. Under `collection`, the band set at k = 5 keeps 20% or more at 13 to 24 nodes at each cap. | low | Not met: 4% at 1.1, 38% at 1.25 and 45% at 1.5. |
 | 8. At 25 to 40 nodes under `all` at the caps 1.1 and 1.25, the base wins on half of the test inputs or more. | medium | Not met: 4 of 20 and 0 of 19. The base wins most under `collection` at 1.1: 18 of 20. |
+
+## The fit of the router (PORTFOLIO-FIT)
+
+This section is the result of the item PORTFOLIO-FIT of the [roadmap](../ROADMAP.md). It has three parts: one key, the import of the contract and a deterministic default.
+
+### The decision: the core imports the contract
+
+The core imports the shared functions from `@mark1russell7/layout-contract` (0.2.6 or later):
+
+- `portfolio`, `selectBest` and `pickMoves`
+- `compareMeasure`, `minEffectOf` and `RECORD_EPS`
+- `outputHash`, `outputGroups`, `exercised`, `canonicalJson` and `sha256Hex`.
+
+The reasons:
+
+- Two copies of the pick can disagree. PORTFOLIO-API found such a difference between the key of the router and the guard of the records.
+- The contract has no dependencies, so the import adds only the contract.
+- The parity tests of the copies are not necessary, so the core loses them.
+
+The published package `@mark1russell7/highways` has one run-time dependency since PORTFOLIO-FIT. The core keeps only the functions that the contract does not have:
+
+- `documentHash`, because the function of the contract rounds to a grid, and the hash of a document keeps the exact numbers
+- `utf8`, because the contract does not export it
+- the seeds, the random generator and `round3`.
+
+A minified bundle of the core (`esbuild`, `src/index.ts`) has 435 086 bytes with the contract and 427 057 bytes without it. So the contract adds 8 029 bytes, approximately 7.8 KB. The CI run [40661133199](https://github.com/mark1russell7/highways/actions/runs/40661133199) of the workflow `Portfolio` measured it.
+
+### One key
+
+PORTFOLIO-API found that the key of the router and the guard of the records did not always choose the same member. The key counted each edge of the base above the cap as a hard break. The offline scan was not `selectBest`. Since PORTFOLIO-FIT, the two sides use the same guard and the same function:
+
+- A member passes when it has no more breaks of each hard rule than the base, and no edge with a stretch above the cap. Under the rule `collection`, it also has no mixed segment.
+- The base `shared` is the fallback, so it always passes. The cap does not apply to it.
+- `selectBest` of the contract ranks the outputs that pass by B1, with the `minEffect` of B1.
+
+`guardBreaks` and `portfolioKey` of `src/portfolio/key.ts` hold the guard. The offline choice `choose` of `scripts/portfolio.ts` uses the same `selectBest`. The test `pick.test.ts` routes the boards of `exact-v1` and a part of `exact-v1-bounds`, and it compares the two picks.
+
+The workflow `Portfolio` compares the winner of each record with the offline choice of the same members. On 3 740 records of the forms without a budget, 0 winners differ. Under `collection` at the cap 1.1, the share of the gap closed does not change. The median B1 of the router goes up. At 13 to 24 nodes and k = 5, it goes from 0.045 to 0.074. At 25 to 40 nodes, it goes from 0.088 to 0.101.
+
+### The deterministic default
+
+The default of the router is deterministic. [The promotion rule](../PROMOTION.md#deterministic-defaults) gives this rule for each project. Without `k`, the router runs the fit of `src/portfolio/fit.ts`. The fit holds a list of members for each rule, cap and band, and a node limit for each member.
+
+The script `portfolio-sets.ts` makes the fit from the times of CI:
+
+- The run [40658558076](https://github.com/mark1russell7/highways/actions/runs/40658558076) timed each member and the key on 10 to 150 nodes (`portfolio:time --members`). `scripts/data/portfolio-times.json` keeps the medians.
+- A member leaves the pool of a band when it alone takes more than 50 ms in that band. The sets come from this pool, so 2 sets changed.
+- The fit is the longest start of the set whose model time is at or below 40 ms. The model time is the time of `shared`, plus the setup of the key, plus each member.
+- A member leaves the fit at the first size where it does not fit. Its node limit is the last size where it fits.
+
+The setup of the key is the stretch network of the graph and the facts of the base. It takes 22 ms at 40 nodes, 65 ms at 64 nodes and 190 ms at 100 nodes. So above 40 nodes, the fit is `shared` alone. At 40 nodes, the fit is `shared` alone in 4 of 6 cells, because the node limits stop at 32 nodes.
+
+The share of the oracle gain on the test seeds, at k = 5, at k = 5 with a budget, and at the fit (CI run [40661449005](https://github.com/mark1russell7/highways/actions/runs/40661449005)):
+
+| rule | cap | band | test | k = 5 | 16 ms | 50 ms | 100 ms | fit |
+|---|---:|---|---:|---:|---:|---:|---:|---:|
+| `collection` | 1.1 | n1-12 | 20 | 23% | 23% | 23% | 23% | 58% |
+| `collection` | 1.1 | n13-24 | 40 | 4% | 0% | 4% | 4% | 0% |
+| `collection` | 1.1 | n25-40 | 20 | - | - | - | - | - |
+| `collection` | 1.25 | n1-12 | 20 | 5% | 5% | 5% | 5% | 19% |
+| `collection` | 1.25 | n13-24 | 40 | 38% | 3% | 38% | 38% | 38% |
+| `collection` | 1.25 | n25-40 | 20 | 43% | 0% | 36% | 43% | -43% |
+| `collection` | 1.5 | n1-12 | 20 | 47% | 47% | 47% | 47% | 70% |
+| `collection` | 1.5 | n13-24 | 40 | 45% | 31% | 45% | 45% | 45% |
+| `collection` | 1.5 | n25-40 | 16 | 94% | 0% | 86% | 94% | 0% |
+| `all` | 1.1 | n1-12 | 19 | 95% | 14% | 95% | 95% | 95% |
+| `all` | 1.1 | n13-24 | 40 | 89% | 35% | 89% | 89% | 72% |
+| `all` | 1.1 | n25-40 | 20 | 83% | 0% | 3% | 83% | -77% |
+| `all` | 1.25 | n1-12 | 20 | 83% | 70% | 83% | 83% | 89% |
+| `all` | 1.25 | n13-24 | 40 | 74% | 0% | 74% | 74% | 0% |
+| `all` | 1.25 | n25-40 | 19 | 43% | 0% | 0% | 43% | -427% |
+| `all` | 1.5 | n1-12 | 20 | 42% | 42% | 42% | 42% | 42% |
+| `all` | 1.5 | n13-24 | 40 | 97% | 31% | 70% | 91% | 61% |
+| `all` | 1.5 | n25-40 | 13 | 100% | 0% | 86% | 100% | 0% |
+
+- At 1 to 12 nodes, the fit runs 4 to 8 members. It keeps as much as k = 5, or more.
+- At 25 to 40 nodes, the test boards have 40 nodes. There the fit is often `shared` alone, and its share is 0% or less. A negative share tells that the best single strategy beats `shared`.
+- The budget of 16 ms cuts most members at 13 nodes and more. With the budget of 50 ms, the share falls by 15 points or less in 8 of 11 cells at 13 to 40 nodes.
+
+The time of the router in CI, one member after the other. Each cell gives the range of the medians over the 6 rules and caps, then the range of the q95, in ms:
+
+| set | `shared` | fit | k = 5 | k = 5, 50 ms |
+|---|---|---|---|---|
+| 1 to 12 nodes | 0.8 | 24 to 37, q95 28 to 45 | 16 to 31, q95 19 to 43 | 16 to 30, q95 19 to 41 |
+| 13 to 24 nodes | 2.6 | 23 to 46, q95 33 to 79 | 31 to 107, q95 49 to 222 | 31 to 68, q95 48 to 126 |
+| 40 nodes | 5.0 | 6 to 41, q95 8 to 51 | 80 to 123, q95 100 to 178 | 55 to 69, q95 63 to 92 |
+| `screen-v1` | 8.9 | 16 to 17, q95 28 to 30 | 214 to 376, q95 831 to 1 653 | 142 to 239, q95 655 to 1 374 |
+
+- The fit has a median of 50 ms or less in each band up to 40 nodes.
+- A budget is not a hard limit. The router examines the budget between two members, so one slow member goes past it. On `screen-v1`, the budget of 50 ms gives a median of 142 to 239 ms.
+- On `screen-v1`, the fit keeps 14% to 94% of the oracle gain, against 14% to 146% at k = 5. Most of its gain comes from the boards of 10 nodes.
+- In the part `opt-in` of the workflow `Bench` (run [40660432890](https://github.com/mark1russell7/highways/actions/runs/40660432890)), the fit took 47 ms at 10 nodes, 37 ms at 100 nodes and 148 ms at 400 nodes.
+
+### The predictions of PORTFOLIO-FIT
+
+| Prediction | Confidence | Result |
+|---|---|---|
+| 1. With one key, 0 winners differ from the offline choice. | high | Met: 0 of 3 740 records. |
+| 2. With one key, the share under `collection` at 1.1 changes by 10 points or more in at least one band. | medium | Not met: the shares do not change. The median B1 of the router goes up. |
+| 3. The contract adds less than 4 KB to a minified bundle. | medium | Not met: 8 029 bytes. |
+| 4. At 50 ms and k = 5, the share falls by less than 15 points in most cells at 13 to 40 nodes, but to near 0 on `screen-v1`. | medium | Partly met: it falls by 15 points or less in 8 of 11 cells. On `screen-v1`, it falls by 0 to 20 points, because the budget cuts only after a slow member. |
+| 5. A deterministic default with a median of 50 ms or less exists in each band up to 40 nodes. Above 40 nodes, it is the base alone or the base and one member. | medium | Met: the medians are 6 to 46 ms. Above 40 nodes, the fit is `shared` alone. |
+

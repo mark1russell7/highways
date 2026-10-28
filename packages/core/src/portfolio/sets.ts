@@ -21,8 +21,8 @@ export const PORTFOLIO_SETS: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|$
   "all|1.1|n25-40": ["w2c:zipper+stretch-b1.1", "w3a:spiral-a15", "w3d:mesh+stretch", "w3a:diffusion+stretch", "w3a:diffusion-wide", "w2c:road-classes-d0.3", "w3d:kdeeb-routes"],
   "all|1.25|n1-12": ["w3d:kdeeb-routes", "w3e:mlseb+stretch", "hw:growth", "hw:level-links", "w3b:growth-input", "w3e:confluent+stretch", "w3d:kdeeb-nomask", "w3a:diffusion-g2"],
   "all|1.25|n13-24": ["w3d:kdeeb-routes", "w3e:mlseb+stretch", "w3f:p-hub-a0.2", "w3a:spiral-n3", "w3a:diffusion-l3", "trunks-tree-bf06", "hw:cubu", "w3a:spiral-a35"],
-  "all|1.25|n25-40": ["w3d:kdeeb-routes", "w3e:mlseb+stretch", "hw:spiral", "hw:shared-ways-all", "w3e:frechet+stretch"],
+  "all|1.25|n25-40": ["w3d:kdeeb-routes", "hw:spiral", "hw:shared-ways-all", "w3a:diffusion-g2", "w3e:frechet+stretch", "hw:cubu"],
   "all|1.5|n1-12": ["w3b:growth-s0.3", "w3e:mlseb-a0", "w3e:mlseb-routes", "w3c:edge-paths-k1.5", "w3f:territories-r2", "hw:mlseb", "hw:growth", "w3e:mlseb-parabola"],
-  "all|1.5|n13-24": ["hw:growth", "w3e:mlseb-routes", "w3b:growth-input", "w3b:growth-s0.3", "w3e:mlseb-parabola", "w3e:mlseb+stretch", "hw:mlseb"],
+  "all|1.5|n13-24": ["hw:growth", "w3b:growth-input", "hw:mlseb", "w3e:mlseb+stretch", "w3b:growth-s0.3"],
   "all|1.5|n25-40": ["hw:growth", "w3b:growth-s0.7", "w3b:growth-s0.3", "w3b:growth-t1.2", "w3b:growth-input"],
 };

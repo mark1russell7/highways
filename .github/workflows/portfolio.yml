@@ -15,6 +15,15 @@ on:
       minutes:
         type: string
         default: "60"
+      sets:
+        type: string
+        default: ""
+      api:
+        type: string
+        default: ""
+      pool:
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       args:
@@ -26,13 +35,22 @@ on:
       minutes:
         description: "The time limit of each shard, in minutes."
         default: "60"
+      sets:
+        description: "PORTFOLIO-FIT: the id of a run of the times with --members. The job writes the sets, the fit and the summary of the times with pnpm portfolio:sets, and times nothing."
+        default: ""
+      api:
+        description: "The ids of Screen runs of the module portfolio-api.ts, with commas. The job writes the report of pnpm portfolio:api, and times nothing."
+        default: ""
+      pool:
+        description: "With api: the ids of the Screen runs of the pool on screen-v1, with commas (--pool of pnpm portfolio:api)."
+        default: ""
 
 permissions:
   contents: read
 
 jobs:
   plan:
-    if: ${{ !inputs.report }}
+    if: ${{ !inputs.report && !inputs.sets && !inputs.api }}
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.plan.outputs.shards }}
@@ -84,7 +102,7 @@ jobs:
 
   merge:
     needs: time
-    if: ${{ always() && !inputs.report }}
+    if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
@@ -163,4 +181,81 @@ jobs:
             portfolio.json
             bounds.md
             bounds.json
+          if-no-files-found: warn
+
+  # PORTFOLIO-FIT: the sets, the fit and the report of the portfolio router from the artifacts of other runs.
+  fit:
+    if: ${{ inputs.sets || inputs.api }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      SETS: ${{ inputs.sets }}
+      API: ${{ inputs.api }}
+      POOL: ${{ inputs.pool }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Measure the bytes of the contract in a bundle of the core
+        run: |
+          esbuild=$(find node_modules/.pnpm -path "*/node_modules/esbuild/bin/esbuild" | head -1)
+          for mode in with without; do
+            ext=""; if [ "$mode" = without ]; then ext="--external:@mark1russell7/layout-contract"; fi
+            "$esbuild" packages/core/src/index.ts --bundle --minify --format=esm --platform=node $ext --outfile="$GITHUB_WORKSPACE/bundle-$mode.js" --log-level=warning
+          done
+          w=$(wc -c < "$GITHUB_WORKSPACE/bundle-with.js"); o=$(wc -c < "$GITHUB_WORKSPACE/bundle-without.js")
+          {
+            echo "| bundle | bytes |"
+            echo "|---|---:|"
+            echo "| the core with the contract | $w |"
+            echo "| the core without the contract | $o |"
+            echo "| the contract | $((w - o)) |"
+          } | tee bundle.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Write the sets and the fit
+        if: ${{ env.SETS != '' }}
+        run: |
+          set -o pipefail
+          gh run download "$SETS" -p "portfolio-time-*" -D "$GITHUB_WORKSPACE/runs/time"
+          files=$(find "$GITHUB_WORKSPACE/runs/time" -name time.jsonl | paste -sd, -)
+          pnpm --filter @mark1russell7/highways portfolio:sets --time "$files" --time-source "$SETS" --out "$GITHUB_WORKSPACE/portfolio-sets.md" > /dev/null
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp packages/core/src/portfolio/sets.ts packages/core/src/portfolio/fit.ts packages/core/scripts/data/portfolio-times.json "$GITHUB_WORKSPACE/out/"
+          cat portfolio-sets.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Write the report of the router
+        if: ${{ env.API != '' }}
+        run: |
+          set -o pipefail
+          dirs() {
+            local out=""
+            IFS=',' read -ra ids <<< "$1"
+            for id in "${ids[@]}"; do
+              gh run download "$id" -p "screen-*" -D "$GITHUB_WORKSPACE/runs/$id" >&2
+              out="${out:+$out,}$GITHUB_WORKSPACE/runs/$id"
+            done
+            printf '%s' "$out"
+          }
+          args=(--records "$(dirs "$API")")
+          if [ -n "$POOL" ]; then args+=(--pool "$(dirs "$POOL")"); fi
+          pnpm --filter @mark1russell7/highways portfolio:api "${args[@]}" --out "$GITHUB_WORKSPACE/portfolio-api.md" --json "$GITHUB_WORKSPACE/portfolio-api.json" > /dev/null
+          cat portfolio-api.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: portfolio-fit-${{ github.sha }}
+          path: |
+            out/
+            portfolio-sets.md
+            portfolio-api.md
+            portfolio-api.json
+            bundle.md
           if-no-files-found: warn

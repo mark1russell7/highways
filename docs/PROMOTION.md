@@ -131,6 +131,10 @@ The `outputHash` of a record is the first 16 hexadecimal digits of the SHA-256 o
 
 Groups compare hashes only in one stage. A number near a rounding boundary can split a group, and then a real copy counts two times. Two outputs with the same rounded hash have each number in one grid step of the other.
 
+### Deterministic defaults
+
+A default is deterministic. A portfolio limits its work by the member count and the input size, not by the wall time. A time budget is only an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine, so the record is not deterministic.
+
 ## The measures of each step
 
 The ids are the ids of [the measure note](research/MEASURES.md). The ids of the `pack` measures are the ids of the [packing measure note](https://github.com/mark1russell7/packing/blob/main/docs/MEASURES.md).
@@ -220,7 +224,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
 
-`highways` has its own copy of `compareMeasure` and `minEffectOf` in `bench/screen/compare.ts`. The contract `@mark1russell7/layout-contract` has the two functions from 0.2.2. The core has no run-time dependency, so it keeps its copy. A test checks that the copy agrees with this note, and a test compares the copy with the functions of the contract.
+`highways` imports `compareMeasure` and `minEffectOf` from the contract `@mark1russell7/layout-contract` (0.2.6 or later). The contract has no dependencies, so the import adds only the contract to the core. A test checks that the functions agree with this note.
 
 This file does not copy the floors of the other projects:
 

@@ -195,13 +195,14 @@ importers:
         version: 7.0.2
 
   packages/core:
+    dependencies:
+      '@mark1russell7/layout-contract':
+        specifier: ^0.2.6
+        version: 0.2.6
     devDependencies:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
-      '@mark1russell7/layout-contract':
-        specifier: ^0.2.6
-        version: 0.2.6
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.5

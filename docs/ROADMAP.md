@@ -89,6 +89,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | ACTIVATION | Each screen record gets its `outputHash` and the move counts of its strategy. A verdict counts only when a candidate is exercised on a decision board. Of 289 strategies, 17 are silent on the static screen. 15 of them go to a rebuild wave. The edit screen of the gate `ids` shows its move. No verdict changes. | 2026-10-28 | #107 |
 | EXACT-BOUNDS | [The bounds of the gap closed](research/BOUNDS.md) at 18, 24 and 40 nodes and at the caps 1.1, 1.25 and 1.5, from 720 solves. The intervals are narrow: the median width of the first 5 is 0.1 or less. The [portfolio](research/PORTFOLIO.md#the-portfolio-at-each-cap-exact-bounds) gets a curve and greedy sets for each rule and cap. | 2026-10-28 | #110 |
 | PORTFOLIO-API | [The opt-in portfolio router](research/PORTFOLIO.md#the-portfolio-router-portfolio-api) `portfolio`: `shared` and the greedy set of the size band, rule and cap of the caller, with the shared combinator of layout-contract. On the held-out seeds, k = 5 keeps 4% to 100% of the oracle gain. At 40 nodes, k = 3 takes 51 to 176 ms. | 2026-10-28 | #112 |
+| PORTFOLIO-FIT | [One key and a deterministic default](research/PORTFOLIO.md#the-fit-of-the-router-portfolio-fit) for the router `portfolio`. The router and the offline choice use one guard and `selectBest`: 0 of 3 740 winners differ. The core imports layout-contract. Without `k`, the router runs a fit with a node limit for each member, at 6 to 46 ms (median) up to 40 nodes. | 2026-10-28 | #114 |
 
 ## Open
 
@@ -105,7 +106,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
-| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at the rule `collection` first, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. The second aim is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
+| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at two holes of the portfolio first. The first hole is the rule `collection` at the cap 1.1 on large boards: there the base `shared` wins on 18 of 20 test inputs. The second hole is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. After them, the waves aim at the rule `collection`, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item
 

@@ -1,6 +1,8 @@
-// The command line of the sets of the portfolio router (PORTFOLIO-API):
-// `pnpm portfolio:sets [--records <path,...>] [--runs <file>] [--sets <file>] [--out portfolio-sets.md] [--json portfolio-sets.json] [--check]`.
+// The command line of the sets of the portfolio router (PORTFOLIO-API, PORTFOLIO-FIT):
+// `pnpm portfolio:sets [--records <path,...>] [--runs <file>] [--time <path,...> --time-source <id>] [--sets <file>] [--fit <file>] [--out portfolio-sets.md] [--json portfolio-sets.json]`.
 // The script chooses the greedy set of each rule, cap and size band, and writes them to `src/portfolio/sets.ts`.
+// With `--time`, it reads the times of the members from the workflow `Portfolio` (`portfolio:time --members`), and writes the summary of the times (`TIMES_PATH`).
+// Without `--time`, it reads that summary. The greedy pool of a band has only the members that take 50 ms or less alone. The fit goes to `src/portfolio/fit.ts`.
 // With `--records`, it reads the records of the workflow `Screen` on `exact-v1` and `exact-v1-bounds`, and writes the short table of the runs (`--runs`).
 // Without `--records`, it reads the short table of the runs. The test `src/portfolio/sets.test.ts` checks that `src/portfolio/sets.ts` is current.
 // Each band splits its seeds: the seeds 0 to 4 choose the set, and the seeds 5 to 9 test it. The script reads only records, so it runs locally in a few seconds.
@@ -12,6 +14,7 @@ import { quantile } from "../src/bench/measures/stats.ts";
 import { gapInterval, optimumInterval } from "../src/bench/screen/bounds.ts";
 import { GAP_BASELINES, GAP_CAPS, GAP_RULES, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
 import { PORTFOLIO_BANDS, PORTFOLIO_KS_API, portfolioBand, type PortfolioBand } from "../src/portfolio/bands.ts";
+import { KEY_SETUP, type TimeRecord } from "./portfolio-time.ts";
 import { B1, MIXED, readRecords, type OracleRecord } from "./oracle.ts";
 import { capTable, choose, fallbackValue, greedySet, MODEL_STRETCH, oracleValue, PORTFOLIO_BASE, portfolioValues, ruleTable, shareOf, singleBest, type Run, type RunTable, type ValueOf } from "./portfolio.ts";
 
@@ -112,6 +115,100 @@ export function midValue(table: RunTable, short: ShortRuns, rule: GapRule, cap: 
   };
 }
 
+/** The time budget of one route of the portfolio router on the CI runner, in ms. A member that takes more alone at the top size of a band is not in the pool of the band. */
+export const BAND_BUDGET_MS = 50;
+
+/** The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key and the members. It is below `BAND_BUDGET_MS` as a margin. */
+export const FIT_TARGET_MS = 40;
+
+/** The summary of the times of the members (`portfolio-times/1`): the median time of each strategy at each size on the CI runner. */
+export interface MemberTimes {
+  readonly schema: "portfolio-times/1";
+  /** The CI run of the times. */
+  readonly source: string;
+  readonly sizes: readonly number[];
+  /**
+   * The median time of each strategy at each node count, in ms, with 2 decimals. The time of a member is its route and the key on its output.
+   * The time of `shared` is its route. The time of `@key-setup` builds the network of the stretch and reads the facts of the output of `shared`.
+   * A size without a time is a size that the strategy skipped: above its node limit, or after a size where it was slow.
+   */
+  readonly ms: Readonly<Record<string, Readonly<Record<string, number>>>>;
+}
+
+/** This function gives the summary of the times of the lines of `portfolio:time --members`: the median over the boards of the median over the repeats. */
+export function memberTimes(records: readonly TimeRecord[], source: string): MemberTimes {
+  const runs = new Map<string, number[]>();
+  const skipped = new Set<string>();
+  for (const r of records) {
+    const size = `${r.strategy}|${r.nodes}`;
+    if (r.skipped !== undefined) {
+      skipped.add(size);
+      continue;
+    }
+    const board = `${size}|${r.cls}|${r.seed}`;
+    if (!runs.has(board)) runs.set(board, []);
+    runs.get(board)!.push(r.ms + (r.keyMs ?? 0));
+  }
+  const boards = new Map<string, number[]>();
+  for (const [board, xs] of runs) {
+    const size = board.split("|").slice(0, 2).join("|");
+    if (!boards.has(size)) boards.set(size, []);
+    boards.get(size)!.push(quantile(xs, 0.5));
+  }
+  const ms: Record<string, Record<string, number>> = {};
+  for (const [size, xs] of [...boards].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
+    if (skipped.has(size)) continue;
+    const [strategy, nodes] = size.split("|") as [string, string];
+    (ms[strategy] ??= {})[nodes] = Math.round(quantile(xs, 0.5) * 100) / 100;
+  }
+  const sizes = [...new Set(records.map((r) => r.nodes))].sort((a, b) => a - b);
+  return { schema: "portfolio-times/1", source, sizes, ms };
+}
+
+/** This function gives the sizes of the times that fall in a band. The last band also has the sizes above its `maxNodes`. */
+function bandSizes(times: MemberTimes, band: PortfolioBand, bands: readonly PortfolioBand[]): number[] {
+  const i = bands.findIndex((b) => b.id === band.id);
+  const lo = i <= 0 ? 0 : bands[i - 1]!.maxNodes;
+  const last = i === bands.length - 1;
+  return times.sizes.filter((n) => n > lo && (last || n <= band.maxNodes));
+}
+
+/** This function tells if a strategy takes `BAND_BUDGET_MS` or less alone at the top size of the band, at or below `maxNodes`. A strategy without a time there does not. */
+export function fastIn(times: MemberTimes, strategy: string, band: PortfolioBand, bands: readonly PortfolioBand[] = PORTFOLIO_BANDS): boolean {
+  const sizes = bandSizes(times, band, bands).filter((n) => n <= band.maxNodes);
+  if (sizes.length === 0) return false;
+  const t = times.ms[strategy]?.[String(Math.max(...sizes))];
+  return t !== undefined && t <= BAND_BUDGET_MS;
+}
+
+/**
+ * This function gives the fit of a set in a band: the members of the default of the router, each with its node limit.
+ * At each size of the band, the prefix of the set runs while the model time stays at or below `FIT_TARGET_MS`.
+ * The model time is the base, plus the setup of the key with the first member, plus each member. A member leaves at the first size where it is not in the prefix.
+ * Its node limit is the last size where it is in the prefix. A member with no such size is not in the fit.
+ */
+export function fitOf(set: readonly string[], times: MemberTimes, band: PortfolioBand, bands: readonly PortfolioBand[] = PORTFOLIO_BANDS): [string, number][] {
+  const alive = new Set(set);
+  const limit = new Map<string, number>();
+  for (const n of bandSizes(times, band, bands)) {
+    const at = (s: string): number | undefined => times.ms[s]?.[String(n)];
+    let total = at(PORTFOLIO_BASE) ?? Infinity;
+    let open = true;
+    for (const [j, s] of set.entries()) {
+      const t = at(s);
+      const add = t === undefined ? Infinity : t + (j === 0 ? (at(KEY_SETUP) ?? Infinity) : 0);
+      if (!open || !alive.has(s) || total + add > FIT_TARGET_MS) {
+        open = false;
+        alive.delete(s);
+        continue;
+      }
+      total += add;
+      limit.set(s, n);
+    }
+  }
+  return set.filter((s) => limit.has(s)).map((s) => [s, limit.get(s)!]);
+}
+
 /** The seeds that choose the sets. The other seeds (5 to 9) test them. */
 export const TRAIN_SEEDS: readonly number[] = [0, 1, 2, 3, 4];
 
@@ -147,6 +244,10 @@ export interface BandChoice {
   readonly tests: readonly SetTest[];
   /** The median gap closed of the base `shared` on the test inputs. */
   readonly base: number;
+  /** The members of the pool that take more than `BAND_BUDGET_MS` alone in the band. They are not in the pool of the greedy choice. */
+  readonly slow: readonly string[];
+  /** With the times: the fit of the set (`fitOf`), and its test on the test inputs. */
+  readonly fit?: { readonly members: readonly (readonly [string, number])[]; readonly test: SetTest };
 }
 
 /**
@@ -154,8 +255,13 @@ export interface BandChoice {
  * The choice has the guard `cap`: a run with more hard breaks than `shared` does not count. The value is the gap closed of `midValue`.
  * An input counts at a cap only when the baseline `shared` has a value there.
  * The best single strategy has the best median on the train inputs. On an input where it fails the guard, the rule or the cap, it falls back to `shared`.
+ * With the times `o.times`, the pool of a band has only the timed strategies that pass `fastIn`, and each choice gets its fit.
  */
-export function chooseSets(short: ShortRuns, optima: readonly ExactOptimum[], o: { readonly bands?: readonly PortfolioBand[]; readonly ks?: readonly number[] } = {}): BandChoice[] {
+export function chooseSets(
+  short: ShortRuns,
+  optima: readonly ExactOptimum[],
+  o: { readonly bands?: readonly PortfolioBand[]; readonly ks?: readonly number[]; readonly times?: MemberTimes } = {},
+): BandChoice[] {
   const bands = o.bands ?? PORTFOLIO_BANDS;
   const ks = o.ks ?? PORTFOLIO_KS_API;
   const kMax = Math.max(...ks);
@@ -174,7 +280,10 @@ export function chooseSets(short: ShortRuns, optima: readonly ExactOptimum[], o:
         const mine = short.inputs.filter((i) => portfolioBand(i.nodes, bands).id === band.id && ok(i.input));
         const train = mine.filter((i) => TRAIN_SEEDS.includes(i.seed)).map((i) => i.input);
         const test = mine.filter((i) => !TRAIN_SEEDS.includes(i.seed)).map((i) => i.input);
-        const set = greedySet(ct, train, pool, kMax, "cap", value);
+        const times = o.times;
+        const bandPool = times === undefined ? pool : pool.filter((s) => s === PORTFOLIO_BASE || fastIn(times, s, band, bands));
+        const slow = times === undefined ? [] : pool.filter((s) => s !== PORTFOLIO_BASE && times.ms[s] !== undefined && !bandPool.includes(s));
+        const set = greedySet(ct, train, bandPool, kMax, "cap", value);
         sets.set(band.id, set);
         const single = singleBest(ct, train, pool, fb, { minShare: 1 });
         const med = (xs: readonly (number | undefined)[]): number => quantile(xs.filter((x): x is number => x !== undefined), 0.5);
@@ -183,8 +292,7 @@ export function chooseSets(short: ShortRuns, optima: readonly ExactOptimum[], o:
         const small = sets.get(bands[0]!.id);
         const trainSingle = med(train.map((i) => (single === undefined ? undefined : fb(i, single))));
         const trainOracle = med(train.map((i) => oracleValue(i, pool, value)));
-        const tests = ks.map((k): SetTest => {
-          const s = set.slice(0, k);
+        const testOf = (k: number, s: readonly string[]): SetTest => {
           const p = med(portfolioValues(ct, test, s, "cap", value));
           const baseWins = test.filter((i) => choose(ct.get(i)!, s, "cap") === PORTFOLIO_BASE).length;
           const trainShare = shareOf(med(portfolioValues(ct, train, s, "cap", value)), trainSingle, trainOracle);
@@ -192,8 +300,15 @@ export function chooseSets(short: ShortRuns, optima: readonly ExactOptimum[], o:
           if (band.id === bands[0]!.id || small === undefined) return t;
           const sp = med(portfolioValues(ct, test, small.slice(0, k), "cap", value));
           return { ...t, smallPortfolio: sp, smallShare: shareOf(sp, singleMed, oracleMed) };
-        });
-        out.push({ band: band.id, rule, cap, train: train.length, test: test.length, single, set, tests, base: med(test.map((i) => fb(i, PORTFOLIO_BASE))) });
+        };
+        const tests = ks.map((k) => testOf(k, set.slice(0, k)));
+        const base = med(test.map((i) => fb(i, PORTFOLIO_BASE)));
+        const choice: BandChoice = { band: band.id, rule, cap, train: train.length, test: test.length, single, set, tests, base, slow };
+        if (times === undefined) out.push(choice);
+        else {
+          const members = fitOf(set, times, band, bands);
+          out.push({ ...choice, fit: { members, test: testOf(members.length, members.map(([s]) => s)) } });
+        }
       }
     }
   }
@@ -213,6 +328,26 @@ export function setsSource(choices: readonly BandChoice[], sources: readonly str
     " */",
     "export const PORTFOLIO_SETS: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|${string}`, readonly string[]>> = {",
     ...choices.map((c) => `  "${c.rule}|${c.cap}|${c.band}": [${c.set.map((s) => JSON.stringify(s)).join(", ")}],`),
+    "};",
+    "",
+  ];
+  return lines.join("\n");
+}
+
+/** This function writes the source of `src/portfolio/fit.ts` from the choices with a fit. The key is `<rule>|<cap>|<band>`. */
+export function fitSource(choices: readonly BandChoice[], source: string): string {
+  const lines = [
+    "// This file is generated by `scripts/portfolio-sets.ts` (`pnpm portfolio:sets`). Do not edit it. The test `sets.test.ts` checks that it is current.",
+    `// The times come from the CI run ${source} (the workflow \`Portfolio\`, \`portfolio:time --members\`).`,
+    'import type { PortfolioCap, PortfolioRule } from "./bands.ts";',
+    "",
+    "/**",
+    " * The fit of each rule, cap and size band, by the key `<rule>|<cap>|<band>`: the members of the default of the portfolio router, in their order.",
+    ` * Each member has a node limit: it runs only on an input with that many nodes or fewer. The limits keep the model time at or below ${FIT_TARGET_MS} ms.`,
+    " * The base `shared` is not in a fit: the portfolio always runs it first.",
+    " */",
+    "export const PORTFOLIO_FIT: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|${string}`, readonly (readonly [string, number])[]>> = {",
+    ...choices.map((c) => `  "${c.rule}|${c.cap}|${c.band}": [${(c.fit?.members ?? []).map(([s, n]) => `[${JSON.stringify(s)}, ${n}]`).join(", ")}],`),
     "};",
     "",
   ];
@@ -252,6 +387,20 @@ export function setsReport(choices: readonly BandChoice[], ks: readonly number[]
     ...choices.map((c) => `| ${c.band} | ${code(c.rule)} | ${c.cap} | ${c.single === undefined ? "-" : code(c.single)} | ${c.set.map(code).join(", ")} |`),
     "",
   ];
+  if (choices.some((c) => c.fit !== undefined))
+    lines.push(
+      "## The fit of the default",
+      "",
+      `Each member runs up to its node limit. The model time of the fit is at or below ${FIT_TARGET_MS} ms. The column \`slow\` counts the members that take more than ${BAND_BUDGET_MS} ms alone in the band.`,
+      "",
+      "| band | rule | cap | slow | members (node limit) | share at the fit | share at k = 5 |",
+      "|---|---|---:|---:|---|---:|---:|",
+      ...choices.map(
+        (c) =>
+          `| ${c.band} | ${code(c.rule)} | ${c.cap} | ${c.slow.length} | ${(c.fit?.members ?? []).map(([s, n]) => `${code(s)} (${n})`).join(", ") || "the base alone"} | ${pct(c.fit?.test.share)} | ${pct(c.tests.find((t) => t.k === 5)?.share)} |`,
+      ),
+      "",
+    );
   return lines.join("\n");
 }
 
@@ -259,6 +408,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 /** The default paths: the short table of the runs, the file of the sets and the files of the optima. */
 export const RUNS_PATH = join(here, "data/portfolio-runs.json.gz");
 export const SETS_PATH = join(here, "../src/portfolio/sets.ts");
+export const FIT_PATH = join(here, "../src/portfolio/fit.ts");
+export const TIMES_PATH = join(here, "data/portfolio-times.json");
+
+/** This function reads the summary of the times of the members. */
+export function readTimes(path: string = TIMES_PATH): MemberTimes {
+  return JSON.parse(readFileSync(path, "utf8")) as MemberTimes;
+}
 export const OPTIMA_PATHS: readonly string[] = [join(here, "../src/bench/exact/optima-exact-v1.json"), join(here, "../src/bench/exact/optima-exact-v1-bounds.json")];
 
 /** This function reads the short table of the runs: a JSON file in gzip. */
@@ -288,8 +444,16 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     if (!existsSync(runsPath)) throw new Error(`There is no short table of the runs at ${runsPath}. Give --records.`);
     short = readShortRuns(runsPath);
   }
-  const choices = chooseSets(short, readOptima());
+  const timePaths = paths("--time");
+  let times: MemberTimes;
+  if (timePaths.length > 0) {
+    const lines = timePaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as TimeRecord));
+    times = memberTimes(lines, opt("--time-source") ?? "local");
+    writeFileSync(TIMES_PATH, JSON.stringify(times, null, 1) + "\n");
+  } else times = readTimes();
+  const choices = chooseSets(short, readOptima(), { times });
   writeFileSync(opt("--sets") ?? SETS_PATH, setsSource(choices, short.sources));
+  writeFileSync(opt("--fit") ?? FIT_PATH, fitSource(choices, times.source));
   const md = setsReport(choices);
   writeFileSync(opt("--out") ?? "portfolio-sets.md", md + "\n");
   if (opt("--json")) writeFileSync(opt("--json")!, JSON.stringify(choices, null, 1));

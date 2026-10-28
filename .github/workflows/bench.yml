@@ -54,7 +54,7 @@ jobs:
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
         # Each step of the measure suite runs in one part of each size: `small` runs each step, and the parts `rest` run the step `group`.
         # The part `opt-in` races the opt-in router `portfolio` (PORTFOLIO-API) to 400 nodes, with one seed. The default race does not have it.
-        # At 1 000 nodes, one fixture takes approximately 9 minutes, so the part stops at 400 nodes.
+        # With k = 3, one fixture of 1 000 nodes took approximately 9 minutes. The default is now the fit (PORTFOLIO-FIT), and the part keeps its limit of 400 nodes.
         run: |
           [[ "$MAX" =~ ^[0-9]+$ ]] || { echo "max must be a number, not '$MAX'"; exit 1; }
           [[ "$REPEAT" =~ ^[1-9][0-9]*$ ]] || { echo "repeat must be a number of 1 or more, not '$REPEAT'"; exit 1; }
