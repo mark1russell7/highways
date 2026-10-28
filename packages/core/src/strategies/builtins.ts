@@ -824,6 +824,7 @@ export const highwayStrategies: {
     schema: FRECHET_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<FrechetOptions>) => frechetPlan(input, o),
+  }),
   spectral: defineStrategy({
     step: "highway",
     name: "spectral",

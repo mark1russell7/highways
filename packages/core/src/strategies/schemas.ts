@@ -796,6 +796,8 @@ export const FRECHET_SCHEMA: OptionSchema<FrechetOptions> = {
   minLength: { type: "number", min: 0.5, max: 16, step: 0.5, marks: [2, 4], default: 2, describe: "The reference part of a bundle is this length or longer, as a multiple of the median short side of the boxes." },
   step: { type: "number", min: 0.1, max: 2, step: 0.1, marks: [0.5], default: 0.5, describe: "The distance between two samples of a route, as a multiple of the median short side of the boxes." },
   stride: { type: "integer", min: 1, max: 8, step: 1, marks: [1, 2, 4], default: 2, describe: "A search starts at each sample of this number along each route." },
+};
+
 /** The declarations of the options of the highway strategy `spectral` (HWY-029). */
 export const SPECTRAL_SCHEMA: OptionSchema<SpectralOptions> = {
   c0: { type: "number", min: 0.05, max: 0.95, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "Two edges are a pair of the graph only when their compatibility is this value or more." },
