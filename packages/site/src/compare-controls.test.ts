@@ -32,6 +32,14 @@ const WITH: Readonly<Record<string, Readonly<Record<string, number | boolean | s
   // The exponent of the flow cost acts only with the cost `flow` (EDA-029).
   "shared.alpha": { cost: "flow" },
   "shared-all.alpha": { cost: "flow" },
+  // The reuse discount (HWY-005) acts only from the second pass. Its exponent acts only with a discount.
+  "shared.reuse": { passes: 2 },
+  "shared-all.reuse": { passes: 2 },
+  "shared.reuseExponent": { passes: 2, reuse: 1 },
+  "shared-all.reuseExponent": { passes: 2, reuse: 1 },
+  // The lane width acts only with the channel capacity (HWY-016).
+  "shared.laneWidth": { capacity: 1 },
+  "shared-all.laneWidth": { capacity: 1 },
   // The exponent of the trunks acts only with the Gilbert split (EDA-030), and the balancing factor only with the fan `tree` (NAT-017).
   "trunks.alpha": { splitAt: "gilbert" },
   "trunks.bf": { fan: "tree" },
