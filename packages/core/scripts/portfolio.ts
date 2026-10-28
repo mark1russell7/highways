@@ -4,6 +4,7 @@
 // It chooses each set of k strategies greedily on one half of the seeds and tests it on the other half.
 // PORTFOLIO-RULE adds the forms with the rule of the caller: the portfolio chooses only among the runs that obey the rule, and measures against the oracle of that rule.
 // The optima of `--optima` (default `src/bench/exact/optima-exact-v1.json`) give the gap closed at one cap for each run.
+// EXACT-BOUNDS adds a form for each cap of the gap closed (1.1, 1.25 and 1.5), and the greedy sets of each rule and cap on all inputs.
 // The script reads only records, so it runs locally in a few seconds. The screens and the times run in CI.
 // The test `src/bench/screen/portfolio.test.ts` examines the functions of this file on a small set of records.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -513,6 +514,20 @@ export interface PortfolioReport {
 /** The one cap of the forms of PORTFOLIO-RULE: the largest cap of the gap closed. The guard `cap` already refuses each run above it. */
 export const RULE_CAP = GAP_CAPS[GAP_CAPS.length - 1]!;
 
+/** The caps of the forms at one cap (EXACT-BOUNDS): each cap of the gap closed, from small to large. */
+export const RULE_CAPS: readonly number[] = GAP_CAPS;
+
+/** The sizes of the greedy sets on all inputs of each rule and cap (EXACT-BOUNDS). The item PORTFOLIO-API builds a strategy from these sets. */
+export const API_KS: readonly number[] = [3, 5, 8];
+
+/**
+ * This function gives the run table with only the runs at or below the cap `cap`. The portfolio of the cap chooses only among these runs.
+ * A run without a stretch has no value at a cap, so it is not in the table.
+ */
+export function capTable(table: RunTable, cap: number): Map<string, Map<string, Run>> {
+  return new Map([...table].map(([i, row]) => [i, new Map([...row].filter(([, r]) => r.stretch !== undefined && r.stretch <= cap + 1e-9))]));
+}
+
 /** One form of the portfolio of PORTFOLIO-RULE: the rule of the caller, and the cap of the value (`undefined` for the cap of each run). */
 export interface RuleForm {
   readonly rule: GapRule;
@@ -520,20 +535,24 @@ export interface RuleForm {
   readonly curve: readonly CurvePoint[];
   /** The best single strategy of each split. */
   readonly singles: readonly (string | undefined)[];
+  /** The greedy sets on all inputs of the splits, for each size of `API_KS`. Only the forms at one cap have them. */
+  readonly sets: readonly { readonly k: number; readonly set: readonly string[] }[];
 }
 
 /**
  * This function gives the Pareto curves of the forms of PORTFOLIO-RULE on `exact-v1`, with the guard `cap`.
  * For each rule, the portfolio chooses by B1 only among the runs that obey the rule. It measures the choice by the gap closed of that rule, against the oracle of that rule.
- * The value is at the cap of each run, and also at the one cap `RULE_CAP` when `optima` holds the optima.
- * The best single strategy of a split falls back to `shared` on an input where it fails the guard or the rule.
+ * The value is at the cap of each run, and also at each cap of `caps` (default `RULE_CAPS`) when `optima` holds the optima.
+ * At one cap, the portfolio chooses only among the runs at or below the cap (`capTable`).
+ * The best single strategy of a split falls back to `shared` on an input where it fails the guard, the rule or the cap.
+ * Each form at one cap also gets the greedy sets on all inputs of the splits, for each size of `apiKs` (default `API_KS`).
  */
 export function ruleForms(
   table: RunTable,
   splits: readonly Split[],
   pool: readonly string[],
   optima: readonly ExactOptimum[] = [],
-  o: { readonly ks?: readonly number[]; readonly full?: boolean } = {},
+  o: { readonly ks?: readonly number[]; readonly full?: boolean; readonly caps?: readonly number[]; readonly apiKs?: readonly number[] } = {},
 ): RuleForm[] {
   const bases = optima.length > 0 ? ruleBaselines(table, optima) : new Map<string, Partial<Record<GapRule, number>>>();
   const forms: RuleForm[] = [];
@@ -541,13 +560,16 @@ export function ruleForms(
     const rt = ruleTable(table, rule);
     const values: { cap?: number; value: ValueOf }[] = [
       { value: ruleValue(table, rule) },
-      ...(optima.length > 0 ? [{ cap: RULE_CAP, value: capValue(table, rule, RULE_CAP, optima, bases) }] : []),
+      ...(optima.length > 0 ? (o.caps ?? RULE_CAPS).map((cap) => ({ cap, value: capValue(table, rule, cap, optima, bases) })) : []),
     ];
+    const all = [...new Set(splits.flatMap((sp) => [...sp.train, ...sp.test]))].sort();
     for (const v of values) {
-      const fb = fallbackValue(rt, v.value, "cap");
-      const curve = paretoCurve(rt, splits, pool, "cap", v.value, { singleBy: fb, singleOf: fb, full: o.full ?? true, ...(o.ks === undefined ? {} : { ks: o.ks }) });
-      const singles = splits.map((sp) => singleBest(rt, sp.train, pool, fb, { minShare: 1 }));
-      forms.push({ rule, ...(v.cap === undefined ? {} : { cap: v.cap }), curve, singles });
+      const ct = v.cap === undefined ? rt : capTable(rt, v.cap);
+      const fb = fallbackValue(ct, v.value, "cap");
+      const curve = paretoCurve(ct, splits, pool, "cap", v.value, { singleBy: fb, singleOf: fb, full: o.full ?? true, ...(o.ks === undefined ? {} : { ks: o.ks }) });
+      const singles = splits.map((sp) => singleBest(ct, sp.train, pool, fb, { minShare: 1 }));
+      const sets = v.cap === undefined ? [] : (o.apiKs ?? API_KS).map((k) => ({ k, set: greedySet(ct, all, pool, k, "cap", v.value) }));
+      forms.push({ rule, ...(v.cap === undefined ? {} : { cap: v.cap }), curve, singles, sets });
     }
   }
   return forms;
@@ -635,8 +657,8 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
     );
     data["causes"] = Object.fromEntries((["same", "cap", "rule"] as const).map((c) => [c, { pairs: sum(c, "pairs"), reversed: sum(c, "reversed") }]));
     const forms = ruleForms(table, splits, pool, optima);
-    const proven = (rule: GapRule): number =>
-      new Set(optima.filter((x) => x.rule === rule && Math.abs(x.cap - RULE_CAP) <= 1e-9 && x.proven && x.b1 !== null).map((x) => x.input)).size;
+    const proven = (rule: GapRule, cap: number): number =>
+      new Set(optima.filter((x) => x.rule === rule && Math.abs(x.cap - cap) <= 1e-9 && x.proven && x.b1 !== null).map((x) => x.input)).size;
     const capText = (f: { cap?: number }): string => (f.cap === undefined ? "the cap of each run" : `the cap ${f.cap}`);
     const kOf = (p: CurvePoint): string => (p.k >= pool.length ? `all ${pool.length - 1}` : String(p.k));
     const rows = [
@@ -646,7 +668,7 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
     lines.push(
       "## `exact-v1`: the portfolio with the rule of the caller (PORTFOLIO-RULE)",
       "",
-      `The guard is \`cap\`. The inputs with a proven optimum at the cap ${RULE_CAP}: ${GAP_RULES.map((r) => `${proven(r)} of ${inputs.length} for ${code(r)}`).join(", ")}.`,
+      `The guard is \`cap\`. At one cap, the portfolio chooses only among the runs at or below the cap. The inputs with a proven optimum at each cap: ${RULE_CAPS.map((c) => `${c}: ${GAP_RULES.map((r) => `${proven(r, c)} of ${inputs.length} for ${code(r)}`).join(", ")}`).join("; ")}.`,
       "",
       `| form | rule | cap | best single | oracle | oracle gain | ${[...PORTFOLIO_KS.map((k) => `k = ${k}`), "all"].join(" | ")} |`,
       `|---|---|---|---:|---:|---:|${[...PORTFOLIO_KS, 0].map(() => "---:").join("|")}|`,
@@ -671,6 +693,22 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
         "",
       ]),
     );
+    const capForms = forms.filter((f) => f.cap !== undefined);
+    if (capForms.length > 0)
+      lines.push(
+        "## `exact-v1`: the greedy sets of each rule and cap on all inputs (EXACT-BOUNDS)",
+        "",
+        "The greedy choice on all inputs, with the guard `cap`, for the rule and the cap of the caller. Each set also runs `shared`. The item PORTFOLIO-API builds a strategy from these sets.",
+        "",
+        "| rule | cap | k | oracle gain | set |",
+        "|---|---:|---:|---:|---|",
+        ...capForms.flatMap((f) => {
+          const p0 = f.curve[0]!;
+          const gain = quantile(p0.oracle, 0.5) - quantile(p0.single, 0.5);
+          return f.sets.map((x) => `| ${code(f.rule)} | ${f.cap} | ${x.k} | ${f3(gain)} | ${setText(x.set)} |`);
+        }),
+        "",
+      );
     data["ruleForms"] = forms;
   }
 

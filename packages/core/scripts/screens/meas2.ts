@@ -1,4 +1,4 @@
-// The settings of the gap screen of MEAS2: each built highway strategy and each option of waves 1 to 3, kept and dropped, on the set `exact-v1`.
+// The settings of the gap screen of MEAS2: each built highway strategy and each option of waves 1 to 3 (3A to 3F), kept and dropped, on the set `exact-v1`.
 // Each strategy here is a router, so that one screen gives the gap closed of all of them. The screen adds the built-in routers.
 // A built-in highway strategy has the name `hw:<name>`, and an option of a wave has the name `<wave>:<name>`, because two waves use the name `quickbundles-t6`.
 // The exact strategies of W3B are not here: they are the reference.
@@ -18,6 +18,7 @@ import * as w3bRouter from "./build-w3b-router.ts";
 import * as w3c from "./build-w3c.ts";
 import * as w3d from "./build-w3d.ts";
 import * as w3e from "./build-w3e.ts";
+import * as w3f from "./build-w3f.ts";
 
 export type AnyOf = Strategy<"highway", object> | Strategy<"router", object>;
 
@@ -41,7 +42,7 @@ export function asRouterStrategy(s: AnyOf, name: string): Strategy<"router", obj
   });
 }
 
-export const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d, w3e };
+export const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d, w3e, w3f };
 
 /** The highway strategies of the gap screen, by the names of the records: `hw:<name>` and `<wave>:<name>`. The activation test counts their moves. */
 export const highwaysByName: Readonly<Record<string, Strategy<"highway", object>>> = Object.fromEntries([

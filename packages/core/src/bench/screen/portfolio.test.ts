@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { B1, B10, B3_Q95, MIXED, type OracleRecord } from "../../../scripts/oracle.ts";
 import {
+  API_KS,
+  capTable,
   capValue,
   choose,
   discordance,
@@ -16,6 +18,7 @@ import {
   portfolioValues,
   ratioValue,
   RULE_CAP,
+  RULE_CAPS,
   ruleBaselines,
   ruleForms,
   ruleGapName,
@@ -246,10 +249,11 @@ describe("the portfolio with the rule of the caller (PORTFOLIO-RULE)", () => {
     const forms = ruleForms(table, seedSplits(IN), pool, OPTIMA, { ks: [1] });
     expect(forms.map((f) => [f.rule, f.cap])).toEqual([
       ["collection", undefined],
-      ["collection", RULE_CAP],
+      ...RULE_CAPS.map((c) => ["collection", c]),
       ["all", undefined],
-      ["all", RULE_CAP],
+      ...RULE_CAPS.map((c) => ["all", c]),
     ]);
+    expect(RULE_CAPS[RULE_CAPS.length - 1]).toBe(RULE_CAP);
     for (const f of forms.filter((x) => x.cap !== undefined)) {
       const whole = f.curve[f.curve.length - 1]!;
       whole.portfolio.forEach((v, n) => expect(v).toBeCloseTo(whole.oracle[n]!));
@@ -262,5 +266,23 @@ describe("the portfolio with the rule of the caller (PORTFOLIO-RULE)", () => {
     expect(report.markdown).toContain("## `exact-v1`: the reversed pairs by cause (PORTFOLIO-RULE)");
     expect(report.markdown).toContain("## `exact-v1`: the portfolio with the rule of the caller (PORTFOLIO-RULE)");
     expect(report.data["causes"]).toEqual({ same: { pairs: 12, reversed: 0 }, cap: { pairs: 12, reversed: 8 }, rule: { pairs: 32, reversed: 4 } });
+  });
+
+  it("chooses only among the runs at or below the cap, and gives the greedy sets of each rule and cap on all inputs (EXACT-BOUNDS)", () => {
+    const table = runTable(RULE_RECORDS);
+    expect([...capTable(table, 1.25).get("t/x/s0")!.keys()].sort()).toEqual(["a", "d", "f", "shared"]);
+    expect(API_KS).toEqual([3, 5, 8]);
+    const pool = Object.keys(RUNS).sort();
+    const forms = ruleForms(table, seedSplits(IN), pool, OPTIMA, { ks: [1], apiKs: [1, 2] });
+    // At the cap 1.25, `c` is above the cap and `a` mixes collections. Thus the best run of the rule `collection` is `d`, and `f` adds nothing.
+    const collection = forms.find((f) => f.rule === "collection" && f.cap === 1.25)!;
+    expect(collection.sets).toEqual([
+      { k: 1, set: ["d"] },
+      { k: 2, set: ["d"] },
+    ]);
+    // At the cap 1.25, `e` is above the cap. Thus the best run of the rule `all` is `a`.
+    expect(forms.find((f) => f.rule === "all" && f.cap === 1.25)!.sets[0]).toEqual({ k: 1, set: ["a"] });
+    expect(forms.find((f) => f.rule === "all" && f.cap === 1.5)!.sets[0]).toEqual({ k: 1, set: ["e"] });
+    for (const f of forms.filter((x) => x.cap === undefined)) expect(f.sets).toEqual([]);
   });
 });
