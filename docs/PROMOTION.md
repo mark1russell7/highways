@@ -60,6 +60,10 @@ The sign test, the wins and the flips put each input, or each board, in one of t
 - A non-finite `rel` product falls back to `RECORD_EPS`.
 - The threshold scales with the two values, not with the baseline alone. Thus the rule is symmetric.
 - `compareMeasure(a, b, spec)`, with `a` the candidate and `b` the baseline, gives `"tie"` when `|a − b| ≤ threshold(a, b)`.
+- `compareMeasure` compares on the grid of the records. `A = Math.round(a × RECORD_SCALE)` and `B = Math.round(b × RECORD_SCALE)` are integers, as in the rounding of the records.
+- On the grid, the threshold is `t = max(1, m × RECORD_SCALE)`, or `max(1, m.rel × max(|A|, |B|))`. A tie is `|A − B| ≤ t + 1e-6`.
+- Thus the replay of a rounded record gives the same class as the live values.
+- An infinite value, or a value outside the safe integers of the grid, uses the threshold of the bullet above.
 - Otherwise, `compareMeasure` gives `"better"` or `"worse"` by `spec.direction`.
 - Two equal `Infinity` values are a tie. `compareMeasure` refuses `NaN`.
 - The rule is symmetric: a loss smaller than the threshold is a tie, not a loss.
@@ -80,8 +84,10 @@ The test compares the candidate with the current default on each input of the co
 | Median | For each guard measure, the median ratio is at most `1 + medianWorse`. |
 | Tail | For each guard measure, at most a `tailShare` of the inputs have a ratio above `1 + tailWorse`. |
 | Gain | One win measure has a median ratio of `1 - gainMin` or better. The sign test and the bootstrap of [The noise guard](#the-noise-guard) pass for it. |
-| Time | The median time ratio is at most `timeRatio`. The `timeTailQ` quantile of the time ratio is at most `timeTail`. The large bench fixtures stay in their CI time limit. |
+| Time | The time ratio of an input is `t / max(b, timeFloorMs / timeRatio)`, with `t` the time of the candidate and `b` the time of the default. The median time ratio is at most `timeRatio`. The `timeTailQ` quantile of the time ratio is at most `timeTail`. The large bench fixtures stay in their CI time limit. |
 | Stability | On the base and change pairs of the corpus, each stability measure is a guard measure. It passes the median and tail tests. |
+
+Thus a candidate with a time of `timeFloorMs` or less passes the median test. Such a time is too small to be a cost to the user.
 
 CI does the time test, because other jobs on a local machine change the times.
 
@@ -197,6 +203,7 @@ Each threshold is a named parameter. A change of a value is a measured decision,
 | `timeRatio` | 1.5 | Time |
 | `timeTailQ` | 0.95 | Time |
 | `timeTail` | 2.0 | Time |
+| `timeFloorMs` | 5 | Time |
 | `cellMin` | 10 | Selector |
 | `flipRate` | 0.05 | Selector |
 | `confirmInputs` | 200 | Confirmation |
