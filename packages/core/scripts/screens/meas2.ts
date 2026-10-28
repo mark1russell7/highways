@@ -17,6 +17,7 @@ import * as w3b from "./build-w3b.ts";
 import * as w3bRouter from "./build-w3b-router.ts";
 import * as w3c from "./build-w3c.ts";
 import * as w3d from "./build-w3d.ts";
+import * as w3e from "./build-w3e.ts";
 
 type AnyOf = Strategy<"highway", object> | Strategy<"router", object>;
 
@@ -40,7 +41,7 @@ function asRouterStrategy(s: AnyOf, name: string): Strategy<"router", object> {
   });
 }
 
-const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d };
+const waves: Readonly<Record<string, Record<string, unknown>>> = { w1b, w1c, w2a, w2b, w2c, w3a, w3b, w3bRouter, w3c, w3d, w3e };
 
 /** The strategies of the gap screen: the built-in highway strategies, `shared-ways-all`, and the options of each wave. */
 export const strategies: readonly Strategy<"router", object>[] = [
