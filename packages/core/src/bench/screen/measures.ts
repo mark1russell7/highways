@@ -57,6 +57,16 @@ const ROWS: readonly Row[] = [
   ["B3.median", "B3", "route.bundle.stretch.median", "ratio", "lower", false],
   ["B3.q95", "B3", "route.bundle.stretch.q95", "ratio", "lower", false],
   ["B6.max", "B6", "route.bundle.merge-angle.max", "degrees", "lower", false],
+  // MEAS2, on the inputs of `exact-v1`: the largest B3, the largest stretch of the exact model, and the gap closed (B10) to the exact optimum at the smallest cap at or above that stretch.
+  ["B3.max", "B3", "route.bundle.stretch.max", "ratio", "lower", false],
+  ["gap.stretch", "B3", "route.bundle.stretch.model.max", "ratio", "lower", false],
+  ["gap.mixed", "B10", "route.bundle.gap-closed.mixed", "0 or 1", "lower", false],
+  ["gap", "B10", "route.bundle.gap-closed", "share of the gap", "higher", false],
+  ["gap.cap", "B10", "route.bundle.gap-closed.cap", "ratio", "lower", false],
+  ["gap.collection", "B10", "route.bundle.gap-closed.collection", "share of the gap", "higher", false],
+  ["gap.cap.collection", "B10", "route.bundle.gap-closed.cap.collection", "ratio", "lower", false],
+  ["gap.all", "B10", "route.bundle.gap-closed.all", "share of the gap", "higher", false],
+  ["gap.cap.all", "B10", "route.bundle.gap-closed.cap.all", "ratio", "lower", false],
   // MEAS3A, for the steps `router` and `highway`. B5, B8 and B9 read the runs and the trunks of the result. B8 is good or bad only in context, as B2.
   ["B5.crossings", "B5", "route.bundle.lane-crossings", "count", "lower", false],
   ["B7.ratio", "B7", "route.bundle.occupied-area", "ratio", "lower", false],

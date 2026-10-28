@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 26, "id": "n0", "w": 52, "x": 205, "y": 200},
+    {"h": 23, "id": "n1", "w": 42, "x": 112, "y": 223},
+    {"h": 20, "id": "n2", "w": 38, "x": 216, "y": 69},
+    {"h": 23, "id": "n3", "w": 53, "x": 8, "y": 182},
+    {"h": 24, "id": "n4", "w": 44, "x": 111, "y": 0},
+    {"h": 18, "id": "n5", "w": 34, "x": 194, "y": 8},
+    {"h": 20, "id": "n6", "w": 33, "x": 159, "y": 130},
+    {"h": 29, "id": "n7", "w": 41, "x": 105, "y": 164},
+    {"h": 21, "id": "n8", "w": 53, "x": 180, "y": 162},
+    {"h": 21, "id": "n9", "w": 58, "x": 42, "y": 86}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeShape": "hubChain", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"data": {"collection": "users"}, "id": "e0", "source": "n6", "target": "n8"},
+    {"data": {"collection": "users"}, "id": "e1", "source": "n2", "target": "n8"},
+    {"data": {"collection": "users"}, "id": "e2", "source": "n1", "target": "n7"},
+    {"data": {"collection": "scores"}, "id": "e3", "source": "n5", "target": "n2"},
+    {"data": {"collection": "users"}, "id": "e4", "source": "n3", "target": "n8"},
+    {"data": {"collection": "users"}, "id": "e5", "source": "n1", "target": "n9"},
+    {"data": {"collection": "scores"}, "id": "e6", "source": "n8", "target": "n0"},
+    {"data": {"collection": "scores"}, "id": "e7", "source": "n4", "target": "n0"},
+    {"data": {"collection": "scores"}, "id": "e8", "source": "n9", "target": "n4"},
+    {"data": {"collection": "users"}, "id": "e9", "source": "n8", "target": "n9"},
+    {"data": {"collection": "scores"}, "id": "e10", "source": "n3", "target": "n0"},
+    {"data": {"collection": "users"}, "id": "e11", "source": "n8", "target": "n5"},
+    {"data": {"collection": "speeds"}, "id": "e12", "source": "n4", "target": "n6"},
+    {"data": {"collection": "scores"}, "id": "e13", "source": "n2", "target": "n4"},
+    {"data": {"collection": "scores"}, "id": "e14", "source": "n3", "target": "n1"}
+  ],
+  "family": "hubs",
+  "generator": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "hubs", "nodes": 10}, "seed": 305, "version": 1},
+  "hash": "e54678d0da46bb94",
+  "id": "exact-v1/hubs/s5",
+  "schema": "layout-input/1",
+  "seed": 5,
+  "set": "exact-v1",
+  "source": "made-up"
+}

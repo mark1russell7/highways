@@ -77,13 +77,15 @@ Status: `done`, `active`, `blocked`, `later`.
 | REL10 | Version 0.5.0 on npm: the strategies of wave 3, the exact reference, the measures of MEAS3A and the types of layout-contract 0.2.0. MINOR: `LayoutCell.containerSize` gets the values `freeHeight` and `freeArea`, and `locked` widens to `boolean`. The default routes do not change. | 2026-10-28 | this PR |
 | RESCREEN-M3A | The ideas of waves 1 to 3 again, on the wins of MEAS3A. 8 of 27 records are at least as good as their baseline on 3 or more boards. No stage or verdict changes. Each built strategy also gets the part of the gap to the exact B1 that it closes on `tiny-uniform`. `growth` closes the most of the built-ins, a median of 0.51. | 2026-10-27 | #92 |
 | BUILD-W3D | Six highway finders: `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb` and `cubu`. `divided` (HWY-011) wins 3 of 4 boards against `shared`, but by very small margins that come from its base `shared-ways`. It is kept. No other finder wins more than 1, alone or with the gate `stretch`. HWY-001, HWY-002, HWY-004, HWY-006 and HWY-007 are dropped. | 2026-10-27 | #93 |
+| MEAS2 | The set `exact-v1` (4 classes of 10 boards, 10 nodes) with 240 proven optima of the exact model, and the gap closed (B10) in the screen. At 300 s for each solve, 10 nodes prove on each class and rule, and 14 nodes for the rule `collection`. The best median is 0.595 (0.508 to 0.634), from `growth`. [`GAP.md`](research/GAP.md) ranks each strategy. | 2026-10-28 | #94 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
-| MEAS2 | The gap to the best route: small boards with a known best answer from an exact solver. The bench gives the gap of each router. | `later` | MEAS1 | P2 |
+| ORACLE | The oracle bound of a selector for each input: the best strategy of the whole portfolio on each input, against the best single strategy. The bound is on each measure and on the gap closed. | `later` | MEAS2 | P1 |
+| MEAS-FLAT | Z2 is 0 on each record, and B8 `runs` is degenerate where `shared` has 0. Correct each definition, or mark it inactive with its reason. | `later` | MEAS3A | P2 |
 | CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
 | GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
 | TUNE | The tuning harness: it sweeps the options of each strategy from its declaration. It gives the Pareto front and the best setting for given weights. | `later` | OPTS, MEAS1 | P2 |

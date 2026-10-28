@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 23, "id": "n0", "w": 36, "x": 74, "y": 179},
+    {"h": 20, "id": "n1", "w": 47, "x": 5, "y": 236},
+    {"h": 28, "id": "n2", "w": 51, "x": 78, "y": 285},
+    {"h": 22, "id": "n3", "w": 42, "x": 10, "y": 299},
+    {"h": 28, "id": "n4", "w": 48, "x": 176, "y": 198},
+    {"h": 20, "id": "n5", "w": 51, "x": 66, "y": 245},
+    {"h": 19, "id": "n6", "w": 51, "x": 42, "y": 21},
+    {"h": 24, "id": "n7", "w": 52, "x": 2, "y": 199},
+    {"h": 18, "id": "n8", "w": 31, "x": -12, "y": 35},
+    {"h": 29, "id": "n9", "w": 34, "x": 136, "y": 375}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeShape": "clustered", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"data": {"collection": "scores"}, "id": "e0", "source": "n2", "target": "n0"},
+    {"data": {"collection": "modes"}, "id": "e1", "source": "n0", "target": "n3"},
+    {"data": {"collection": "scores"}, "id": "e2", "source": "n4", "target": "n8"},
+    {"data": {"collection": "scores"}, "id": "e3", "source": "n8", "target": "n0"},
+    {"data": {"collection": "speeds"}, "id": "e4", "source": "n4", "target": "n1"},
+    {"data": {"collection": "modes"}, "id": "e5", "source": "n2", "target": "n3"},
+    {"data": {"collection": "modes"}, "id": "e6", "source": "n9", "target": "n3"},
+    {"data": {"collection": "speeds"}, "id": "e7", "source": "n6", "target": "n1"},
+    {"data": {"collection": "modes"}, "id": "e8", "source": "n5", "target": "n3"},
+    {"data": {"collection": "scores"}, "id": "e9", "source": "n9", "target": "n2"},
+    {"data": {"collection": "speeds"}, "id": "e10", "source": "n7", "target": "n1"},
+    {"data": {"collection": "speeds"}, "id": "e11", "source": "n2", "target": "n1"},
+    {"data": {"collection": "speeds"}, "id": "e12", "source": "n5", "target": "n9"},
+    {"data": {"collection": "modes"}, "id": "e13", "source": "n5", "target": "n6"},
+    {"data": {"collection": "speeds"}, "id": "e14", "source": "n0", "target": "n1"}
+  ],
+  "family": "clustered",
+  "generator": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "clustered", "nodes": 10}, "seed": 204, "version": 1},
+  "hash": "2fed4a6bafaeaf7b",
+  "id": "exact-v1/clustered/s4",
+  "schema": "layout-input/1",
+  "seed": 4,
+  "set": "exact-v1",
+  "source": "made-up"
+}

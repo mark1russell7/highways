@@ -270,6 +270,15 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.bundle.runs` | B8 | `B8.runs` | count | lower | no |
 | `route.bundle.run-edges.median` | B8 | `B8.median` | count | higher | no |
 | `route.bundle.run-edges.max` | B8 | `B8.max` | count | higher | no |
+| `route.bundle.stretch.max` | B3 | `B3.max` | ratio | lower | no |
+| `route.bundle.stretch.model.max` | B3 | `gap.stretch` | ratio | lower | no |
+| `route.bundle.gap-closed` | B10 | `gap` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap` | B10 | `gap.cap` | ratio | lower | no |
+| `route.bundle.gap-closed.mixed` | B10 | `gap.mixed` | 0 or 1 | lower | no |
+| `route.bundle.gap-closed.collection` | B10 | `gap.collection` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap.collection` | B10 | `gap.cap.collection` | ratio | lower | no |
+| `route.bundle.gap-closed.all` | B10 | `gap.all` | share of the gap | higher | no |
+| `route.bundle.gap-closed.cap.all` | B10 | `gap.cap.all` | ratio | lower | no |
 | `route.bundle.lane-fidelity.median` | B9 | `B9.median` | ratio | lower | no |
 | `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | lower | no |
 | `route.lane.area` | M1 | `M1.area` | ratio | lower | no |
@@ -413,3 +422,41 @@ gh workflow run screen.yml --ref main -f step=router -f wrap=stable -f shuffles=
 | `packed-grid` | 3 | 96 | A packed grid: boxes touch, with no channel for the routes. |
 
 The seed 0 of each family is the fixture or the case board of the benchmark. The set does not change. A new board or a changed board gets a new set id.
+
+### The screen set `exact-v1`
+
+The set `exact-v1` (MEAS2) has small boards with a known optimum of the exact model. Its files are in [`corpus/exact-v1`](../corpus/exact-v1). `EXACT_V1` of `bench/screen/exact-set.ts` makes them.
+
+| Class | Seeds | Nodes | Edges | Fixture kind | `edgeShape` |
+|---|---:|---:|---:|---|---|
+| `uniform` | 10 | 10 | 15 | `uniform` | `random` |
+| `clustered` | 10 | 10 | 15 | `clustered` | `clustered` |
+| `hubs` | 10 | 10 | 15 | `hubs` | `hubChain` |
+| `fanout` | 10 | 10 | 15 | `collections` | `bundled` |
+
+- The generator of each input is `fixture`, version 1, with the kind of its class, `nodes` 10 and `edgesPerNode` 1.5.
+- The seed of the member `k` of a class is `100 × (the index of the class + 1) + k`. Thus `uniform` has the seeds 100 to 109, and `fanout` has 400 to 409.
+- Each id is `exact-v1/<class>/s<k>`. The count of the cell is `10`, and each class has `cellMin` seeds.
+- The size ladder of MEAS2 sets the size of 10 nodes. `docs/research/MEASURES.md` gives the ladder.
+- The set does not change. A new size or a new class gets a new set id.
+
+#### The file of the optima: `exact-optima/1`
+
+The file [`optima-exact-v1.json`](../packages/core/src/bench/exact/optima-exact-v1.json) keeps the optima of `exact-v1`. It has one row for each input, each rule (`collection`, `all`) and each cap (1.1, 1.25, 1.5): 240 rows.
+
+- The head of the file gives the set, the time limit of each solve (300 s), the commit and the CI run of the solves.
+- Each row gives the input, the hash of the input, the class, the rule and the cap.
+- Each row also gives the status of HiGHS, the proof, the objective, the bound, the MIP gap and the time of the solve.
+- `b1` is the ink saved of the best plan after `follow`. The gap closed uses this value. `b3max` is the largest stretch of its routes.
+- A screen of `exact-v1` reads the file and does not solve again. It uses an optimum only when the hash matches the input. A test examines each hash.
+- The input `exact` of the workflow `Screen` starts the workflow `Exact`. It solves the set in shards and joins them into the file of an artifact.
+
+```sh
+gh workflow run screen.yml --ref main -f exact="--set exact-v1 --caps 1.1,1.25,1.5 --rules collection,all --seconds 300 --shards 40"
+```
+
+The screen of `exact-v1` adds the gap closed (B10) to each record of the step `router`. `docs/research/GAP.md` gives the result of each strategy.
+
+```sh
+gh workflow run screen.yml --ref main -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
+```

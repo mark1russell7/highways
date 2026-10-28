@@ -160,19 +160,21 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 |---|---|---|---|---|---|---|---|---|
 | B1 | Ink saved | Less ink for the same edges | `inkSaved = 1 - ink(S) / Σ_e L(r_e)` | 0..1, `↑` | `n log n`, a hash of the segments | score | yes, `B1.inkSaved` of the suite | [Gansner 2011][gansner11], [Lhuillier 2017][lhuillier17] |
 | B2 | Bundled share | Edges that share their ways | `count(e : e is in a run or a bundle) / m` | 0..1, `↑` in context | `linear` | score | yes, `B2.share` of the screen | [Holten 2006][holten06] |
-| B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | yes, `B3.median` and `B3.q95` of the screen | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
+| B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | yes, `B3.median` and `B3.q95` of the screen. MEAS2 adds `B3.max`, the largest stretch | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
 | B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.ambiguity` of the suite, sampled above 1000 nodes | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
 | B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | yes, `B5.crossings` of the screen. ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
 | B6 | Merge angle | Smooth merges and splits | `ma = max angle of the turn of a lane where it joins or leaves a run` | degrees, `↓` | `linear` | score | yes, `B6.max` of the screen | [Gansner 2011][gansner11] (a limit of 40° on the turn) |
 | B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | yes, `B7.ratio` of the screen | [Saga 2016][saga16] |
 | B8 | Run profile | Bundles of a useful size | `runs`, `q_0.5` and `max` of the edges of each run | counts, in context | `linear` | score | yes, `B8.runs`, `B8.median` and `B8.max` of the screen | [Holten 2006][holten06], [Lhuillier 2017][lhuillier17] |
 | B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
+| B10 | Gap closed | Ink saved near the optimum | `gc = (B1(s) - B1(b)) / (B1* - B1(b))`. `b` is the baseline, and `B1*` is the optimum at the smallest cap at or above the largest stretch of `s`. | share of the gap, `↑`. 0 is the baseline, and 1 is the optimum | an exact solve for each input, kept in a file | score | yes, `gap` of the screen on `exact-v1`, with `gap.cap` and the views `gap.collection` and `gap.all` | [Magnanti and Wong 1984][magnanti84] |
 
 ### Notes on the bundles
 
 - B1 and B3 pull in opposite directions. A Pareto front of B1 against B3 shows each router at its best trade.
 - B4 here uses one step: two nodes are neighbours when their routes share a segment. [Wallinger 2022][wallinger22] also follows paths of two steps and more. MEAS1 starts with one step, because it is the cheapest.
 - `laneRoutes` and `runKey` let a reader open each bundle. Thus a bundle of this library can hide a path only while it is closed. B4 measures the closed view.
+- B10 needs a known optimum, so only the set `exact-v1` gives it. [`GAP.md`](GAP.md) ranks the strategies by B10.
 
 ## Curves
 
@@ -303,7 +305,34 @@ The host places the boxes, so these measures are not scores of this library. The
 
 ### The gap to an optimum
 
-MEAS2 adds small boards with a known best answer. For a score `f`, the gap is `f(strategy) / f(optimum) - 1`. The same seeds and the same baselines apply.
+MEAS2 adds small boards with a known optimum: the set `exact-v1`. The exact model is fixed-charge network design (HWY-040), solved with HiGHS. [`GAP.md`](GAP.md) gives the result for each strategy.
+
+- The measure is the gap closed (B10): `(B1 of the strategy - B1 of the baseline) / (the optimum B1 - B1 of the baseline)`.
+- The optimum is the optimum at the smallest stretch cap of 1.1, 1.25 and 1.5 at or above the largest stretch of the routes. Above 1.5, a run has no value.
+- The stretch of the cap is the stretch of the exact model (`gap.stretch`). It divides the length of a route without its plug ends by the shortest way in the network of the model.
+- The rule `collection` lets only the edges of one collection share a link. Its baseline is `shared`.
+- The rule `all` lets each edge share a link. Its baseline is `shared-ways-all`, routed with `follow`.
+- The screen takes the rule `all` for a run with a shared segment that holds edges of two collections, else `collection`.
+- When the denominator is 0 or less, a run has no value.
+- The summary gives the median of each class and the 95% paired bootstrap interval of the median over all inputs, with 10000 samples.
+- The file `optima-exact-v1.json` keeps each optimum with the hash of its input. A screen reads the file and does not solve again. A test compares each hash with its input.
+
+#### The size ladder
+
+The size ladder finds the largest board that HiGHS solves to a proven optimum within 300 s. CI solved the ladder in the [run 40613531631](https://github.com/mark1russell7/highways/actions/runs/40613531631), at the cap 1.5, with 3 seeds of each class and both rules.
+
+| Nodes | Proven, both rules | Proven, rule `collection` | Proven, rule `all` | Largest finite MIP gap at 300 s |
+|---:|---:|---:|---:|---:|
+| 10 | 24 of 24 | 12 of 12 | 12 of 12 | 0 |
+| 14 | 20 of 24 | 12 of 12 | 8 of 12 | 0.072 |
+| 18 | 10 of 24 | 9 of 12 | 1 of 12 | 0.169 |
+| 24 | 4 of 24 | 4 of 12 | 0 of 12 | 0.212 |
+| 30 | 0 of 24 | 0 of 12 | 0 of 12 | 0.262 |
+| 40 | 0 of 24 | 0 of 12 | 0 of 12 | 0.952 |
+
+- The largest size proven on each class and each rule is 10 nodes. For the rule `collection` alone, it is 14 nodes.
+- Thus `exact-v1` has boards of 10 nodes and 15 edges. All 240 optima of `exact-v1` are proven ([run 40616274264](https://github.com/mark1russell7/highways/actions/runs/40616274264)). The longest solve took 223 s.
+- At 30 nodes and more, HiGHS proves no optimum within 300 s. On some boards of 30 and 40 nodes, HiGHS gives no finite MIP gap.
 
 ## Proposed hard rules
 
@@ -365,6 +394,7 @@ MEAS1 first adds the seeds and the spread of the method section. Then it adds th
 - <a id="levien09"></a>Levien, 2009. [From spiral to spline: optimal techniques in interactive curve design](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2009/EECS-2009-162.html). UCB/EECS-2009-162.
 - <a id="lhuillier17"></a>Lhuillier, Hurter and Telea, 2017. [State of the art in edge and trail bundling techniques](https://doi.org/10.1111/cgf.13213). Computer Graphics Forum 36(3).
 - <a id="luxburg10"></a>von Luxburg, 2010. [Clustering stability: an overview](https://arxiv.org/abs/1007.1075). `Foundations and Trends in Machine Learning` 2(3).
+- <a id="magnanti84"></a>Magnanti and Wong, 1984. [Network design and transportation planning: models and algorithms](https://doi.org/10.1287/trsc.18.1.1). Transportation Science 18(1).
 - <a id="marler04"></a>Marler and Arora, 2004. [Survey of multi-objective optimization methods for engineering](https://doi.org/10.1007/s00158-003-0368-6). Structural and Multidisciplinary Optimization 26.
 - <a id="marriott14"></a>Marriott, Stuckey and Wybrow, 2014. [Seeing around corners: fast orthogonal connector routing](https://doi.org/10.1007/978-3-662-44043-8_4). Diagrams 2014.
 - <a id="misue95"></a>Misue, Eades, Lai and Sugiyama, 1995. [Layout adjustment and the mental map](https://doi.org/10.1006/jvlc.1995.1010). JVLC 6(2).
@@ -414,6 +444,7 @@ MEAS1 first adds the seeds and the spread of the method section. Then it adds th
 [levien09]: #levien09
 [lhuillier17]: #lhuillier17
 [luxburg10]: #luxburg10
+[magnanti84]: #magnanti84
 [marler04]: #marler04
 [marriott14]: #marriott14
 [misue95]: #misue95

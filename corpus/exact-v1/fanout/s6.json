@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 25, "id": "n0", "w": 52, "x": 215, "y": 155},
+    {"h": 24, "id": "n1", "w": 48, "x": 71, "y": 205},
+    {"h": 26, "id": "n2", "w": 36, "x": 141, "y": 116},
+    {"h": 26, "id": "n3", "w": 53, "x": 223, "y": 116},
+    {"h": 25, "id": "n4", "w": 53, "x": 65, "y": -21},
+    {"h": 19, "id": "n5", "w": 32, "x": 313, "y": 20},
+    {"h": 18, "id": "n6", "w": 43, "x": 222, "y": 235},
+    {"h": 28, "id": "n7", "w": 58, "x": 89, "y": 73},
+    {"h": 20, "id": "n8", "w": 38, "x": -27, "y": 15},
+    {"h": 27, "id": "n9", "w": 40, "x": 115, "y": 291}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeShape": "bundled", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"data": {"collection": "users-0"}, "id": "e0", "source": "n6", "target": "n8"},
+    {"data": {"collection": "users-0"}, "id": "e1", "source": "n6", "target": "n4"},
+    {"data": {"collection": "users-0"}, "id": "e2", "source": "n6", "target": "n7"},
+    {"data": {"collection": "users-0"}, "id": "e3", "source": "n1", "target": "n4"},
+    {"data": {"collection": "users-0"}, "id": "e4", "source": "n1", "target": "n8"},
+    {"data": {"collection": "users-0"}, "id": "e5", "source": "n1", "target": "n7"},
+    {"data": {"collection": "users-0"}, "id": "e6", "source": "n3", "target": "n7"},
+    {"data": {"collection": "users-0"}, "id": "e7", "source": "n3", "target": "n8"},
+    {"data": {"collection": "users-0"}, "id": "e8", "source": "n3", "target": "n4"},
+    {"data": {"collection": "users-0"}, "id": "e9", "source": "n0", "target": "n8"},
+    {"data": {"collection": "speeds-2"}, "id": "e10", "source": "n2", "target": "n5"},
+    {"data": {"collection": "users-0"}, "id": "e11", "source": "n9", "target": "n7"},
+    {"data": {"collection": "speeds-2"}, "id": "e12", "source": "n4", "target": "n2"},
+    {"data": {"collection": "speeds-2"}, "id": "e13", "source": "n1", "target": "n5"},
+    {"data": {"collection": "speeds-2"}, "id": "e14", "source": "n0", "target": "n2"}
+  ],
+  "family": "fanout",
+  "generator": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "collections", "nodes": 10}, "seed": 406, "version": 1},
+  "hash": "1d9a79a01a92c5ab",
+  "id": "exact-v1/fanout/s6",
+  "schema": "layout-input/1",
+  "seed": 6,
+  "set": "exact-v1",
+  "source": "made-up"
+}
