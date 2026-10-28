@@ -882,9 +882,11 @@ The calibration compares the predicted gain of each taken idea with its measured
 - The test checks that each taken idea that is built has `predicted` and `measured`.
 - The rank correlation (Spearman) comes when 5 or more taken ideas are built.
 
-On 2026-10-28, no taken idea is built. The back test applies the formula to the 50 ideas that a strategy builds and that have a screen result. These are from before the queue. Their rank correlation is 0.50. The predicted gain of the back test does not count the open targets of the strategy itself.
+On 2026-10-28, no taken idea is built. The back test applies the formula to the 55 ideas that a strategy builds and that have a screen result. These are from before the queue. Their rank correlation is 0.39.
 
-The bootstrap interval of 95 % of the back test is 0.23 to 0.72. The script takes 2000 resamples of the 50 pairs, with replacement and the fixed seed 1. The interval is the 2.5 and the 97.5 percentile. The header of `queue.json` holds it as `backtest`, and the results page shows it.
+At the build of the queue (#147), the back test had 50 ideas and 0.50. The map of #148 and the screens after it added 5 ideas. The predicted gain of the back test does not count the open targets of the strategy itself.
+
+The bootstrap interval of 95 % of the back test is 0.11 to 0.62. With the 50 ideas of #147, it was 0.23 to 0.72. The script takes 2000 resamples of the pairs, with replacement and the fixed seed 1. The interval is the 2.5 and the 97.5 percentile. The header of `queue.json` holds it as `backtest`, and the results page shows it.
 
 | Idea | Taken | Predicted gain | Predicted score | Measured gain |
 |---|---|---:|---:|---:|
@@ -909,31 +911,44 @@ An enabler is an item that removes a block of ideas (QUEUE-ENABLERS). It gets a 
 - The scores of the unblocked ideas are the scores of the list. They keep the double cost of a step with no strategies.
 - The ideas and the enablers sort together by score, then by id. A rank is unique on the joint list.
 
-The two enablers on 2026-10-28:
+The enablers at the build (QUEUE-ENABLERS, before STEP-SLOTS):
 
 | Enabler | Removes | Size | Unblocks | Sum of the scores | Score | Rank |
 |---|---|---|---:|---:|---:|---:|
 | `STEP-SLOTS` | `step:` (the steps `whole`, `levels` and `plugs`) | L | 45 | 105.279 | 26.32 | 1 |
 | `SCREEN-MEASURES` | `measure:` (11 measures) | L | 17 | 35.67 | 8.918 | 18 |
 
-- `STEP-SLOTS` unblocks 45 of the 51 ideas with a step block. 6 of the 45 wait for an idea that `STEP-SLOTS` also unblocks.
-- 4 ideas need both enablers: `WILD-011`, `WILD-013`, `EDA-014` and `EDA-036`. 2 other ideas wait for an idea that no enabler unblocks.
+- `STEP-SLOTS` unblocked 45 of the 51 ideas with a step block. 6 of the 45 waited for an idea that `STEP-SLOTS` also unblocked.
+- 4 ideas needed both enablers: `WILD-011`, `WILD-013`, `EDA-014` and `EDA-036`.
+
+STEP-SLOTS (#154) is built. It added a slot for each of the steps `plugs`, `levels` and `whole`, so no block `step:` is left. It left the list `ENABLERS`. A built enabler leaves the list, because it removes no block.
+
+- The blocked ideas went from 77 to 38: 21 by a measure and 17 by an idea.
+- The ideas of the three steps lost the double cost of a step with no strategies. Their scores doubled.
+
+The enabler on 2026-10-28, after STEP-SLOTS:
+
+| Enabler | Removes | Size | Unblocks | Sum of the scores | Score | Rank |
+|---|---|---|---:|---:|---:|---:|
+| `SCREEN-MEASURES` | `measure:` (11 measures: `C4`, `C8`, `G4`, `G5`, `G7`, `H3`, `M2`, `M3`, `M5`, `Z1` and `Z5`) | L | 21 | 41.508 | 10.377 | 19 |
+
+- `SCREEN-MEASURES` unblocks each of the 21 ideas with a measure block. For each one, the measure is the only block.
 - `SCREEN-MEASURES` gets a low score because a missing measure has no open targets. Each win on it adds only 0.5 to the gain.
 
-The joint top 10:
+The joint top 10 after STEP-SLOTS:
 
 | Rank | Item | Step | Score | Blocked by |
 |---:|---|---|---:|---|
-| 1 | `STEP-SLOTS` (enabler) | | 26.32 | |
+| 1 | `NAT-016` Closed venation backbone for levels | `levels` | 21.42 | |
 | 2 | `NAT-018` Knee of the plant Pareto front | `highway` | 20.825 | |
 | 3 | `RULE-021` Simulated annealing over candidate routes | `router` | 18.7 | |
 | 4 | `NAT-019` Bronchial space-filling splits | `highway` | 17.85 | |
-| 5 | `EDA-017` Stretch balance in a bundle | `highway` | 13.175 | |
-| 6 | `WILD-023` Tight edges first | `router` | 12.5 | |
-| 7 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 12 | |
-| 8 | `WILD-036` Manifolds for a fan to a row | `highway` | 12 | |
-| 9 | `WILD-031` Approval corridors | `highway` | 11.75 | |
-| 10 | `RULE-020` Adam with a seeded sample of pairs | `router` | 11.73 | `idea:RULE-019` |
+| 5 | `RULE-048` A curriculum that adds the rules one at a time | `whole` | 13.8 | `idea:RULE-019` |
+| 6 | `WILD-016` Bundle level of detail | `levels` | 13.2 | `idea:WILD-060` |
+| 7 | `WILD-045` A portfolio for each board | `whole` | 13.2 | |
+| 8 | `EDA-017` Stretch balance in a bundle | `highway` | 13.175 | |
+| 9 | `WILD-023` Tight edges first | `router` | 12.5 | |
+| 10 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 12 | |
 
 ### The prediction of QUEUE-ENABLERS
 
@@ -942,7 +957,7 @@ The joint top 10:
 | 1. `STEP-SLOTS` gets rank 1, with a score of 2 or more times that of `NAT-018` (41.65 or more). | 0.45 | Not met: rank 1, but the score is 26.32 (1.26 times). |
 | 2. `SCREEN-MEASURES` gets a rank from 2 to 10. | 0.4 | Not met: rank 18. |
 | 3. 10 or fewer ranked ideas have a step block and a measure block. | 0.5 | Met: 4. |
-| 4. The lower bound of the bootstrap interval of 95 % is above 0.2. | 0.5 | Met: 0.23. |
+| 4. The lower bound of the bootstrap interval of 95 % is above 0.2. | 0.5 | Met at the build: 0.23 over 50 ideas. After #148, the back test has 55 ideas, and the lower bound is 0.11. |
 | 5. No route output, digest or Xplat hash changes. | high | Met: the change adds scripts, tests and site code only. |
 
 ## Queue builds
