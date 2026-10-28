@@ -113,6 +113,7 @@ const V1_FAMILIES = screenFamilies(3, 1);
  * The screen set `screen-v1`: 14 boards of made-up data from 10 to 150 nodes. Each family shows a known hard case.
  * The seed 0 of each family is the fixture or the case board of the benchmark. The seed `k` of a fixture family is `familySeed(spec, k)`, as in `runSuite`.
  * The generators wrap the fixtures and the case boards without a change to their output.
+ *
  * The manifest declares the inputs of each family, with `minCount` 3. The case boards `hub-chain` and `many-groups` have 1 input, so they are in `thin`.
  * The boards of this set do not change. The tests compare it with the files in `corpus/screen-v1`.
  */

@@ -123,7 +123,7 @@ describe("the screen set screen-v2 (CORPUS-SEEDS)", () => {
     expect(checkDeclared(v2, declaresFamily, claim).map((b) => b.detail)).toEqual(["60 inputs have a cell without kind, which the map form of familyBy needs"]);
     // Two families have the same cell. Thus a key from the dimensions of the cell gives 5 families, not 6.
     const dims = Object.keys(v2[0]!.cell!);
-    expect(new Set(v2.map((i) => familyOf(i.cell!, dims))).size).toBe(5);
+    expect(new Set(v2.map((i) => familyOf({ ...i.cell }, dims))).size).toBe(5);
     expect(byId(v2, "screen-v2/dense-groups/s0").cell).toEqual(byId(v2, "screen-v2/many-groups/s0").cell);
   });
 

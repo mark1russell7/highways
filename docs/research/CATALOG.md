@@ -705,6 +705,96 @@ The mean B1 over the inputs gives each input the same weight. `screen-v1` has 1 
 
 This change sets no verdict and no portfolio set. SELECT can use the split `default`: it fits on the members 0 to 6 and gets its score on the members 7 to 9.
 
+## The verdict over families of the screens (SCREEN-WEIGHT)
+
+Step 1 (VERDICT, #139) made the family the unit of a verdict. This step gives the families to the manifests and scores the records of both screens again with `verdict` of `layout-contract` 0.2.11.
+
+### The families of the manifests
+
+- The claim `claims.declared` of `screen-v1` and of `screen-v2` has `familyBy: { "*": [] }`. The key of the family is the kind of the cell, with no other dimension.
+- The cells of the screen sets have no `kind`. Also, `dense-groups` and `many-groups` have the same cell. Thus a key from the dimensions of the cell gives 5 families, not 6.
+- `familyCell` of `bench/screen/set.ts` gives the cell of an input with its family as `kind`. `checkFamilies` gives this hook to `checkDeclared`. No cell and no input hash change.
+- `screen-v2` declares `familyMin` 10. `screen-v1` declares `minCount` 3, and `hub-chain` and `many-groups` are in `thin`, with 1 input each.
+- `checkDeclared` passes on both manifests. The corpus hashes do not change, because they read only the ids and the input hashes.
+
+### The rescore
+
+`node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>]` reads the records of one artifact of the workflow `Screen`. It compares each strategy of the step with `shared`, on each guard measure of the step in [the promotion rule](../PROMOTION.md#the-measures-of-each-step).
+
+- The tie is the `minEffect` of the measure in `MEASURES`, and the level is 0.05.
+- A guard with a quantile or a limit uses that measure of each input. For example, `R5` q0.95 uses `route.detour.q95`, and `B6` max uses `route.bundle.merge-angle.max`. `R1` uses `route.crossings`.
+- The script also gives the old verdict: the sign of the mean of the inputs, with the same tie.
+- It gives the breadth from `families`, so it works with the contract 0.2.11. With 0.2.12, it reads the field `breadth`.
+
+The records of `screen-v1` are the runs of `main` at `9870eac`: [40716114094](https://github.com/mark1russell7/highways/actions/runs/40716114094) (`router`) and [40716118524](https://github.com/mark1russell7/highways/actions/runs/40716118524) (`highway`). `main` has no run of `screen-v2`. Thus its records are the runs of CORPUS-SEEDS: [40738231081](https://github.com/mark1russell7/highways/actions/runs/40738231081) (`router`) and [40738642229](https://github.com/mark1russell7/highways/actions/runs/40738642229) (`highway`).
+
+### The labels
+
+| Set | Step | Verdicts | `better` | `worse` | `depends on the mix` | `no verdict` |
+|---|---|---:|---:|---:|---:|---:|
+| `screen-v1` | `router` | 40 | 11 | 16 | 1 | 12 |
+| `screen-v1` | `highway` | 212 | 60 | 58 | 20 | 74 |
+| `screen-v2` | `router` | 40 | 13 | 17 | 0 | 10 |
+| `screen-v2` | `highway` | 212 | 81 | 90 | 0 | 41 |
+
+- A verdict is one strategy on one guard measure. The step `router` has 8 strategies and 5 guards. The step `highway` has 53 strategies and 4 guards.
+- On `screen-v2`, each family has 10 inputs. Then the mean of the family means is equal to the mean of the inputs, so no verdict is `depends on the mix`.
+- On `screen-v1`, the families have 1 or 3 inputs. Thus 21 verdicts are `depends on the mix`.
+- The B1 of the step `highway` gets 22, 4, 10 and 17 on `screen-v1`, and 30, 8, 0 and 15 on `screen-v2`.
+
+### From `screen-v1` to `screen-v2`
+
+No verdict that is `better` or `worse` on both sets changes its side: 145 of 145 stay the same. The changes are between a verdict and no verdict.
+
+- The step `router`: 4 of 40 verdicts change, for 4 strategies. `plugs` gets `worse` on `R5` q0.95, and `corners-smooth` gets `better`. `sections-tree` gets `better` on `R1`. The `R1` of `sections` goes from `depends on the mix` to `no verdict`.
+- The step `highway`: 71 of 212 verdicts change, for 41 strategies. 20 go from `no verdict` to `better`, and 31 to `worse`. 18 go from `depends on the mix` to `no verdict`, 1 to `better` and 1 to `worse`.
+
+The changes of B1 of the step `highway`:
+
+| Change | Strategies |
+|---|---|
+| `depends on the mix` to `better` | `wspd` |
+| `depends on the mix` to `no verdict` | `corridors`, `spiral`, `sbeb`, `areas`, `consensus`, `corridors+breakeven`, `corridors+stretch`, `corridors+hysteresis`, `corridors+ids` |
+| `no verdict` to `better` | `select`, `flow-clusters`, `soft-keys`, `ridges`, `divided`, `mesh`, `p-hub` |
+| `no verdict` to `worse` | `flow-field`, `od-cells`, `scale-space`, `corridors+ambiguity` |
+
+The B1 of `wspd` on `screen-v2` is `better` with p 0.039. The family signs are 3 wins, 2 losses and 1 tie: `better on these families, worse on 2 of 6 (1 tie)`.
+
+### The old verdict and the new label
+
+The old verdict is the sign of the mean of the inputs. It is different from the new label when the new label is not its side, or when a tie gets a side.
+
+| Set | Step | Different verdicts | Strategies |
+|---|---|---:|---:|
+| `screen-v1` | `router` | 6 of 40 | 5 |
+| `screen-v1` | `highway` | 92 of 212 | 45 |
+| `screen-v2` | `router` | 4 of 40 | 3 |
+| `screen-v2` | `highway` | 38 of 212 | 26 |
+
+- On `screen-v2`, each difference is an old `better` or `worse` that becomes `no verdict`. Then an interval touches 0, or the permutation p is 0.05 or more.
+- On `screen-v2`, the strategies of the step `router` are `straight` (`R11` min), `trunks` (`R5` q0.95 and `R11` min) and `sections` (`R1`).
+- On `screen-v2`, 15 of the 26 highway strategies lose a B1 verdict. These are `corridors`, `quickbundles`, `spiral`, `traclus`, `nested`, `hough`, `fdeb`, `sbeb`, `areas`, `confluent`, `consensus` and the 4 riders of `corridors` without `ambiguity`.
+- On `screen-v1`, 20 of the 21 verdicts that are `depends on the mix` differ from the old verdict.
+
+### The guard count
+
+The guard is a test that refuses a promotion when a family loses beyond the tie. This step counts the cases. It does not add the guard.
+
+- The promotion rule has promoted no option yet. `docs/PROMOTION.md` and the roadmap list no promotion, and no record of the catalog has the field `promotion`. Thus the guard count is 0 of 0.
+- Take as a proxy each strategy with 1 or more `better` guards and no `worse` guard on `screen-v2`. These are `shared-ways`, `lanes` and `soft-keys`, all of the step `highway`. Only `soft-keys` has families against it: its B1 is `better`, but 3 of 6 families are against it.
+- Over all the `better` verdicts of `screen-v2`, 40 of 94 have 1 or more families against them. Over all the `better` and `worse` verdicts, 93 of 201 have.
+
+### The prediction
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. All the tests of `layout-contract` pass, and the new tests pass. | high | Met: 18 of 18 in `verdict.test.ts` on the branch of 0.2.12. CI starts the full suite. |
+| 2. On `screen-v2`, B1 against `shared` of the step `highway`: 25% or fewer of the strategies get `better` or `worse`. | 0.5 | Not met: 38 of 53 (72%). |
+| 3. Of the `better` and `worse` verdicts of `screen-v2`, 50% or more have 1 or more family losses. | 0.45 | Not met: 93 of 201 (46%). |
+| 4. The guard count is 1 to 3 of the current promotions. | 0.4 | Not met: no promotion yet, so 0 of 0. The proxy gives 1 of 3. |
+| 5. Of the verdicts that are `better` or `worse` on both sets, 80% or more get the same label. | 0.45 | Met: 145 of 145 (100%). |
+| 6. `checkDeclared` of 0.2.11 passes on both manifests with the new `familyBy`, with no change of a cell. | medium | Partly met: it passes with no change of a cell, but only with the hook `familyCell`. The cells cannot give the 6 families. |
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
