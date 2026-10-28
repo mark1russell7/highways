@@ -16,14 +16,27 @@ import { PORTFOLIO_SETS } from "./sets.ts";
 const board = exactBoard("clustered", 10, 3);
 
 describe("the portfolio router", () => {
-  it("chooses the band from the node count, and the last band above 40 nodes", () => {
-    expect([1, 12, 13, 24, 25, 40, 41, 400].map((n) => portfolioBand(n).id)).toEqual(["n1-12", "n1-12", "n13-24", "n13-24", "n25-40", "n25-40", "n25-40", "n25-40"]);
+  it("chooses the band from the node count, and the last band above 128 nodes", () => {
+    expect([1, 12, 13, 24, 25, 40, 41, 64, 65, 128, 129, 400].map((n) => portfolioBand(n).id)).toEqual([
+      "n1-12",
+      "n1-12",
+      "n13-24",
+      "n13-24",
+      "n25-40",
+      "n25-40",
+      "n41-64",
+      "n41-64",
+      "n65-128",
+      "n65-128",
+      "n65-128",
+      "n65-128",
+    ]);
   });
 
   it("runs the base first, then the first k names of the set of the band", () => {
     expect(portfolioMembers(10, { k: 3 })).toEqual(["shared", ...PORTFOLIO_SETS["collection|1.5|n1-12"]!.slice(0, 3)]);
     expect(portfolioMembers(30, { rule: "all", cap: 1.1, k: 8 })).toEqual(["shared", ...PORTFOLIO_SETS["all|1.1|n25-40"]!.slice(0, 8)]);
-    expect(portfolioMembers(400, { rule: "all", cap: 1.25, k: 5 })).toEqual(portfolioMembers(40, { rule: "all", cap: 1.25, k: 5 }));
+    expect(portfolioMembers(400, { rule: "all", cap: 1.25, k: 5 })).toEqual(portfolioMembers(128, { rule: "all", cap: 1.25, k: 5 }));
   });
 
   it("runs the fit without k: each member of the fit of the band up to its node limit", () => {

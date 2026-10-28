@@ -5,6 +5,9 @@
 // Without `--time`, it reads that summary. The greedy pool of a band has only the members that take 50 ms or less alone. The fit goes to `src/portfolio/fit.ts`.
 // With `--records`, it reads the records of the workflow `Screen` on `exact-v1` and `exact-v1-bounds`, and writes the short table of the runs (`--runs`).
 // Without `--records`, it reads the short table of the runs. The test `src/portfolio/sets.test.ts` checks that `src/portfolio/sets.ts` is current.
+// With `--large`, it adds the records of `portfolio:time --guard-records` to the short table (PORTFOLIO-SPEED). Those boards have more than 40 nodes and no optima.
+// There the value of a run is its B1 under the guard, and the oracle is the best member of the pool (`LARGE_SET`).
+// With `--setup-time <path,...> --setup-source <id>`, it keeps the times of the members, and takes the times of the setup of the key from other lines (`withSetup`).
 // Each band splits its seeds: the seeds 0 to 4 choose the set, and the seeds 5 to 9 test it. The script reads only records, so it runs locally in a few seconds.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync, gzipSync } from "node:zlib";
@@ -95,22 +98,45 @@ export function runTableOf(short: ShortRuns): Map<string, Map<string, Run>> {
   return table;
 }
 
+/** The set of the boards above 40 nodes (PORTFOLIO-SPEED): the boards of `exact-v1` at larger sizes, without optima. Its inputs have the id `exact-large/...`. */
+export const LARGE_SET = "exact-large";
+
+/**
+ * This function adds the inputs of the short table `extra` to the short table `short`. An input of `short` does not change.
+ * A strategy that `short` does not have goes at the end of its list, so the index of each run of `short` stays the same.
+ */
+export function mergeShortRuns(short: ShortRuns, extra: ShortRuns): ShortRuns {
+  const strategies = [...short.strategies, ...extra.strategies.filter((s) => !short.strategies.includes(s))];
+  const index = new Map(strategies.map((s, i) => [s, i]));
+  const have = new Set(short.inputs.map((i) => i.input));
+  const inputs = [
+    ...short.inputs,
+    ...extra.inputs
+      .filter((i) => !have.has(i.input))
+      .map((i) => ({ ...i, runs: i.runs.map(([s, ...rest]) => [index.get(extra.strategies[s]!)!, ...rest] as const).sort((a, b) => a[0] - b[0]) })),
+  ];
+  return { schema: short.schema, sources: [...short.sources, ...extra.sources.filter((s) => !short.sources.includes(s))], strategies, inputs };
+}
+
 /**
  * This function gives the gap closed of the rule `rule` at the cap `cap` for each run: the midpoint of its interval over the interval of the optimum, as `BOUNDS.md` gives it.
  * A run with a stretch above the cap has no value, and under `collection` a run that mixes collections has no value.
  * The baseline `shared` is the fallback output, so it has a value at each cap, also above the cap.
  * At a proven optimum, the interval has a width of 0, so the midpoint is the gap closed itself.
+ * An input of `LARGE_SET` has no optimum. There the value is the B1 of the run, with the same guard. The share of the oracle gain does not change with the scale of the value.
  */
 export function midValue(table: RunTable, short: ShortRuns, rule: GapRule, cap: number, optima: readonly ExactOptimum[]): ValueOf {
   const opt = new Map(optima.filter((o) => o.rule === rule && Math.abs(o.cap - cap) <= 1e-9).flatMap((o) => (optimumInterval(o) ? [[o.input, optimumInterval(o)!] as const] : [])));
   const base = new Map(short.inputs.map((i) => [i.input, i.base[rule]]));
   return (input, strategy) => {
     const r = table.get(input)?.get(strategy);
-    const o = opt.get(input);
-    const b = base.get(input);
-    if (r === undefined || o === undefined || b === undefined) return undefined;
+    if (r === undefined) return undefined;
     if (rule === "collection" && r.mixed === true) return undefined;
     if (strategy !== PORTFOLIO_BASE && (r.stretch === undefined || r.stretch > cap + 1e-9)) return undefined;
+    if (input.startsWith(`${LARGE_SET}/`)) return r.b1;
+    const o = opt.get(input);
+    const b = base.get(input);
+    if (o === undefined || b === undefined) return undefined;
     return gapInterval(r.b1, b, o)?.mid;
   };
 }
@@ -163,6 +189,16 @@ export function memberTimes(records: readonly TimeRecord[], source: string): Mem
   }
   const sizes = [...new Set(records.map((r) => r.nodes))].sort((a, b) => a - b);
   return { schema: "portfolio-times/1", source, sizes, ms };
+}
+
+/**
+ * This function gives the summary `times` with the times of the setup of the key (`KEY_SETUP`) of the summary `setup` (PORTFOLIO-SPEED).
+ * A change of the setup does not change the time of a member, so the members keep their times. The source names both runs.
+ */
+export function withSetup(times: MemberTimes, setup: MemberTimes): MemberTimes {
+  const at = setup.ms[KEY_SETUP];
+  if (at === undefined) throw new Error(`The times of the run ${setup.source} have no lines of ${KEY_SETUP}.`);
+  return { ...times, source: `${times.source}, with the setup of the key from ${setup.source}`, ms: { ...times.ms, [KEY_SETUP]: at } };
 }
 
 /** This function gives the sizes of the times that fall in a band. The last band also has the sizes above its `maxNodes`. */
@@ -444,6 +480,11 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     if (!existsSync(runsPath)) throw new Error(`There is no short table of the runs at ${runsPath}. Give --records.`);
     short = readShortRuns(runsPath);
   }
+  const large = paths("--large");
+  if (large.length > 0) {
+    short = mergeShortRuns(short, shortRuns(readRecords(large), paths("--large-sources")));
+    writeFileSync(runsPath, gzipSync(JSON.stringify(short), { level: 9 }));
+  }
   const timePaths = paths("--time");
   let times: MemberTimes;
   if (timePaths.length > 0) {
@@ -451,6 +492,12 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     times = memberTimes(lines, opt("--time-source") ?? "local");
     writeFileSync(TIMES_PATH, JSON.stringify(times, null, 1) + "\n");
   } else times = readTimes();
+  const setupPaths = paths("--setup-time");
+  if (setupPaths.length > 0) {
+    const lines = setupPaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as TimeRecord));
+    times = withSetup(times, memberTimes(lines, opt("--setup-source") ?? "local"));
+    writeFileSync(TIMES_PATH, JSON.stringify(times, null, 1) + "\n");
+  }
   const choices = chooseSets(short, readOptima(), { times });
   writeFileSync(opt("--sets") ?? SETS_PATH, setsSource(choices, short.sources));
   writeFileSync(opt("--fit") ?? FIT_PATH, fitSource(choices, times.source));
