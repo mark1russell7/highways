@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import { laneRoutes, runKey, sectionsRouter, segmentsOf } from "@mark1russell7/highways";
+import { cornersRouter, laneRoutes, runKey, sectionsRouter, segmentsOf } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
-import { BOARDS } from "./boards.ts";
+import { BOARDS, EXAMPLE_BOARDS, ordersBoard } from "./boards.ts";
 
 /**
  * The digests of the routes of the example boards with version 0.1.2 of the core. A host app pins `^0.1.2`.
@@ -29,4 +29,21 @@ describe("the routes of the example boards", () => {
       expect(createHash("sha256").update(JSON.stringify({ result, keys, lanes })).digest("hex")).toBe(DIGESTS[board.id]);
     });
   }
+});
+
+describe("the board orders: a table card with rows and wall plugs (INTERIOR-ROUTE)", () => {
+  const board = ordersBoard();
+  const card = board.graph.nodes.find((n) => n.id === "orders")!.box;
+
+  it("is the last board of the examples page, and the compare page does not show it", () => {
+    expect(EXAMPLE_BOARDS.at(-1)).toBe(ordersBoard);
+    expect(BOARDS).not.toContain(ordersBoard);
+  });
+
+  it("gets an inner route in the card for each edge from a row, and sections routes the outer edges", () => {
+    const inner = cornersRouter({ name: "corners", margin: 6 }).route(board.graph).routes.filter((r) => r.frame === "orders");
+    expect(inner.map((r) => r.edge).sort()).toEqual(["e4", "e5", "e6", "e7"]);
+    for (const r of inner) for (const p of r.points) expect(p.x >= card.x && p.x <= card.x + card.w && p.y >= card.y && p.y <= card.y + card.h, r.edge).toBe(true);
+    expect(router.route(board.graph).routes.map((r) => r.edge).sort()).toEqual(["e0", "e1", "e2", "e3"]);
+  });
 });

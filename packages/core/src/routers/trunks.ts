@@ -1,5 +1,5 @@
 import { center, dist, type Point } from "../geom.ts";
-import { nodeIndex, resolvePorts, type Bundle, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, outerGraph, type Bundle, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
@@ -210,7 +210,7 @@ export function trunksRouter(options: TrunksOptions): Router {
   const router: Router = {
     name: options.name,
     route(input: Graph): Result {
-      const graph = resolvePorts(input);
+      const graph = outerGraph(input);
       const byId = nodeIndex(graph);
       const ways = new WayFinder(graph.nodes, options);
       const points = new Map<string, readonly Point[]>();

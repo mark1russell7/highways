@@ -30,6 +30,12 @@ export interface Node {
   readonly ports?: readonly Port[];
   /** This data is free for the grouping rules of the nodes. The rule `keys` reads the string `data.group` by default. */
   readonly data?: Readonly<Record<string, unknown>>;
+  /**
+   * This id names the frame node that holds the node. A frame is a node that another node names as its parent.
+   * An edge from a plug of a frame to a node in the frame is an inner edge (`splitFrames`). The router `corners` routes it inside the frame.
+   * A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
+   */
+  readonly parent?: string;
 }
 
 /** One end of an edge: a node, and optionally one plug of that node. */
@@ -56,6 +62,8 @@ export interface Graph {
 export interface Route {
   readonly edge: string;
   readonly points: readonly Point[];
+  /** This id names the frame of an inner route: the route stays inside the box of that node. An outer route has no frame. */
+  readonly frame?: string;
 }
 
 /**
@@ -193,4 +201,63 @@ export function fixedPortPoint(node: Node, end: End): Point | undefined {
   const at = p === undefined ? undefined : portOffset(node.box, p);
   if (at === undefined) return undefined;
   return { x: node.box.x + at.x, y: node.box.y + at.y };
+}
+
+/**
+ * An inner edge: an edge from a plug of a frame to a node in that frame, at any depth.
+ * `plug` tells which end of the edge is the plug of the frame.
+ */
+export interface InnerEdge {
+  readonly edge: Edge;
+  readonly frame: string;
+  readonly plug: "source" | "target";
+}
+
+/** This function throws a `RangeError` when the parent of a node names no node, or when the parents of a node make a cycle. */
+export function checkParents(graph: Graph, byId: ReadonlyMap<string, Node> = nodeIndex(graph)): void {
+  const done = new Set<string>();
+  for (const n of graph.nodes) {
+    const seen = new Set<string>();
+    for (let m: Node | undefined = n; m?.parent !== undefined && !done.has(m.id); ) {
+      seen.add(m.id);
+      const p = byId.get(m.parent);
+      if (!p) throw new RangeError(`The parent "${m.parent}" of the node "${m.id}" names no node of the graph.`);
+      if (seen.has(p.id)) throw new RangeError(`The parents of the node "${n.id}" make a cycle through the node "${p.id}".`);
+      m = p;
+    }
+    for (const id of seen) done.add(id);
+  }
+}
+
+/** This function tells if the node `frame` holds the node `id`, at any depth. A node does not hold itself. */
+function holds(byId: ReadonlyMap<string, Node>, frame: string, id: string): boolean {
+  for (let p = byId.get(id)?.parent; p !== undefined; p = byId.get(p)?.parent) if (p === frame) return true;
+  return false;
+}
+
+/**
+ * This function checks the parents of a graph (`checkParents`), and takes its inner edges out.
+ * An inner edge of the frame F has a plug of F (`End.port`) at one end. F holds the node at the other end.
+ * The graph that it gives keeps each node and the other edges. A graph without `parent` comes back as the same object, with no inner edge.
+ */
+export function splitFrames(graph: Graph): { readonly graph: Graph; readonly inner: readonly InnerEdge[] } {
+  if (!graph.nodes.some((n) => n.parent !== undefined)) return { graph, inner: [] };
+  const byId = nodeIndex(graph);
+  checkParents(graph, byId);
+  const inner: InnerEdge[] = [];
+  const edges = graph.edges.filter((e) => {
+    if (e.source.port !== undefined && holds(byId, e.source.node, e.target.node)) inner.push({ edge: e, frame: e.source.node, plug: "source" });
+    else if (e.target.port !== undefined && holds(byId, e.target.node, e.source.node)) inner.push({ edge: e, frame: e.target.node, plug: "target" });
+    else return true;
+    return false;
+  });
+  return { graph: inner.length === 0 ? graph : { ...graph, edges }, inner };
+}
+
+/**
+ * This function gives the graph of a router without frames. It has the plugs of `resolvePorts`, and no inner edges (`splitFrames`).
+ * Each router except `corners` uses it at the start of `route`. So an inner edge gets no route from such a router.
+ */
+export function outerGraph(graph: Graph): Graph {
+  return splitFrames(resolvePorts(graph)).graph;
 }
