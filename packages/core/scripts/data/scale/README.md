@@ -8,3 +8,5 @@ The file `route-scale-fixture.json.gz` is the input of the times script `scripts
 - `env` names the versions that made the file: node 26, `highways` 0.7.0 and `packing` 0.2.13.
 
 The research note `docs/research/SCALE.md` gives the times and the route hash of each router.
+
+The job `screen` of the workflow `Scale` runs the router screen of the base commit and of the head in turn on one runner. The script `scripts/scale-screen.ts` compares their records and their times.
