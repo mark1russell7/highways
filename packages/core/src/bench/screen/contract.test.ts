@@ -26,10 +26,15 @@ import {
   type Region,
   type RouteInput,
 } from "./forms.ts";
+import { exercised, outputGroups, outputHash, type ExerciseEvidence, type HashOptions, type OutputGroup } from "./activation.ts";
 import { compareMeasure, minEffectOf, type CompareSpec, type MeasureCompare, type MinEffect } from "./compare.ts";
-import { mulberry32, RECORD_EPS, round3 } from "./hash.ts";
+import { canonicalJson, mulberry32, RECORD_EPS, round3, sha256Hex } from "./hash.ts";
 import { screen } from "./screen.ts";
 import { screenInputs } from "./set.ts";
+import { resultForm } from "./exercise.ts";
+import { follow } from "../../highways/follow.ts";
+import { highwayStrategies, STRATEGIES } from "../../strategies/builtins.ts";
+import { asRouter, listStrategies } from "../../strategies/model.ts";
 
 /** This type is `true` when the type `A` fits the type `B`. */
 type Fits<A, B> = [A] extends [B] ? true : false;
@@ -122,6 +127,19 @@ holds<Fits<RecordTrace, C.StageTrace>>();
 holds<Fits<C.StageTrace, RecordTrace>>();
 // @ts-expect-error G11: the contract record has no `trace` with the move counts. The contract has `StageTrace` only on the output of a packer.
 holds<Has<C.LayoutRecord, "trace">>();
+// The copy of the activation functions in `activation.ts` has the types of the contract 0.2.5.
+holds<Fits<OutputGroup, C.OutputGroup>>();
+holds<Fits<C.OutputGroup, OutputGroup>>();
+holds<Fits<ExerciseEvidence, C.ExerciseEvidence>>();
+holds<Fits<C.ExerciseEvidence, ExerciseEvidence>>();
+holds<Fits<HashOptions, C.HashOptions>>();
+holds<Fits<C.HashOptions, HashOptions>>();
+holds<Fits<typeof outputHash, typeof C.outputHash>>();
+holds<Fits<typeof C.outputHash, typeof outputHash>>();
+holds<Fits<typeof outputGroups, typeof C.outputGroups>>();
+holds<Fits<typeof C.outputGroups, typeof outputGroups>>();
+holds<Fits<typeof exercised, typeof C.exercised>>();
+holds<Fits<typeof C.exercised, typeof exercised>>();
 
 /** The floor and the tolerance of each row of the table "The floors" in `docs/PROMOTION.md`, by the name of the measure. */
 function promotionFloors(): Map<string, { floor: number; tol: number }> {
@@ -329,5 +347,103 @@ describe("the copy of compareMeasure and minEffectOf in highways agrees with lay
       expect(() => compareMeasure(a, b, { direction: "lower" })).toThrow(RangeError);
       expect(() => C.compareMeasure(a, b, { direction: "lower" })).toThrow(RangeError);
     }
+  });
+});
+
+/** This function gives a seeded random JSON value with numbers near the points of the grid, `-0`, keys in random order and `undefined` values. */
+function randomValue(r: () => number, depth: number, wild: boolean): unknown {
+  const pick = <T>(xs: readonly T[]): T => xs[Math.floor(r() * xs.length)]!;
+  const u = r();
+  if (depth <= 0 || u < 0.45) {
+    const w = r();
+    if (wild && w < 0.02) return pick([Number.NaN, Infinity, -Infinity]);
+    if (w < 0.1) return pick([0, -0, 1, -1, RECORD_EPS / 2, -RECORD_EPS / 2, 1.0005, -2.0005, 1e15, 1e300]);
+    if (w < 0.4) return (Math.floor(r() * 20001) - 10000) / 1000 + (r() < 0.5 ? 0 : pick([0.0004999, 0.0005, 0.0005001, -0.0005]));
+    if (w < 0.7) return (r() < 0.3 ? -1 : 1) * 10 ** (r() * 8 - 4);
+    if (w < 0.8) return pick(["a", "", "é", "x y", "\u0000"]);
+    if (w < 0.9) return pick([true, false, null]);
+    return Math.floor(r() * 100);
+  }
+  if (u < 0.7) return Array.from({ length: Math.floor(r() * 5) }, () => (r() < 0.05 ? undefined : randomValue(r, depth - 1, wild)));
+  const o: Record<string, unknown> = {};
+  for (let i = Math.floor(r() * 5); i > 0; i--) o[pick(["b", "a", "c", "z", "points", "x", "y", "10", "2"])] = r() < 0.05 ? undefined : randomValue(r, depth - 1, wild);
+  return o;
+}
+
+describe("the copy of the activation functions in highways agrees with layout-contract 0.2.5 (ACTIVATION)", () => {
+  it("has the SHA-256 and the canonical JSON of the contract", () => {
+    const r = mulberry32(20261028);
+    for (let i = 0; i < 500; i++) {
+      const v = randomValue(r, 4, false);
+      expect(canonicalJson(v)).toBe(C.canonicalJson(v));
+      expect(sha256Hex(canonicalJson(v))).toBe(C.sha256Hex(C.canonicalJson(v)));
+    }
+  });
+
+  it("gives the hash of the contract for the outputs of each built-in router and of three highway plans", () => {
+    const some = [inputs.find((i) => i.id.includes("/tiny-uniform/"))!, inputs.find((i) => i.id.includes("/hub-chain/"))!];
+    let count = 0;
+    for (const input of some) {
+      const graph = inputGraph(input);
+      const results = listStrategies(STRATEGIES, "router").map((s) => asRouter(s).route(graph));
+      results.push(follow(graph, highwayStrategies["shared-ways"].run({ graph }, highwayStrategies["shared-ways"].defaults)));
+      results.push(follow(graph, highwayStrategies.corridors.run({ graph }, highwayStrategies.corridors.defaults)));
+      results.push(follow(graph, highwayStrategies.power.run({ graph }, highwayStrategies.power.defaults)));
+      for (const result of results) {
+        const form = resultForm(result);
+        for (const options of [{}, { grid: RECORD_EPS }, { grid: 0 }]) expect(outputHash(form, options)).toBe(C.outputHash(form, options));
+        count++;
+      }
+    }
+    expect(count).toBeGreaterThan(10);
+  });
+
+  it("gives the hash of the contract, or the same error, for 3000 seeded random values and grids", () => {
+    const r = mulberry32(20261029);
+    const grids = [undefined, 0, RECORD_EPS, 0.01, 0.5, 1, 1e-6, 1e-300, -1, Number.NaN, Infinity];
+    const differences: string[] = [];
+    let errors = 0;
+    for (let i = 0; i < 3000; i++) {
+      const v = randomValue(r, 4, true);
+      const grid = grids[Math.floor(r() * grids.length)];
+      const options: HashOptions = grid === undefined ? {} : { grid };
+      const own = outcome(() => outputHash(v, options));
+      const theirs = outcome(() => C.outputHash(v, options));
+      if (own === "RangeError") errors++;
+      if (own !== theirs) differences.push(`outputHash(${canonicalJson(v)}, ${String(grid)}): ${own} and ${theirs}`);
+    }
+    expect(differences).toEqual([]);
+    expect(errors).toBeGreaterThan(50);
+  });
+
+  it("gives the groups of the contract, or the same error, for 1000 seeded random hash lists", () => {
+    const r = mulberry32(20261030);
+    for (let i = 0; i < 1000; i++) {
+      const length = 1 + Math.floor(r() * 4);
+      const hashes: Record<string, string[]> = {};
+      for (let c = Math.floor(r() * 8); c > 0; c--) {
+        const n = r() < 0.03 ? length + 1 : length;
+        hashes[`c${Math.floor(r() * 20)}`] = Array.from({ length: n }, () => `h${Math.floor(r() * 3)}`);
+      }
+      expect(outcome(() => outputGroups(hashes))).toEqual(outcome(() => C.outputGroups(hashes)));
+    }
+  });
+
+  it("gives the verdict of the contract, or the same error, for 1000 seeded random evidence", () => {
+    const r = mulberry32(20261031);
+    const list = (n: number): string[] => Array.from({ length: n }, () => `h${Math.floor(r() * 2)}`);
+    let errors = 0;
+    for (let i = 0; i < 1000; i++) {
+      const n = 1 + Math.floor(r() * 3);
+      const evidence: ExerciseEvidence = {
+        ...(r() < 0.5 ? { moves: { "move.a": Math.floor(r() * 3) - 1, "move.b": r() < 0.8 ? 0 : 1 } } : {}),
+        ...(r() < 0.9 ? { hashes: list(n) } : {}),
+        ...(r() < 0.9 ? { baseHashes: list(r() < 0.1 ? n + 1 : n) } : {}),
+      };
+      const own = outcome(() => exercised(evidence));
+      if (own === "RangeError") errors++;
+      expect(own, JSON.stringify(evidence)).toBe(outcome(() => C.exercised(evidence)));
+    }
+    expect(errors).toBeGreaterThan(50);
   });
 });

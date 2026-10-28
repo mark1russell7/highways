@@ -21,16 +21,23 @@ describe("outputHash", () => {
     expect(outputHash({ a: 1, b: { c: 2, d: 3 } })).toBe(outputHash({ b: { d: 3, c: 2 }, a: 1 }));
   });
 
-  it("keeps the numbers exact without a grid", () => {
-    expect(outputHash({ x: 1.0001 })).not.toBe(outputHash({ x: 1 }));
+  it("puts each number on the grid RECORD_EPS by default, as round3 does, and changes -0 to 0", () => {
+    expect(outputHash({ x: 1.0001 })).toBe(outputHash({ x: 1 }));
+    expect(outputHash({ x: 1.002 })).not.toBe(outputHash({ x: 1 }));
+    expect(outputHash([-0.0001, -0])).toBe(outputHash([0, 0], { grid: 0 }));
+    expect(outputHash({ x: 1.0001 }, { grid: RECORD_EPS })).toBe(outputHash({ x: 1.0001 }));
+    for (const v of [0.0005, 1.2345, -2.0004, 123.4565, 7.0015]) expect(outputHash(v)).toBe(outputHash(round3(v), { grid: 0 }));
   });
 
-  it("puts each number on the grid RECORD_EPS as round3 does, and changes -0 to 0", () => {
-    const grid = { grid: RECORD_EPS };
-    expect(outputHash({ x: 1.0001 }, grid)).toBe(outputHash({ x: 1 }, grid));
-    expect(outputHash({ x: 1.002 }, grid)).not.toBe(outputHash({ x: 1 }, grid));
-    expect(outputHash([-0.0001, -0], grid)).toBe(outputHash([0, 0]));
-    for (const v of [0.0005, 1.2345, -2.0004, 123.4565, 7.0015]) expect(outputHash(v, grid)).toBe(outputHash(round3(v)));
+  it("keeps the numbers exact with the grid 0", () => {
+    expect(outputHash({ x: 1.0001 }, { grid: 0 })).not.toBe(outputHash({ x: 1 }, { grid: 0 }));
+  });
+
+  it("throws for a number that is not finite, with its path, and for a bad grid", () => {
+    expect(() => outputHash({ a: [1, Number.NaN] })).toThrow(/\$\.a\[1\]/);
+    expect(() => outputHash({ a: Infinity }, { grid: 0 })).toThrow(RangeError);
+    expect(() => outputHash(1, { grid: -1 })).toThrow(RangeError);
+    expect(() => outputHash(1, { grid: Infinity })).toThrow(RangeError);
   });
 });
 
@@ -47,12 +54,16 @@ describe("outputGroups", () => {
   it("splits two candidates that differ on one input only", () => {
     expect(outputGroups({ a: ["x", "y"], b: ["x", "z"] }).length).toBe(2);
   });
+
+  it("throws when two lists have different lengths", () => {
+    expect(() => outputGroups({ a: ["x", "y"], b: ["x"] })).toThrow(RangeError);
+  });
 });
 
 describe("exercised", () => {
   it("is true when a move count is above 0", () => {
     expect(exercised({ moves: { "move.powerEdge": 1 } })).toBe(true);
-    expect(exercised({ moves: [{ "move.powerEdge": 0 }, { "move.powerEdge": 2 }] })).toBe(true);
+    expect(exercised({ moves: { "move.powerEdge": 0, "move.other": 2 } })).toBe(true);
   });
 
   it("is true when a hash differs from the base hash", () => {
@@ -64,8 +75,10 @@ describe("exercised", () => {
     expect(exercised({})).toBe(false);
   });
 
-  it("does not count an input without a hash", () => {
-    expect(exercised({ hashes: ["a", undefined], baseHashes: ["a", "b"] })).toBe(false);
+  it("throws when only one hash list is given, or when the lengths differ", () => {
+    expect(() => exercised({ hashes: ["a"] })).toThrow(RangeError);
+    expect(() => exercised({ baseHashes: ["a"] })).toThrow(RangeError);
+    expect(() => exercised({ hashes: ["a", "b"], baseHashes: ["a"] })).toThrow(RangeError);
   });
 });
 

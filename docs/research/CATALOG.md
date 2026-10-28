@@ -236,6 +236,21 @@ A strategy that does not do its own move on any board was not tested. Its verdic
 - The field `result.activation` keeps the old verdict and the old stage.
 - [The activation report](../LAYOUT-RECORDS.md#the-activation-report) tells how the screen gives the counts and the groups.
 
+#### The silent strategies of waves 1 to 3
+
+The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/highways/actions/runs/40628435755)) examined 289 strategies on 8 decision inputs. 17 strategies are silent. They go to a rebuild wave. The reasons come from the move counts and the code. A diagnostic run has not yet confirmed each reason.
+
+| Strategies | Reason |
+|---|---|
+| `hw:power`, `w3e:power-near`, `w3e:power-saved1` | The finder makes 0 power edges on each decision input. Equal neighbour sets are rare, and the near match with Jaccard 0.8 is too strict. The scope `collection` fires. |
+| `w3e:power+stretch` | The gate has no edge to cut, because its base `hw:power` is silent. |
+| `hw:corridors+breakeven`, `hw:corridors+stretch`, `w2a:corridors+breakeven-a0`, `w2a:corridors+stretch-1.1`, `w2a:corridors+stretch-1.5`, `w2a:corridors+stretch+breakeven` | A corridor holds edges of one signature. Their routes stay in the stretch budget and break even, so the gate removes no edge. The same gates fire on `shared-ways`. |
+| `hw:corridors+ids`, `w2a:shared-ways+ids` | The gate `ids` acts only between two edits. The static screen has no edits. This silence comes from the measurement, so `HWY-054` needs an edit screen. |
+| `w3b:lanes-corridors` | The lanes change nothing on the plan of `corridors`. |
+| `w2c:flow-field+stretch`, `w3f:consensus+stretch`, `w3f:link-communities+stretch`, `w3f:scale-space+stretch` | No edge of these finders is longer than 1.2 times its route alone, so the gate cuts no edge. |
+
+The screen also found 16 output groups. Each group holds strategies with the same output on each decision input. For example, `hw:cubu` and `w3d:cubu-fft` are one group, and `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` are one group.
+
 ### Wave 4: the other new ideas (WILD)
 
 Wave 4 holds the other ideas of the note of new ideas, in the build order of that note. It also holds `RULE-021`, `RULE-049` and `EDA-049`, because their riders are WILD ideas.

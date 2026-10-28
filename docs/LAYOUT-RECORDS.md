@@ -171,11 +171,12 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 ### The output hash
 
-`outputHash(value, { grid })` of `bench/screen/activation.ts` gives the first 16 hex characters of `sha256Hex(canonicalJson(value))`. It is a copy of the function of the contract 0.2.5, until that version is on npm.
+`outputHash(value, { grid })` of `bench/screen/activation.ts` gives the first 16 hex characters of `sha256Hex(canonicalJson(value))`. It is a copy of the function of the contract 0.2.5. The core has no run-time dependency, so it keeps the copy, and the test compares the two.
 
-- Without `grid`, the numbers stay exact. With `grid`, each number goes to the nearest step of the grid, and -0 becomes 0.
+- Each number goes to the nearest step of the grid, and -0 becomes 0. The default grid is `RECORD_EPS`, and the grid 0 keeps the exact numbers.
+- `NaN` and an infinite number cause a `RangeError` with the path of the number.
 - `canonicalJson` sorts the keys. Thus the order of the keys does not change the hash.
-- Each stage has its own form. The highways form of a router is `{ routes, levels, bundles, runs }`, with the routes sorted by edge. The grid is `RECORD_EPS`, so it agrees with `round3`.
+- Each stage has its own form. The highways form of a router is `{ routes, levels, bundles, runs }`, with the routes sorted by edge. The grid is `RECORD_EPS`, so the hash agrees with `round3`.
 - A curve record hashes the curves, and a group record hashes the tree and the result.
 
 ### The hard rules of the router
@@ -203,7 +204,9 @@ A record of a packer counts the breaks of `no-overlap`, `in-container`, `locked-
 
 ## The shared contract
 
-The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.3 from npm as a development dependency. The core has no run-time dependency, so it keeps its own copy of each shared constant and function, and the test compares the two. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+The package `@mark1russell7/layout-contract` holds the shared types of the two formats, the turn rule, the tolerances and the hard rules of the packer. The core has version 0.2.5 from npm as a development dependency. The core has no run-time dependency, so it keeps its own copy of each shared constant and function, and the test compares the two. The test `bench/screen/contract.test.ts` examines the fit of the types of `forms.ts` to the types of the contract. It also examines the `screen-v1` inputs and a record with the rules of the contract, and it compares `TOLERANCE` with `DEFAULT_TOLERANCE.through`.
+
+The test also compares the copy of `outputHash`, `outputGroups` and `exercised` in `activation.ts` with the contract. It uses the outputs of the built-in routers and seeded random values.
 
 The test also checks that [the floors](PROMOTION.md#the-floors) has no row of a `joint.*` or a `pack.*` measure. `JOINT_MEASURES` of the contract and `MEASURE_SPECS` of `packing` give these floors.
 

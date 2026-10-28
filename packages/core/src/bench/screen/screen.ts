@@ -292,7 +292,19 @@ function rowRules(step: ScreenStep, graph: Graph, row: CompareRow, again: Compar
  * This function gives the output hash of a row of `compareStep` (ACTIVATION), or `undefined` for a row without output.
  * A router hashes its result with `resultHash`. The step `group` hashes its tree and its result, and the step `curve` hashes its curves.
  */
-function rowHash(row: CompareRow): string | undefined {
+function rowHash(row: CompareRow, input: string): string | undefined {
+  try {
+    return rowHashOf(row);
+  } catch (e) {
+    // An output with NaN or an infinite number has no hash. The record then has no `outputHash`, and the log names the row.
+    if (!(e instanceof RangeError)) throw e;
+    console.warn(`screen: no output hash for ${row.strategy} on ${input}: ${e.message}`);
+    return undefined;
+  }
+}
+
+/** This function gives the output hash of a row. It throws a `RangeError` for an output with a number that is not finite. */
+function rowHashOf(row: CompareRow): string | undefined {
   if (row.step === "curve") return row.curves && row.edges ? curvesHash(row.edges, row.curves) : undefined;
   if (row.step === "group") return row.result || row.tree ? outputHash({ tree: row.tree, result: row.result }, { grid: RECORD_EPS }) : undefined;
   return row.result ? resultHash(row.result) : undefined;
@@ -420,7 +432,7 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
         const z = highwayEdits(graph, plan, own[row.strategy], edits, seed);
         Object.assign(values, { "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids });
       }
-      const output = rowHash(row);
+      const output = rowHash(row, input.id);
       const counts = row.result ? options.moves?.(row.strategy, graph) : undefined;
       const facts = { ...(output === undefined ? {} : { outputHash: output }), ...(counts === undefined ? {} : { trace: [{ id: head.step, measures: { ...counts } }] }) };
       const record = { ...head, measures: named(values), hard, tolerance: { through: TOLERANCE }, deterministic, ms: row.ms, ...tail, ...facts };

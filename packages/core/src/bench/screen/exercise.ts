@@ -18,8 +18,12 @@ const byEdge = <T extends { readonly edge: string }>(list: readonly T[]): T[] =>
  * Each number goes to the grid `RECORD_EPS`, as `round3` does.
  */
 export function resultHash(result: Result): string {
-  const form = { routes: byEdge(result.routes), levels: result.levels, bundles: result.bundles, runs: result.runs };
-  return outputHash(form, { grid: RECORD_EPS });
+  return outputHash(resultForm(result), { grid: RECORD_EPS });
+}
+
+/** This function gives the highways form of a result of a router: the value that `resultHash` hashes. */
+export function resultForm(result: Result): object {
+  return { routes: byEdge(result.routes), levels: result.levels, bundles: result.bundles, runs: result.runs };
 }
 
 /** This function gives the output hash of the curves of the step `curve`, in the order of the edge ids. */
@@ -236,7 +240,10 @@ export function activationReport(
       const m = recordMoves(r);
       for (const [k, v] of Object.entries(m)) moves[k] = (moves[k] ?? 0) + v;
       if (exercised({ moves: m })) moved.push(input);
-      if (base !== undefined && exercised({ hashes: [hashOf(strategy, input)], baseHashes: [hashOf(base, input)] })) differs.push(input);
+      const own = hashOf(strategy, input);
+      const theirs = base === undefined ? undefined : hashOf(base, input);
+      // A skipped run of the base has no hash. Then the input gives no evidence of a difference.
+      if (own !== undefined && theirs !== undefined && exercised({ hashes: [own], baseHashes: [theirs] })) differs.push(input);
     }
     const verdict = moved.length > 0 || differs.length > 0 ? "exercised" : "not-exercised";
     return { strategy, ...(base === undefined ? {} : { base }), inputs: ran, moved, differs, moves, verdict, group: groupOf.get(strategy) ?? strategy };

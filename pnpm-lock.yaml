@@ -200,7 +200,7 @@ importers:
         specifier: github:mark1russell7/cue
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/layout-contract':
-        specifier: ^0.2.3
+        specifier: ^0.2.5
         version: 0.2.5
       '@types/node':
         specifier: ^26.6.4
