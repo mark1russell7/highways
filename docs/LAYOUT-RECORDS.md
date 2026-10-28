@@ -453,6 +453,20 @@ gh workflow run screen.yml --ref main -f step=router -f module=packages/core/scr
 
 The seed 0 of each family is the fixture or the case board of the benchmark. The set does not change. A new board or a changed board gets a new set id.
 
+### The screen set `screen-v2`
+
+The set `screen-v2` (CORPUS-SEEDS) has the 6 families of `screen-v1`, each with the 10 seeds 0 to 9: 60 boards. Its files are in [`corpus/screen-v2`](../corpus/screen-v2). `SCREEN_V2` of `bench/screen/set.ts` makes them.
+
+- Each family keeps the seed rule of `screen-v1`. Thus the seeds 0 to 2 are the boards of `screen-v1`.
+- `hub-chain` and `many-groups` get the seed `3 + 1009 k` and `7 + 1009 k`. The seed changes only their random links.
+- The manifest declares 10 inputs of each family in `claims.declared`. `checkDeclared` of `layout-contract` checks it.
+- The split file [`corpus/splits/screen-v2.35795acefa7148c3.json`](../corpus/splits/screen-v2.35795acefa7148c3.json) (`corpus-split/1`) holds out the seeds 7 to 9 of each family.
+- [The corpus `screen-v2`](research/CATALOG.md#the-corpus-screen-v2-corpus-seeds) gives the hashes, the split and the numbers of the screen.
+
+```sh
+gh workflow run screen.yml --ref main -f step=router -f set=screen-v2 -f minutes=45
+```
+
 ### The screen set `exact-v1`
 
 The set `exact-v1` (MEAS2) has small boards with a known optimum of the exact model. Its files are in [`corpus/exact-v1`](../corpus/exact-v1). `EXACT_V1` of `bench/screen/exact-set.ts` makes them.

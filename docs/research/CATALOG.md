@@ -606,6 +606,105 @@ The notes also propose new measures that MEAS0 does not have. `meas3.json` gives
 | `P3` | Alignment: the count of distinct leg coordinates | `RULE-004`, `RULE-052` |
 | `P4` | Highways that change between two levels | `HWY-052`, `HWY-053` |
 
+## The corpus `screen-v2` (CORPUS-SEEDS)
+
+The screen set `screen-v1` has 14 boards in 6 families. `hub-chain` and `many-groups` have 1 seed, and the other families have 3. Thus a selector or a portfolio cannot hold out seeds of each family. `screen-v2` is a new corpus version with 10 seeds of each family. `screen-v1` does not change, so the records of the past stay comparable.
+
+### The seeds
+
+| Family | Seeds | Seed rule of the member `k` | Generator |
+|---|---:|---|---|
+| `tiny-uniform` | 10 | `1 + 1009 k` | `fixture` 1 |
+| `small-clustered` | 10 | `2 + 1009 k` | `fixture` 1 |
+| `dense-groups` | 10 | `3 + 1009 k` | `fixture` 1 |
+| `hub-chain` | 10 | `3 + 1009 k` | `case.hub-chain` 1 |
+| `many-groups` | 10 | `7 + 1009 k` | `case.many-groups` 1 |
+| `packed-grid` | 10 | `11 + 1009 k` | `case.packed-grid` 1 |
+
+- Each family keeps the seed rule of `screen-v1`. Thus the members 0 to 2 are the boards of `screen-v1`, and the member 0 of `hub-chain` and `many-groups` is their board.
+- `hubChainBoard` and `manyGroupsBoard` take the option `seed`. The seed changes only the random links. The 3 rows of 32 cards and the 32 groups of 4 cards stay, so each board keeps its hard case.
+- The default seed (3 and 7) gives the old board. Thus the generator versions stay at 1.
+- The files are in [`corpus/screen-v2`](../../corpus/screen-v2). `pnpm screen:inputs --set screen-v2` writes them.
+
+### The hashes
+
+- The hash of an input includes its id and its set. Thus the test gives each member 0 to 2 of `screen-v2` the head of `screen-v1`. Then the 14 hashes are equal to the hashes of `screen-v1`.
+- The corpus hash (`corpusHashOf` of `layout-contract` 0.2.9) of `screen-v1` is `e5fe56d1069d2a18`. The corpus hash of `screen-v2` is `35795acefa7148c3`.
+- A test pins the shared value of the contract. The corpus `t` with the inputs `t/a/s1` to `t/a/s3` and the hashes `h1` to `h3` gives `85baebbf77017041`.
+- The manifest declares 10 inputs of each family in `claims.declared`, with `minCount` 10. `checkDeclared` of the contract passes on it.
+
+### The split
+
+The split file is [`corpus/splits/screen-v2.35795acefa7148c3.json`](../../corpus/splits/screen-v2.35795acefa7148c3.json), of the form `corpus-split/1`. `checkSplit` of the contract passes on it.
+
+- The split `default` has one fold. It holds out the members 7 to 9 of each family (18 inputs) and trains on the members 0 to 6 (42 inputs).
+- The split `by-member` has 10 folds. The fold `k` holds out the member `k` of each family.
+- The seeds of a split file are the seeds of the specs of the manifest. Thus a fold lists the generator seeds of its members.
+- Each base seed is below 1009, so two different members do not share a seed.
+
+The members 0 to 2 are the boards of `screen-v1`. The past verdicts and the portfolio sets saw them, so they stay in the training part. The members 7 to 9 are boards that no screen saw before. Thus the held-out part is free of the choices of the past.
+
+### The numbers
+
+The runs are the screen of `screen-v1` of the pull request ([40738632085](https://github.com/mark1russell7/highways/actions/runs/40738632085)) and the screens of `screen-v2`. The step `router` started in [40738231081](https://github.com/mark1russell7/highways/actions/runs/40738231081), and the step `highway` in [40738642229](https://github.com/mark1russell7/highways/actions/runs/40738642229). Each run started one time on `ubuntu-latest`.
+
+| Step | Records `screen-v1` | Time `screen-v1` | Records `screen-v2` | Time `screen-v2` | Time ratio |
+|---|---:|---:|---:|---:|---:|
+| `router` | 126 | 9.7 s | 540 | 36.5 s | 3.76 |
+| `highway` | 784 | 158.2 s | 3360 | 644.9 s | 4.08 |
+
+- The records of the members 0 to 2 of `screen-v2` are equal to the records of `screen-v1`. This is true for 126 of 126 records of the step `router` and 784 of 784 of the step `highway`.
+- The step `router` keeps its verdicts. Its Pareto front gets `corners-smooth`, and no strategy leaves it. No router changes the sign of its B1 against `shared`.
+- The step `highway` has no front on `screen-v2`. On `screen-v1`, `territories` is the only strategy without a break over the floor, so it is the front.
+- On `packed-grid/s6`, `territories` has 88 pass-throughs, and `ridges` has 85. Thus `territories` goes from keep to drop.
+- Each strategy of the step `highway` has a break over the floor on `screen-v2`. All of these breaks are pass-throughs on `packed-grid`, where the boxes touch.
+
+#### The mean B1 against `shared`
+
+The mean B1 over the inputs gives each input the same weight. `screen-v1` has 1 seed of `hub-chain` and of `many-groups` in 14 inputs, and `screen-v2` has 10 of each in 60. Thus these two families have more weight on `screen-v2`. The table also gives the mean of the family means, which gives each family the same weight.
+
+| Strategy of the step `highway` | B1 − B1 of `shared`, mean of the inputs, `screen-v1` | `screen-v2` | Mean of the family means, `screen-v1` | `screen-v2` |
+|---|---:|---:|---:|---:|
+| `corridors` | −0.036 | 0.021 | 0.032 | 0.021 |
+| `wspd` | −0.009 | 0.060 | 0.068 | 0.060 |
+| `spiral` | −0.010 | 0.008 | 0.005 | 0.008 |
+| `fdeb` | −0.016 | 0.006 | −0.007 | 0.006 |
+| `sbeb` | −0.017 | 0.018 | 0.012 | 0.018 |
+| `areas` | −0.013 | 0.014 | 0.005 | 0.014 |
+| `consensus` | −0.058 | −0.014 | 0.002 | −0.014 |
+
+- On the mean of the inputs, 10 highway strategies change sign. These are the first 6 of the table and `corridors+breakeven`, `corridors+stretch`, `corridors+hysteresis` and `corridors+ids`.
+- On the mean of the family means, only `fdeb` (to above `shared`) and `consensus` (to below `shared`) change sign.
+- Thus most changes come from the weight of the families, not from the new seeds.
+- The B1 of `corridors` on `hub-chain` goes from 0.467 (1 seed) to 0.387 ± 0.054 (10 seeds). The first board of `hub-chain` is a good board for the corridors.
+
+#### The spread over the seeds of `shared`
+
+| Family | B1 of `shared`, `screen-v1`: mean ± sd (seeds) | `screen-v2`: mean ± sd (seeds) | Ratio of the sd |
+|---|---|---|---:|
+| `tiny-uniform` | 0.017 ± 0.021 (3) | 0.018 ± 0.021 (10) | 1.00 |
+| `small-clustered` | 0.231 ± 0.042 (3) | 0.225 ± 0.026 (10) | 0.62 |
+| `dense-groups` | 0.305 ± 0.007 (3) | 0.323 ± 0.045 (10) | 6.43 |
+| `hub-chain` | 0.078 (1) | 0.041 ± 0.019 (10) | no sd on 1 seed |
+| `many-groups` | 0.083 (1) | 0.083 ± 0.024 (10) | no sd on 1 seed |
+| `packed-grid` | 0 (3) | 0 (10) | no B1 |
+
+- The 3 seeds of `dense-groups` show 1/6 of the spread of its 10 seeds.
+- The B1 of `shared` on `hub-chain` is 0.078 on its first board, and 0.041 on the mean of 10 boards. Thus a choice on 1 seed of a case board is not safe.
+
+#### The prediction
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. The members 0 to 2 give the input hashes of `screen-v1`. The digests and the records do not change. | high | Met: 14 of 14 hashes and 910 of 910 records. The digest tests pass. |
+| 2. `checkDeclared`, `checkSplit` and the pinned hash pass with the contract 0.2.9. | high | Met. |
+| 3. Seeded `hub-chain` and `many-groups` keep the board of the seed 0 without a new generator version. | 0.5 | Met. |
+| 4. The router screen of `screen-v2` takes 4 times or less the time of `screen-v1`. | medium | Met: 3.76 times (36.5 s against 9.7 s). |
+| 5. The verdict of 2 or more highway strategies changes sign. | 0.4 | Partly met. The front verdict changes for 1 strategy (`territories`). The sign of B1 against `shared` changes for 2 strategies on the family means. |
+| 6. In 3 or more families, the spread of the main measure of `shared` over 10 seeds is 2 or more times its spread over 3 seeds. | 0.35 | Partly met: 1 of the 4 families with 3 seeds (`dense-groups`, 6.43). `hub-chain` and `many-groups` had 1 seed and no spread. |
+
+This change sets no verdict and no portfolio set. SELECT can use the split `default`: it fits on the members 0 to 6 and gets its score on the members 7 to 9.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
