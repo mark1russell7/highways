@@ -4,7 +4,7 @@ This note is the result of the item ROUTE-SCALE of the [roadmap](../ROADMAP.md).
 
 ## The dense board (ROUTE-SCALE)
 
-The joint bench of layout-contract routes a board of 1000 boxes and 4000 edges. One route of `shared` took about 318 s, and the cell of `shared-all` took 27 min. This item finds the cause and removes it. Each byte of each route stays the same.
+The joint bench of layout-contract routes a board of 1000 boxes and 4000 edges. One route of `shared` took approximately 318 s, and the cell of `shared-all` took 27 min. This item finds the cause and removes it. Each byte of each route stays the same.
 
 - The folder `packages/core/scripts/data/scale` keeps the board. Its `README.md` tells where the board comes from.
 - The script `packages/core/scripts/scale.ts` routes the board with one router. It writes the time of each route and of each step of the bench after the route.
@@ -38,7 +38,7 @@ The CPU of the runner is not the same in each cell, so compare the large changes
 
 | Router | Commit | Cold | Warm | `checkProperties` | `measureQuality` | `exactStretches.use` |
 |---|---|---:|---:|---:|---:|---:|
-| `shared` | `main` | about 318 000 | | | | |
+| `shared` | `main` | approximately 318 000 | | | | |
 | `shared` | `18095dc`, the signatures | 27 966 | 27 956 | 6 685 | 3 710 | 8 582 |
 | `shared` | `e387f66`, the lane order | 18 392 | 18 445 | 4 166 | 2 847 | 7 791 |
 | `shared-all` | `18095dc` | 41 945 | 40 196 | 8 891 | 3 180 | 8 534 |
@@ -74,8 +74,8 @@ These hot spots stay. Each fix is larger than this item, and each fix must keep 
 
 | Function | Share | Cause | Proposed fix |
 |---|---|---|---|
-| `partBefore` and `partAfter` of `lane-order.ts` | about 53% of the self time of a route of `shared` | The merge sort compares each pair of lanes again, and each compare walks the common points past the run. | Give each lane of a run its parting points one time, with a trie of the points past each end. The compare then reads the trie. |
-| `mergeSort` of `lane-order.ts` | about 7% | The sort makes a new list at each level. | Sort in one buffer. The pairs to `compare` must stay the same, so the order stays the same. |
-| `indexOf` of `segments.ts` | about 5% | `orderLanes` looks for the run in each route with a scan, and again in the reverse. | Give `orderLanes` the place of the run in each route, from the walk of `shared`. |
-| `distancesTo` of `bench/exact/index.ts` | about 25% of the self time of the steps of `shared`, before the guide cache | Each end point gets one search to all its partners. The guide goes to the nearest partner, so the search opens most of the network. | Use a guide with landmarks (ALT) for a tighter bound. Two paths of the same length can give other last digits, so compare the bits of each distance. |
-| `measureQuality` | about 3 s on `shared` | The grid query of each segment walks many cells on a dense board. | Measure the profile of the grid query first. |
+| `partBefore` and `partAfter` of `lane-order.ts` | approximately 53% of the self time of a route of `shared` | The merge sort compares each pair of lanes again, and each compare walks the common points past the run. | Give each lane of a run its parting points one time, with a trie of the points past each end. The compare then reads the trie. |
+| `mergeSort` of `lane-order.ts` | approximately 7% | The sort makes a new list at each level. | Sort in one buffer. The pairs to `compare` must stay the same, so the order stays the same. |
+| `indexOf` of `segments.ts` | approximately 5% | `orderLanes` looks for the run in each route with a scan, and again in the reverse. | Give `orderLanes` the place of the run in each route, from the walk of `shared`. |
+| `distancesTo` of `bench/exact/index.ts` | approximately 25% of the self time of the steps of `shared`, before the guide cache | Each end point gets one search to all its partners. The guide goes to the nearest partner, so the search opens most of the network. | Use a guide with landmarks (ALT) for a tighter bound. Two paths of the same length can give other last digits, so compare the bits of each distance. |
+| `measureQuality` | approximately 3 s on `shared` | The grid query of each segment walks many cells on a dense board. | Measure the profile of the grid query first. |

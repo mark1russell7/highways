@@ -104,7 +104,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | LANE-ORDER | [The lane order](research/XPLAT.md#the-lane-order-lane-order). `orderLanes` and `laneOrderOfRun` sort with a merge sort of the package, so node 24 and node 26 give the same lane order. 5 of 27 digests change. `B5` goes from 295 to 300 on the routers and from 6559 to 6552 on the highways. LANE-STRETCH is to remove the cycles. | 2026-10-28 | #130 |
 | REL14 | Version 0.8.0 on npm. MINOR: the default lane order of shared runs changes, so each engine gives the same order (#130). No route point moves. [The lane order](research/XPLAT.md#the-lane-order-lane-order) gives the changes. | 2026-10-28 | #131 |
 | CI-AUTO | A pull request that changes the core source starts the `xplat` matrix and the screens of the routers and of the highways by itself. Thus it needs no manual dispatch. | 2026-10-28 | #134 |
-| ROUTE-SCALE | [The dense board](research/SCALE.md#the-dense-board-route-scale). A route of `shared` on 1000 boxes and 4000 edges goes from about 318 s to about 18 s. Each sorted list of link users gets a number one time, and the lane order skips the distance of a point to itself. No output byte changes. | 2026-10-28 | #132 |
+| ROUTE-SCALE | [The dense board](research/SCALE.md#the-dense-board-route-scale). A route of `shared` on 1000 boxes and 4000 edges goes from approximately 318 s to approximately 18 s. Each sorted list of link users gets a number one time, and the lane order skips the distance of a point to itself. No output byte changes. | 2026-10-28 | #132 |
 
 ## Calibration
 
