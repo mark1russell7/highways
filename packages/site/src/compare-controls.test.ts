@@ -42,6 +42,9 @@ const WITH: Readonly<Record<string, Readonly<Record<string, number | boolean | s
   // The lane width acts only with the channel capacity (HWY-016).
   "shared.laneWidth": { capacity: 1 },
   "shared-all.laneWidth": { capacity: 1 },
+  // The passes of the sifting act only with the stretch order `sifting` (LANE-STRETCH).
+  "shared.siftPasses": { stretchOrder: "sifting" },
+  "shared-all.siftPasses": { stretchOrder: "sifting" },
   // The exponent of the trunks acts only with the Gilbert split (EDA-030), and the balancing factor only with the fan `tree` (NAT-017).
   "trunks.alpha": { splitAt: "gilbert" },
   "trunks.bf": { fan: "tree" },
