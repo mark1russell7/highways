@@ -52,7 +52,12 @@ function nearestOfSegments(a: Point, b: Point, c: Point, d: Point): { s: number;
   const uy = b.y - a.y;
   const vx = d.x - c.x;
   const vy = d.y - c.y;
-  const at = (s: number, t: number): number => Math.hypot(a.x + s * ux - (c.x + t * vx), a.y + s * uy - (c.y + t * vy));
+  const at = (s: number, t: number): number => {
+    const dx = a.x + s * ux - (c.x + t * vx);
+    const dy = a.y + s * uy - (c.y + t * vy);
+    // `Math.sqrt` is exact on each platform. `Math.hypot` is not.
+    return Math.sqrt(dx * dx + dy * dy);
+  };
   const clamp = (v: number): number => Math.min(1, Math.max(0, v));
   const uu = ux * ux + uy * uy;
   const vv = vx * vx + vy * vy;

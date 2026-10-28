@@ -77,9 +77,18 @@ export function searchScore(graph: Graph, routes: readonly Route[], first: reado
 }
 
 /**
+ * The function `acceptance` gives the chance to keep a worse plan, for a loss `y` of 0 or more on the scale of the temperature.
+ * It is `1 / (1 + y + y² / 2)`, near `exp(-y)` for a small loss.
+ * It uses only exact arithmetic, so each platform keeps the same plans.
+ */
+function acceptance(y: number): number {
+  return 1 / (1 + y + (y * y) / 2);
+}
+
+/**
  * This function gives the highways of a local search over the set of highways (HWY-059). The search starts at the plan of `from`.
  * Each move adds a highway of the pool, drops a highway, moves one edge to another highway, or moves one point of a spine.
- * The annealing keeps a worse plan with the chance `exp(delta / T)`. The best plan that the search measures is the result.
+ * The annealing keeps a worse plan with the chance `acceptance(-delta / T)`. The best plan that the search measures is the result.
  *
  * The score reads only this graph and its routes. Thus the search does not fit to the inputs of a screen.
  */
@@ -153,7 +162,7 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
     n++;
     const score = scoreOf(plan);
     const delta = score - currentScore;
-    if (delta >= 0 || (temperature > 0 && next() < Math.exp(delta / temperature))) [current, currentScore] = [plan, score];
+    if (delta >= 0 || (temperature > 0 && next() < acceptance(-delta / temperature))) [current, currentScore] = [plan, score];
     if (score > bestScore + 1e-12) [best, bestScore] = [plan, score];
     if (n % SWEEP === 0) temperature *= 0.95;
   }
