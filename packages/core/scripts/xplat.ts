@@ -13,6 +13,7 @@
 //
 // The files in `--out`:
 // - `meta.json`: the system, the node version, the V8 version and the version of the core.
+// - `sort.json`: the sort probe (`sortProbe`). It shows whether the engine gives the same pairs to the compare function of `Array.prototype.sort`.
 // - `routes.jsonl`: one line for each input and router, with the hashes, the count of the Math calls and the hashes of the joint bench.
 // - `routes/<input>.<router>.txt.gz`: the exact result. Each line is `<key>\t<canonical JSON>`, with the numbers of `JSON.stringify` (each number round trips).
 //   The keys are `route <edge>` in the order of the edges, then `levels`, `bundles` and `runs`.
@@ -178,6 +179,42 @@ function sha16(text: string): string {
   return createHash("sha256").update(text).digest("hex").slice(0, 16);
 }
 
+/** The lengths of the arrays of the sort probe. */
+const PROBE_LENGTHS = [2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 20, 24, 32, 48, 64, 100] as const;
+
+/**
+ * This function is the sort probe. For each length of `PROBE_LENGTHS`, it sorts a fixed shuffle of the numbers from 0 to n - 1 with `Array.prototype.sort`.
+ * - `pairs` is the hash of the pairs that the engine gives to the compare function, in turn. The result of the sort is the same on each engine.
+ * - `cycle` is the order that a compare function without a total order gives: a cycle of 3 classes, so that 0 < 1, 1 < 2 and 2 < 0.
+ * When two engines have different `pairs` and different `cycle` orders, the result of a sort with such a compare function depends on the engine.
+ */
+function sortProbe(): Record<string, { readonly pairs: string; readonly cycle: string }> {
+  const out: Record<string, { readonly pairs: string; readonly cycle: string }> = {};
+  for (const n of PROBE_LENGTHS) {
+    let seed = 0x2545f491 ^ n;
+    const next = (): number => {
+      seed = (Math.imul(seed, 1103515245) + 12345) >>> 0;
+      return seed;
+    };
+    const a = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = next() % (i + 1);
+      [a[i], a[j]] = [a[j]!, a[i]!];
+    }
+    const pairs: number[] = [];
+    [...a].sort((x, y) => {
+      pairs.push(x, y);
+      return x - y;
+    });
+    const cycle = [...a].sort((x, y) => {
+      const d = (((x % 3) - (y % 3)) % 3 + 3) % 3;
+      return d === 0 ? x - y : d === 1 ? 1 : -1;
+    });
+    out[String(n)] = { pairs: sha16(pairs.join(",")), cycle: cycle.join(",") };
+  }
+  return out;
+}
+
 /** This function gives the input files under the folders: each `.json` or `.json.gz` file, one for each name. */
 function inputFiles(dirs: readonly string[]): Map<string, string> {
   const byName = new Map<string, string>();
@@ -247,6 +284,7 @@ async function main(): Promise<void> {
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
   const meta = { os: platform(), arch: arch(), node: process.version, v8: process.versions.v8, highways: pkg.version, near: targets !== undefined };
   writeFileSync(join(out, "meta.json"), JSON.stringify(meta, null, 2) + "\n");
+  writeFileSync(join(out, "sort.json"), JSON.stringify(sortProbe(), null, 2) + "\n");
   const lines = join(out, targets === undefined ? "routes.jsonl" : "near.jsonl");
   writeFileSync(lines, "");
   console.log(`xplat: ${meta.os} ${meta.arch} node ${meta.node} V8 ${meta.v8}, highways ${meta.highways}.`);

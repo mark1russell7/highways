@@ -197,6 +197,8 @@ interface RouteDiff {
   readonly maxUlps: string;
   readonly first: { readonly line: string; readonly path: string; readonly ref: unknown; readonly cell: unknown; readonly ulps: string | null } | undefined;
   readonly orders: readonly string[];
+  /** For each line that is a list (the levels, the bundles, the runs): the count of its items that differ, and its length. */
+  readonly items: readonly string[];
   readonly verdict: "same" | "ulps" | "decision";
 }
 
@@ -217,13 +219,21 @@ function diffRoutes(key: string, ref: Cell, cell: Cell): RouteDiff | undefined {
   let maxUlps = 0n;
   let first: RouteDiff["first"];
   const orders: string[] = [];
+  const items: string[] = [];
   for (const k of keys) {
     const x = a.get(k);
     const y = b.get(k);
     if (x === y) continue;
     differ++;
     const w: Walk = { first: undefined, shape: false, numbers: 0, maxAbs: 0, maxUlps: 0n };
-    walk(x === undefined ? undefined : JSON.parse(x), y === undefined ? undefined : JSON.parse(y), "", w);
+    const xv: unknown = x === undefined ? undefined : JSON.parse(x);
+    const yv: unknown = y === undefined ? undefined : JSON.parse(y);
+    walk(xv, yv, "", w);
+    if (Array.isArray(xv) && Array.isArray(yv)) {
+      let n = 0;
+      for (let i = 0; i < Math.max(xv.length, yv.length); i++) if (JSON.stringify(xv[i]) !== JSON.stringify(yv[i])) n++;
+      items.push(`${k}: ${n} of ${xv.length}`);
+    }
     if (x === undefined || y === undefined) w.shape = true;
     if (w.shape) shape++;
     else if (w.maxAbs > FAR) far++;
@@ -237,7 +247,7 @@ function diffRoutes(key: string, ref: Cell, cell: Cell): RouteDiff | undefined {
     }
   }
   const verdict = differ === 0 ? "same" : shape > 0 || far > 0 ? "decision" : "ulps";
-  return { key, cell: cell.id, lines: keys.length, differ, shape, far, near, maxAbs, maxUlps: maxUlps.toString(), first, orders, verdict };
+  return { key, cell: cell.id, lines: keys.length, differ, shape, far, near, maxAbs, maxUlps: maxUlps.toString(), first, orders, items, verdict };
 }
 
 /** This function gives the first chunk of the call logs of two cells that differs, or nothing when the logs are equal. */
@@ -303,6 +313,18 @@ function firstCall(key: string, refDir: string, cell: string, cellDir: string): 
     };
   }
   return undefined;
+}
+
+/** This function gives a letter for each value: the same letter for the same value, and "-" for a missing value. */
+function letters(values: readonly (string | undefined)[]): string {
+  const seen = new Map<string, string>();
+  return values
+    .map((v) => {
+      if (v === undefined) return "-";
+      if (!seen.has(v)) seen.set(v, String.fromCharCode(65 + seen.size));
+      return seen.get(v)!;
+    })
+    .join("");
 }
 
 /** This function gives the text of a number with all its digits. */
@@ -400,6 +422,48 @@ function main(): void {
   }
   md.push("");
 
+  // The agreement of each pair of cells: the route hashes, the exact results and the call logs.
+  md.push("| pair of cells | equal route hashes | equal exact results | equal call logs |", "|---|---|---|---|");
+  for (let i = 0; i < cells.length; i++)
+    for (let j = i + 1; j < cells.length; j++) {
+      const x = cells[i]!;
+      const y = cells[j]!;
+      let hashes = 0;
+      let exact = 0;
+      let logs = 0;
+      let both = 0;
+      for (const key of keys) {
+        const r = x.rows.get(key);
+        const q = y.rows.get(key);
+        if (r === undefined || q === undefined) continue;
+        both++;
+        if (r.hash === q.hash) hashes++;
+        if (r.exact === q.exact) exact++;
+        const stem = `${key.replace("/", ".")}.txt`;
+        const lx = readText(join(x.dir, "calls", stem));
+        if (lx !== undefined && lx === readText(join(y.dir, "calls", stem))) logs++;
+      }
+      md.push(`| ${x.id} and ${y.id} | ${hashes} of ${both} | ${exact} of ${both} | ${logs} of ${both} |`);
+    }
+  md.push("");
+
+  // The sort probe.
+  const probes = cells.map((c) => {
+    const text = readText(join(c.dir, "sort.json"));
+    return text === undefined ? undefined : (JSON.parse(text) as Record<string, { readonly pairs: string; readonly cycle: string }>);
+  });
+  const lengths = [...new Set(probes.flatMap((p) => Object.keys(p ?? {})))].sort((a, b) => Number(a) - Number(b));
+  if (lengths.length > 0) {
+    md.push("## The sort probe", "");
+    md.push(
+      "Each cell sorts a fixed shuffle of n numbers. `pairs` groups the cells by the pairs that the engine gives to the compare function. `cycle` groups them by the result of a compare function without a total order.",
+      "",
+    );
+    md.push(`| n | pairs: ${cells.map((c) => c.id).join(", ")} | cycle: ${cells.map((c) => c.id).join(", ")} |`, "|---|---|---|");
+    for (const n of lengths) md.push(`| ${n} | ${letters(probes.map((p) => p?.[n]?.pairs))} | ${letters(probes.map((p) => p?.[n]?.cycle))} |`);
+    md.push("");
+  }
+
   // The first difference of each route.
   const routeDiffs: RouteDiff[] = [];
   for (const key of keys)
@@ -418,13 +482,13 @@ function main(): void {
       `A line is a route of one edge, or the levels, the bundles or the runs. \`shape\` counts the lines with a different length, key or text (for example a different lane order). \`far\` counts the lines with a move above ${FAR}. \`ulps\` counts the lines with smaller moves only.`,
       "",
     );
-    md.push("| input / router | cell | lines that differ | shape | far | ulps | max move | max ulps | first line | first value: reference, cell (ulps) | verdict |");
-    md.push("|---|---|---|---|---|---|---|---|---|---|---|");
+    md.push("| input / router | cell | lines that differ | shape | far | ulps | max move | max ulps | items that differ | first line | first value: reference, cell (ulps) | verdict |");
+    md.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
     for (const d of routeDiffs) {
       const f = d.first;
       const value = f === undefined ? "" : `\`${f.path}\`: ${num(f.ref)}, ${num(f.cell)}${f.ulps === null ? "" : ` (${f.ulps})`}`;
       md.push(
-        `| ${d.key} | ${d.cell} | ${d.differ} of ${d.lines} | ${d.shape} | ${d.far} | ${d.near} | ${d.maxAbs.toPrecision(3)} | ${d.maxUlps} | ${f?.line ?? ""} | ${value} | ${d.verdict}${d.orders.length > 0 ? ` (${d.orders.join(", ")})` : ""} |`,
+        `| ${d.key} | ${d.cell} | ${d.differ} of ${d.lines} | ${d.shape} | ${d.far} | ${d.near} | ${d.maxAbs.toPrecision(3)} | ${d.maxUlps} | ${d.items.join("<br>")} | ${f?.line ?? ""} | ${value} | ${d.verdict}${d.orders.length > 0 ? ` (${d.orders.join(", ")})` : ""} |`,
       );
     }
     md.push("");
@@ -494,7 +558,7 @@ function main(): void {
   const jsonFile = opt("--json");
   if (jsonFile !== undefined) {
     const cellsOut = cells.map((c) => ({ id: c.id, meta: c.meta, rows: [...c.rows.values()] }));
-    writeFileSync(jsonFile, JSON.stringify({ ref: ref.id, cells: cellsOut, groups: groupsOf, repeatAll, routeDiffs, chunkDiffs, callDiffs }, null, 2) + "\n");
+    writeFileSync(jsonFile, JSON.stringify({ ref: ref.id, cells: cellsOut, groups: groupsOf, repeatAll, routeDiffs, chunkDiffs, callDiffs, probes }, null, 2) + "\n");
   }
 }
 
