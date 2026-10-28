@@ -35,8 +35,8 @@ export interface PortfolioFacts {
 /**
  * This function gives the count of the breaks of the guard of an output against the base, with the rule `rule` and the cap `cap`.
  * The count is the sum of three parts:
- * - for each hard rule, the breaks above the breaks of the base;
- * - the edges with a stretch above the cap;
+ * - for each hard rule, the breaks above the breaks of the base
+ * - the edges with a stretch above the cap
  * - under the rule `collection`, the mixed segments.
  * An output passes the guard when the count is 0.
  */

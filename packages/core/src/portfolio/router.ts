@@ -72,7 +72,7 @@ export function portfolioName(options: PortfolioRouterOptions = {}): string {
  */
 export function portfolioMembers(nodes: number, options: PortfolioRouterOptions = {}): string[] {
   const { rule, cap, k } = checked(options);
-  const key = `${rule}|${cap}|${portfolioBand(nodes).id}`;
+  const key: `${PortfolioRule}|${PortfolioCap}|${string}` = `${rule}|${cap}|${portfolioBand(nodes).id}`;
   if (k === undefined) return [PORTFOLIO_BASE_MEMBER, ...(PORTFOLIO_FIT[key] ?? []).filter(([s, limit]) => s !== PORTFOLIO_BASE_MEMBER && nodes <= limit).map(([s]) => s)];
   const set = PORTFOLIO_SETS[key] ?? [];
   return [PORTFOLIO_BASE_MEMBER, ...set.filter((s) => s !== PORTFOLIO_BASE_MEMBER).slice(0, k)];
