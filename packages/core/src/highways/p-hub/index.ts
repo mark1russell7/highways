@@ -101,18 +101,35 @@ export function pMedian(points: readonly Point[], candidates: readonly Point[], 
     });
   }
   // The swaps of Teitz and Bart: one chosen candidate changes for one other candidate while the sum falls.
-  const sumOf = (list: readonly number[]): number => points.reduce((s, q) => s + Math.min(...list.map((c) => dist(q, candidates[c]!))), 0);
-  let sum = sumOf(chosen);
+  // The nearest and the second nearest chosen candidate of each point give the sum after a swap in one pass over the points.
+  const d = candidates.map((c) => points.map((q) => dist(q, c)));
+  let first: number[] = [];
+  let second: number[] = [];
+  const nearTwo = (): void => {
+    first = points.map(() => -1);
+    second = points.map(() => -1);
+    points.forEach((_, p) => {
+      chosen.forEach((_, j) => {
+        const v = d[chosen[j]!]![p]!;
+        if (first[p]! < 0 || v < d[chosen[first[p]!]!]![p]!) [second[p], first[p]] = [first[p]!, j];
+        else if (second[p]! < 0 || v < d[chosen[second[p]!]!]![p]!) second[p] = j;
+      });
+    });
+  };
+  const at = (j: number, p: number): number => (j < 0 ? Infinity : d[chosen[j]!]![p]!);
+  nearTwo();
+  let sum = points.reduce((s, _, p) => s + at(first[p]!, p), 0);
   for (let pass = 0; pass < 4; pass++) {
     let better = false;
     for (let i = 0; i < chosen.length; i++)
       for (let c = 0; c < candidates.length; c++) {
         if (chosen.includes(c)) continue;
-        const next = chosen.map((x, j) => (j === i ? c : x));
-        const v = sumOf(next);
+        let v = 0;
+        for (let p = 0; p < points.length; p++) v += Math.min(d[c]![p]!, first[p] === i ? at(second[p]!, p) : at(first[p]!, p));
         if (v < sum - 1e-9) {
           [sum, better] = [v, true];
           chosen[i] = c;
+          nearTwo();
         }
       }
     if (!better) break;
