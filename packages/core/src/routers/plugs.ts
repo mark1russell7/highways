@@ -1,6 +1,6 @@
 import { inflectionCurve } from "../curves.ts";
 import { center } from "../geom.ts";
-import { nodeIndex, type Graph, type Result, type Route, type Router } from "../model.ts";
+import { nodeIndex, resolvePorts, type Graph, type Result, type Route, type Router } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 
 /**
@@ -9,7 +9,8 @@ import { placePlug } from "../plugs.ts";
  */
 export const plugsRouter: Router = {
   name: "plugs",
-  route(graph: Graph): Result {
+  route(input: Graph): Result {
+    const graph = resolvePorts(input);
     const byId = nodeIndex(graph);
     const routes: Route[] = [];
     for (const e of graph.edges) {

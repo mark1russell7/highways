@@ -1,5 +1,5 @@
 import { center, type Point } from "../geom.ts";
-import { nodeIndex, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
+import { nodeIndex, fixedPortPoint, resolvePorts, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { justifyPlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
@@ -42,7 +42,8 @@ export interface CornersOptions extends WayOptions {
 export function cornersRouter(options: CornersOptions): Router {
   const router: Router = {
     name: options.name,
-    route(graph: Graph): Result {
+    route(input: Graph): Result {
+      const graph = resolvePorts(input);
       const byId = nodeIndex(graph);
       const ways = new WayFinder(graph.nodes, options);
       const routes: Route[] = [];
@@ -104,8 +105,7 @@ function spacePlugs(ends: [Edge, Node, Node, Plug, Plug][], gap: number): void {
       [e.source, s, ps, pt, 3],
       [e.target, t, pt, ps, 4],
     ] as const) {
-      const port = end.port === undefined ? undefined : node.ports?.find((p) => p.id === end.port);
-      if (port?.at !== undefined) continue;
+      if (fixedPortPoint(node, end) !== undefined) continue;
       const key = JSON.stringify([node.id, plug.normal.x, plug.normal.y]);
       let side = sides.get(key);
       if (!side) sides.set(key, (side = { node, normal: plug.normal, items: [] }));

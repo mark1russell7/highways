@@ -26,6 +26,29 @@ const result = cornersRouter({ name: "corners" }).route(graph);
 // Each route is a polyline: result.routes[0].points
 ```
 
+### Plugs
+
+A node can have `ports`, and an end of an edge can name one of them in `port`. Each plug has one of these forms:
+
+| Form | The place of the plug |
+|---|---|
+| `{ id }` | The router picks the side and the point. |
+| `{ id, side }` | The router picks the point on that side. |
+| `{ id, at }` | The plug is fixed at `at`, relative to the top-left corner of the box. |
+| `{ id, side, along }` | The plug is fixed at the side start plus `along` times the side length. |
+
+- `along` goes from 0 to 1. The start of `north` and `south` is the left end. The start of `east` and `west` is the top end.
+- When the box gets taller or wider, a plug with `along` keeps its fraction of the side.
+- `resolvePorts(graph)` gives each plug with `along` a fixed `at`. Each router calls it at the start of `route`.
+- The arithmetic is the arithmetic of `portPoint` of `@mark1russell7/layout-contract`. `portOffset` calls it.
+- `resolvePorts` throws a `RangeError` for a bad `along`. A bad value is not finite or is outside 0 to 1. A plug with `along` also needs a `side` and has no `at`.
+- In an input file, such a plug has `side` and `along`, with no `x` and no `y`.
+
+```ts
+const node = { id: "a", box: { x: 0, y: 0, w: 80, h: 40 }, ports: [{ id: "out", side: "east", along: 0.25 }] };
+// The plug "out" is at (80, 10). With h = 120, it is at (80, 30).
+```
+
 ## Curve types
 
 A router gives polylines. The curve layer turns a polyline into a curve of a type. The polyline can come from any router, from a lane of `laneRoutes` or from a link of a zoom level.

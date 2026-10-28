@@ -2,7 +2,7 @@ import { BACKTRACK_MIN, goesOutAndBack } from "../bench/links.ts";
 import { center, dist, pointSegmentDistance, polylineLength, type Point } from "../geom.ts";
 import { LEVEL_LINK_DEFAULTS, type LevelLinkOptions } from "../levels.ts";
 import { depthLevels, type DepthLevelOptions } from "../levels/depths/index.ts";
-import { nodeIndex, type Graph, type Level, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, resolvePorts, type Graph, type Level, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 import { allSections, buildSections, checkSections, SECTION_DEFAULTS, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
@@ -91,7 +91,8 @@ const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || d
 export function sectionsRouter(options: SectionsOptions): Router {
   const router: Router = {
     name: options.name,
-    route(graph: Graph): Result {
+    route(input: Graph): Result {
+      const graph = resolvePorts(input);
       const stretch = options.stretch ?? SECTIONS_DEFAULTS.stretch;
       const stretchPad = options.stretchPad ?? SECTIONS_DEFAULTS.stretchPad;
       const hubSlack = options.hubSlack ?? SECTIONS_DEFAULTS.hubSlack;
