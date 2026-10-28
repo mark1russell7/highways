@@ -73,6 +73,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W3A | Five clustering finders: `mingle`, `spiral`, `flow-clusters`, `traclus` and `diffusion`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `diffusion` (HWY-020) wins 2: B1 rises on 4 boards and R1 falls 22% to 84%. HWY-003, HWY-017, EDA-035, HWY-023, HWY-025 and HWY-020 are dropped. | 2026-10-27 | #84 |
 | BUILD-W3B | Three highway strategies (`nested`, `lanes`, `growth`), the options `reuse` and `capacity` of `shared`, and an exact reference of HWY-040 with HiGHS. The option `capacity` (HWY-016) and the exact reference are kept. On 3 tiny boards, `shared` reaches 4% of the optimum B1. `growth` has the largest B1 but wins 0 of 4. `lanes` (HWY-051) is dropped. | 2026-10-27 | #85 |
 | MEAS3A | The screen gives ten more measures of MEAS0: `R12`, `R14`, `B5`, `B7`, `B8`, `B9`, `M1`, `M4`, `Z2` and `Z9`. On screen-v1, `R14` is 0.07 to 0.89 and `M4` is 0 on 21 of 70 records. `M1` stays at 1 to 1.005. | 2026-10-27 | #88 |
+| BUILD-W3C | Six highway finders: `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan` and `hub-arcs`. No finder beats `shared` on 3 of 4 boards, alone or with the gate `stretch`. `hub-arcs` (HWY-042) with the gate wins 2: the paired B1 ratio is 1.07 and the q95 ratio 0.96. HWY-012, HWY-019, HWY-024, HWY-032, HWY-028 and HWY-042 are dropped. | 2026-10-27 | #89 |
 
 ## Open
 
