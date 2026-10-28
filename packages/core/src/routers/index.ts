@@ -9,6 +9,7 @@ import { byCollection, trunksRouter } from "./trunks.ts";
 export { boxExit, straightRouter } from "./straight.ts";
 export { plugsRouter } from "./plugs.ts";
 export { cornersRouter, type CornersOptions } from "./corners.ts";
+export { frameRoutes, type FrameOptions, type Outside } from "./frames.ts";
 export { sharedRouter, type ShareCost, type SharedNegotiation, type SharedOptions, type ShareMerge, type ShareOrder } from "./shared.ts";
 export { ATTRACTION_DEFAULTS, ATTRACTION_SCHEMA, attractionRouter, attractionStrategy, type AttractionOptions } from "./attraction/index.ts";
 export { sectionsRouter, type SectionsOptions } from "./sections.ts";

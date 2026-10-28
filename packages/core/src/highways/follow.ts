@@ -1,5 +1,5 @@
 import { center, dist, pointBoxDistance, type Point } from "../geom.ts";
-import { fixedPortPoint, nodeIndex, resolvePorts, type End, type Graph, type Node, type Result, type Route, type SharedRun } from "../model.ts";
+import { fixedPortPoint, nodeIndex, outerGraph, type End, type Graph, type Node, type Result, type Route, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
@@ -69,7 +69,7 @@ function slice(stops: Stops, on: number, off: number): Point[] {
  * The same graph, plan and options give the same result.
  */
 export function follow(input: Graph, plan: HighwayPlan, options: FollowOptions = {}): Result {
-  const graph = resolvePorts(input);
+  const graph = outerGraph(input);
   const byId = nodeIndex(graph);
   const ways = new WayFinder(graph.nodes, options);
   const base = new Map((options.routes?.routes ?? []).map((r) => [r.edge, r.points]));

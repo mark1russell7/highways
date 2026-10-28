@@ -22,6 +22,10 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "routes.lanes": "Each pair of boxes of these boards has one edge or none. So a link takes one lane with `link` and with `count`.",
   "lines.lanes": "Each pair of boxes of these boards has one edge or none. So a link takes one lane with `link` and with `count`.",
   "levels.board": "The room strategy `levels` gives the gaps of the board of the nodes. The option `board` changes only the boards of the far levels. This is a gap of the core.",
+  "corners.outside": "The boards of the compare page have no frames (INTERIOR-ROUTE), so no box is outside its frame.",
+  "corners-smooth.outside": "The boards of the compare page have no frames (INTERIOR-ROUTE), so no box is outside its frame.",
+  "corners.frameInset": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners-smooth.frameInset": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */

@@ -263,6 +263,7 @@ export function graphInput(graph: Graph, head: LayoutInputHead): LayoutInput {
       h: num(n.box.h),
       x: num(n.box.x),
       y: num(n.box.y),
+      ...(n.parent !== undefined ? { parent: n.parent } : {}),
       ...(n.ports ? { ports: n.ports.map((p) => portToFile(p, n)) } : {}),
       ...(n.data ? { data: n.data } : {}),
     }),
@@ -316,7 +317,7 @@ export function regionBounds(region: Region): { x: number; y: number; w: number;
 export type RouteInput = Pick<LayoutInput, "id" | "boxes" | "obstacles"> & { readonly edges?: LayoutInput["edges"] };
 
 /**
- * This function reads the graph of the router from an input file. The router reads the positions, the ports, the edges and the data.
+ * This function reads the graph of the router from an input file. The router reads the positions, the ports, the parents, the edges and the data.
  * Each obstacle becomes a node without edges, with the bounding box of its region, after the boxes.
  * The router ignores the other fields of the packer: `container`, `gap`, `locked`, `rank`, the `shape` of a box and the `move` of an obstacle.
  * A box without `x` and `y` is an error.
@@ -324,7 +325,13 @@ export type RouteInput = Pick<LayoutInput, "id" | "boxes" | "obstacles"> & { rea
 export function inputGraph(input: RouteInput): Graph {
   const nodes = input.boxes.map((b): Node => {
     if (b.x === undefined || b.y === undefined) throw new Error(`The box "${b.id}" of the input "${input.id}" has no position. The router needs a placed input.`);
-    return { id: b.id, box: { x: b.x, y: b.y, w: b.w, h: b.h }, ...(b.ports ? { ports: b.ports.map(portToModel) } : {}), ...(b.data ? { data: b.data } : {}) };
+    return {
+      id: b.id,
+      box: { x: b.x, y: b.y, w: b.w, h: b.h },
+      ...(b.ports ? { ports: b.ports.map(portToModel) } : {}),
+      ...(b.data ? { data: b.data } : {}),
+      ...(b.parent !== undefined ? { parent: b.parent } : {}),
+    };
   });
   for (const o of input.obstacles ?? []) nodes.push({ id: o.id, box: regionBounds(o.region) });
   const edges = (input.edges ?? []).map(

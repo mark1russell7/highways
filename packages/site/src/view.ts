@@ -132,6 +132,8 @@ export class MapView {
   private fade = 1;
   private placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
   private nodeById = new Map<string, Node>();
+  /** The ids of the frames: the nodes that another node names as its parent. */
+  private frames = new Set<string>();
   private shapes = new WeakMap<Level, Map<string, GroupShape>>();
   private badges: Badge[] = [];
   private lanes: { graph: SegmentGraph; open: ReadonlySet<string>; width: number; routes: Route[] } | undefined;
@@ -177,6 +179,7 @@ export class MapView {
     if (newGraph) {
       this.space = curveSpace(scene.graph.nodes.map((n) => n.box));
       this.nodeById = new Map(scene.graph.nodes.map((n) => [n.id, n]));
+      this.frames = new Set(scene.graph.nodes.flatMap((n) => (n.parent === undefined ? [] : [n.parent])));
       // A new graph tells its level again, even when the index of the level does not change.
       this.shownLevel = -1;
       this.edgesOf = new Map();
@@ -356,7 +359,8 @@ export class MapView {
     const x = (p.x - this.tx) / this.s;
     const y = (p.y - this.ty) / this.s;
     const slack = 4 / this.s;
-    for (const n of g.nodes) {
+    // The last node on top wins, so a row in a card wins over its card.
+    for (const n of [...g.nodes].reverse()) {
       const b = n.box;
       if (x >= b.x - slack && x <= b.x + b.w + slack && y >= b.y - slack && y <= b.y + b.h + slack) return n.id;
     }
@@ -484,6 +488,19 @@ export class MapView {
       scene,
       scene.graph.nodes.map((n) => n.id),
     );
+    // The inner routes of a frame are inside its card, so they go on top of the cards. On a strong card, they take the ink of the sign.
+    const innerRoutes = done?.result.routes.filter((r) => r.frame !== undefined) ?? [];
+    if (innerRoutes.length > 0) {
+      this.fade = scene.selected && scene.cards ? 0.3 : 1;
+      for (const strong of [false, true])
+        this.strokeAll(
+          innerRoutes.filter((r) => Boolean(scene.cards?.get(r.frame!)?.strong) === strong).map((r) => r.points),
+          strong ? c.signInk : c.ink,
+          this.thin(),
+          0.8,
+        );
+      this.fade = 1;
+    }
     if (scene.selected && drawn) {
       const ids = this.edgesOf.get(scene.selected) ?? new Set<string>();
       const routes = drawn.filter((r) => ids.has(r.edge));
@@ -594,8 +611,11 @@ export class MapView {
   /** This method draws the nodes with these ids: as cards with a title when the scene has cards, else as plain boxes. */
   private paintNodeIds(scene: Scene, ids: readonly string[]): void {
     const nodes = ids.map((id) => this.nodeById.get(id)).filter((n): n is Node => n !== undefined);
-    if (scene.cards) this.paintCards(nodes, scene.cards);
-    else this.paintNodes(nodes.map((n) => n.box));
+    // A frame goes under the nodes in it: the nodes of each depth go on top of the nodes of the depth before.
+    for (const layer of depthLayers(nodes, this.nodeById)) {
+      if (scene.cards) this.paintCards(layer, scene.cards);
+      else this.paintNodes(layer.map((n) => n.box));
+    }
   }
 
   /** This method draws each node as a card. A card that is large enough on the screen shows its title and its second line. */
@@ -603,7 +623,7 @@ export class MapView {
     const { ctx, colors: c } = this;
     const screen = (b: Box): Box => ({ x: b.x * this.s + this.tx, y: b.y * this.s + this.ty, w: b.w * this.s, h: b.h * this.s });
     const visible = nodes
-      .map((n) => ({ b: screen(n.box), card: cards.get(n.id) }))
+      .map((n) => ({ b: screen(n.box), card: cards.get(n.id), frame: this.frames.has(n.id) }))
       .filter(({ b }) => b.x + b.w >= 0 && b.y + b.h >= 0 && b.x <= this.w && b.y <= this.h);
     for (const strong of [false, true]) {
       ctx.beginPath();
@@ -621,14 +641,15 @@ export class MapView {
     }
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    for (const { b, card } of visible) {
+    for (const { b, card, frame } of visible) {
       if (!card || b.w < 44 || b.h < 14) continue;
       const pad = Math.min(10, b.w * 0.08);
       const size = Math.max(9, Math.min(15, b.h * 0.3));
-      const two = card.sub !== undefined && b.h >= 34;
+      const two = !frame && card.sub !== undefined && b.h >= 34;
       ctx.font = `800 ${size}px Overpass, system-ui, sans-serif`;
       ctx.fillStyle = card.strong ? c.signInk : c.text;
-      const ty = two ? b.y + b.h * 0.36 : b.y + b.h / 2;
+      // The title of a frame goes in the band above the nodes in it.
+      const ty = frame ? b.y + Math.min(b.h / 2, 18 * this.s) : two ? b.y + b.h * 0.36 : b.y + b.h / 2;
       ctx.fillText(fitText(ctx, card.title, b.w - 2 * pad), b.x + pad, ty + 1);
       if (two) {
         ctx.font = `600 ${Math.max(8.5, size * 0.78)}px Overpass, system-ui, sans-serif`;
@@ -828,6 +849,18 @@ export class MapView {
       if (item) this.outline(item.box, c.hi, 2.5);
     }
   }
+}
+
+/** This function puts the nodes in layers by their depth of frames. A node without a parent has the depth 0. One layer keeps the order of the nodes. */
+function depthLayers(nodes: readonly Node[], byId: ReadonlyMap<string, Node>): Node[][] {
+  if (!nodes.some((n) => n.parent !== undefined)) return [[...nodes]];
+  const layers: Node[][] = [];
+  for (const n of nodes) {
+    let depth = 0;
+    for (let p = n.parent; p !== undefined && depth < byId.size; p = byId.get(p)?.parent) depth++;
+    (layers[depth] ??= []).push(n);
+  }
+  return layers.filter((l) => l !== undefined);
 }
 
 function bounds(boxes: readonly Box[]): Box {

@@ -1,5 +1,5 @@
 import { center, dist, type Point } from "../geom.ts";
-import { nodeIndex, resolvePorts, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, outerGraph, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
 import { orderRun } from "../lane-order.ts";
 import { stretchLaneOrders, type LaneStretchOrder } from "../lane-orders/stretch/index.ts";
@@ -149,7 +149,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
   const router: Router = {
     name: options.name,
     route(input: Graph): Result {
-      const graph = resolvePorts(input);
+      const graph = outerGraph(input);
       const byId = nodeIndex(graph);
       const ways = new WayFinder(graph.nodes, options);
       const corners = ways.corners;

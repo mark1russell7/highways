@@ -49,6 +49,32 @@ const node = { id: "a", box: { x: 0, y: 0, w: 80, h: 40 }, ports: [{ id: "out", 
 // The plug "out" is at (80, 10). With h = 120, it is at (80, 30).
 ```
 
+### Frames
+
+A node can name a frame node in `parent`. A frame is a node that holds other nodes, for example a card that holds rows.
+
+- An inner edge goes from a plug of a frame to a node in the frame. `splitFrames(graph)` finds the inner edges.
+- The router `corners` routes each inner edge inside its frame. The route stays in the box of the frame, smaller by the option `frameInset`.
+- The route goes around the other nodes of the frame. It leaves the plug of the wall into the frame, along the normal of the wall.
+- Each inner route has the id of its frame in `Route.frame`. The inner routes come after the outer routes.
+- Each other router gives no route for an inner edge. To route both, use your outer router, then `corners` for the inner routes.
+- An outer edge to a plug of the frame routes as before. The outer route and the inner route meet at the plug.
+- The default of `frameInset` is the margin of the router.
+- A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
+- The option `outside` sets the rule for a node box outside the box of its frame:
+  - `throw` (the default) throws a `RangeError`.
+  - `skip` gives no route to the edges of that node.
+  - `clamp` cuts the box to the bounds of the frame.
+
+```ts
+const nodes = [
+  { id: "card", box: { x: 0, y: 0, w: 240, h: 200 }, ports: [{ id: "in", side: "west", along: 0.25 }] },
+  { id: "row", parent: "card", box: { x: 20, y: 120, w: 200, h: 24 } },
+];
+const edges = [{ id: "inner", source: { node: "row" }, target: { node: "card", port: "in" } }];
+const inner = cornersRouter({ name: "corners" }).route({ nodes, edges }).routes; // inner[0].frame is "card"
+```
+
 ## Curve types
 
 A router gives polylines. The curve layer turns a polyline into a curve of a type. The polyline can come from any router, from a lane of `laneRoutes` or from a link of a zoom level.
