@@ -3,10 +3,10 @@
   "step": "highway",
   "base": "shared",
   "level": 0.05,
-  "run": 40716118524,
-  "commit": "9870eacc58d508b066d9711d2ad0666aacfdf715",
+  "run": 40764071893,
+  "commit": "542840cc73305c93a1956da32656ee00aaddc5ec",
   "date": "2026-10-28",
-  "core": "0.8.0",
+  "core": "0.8.1",
   "rows": [
     {"strategy":"keys","guard":"R1","measure":"route.crossings","label":"worse","old":"worse","stratified":-255.44444444444446,"pooled":-328.14285714285717,"p":0.009765625,"families":[{"family":"dense-groups","n":3,"mean":-1102,"sign":-1},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":-2,"sign":-1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-428.6666666666667,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":3}},
     {"strategy":"keys","guard":"B1","measure":"route.bundle.ink-saved","label":"worse","old":"worse","stratified":-0.055133603143643184,"pooled":-0.07123314750615625,"p":0.03125,"families":[{"family":"dense-groups","n":3,"mean":-0.21989605144213212,"sign":-1},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":0.0024296042503050286,"sign":1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.15005585315523273,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0.03672068148520069,"sign":1}],"breadth":{"against":2,"of":6,"ties":2}},

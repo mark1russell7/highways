@@ -6377,7 +6377,7 @@
     "placementDependent": true,
     "screen": "Screen boards: case-dense-groups, case-hub-chain, case-many-groups, small-clustered (5 seeds) and mid-fanout (1 seed). Baselines: corners, shared, trunks. Keep if B1 >= 0.9 x shared at B3 q95 <= 0.95 x shared on 3 of 5 boards. This is the first idea to screen.",
     "prototype": "S",
-    "stage": "prototyped",
+    "stage": "screened",
     "related": [
       "HWY-025",
       "HWY-034",
@@ -6387,7 +6387,242 @@
     "same": [
       "WILD-030"
     ],
-    "wave": 2
+    "wave": 2,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40764071893 https://github.com/mark1russell7/highways/actions/runs/40764744994",
+      "records": [
+        "screen-v1/*/shared@542840c",
+        "screen-v1/*/corridors@542840c",
+        "screen-v1/*/corridors+stretch@542840c",
+        "screen-v1/*/corridors-near4@542840c",
+        "screen-v2/*/shared@542840c",
+        "screen-v2/*/corridors@542840c",
+        "screen-v2/*/corridors+stretch@542840c",
+        "screen-v2/*/corridors-near4@542840c"
+      ],
+      "measures": {
+        "B1 against shared, screen-v1": {
+          "base": {
+            "dense-groups": 0.305,
+            "hub-chain": 0.078,
+            "many-groups": 0.083,
+            "packed-grid": 0,
+            "small-clustered": 0.231,
+            "tiny-uniform": 0.017
+          },
+          "new": {
+            "dense-groups": 0.107,
+            "hub-chain": 0.467,
+            "many-groups": 0.235,
+            "packed-grid": 0,
+            "small-clustered": 0.081,
+            "tiny-uniform": 0.017
+          }
+        },
+        "B2 against shared, screen-v1": {
+          "base": {
+            "dense-groups": 0.493,
+            "hub-chain": 0.084,
+            "many-groups": 0.353,
+            "packed-grid": 0.01,
+            "small-clustered": 0.518,
+            "tiny-uniform": 0.222
+          },
+          "new": {
+            "dense-groups": 0.327,
+            "hub-chain": 0.193,
+            "many-groups": 0.449,
+            "packed-grid": 0.01,
+            "small-clustered": 0.387,
+            "tiny-uniform": 0.222
+          }
+        },
+        "B3 q0.95 against shared, screen-v1": {
+          "base": {
+            "dense-groups": 1.238,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1,
+            "small-clustered": 1.187,
+            "tiny-uniform": 1
+          },
+          "new": {
+            "dense-groups": 1.005,
+            "hub-chain": 1,
+            "many-groups": 1.036,
+            "packed-grid": 1,
+            "small-clustered": 1.001,
+            "tiny-uniform": 1
+          }
+        },
+        "B8 runs against shared, screen-v1": {
+          "base": {
+            "dense-groups": 133.333,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 65.667,
+            "tiny-uniform": 0.333
+          },
+          "new": {
+            "dense-groups": 25,
+            "hub-chain": 23,
+            "many-groups": 36,
+            "packed-grid": 0.667,
+            "small-clustered": 15,
+            "tiny-uniform": 0.333
+          }
+        },
+        "B8 median against shared, screen-v1": {
+          "base": {
+            "dense-groups": 3,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 2.333,
+            "tiny-uniform": 0.667
+          },
+          "new": {
+            "dense-groups": 2,
+            "hub-chain": 5,
+            "many-groups": 2,
+            "packed-grid": 0.667,
+            "small-clustered": 2,
+            "tiny-uniform": 0.667
+          }
+        },
+        "B8 max against shared, screen-v1": {
+          "base": {
+            "dense-groups": 9.667,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 6.667,
+            "tiny-uniform": 0.667
+          },
+          "new": {
+            "dense-groups": 5.333,
+            "hub-chain": 10,
+            "many-groups": 4,
+            "packed-grid": 0.667,
+            "small-clustered": 3,
+            "tiny-uniform": 0.667
+          }
+        },
+        "B1 against shared, screen-v2": {
+          "base": {
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0,
+            "small-clustered": 0.225,
+            "tiny-uniform": 0.018
+          },
+          "new": {
+            "dense-groups": 0.118,
+            "hub-chain": 0.387,
+            "many-groups": 0.214,
+            "packed-grid": 0,
+            "small-clustered": 0.086,
+            "tiny-uniform": 0.012
+          }
+        },
+        "B2 against shared, screen-v2": {
+          "base": {
+            "dense-groups": 0.504,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006,
+            "small-clustered": 0.542,
+            "tiny-uniform": 0.18
+          },
+          "new": {
+            "dense-groups": 0.339,
+            "hub-chain": 0.173,
+            "many-groups": 0.393,
+            "packed-grid": 0.006,
+            "small-clustered": 0.426,
+            "tiny-uniform": 0.14
+          }
+        },
+        "B3 q0.95 against shared, screen-v2": {
+          "base": {
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1,
+            "small-clustered": 1.199,
+            "tiny-uniform": 1.007
+          },
+          "new": {
+            "dense-groups": 1.007,
+            "hub-chain": 1,
+            "many-groups": 1.017,
+            "packed-grid": 1,
+            "small-clustered": 1.004,
+            "tiny-uniform": 1.001
+          }
+        },
+        "B8 runs against shared, screen-v2": {
+          "base": {
+            "dense-groups": 137.2,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 66.2,
+            "tiny-uniform": 0.5
+          },
+          "new": {
+            "dense-groups": 28.1,
+            "hub-chain": 20.2,
+            "many-groups": 28.2,
+            "packed-grid": 0.4,
+            "small-clustered": 15.6,
+            "tiny-uniform": 0.2
+          }
+        },
+        "B8 median against shared, screen-v2": {
+          "base": {
+            "dense-groups": 3,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 2.35,
+            "tiny-uniform": 0.8
+          },
+          "new": {
+            "dense-groups": 2.15,
+            "hub-chain": 4.9,
+            "many-groups": 2.05,
+            "packed-grid": 0.6,
+            "small-clustered": 2.1,
+            "tiny-uniform": 0.4
+          }
+        },
+        "B8 max against shared, screen-v2": {
+          "base": {
+            "dense-groups": 11,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 6.5,
+            "tiny-uniform": 0.8
+          },
+          "new": {
+            "dense-groups": 6.2,
+            "hub-chain": 8,
+            "many-groups": 4.9,
+            "packed-grid": 0.6,
+            "small-clustered": 3.4,
+            "tiny-uniform": 0.4
+          }
+        }
+      },
+      "verdict": "screened",
+      "summary": "The strategy `corridors` is the build of HWY-031. B3 q0.95 is better on both sets, with 1 family against. B1 has no side, with 3 of 6 families against on screen-v2.",
+      "note": "BUILD-Q1. The built-in strategy `corridors` (HWY-STEP, #67) is the build of this idea. The labels against `shared` (level 0.05, families against) on screen-v1 and screen-v2: B1 `depends on the mix` (2 of 6) and `no verdict` (3 of 6: dense-groups, small-clustered, tiny-uniform). B2 `no verdict` (2 of 6) on both sets. B3 q0.95 `better` on both sets (1 of 6: many-groups). B8 runs `no verdict` (3 of 6) and `better` (3 of 6). B8 median `no verdict` (2 of 6) and `better` (3 of 6). B8 max `depends on the mix` (2 of 6) and `no verdict` (3 of 6). The paired B1 ratio corridors/shared has the median 0.465 (max 5.97) on screen-v1 and 1.000 (max 19.7) on screen-v2. The B3 q95 ratio has the median 1.000 (max 1.036) on both sets. The median time ratio is 1.83 (v1) and 1.92 (v2). With the gate `stretch`, each label is the same, because the gate removes no member. The variants of the params (near 4, rho 0.1 and 0.6, minSize 3, lane 2, 128 hashes in 16 bands) do not give B1 a side. The variant with 128 hashes is worse on B1. 0 new hard-rule breaks. The idea is not better on B1, so it is not kept. It is not worse on a named win, so it is not dropped."
+    }
   },
   {
     "id": "HWY-032",

@@ -1,7 +1,7 @@
 {
   "formula": "queue/1",
   "date": "2026-10-28",
-  "commit": "220f371d1bba1f9aab4bf2845c27956b94400895",
+  "commit": "820a79eebe7bcd0a9995f69d63b81686f133f583",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -22,7 +22,7 @@
     {
       "set": "screen-v2",
       "step": "highway",
-      "run": 40738642229
+      "run": 40764744994
     },
     {
       "set": "screen-v2",
@@ -31,13 +31,12 @@
     }
   ],
   "counts": {
-    "rows": 195,
+    "rows": 193,
     "ranked": 183,
-    "duplicates": 11,
+    "duplicates": 10,
     "blocked": 77,
     "openTargets": 40,
     "byStatus": {
-      "built": 1,
       "queued": 183
     },
     "byStep": {
@@ -238,14 +237,12 @@
     {"id":"EDA-001","name":"Grid maze router (Lee, Hadlock, A*)","step":"router","kind":"literature","wins":["R14","R3","R8","R9"],"gain":3,"uncertainty":0.84,"cost":4,"score":0.63,"rank":null,"slot":true,"canonical":"RULE-032","blockedBy":[],"status":"queued"},
     {"id":"EDA-015","name":"Rectilinear Steiner trunks (FLUTE)","step":"highway","kind":"literature","wins":["B1","B3","B7"],"gain":23.5,"uncertainty":0.7,"cost":2,"score":8.225,"rank":null,"slot":true,"canonical":"HWY-036","blockedBy":[],"status":"queued"},
     {"id":"EDA-038","name":"Lane collapse for each zoom","step":"levels","kind":"hybrid","wins":["Z4","B7","R12"],"gain":2.5,"uncertainty":0.85,"cost":2,"score":1.063,"rank":null,"slot":false,"canonical":"WILD-016","blockedBy":["step:levels"],"status":"queued"},
-    {"id":"HWY-031","name":"Corridor signatures: overlap of the first routes","step":"highway","kind":"ours","wins":["B1","B2","B3","B8"],"gain":24,"uncertainty":1,"cost":0.5,"score":48,"rank":null,"slot":true,"canonical":"HWY-031","blockedBy":[],"status":"built","strategy":"corridors","measured":3.5},
     {"id":"RULE-001","name":"Elastic band: springs along the route and a push from the boxes","step":"router","kind":"literature","wins":["R8","C3","C7","R4"],"gain":5,"uncertainty":0.7,"cost":1,"score":3.5,"rank":null,"slot":true,"canonical":"NAT-026","blockedBy":[],"status":"queued"},
     {"id":"RULE-005","name":"Harmonic potential field router","step":"router","kind":"literature","wins":["R8","C7","R9","C3"],"gain":3,"uncertainty":0.84,"cost":2,"score":1.26,"rank":null,"slot":true,"canonical":"NAT-023","blockedBy":[],"status":"queued"},
     {"id":"RULE-025","name":"Prices for rules that couple edges (dual ascent, ADMM)","step":"router","kind":"hybrid","wins":["R12","R1","R8","M4"],"gain":12,"uncertainty":0.85,"cost":2,"score":5.1,"rank":null,"slot":true,"canonical":"EDA-012","blockedBy":[],"status":"queued"},
     {"id":"RULE-030","name":"Medial axis of the free space as the highway line","step":"highway","kind":"hybrid","wins":["R8","C7","B7"],"gain":2.5,"uncertainty":0.85,"cost":2,"score":1.063,"rank":null,"slot":true,"canonical":"NAT-034","blockedBy":[],"status":"queued"},
     {"id":"WILD-028","name":"Candidate routes and a joint choice","step":"router","kind":"ours","wins":["R1","R2","B5"],"gain":11.5,"uncertainty":1,"cost":8,"score":1.438,"rank":null,"slot":true,"canonical":"RULE-021","blockedBy":[],"status":"queued"},
     {"id":"WILD-029","name":"Route each group alone, then stitch","step":"router","kind":"literature","wins":["Z10","R5"],"gain":3,"uncertainty":0.84,"cost":4,"score":0.63,"rank":null,"slot":true,"canonical":"EDA-049","blockedBy":[],"status":"queued"},
-    {"id":"WILD-030","name":"Detect highways after routing","step":"highway","kind":"hybrid","wins":["B1","B2","B7"],"gain":11.5,"uncertainty":0.85,"cost":1,"score":9.775,"rank":null,"slot":true,"canonical":"HWY-031","blockedBy":[],"status":"built","strategy":"corridors","measured":1},
     {"id":"WILD-042","name":"Right-angle crossing nudge","step":"curve","kind":"hybrid","wins":["R2"],"gain":1.5,"uncertainty":1.02,"cost":2,"score":0.765,"rank":null,"slot":true,"canonical":"RULE-049","blockedBy":[],"status":"queued"}
   ]
 }
