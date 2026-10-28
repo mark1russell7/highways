@@ -13,6 +13,8 @@ import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_CAPS, GAP_RULES, gapCap, gapClosed, optimumKey, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
 import { RECORD_EPS } from "../src/bench/screen/hash.ts";
+import { selectBest, type SelectCandidate, type SelectLevel } from "../src/bench/screen/portfolio-pick.ts";
+import { PORTFOLIO_B1, portfolioB1Spec } from "../src/portfolio/key.ts";
 import { B1, B10, B3_Q95, DECISION_BOARDS, familyOf, halfFolds, MIXED, pairedBootstrap, readRecords, type OracleRecord } from "./oracle.ts";
 import type { TimeRecord } from "./portfolio-time.ts";
 
@@ -90,23 +92,24 @@ export function passes(run: Run, base: Run, guard: Guard): boolean {
 
 /**
  * This function gives the choice of the portfolio on one input: the run with the best B1 among the baseline and the strategies of `set` that pass the guard.
- * A tie within `RECORD_EPS` goes to the first name: the baseline, then the order of `set`. It gives `undefined` when the input has no run of the baseline.
+ * The rank is `selectBest` of the contract with the B1 level of the portfolio router (PORTFOLIO-FIT). Thus the router and this function make the same choice.
+ * Of the runs within the `minEffect` of the best B1, the first name wins: the baseline, then the order of `set`.
+ * It gives `undefined` when the input has no run of the baseline.
  */
 export function choose(row: ReadonlyMap<string, Run>, set: readonly string[], guard: Guard, base: string = PORTFOLIO_BASE): string | undefined {
   const b = row.get(base);
   if (b === undefined) return undefined;
-  let best = base;
-  let bestB1 = b.b1;
+  const candidates: SelectCandidate[] = [{ id: base, values: { [PORTFOLIO_B1]: b.b1 } }];
   for (const s of set) {
     const r = row.get(s);
     if (r === undefined || s === base || !passes(r, b, guard)) continue;
-    if (r.b1 > bestB1 + RECORD_EPS) {
-      best = s;
-      bestB1 = r.b1;
-    }
+    candidates.push({ id: s, values: { [PORTFOLIO_B1]: r.b1 } });
   }
-  return best;
+  return selectBest(candidates, B1_LEVELS).winner;
 }
+
+/** The one level of the rank of `choose`: the B1 level of the key of the portfolio router. */
+const B1_LEVELS: readonly SelectLevel[] = [{ id: PORTFOLIO_B1, spec: portfolioB1Spec() }];
 
 /** The value of a run on an input: the gap closed on `exact-v1`, or the ratio of B1 to the B1 of the baseline on `screen-v1`. */
 export type ValueOf = (input: string, strategy: string) => number | undefined;
