@@ -330,14 +330,14 @@ export function laneStretches(runs: readonly LaneRun[], options: Partial<LaneStr
 /** The side of each pair of edges of a run, in the way of the root. The key is the two edges in the order of their ids. */
 type Sides = Map<string, number>;
 
-/** This function gives the sides of the pairs of a run with the way `turn` against the root. The value -1 puts the first edge of the key on the left. */
-function sidesOf(run: Prepared, turn: 1 | -1): Sides {
+/** This function gives the sides of the pairs of a run in its own way. The value -1 puts the first edge of the key on the left. */
+function sidesOf(run: Prepared): Sides {
   const out: Sides = new Map();
   const lanes = [...run.placed].sort(byEdge);
   for (let x = 0; x < lanes.length; x++)
     for (let y = x + 1; y < lanes.length; y++) {
       const v = byBundle(lanes[x]!, lanes[y]!);
-      out.set(`${lanes[x]!.edge}\u0000${lanes[y]!.edge}`, (v > 0 ? 1 : -1) * turn);
+      out.set(`${lanes[x]!.edge}\u0000${lanes[y]!.edge}`, v > 0 ? 1 : -1);
     }
   return out;
 }
@@ -353,6 +353,13 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
   const rank = new Map(keyOrder.map((i, r) => [i, r] as const));
   const done = new Uint8Array(prepared.length);
   const out: LaneStretch[] = [];
+  // The sides of each run, in its own way. Each run gets them one time, because the walks test a run again in each later stretch.
+  const own = new Map<number, Sides>();
+  const sidesOfRun = (i: number): Sides => {
+    let s = own.get(i);
+    if (!s) own.set(i, (s = sidesOf(prepared[i]!)));
+    return s;
+  };
   // Each loop makes one stretch and marks its runs. A run that the walk does not take stays for a later stretch.
   for (let p = 0; p < keyOrder.length; ) {
     const start = keyOrder[p]!;
@@ -380,7 +387,7 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
     const runsOf: number[] = [root];
     const turns: (1 | -1)[] = [1];
     const turnOf = new Map<number, 1 | -1>([[root, 1]]);
-    const sides = sidesOf(prepared[root]!, 1);
+    const sides: Sides = new Map(sidesOfRun(root));
     done[root] = 1;
     for (let k = 0; k < runsOf.length; k++) {
       const i = runsOf[k]!;
@@ -388,11 +395,17 @@ function stretchesOf(prepared: readonly Prepared[], options: Readonly<LaneStretc
       for (const l of links[i]!) {
         if (done[l.to] || prepared[l.to]!.twice) continue;
         const t = (turnOf.get(i)! * l.turn) as 1 | -1;
-        const own = sidesOf(prepared[l.to]!, t);
+        const base = sidesOfRun(l.to);
         let agrees = true;
-        for (const [key, side] of own) if ((sides.get(key) ?? side) !== side) agrees = false;
+        for (const [key, side] of base) {
+          const s = sides.get(key);
+          if (s !== undefined && s !== side * t) {
+            agrees = false;
+            break;
+          }
+        }
         if (!agrees) continue;
-        for (const [key, side] of own) sides.set(key, side);
+        for (const [key, side] of base) sides.set(key, side * t);
         done[l.to] = 1;
         turnOf.set(l.to, t);
         runsOf.push(l.to);

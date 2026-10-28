@@ -265,10 +265,13 @@ The workflow `Scale` routes the board of 1000 boxes and 4000 edges 3 times in on
 | Router | Run | Commit | Median, s | Ratio to `shared` |
 |---|---|---|---:|---:|
 | `shared` | 40748153040 | `a4304c6` | 21.19 | 1.00 |
-| `shared-stretch`, `consensus` | 40749484343 | `a4304c6` | SCALE_CONSENSUS | SCALE_CONSENSUS_RATIO |
+| `shared-stretch`, `consensus`, before the cache of the sides | 40749484343 | `a4304c6` | 735.42 | 34.7 |
 | `shared-stretch`, `sifting` (the default) | SCALE_SIFTING_RUN | SCALE_SIFTING_SHA | SCALE_SIFTING | SCALE_SIFTING_RATIO |
 
 The jobs of two runs can use different machines. Thus the ratio has the noise of the runner.
+
+- At `a4304c6`, the walk of the stretches calculated the sides of a run again for each test of the run. The profile gave 75% of the time to `sidesOf`, `partBefore` and `partAfter`.
+- The fix keeps the sides of each run in a cache. Each run gets them one time. The orders do not change.
 
 ### The verdict
 
