@@ -95,7 +95,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PORTFOLIO-SPEED | [A cheaper key and two bands above 40 nodes](research/PORTFOLIO.md#the-speed-of-the-router-portfolio-speed) for the router `portfolio`. One A* search for each terminal gives the same stretch, to 1e-15. The setup at 100 nodes goes from 172 to 25 ms. At 41 to 64 nodes, the fit runs one member at the cap 1.5, at 39 to 46 ms. | 2026-10-28 | #118 |
 | CALIBRATION | [A Brier score of the predictions](#calibration): 229 claims of 54 items score 0.177. Quality and size claims hit less than their confidence, and correctness and build claims hit more. | 2026-10-28 | #120 |
 | SHARED-RULE | The 16 shared sections of `docs/PROMOTION.md` sit between markers. `docs/shared.lock.json` holds their hashes, and `scripts/check-shared.mjs` fails `pnpm test` on drift. The win test gets one sentence: the same machine times the candidate and the default. | 2026-10-28 | #122 |
-| FIT-COST | [The cost of each member](research/PORTFOLIO.md#the-cost-of-each-member-fit-cost) in the fit of the router `portfolio`. In the router, a member takes 1.06 to 1.17 times its run alone, and 0.97 to 1.03 times its run and its key. The fit uses the measured key at the target 42 ms. On the test seeds, the median is 48 ms or less in each of 48 cells. | 2026-10-28 | #PR |
+| FIT-COST | [The cost of each member](research/PORTFOLIO.md#the-cost-of-each-member-fit-cost) in the fit of the router `portfolio`. In the router, a member takes 1.06 to 1.17 times its run alone, and 0.97 to 1.03 times its run and its key. The fit uses the measured key at the target 42 ms. On the test seeds, the median is 48 ms or less in each of 48 cells. | 2026-10-28 | #123 |
 
 ## Calibration
 
