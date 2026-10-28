@@ -4,7 +4,7 @@
 //
 // The fixture is a `.json.gz` file with `{ manifestId, pack, env, graph }`. The default is `data/scale/route-scale-fixture.json.gz`.
 // The router is `asRouter(routerStrategies[name])` with the default options, or `portfolioRouter()` for the name `portfolio`, as the joint runner of
-// layout-contract calls them.
+// layout-contract calls them. The name `attraction` gives the opt-in router `attractionStrategy` (HWY-044).
 //
 // The steps:
 // - `route`: each run of the route. The first run is cold. With `--repeat 3`, the script also gives the warm median of the later runs.
@@ -25,7 +25,7 @@ import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
-import { asRouter, checkProperties, exactStretches, measureQuality, routePortfolio, routerStrategies, sharedStretchStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, routePortfolio, routerStrategies, sharedStretchStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { exactLines, routeHash } from "./xplat.ts";
 
 interface ProfileNode {
@@ -69,8 +69,9 @@ function routerOf(name: string): (graph: Graph) => Routed {
       return { result: p.result, ms: t, key: Math.max(0, t - run), members };
     };
   }
-  // The opt-in router `shared-stretch` (LANE-STRETCH) is not in the registry. The name gives it here too.
-  const s = name === "shared-stretch" ? (sharedStretchStrategy as unknown as Strategy<"router", object>) : (routerStrategies as unknown as Readonly<Record<string, Strategy<"router", object>>>)[name];
+  // The opt-in routers `shared-stretch` (LANE-STRETCH) and `attraction` (HWY-044) are not in the registry. The name gives them here too.
+  const optIn: Readonly<Record<string, unknown>> = { "shared-stretch": sharedStretchStrategy, attraction: attractionStrategy };
+  const s = (optIn[name] ?? (routerStrategies as unknown as Readonly<Record<string, unknown>>)[name]) as Strategy<"router", object> | undefined;
   if (s === undefined) throw new RangeError(`There is no router "${name}".`);
   const router = asRouter(s);
   return (graph) => {
