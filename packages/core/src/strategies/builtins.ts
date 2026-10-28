@@ -24,6 +24,12 @@ import { EDGE_PATH_DEFAULTS, edgePathPlan, type EdgePathOptions } from "../highw
 import { HDBSCAN_DEFAULTS, hdbscanPlan, type HdbscanOptions } from "../highways/hdbscan/index.ts";
 import { HOUGH_DEFAULTS, houghPlan, type HoughOptions } from "../highways/hough/index.ts";
 import { HUB_ARC_DEFAULTS, hubArcPlan, type HubArcOptions } from "../highways/hub-arcs/index.ts";
+import { DIVIDED_DEFAULTS, dividedPlan, type DividedOptions } from "../highways/divided/index.ts";
+import { HIERARCHY_DEFAULTS, hierarchyPlan, type HierarchyOptions } from "../highways/hierarchy/index.ts";
+import { FDEB_DEFAULTS, fdebPlan, type FdebOptions } from "../highways/fdeb/index.ts";
+import { MESH_DEFAULTS, meshPlan, type MeshOptions } from "../highways/mesh/index.ts";
+import { KDEEB_DEFAULTS, kdeebPlan, type KdeebOptions } from "../highways/kdeeb/index.ts";
+import { CUBU_DEFAULTS, cubuPlan, type CubuOptions } from "../highways/cubu/index.ts";
 import { RIDGE_DEFAULTS, ridgePlan, type RidgeOptions } from "../highways/ridges/index.ts";
 import { SOFT_KEY_DEFAULTS, softKeyPlan, type SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
@@ -58,7 +64,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, EDGE_PATH_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -417,6 +423,12 @@ export const highwayStrategies: {
   readonly ridges: Strategy<"highway", RidgeOptions>;
   readonly hdbscan: Strategy<"highway", HdbscanOptions>;
   readonly "hub-arcs": Strategy<"highway", HubArcOptions>;
+  readonly divided: Strategy<"highway", DividedOptions>;
+  readonly hierarchy: Strategy<"highway", HierarchyOptions>;
+  readonly fdeb: Strategy<"highway", FdebOptions>;
+  readonly mesh: Strategy<"highway", MeshOptions>;
+  readonly kdeeb: Strategy<"highway", KdeebOptions>;
+  readonly cubu: Strategy<"highway", CubuOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -666,6 +678,60 @@ export const highwayStrategies: {
     schema: HUB_ARC_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<HubArcOptions>) => hubArcPlan(input, o),
+  }),
+  divided: defineStrategy({
+    step: "highway",
+    name: "divided",
+    describe: "Divided edge bundling (HWY-011). Each highway of two-way traffic splits into two carriageways at an offset, one for each direction.",
+    defaults: { ...DIVIDED_DEFAULTS } as DividedOptions,
+    schema: DIVIDED_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<DividedOptions>) => dividedPlan(input, o),
+  }),
+  hierarchy: defineStrategy({
+    step: "highway",
+    name: "hierarchy",
+    describe: "Hierarchical edge bundling (HWY-001). Each edge goes near the hubs of the sections between its two leaves, and the shared stretches become highways.",
+    defaults: { ...HIERARCHY_DEFAULTS } as HierarchyOptions,
+    schema: HIERARCHY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<HierarchyOptions>) => hierarchyPlan(input, o),
+  }),
+  fdeb: defineStrategy({
+    step: "highway",
+    name: "fdeb",
+    describe: "Force-directed edge bundling with a field of the boxes (HWY-002 with RULE-002). The bundled points snap back to legal ways.",
+    defaults: { ...FDEB_DEFAULTS } as FdebOptions,
+    schema: FDEB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<FdebOptions>) => fdebPlan(input, o),
+  }),
+  mesh: defineStrategy({
+    step: "highway",
+    name: "mesh",
+    describe: "A control mesh (HWY-004). The crossings of the edges with the mesh form clusters, and the edges of a cluster share its point.",
+    defaults: { ...MESH_DEFAULTS } as MeshOptions,
+    schema: MESH_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<MeshOptions>) => meshPlan(input, o),
+  }),
+  kdeeb: defineStrategy({
+    step: "highway",
+    name: "kdeeb",
+    describe: "Density bundling with a mask of the free space (RULE-028 with HWY-006). The edges move up the density, and the ridges become highways.",
+    defaults: { ...KDEEB_DEFAULTS } as KdeebOptions,
+    schema: KDEEB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<KdeebOptions>) => kdeebPlan(input, o),
+  }),
+  cubu: defineStrategy({
+    step: "highway",
+    name: "cubu",
+    describe: "Fast density bundling (HWY-007). The steps of `kdeeb` with a separable blur or a Fourier transform of the counts of the cells.",
+    defaults: { ...CUBU_DEFAULTS } as CubuOptions,
+    schema: CUBU_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CubuOptions>) => cubuPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

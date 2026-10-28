@@ -34,4 +34,24 @@ export { HOUGH_DEFAULTS, houghLines, houghPeaks, houghPlan, type HoughOptions, t
 export { densityRidges, lineDensity, RIDGE_DEFAULTS, ridgeLines, ridgePlan, type DensityImage, type Ridge, type RidgeOptions, type RidgeSource } from "./ridges/index.ts";
 export { compatibility, EDGE_DISTANCES, HDBSCAN_DEFAULTS, hdbscanClusters, hdbscanLabels, hdbscanPlan, type EdgeDistance, type HdbscanOptions } from "./hdbscan/index.ts";
 export { ARC_SOURCES, candidateArcs, HUB_ARC_DEFAULTS, hubArcPlan, type ArcSource, type HubArcOptions } from "./hub-arcs/index.ts";
+export { boxPush, innerPoints, outOfBoxes, tracePlan, waypointWay, type TraceOptions } from "./trace.ts";
+export { DIVIDED_DEFAULTS, divideHighway, dividedPlan, offsetLine, TRAFFIC_RULES, type DividedOptions, type TrafficRule } from "./divided/index.ts";
+export { controlChain, HIERARCHY_DEFAULTS, HIERARCHY_GROUPS, hierarchyPlan, type HierarchyGroups, type HierarchyOptions } from "./hierarchy/index.ts";
+export { FDEB_DEFAULTS, fdebLines, fdebPlan, type FdebOptions } from "./fdeb/index.ts";
+export { boxUnit, clusters1d, MESH_DEFAULTS, meshPlan, meshWaypoints, type MeshOptions } from "./mesh/index.ts";
+export {
+  DENSITY_KERNELS,
+  densityPlan,
+  fft,
+  KDEEB_DEFAULTS,
+  kdeebLines,
+  kdeebPlan,
+  pointDensity,
+  type AdvectionSettings,
+  type DensityGrid,
+  type DensityKernel,
+  type DensitySource,
+  type KdeebOptions,
+} from "./kdeeb/index.ts";
+export { CUBU_DEFAULTS, cubuPlan, type CubuOptions } from "./cubu/index.ts";
 export * from "./gates/index.ts";

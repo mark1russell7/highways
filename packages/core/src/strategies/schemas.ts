@@ -3,18 +3,24 @@ import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
 import type { CorridorOptions } from "../highways/corridors/index.ts";
+import type { CubuOptions } from "../highways/cubu/index.ts";
 import type { DiffusionOptions } from "../highways/diffusion/index.ts";
+import type { DividedOptions } from "../highways/divided/index.ts";
 import type { EdgePathOptions } from "../highways/edge-paths/index.ts";
+import type { FdebOptions } from "../highways/fdeb/index.ts";
 import type { FlowClusterOptions } from "../highways/flow-clusters/index.ts";
 import type { FlowFieldOptions } from "../highways/flow-field/index.ts";
 import type { GrowthOptions } from "../highways/growth/index.ts";
 import type { GroupSpine } from "../highways/grouped.ts";
 import type { HdbscanOptions } from "../highways/hdbscan/index.ts";
+import type { HierarchyOptions } from "../highways/hierarchy/index.ts";
 import type { HoughOptions } from "../highways/hough/index.ts";
 import type { HubArcOptions } from "../highways/hub-arcs/index.ts";
+import type { KdeebOptions } from "../highways/kdeeb/index.ts";
 import type { LanesOptions } from "../highways/lanes/index.ts";
 import type { LevelHighwayOptions } from "../highways/level-links/index.ts";
 import type { MeetOptions } from "../highways/meet/index.ts";
+import type { MeshOptions } from "../highways/mesh/index.ts";
 import type { MingleOptions } from "../highways/mingle/index.ts";
 import type { NestedOptions } from "../highways/nested/index.ts";
 import type { OdCellOptions } from "../highways/od-cells/index.ts";
@@ -582,4 +588,91 @@ export const HUB_ARC_SCHEMA: OptionSchema<HubArcOptions> = {
   swaps: { type: "integer", min: 0, max: 5, step: 1, default: 1, describe: "The number of passes of the local search with one swap." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "An arc with fewer edges than this number is not a highway." },
   generators: { type: "list", default: ["runs", "corridors", "road-classes"], describe: "The generators of the candidate arcs." },
+};
+
+/** The declarations of the options of the highway strategy `divided` (HWY-011). */
+export const DIVIDED_SCHEMA: OptionSchema<DividedOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  from: HIGHWAY_BASE,
+  rule: { type: "enum", values: ["right", "left"], default: "right", describe: "The side of the road of the traffic of each direction." },
+  gap: { type: "number", min: 0, max: 4, step: 0.5, marks: [1, 2], default: 1, describe: "The gap between the two carriageways, in lanes." },
+  laneWidth: { type: "number", min: 1, max: 12, step: 1, marks: [4], default: 4, describe: "The width of one lane, in units of the board." },
+  minSize: { type: "integer", min: 1, max: 16, step: 1, default: 2, describe: "A highway divides only when each direction has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `hierarchy` (HWY-001). */
+export const HIERARCHY_SCHEMA: OptionSchema<HierarchyOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  group: { type: "enum", values: ["quadtree", "kd", "cut"], default: "quadtree", describe: "The tree of sections that gives the hubs." },
+  cap: { type: "integer", min: 1, max: 32, step: 1, marks: [4, 8, 16], default: 8, describe: "A section with more nodes splits." },
+  beta: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.5, 0.85], default: 0.85, describe: "The pull of the hubs. The value 0 gives the straight line, and 1 goes through each hub." },
+  hubs: {
+    type: "integer",
+    min: 0,
+    max: 8,
+    step: 1,
+    special: [Infinity],
+    default: Infinity,
+    describe: "The largest number of hubs on each side of the lowest common section. `Infinity` uses each hub.",
+  },
+  snap: { type: "number", min: 0, max: 32, step: 2, marks: [8, 16], default: 8, describe: "The side of the grid that the hubs snap to, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `fdeb` (HWY-002 with RULE-002). */
+export const FDEB_SCHEMA: OptionSchema<FdebOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  compatibility: { type: "number", min: 0.05, max: 1, step: 0.05, marks: [0.4, 0.6, 0.8], default: 0.6, describe: "Two edges attract each other when their compatibility is this value or more." },
+  spring: { type: "number", min: 0, max: 0.5, step: 0.05, default: 0.1, describe: "The spring constant that keeps each edge smooth." },
+  cycles: { type: "integer", min: 0, max: 7, step: 1, default: 5, describe: "The number of cycles. Each cycle doubles the points of each edge." },
+  iterations: { type: "integer", min: 0, max: 200, step: 10, marks: [50], default: 50, describe: "The number of steps of the first cycle." },
+  repulsion: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1], default: 1, describe: "The weight of the push of the boxes. The value 0 turns it off." },
+  budget: {
+    type: "number",
+    min: 1,
+    max: 3,
+    step: 0.05,
+    special: [Infinity],
+    marks: [1.25, 1.5, Infinity],
+    default: 1.25,
+    describe: "An edge longer than this value times its straight line gets no pull. `Infinity` sets no budget.",
+  },
+  snap: { type: "number", min: 0, max: 32, step: 2, marks: [8, 16], default: 8, describe: "The side of the grid that the points of the edges snap to, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `mesh` (HWY-004). */
+export const MESH_SCHEMA: OptionSchema<MeshOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  cell: { type: "number", min: 1, max: 16, step: 0.5, marks: [2, 4, 8], default: 4, describe: "The side of a cell of the mesh, in units of the boxes." },
+  capacity: { type: "integer", min: 1, max: 32, step: 1, marks: [4, 8, 16], default: 8, describe: "A cluster of crossings has at most about this number of edges." },
+  merge: { type: "number", min: 0, max: 4, step: 0.25, marks: [1], default: 1, describe: "Two clusters nearer than this value, in units of the boxes, become one." },
+  angle: { type: "number", min: 0, max: 90, step: 5, marks: [30, 45], default: 45, describe: "A line crosses a segment of the mesh only within this angle in degrees to the main direction." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `kdeeb` (RULE-028 with HWY-006). */
+export const KDEEB_SCHEMA: OptionSchema<KdeebOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  source: { type: "enum", values: ["lines", "routes"], default: "lines", describe: "The lines of the first density: the straight lines of the edges, or their first routes." },
+  cell: { type: "number", min: 2, max: 32, step: 1, marks: [4, 8, 16], default: 8, describe: "The size of a cell of the density image, in units of the board." },
+  bandwidth: { type: "number", min: 4, max: 64, step: 2, marks: [12, 24, 48], default: 24, describe: "The width of the kernel at the first step, in units of the board." },
+  decay: { type: "number", min: 0.3, max: 1, step: 0.05, marks: [0.7], default: 0.7, describe: "Each step multiplies the width of the kernel by this value." },
+  steps: { type: "integer", min: 0, max: 30, step: 1, marks: [10], default: 10, describe: "The number of steps." },
+  smoothing: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.5], default: 0.5, describe: "The share of the smoothing of each polyline after each step." },
+  mask: { type: "boolean", default: true, describe: "With `true`, the density is 0 in the boxes, so no ridge forms over a box." },
+  snap: { type: "number", min: 0, max: 32, step: 2, marks: [8, 16], default: 8, describe: "The side of the grid that the points of the edges snap to, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `cubu` (HWY-007). */
+export const CUBU_SCHEMA: OptionSchema<CubuOptions> = {
+  ...KDEEB_SCHEMA,
+  kernel: { type: "enum", values: ["separable", "fft"], default: "separable", describe: "The blur of the counts of the cells: a separable kernel (CUBu) or a Fourier transform (FFTEB)." },
+  resample: { type: "number", min: 0, max: 32, step: 2, marks: [0, 8], default: 8, describe: "The spacing of the sample points after each step, in units of the board. The value 0 keeps the points." },
 };

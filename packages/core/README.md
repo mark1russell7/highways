@@ -346,7 +346,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -400,9 +400,15 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `ridges` | The density ridges of HWY-032. The ridges of the blurred density of the edges become highways. |
 | `hdbscan` | The density clusters of HWY-028 (HDBSCAN). The clusters of edges that live over a long range of densities become highways. |
 | `hub-arcs` | The hub arc location of HWY-042. A greedy pass with swaps chooses at most `q` arcs, and each edge rides its best arc. |
+| `divided` | The divided edge bundling of HWY-011. Each highway of two-way traffic splits into two carriageways, one for each direction. |
+| `hierarchy` | The hierarchical edge bundling of HWY-001. Each edge goes near the hubs of the sections between its two leaves. |
+| `fdeb` | The force-directed edge bundling of HWY-002 with the box field of RULE-002. The bundled points snap back to legal ways. |
+| `mesh` | The control mesh of HWY-004. The crossings of the edges with the mesh form clusters, and a cluster shares one point. |
+| `kdeeb` | The density bundling of RULE-028 with HWY-006. The edges move up a density that is 0 in the boxes. |
+| `cubu` | The fast density bundling of HWY-007. The steps of `kdeeb` with a separable blur or a Fourier transform. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
-The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links` and `lanes` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes` and `divided` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
