@@ -19,6 +19,7 @@ import { measureQuality } from "../quality.ts";
 import { sameData } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
 import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
+import { formatGap, gapBaselines, gapValues, optimumKey, summarizeGap, type ExactOptimum, type GapRule, type GapSummary } from "./gap.ts";
 import { measureByName, measureName, namedObjectives } from "./measures.ts";
 import { SCREEN_V1, screenInputs, type ScreenSet } from "./set.ts";
 
@@ -98,6 +99,11 @@ export interface ScreenOptions {
   readonly commit?: string;
   /** The predictions of the run. Each record names the first prediction with its strategy, its set and its input. */
   readonly predictions?: readonly LayoutPrediction[];
+  /**
+   * The exact optima of the inputs, from the file of the optima of a set (MEAS2). The steps `router` and `highway` read them.
+   * Each run on an input with optima gets the largest B3 and the gap closed of each rule (B10). The summary then gets the gap table.
+   */
+  readonly optima?: readonly ExactOptimum[];
   /** This function gets one line of progress for each input. */
   readonly log?: (line: string) => void;
 }
@@ -154,6 +160,8 @@ export interface ScreenSummary {
   /** The strategies with a break over the floor, without a run or with two different outputs of one input. They do not enter the front. */
   readonly excluded: readonly string[];
   readonly predictions: readonly PredictionCheck[];
+  /** The gap closed of each strategy and rule, when the screen has optima. */
+  readonly gap?: readonly GapSummary[];
 }
 
 /** The result of `screen`: one record for each strategy and input, and the summary. */
@@ -339,6 +347,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   const comparisons: StepComparison[] = [];
   const kept = new Map<string, { graph: Graph; results: Map<string, Result> }>();
   const variants: { record: (typeof records)[number]; base: string; result: Result }[] = [];
+  const optima = givesRoutes(step) && options.optima ? new Map(options.optima.map((o) => [optimumKey(o.input, o.rule, o.cap), o])) : undefined;
+  const withOptima = new Set(options.optima?.map((o) => o.input));
 
   for (const input of inputs) {
     const graph = inputGraph(input);
@@ -352,6 +362,9 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
     let cornersRoutes: readonly Route[] | undefined;
     const cornersBase = (): readonly Route[] =>
       (cornersRoutes ??= (cmp.rows.find((r) => r.strategy === "corners" && r.result)?.result ?? asRouter(getStrategy(STRATEGIES, "router", "corners")).route(graph)).routes);
+    // The B1 of the baseline of each rule of the gap closed, for an input with optima.
+    let baselines: Record<GapRule, number> | undefined;
+    const gapBase = (): Record<GapRule, number> => (baselines ??= gapBaselines(graph));
     cmp.rows.forEach((row, i) => {
       const strategy = byName.get(row.strategy)!;
       const head = {
@@ -378,6 +391,7 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
       const values = rowValues(step, graph, row, cornersBase);
       // Z2 is the count of the hard rule `link-ends`, as a measure. The steps `router`, `highway` and `group` check the rule.
       if (hard["link-ends"] !== undefined) values["Z2.linkEnds"] = hard["link-ends"];
+      if (optima && withOptima.has(input.id) && row.result) Object.assign(values, gapValues(input, row.result.routes, cornersBase(), gapBase(), optima));
       if (shuffles > 0 && row.result) {
         const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);
         const f = orderFragility(graph, (g) => router.route(g), { orders: shuffles, seed, base: row.result });
@@ -403,7 +417,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
     Object.assign(v.record.measures, named({ "Z10.base.mean": s.mean, "Z10.base.max": s.max, "Z10.base.moved": s.moved }));
   }
 
-  return { records, summary: summarizeScreen(records, comparisons, { set: set.id, step, candidates, ...(options.predictions ? { predictions: options.predictions } : {}) }) };
+  const summary = summarizeScreen(records, comparisons, { set: set.id, step, candidates, ...(options.predictions ? { predictions: options.predictions } : {}) });
+  return { records, summary: optima ? { ...summary, gap: summarizeGap(records) } : summary };
 }
 
 /** This function gives the summary of the records of a screen. */
@@ -492,5 +507,6 @@ export function formatScreen(summary: ScreenSummary): string {
     for (const p of summary.predictions)
       lines.push(`| ${p.id} | ${p.strategy} | ${p.input ?? "median"} | ${p.measure} | ${p.op} ${fmt(p.expected)} | ${fmt(p.measured)} | ${p.met === undefined ? "-" : p.met ? "yes" : "no"} | ${p.reason} |`);
   }
+  if (summary.gap) lines.push(formatGap(summary.gap).trimEnd());
   return lines.join("\n") + "\n";
 }

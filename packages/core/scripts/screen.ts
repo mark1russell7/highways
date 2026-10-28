@@ -5,12 +5,27 @@
 // `--wrap` adds the router `<name>+<w>` for each router and each wrapper. `--shuffles` measures the order fragility (W3) over this number of random orders.
 // `--strategy` names strategies of the registry. `--module` loads a prototype file and screens each export that is a strategy of the step,
 // or only the exports of `--export`. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
+// `--set exact-v1` screens the small boards with a known optimum (MEAS2). With that set, the screen reads the optima of `src/bench/exact/optima-exact-v1.json`,
+// or of `--optima <file>`, and gives the gap closed of each strategy. `--optima none` gives no optima.
 // The workflow `Screen` starts it in CI. Locally, start it only on one or two small families, for example `--families tiny-uniform`.
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { formatScreen, parseLines, recordLines, screen, SCREEN_STEPS, SCREEN_WRAPS, type LayoutInput, type LayoutPrediction, type ScreenStep, type ScreenWrap } from "../src/bench/screen/index.ts";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  formatScreen,
+  parseLines,
+  recordLines,
+  screen,
+  SCREEN_SETS,
+  SCREEN_STEPS,
+  SCREEN_WRAPS,
+  type ExactOptimaFile,
+  type LayoutInput,
+  type LayoutPrediction,
+  type ScreenStep,
+  type ScreenWrap,
+} from "../src/bench/screen/index.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 
 const args = process.argv.slice(2);
@@ -52,6 +67,13 @@ const files = (dir: string): string[] =>
     .flatMap((n) => (statSync(join(dir, n)).isDirectory() ? files(join(dir, n)) : n.endsWith(".json") && n !== "index.json" ? [join(dir, n)] : []));
 const inputs = inputsDir ? files(inputsDir).map((f) => JSON.parse(readFileSync(f, "utf8")) as LayoutInput) : undefined;
 
+const setId = opt("--set") ?? "screen-v1";
+const set = SCREEN_SETS[setId];
+if (!set) throw new Error(`There is no screen set "${setId}". The sets are ${Object.keys(SCREEN_SETS).join(", ")}.`);
+// The optima of the set: the file of `--optima`, or the file `optima-<set>.json` of `src/bench/exact` when it exists.
+const optimaPath = opt("--optima") ?? join(dirname(fileURLToPath(import.meta.url)), `../src/bench/exact/optima-${set.id}.json`);
+const optima = optimaPath !== "none" && existsSync(optimaPath) ? (JSON.parse(readFileSync(optimaPath, "utf8")) as ExactOptimaFile).optima : undefined;
+
 const commit = (() => {
   const given = opt("--commit") ?? process.env["GITHUB_SHA"];
   if (given) return given.slice(0, 7);
@@ -72,6 +94,8 @@ if (!Number.isInteger(edits) || edits < 0) throw new Error(`The value of --edits
 
 const start = performance.now();
 const report = screen(step, strategies, {
+  set,
+  ...(optima ? { optima } : {}),
   ...(inputs ? { inputs } : {}),
   ...(list("--families") ? { families: list("--families")! } : {}),
   baseline: !args.includes("--no-baseline"),

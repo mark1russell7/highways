@@ -4,3 +4,5 @@ export * from "./measures.ts";
 export * from "./set.ts";
 export * from "./screen.ts";
 export * from "./generators.ts";
+export * from "./exact-set.ts";
+export * from "./gap.ts";

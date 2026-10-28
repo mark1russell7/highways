@@ -28,6 +28,8 @@ export interface ExactModel {
   readonly rows: number;
   /** The number of edges in the model. An edge without a way in the stretch limit is not in the model. */
   readonly edges: number;
+  /** The length of the arc or the link of each binary variable, by its name. A name `x…` is an arc of an edge, and a name `y…` is a link of a key. */
+  readonly lengths: ReadonlyMap<string, number>;
   /** This function gives the plan of a solution. `value` gives the value of a variable by its name. */
   decode(value: (name: string) => number): HighwayPlan;
 }
@@ -105,6 +107,7 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
   const objective: string[] = [];
   const rows: string[] = [];
   const binaries: string[] = [];
+  const lengths = new Map<string, number>();
   const keys = [...new Set(ends.map((e) => e.key))];
   const used = new Map<string, Set<number>>();
   const arcsOf: { e: number; arcs: Arc[] }[] = [];
@@ -134,6 +137,7 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
     for (const a of arcs) {
       const x = `x${ei}_${a.link}_${a.from < a.to ? 0 : 1}`;
       binaries.push(x);
+      lengths.set(x, a.len);
       objective.push(`${(eps * a.len).toFixed(6)} ${x}`);
       term(a.from, `+ ${x}`);
       term(a.to, `- ${x}`);
@@ -156,6 +160,7 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
     for (const li of used.get(key) ?? []) {
       const y = `y${ki}_${li}`;
       binaries.push(y);
+      lengths.set(y, links[li]!.len);
       objective.push(`${links[li]!.len.toFixed(6)} ${y}`);
     }
   });
@@ -193,5 +198,5 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
     }
     return sharedStretches(ways, { minSize: 2 });
   };
-  return { lp, columns: binaries.length, rows: rows.length, edges: arcsOf.length, decode };
+  return { lp, columns: binaries.length, rows: rows.length, edges: arcsOf.length, lengths, decode };
 }
