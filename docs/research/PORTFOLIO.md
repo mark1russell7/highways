@@ -1,6 +1,6 @@
 # The portfolio of strategies
 
-This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A portfolio runs `shared` and k more strategies on an input. Then it keeps the output with the best guarded B1.
+This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A portfolio starts `shared` and k more strategies on an input. Then it keeps the output with the best guarded B1.
 
 - The score of the portfolio uses only the outputs. Thus the portfolio needs no prediction of the winner.
 - The note gives the Pareto curve of the portfolio: the gain for each k, on seeds that the choice of the set did not see. It also gives the time of each set.
@@ -46,8 +46,8 @@ gh workflow run screen.yml --ref <branch> -f report="--exact <id> --screen <id,.
 
 ## The method
 
-- **The portfolio.** The portfolio runs `shared` and each strategy of its set. It keeps the output with the best B1 among the outputs that pass the guard. `shared` always passes, so it is the fall back. A tie within `RECORD_EPS` goes to `shared`, then to the order of the set.
-- **The guard `q95`.** A run passes when its B3 q95 is at most the B3 q95 of `shared`, and each hard count is at most the count of `shared`. This is the guard of `ORACLE.md`, with the hard rules.
+- **The portfolio.** The portfolio starts `shared` and each strategy of its set. It keeps the output with the best B1 among the outputs that pass the guard. `shared` always passes, so it is the fall back. A tie within `RECORD_EPS` goes to `shared`, then to the order of the set.
+- **The guard `q95`.** A run passes when its B3 q95 is at most the B3 q95 of `shared`. Each hard count must also be at most the count of `shared`. This is the guard of `ORACLE.md`, with the hard rules.
 - **The guard `cap`.** A run passes when each hard count is at most the count of `shared`. It has no B3 condition.
 - **The cap of the stretch.** On `exact-v1`, each guard also needs the largest stretch at or below 1.5, the largest cap of the gap closed. Thus each choice has a gap closed. The stretch is a measure of the output.
 - **The greedy set.** On the train inputs, each step adds the strategy that gives the best median of the portfolio, then the best mean. The choice stops when no strategy improves the score. Thus some sets have fewer than k strategies.
@@ -194,7 +194,7 @@ The largest k that fits each budget, by the q95 of the time:
 | `exact-v1` | `cap` | 40 | none | 1 | 1 | 1 |
 
 - The forms of `mlseb` are the slow strategies of the sets: 83 to 102 ms at 40 nodes, 17 to 21 times `shared`. A set with them does not fit 100 ms at 40 nodes.
-- Without `mlseb`, each strategy of the sets takes 1 to 9 times `shared`. The score of an output takes about 0.3 ms at 40 nodes.
+- Without `mlseb`, each strategy of the sets takes 1 to 9 times `shared`. The score of an output takes approximately 0.3 ms at 40 nodes.
 - In parallel, the time is the time of the slowest strategy. Thus the parallel set of k = 3 of `screen-v1` fits 16 ms at 40 nodes on this machine.
 - The full tables, with each set at each size, are in the artifact of the report run.
 
@@ -213,7 +213,7 @@ The prediction of the item was written before the work.
 ## What this means
 
 - On `screen-v1`, the score of the portfolio is the score of the oracle. A portfolio of the whole pool reaches the oracle, but a small greedy set does not carry the winners of the boards with 1 seed.
-- On `exact-v1`, no score of the output alone gives the choice of the oracle. B1 without the guard prefers runs that mix collections, and the guard `q95` refuses almost each run.
+- On `exact-v1`, no score of the output alone gives the choice of the oracle. B1 without the guard prefers outputs that mix collections, and the guard `q95` refuses almost each run.
 - A portfolio can use a better score of the output. One option is the B1 above the baseline of the rule of the run, divided by a bound of the rule that needs no solve. The item SELECT can test it.
 - The time is small for most strategies. A portfolio of 3 fast strategies fits 100 ms at 40 nodes, one after the other, on a CI machine.
 - The item adds no strategy and changes no default, so it needs no release.
