@@ -148,7 +148,7 @@ export const BAND_BUDGET_MS = 50;
  * The target of the model of the time of the fit, in ms: the sum of the medians of the base, the setup of the key, and each member with the key on its output.
  * Without a margin, it is `BAND_BUDGET_MS`. A margin below it covers the noise between two CI runs (FIT-COST).
  */
-export const FIT_TARGET_MS = 50;
+export const FIT_TARGET_MS = 45;
 
 /** The summary of the times of the members (`portfolio-times/2`): the median time of each strategy at each size on the CI runner. */
 export interface MemberTimes {
