@@ -52,12 +52,18 @@ const SIDES: readonly Side[] = ["north", "east", "south", "west"];
 const GAP = 12;
 const SPACING = 90;
 
+/** This function gives the seed of the random numbers of a fixture: `(seed × 2654435761 + nodes) >>> 0`. */
+export function fixtureRngSeed(seed: number, nodes: number): number {
+  return (seed * 2654435761 + nodes) >>> 0;
+}
+
 /**
  * This function makes the graph of a fixture. The same spec always gives the same graph.
  * Node boxes do not overlap, and a gap of 12 units stays between them.
+ * The default source of random numbers is `rng(fixtureRngSeed(spec.seed, spec.nodes))`. A corpus family gives the same stream from its registry.
  */
-export function makeFixture(spec: FixtureSpec): Graph {
-  const R = rng(spec.seed * 2654435761 + spec.nodes);
+export function makeFixture(spec: FixtureSpec, random: () => number = rng(fixtureRngSeed(spec.seed, spec.nodes))): Graph {
+  const R = random;
   const gauss = (): number => Math.sqrt(-2 * Math.log(R() + 1e-12)) * Math.cos(2 * Math.PI * R());
   const side = Math.sqrt(spec.nodes) * SPACING;
   const grid = new Grid<Box>(SPACING);

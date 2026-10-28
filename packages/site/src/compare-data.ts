@@ -25,6 +25,7 @@ import {
   type Strategy,
 } from "@mark1russell7/highways";
 import { BOARDS } from "./boards.ts";
+import { cleanGen, genGraph, readGen, START_GEN, writeGen, type GenSpec } from "./generated.ts";
 import { controlOptions, readValue } from "./options.ts";
 
 export { controlOptions, type ControlOption } from "./options.ts";
@@ -55,6 +56,19 @@ export const COMPARE_BOARDS: readonly CompareBoard[] = [
 ]
   .filter((b) => b.graph.nodes.length <= COMPARE_MAX_NODES)
   .map((b) => ({ ...b, nodes: b.graph.nodes.length, edges: b.graph.edges.length }));
+
+/** The id of the generated board (CORPUS-GEN). The keys `family`, `seed` and the dimensions of the hash give its family, its seed and its dimensions. */
+export const GENERATED_BOARD = "generated";
+
+/** This function gives the board of a state: a board of `COMPARE_BOARDS`, or the generated board of `gen`. A generated board can have more than `COMPARE_MAX_NODES` nodes. */
+export function compareBoardOf(state: Pick<CompareState, "board" | "gen">): CompareBoard {
+  if (state.board === GENERATED_BOARD) {
+    const gen = cleanGen(state.gen ?? START_GEN);
+    const graph = genGraph(gen);
+    return { id: GENERATED_BOARD, name: `Generated ${gen.family}, seed ${gen.seed}`, graph, nodes: graph.nodes.length, edges: graph.edges.length };
+  }
+  return COMPARE_BOARDS.find((b) => b.id === state.board) ?? COMPARE_BOARDS[0]!;
+}
 
 /** The router whose routes the step `curve` draws. It shares the ways of the edges, so the board has bundles for the curve `highway`. */
 export const CURVE_ROUTER = "shared";
@@ -170,6 +184,8 @@ export interface CompareState {
   readonly options: OptionValues;
   /** The picked strategies of the step, in the order of the link. The page shows them first and marks them. */
   readonly pick?: readonly string[];
+  /** The generated board, when `board` is `GENERATED_BOARD`. */
+  readonly gen?: GenSpec;
 }
 
 /** The strategies of the key `pick` of a hash: the names of the step, and the names that the step does not have. */
@@ -243,7 +259,8 @@ export function parseHash(hash: string, registry: Registry = STRATEGIES): Compar
   const stepText = params.get("step");
   const step = PAGE_STEPS.find((s) => s === stepText) ?? START.step;
   const boardText = params.get("board");
-  const board = COMPARE_BOARDS.some((b) => b.id === boardText) ? boardText! : START.board;
+  const board = boardText === GENERATED_BOARD || COMPARE_BOARDS.some((b) => b.id === boardText) ? boardText! : START.board;
+  const gen = board === GENERATED_BOARD ? (readGen(params) ?? START_GEN) : undefined;
   const options: Record<string, Record<string, number | boolean | string>> = {};
   for (const strategy of listStrategies(registry, step) as readonly Strategy<Step, object>[]) {
     for (const o of controlOptions(strategy)) {
@@ -254,12 +271,13 @@ export function parseHash(hash: string, registry: Registry = STRATEGIES): Compar
     }
   }
   const { pick } = readPick(hash, step, registry);
-  return { step, board, options: cleanOptions(step, options, registry), ...(pick.length > 0 ? { pick } : {}) };
+  return { step, board, options: cleanOptions(step, options, registry), ...(pick.length > 0 ? { pick } : {}), ...(gen ? { gen } : {}) };
 }
 
 /** This function writes the state of the page as a URL hash. The hash keeps only the options that differ from the defaults. */
 export function formatHash(state: CompareState): string {
   const params = new URLSearchParams({ step: state.step, board: state.board });
+  if (state.board === GENERATED_BOARD) writeGen(state.gen ?? START_GEN, params);
   for (const [name, values] of Object.entries(state.options)) for (const [key, v] of Object.entries(values)) params.set(`${name}.${key}`, String(v));
   // The names keep their commas and their `+`, so the link stays easy to read.
   const pick = state.pick?.length ? `&pick=${state.pick.map((n) => encodeURIComponent(n).replace(/%2B/g, "+")).join(",")}` : "";
@@ -410,7 +428,7 @@ export interface PanelOptions {
  */
 export function computePanels(state: CompareState, options: PanelOptions = {}): ComparePanels {
   const registry = options.registry ?? STRATEGIES;
-  const board = COMPARE_BOARDS.find((b) => b.id === state.board) ?? COMPARE_BOARDS[0]!;
+  const board = compareBoardOf(state);
   const own = cleanOptions(state.step, state.options, registry);
   const t0 = performance.now();
   const progress = options.progress;

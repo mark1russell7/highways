@@ -8,6 +8,7 @@ import {
   type Graph,
 } from "@mark1russell7/highways";
 import { demoRoute } from "./demo-data.ts";
+import { genGraph, writeGen, type GenSpec } from "./generated.ts";
 import type { RouteReply, RouteRequest } from "./protocol.ts";
 
 // The routing runs here, so the page stays responsive while a router works on 1 000 nodes.
@@ -24,14 +25,27 @@ const graphOf = (name: string): Graph => {
   return g;
 };
 
+/** This function gives a generated board. The worker keeps the last 8 boards. */
+const genOf = (spec: GenSpec): Graph => {
+  const key = `gen:${writeGen(spec).toString()}`;
+  let g = graphs.get(key);
+  if (!g) {
+    g = genGraph(spec);
+    graphs.set(key, g);
+    for (const k of graphs.keys()) if (k.startsWith("gen:") && graphs.size > FIXTURES.length + 8) graphs.delete(k);
+  }
+  return g;
+};
+
 const now = (): number => performance.now();
 
 self.addEventListener("message", (event: MessageEvent<RouteRequest>) => {
-  const { id, fixture, pick } = event.data;
+  const { id, fixture, pick, gen } = event.data;
   let reply: RouteReply;
   try {
     const t0 = now();
-    const { graph, result } = demoRoute(graphOf(fixture), pick);
+    const input = gen ? genOf(gen) : graphOf(fixture);
+    const { graph, result } = demoRoute(input, pick);
     const ms = now() - t0;
     const shared = (result.runs?.length ?? 0) + (result.bundles?.length ?? 0) > 0;
     const segments = shared ? segmentsOf(result) : undefined;
@@ -43,6 +57,7 @@ self.addEventListener("message", (event: MessageEvent<RouteRequest>) => {
       ms,
       quality: measureQuality(graph, result),
       violations: checkProperties(graph, result, 1000).length,
+      ...(gen ? { graph: input } : {}),
       ...(pick.room ? { nodes: graph.nodes } : {}),
       ...(segments ? { segments } : {}),
       ...(apart ? { apart } : {}),

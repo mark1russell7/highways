@@ -32,6 +32,8 @@ export * from "./bench/suite.ts";
 export * from "./strategies/index.ts";
 export * from "./bench/compare.ts";
 export * from "./bench/screen/index.ts";
+// The corpus families of highways on the shared registry of the contract (CORPUS-GEN).
+export * from "./families/index.ts";
 // The stretch of the exact model, for a benchmark that compares routers with the measures of the portfolio (PORTFOLIO-SPEED).
 export { exactStretch, exactStretches } from "./bench/exact/index.ts";
 export * from "./highways/index.ts";

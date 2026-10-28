@@ -160,7 +160,6 @@ The rule for the next predictions:
 |---|---|---|---|---|
 | BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
 | SCREEN-MEASURES | The 11 measures that the screen does not have, for example `G4`, `Z5` and `M2`. It is the only enabler of the [build queue](research/CATALOG.md#the-enablers-queue2): rank 19, and it unblocks 21 ideas. | `later` | IDEA-QUEUE | P1 |
-| CORPUS-GEN | The example boards of the site become the corpus generator, with sliders for each parameter of a board. | `later` | CORPUS-SEEDS | P1 |
 | LANE-WALK | The lane order of a dense run without a walk for each compare. After ROUTE-SCALE, `partBefore` and `partAfter` take approximately 55% of a `shared` route on the dense board. The lane order stays the same. | `later` | ROUTE-SCALE | P2 |
 | BENCH-STEPS | Cheaper measures on a dense board: `exactStretches` (a landmark guide for `distancesTo`), `measureQuality` and `checkProperties`. The values stay the same. | `later` | ROUTE-SCALE | P3 |
 | STAGE-DATA | The stages of the routers and their options as data (`strategy-space/1` of layout-contract 0.2.10): `routeSpace`, `routeConfig` and each router of today as a named point with an equal route hash. | `later` | LANE-STRETCH, OPTS | P1 |

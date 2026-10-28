@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { defineStrategy, findStrategy, getStrategy } from "../../strategies/model.ts";
 import { canonicalJson, documentHash, fnv1a32, mulberry32, round3, sha256Hex, stepSeed } from "./hash.ts";
+import { createFamilyRegistry, RECT_SCATTERED } from "@mark1russell7/layout-contract";
 import { rectScattered } from "./generators.ts";
 import { formatInput, graphInput, inputGraph, parseLines, recordLines, type LayoutInput, type LayoutRecord } from "./forms.ts";
 import { MEASURES, measureByKey } from "./measures.ts";
@@ -71,22 +72,29 @@ describe("the generators (layout-corpus/1)", () => {
     expect(Object.is(round3(-0), 0)).toBe(true);
   });
 
-  it("gives the hashes of packing for rect-scattered, version 1, with 40 boxes", () => {
+  it("gives the hashes of packing for rect-scattered, version 1, with 40 boxes, from the shared family `RECT_SCATTERED`", () => {
+    const shared = createFamilyRegistry([RECT_SCATTERED]);
+    const sharedInput = (seed: number, params: { count: number }) => shared.generate("rect-scattered", seed, params);
     const pins = [
       { seed: 1, w: 970, h: 705, n: 4, hash: "f5f5c51d1560e41c" },
       { seed: 2, w: 733, h: 437, n: 7, hash: "cfd6ef0ef232aaa3" },
       { seed: 3, w: 871, h: 554, n: 8, hash: "d1638f2406360b2e" },
     ];
     for (const p of pins) {
-      const input = rectScattered(p.seed, { count: 40 });
+      const input = sharedInput(p.seed, { count: 40 });
       expect(input.container).toEqual({ w: p.w, h: p.h, fixed: "size" });
       expect(input.obstacles).toHaveLength(p.n);
       expect(input.boxes).toHaveLength(40);
       expect(input.hash).toBe(p.hash);
       expect(documentHash(input)).toBe(p.hash);
-      expect(rectScattered(p.seed, { count: 40 }).hash).toBe(p.hash);
+      expect(sharedInput(p.seed, { count: 40 }).hash).toBe(p.hash);
     }
-    expect(rectScattered(1, { count: 40 }).obstacles?.[0]).toEqual({ id: "o0", region: { kind: "rect", x: 690, y: 281, w: 111, h: 100 } });
+    expect(sharedInput(1, { count: 40 }).obstacles?.[0]).toEqual({ id: "o0", region: { kind: "rect", x: 690, y: 281, w: 111, h: 100 } });
+  });
+
+  it("keeps `rectScattered` as a call of the shared family: the same input for each seed and set", () => {
+    const shared = createFamilyRegistry([RECT_SCATTERED]);
+    for (const seed of [1, 2, 3, 17]) expect(rectScattered(seed, { count: 12 }, "xcheck-v2")).toEqual(shared.generate("rect-scattered", seed, { count: 12 }, { set: "xcheck-v2" }));
   });
 });
 

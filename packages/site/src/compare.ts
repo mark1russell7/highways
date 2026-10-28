@@ -4,7 +4,10 @@ import {
   cleanOptions,
   COLUMNS,
   COMPARE_BOARDS,
+  COMPARE_MAX_NODES,
+  compareBoardOf,
   formatHash,
+  GENERATED_BOARD,
   formatValue,
   PACKED_BOARD,
   PAGE_STEPS,
@@ -17,6 +20,8 @@ import {
   type Panel,
 } from "./compare-data.ts";
 import { html, sectionOf } from "./content.ts";
+import { genPanel } from "./gen-controls.ts";
+import { cleanGen, START_GEN, type GenSpec } from "./generated.ts";
 import { optionSet } from "./option-control.ts";
 import type { CompareReply, CompareRequest } from "./protocol.ts";
 import "./style.css";
@@ -57,7 +62,7 @@ let scrollToPick = (state.pick?.length ?? 0) > 0;
 const picked = (name: string): boolean => state.pick?.includes(name) ?? false;
 
 /** This function gives the hash of the state without the pick. Two states with the same text need the same run. */
-const runKey = (s: CompareState): string => formatHash({ step: s.step, board: s.board, options: s.options });
+const runKey = (s: CompareState): string => formatHash({ step: s.step, board: s.board, options: s.options, ...(s.gen ? { gen: s.gen } : {}) });
 
 $("intro").innerHTML = html(compareText.split(/\r?\n## /)[0]!.trim());
 $("howto-body").innerHTML = html(sectionOf(compareText, "How to read the panels"));
@@ -96,9 +101,10 @@ function run(): void {
   worker ??= startWorker();
   busy = true;
   next++;
-  const board = COMPARE_BOARDS.find((b) => b.id === state.board)!;
+  const board = compareBoardOf(state);
   const count = listStrategies(STRATEGIES, state.step).length;
-  $("status").textContent = `The worker runs ${count} ${NOUNS[state.step]} on ${board.name}…`;
+  const large = board.nodes > COMPARE_MAX_NODES ? ` The board has ${fmt.format(board.nodes)} nodes, more than ${COMPARE_MAX_NODES}, so some strategies take a long time.` : "";
+  $("status").textContent = `The worker runs ${count} ${NOUNS[state.step]} on ${board.name}…${large}`;
   $("panels").setAttribute("aria-busy", "true");
   $("panels").classList.add("stale");
   const request: CompareRequest = { id: next, state };
@@ -111,7 +117,10 @@ function set(change: Partial<CompareState>): void {
   // The names of a pick are names of one step, so a new step clears the pick.
   const pick = change.pick ?? (change.step && change.step !== state.step ? [] : (state.pick ?? []));
   const before = runKey(state);
-  state = { step, board: change.board ?? state.board, options: cleanOptions(step, change.options ?? (change.step ? {} : state.options)), ...(pick.length > 0 ? { pick } : {}) };
+  const board = change.board ?? state.board;
+  // The generated board keeps its spec. The first choice of the board starts at `START_GEN`.
+  const gen = board === GENERATED_BOARD ? cleanGen(change.gen ?? state.gen ?? START_GEN) : undefined;
+  state = { step, board, options: cleanOptions(step, change.options ?? (change.step ? {} : state.options)), ...(pick.length > 0 ? { pick } : {}), ...(gen ? { gen } : {}) };
   unknown = [];
   const hash = formatHash(state);
   if (location.hash !== hash) history.replaceState(null, "", hash);
@@ -156,6 +165,7 @@ for (const b of COMPARE_BOARDS) {
   option.textContent = `${b.name}: ${fmt.format(b.nodes)} nodes, ${fmt.format(b.edges)} edges`;
   boardSelect.append(option);
 }
+boardSelect.append(new Option("Generated: a family, a seed and its dimensions", GENERATED_BOARD));
 boardSelect.addEventListener("change", () => set({ board: boardSelect.value }));
 $("reset").addEventListener("click", () => set({ options: {} }));
 addEventListener("hashchange", () => {
@@ -186,6 +196,9 @@ function controls(): void {
     b.tabIndex = on ? 0 : -1;
   }
   boardSelect.value = state.board;
+  const gen = $("gen-board");
+  gen.hidden = state.board !== GENERATED_BOARD;
+  gen.replaceChildren(...(state.gen ? [genPanel("cmp", state.gen, (spec: GenSpec) => set({ gen: spec }))] : []));
   const body = $("option-body");
   body.replaceChildren();
   let changed = 0;
@@ -239,7 +252,7 @@ const timeOf = (p: Panel): number => p.measures.find((m) => m.key === "ms")?.val
 /** This function shows the panels and the table of the measures. */
 function show(all: ComparePanels): void {
   const data: ComparePanels = { ...all, panels: pickFirst(all.panels, state.pick) };
-  const board = COMPARE_BOARDS.find((b) => b.id === data.board)!;
+  const board = data.board === GENERATED_BOARD ? compareBoardOf(state) : COMPARE_BOARDS.find((b) => b.id === data.board)!;
   const columns = COLUMNS[data.step];
   const front = data.panels.filter((p) => p.front).map((p) => `<strong>${esc(p.strategy)}</strong>`);
   const axes = data.objectives.map((o) => `${AXIS_NAMES[o.key] ?? columns.find((c) => c.key === o.key)?.label.toLowerCase() ?? o.key} ${o.better === "min" ? "↓" : "↑"}`);
