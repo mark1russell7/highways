@@ -490,19 +490,23 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
         return `| ${kText} | ${p.inputs.length} | ${f3(quantile(p.portfolio, 0.5))} | ${f3(quantile(p.single, 0.5))} | ${f3(quantile(p.oracle, 0.5))} | ${pct(p.share)} | ${p.shares.map(pct).join(" / ")} | ${sets[0]} | ${sets[1]} |`;
       }),
       "",
-      "The portfolio over the best single strategy on each board that decides, on the test inputs:",
-      "",
-      `| k | ${DECISION_BOARDS.map(code).join(" | ")} | boards at 15% or more |`,
-      `|---:|${DECISION_BOARDS.map(() => "---:").join("|")}|---:|`,
-      ...curve.map((p) => {
-        const byBoard = DECISION_BOARDS.map((b) => {
-          const idx = p.inputs.map((i, n) => [i, n] as const).filter(([i]) => familyOf(i) === b);
-          return idx.length === 0 ? Number.NaN : quantile(idx.map(([, n]) => p.portfolio[n]! / p.single[n]!), 0.5);
-        });
-        const kText = p.k >= pool.length ? `all ${pool.length - 1}` : String(p.k);
-        return `| ${kText} | ${byBoard.map(f3).join(" | ")} | ${byBoard.filter((v) => v >= 1.15 - RECORD_EPS).length} of ${byBoard.filter((v) => !Number.isNaN(v)).length} |`;
-      }),
-      "",
+      ...(["single", "shared"] as const).flatMap((against) => [
+        against === "single"
+          ? "The portfolio over the best single strategy on each board that decides, on the test inputs:"
+          : "The portfolio over `shared` on each board that decides, on the test inputs:",
+        "",
+        `| k | ${DECISION_BOARDS.map(code).join(" | ")} | boards at 15% or more |`,
+        `|---:|${DECISION_BOARDS.map(() => "---:").join("|")}|---:|`,
+        ...curve.map((p) => {
+          const byBoard = DECISION_BOARDS.map((b) => {
+            const idx = p.inputs.map((i, n) => [i, n] as const).filter(([i]) => familyOf(i) === b);
+            return idx.length === 0 ? Number.NaN : quantile(idx.map(([, n]) => p.portfolio[n]! / (against === "single" ? p.single[n]! : 1)), 0.5);
+          });
+          const kText = p.k >= pool.length ? `all ${pool.length - 1}` : String(p.k);
+          return `| ${kText} | ${byBoard.map(f3).join(" | ")} | ${byBoard.filter((v) => v >= 1.15 - RECORD_EPS).length} of ${byBoard.filter((v) => !Number.isNaN(v)).length} |`;
+        }),
+        "",
+      ]),
     );
     data["screen"] = curve;
     const decision = inputs.filter((i) => DECISION_BOARDS.includes(familyOf(i)));
