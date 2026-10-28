@@ -16,3 +16,4 @@ Choose a step and a board. Each strategy of the step runs on the same board, and
 - The step `highway` has more than 50 strategies, so it runs for some seconds. The line of the status shows the progress after each strategy and the slowest strategies.
 - A worker in your browser runs the strategies, so the time is the time on your device.
 - The link of the page keeps the step, the board and the options. Send it, and the same view opens.
+- The key `pick` of the link picks strategies, for example `#step=highway&pick=corridors,keys`. The page shows them first and marks them. The page ignores a name that the step does not have, and a note tells it.

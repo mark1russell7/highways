@@ -1215,6 +1215,31 @@ pre code {
   white-space: nowrap;
 }
 
+.cmp-panel.picked {
+  outline: 3px solid var(--sign-bg);
+  outline-offset: 2px;
+}
+
+.cmp-table tr.picked th {
+  box-shadow: inset 4px 0 0 var(--sign-bg);
+}
+
+.tag.picked {
+  color: var(--sign-bg);
+  border-color: var(--sign-bg);
+}
+
+.cmp-pick {
+  font-size: 0.78rem;
+}
+
+.cmp-pick-note {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-left: 4px solid var(--sign-bg);
+  background: var(--panel);
+}
+
 .tag.front {
   color: var(--sign-ink);
   background: var(--sign-bg);

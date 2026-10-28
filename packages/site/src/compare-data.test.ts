@@ -1,6 +1,6 @@
 import { BUILT_IN_STRATEGIES, createRegistry, defineStrategy, listStrategies, STRATEGIES, straightRouter, type Graph } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
-import { bestValues, COLUMNS, COMPARE_BOARDS, computePanels, formatHash, parseHash, type ComparePanels } from "./compare-data.ts";
+import { bestValues, COLUMNS, COMPARE_BOARDS, computePanels, formatHash, parseHash, pickFirst, readPick, type ComparePanels } from "./compare-data.ts";
 
 /** The board of 100 nodes: the fixture `small-clustered`, with made-up data. */
 const BOARD = "small-clustered";
@@ -102,5 +102,23 @@ describe("the panels of the compare page (EX2)", () => {
     // A value out of the range moves into the range. A default, an unknown key and a bad value drop out.
     expect(parseHash("#step=curve&board=delivery&arc.radius=99999&arc.nope=1&rounded.radius=12&highway.jog=zigzag").options).toEqual({ arc: { radius: 48 } });
     expect(parseHash("#step=nope&board=nope")).toEqual({ step: "router", board: "delivery", options: {} });
+  });
+
+  it("opens with the strategies of the key pick, and ignores a name that the step does not have (COMPARE-PICK)", () => {
+    // One name, as a card of the strategies links it.
+    expect(parseHash("#step=highway&pick=corridors").pick).toEqual(["corridors"]);
+    // Two names or more, in the order of the link, each one time. A `+` of a name stays, raw or as `%2B`.
+    const state = parseHash("#step=highway&board=delivery&pick=keys,corridors+stretch,keys,corridors%2Bbreakeven");
+    expect(state.pick).toEqual(["keys", "corridors+stretch", "corridors+breakeven"]);
+    expect(formatHash(state)).toBe("#step=highway&board=delivery&pick=keys,corridors+stretch,corridors+breakeven");
+    expect(parseHash(formatHash(state))).toEqual(state);
+    // A name of another step, a made-up name and an empty name: the page ignores them, and the note tells the first two.
+    expect(readPick("#step=router&pick=shared,arc,nope,,", "router")).toEqual({ pick: ["shared"], unknown: ["arc", "nope"] });
+    expect(parseHash("#step=router&pick=nope").pick).toBeUndefined();
+    expect(parseHash("#step=router").pick).toBeUndefined();
+    // The picked panels come first, in the order of the pick. The other panels keep the order of the registry.
+    const rows = ["a", "b", "c", "d"].map((strategy) => ({ strategy }));
+    expect(pickFirst(rows, ["c", "a"]).map((r) => r.strategy)).toEqual(["c", "a", "b", "d"]);
+    expect(pickFirst(rows).map((r) => r.strategy)).toEqual(["a", "b", "c", "d"]);
   });
 });
