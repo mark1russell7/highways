@@ -501,8 +501,12 @@ async function bench(): Promise<void> {
       { name: "Bends", get: (r) => r.quality.bends, show: (v) => v.toFixed(2) },
       { name: "Detour", get: (r) => r.quality.detour, show: (v) => v.toFixed(2) },
       { name: "Broken rules", get: (r) => r.violations, show: (v) => fmt.format(v) },
+      // The paired arm (BENCH-GREEN): the time of the router over the time of `shared` in turn on the same CPU. Only a newer snapshot has it.
+      ...(list.some((r) => r.paired)
+        ? [{ name: "Time ÷ shared", get: (r: BenchRow) => r.paired?.ratio ?? Number.NaN, show: (v: number) => (Number.isNaN(v) ? "-" : v.toFixed(2)) }]
+        : []),
     ];
-    const best = cols.map((c) => Math.min(...list.map(c.get)));
+    const best = cols.map((c) => Math.min(...list.map(c.get).filter((v) => !Number.isNaN(v))));
     const first = list[0];
     const head = `<tr><th scope="col">Router</th>${cols.map((c) => `<th scope="col">${c.name}</th>`).join("")}</tr>`;
     const body = list

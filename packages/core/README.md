@@ -607,6 +607,12 @@ The script `bench` takes `--seeds <n>` and `--report <file>`. A family with more
 
 The workflow `Bench` runs the suite in parts. Each part writes its report, and `joinReports` joins the reports into the report of one run.
 
+Three options of `runSuite` keep each part short (BENCH-GREEN):
+
+- `shard` runs one shard of the cells of the steps `router` and `highway`. The strategy at place `s` on the seed `k` belongs to the shard `(s + k) % count`.
+- `caps` stops a strategy above a fixture size. The report lists each such cell in `capped`.
+- `pair` names a baseline router, for example `shared`. On the first seed of each fixture to `pairMax` nodes, the baseline routes in turn with each strategy. The row gets `paired`, with the two medians and their ratio.
+
 `compareStep` runs each strategy of one step on one board, with the measures of the suite. It gives one row for each strategy and the Pareto front of the step. The options give each strategy its own options.
 
 `compareAnyStep` does the same for each step of `COMPARE_ALL_STEPS`, which is `STEPS`. The compare page of the site uses it.

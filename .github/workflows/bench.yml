@@ -5,6 +5,9 @@
 # Each cell has a time limit. After the routes of a cell pass the limit, the cell starts no more routes, and its row shows "over the limit".
 # The measure suite runs each fixture family over `seeds` seeds to 1 000 nodes, and over one seed above. Each part keeps its report.
 # The job `join` joins the reports into one report.json, in the same artifact as bench.json.
+# BENCH-GREEN: the step `highway` of the suite runs in `shards` shards (`--shard`). Each shard gets one seed of each strategy, so the shards take similar times.
+# The input `caps` stops a slow strategy above a fixture size. The report and the summary list each capped cell, so the row is capped, not missing.
+# Each part to 1 000 nodes also routes `shared` in turn with each strategy on the first seed (`--pair shared`), so each strategy gets a ratio from the same CPU.
 name: Bench
 
 on:
@@ -24,6 +27,12 @@ on:
       seeds:
         description: "The seeds of each fixture family to 1 000 nodes (the measure suite gives the median and the spread). A larger family gets one seed."
         default: "5"
+      shards:
+        description: "The shards of the step highway of the suite, to 1 000 nodes."
+        default: "10"
+      caps:
+        description: "The caps of slow strategies, as name=nodes with commas. An empty text has no cap. The nightly run has no cap."
+        default: "mlseb=400"
 
 permissions:
   contents: read
@@ -43,6 +52,7 @@ jobs:
       max: ${{ steps.plan.outputs.max }}
       repeat: ${{ steps.plan.outputs.repeat }}
       seeds: ${{ steps.plan.outputs.seeds }}
+      caps: ${{ steps.plan.outputs.caps }}
     steps:
       - name: Plan the parts
         id: plan
@@ -50,18 +60,30 @@ jobs:
           MAX: ${{ github.event_name == 'schedule' && '100000' || inputs.max || '10000' }}
           REPEAT: ${{ inputs.repeat || '3' }}
           SEEDS: ${{ inputs.seeds || '5' }}
+          SHARDS: ${{ inputs.shards || '10' }}
+          # A dispatch can give an empty text, so the default comes from the event, not from `||`.
+          CAPS: ${{ github.event_name == 'workflow_dispatch' && inputs.caps || github.event_name == 'push' && 'mlseb=400' || '' }}
         # Each part has the nodes of its fixtures, the options of `pnpm bench`, the cell limit in milliseconds and the time limit of its job in minutes.
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
-        # Each step of the measure suite runs in one part of each size: `small` runs each step, and the parts `rest` run the step `group`.
+        # Each step of the measure suite runs in one part of each size: `small` runs each step but `highway`, and the parts `rest` run the step `group`.
         # The part `opt-in` races the opt-in router `portfolio` (PORTFOLIO-API) to 400 nodes, with one seed. The default race does not have it.
         # With k = 3, one fixture of 1 000 nodes took approximately 9 minutes. The default is now the fit (PORTFOLIO-FIT), and the part keeps its limit of 400 nodes.
+        # BENCH-GREEN: on 2026-10-28, the part `small` with each step went past its 30 min. The step `highway` took approximately 43 min of it.
+        # So the parts `highway-<i>of<n>` run the step `highway` to 1 000 nodes, one shard each.
+        # In the dispatch 40762459102 with 6 shards, the step took 696 to 1154 s in one shard. A slow runner takes up to 1.6 times as long.
+        # So the default is 10 shards, each with a job limit of 30 min.
         run: |
           [[ "$MAX" =~ ^[0-9]+$ ]] || { echo "max must be a number, not '$MAX'"; exit 1; }
           [[ "$REPEAT" =~ ^[1-9][0-9]*$ ]] || { echo "repeat must be a number of 1 or more, not '$REPEAT'"; exit 1; }
           [[ "$SEEDS" =~ ^[1-9][0-9]*$ ]] || { echo "seeds must be a number of 1 or more, not '$SEEDS'"; exit 1; }
-          parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" '[
-            {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds)", limit: 900000, timeout: 30},
-            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio,shared-stretch --routers portfolio,shared-stretch", limit: 900000, timeout: 30},
+          [[ "$SHARDS" =~ ^[1-9][0-9]*$ ]] || { echo "shards must be a number of 1 or more, not '$SHARDS'"; exit 1; }
+          [[ "$CAPS" =~ ^([A-Za-z0-9+_-]+=[0-9]+(,[A-Za-z0-9+_-]+=[0-9]+)*)?$ ]] || { echo "caps must be name=nodes with commas, not '$CAPS'"; exit 1; }
+          caps=""
+          if [ -n "$CAPS" ]; then caps=" --caps $CAPS"; fi
+          parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" --argjson shards "$SHARDS" --arg caps "$caps" '[
+            {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds) --suite-steps router,curve,room,group --pair shared\($caps)", limit: 300000, timeout: 30},
+            (range(1; $shards + 1) as $i | {name: "highway-\($i)of\($shards)", min: 0, max: ([$max, 1000] | min), args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps highway --shard \($i)/\($shards) --pair shared\($caps)", limit: 300000, timeout: 30}),
+            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio,shared-stretch --routers portfolio,shared-stretch --pair shared", limit: 900000, timeout: 30},
             {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared-all", limit: 900000, timeout: 40},
             {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared,sections", limit: 900000, timeout: 40},
             {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router,group --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},
@@ -70,7 +92,7 @@ jobs:
             {name: "huge-rest", min: 100000, max: 100000, args: "--rows-only --repeat 1 --seeds \($seeds) --suite-steps router,group --skip-routers sections,sections-tree", limit: 3600000, timeout: 300}
           ] | map(select(.min <= $max))')
           echo "$parts" | jq .
-          { echo "parts=$parts"; echo "max=$MAX"; echo "repeat=$REPEAT"; echo "seeds=$SEEDS"; } >> "$GITHUB_OUTPUT"
+          { echo "parts=$parts"; echo "max=$MAX"; echo "repeat=$REPEAT"; echo "seeds=$SEEDS"; echo "caps=$CAPS"; } >> "$GITHUB_OUTPUT"
 
   part:
     needs: plan
@@ -129,6 +151,7 @@ jobs:
       MAX: ${{ needs.plan.outputs.max }}
       REPEAT: ${{ needs.plan.outputs.repeat }}
       SEEDS: ${{ needs.plan.outputs.seeds }}
+      CAPS: ${{ needs.plan.outputs.caps }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -170,6 +193,8 @@ jobs:
             done
             echo
             echo "Cells over the limit: $(jq '[.[] | select(.overLimit)] | length' bench.json)"
+            echo
+            echo "Caps: ${CAPS:-none}. Capped cells: $(jq '.capped // [] | length' report.json). Rows with the paired arm of shared: $(jq '[.rows[] | select(.paired)] | length' report.json)."
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

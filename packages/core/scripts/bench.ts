@@ -1,6 +1,8 @@
 // The command line of the benchmark: `pnpm bench [--min <nodes>] [--max <nodes>] [--repeat <n>] [--routers <a,b>] [--skip-routers <a,b>]
 // [--cell-limit <ms>] [--rows-only] [--seeds <n>] [--seeds-max-nodes <nodes>] [--stability-max <nodes>] [--suite-steps <a,b>]
-// [--opt-in <a,b>] [--json <file>] [--side-tables <file>] [--report <file>]`.
+// [--opt-in <a,b>] [--shard <i>/<n>] [--caps <name>=<nodes>,...] [--pair <router>] [--pair-max <nodes>] [--json <file>] [--side-tables <file>] [--report <file>]`.
+// `--shard 2/6` runs the second of six shards of the cells of the steps `router` and `highway` (BENCH-GREEN). `SuiteOptions.shard` tells which cells.
+// `--caps mlseb=400` stops a strategy above a fixture size. The report lists the capped cells. `--pair shared` adds the paired baseline arm.
 // `--opt-in` adds opt-in routers to the race, for example `portfolio` (PORTFOLIO-API). The default race does not have them.
 // The workflow `Bench` starts one part of the benchmark in each job, with `--min`, `--max`, `--routers` and `--rows-only`.
 // The script `bench-join.ts` joins the parts.
@@ -22,7 +24,7 @@ import { sharedStretchStrategy } from "../src/lane-orders/stretch/router.ts";
 import { portfolioStrategy } from "../src/portfolio/router.ts";
 import { STRATEGIES as BUILT_IN } from "../src/strategies/builtins.ts";
 import { listStrategies, register, routersOf, STEPS, type AnyStrategy, type Step } from "../src/strategies/model.ts";
-import { formatFronts, formatMeasureTime, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
+import { formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -55,6 +57,20 @@ const rowsOnly = args.includes("--rows-only");
 // The steps of the measure suite. A part of the workflow `Bench` runs some steps only, so each step runs in one part.
 const suiteSteps = (list("--suite-steps") ?? [...STEPS]) as Step[];
 for (const step of suiteSteps) if (!STEPS.includes(step)) throw new Error(`There is no step "${step}"`);
+// The shard of the cells, as `<i>/<n>` with i from 1 to n. The suite counts the shards from 0.
+const shardText = opt("--shard");
+const shardMatch = shardText === undefined ? undefined : /^(\d+)\/(\d+)$/.exec(shardText);
+if (shardText !== undefined && (!shardMatch || Number(shardMatch[1]) < 1 || Number(shardMatch[1]) > Number(shardMatch[2])))
+  throw new Error(`--shard needs <i>/<n> with i from 1 to n, not "${shardText}"`);
+const shard = shardMatch ? { index: Number(shardMatch[1]) - 1, count: Number(shardMatch[2]) } : undefined;
+// The caps of the strategies, as `<name>=<nodes>` with commas. An empty text has no cap.
+const caps: Record<string, number> = {};
+for (const item of list("--caps") ?? []) {
+  const m = /^(.+)=(\d+)$/.exec(item);
+  if (!m) throw new Error(`--caps needs <name>=<nodes>, not "${item}"`);
+  caps[m[1]!.trim()] = Number(m[2]);
+}
+const pair = opt("--pair");
 // The measure suite (MEAS1) runs each fixture family over the seeds. Its first seed gives the rows of today.
 // A family with more nodes than `--seeds-max-nodes` gets one seed only.
 const suite = runSuite({
@@ -68,6 +84,9 @@ const suite = runSuite({
   routers: ROUTERS.map((r) => r.name),
   steps: suiteSteps,
   cellLimit,
+  ...(shard ? { shard } : {}),
+  caps,
+  ...(pair ? { pair, pairMax: number("--pair-max", 1000) } : {}),
   log: (line) => process.stderr.write(line + "\n"),
 });
 const rows = suite.bench;
@@ -111,6 +130,15 @@ console.log(formatRules(report.rules));
 for (const step of ["router", "group"] as const) {
   console.log();
   console.log(formatMeasureTime(report.rows, step));
+}
+// The capped cells and the paired arm (BENCH-GREEN).
+if (report.capped) {
+  console.log();
+  console.log(formatCapped(report.capped));
+}
+if (report.rows.some((r) => r.paired)) {
+  console.log();
+  console.log(formatPaired(report.rows));
 }
 const out = opt("--report");
 if (out) writeFileSync(out, JSON.stringify(report) + "\n");

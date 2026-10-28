@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { CASES } from "../src/cases.ts";
 import { FIXTURES } from "../src/fixtures.ts";
 import { formatFaults, formatLevels, formatTable, orderRows, type BenchRow } from "../src/bench/run.ts";
-import { formatFronts, formatMeasureTime, formatRules, formatSummaries, joinReports, type SuiteReport } from "../src/bench/suite.ts";
+import { formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, joinReports, type SuiteReport } from "../src/bench/suite.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { routersOf } from "../src/strategies/model.ts";
 
@@ -50,6 +50,15 @@ console.log(formatRules(report.rules));
 for (const step of ["router", "group"] as const) {
   console.log();
   console.log(formatMeasureTime(report.rows, step));
+}
+// The capped cells and the paired arm (BENCH-GREEN): a capped cell shows "capped", so the row is not missing.
+if (report.capped) {
+  console.log();
+  console.log(formatCapped(report.capped));
+}
+if (report.rows.some((r) => r.paired)) {
+  console.log();
+  console.log(formatPaired(report.rows));
 }
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
