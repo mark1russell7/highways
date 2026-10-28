@@ -123,6 +123,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SCHEMA-GAPS | The router `portfolio` gets a schema of each option except the clock `now`. The option `rule` of 6 strategies takes the names `collection` and `all`. On the compare page, 6 options move from text to a control. No default output changes. | 2026-10-28 | #152 |
 | BUILD-W3G | [Wave 3G](research/CATALOG.md#wave-3g-build-w3g): `steiner`, `gaps`, `streets`, `search` and `interchanges` of the step `highway`, and the opt-in router `attraction`. `gaps` and `interchanges` get B1 `better` with 0 families against on both sets, but each loses a named win. `steiner` adds routes through boxes. `search` gains nothing over its start and is dropped. `attraction` gains 0.003 of B1 at 2.8 times the time of `shared`. The defaults do not change. | 2026-10-28 | #142 |
 | PORT-ALONG | [A plug at a fraction along one side](../packages/core/README.md#plugs): `Port.along` of `@mark1russell7/layout-contract` 0.2.15. `resolvePorts` gives such a plug a fixed `at` at the start of each router. A taller box keeps the plug on its fraction of the side. A graph with no `along` gives the same output. | 2026-10-28 | #161 |
+| SCREEN-MEASURES | The screen computes the 11 measures that it did not have: C4, C8, G4, G5, G7, H3, M2, M3, M5, Z1 and Z5. Each one has a [definition](research/MEASURES.md#the-exact-forms-of-screen-measures) that the results page shows. The 21 ideas with a block `measure:` are ranked with no block, and the blocked ideas go from 38 to 17. No route output changes. | 2026-10-28 | #165 |
 
 ## Calibration
 
@@ -163,7 +164,6 @@ The rule for the next predictions:
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
-| SCREEN-MEASURES | The 11 measures that the screen does not have, for example `G4`, `Z5` and `M2`. It is the only enabler of the [build queue](research/CATALOG.md#the-enablers-queue2): rank 25 after BUILD-W3G, and it unblocks 21 ideas. | `later` | IDEA-QUEUE | P1 |
 | INTERIOR-ROUTE | Routes inside a node that is a frame. Slice 1 routes from each inner box to a plug on a wall of the node, inside the node and around the other inner boxes. Slice 2 routes from inner box to inner box. The input uses `LayoutBox.parent`, the ports and `Port.along`. | `later` | STEP-SLOTS | P1 |
 | PASS-GRID | On `screen-v2`, each highway strategy has too many pass-throughs on some `packed-grid` seed, so the front of the highway screen is empty. Find the cause on the worst seeds: the plan, `follow`, or the floor. | `later` | CORPUS-SEEDS | P1 |
 | CORPUS-FAMILIES | 12 or more input families from the dimensions of the generator, so a verdict over families has power. Today `screen-v2` has 6, and a sign test passes only at 6 of 6. | `later` | CORPUS-GEN | P1 |
