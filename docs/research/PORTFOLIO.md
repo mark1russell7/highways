@@ -769,3 +769,44 @@ The share of the oracle gain at the fit, on the test seeds 5 to 9, before and af
 | 2. The 3 cells above 50 ms each lose one member, and the share falls by 10 points or less. | Not met: at 12 nodes, `all` 1.1 loses 3 members and `all` 1.25 loses 4. The shares fall by 0 and 6 points. At 40 nodes, `all` 1.25 loses its one member, and the fit is `shared` alone. |
 | 3. A fit from one clean run changes 1 set or more up to 40 nodes. | Met: 2 sets at 13 to 24 nodes, and the fit in 14 of 18 cells up to 40 nodes. |
 | 4. The router has a median of 50 ms or less and a q95 of 80 ms or less in each cell. | Partly met: the median is 48 ms or less in each of the 48 cells. The q95 is 91 ms in 1 cell. |
+
+## The defaults of 0.5.1 and 0.6.0
+
+Version 0.6.0 changes the default output of `routePortfolio`. This table gives the default of each rule, cap and band in the two versions. A default is the base `shared`, then the members of the fit, in their order. The number after each member is its node limit.
+
+- PORTFOLIO-SPEED (#118) added the bands n41-64 and n65-128. In 0.5.1, an input above 40 nodes used `shared` alone.
+- TIE-GRID (#119) took the tie rule of layout-contract 0.2.7. It moved one member of `collection|1.1|n13-24`.
+- FIT-COST (#123) counts the key of each member, and sets the target of the fit to 42 ms.
+
+| Rule | Cap | Band | 0.5.1 | 0.6.0 |
+|---|---|---|---|---|
+| `all` | 1.1 | n1-12 | `w2b:zipper-p2` (12), `hw:cubu` (12), `w3d:kdeeb+stretch` (12), `w3c:hough-wide` (12), `w3d:kdeeb-routes` (12), `hw:stubs` (12), `hw:spiral` (12), `w3b:growth-s0.7` (12) | `w2b:zipper-p2` (12), `hw:cubu` (12), `w3d:kdeeb+stretch` (12), `w3c:hough-wide` (12), `w3d:kdeeb-routes` (12), `hw:stubs` (10), `hw:spiral` (10), `w3b:growth-s0.7` (10) |
+| `all` | 1.1 | n13-24 | `w3e:frechet-e0.5` (24), `w3a:diffusion-wide` (24), `w2c:zipper+stretch-b1.1` (24), `w3d:cubu+stretch` (18) | `w3e:frechet-e0.5` (24), `w3a:diffusion-wide` (24), `w2c:zipper+stretch-b1.1` (24), `w3d:cubu+stretch` (18) |
+| `all` | 1.1 | n25-40 | `w2c:zipper+stretch-b1.1` (32), `w3a:spiral-a15` (32) | `w2c:zipper+stretch-b1.1` (40), `w3a:spiral-a15` (32) |
+| `all` | 1.1 | n41-64 | `shared` alone (no band) | `shared` alone |
+| `all` | 1.1 | n65-128 | `shared` alone (no band) | `shared` alone |
+| `all` | 1.25 | n1-12 | `w3d:kdeeb-routes` (12), `w3e:mlseb+stretch` (12), `hw:growth` (12), `hw:level-links` (12), `w3b:growth-input` (12), `w3e:confluent+stretch` (12), `w3d:kdeeb-nomask` (10), `w3a:diffusion-g2` (10) | `w3d:kdeeb-routes` (12), `w3e:mlseb+stretch` (12), `hw:growth` (12), `hw:level-links` (10), `w3b:growth-input` (10), `w3e:confluent+stretch` (10) |
+| `all` | 1.25 | n13-24 | `w3d:kdeeb-routes` (24), `w3e:mlseb+stretch` (18) | `w3d:kdeeb-routes` (24), `w3f:p-hub-a0.2` (18), `w3d:kdeeb-nomask` (18) |
+| `all` | 1.25 | n25-40 | `w3d:kdeeb-routes` (32) | `shared` alone |
+| `all` | 1.25 | n41-64 | `shared` alone (no band) | `shared` alone |
+| `all` | 1.25 | n65-128 | `shared` alone (no band) | `shared` alone |
+| `all` | 1.5 | n1-12 | `w3b:growth-s0.3` (12), `w3e:mlseb-a0` (12), `w3e:mlseb-routes` (10), `w3c:edge-paths-k1.5` (10) | `w3b:growth-s0.3` (12), `w3e:mlseb-a0` (12), `w3e:mlseb-routes` (10), `w3c:edge-paths-k1.5` (10), `w3f:territories-r2` (10) |
+| `all` | 1.5 | n13-24 | `hw:growth` (24), `w3b:growth-input` (24) | `hw:growth` (24), `w3b:growth-input` (24) |
+| `all` | 1.5 | n25-40 | `hw:growth` (40), `w3b:growth-s0.7` (32), `w3b:growth-s0.3` (32) | `hw:growth` (40), `w3b:growth-s0.7` (40) |
+| `all` | 1.5 | n41-64 | `shared` alone (no band) | `shared` alone |
+| `all` | 1.5 | n65-128 | `shared` alone (no band) | `shared` alone |
+| `collection` | 1.1 | n1-12 | `corners-side` (12), `w2c:select+stretch` (12), `trunks-gilbert-a05` (12), `w3a:spiral-a15` (12), `trunks-tree-bf08` (12), `hw:zipper` (12), `w2c:level-links+stretch-b1.1` (12), `hw:stubs` (12) | `corners-side` (12), `w2c:select+stretch` (12), `trunks-gilbert-a05` (12), `w3a:spiral-a15` (12), `trunks-tree-bf08` (12), `hw:zipper` (12), `w2c:level-links+stretch-b1.1` (12), `hw:stubs` (12) |
+| `collection` | 1.1 | n13-24 | `w3e:crossbars+stretch` (24), `corners-side` (24), `shared-p2` (24), `w2c:zipper+stretch-b1.1` (18), `trunks-tree-bf08` (18), `hw:weiszfeld` (18) | `w3e:crossbars+stretch` (24), `trunks-tree-bf08` (24), `corners-side` (24), `shared-p2` (24), `w2c:zipper+stretch-b1.1` (18) |
+| `collection` | 1.1 | n25-40 | `w2a:shared-ways+breakeven` (32), `w2b:weiszfeld-a1` (32) | `w2a:shared-ways+breakeven` (40), `w2b:weiszfeld-a1` (32) |
+| `collection` | 1.1 | n41-64 | `shared` alone (no band) | `shared` alone |
+| `collection` | 1.1 | n65-128 | `shared` alone (no band) | `shared` alone |
+| `collection` | 1.25 | n1-12 | `corners-side` (12), `trunks-tree-bf06` (12), `w3f:p-hub-a0.2` (12), `hw:stubs` (12), `hw:p-hub` (12), `hw:spiral` (12), `w2c:level-links+stretch` (12), `w3f:spectral-c0.3` (12) | `corners-side` (12), `trunks-tree-bf06` (12), `w3f:p-hub-a0.2` (12), `hw:stubs` (12), `hw:p-hub` (12), `hw:spiral` (12), `w2c:level-links+stretch` (12), `w3f:spectral-c0.3` (12) |
+| `collection` | 1.25 | n13-24 | `w2a:shared-ways+stretch` (24), `shared-p3` (24), `trunks-gilbert-a07` (24), `w3e:crossbars+stretch` (24), `trunks-tree-bf06` (18), `w3c:hdbscan+stretch` (18), `shared-wind-p2-r1-e2` (18), `hw:stubs` (18) | `w2a:shared-ways+stretch` (24), `shared-p3` (24), `trunks-gilbert-a07` (24), `w3e:crossbars+stretch` (24), `trunks-tree-bf06` (24), `w3c:hdbscan+stretch` (18), `shared-wind-p2-r1-e2` (18) |
+| `collection` | 1.25 | n25-40 | `w2a:shared-ways+stretch` (32), `shared-p3` (32), `shared-order-shortest` (32) | `w2a:shared-ways+stretch` (40), `shared-p3` (40), `shared-order-shortest` (32) |
+| `collection` | 1.25 | n41-64 | `shared` alone (no band) | `shared` alone |
+| `collection` | 1.25 | n65-128 | `shared` alone (no band) | `shared` alone |
+| `collection` | 1.5 | n1-12 | `trunks-gilbert-a03` (12), `w3e:areas-keys` (12), `trunks-tree-bf02` (12), `w3f:p-hub-a0.2` (12), `w2b:zipper-a1` (12), `w3a:spiral-a35` (12), `w3f:spectral-c0.3` (12), `w2c:level-links+stretch` (12) | `trunks-gilbert-a03` (12), `w3e:areas-keys` (12), `trunks-tree-bf02` (12), `w3f:p-hub-a0.2` (12), `w2b:zipper-a1` (12), `w3a:spiral-a35` (12), `w3f:spectral-c0.3` (12), `w2c:level-links+stretch` (12) |
+| `collection` | 1.5 | n13-24 | `shared-wind-p2-r0.5` (24), `trunks-gilbert-a03` (24), `w3e:crossbars+stretch` (24), `shared-wind-p2-r1-e2` (24), `trunks-tree-bf06` (24), `shared-flow-a06-p3` (18), `shared-wind-p3-r1` (18), `trunks-gilbert-a07` (18) | `shared-wind-p2-r0.5` (24), `trunks-gilbert-a03` (24), `w3e:crossbars+stretch` (24), `shared-wind-p2-r1-e2` (24), `trunks-tree-bf06` (24), `shared-flow-a06-p3` (24), `shared-wind-p3-r1` (18), `trunks-gilbert-a07` (18) |
+| `collection` | 1.5 | n25-40 | `shared-p3` (40), `hw:lanes` (32), `shared-wind-p2-r1-e2` (32) | `shared-p3` (40), `hw:lanes` (40), `shared-wind-p2-r1-e2` (32) |
+| `collection` | 1.5 | n41-64 | `shared` alone (no band) | `shared-flow-a06-p3` (64) |
+| `collection` | 1.5 | n65-128 | `shared` alone (no band) | `shared` alone |
