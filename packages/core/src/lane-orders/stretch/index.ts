@@ -21,14 +21,14 @@ export const LANE_STRETCH_ORDERS: readonly LaneStretchOrder[] = Object.freeze(["
 
 /** The options of `stretchLaneOrders`. */
 export interface LaneStretchOptions {
-  /** The lane order of the stretches. The default is `consensus`. */
+  /** The lane order of the stretches. The default is `sifting`. */
   readonly method: LaneStretchOrder;
   /** The number of passes of the method `sifting`, from 1 to 4. The default is 2. The other methods do not read it. */
   readonly passes: number;
 }
 
 /** The default options of `stretchLaneOrders`. */
-export const LANE_STRETCH_DEFAULTS: Readonly<LaneStretchOptions> = Object.freeze({ method: "consensus", passes: 2 });
+export const LANE_STRETCH_DEFAULTS: Readonly<LaneStretchOptions> = Object.freeze({ method: "sifting", passes: 2 });
 
 /** One run: its points and the routes on it. Each route holds the points of the run in a row, in either direction. */
 export interface LaneRun {

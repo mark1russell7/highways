@@ -107,7 +107,7 @@ Two edges can go along several runs one after the other. The option `laneOrder` 
 - The default of `trunks` and `shared` is `bundle`. The default of `sections` is `run`, so its runs keep the lane order of version 0.2.0.
 - `orderLanes(run, routes, order)` gives the order of one run. Its default order is `run`.
 - The option changes only the lane order. The routes, the runs and their keys stay the same.
-- The option `stretchOrder` of `shared` and `shared-all` gives one order to each stretch of runs: `none` (the default), `consensus`, `periphery` or `sifting`. `siftPasses` sets the passes of `sifting`.
+- The option `stretchOrder` of `shared` and `shared-all` gives one order to each stretch of runs: `none` (the default), `consensus`, `periphery` or `sifting`. The default of `shared-stretch` is `sifting`. `siftPasses` sets the passes of `sifting`.
 - `stretchLaneOrders(runs, options?)` gives the order of each run. `laneStretches` gives the stretches. [One lane order for each stretch](../../docs/research/XPLAT.md#one-lane-order-for-each-stretch-lane-stretch) gives the numbers.
 
 The benchmark measures the lanes of `highwayCurves` on the case boards, with each lane order. A crossing in the body is between the middles of the first and the last leg of a bundle. An end crossing is near a merge or a split.
@@ -516,7 +516,7 @@ const { result, winner } = routePortfolio(graph, { rule: "all", cap: 1.25, k: 5,
 
 ### The router `shared-stretch`
 
-The router `shared-stretch` is opt-in. It is `shared` with the stretch order `consensus`. It is not in `STRATEGIES`, so the default outputs do not change.
+The router `shared-stretch` is opt-in. It is `shared` with the stretch order `sifting`. It is not in `STRATEGIES`, so the default outputs do not change.
 
 - `sharedStretchStrategy` is the router strategy. Add it to a registry of your own to race it.
 - Its routes are the routes of `shared`. Only the lane order of the runs changes.

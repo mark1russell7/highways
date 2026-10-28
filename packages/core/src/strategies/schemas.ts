@@ -75,7 +75,7 @@ export const LANE_STRETCH_SCHEMA: OptionSchema<LaneStretchOptions> = {
   method: {
     type: "enum",
     values: ["none", "consensus", "periphery", "sifting"],
-    default: "consensus",
+    default: "sifting",
     describe: "The order of each stretch: the order of each run alone, the order of the pair relation, the order of the largest run, or the order of the pair relation after sifting.",
   },
   passes: { type: "integer", min: 1, max: 4, step: 1, default: 2, describe: "The number of passes of the method `sifting`. In each pass, each edge moves to its best place." },

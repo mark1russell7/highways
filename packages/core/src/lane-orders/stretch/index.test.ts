@@ -7,7 +7,7 @@ import { sharedRouter } from "../../routers/shared.ts";
 import { byCollection } from "../../routers/trunks.ts";
 import { orderLanes, segmentsOf } from "../../segments.ts";
 import { asRouter } from "../../strategies/model.ts";
-import { LANE_STRETCH_ORDERS, laneStretches, stretchLaneOrders, type LaneRun, type LaneStretchOrder } from "./index.ts";
+import { LANE_STRETCH_DEFAULTS, LANE_STRETCH_ORDERS, laneStretches, stretchLaneOrders, type LaneRun, type LaneStretchOrder } from "./index.ts";
 import { sharedStretchStrategy } from "./router.ts";
 
 const P = (x: number, y: number): Point => ({ x, y });
@@ -136,6 +136,18 @@ describe("stretchLaneOrders (LANE-STRETCH)", () => {
         order.forEach((i, j) => expect(got[j]).toEqual(want[i]));
       }
     }
+  });
+
+  it("uses the stretch order sifting by default, the best order of the screen", () => {
+    expect(LANE_STRETCH_DEFAULTS.method).toBe("sifting");
+    expect(sharedStretchStrategy.defaults.stretchOrder).toBe("sifting");
+    expect(sharedStretchStrategy.schema!.stretchOrder!.default).toBe("sifting");
+    expect(stretchLaneOrders([R1, R2])).toEqual(stretchLaneOrders([R1, R2], { method: "sifting" }));
+    boards.forEach((g) => {
+      const stretch = asRouter(sharedStretchStrategy).route(g);
+      const sifting = sharedRouter({ name: "shared-stretch", rule: byCollection, stretchOrder: "sifting" }).route(g);
+      expect(stretch.runs).toEqual(sifting.runs);
+    });
   });
 
   it("keeps the routes of the router shared, and changes only the lane orders", () => {

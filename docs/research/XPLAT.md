@@ -193,7 +193,8 @@ LANE-ORDER gives each run its own merge sort. The relation `bundle` is not trans
 - A stretch is a set of runs that the routes go through one after the other.
 - `stretchLaneOrders(runs, options)` of `lane-orders/stretch/` gives the order of each run. Each run gets the order of its stretch, restricted to its edges.
 - The router `shared` gets the options `stretchOrder` (default `none`) and `siftPasses` (default 2). With `none`, the order is the order of `orderLanes` with `bundle`.
-- The router `shared-stretch` is opt-in. It is `shared` with `stretchOrder: "consensus"`. It is not in `STRATEGIES`, so no default output changes.
+- The router `shared-stretch` is opt-in. It is `shared` with `stretchOrder: "sifting"`, the best variant of the screen. It is not in `STRATEGIES`, so no default output changes.
+- `stretchLaneOrders` also uses `sifting` by default.
 - The option changes only the lane order. The routes, the runs, the length and the bends stay the same.
 
 ### The survey
@@ -255,11 +256,19 @@ The promotion rule on the records of the screen gives these results against `sha
 - `B5` of `shared-all`: `periphery` and `sifting` are better on 6 inputs and worse on 0 (p = 0.016). The median ratio is also 1.000.
 - Time: the median time ratio is 0.90 to 0.98 for `shared` and 1.07 to 1.09 for `shared-all`. The q95 is 1.32 or less. Each passes the limits 1.5 and 2.0.
 - The gain test needs a median ratio of 0.95 or less. No variant passes it, because most inputs tie at the floor 0.
-- The audit has the broken pairs only as totals over the inputs. Thus the rule cannot run on the total for each input.
+- The audit has the broken pairs only as totals over the inputs. Thus the rule cannot run on the total for each input. [The gap of the rule](#the-gap-of-the-rule) tells the measure that it needs.
 
 ### The time on the dense board
 
-SCALE_PLACEHOLDER
+The workflow `Scale` routes the board of 1000 boxes and 4000 edges 3 times in one job. The table gives the median of the 3 routes.
+
+| Router | Run | Commit | Median, s | Ratio to `shared` |
+|---|---|---|---:|---:|
+| `shared` | 40748153040 | `a4304c6` | 21.19 | 1.00 |
+| `shared-stretch`, `consensus` | 40749484343 | `a4304c6` | SCALE_CONSENSUS | SCALE_CONSENSUS_RATIO |
+| `shared-stretch`, `sifting` (the default) | SCALE_SIFTING_RUN | SCALE_SIFTING_SHA | SCALE_SIFTING | SCALE_SIFTING_RATIO |
+
+The jobs of two runs can use different machines. Thus the ratio has the noise of the runner.
 
 ### The verdict
 
@@ -267,8 +276,17 @@ SCALE_PLACEHOLDER
 
 - The verdict is `kept`, opt-in. `shared-stretch` and the option `stretchOrder` stay. No default changes.
 - The variant does not pass the promotion rule. The gain test fails on `B5`, and the rule has no measure for the broken pairs.
-- `consensus` makes the total of `shared-all` rise by 94%. Thus the default of `shared-stretch` is to change to `sifting` in a later item. This item does not change it.
+- The default of `shared-stretch` is `sifting`. The audit ran with each variant as an option, so the numbers do not change.
+- `consensus` makes the total of `shared-all` rise by 94%. Thus it is not the default.
 - `periphery` makes the total of `shared` rise by 5%.
+
+### The gap of the rule
+
+The promotion rule cannot decide on the broken pairs.
+
+- `B5` does not count a crossing at the end of a run. Thus a lane order can make `B5` fall and the true crossings rise.
+- The audit gives the broken pairs only as a total over the inputs. The sign test and the median test need one value for each input.
+- The rule needs a measure of the broken pairs for each input, in the records of the screen. Then the total of `B5` and the broken pairs can be a win measure.
 
 ### The predictions of LANE-STRETCH
 

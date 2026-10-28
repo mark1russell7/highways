@@ -9,14 +9,14 @@ import { SHARED_SCHEMA } from "../../strategies/schemas.ts";
 
 /**
  * The router strategy `shared-stretch` (LANE-STRETCH). It routes as `shared`, and the runs of one stretch share one lane order.
- * The default stretch order is `consensus`. The option `stretchOrder` selects `periphery` or `sifting`.
+ * The default stretch order is `sifting`, the best order of the screen. The option `stretchOrder` selects `consensus` or `periphery`.
  */
 export const sharedStretchStrategy: Strategy<"router", RouterPreset<SharedOptions>> = defineStrategy<"router", RouterPreset<SharedOptions>>({
   step: "router",
   name: "shared-stretch",
   describe: "The same ways as `shared`. The runs that follow each other on the routes share one lane order, so fewer lanes cross between them (LANE-STRETCH).",
-  defaults: { rule: byCollection, stretchOrder: "consensus" },
-  schema: { ...SHARED_SCHEMA, stretchOrder: { ...SHARED_SCHEMA.stretchOrder!, default: "consensus" } },
+  defaults: { rule: byCollection, stretchOrder: "sifting" },
+  schema: { ...SHARED_SCHEMA, stretchOrder: { ...SHARED_SCHEMA.stretchOrder!, default: "sifting" } },
   maxNodes: 10_000,
   run: (graph: Graph, options: Readonly<RouterPreset<SharedOptions>>): Result => sharedRouter({ ...options, name: "shared-stretch" }).route(graph),
 });
