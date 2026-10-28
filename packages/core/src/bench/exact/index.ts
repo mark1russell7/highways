@@ -220,21 +220,39 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
 }
 
 /**
- * This function gives the largest stretch of routes as the exact model counts it.
+ * This function gives the stretch of each route as the exact model counts it, by the edge id.
  * The stretch of a route is its length without its two plug ends, divided by the shortest way in the network of the model.
+ * The function builds the network one time. The result function then measures each list of routes of the graph, so a portfolio pays for the network once.
+ * An edge without a route or without a way in the network has no value.
+ */
+export function exactStretches(graph: Graph, o: Readonly<WayOptions> = {}): (routes: readonly Route[]) => Map<string, number> {
+  const { adj, ends, margin } = exactNetwork(graph, o);
+  const best = new Map<number, Float64Array>();
+  const from = (a: number): Float64Array => {
+    if (!best.has(a)) best.set(a, distances(adj, a));
+    return best.get(a)!;
+  };
+  return (routes) => {
+    const byEdge = new Map(routes.map((r) => [r.edge, r]));
+    const out = new Map<string, number>();
+    for (const e of ends) {
+      const r = byEdge.get(e.edge.id);
+      if (!r || r.points.length < 2 || e.a === e.b) continue;
+      const b = from(e.a)[e.b]!;
+      if (!Number.isFinite(b) || b <= 1) continue;
+      out.set(e.edge.id, (polylineLength(r.points) - 2 * margin) / b);
+    }
+    return out;
+  };
+}
+
+/**
+ * This function gives the largest stretch of routes as the exact model counts it (`exactStretches`).
  * The cap of the model is a limit on this value.
  * An edge without a route or without a way in the network does not count. Without such an edge, the value is 1.
  */
 export function exactStretch(graph: Graph, routes: readonly Route[], o: Readonly<WayOptions> = {}): number {
-  const { adj, ends, margin } = exactNetwork(graph, o);
-  const byEdge = new Map(routes.map((r) => [r.edge, r]));
   let max = 1;
-  for (const e of ends) {
-    const r = byEdge.get(e.edge.id);
-    if (!r || r.points.length < 2 || e.a === e.b) continue;
-    const best = distances(adj, e.a)[e.b]!;
-    if (!Number.isFinite(best) || best <= 1) continue;
-    max = Math.max(max, (polylineLength(r.points) - 2 * margin) / best);
-  }
+  for (const v of exactStretches(graph, o)(routes).values()) max = Math.max(max, v);
   return max;
 }

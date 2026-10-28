@@ -47,6 +47,7 @@
     "oracle": "node scripts/oracle.ts",
     "portfolio": "node scripts/portfolio.ts",
     "portfolio:time": "node scripts/portfolio-time.ts",
+    "portfolio:sets": "node scripts/portfolio-sets.ts",
     "bounds": "node scripts/bounds.ts",
     "screen:inputs": "node scripts/screen-inputs.ts",
     "test:watch": "vitest",
@@ -54,7 +55,7 @@
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue",
-    "@mark1russell7/layout-contract": "^0.2.5",
+    "@mark1russell7/layout-contract": "^0.2.6",
     "@types/node": "^26.6.4",
     "highs": "^1.15.4",
     "typescript": "^7.0.2",

@@ -262,11 +262,16 @@ export function formatGap(rows: readonly GapSummary[]): string {
   return lines.join("\n") + "\n";
 }
 
-/** This function tells if a shared segment of a result (a run or a bundle) holds edges of two collections. */
-export function mixesCollections(graph: Graph, result: Result): boolean {
+/** This function gives the count of the shared segments of a result (the runs and the bundles) that hold edges of two collections or more. */
+export function mixedSegments(graph: Graph, result: Result): number {
   const key = new Map(graph.edges.map((e) => [e.id, byCollection(e) ?? `\u0000${e.id}`]));
   const shared = [...(result.runs ?? []).map((r) => r.edges), ...(result.bundles ?? []).map((b) => b.edges)];
-  return shared.some((edges) => new Set(edges.map((e) => key.get(e))).size > 1);
+  return shared.filter((edges) => new Set(edges.map((e) => key.get(e))).size > 1).length;
+}
+
+/** This function tells if a shared segment of a result (a run or a bundle) holds edges of two collections. */
+export function mixesCollections(graph: Graph, result: Result): boolean {
+  return mixedSegments(graph, result) > 0;
 }
 
 /**
