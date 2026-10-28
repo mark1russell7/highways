@@ -9,7 +9,7 @@ import type { PortfolioCap, PortfolioRule } from "./bands.ts";
  */
 export const PORTFOLIO_FIT: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|${string}`, readonly (readonly [string, number])[]>> = {
   "collection|1.1|n1-12": [["corners-side", 12], ["w2c:select+stretch", 12], ["trunks-gilbert-a05", 12], ["w3a:spiral-a15", 12], ["trunks-tree-bf08", 12], ["hw:zipper", 12], ["w2c:level-links+stretch-b1.1", 12], ["hw:stubs", 12]],
-  "collection|1.1|n13-24": [["w3e:crossbars+stretch", 24], ["corners-side", 24], ["shared-p2", 24], ["w2c:zipper+stretch-b1.1", 18], ["trunks-tree-bf08", 18], ["hw:weiszfeld", 18], ["trunks-gilbert-a07", 18]],
+  "collection|1.1|n13-24": [["w3e:crossbars+stretch", 24], ["trunks-tree-bf08", 24], ["corners-side", 24], ["shared-p2", 24], ["w2c:zipper+stretch-b1.1", 18], ["hw:weiszfeld", 18], ["trunks-gilbert-a07", 18]],
   "collection|1.1|n25-40": [["w2a:shared-ways+breakeven", 40], ["w2b:weiszfeld-a1", 40]],
   "collection|1.1|n41-64": [],
   "collection|1.1|n65-128": [],

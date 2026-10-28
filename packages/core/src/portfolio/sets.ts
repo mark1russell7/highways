@@ -8,7 +8,7 @@ import type { PortfolioCap, PortfolioRule } from "./bands.ts";
  */
 export const PORTFOLIO_SETS: Readonly<Record<`${PortfolioRule}|${PortfolioCap}|${string}`, readonly string[]>> = {
   "collection|1.1|n1-12": ["corners-side", "w2c:select+stretch", "trunks-gilbert-a05", "w3a:spiral-a15", "trunks-tree-bf08", "hw:zipper", "w2c:level-links+stretch-b1.1", "hw:stubs"],
-  "collection|1.1|n13-24": ["w3e:crossbars+stretch", "corners-side", "shared-p2", "w2c:zipper+stretch-b1.1", "trunks-tree-bf08", "hw:weiszfeld", "trunks-gilbert-a07", "hw:stubs"],
+  "collection|1.1|n13-24": ["w3e:crossbars+stretch", "trunks-tree-bf08", "corners-side", "shared-p2", "w2c:zipper+stretch-b1.1", "hw:weiszfeld", "trunks-gilbert-a07", "hw:stubs"],
   "collection|1.1|n25-40": ["w2a:shared-ways+breakeven", "w2b:weiszfeld-a1", "w2c:level-links+stretch-b1.1"],
   "collection|1.1|n41-64": [],
   "collection|1.1|n65-128": [],
