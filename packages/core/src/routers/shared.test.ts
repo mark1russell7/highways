@@ -100,6 +100,38 @@ describe("sharedRouter", () => {
       }
   });
 
+  it("keeps the hard rules with Winding Roads and the channel capacity, and their defaults keep the routes (BUILD-W3B)", () => {
+    const g = makeFixture({ name: "t", kind: "collections", nodes: 80, edgesPerNode: 3, seed: 2, fixedPorts: 0.2 });
+    const base = JSON.stringify(sharedRouter({ name: "shared", rule: byCollection, passes: 2 }).route(g));
+    const same = sharedRouter({ name: "shared", rule: byCollection, passes: 2, reuse: 0, reuseExponent: 1, capacity: 0, laneWidth: 4 }).route(g);
+    expect(JSON.stringify(same)).toBe(base);
+    const settings: Omit<SharedOptions, "name">[] = [
+      { passes: 2, reuse: 1 },
+      { passes: 3, reuse: 0.5, reuseExponent: 2 },
+      { capacity: 1 },
+      { capacity: 2, laneWidth: 6, laneOrder: "run" },
+      { passes: 2, reuse: 1, capacity: 1, cost: "flow" },
+    ];
+    for (const rule of [undefined, byCollection])
+      for (const o of settings) {
+        const result = sharedRouter({ ...o, name: "x", ...(rule ? { rule } : {}) }).route(g);
+        expect(checkProperties(g, result), JSON.stringify(o)).toEqual([]);
+        expect(result.routes.length, JSON.stringify(o)).toBe(g.edges.length);
+        expect(JSON.stringify(sharedRouter({ ...o, name: "x", ...(rule ? { rule } : {}) }).route(g)), JSON.stringify(o)).toBe(JSON.stringify(result));
+      }
+  });
+
+  it("with the channel capacity, keeps the hard rules and a route for each edge on a board with a narrow gap", () => {
+    // The gap between the walls is 14 wide. Three lanes of width 6 do not fit in it.
+    const narrow: Graph = {
+      ...gap,
+      nodes: gap.nodes.map((n) => (n.id === "bottom" ? { ...n, box: box(150, 4, 20, 290) } : n)),
+    };
+    const fit = sharedRouter({ name: "shared", capacity: 10, laneWidth: 6 }).route(narrow);
+    expect(checkProperties(narrow, fit)).toEqual([]);
+    expect(fit.routes.map((r) => r.edge)).toEqual(["a", "b", "c"]);
+  });
+
   it("with the Snell merges, keeps the hard rules and a route for each edge on the gap board", () => {
     const corner = sharedRouter({ name: "shared" }).route(gap);
     const snell = sharedRouter({ name: "shared", merge: "snell" }).route(gap);

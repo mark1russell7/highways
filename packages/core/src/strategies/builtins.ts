@@ -28,6 +28,9 @@ import { MINGLE_DEFAULTS, minglePlan, type MingleOptions } from "../highways/min
 import type { HighwayInput } from "../highways/model.ts";
 import { OD_CELL_DEFAULTS, odCellPlan, type OdCellOptions } from "../highways/od-cells/index.ts";
 import { QUICKBUNDLES_DEFAULTS, quickBundlesPlan, type QuickBundlesOptions } from "../highways/quickbundles/index.ts";
+import { NESTED_DEFAULTS, nestedPlan, type NestedOptions } from "../highways/nested/index.ts";
+import { LANES_DEFAULTS, lanesPlan, type LanesOptions } from "../highways/lanes/index.ts";
+import { GROWTH_DEFAULTS, growthPlan, type GrowthOptions } from "../highways/growth/index.ts";
 import { ROAD_CLASS_DEFAULTS, roadClassPlan, type RoadClassOptions } from "../highways/road-classes/index.ts";
 import { SELECT_DEFAULTS, selectPlan, type SelectOptions } from "../highways/select/index.ts";
 import { sharedWaysPlan, type SharedWaysOptions } from "../highways/shared-ways/index.ts";
@@ -49,7 +52,7 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HIGHWAY_SCHEMA, KD_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -399,6 +402,9 @@ export const highwayStrategies: {
   readonly "flow-clusters": Strategy<"highway", FlowClusterOptions>;
   readonly traclus: Strategy<"highway", TraclusOptions>;
   readonly diffusion: Strategy<"highway", DiffusionOptions>;
+  readonly nested: Strategy<"highway", NestedOptions>;
+  readonly lanes: Strategy<"highway", LanesOptions>;
+  readonly growth: Strategy<"highway", GrowthOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -567,6 +573,33 @@ export const highwayStrategies: {
     schema: DIFFUSION_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<DiffusionOptions>) => diffusionPlan(input, o),
+  }),
+  nested: defineStrategy({
+    step: "highway",
+    name: "nested",
+    describe: "Highways for each zoom level that nest (HWY-052). Each level puts the edges of each cluster of the level above in finer clusters.",
+    defaults: { ...NESTED_DEFAULTS } as NestedOptions,
+    schema: NESTED_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<NestedOptions>) => nestedPlan(input, o),
+  }),
+  lanes: defineStrategy({
+    step: "highway",
+    name: "lanes",
+    describe: "Width, lanes and capacity (HWY-051). A highway that does not fit in its channels splits into two highways by lane order.",
+    defaults: { ...LANES_DEFAULTS } as LanesOptions,
+    schema: LANES_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<LanesOptions>) => lanesPlan(input, o),
+  }),
+  growth: defineStrategy({
+    step: "highway",
+    name: "growth",
+    describe: "Local growth (HWY-055). Each edge, the longest first, joins the highway with the largest saving, or starts a highway.",
+    defaults: { ...GROWTH_DEFAULTS } as GrowthOptions,
+    schema: GROWTH_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<GrowthOptions>) => growthPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

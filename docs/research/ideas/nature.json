@@ -270,7 +270,7 @@
     "placementDependent": true,
     "screen": "Against shared-all on case-many-groups, small-clustered and mid-fanout: the front of B1 against R5 q95, and Z10 after one seeded added edge. Keep if it dominates shared-all on one board and is not dominated on the others.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-030",
       "NAT-007",
@@ -283,7 +283,68 @@
       "HWY-005"
     ],
     "canonical": "HWY-005",
-    "wave": 3
+    "wave": 3,
+    "result": {
+      "date": "2026-10-27",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40602854786",
+      "records": [
+        "screen-v1/*/shared@ae86b52",
+        "screen-v1/*/shared-p2@ae86b52",
+        "screen-v1/*/shared-wind-p2-r0.5@ae86b52",
+        "screen-v1/*/shared-wind-p2-r1@ae86b52",
+        "screen-v1/*/shared-wind-p2-r2@ae86b52",
+        "screen-v1/*/shared-wind-p3-r1@ae86b52",
+        "screen-v1/*/shared-wind-p2-r1-e2@ae86b52",
+        "screen-v1/*/shared-all@ae86b52",
+        "screen-v1/*/shared-all-wind-p2-r1@ae86b52"
+      ],
+      "measures": {
+        "shared-all B1": {
+          "base": {
+            "small-clustered": 0.43,
+            "dense-groups": 0.498,
+            "hub-chain": 0.709,
+            "many-groups": 0.718
+          },
+          "new": {
+            "small-clustered": 0.624,
+            "dense-groups": 0.696,
+            "hub-chain": 0.727,
+            "many-groups": 0.791
+          }
+        },
+        "shared-all B3q95": {
+          "base": {
+            "small-clustered": 1.359,
+            "dense-groups": 1.348,
+            "hub-chain": 1.055,
+            "many-groups": 1.239
+          },
+          "new": {
+            "small-clustered": 2.475,
+            "dense-groups": 2.492,
+            "hub-chain": 1.079,
+            "many-groups": 1.587
+          }
+        },
+        "shared-all R1": {
+          "base": {
+            "small-clustered": 305,
+            "dense-groups": 471,
+            "hub-chain": 18,
+            "many-groups": 111
+          },
+          "new": {
+            "small-clustered": 134,
+            "dense-groups": 243,
+            "hub-chain": 2,
+            "many-groups": 86
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "NAT-005 is screened with HWY-005, as the option `reuse` of the router `shared`. The baseline is `shared-all`. With 2 passes and `reuse: 1`, B1 rises on each board (0.430 to 0.624 on small-clustered), and crossings fall 23% to 89%. But the q95 rises on each board (1.359 to 2.475 on small-clustered), so neither dominates the other."
+    }
   },
   {
     "id": "NAT-006",

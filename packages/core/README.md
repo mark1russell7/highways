@@ -150,6 +150,8 @@ These options of `shared` and `trunks` are off by default. With the defaults, th
 - `passes` of `shared` sets the number of passes. After the first pass, each edge finds its way again with the ways of the other edges fixed (HWY-039).
 - `order` of `shared` sets the order of the edges of a key: `span` (the default, the longest first), `shortest`, `load` or `input` (NAT-024).
 - `merge: snell` of `shared` moves each merge point to the angle `acos(d)` on the run (NAT-035). It cuts the sharp merges.
+- `reuse` of `shared`, with `passes` 2 or more, routes each edge again in each later pass. The busy links of the pass before cost less (HWY-005).
+- `capacity` of `shared` adds a cost for each lane that does not fit in the free space across a link. `laneWidth` sets the width of a lane (HWY-016).
 - `splitAt: gilbert` of `trunks` puts the split point where the flow cost is least, with the exponent `alpha` (EDA-030).
 - `fan: tree` of `trunks` grows a balancing-factor tree for each group, with the factor `bf` (NAT-017). 0 gives the least ink.
 
@@ -344,7 +346,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 
@@ -389,9 +391,12 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `flow-clusters` | The end point clusters of HWY-023. A hierarchical clustering puts the edges with near ends in 4D into one highway. |
 | `traclus` | The segment clusters of HWY-025 (TRACLUS). The near segments of the first routes make clusters, and each cluster gives its mean line. |
 | `diffusion` | The route-aware bundling of HWY-020. The use of each link spreads to the links next to it, and dense links cost less. |
+| `nested` | The nested levels of HWY-052. Each level puts the edges of each cluster of the level above in finer clusters. The option `level` selects the plan. |
+| `lanes` | The lanes and the capacity of HWY-051. A highway that does not fit in its channels splits into two highways by lane order. |
+| `growth` | The local growth of HWY-055. Each edge, the longest first, joins the highway with the largest saving, or starts a highway. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
-The strategies `meet`, `weiszfeld`, `stubs`, `zipper` and `level-links` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links` and `lanes` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.

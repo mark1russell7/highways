@@ -24,4 +24,7 @@ export { SPIRAL_DEFAULTS, spiralJoin, spiralPlan, spiralTree, type SpiralNode, t
 export { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, flowClusters, flowDistance, LINKAGES, type FlowClusterOptions, type Linkage } from "./flow-clusters/index.ts";
 export { characteristicPoints, representative, segmentClusters, segmentDistance, TRACLUS_DEFAULTS, traclusPlan, type RouteSegment, type TraclusOptions } from "./traclus/index.ts";
 export { DIFFUSION_DEFAULTS, diffusionPlan, linkDensity, type DiffusionOptions } from "./diffusion/index.ts";
+export { NESTED_DEFAULTS, nestedGroups, nestedPlan, nestingViolations, type NestedOptions } from "./nested/index.ts";
+export { channelOverflows, LANES_DEFAULTS, lanesPlan, type LanesOptions } from "./lanes/index.ts";
+export { GROWTH_DEFAULTS, growthPlan, type GrowthOptions, type GrowthOrder } from "./growth/index.ts";
 export * from "./gates/index.ts";

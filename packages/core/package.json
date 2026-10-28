@@ -51,6 +51,7 @@
     "@mark1russell7/cue": "github:mark1russell7/cue",
     "@mark1russell7/layout-contract": "github:mark1russell7/layout-contract#69933a61b0270c5915b82ab563d24908ade708af&path:/packages/layout-contract",
     "@types/node": "^26.6.4",
+    "highs": "^1.15.4",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"
   }

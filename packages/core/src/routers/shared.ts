@@ -1,5 +1,6 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { channelWidth } from "../channels.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
@@ -44,6 +45,20 @@ export interface SharedOptions extends WayOptions {
    * With `snell`, the route meets the run at the angle `acos(d)`, with `d` the cost share of the run for the route (NAT-035).
    */
   readonly merge?: ShareMerge;
+  /**
+   * The pull of the busy links of the pass before (HWY-005, Winding Roads). With a value above 0 and two passes or more, each later pass routes each edge again from no ways.
+   * A link then costs `len / (1 + reuse * u)^reuseExponent`, with `u` the edges of the key on it in the pass before. The default is 0: the later passes are rip-up passes.
+   */
+  readonly reuse?: number;
+  /** The exponent of the pull of `reuse`. The default is 1. */
+  readonly reuseExponent?: number;
+  /**
+   * The cost of a lane that does not fit in its channel (HWY-016). One more edge on a link with `f` edges of the key costs `capacity * max(0, (f + 1) * laneWidth - width)` more.
+   * `width` is the free space across the link (`channelWidth`). The default is 0: the router does not read the channels.
+   */
+  readonly capacity?: number;
+  /** The width of one lane, for `capacity`. The default is 4. */
+  readonly laneWidth?: number;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
 }
@@ -94,6 +109,10 @@ export function sharedRouter(options: SharedOptions): Router {
   // The cost share of a link for one more edge, when `f` edges of the key use it already. The share falls when `f` grows.
   const share = (f: number): number => (f <= 0 ? 1 : flow ? (f + 1) ** alpha - f ** alpha : discount);
   const passes = Math.max(1, Math.floor(options.passes ?? 1));
+  const reuse = Math.max(0, options.reuse ?? 0);
+  const reuseExponent = Math.max(0, options.reuseExponent ?? 1);
+  const capacity = Math.max(0, options.capacity ?? 0);
+  const laneWidth = Math.max(0, options.laneWidth ?? 4);
   const keyOf = (e: Edge): string => {
     if (!options.rule) return "*";
     return options.rule(e) ?? `\u0000${e.id}`;
@@ -131,14 +150,34 @@ export function sharedRouter(options: SharedOptions): Router {
       const order = orderWays(all, options.order ?? "span", graph);
       // The largest number of edges on one link of each key. The cost share of that number is the floor of the search.
       const top = new Map<string, number>();
-      const route = (w: Way): void => {
+      // The width of the channel of each link, for the option `capacity`. Each link gets its width at its first use.
+      const widths = new Map<number, number>();
+      const widthOf = (i: number, j: number): number => {
+        const k = link(i, j);
+        let wd = widths.get(k);
+        if (wd === undefined) widths.set(k, (wd = channelWidth(ways.obstacles, corners.points[i]!, corners.points[j]!)));
+        return wd;
+      };
+      /** This function routes one way. `before` holds the edges of the key on each link in the pass before, for the option `reuse`. */
+      const route = (w: Way, before?: ReadonlyMap<number, number>): void => {
         let used = discounted.get(w.key);
         if (!used) discounted.set(w.key, (used = new Map()));
         const mine = used;
-        const floor = flow ? share(top.get(w.key) ?? 0) : discount;
-        const cost = flow
+        let floor = flow ? share(top.get(w.key) ?? 0) : discount;
+        let cost = flow
           ? (i: number, j: number, d: number): number => d * share(mine.get(link(i, j))?.length ?? 0)
           : (i: number, j: number, d: number): number => (mine.has(link(i, j)) ? d * discount : d);
+        if (capacity > 0) {
+          const plain = cost;
+          cost = (i, j, d) => plain(i, j, d) + capacity * Math.max(0, ((mine.get(link(i, j))?.length ?? 0) + 1) * laneWidth - widthOf(i, j));
+        }
+        if (before !== undefined) {
+          const plain = cost;
+          let most = 0;
+          for (const u of before.values()) most = Math.max(most, u);
+          cost = (i, j, d) => plain(i, j, d) / (1 + reuse * (before.get(link(i, j)) ?? 0)) ** reuseExponent;
+          floor /= (1 + reuse * most) ** reuseExponent;
+        }
         const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
         if (!way) return;
         w.found = true;
@@ -157,6 +196,20 @@ export function sharedRouter(options: SharedOptions): Router {
       for (const w of order) route(w);
       // Each later pass takes each edge off its links and finds its way again, with the ways of the other edges fixed.
       for (let pass = 1; pass < passes; pass++) {
+        if (reuse > 0) {
+          // Winding Roads (HWY-005): each edge finds its way again from no ways, and the busy links of the pass before pull it.
+          const before = new Map<string, Map<number, number>>();
+          for (const [key, links] of discounted) before.set(key, new Map([...links].map(([k, list]) => [k, list.length])));
+          discounted.clear();
+          top.clear();
+          for (const w of order) {
+            w.found = false;
+            w.seq = [];
+            w.ids = [];
+          }
+          for (const w of order) route(w, before.get(w.key) ?? new Map());
+          continue;
+        }
         for (const w of order) {
           if (!w.found) continue;
           const mine = discounted.get(w.key)!;
