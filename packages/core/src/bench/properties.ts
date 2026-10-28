@@ -83,9 +83,11 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
   for (const run of result.runs ?? []) {
     if (run.edges.length < 2)
       if (add({ rule: "run-shared", detail: `run ${run.id} has fewer than two edges` })) return out;
+    // The run gets its reverse one time, not one time for each edge (ROUTE-SCALE).
+    let back: readonly Point[] | undefined;
     for (const id of run.edges) {
       const r = routes.get(id);
-      if (!r || !(holds(r.points, run.points) || holds(r.points, [...run.points].reverse())))
+      if (!r || !(holds(r.points, run.points) || holds(r.points, (back ??= [...run.points].reverse()))))
         if (add({ rule: "run-shared", edge: id, detail: `run ${run.id}: the route does not hold the points of the run in a row` })) return out;
     }
   }
@@ -139,6 +141,10 @@ function onBoundary(p: Point, b: Box): boolean {
 /** This function tells if the polyline `p` holds the points of `part` in a row. */
 function holds(p: readonly Point[], part: readonly Point[]): boolean {
   if (part.length === 0) return true;
-  for (let i = 0; i + part.length <= p.length; i++) if (part.every((q, j) => dist(q, p[i + j]!) <= TOLERANCE)) return true;
+  for (let i = 0; i + part.length <= p.length; i++) {
+    let j = 0;
+    while (j < part.length && dist(part[j]!, p[i + j]!) <= TOLERANCE) j++;
+    if (j === part.length) return true;
+  }
   return false;
 }

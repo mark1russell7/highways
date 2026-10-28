@@ -31,13 +31,16 @@ function turn(from: Point, base: Point, to: Point): number {
   return Math.atan2(dx * vy - dy * vx, dx * vx + dy * vy);
 }
 
+// The routes of one run often hold the same point objects past the run. A point is at the distance 0 from itself,
+// so the check `a !== b` skips the distance and keeps each result (ROUTE-SCALE).
+
 /** This function gives the place where the routes `P` and `Q` part after the last point of the run, or nothing. */
 function partAfter(P: Placed, Q: Placed): Parting | undefined {
   for (let j = 1; ; j++) {
     const a = P.p[P.e + j];
     const b = Q.p[Q.e + j];
     if (a === undefined || b === undefined) return undefined;
-    if (dist(a, b) > SAME) {
+    if (a !== b && dist(a, b) > SAME) {
       const from = P.p[P.e + j - 2]!;
       const at = P.p[P.e + j - 1]!;
       const side = turn(from, at, a) - turn(from, at, b);
@@ -52,7 +55,7 @@ function partBefore(P: Placed, Q: Placed): Parting | undefined {
     const a = P.p[P.s - j];
     const b = Q.p[Q.s - j];
     if (a === undefined || b === undefined) return undefined;
-    if (dist(a, b) > SAME) {
+    if (a !== b && dist(a, b) > SAME) {
       const from = P.p[P.s - j + 2]!;
       const at = P.p[P.s - j + 1]!;
       // Seen backward, the left side is the right side. Thus the order turns around.

@@ -1,0 +1,163 @@
+# The times of the dense board (ROUTE-SCALE). Each cell of the matrix routes the fixture of packages/core/scripts/data/scale with one router
+# and writes the wall time of the route and of each step after it, with `scripts/scale.ts`. With "profile", the cell also keeps a CPU profile
+# of one more route and of its steps as an artifact. The job summary joins the rows of the cells.
+# The job screen runs the router screen of the base commit and of this commit in turn on one runner, and compares the records and the times.
+# The note `docs/research/SCALE.md` gives the result.
+name: Scale
+
+on:
+  workflow_dispatch:
+    inputs:
+      routers:
+        description: "The routers, with commas."
+        default: "shared,shared-all,sections,portfolio,corners"
+      repeat:
+        description: "The number of routes of each router for the times. The first route is cold."
+        default: "3"
+      profile:
+        description: "Also keep a CPU profile of one more route of each router."
+        type: boolean
+        default: true
+      base:
+        description: "The base commit of the job screen."
+        default: "origin/main"
+      rounds:
+        description: "The number of rounds of the router screen of each commit in the job screen."
+        default: "5"
+  pull_request:
+    paths:
+      - .github/workflows/scale.yml
+      - packages/core/scripts/scale.ts
+      - packages/core/scripts/scale-summary.ts
+      - packages/core/scripts/scale-screen.ts
+      - packages/core/scripts/data/scale/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scale-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  routers:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.list.outputs.list }}
+    env:
+      ROUTERS: ${{ inputs.routers || 'shared,shared-all,sections,portfolio,corners' }}
+    steps:
+      - id: list
+        run: echo "list=$(echo "$ROUTERS" | jq -Rc 'split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))')" >> "$GITHUB_OUTPUT"
+
+  time:
+    needs: routers
+    runs-on: ubuntu-latest
+    # The router shared-all took 27 min for two routes of this board on highways 0.7.0. The cell routes it up to four times.
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        router: ${{ fromJSON(needs.routers.outputs.list) }}
+    env:
+      ROUTER: ${{ matrix.router }}
+      REPEAT: ${{ inputs.repeat || '3' }}
+      PROFILE: ${{ github.event_name == 'pull_request' || inputs.profile }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time the router
+        run: |
+          set -o pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cd packages/core
+          node scripts/scale.ts --router "$ROUTER" --repeat "$REPEAT" --out "$GITHUB_WORKSPACE/out/rows.jsonl" | tee "$GITHUB_WORKSPACE/out/time.log"
+      - name: Profile one more route
+        if: env.PROFILE == 'true'
+        run: |
+          set -o pipefail
+          cd packages/core
+          node scripts/scale.ts --router "$ROUTER" --profile "$GITHUB_WORKSPACE/out/$ROUTER.cpuprofile" | tee "$GITHUB_WORKSPACE/out/profile.md"
+          { echo "## The profile of $ROUTER"; echo; sed -n '/^| self/,/^$/p' "$GITHUB_WORKSPACE/out/profile.md"; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: scale-${{ matrix.router }}
+          path: out/
+          if-no-files-found: warn
+
+  summary:
+    needs: time
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: scale-*
+          path: cells
+      - name: Write the summary
+        run: |
+          find cells -name rows.jsonl | sort | xargs cat > rows.jsonl
+          node packages/core/scripts/scale-summary.ts rows.jsonl > scale.md
+          cat scale.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: scale-summary
+          path: |
+            scale.md
+            rows.jsonl
+
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BASE: ${{ inputs.base || 'origin/main' }}
+      ROUNDS: ${{ inputs.rounds || '5' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run the router screen of the two commits in turn
+        run: |
+          set -o pipefail
+          # The base uses the packages of this commit. The lockfile of the two commits must give the same packages.
+          git worktree add --detach "$RUNNER_TEMP/base" "$BASE"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/base/node_modules"
+          ln -s "$GITHUB_WORKSPACE/packages/core/node_modules" "$RUNNER_TEMP/base/packages/core/node_modules"
+          mkdir -p out
+          for i in $(seq 1 "$ROUNDS"); do
+            (cd "$RUNNER_TEMP/base/packages/core" && node scripts/screen.ts --step router --out "$GITHUB_WORKSPACE/out/base-$i.jsonl" --summary "$GITHUB_WORKSPACE/out/base-$i.md")
+            (cd packages/core && node scripts/screen.ts --step router --out "$GITHUB_WORKSPACE/out/head-$i.jsonl" --summary "$GITHUB_WORKSPACE/out/head-$i.md")
+          done
+          node packages/core/scripts/scale-screen.ts out/base-*.jsonl -- out/head-*.jsonl | tee out/screen.md
+          { echo "Base: $(git rev-parse --short "$BASE"). Head: $(git rev-parse --short HEAD)."; echo; cat out/screen.md; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: scale-screen
+          path: out/
+          if-no-files-found: warn

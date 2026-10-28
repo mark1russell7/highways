@@ -283,9 +283,13 @@ function distancesTo(points: readonly Point[], adj: readonly (readonly { to: num
   const done = new Uint8Array(adj.length);
   const goal = new Set(targets);
   const ends = targets.map((t) => points[t]!);
+  // A node can go in the heap more than one time. Each node gets its guide one time (ROUTE-SCALE), so a search to many targets stays fast.
+  const guides = new Float64Array(adj.length).fill(-1);
   const guide = (v: number): number => {
+    if (guides[v]! >= 0) return guides[v]!;
     let h = Infinity;
     for (const t of ends) h = Math.min(h, dist(points[v]!, t));
+    guides[v] = h;
     return h;
   };
   const heap = new NodeHeap();
