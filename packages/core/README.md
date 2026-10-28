@@ -495,6 +495,7 @@ The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outp
 - With `k`, the members are the first `k` names of the greedy set of the band.
 - A member passes the guard when it has no more breaks of each hard rule than `shared`. It also has no edge with a stretch above the cap. Under the rule `collection`, it also has no shared segment with edges of two collections. The base `shared` always passes.
 - `budgetMs` is an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine.
+- `budgetMs` is a soft limit between members. The router examines it only before each member, so a slow member runs to its end. With `budgetMs: 50`, the median on large boards was 142 to 239 ms.
 - The router picks with `selectBest` of `@mark1russell7/layout-contract`, the one run-time dependency of the core.
 - The result has the output, the winner, the trace of the pick and the move count `move.pick`.
 - `portfolioRouter(options?)` gives a `Router`, and `portfolioStrategy` is the router strategy. Add `portfolioStrategy` to a registry of your own to race it.
