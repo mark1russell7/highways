@@ -217,9 +217,11 @@ export function stageCounts(records: readonly IdeaRecord[]): { readonly stage: s
   return order.filter((s) => counts.has(s)).map((stage) => ({ stage, count: counts.get(stage)! }));
 }
 
-/** One row of the idea queue that the page shows. */
+/** One row of the idea queue that the page shows: an idea or an enabler. */
 export interface QueueTopRow {
   readonly rank: number;
+  /** An enabler removes a block of ideas. Its score is the sum of the scores that it unblocks, divided by its cost. */
+  readonly kind: "idea" | "enabler";
   readonly id: string;
   readonly name: string;
   readonly step: string;
@@ -227,6 +229,17 @@ export interface QueueTopRow {
   readonly status: string;
   /** The reasons that block a build, for example `step:levels`. */
   readonly blockedBy: readonly string[];
+  /** The count of the ideas that an enabler unblocks. It is 0 for an idea. */
+  readonly unblocks: number;
+}
+
+/** The back test of the gain: the rank correlation and its bootstrap interval of 95 %. */
+export interface QueueBacktest {
+  readonly ideas: number;
+  readonly rho: number;
+  readonly low: number;
+  readonly high: number;
+  readonly resamples: number;
 }
 
 /** The part of the idea queue that the page shows: the top rows and the counts. */
@@ -237,7 +250,11 @@ export interface QueueView {
   readonly blocked: number;
   /** The count of the canonical ideas of each status, in the sequence of `QUEUE_STATUSES`. */
   readonly statuses: readonly { readonly status: string; readonly count: number }[];
+  /** The joint list of the ideas and the enablers, from rank 1 to rank `QUEUE_TOP`. */
   readonly top: readonly QueueTopRow[];
+  /** All the enablers, also the enablers below the top rows. */
+  readonly enablers: readonly QueueTopRow[];
+  readonly backtest: QueueBacktest;
 }
 
 /** The statuses of a row of the queue, in the sequence of the page. */
@@ -252,20 +269,25 @@ export function queueView(text: string): QueueView {
     date: string;
     formula: string;
     counts: { ranked: number; blocked: number; byStatus: Record<string, number> };
+    backtest: QueueBacktest;
+    enablers: { rank: number; id: string; name: string; score: number; unblocks: string[] }[];
     rows: { rank: number | null; id: string; name: string; step: string; score: number; status: string; blockedBy: string[] }[];
   };
-  if (!Array.isArray(q.rows) || typeof q.counts?.ranked !== "number") throw new Error("queue.json has no rows or no counts.");
+  if (!Array.isArray(q.rows) || !Array.isArray(q.enablers) || typeof q.counts?.ranked !== "number") throw new Error("queue.json has no rows, no enablers or no counts.");
+  const enablers: QueueTopRow[] = q.enablers.map((e) => ({ rank: e.rank, kind: "enabler", id: e.id, name: e.name, step: "", score: e.score, status: "queued", blockedBy: [], unblocks: e.unblocks.length }));
+  const ideas: QueueTopRow[] = q.rows
+    .filter((r): r is typeof r & { rank: number } => r.rank !== null)
+    .map((r) => ({ rank: r.rank, kind: "idea", id: r.id, name: r.name, step: r.step, score: r.score, status: r.status, blockedBy: r.blockedBy, unblocks: 0 }));
+  const { ideas: n, rho, low, high, resamples } = q.backtest;
   return {
     date: q.date,
     formula: q.formula,
     ranked: q.counts.ranked,
     blocked: q.counts.blocked,
     statuses: QUEUE_STATUSES.map((status) => ({ status, count: q.counts.byStatus[status] ?? 0 })),
-    top: q.rows
-      .filter((r): r is typeof r & { rank: number } => r.rank !== null)
-      .sort((a, b) => a.rank - b.rank)
-      .slice(0, QUEUE_TOP)
-      .map((r) => ({ rank: r.rank, id: r.id, name: r.name, step: r.step, score: r.score, status: r.status, blockedBy: r.blockedBy })),
+    top: [...ideas, ...enablers].sort((a, b) => a.rank - b.rank).slice(0, QUEUE_TOP),
+    enablers,
+    backtest: { ideas: n, rho, low, high, resamples },
   };
 }
 

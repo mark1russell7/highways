@@ -808,12 +808,12 @@ The queue puts each idea that is not built in the order of a score (IDEA-QUEUE).
 - `pnpm queue --calibration` gives the table of the calibration below.
 - The test `packages/core/src/bench/screen/queue.test.ts` fails when `queue.json` is old.
 
-The header of `queue.json` has the formula version, the date and the commit. It also has the files that the script read, the runs of the snapshots and the counts.
+The header of `queue.json` has the formula version, the date and the commit. It also has the files that the script read, the runs of the snapshots, the counts and the back test. The list `enablers` comes after the header, then the rows.
 
 ### The fields of a row
 
 - `id`, `name`, `step`, `kind` and `wins` come from the record.
-- `gain`, `uncertainty`, `cost` and `score` come from the formula. `rank` is the rank by score.
+- `gain`, `uncertainty`, `cost` and `score` come from the formula. `rank` is the rank by score on the joint list of the ideas and the enablers.
 - `slot` tells if the step has strategies in `STEPS`.
 - `canonical` is the id of the canonical idea of the group. A duplicate has no rank, and it takes the status of its canonical.
 - `blockedBy` gives the reasons that block a build:
@@ -884,6 +884,8 @@ The calibration compares the predicted gain of each taken idea with its measured
 
 On 2026-10-28, no taken idea is built. The back test applies the formula to the 50 ideas that a strategy builds and that have a screen result. These are from before the queue. Their rank correlation is 0.50. The predicted gain of the back test does not count the open targets of the strategy itself.
 
+The bootstrap interval of 95 % of the back test is 0.23 to 0.72. The script takes 2000 resamples of the 50 pairs, with replacement and the fixed seed 1. The interval is the 2.5 and the 97.5 percentile. The header of `queue.json` holds it as `backtest`, and the results page shows it.
+
 | Idea | Taken | Predicted gain | Predicted score | Measured gain |
 |---|---|---:|---:|---:|
 
@@ -895,6 +897,53 @@ On 2026-10-28, no taken idea is built. The back test applies the formula to the 
 | 2. 15% or more of the ranked ideas have a `blockedBy`. | 0.45 | Met: 77 of 183 (42%). |
 | 3. The results page grows by 5 KB gzip or less. | high | Met by an estimate: the changed sources and the data grow by 1.8 KB gzip. The Pages build of CI gives the true size. |
 | 4. No route output, digest or Xplat hash changes. | high | Met: the change adds scripts and tests only, and no file of `packages/core/src` outside the tests. |
+
+### The enablers (`queue/2`)
+
+An enabler is an item that removes a block of ideas (QUEUE-ENABLERS). It gets a score on the same list as the ideas. The formula `queue/2` is `queue/1` with the enablers on the list.
+
+- The list `ENABLERS` of `packages/core/scripts/queue.ts` gives each enabler: its id, the blocks that it removes and its size.
+- The score of an enabler is the sum of the scores of the ideas that it unblocks, divided by its cost. The cost is the size: S 1, M 2 or L 4.
+- The enabler unblocks an idea when it removes each block of the idea. A block `idea:<id>` is removed when the enabler unblocks that idea. The script repeats this until no idea changes.
+- An idea with the blocks of two enablers needs both. Neither enabler gets its score.
+- The scores of the unblocked ideas are the scores of the list. They keep the double cost of a step with no strategies.
+- The ideas and the enablers sort together by score, then by id. A rank is unique on the joint list.
+
+The two enablers on 2026-10-28:
+
+| Enabler | Removes | Size | Unblocks | Sum of the scores | Score | Rank |
+|---|---|---|---:|---:|---:|---:|
+| `STEP-SLOTS` | `step:` (the steps `whole`, `levels` and `plugs`) | L | 45 | 105.279 | 26.32 | 1 |
+| `SCREEN-MEASURES` | `measure:` (11 measures) | L | 17 | 35.67 | 8.918 | 18 |
+
+- `STEP-SLOTS` unblocks 45 of the 51 ideas with a step block. 6 of the 45 wait for an idea that `STEP-SLOTS` also unblocks.
+- 4 ideas need both enablers: `WILD-011`, `WILD-013`, `EDA-014` and `EDA-036`. 2 other ideas wait for an idea that no enabler unblocks.
+- `SCREEN-MEASURES` gets a low score because a missing measure has no open targets. Each win on it adds only 0.5 to the gain.
+
+The joint top 10:
+
+| Rank | Item | Step | Score | Blocked by |
+|---:|---|---|---:|---|
+| 1 | `STEP-SLOTS` (enabler) | | 26.32 | |
+| 2 | `NAT-018` Knee of the plant Pareto front | `highway` | 20.825 | |
+| 3 | `RULE-021` Simulated annealing over candidate routes | `router` | 18.7 | |
+| 4 | `NAT-019` Bronchial space-filling splits | `highway` | 17.85 | |
+| 5 | `EDA-017` Stretch balance in a bundle | `highway` | 13.175 | |
+| 6 | `WILD-023` Tight edges first | `router` | 12.5 | |
+| 7 | `RULE-044` Corner graph with rule prices, then rip-up and reroute | `router` | 12 | |
+| 8 | `WILD-036` Manifolds for a fan to a row | `highway` | 12 | |
+| 9 | `WILD-031` Approval corridors | `highway` | 11.75 | |
+| 10 | `RULE-020` Adam with a seeded sample of pairs | `router` | 11.73 | `idea:RULE-019` |
+
+### The prediction of QUEUE-ENABLERS
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. `STEP-SLOTS` gets rank 1, with a score of 2 or more times that of `NAT-018` (41.65 or more). | 0.45 | Not met: rank 1, but the score is 26.32 (1.26 times). |
+| 2. `SCREEN-MEASURES` gets a rank from 2 to 10. | 0.4 | Not met: rank 18. |
+| 3. 10 or fewer ranked ideas have a step block and a measure block. | 0.5 | Met: 4. |
+| 4. The lower bound of the bootstrap interval of 95 % is above 0.2. | 0.5 | Met: 0.23. |
+| 5. No route output, digest or Xplat hash changes. | high | Met: the change adds scripts, tests and site code only. |
 
 ## Queue builds
 
