@@ -18,6 +18,7 @@ import type { Graph, Node } from "../src/model.ts";
 import { sectionsRouter } from "../src/routers/sections.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection, trunksRouter } from "../src/routers/trunks.ts";
+import { sharedStretchStrategy } from "../src/lane-orders/stretch/router.ts";
 import { portfolioStrategy } from "../src/portfolio/router.ts";
 import { STRATEGIES as BUILT_IN } from "../src/strategies/builtins.ts";
 import { listStrategies, register, routersOf, STEPS, type AnyStrategy, type Step } from "../src/strategies/model.ts";
@@ -37,7 +38,7 @@ const number = (name: string, fallback: number): number => {
   return value;
 };
 // The opt-in routers that `--opt-in` can add to the registry of the race.
-const OPT_IN: Readonly<Record<string, AnyStrategy>> = { portfolio: portfolioStrategy };
+const OPT_IN: Readonly<Record<string, AnyStrategy>> = { portfolio: portfolioStrategy, "shared-stretch": sharedStretchStrategy };
 for (const name of list("--opt-in") ?? []) if (OPT_IN[name] === undefined) throw new Error(`There is no opt-in router "${name}". The opt-in routers are ${Object.keys(OPT_IN).join(", ")}.`);
 const STRATEGIES = register(BUILT_IN, ...(list("--opt-in") ?? []).map((name) => OPT_IN[name]!));
 // The registry gives each list, so a new strategy gets its rows with no edit here.
@@ -137,6 +138,11 @@ function sideTables(): void {
     // The lanes leave the trunk at the split point (HWC-C): the old default, for the comparison.
     trunksRouter({ name: "trunks (leave at split)", rule: byCollection, leave: "split" }),
     trunksRouter({ name: "trunks-all (leave at split)", rule: all, leave: "split" }),
+    // One lane order for each stretch of runs (LANE-STRETCH): the three stretch orders, for the comparison with the order of each run alone.
+    sharedRouter({ name: "shared (stretch consensus)", rule: byCollection, stretchOrder: "consensus" }),
+    sharedRouter({ name: "shared (stretch periphery)", rule: byCollection, stretchOrder: "periphery" }),
+    sharedRouter({ name: "shared (stretch sifting)", rule: byCollection, stretchOrder: "sifting" }),
+    sharedRouter({ name: "shared-all (stretch consensus)", rule: all, stretchOrder: "consensus" }),
   ];
   const highways: HighwayBenchRow[] = [];
   for (const name of ["case-dense-groups", "case-hub-chain", "case-many-groups"]) {

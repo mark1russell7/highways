@@ -84,8 +84,8 @@ function shared(a: Prepared, b: Prepared): number {
 }
 
 /**
- * This function gives the links between the runs. Two runs are linked when a route goes through one and then the other, with no shared run between them,
- * and when they share two edges or more. Each such route gives a vote for the way of one run against the other.
+ * This function gives the links between the runs. A link can join two runs when a route goes through one and then the other.
+ * No shared run is between them on that route, and the two runs share two edges or more. Each such route gives a vote for the way of one run against the other.
  * A link joins two runs only when all the votes agree. The links are a forest. The edges and the runs are taken in a fixed order, so the links do not depend on the order of the input.
  */
 function linksOf(prepared: readonly Prepared[], keyOrder: readonly number[]): Link[][] {
@@ -184,15 +184,15 @@ class Relation {
     }
   }
 
-  /** This method gives -1 when the edge `a` is on the left of the edge `b`, 1 when it is on the right, and 0 when the two edges share no run. */
+  /** This method gives -1 when the edge `a` is on the left of the edge `b`, and 1 when it is on the right. It gives 0 when the two edges share no run. */
   side(a: number, b: number): number {
     return this.pairs[a]!.get(b) ?? 0;
   }
 }
 
 /**
- * This function gives an order of the edges of a relation with few broken pairs: the heuristic of Eades, Lin and Smyth (1993) for the feedback arc set.
- * The sinks go to the end, the sources go to the start, and else the edge with the most pairs on its right minus the pairs on its left goes to the start.
+ * This function gives an order of the edges of a relation with few broken pairs. It is the heuristic of Eades, Lin and Smyth (1993) for the feedback arc set.
+ * The sinks go to the end, and the sources go to the start. Else, the edge with the largest count of right pairs minus left pairs goes to the start.
  * Each tie goes to the smallest index. A relation with no cycle gives an order with no broken pair.
  */
 function eadesOrder(rel: Relation): number[] {
@@ -242,7 +242,7 @@ function eadesOrder(rel: Relation): number[] {
   return [...head, ...tail.reverse()];
 }
 
-/** This function counts the broken pairs of the edge at the place `at` of an order: the edges on its left that must be on its right, and the reverse. */
+/** This function counts the broken pairs of the edge `a` at the place `at` of an order. A broken pair has the other edge on the wrong side. */
 function cost(rel: Relation, order: readonly number[], a: number, at: number): number {
   let c = 0;
   for (let k = 0; k < order.length; k++) {
@@ -256,7 +256,7 @@ function cost(rel: Relation, order: readonly number[], a: number, at: number): n
 }
 
 /**
- * This function moves each edge to the place with the fewest broken pairs, one edge at a time, in the order of the start of the pass (sifting).
+ * This function moves each edge to the place with the fewest broken pairs (sifting). It moves one edge at a time, in the order of the start of the pass.
  * An edge stays at its place when no other place is better. Each tie goes to the place more to the left.
  */
 function sift(rel: Relation, start: readonly number[], passes: number): number[] {
@@ -410,7 +410,7 @@ function orderOf(prepared: readonly Prepared[], runs: readonly number[], turns: 
 
 /**
  * This function gives the lane order of each run (LANE-STRETCH). The orders are in the order of `runs`.
- * Each order holds the edges of the run from left to right, from the first point of the run to its last point, with the y axis down.
+ * Each order holds the edges of the run from left to right. The way goes from the first point of the run to its last point, with the y axis down.
  * A route that does not hold its run goes last, as in `orderLanes`.
  *
  * With the method `none`, each run gets the order `bundle` of `orderLanes`. With the other methods, each run of a stretch gets the order of the stretch.

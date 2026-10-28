@@ -61,7 +61,7 @@ jobs:
           [[ "$SEEDS" =~ ^[1-9][0-9]*$ ]] || { echo "seeds must be a number of 1 or more, not '$SEEDS'"; exit 1; }
           parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" '[
             {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds)", limit: 900000, timeout: 30},
-            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio --routers portfolio", limit: 900000, timeout: 30},
+            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio,shared-stretch --routers portfolio,shared-stretch", limit: 900000, timeout: 30},
             {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared-all", limit: 900000, timeout: 40},
             {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared,sections", limit: 900000, timeout: 40},
             {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router,group --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},

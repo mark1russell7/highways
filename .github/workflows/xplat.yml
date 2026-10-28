@@ -95,7 +95,7 @@ jobs:
           set -o pipefail
           node --version
           cd packages/core
-          node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/trace"
+          node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/trace" --extra shared-stretch
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -156,7 +156,7 @@ jobs:
         run: |
           set -o pipefail
           cd packages/core
-          XPLAT_NEAR="$GITHUB_WORKSPACE/targets/targets.json" node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/near"
+          XPLAT_NEAR="$GITHUB_WORKSPACE/targets/targets.json" node scripts/xplat.ts --inputs "$GITHUB_WORKSPACE/inputs" --out "$GITHUB_WORKSPACE/near" --extra shared-stretch
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
