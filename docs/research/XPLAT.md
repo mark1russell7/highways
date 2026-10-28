@@ -304,4 +304,9 @@ The promotion rule cannot decide on the broken pairs.
 
 ### The score of the predictions
 
-SCORE_PLACEHOLDER
+1. Met. Xplat 40759406196 (commit `00ddf68`) gives 51 of 51 default routes the same hash in the 4 cells, with `rep` yes. The 51 hashes equal those of `d892da1`. The digest tests pass in CI.
+2. Met. The 24 routes of `shared-stretch` with `sifting` have one hash in the 4 cells, with `rep` yes. The tests of the permutations pass.
+3. Met. `sifting` cuts the total of `shared` from 21 to 16 (−24%), and `B5` from 11 to 2.
+4. Not met. The gain test fails on `B5`, because the median ratio is 1.000. Length and bends tie.
+5. Met. The median time ratio of `sifting` against `shared` is 0.90 on `screen-v1`.
+6. SCORE_P6
