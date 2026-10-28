@@ -44,6 +44,7 @@
     "levels": "node scripts/levels.ts",
     "screen": "node scripts/screen.ts",
     "exact": "node scripts/exact.ts",
+    "oracle": "node scripts/oracle.ts",
     "screen:inputs": "node scripts/screen-inputs.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"

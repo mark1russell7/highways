@@ -81,13 +81,14 @@ Status: `done`, `active`, `blocked`, `later`.
 | WIN-RES | A win must beat the baseline by more than the resolution. `compareMeasure` gives `"better"`, `"worse"` or `"tie"` with the `minEffect` of each measure, and a tie is not a win. With the strict rule, HWY-011 and HWY-016 change from kept to dropped. NAT-022 and WILD-037 reach 3 boards, but their guards keep them dropped. | 2026-10-28 | #96 |
 | BUILD-W3E | Seven highway finders: `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars` and `frechet`. No finder wins more than 2 of 4 boards against `shared`, alone or with the gate `stretch`. Each win of `power` and `areas` is a tie on a board where `shared` has 0 runs. HWY-008, HWY-009, HWY-010, HWY-013, HWY-014, HWY-022 and HWY-027 are dropped. | 2026-10-27 | #97 |
 | G10 | The contract 0.2.2 has `compareMeasure` and `minEffectOf`. The core has `layout-contract` ^0.2.3 as a development dependency and keeps its own copy. A test shows that the copy and the contract give the same result on the cases of `compare.test.ts` and on 5000 seeded random pairs. | 2026-10-27 | #99 |
+| ORACLE | [The oracle bound](research/ORACLE.md): the best strategy of each input, over 228 strategies. On `exact-v1`, the oracle closes 0.947 of the gap, against 0.595 for the best single strategy. On `screen-v1`, the guarded oracle B1 is 39% to 534% above the best single strategy on 4 of 4 boards. A selector by class keeps -32% of the gain on `exact-v1`. | 2026-10-27 | #100 |
 
 ## Open
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. | `later` | ORACLE | P1 |
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
-| ORACLE | The oracle bound of a selector for each input: the best strategy of the whole portfolio on each input, against the best single strategy. The bound is on each measure and on the gap closed. | `later` | MEAS2 | P1 |
 | MEAS-FLAT | Z2 is 0 on each record, and B8 `runs` is degenerate where `shared` has 0. Correct each definition, or mark it inactive with its reason. | `later` | MEAS3A | P2 |
 | CURV3 | More curve types from CURV-R, each with its options: Hobby curves, B-splines, biarc corners and superellipse corners. | `later` | CURV2 | P2 |
 | GRP3 | More grouping rules from GRP-R: `agglomerative`, `leiden` and `pack`, and the options `refine` and `band` of the rule `cut`. | `later` | GRP2 | P2 |
