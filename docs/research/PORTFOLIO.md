@@ -485,8 +485,8 @@ This section is the result of the item PORTFOLIO-FIT of the [roadmap](../ROADMAP
 
 The core imports the shared functions from `@mark1russell7/layout-contract` (0.2.6 or later):
 
-- `portfolio`, `selectBest` and `pickMoves`;
-- `compareMeasure`, `minEffectOf` and `RECORD_EPS`;
+- `portfolio`, `selectBest` and `pickMoves`
+- `compareMeasure`, `minEffectOf` and `RECORD_EPS`
 - `outputHash`, `outputGroups`, `exercised`, `canonicalJson` and `sha256Hex`.
 
 The reasons:
@@ -495,17 +495,17 @@ The reasons:
 - The contract has no dependencies, so the import adds only the contract.
 - The parity tests of the copies are not necessary, so the core loses them.
 
-The published package `@mark1russell7/highways` now has one run-time dependency. The core keeps only the functions that the contract does not have:
+The published package `@mark1russell7/highways` has one run-time dependency since PORTFOLIO-FIT. The core keeps only the functions that the contract does not have:
 
-- `documentHash`, because the function of the contract rounds to a grid, and the hash of a document keeps the exact numbers;
-- `utf8`, because the contract does not export it;
+- `documentHash`, because the function of the contract rounds to a grid, and the hash of a document keeps the exact numbers
+- `utf8`, because the contract does not export it
 - the seeds, the random generator and `round3`.
 
 A minified bundle of the core (`esbuild`, `src/index.ts`) has 435 086 bytes with the contract and 427 057 bytes without it. So the contract adds 8 029 bytes, approximately 7.8 KB. The CI run [40661133199](https://github.com/mark1russell7/highways/actions/runs/40661133199) of the workflow `Portfolio` measured it.
 
 ### One key
 
-PORTFOLIO-API found that the key of the router and the guard of the records did not always choose the same member. The key counted each edge of the base above the cap as a hard break. The offline scan was not `selectBest`. Now the two sides use the same guard and the same function:
+PORTFOLIO-API found that the key of the router and the guard of the records did not always choose the same member. The key counted each edge of the base above the cap as a hard break. The offline scan was not `selectBest`. Since PORTFOLIO-FIT, the two sides use the same guard and the same function:
 
 - A member passes when it has no more breaks of each hard rule than the base, and no edge with a stretch above the cap. Under the rule `collection`, it also has no mixed segment.
 - The base `shared` is the fallback, so it always passes. The cap does not apply to it.
@@ -513,7 +513,7 @@ PORTFOLIO-API found that the key of the router and the guard of the records did 
 
 `guardBreaks` and `portfolioKey` of `src/portfolio/key.ts` hold the guard. The offline choice `choose` of `scripts/portfolio.ts` uses the same `selectBest`. The test `pick.test.ts` routes the boards of `exact-v1` and a part of `exact-v1-bounds`, and it compares the two picks.
 
-The workflow `Portfolio` compares the winner of each record with the offline choice of the same members. On 3 740 records of the forms without a budget, 0 winners differ. Under `collection` at the cap 1.1, the share of the gap closed does not change. The median B1 of the router goes up: from 0.045 to 0.074 at 13 to 24 nodes (k = 5), and from 0.088 to 0.101 at 25 to 40 nodes.
+The workflow `Portfolio` compares the winner of each record with the offline choice of the same members. On 3 740 records of the forms without a budget, 0 winners differ. Under `collection` at the cap 1.1, the share of the gap closed does not change. The median B1 of the router goes up. At 13 to 24 nodes and k = 5, it goes from 0.045 to 0.074. At 25 to 40 nodes, it goes from 0.088 to 0.101.
 
 ### The deterministic default
 

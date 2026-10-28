@@ -493,7 +493,7 @@ The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outp
 - The options are `rule` (`collection` or `all`), `cap` (1.1, 1.25 or 1.5), `k` (3, 5 or 8), `budgetMs` and `maxMembers`.
 - Without `k`, the members are the fit of the band. Each member has a node limit, so the default is deterministic. Above 40 nodes, the fit is `shared` alone.
 - With `k`, the members are the first `k` names of the greedy set of the band.
-- A member passes the guard when it has no more breaks of each hard rule than `shared`, and no edge with a stretch above the cap. Under the rule `collection`, it also has no shared segment with edges of two collections. The base `shared` always passes.
+- A member passes the guard when it has no more breaks of each hard rule than `shared`. It also has no edge with a stretch above the cap. Under the rule `collection`, it also has no shared segment with edges of two collections. The base `shared` always passes.
 - `budgetMs` is an opt-in ceiling. A cut by the budget makes the output depend on the speed of the machine.
 - The router picks with `selectBest` of `@mark1russell7/layout-contract`, the one run-time dependency of the core.
 - The result has the output, the winner, the trace of the pick and the move count `move.pick`.
