@@ -59,12 +59,13 @@
     "packages/core/src/highways/traclus/index.ts": 2,
     "packages/core/src/highways/wspd/index.ts": 1,
     "packages/core/src/highways/zipper/index.ts": 2,
+    "packages/core/src/lane-order.ts": 1,
     "packages/core/src/plugs/side.ts": 1,
     "packages/core/src/room/bends.ts": 7,
     "packages/core/src/routers/shared.ts": 1,
     "packages/core/src/routers/snell.ts": 2,
     "packages/core/src/routers/trunks.ts": 2,
-    "packages/core/src/segments.ts": 3,
+    "packages/core/src/segments.ts": 2,
     "packages/site/src/outlines.ts": 3,
     "packages/site/src/view.ts": 6
   }

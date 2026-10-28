@@ -614,6 +614,7 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - The script `scripts/check-math.mjs` of the repository counts these calls in each source file. `pnpm test` fails when a count goes up.
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
+- The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 
 ## License

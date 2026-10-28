@@ -101,6 +101,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | HASH-LAZY | [The hash of the router](research/PORTFOLIO.md#the-hash-of-the-router-hash-lazy) `portfolio`. With the new default `hashes: "pick"`, only a pick that moves hashes the base and the winner. A member takes 1.01 to 1.07 times its run alone. The fit target goes to 45 ms. 5 shares get their value of 0.5.1 again. | 2026-10-28 | #127 |
 | REL13 | Version 0.7.0 on npm. MINOR: the default fit and the default trace of `routePortfolio` change (#127). [The defaults of 0.6.0 and 0.7.0](research/PORTFOLIO.md#the-defaults-of-060-and-070) gives the members that change. | 2026-10-28 | #128 |
 | XPLAT-HASH | [The routes on each platform](research/XPLAT.md#the-same-routes-on-each-platform-xplat-hash). The node version is the axis, not the system. The compare function of `orderLanes` is not a total order. V8 13.6 and 14.6 sort 3 to 7 items in other sequences, so 259 runs of 3 to 7 lanes get another lane order. No point moves. `scripts/check-math.mjs` holds the 187 transcendental Math calls. | 2026-10-28 | #129 |
+| LANE-ORDER | [The lane order](research/XPLAT.md#the-lane-order-lane-order). `orderLanes` and `laneOrderOfRun` sort with a merge sort of the package, so node 24 and node 26 give the same lane order. 5 of 27 digests change. `B5` goes from 295 to 300 on the routers and from 6559 to 6552 on the highways. LANE-STRETCH is to remove the cycles. | 2026-10-28 | #130 |
 
 ## Calibration
 
