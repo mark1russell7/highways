@@ -2,7 +2,7 @@ import { hubChainBoard, manyGroupsBoard, packedGridBoard } from "../../cases.ts"
 import { FIXTURES, makeFixture, type FixtureSpec } from "../../fixtures.ts";
 import type { Graph } from "../../model.ts";
 import { familySeed } from "../suite.ts";
-import { EXACT_V1 } from "./exact-set.ts";
+import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
 
 /** A family of boards of a screen set. The member `k` of the family has the seed `k`. */
@@ -86,8 +86,8 @@ export const SCREEN_V1: ScreenSet = {
   ],
 };
 
-/** The screen sets by id: `screen-v1` and the small boards with a known optimum, `exact-v1` (MEAS2). */
-export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = { [SCREEN_V1.id]: SCREEN_V1, [EXACT_V1.id]: EXACT_V1 };
+/** The screen sets by id: `screen-v1`, the small boards with a known optimum `exact-v1` (MEAS2), and the larger boards with bounds `exact-v1-bounds` (EXACT-BOUNDS). */
+export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = { [SCREEN_V1.id]: SCREEN_V1, [EXACT_V1.id]: EXACT_V1, [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS };
 
 /** This function gives the id of the member `seed` of a family of a set: `<set>/<family>/s<seed>`. */
 export function inputId(set: string, family: string, seed: number): string {

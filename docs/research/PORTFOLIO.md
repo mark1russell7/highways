@@ -6,6 +6,7 @@ This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A
 - The note gives the Pareto curve of the portfolio: the gain for each k, on seeds that the choice of the set did not see. It also gives the time of each set.
 - The script [`scripts/portfolio.ts`](../../packages/core/scripts/portfolio.ts) makes the tables from the records of CI. The test `src/bench/screen/portfolio.test.ts` examines its functions.
 - The section [The rule of the caller](#the-rule-of-the-caller-portfolio-rule) is the result of the item PORTFOLIO-RULE. The script also makes its tables, with the optima of `exact-v1`.
+- The section [The portfolio at each cap](#the-portfolio-at-each-cap-exact-bounds) is the result of the item EXACT-BOUNDS. It gives the greedy sets of each rule and cap.
 - The script [`scripts/portfolio-time.ts`](../../packages/core/scripts/portfolio-time.ts) times each strategy. The workflow `Portfolio` starts it in CI.
 
 ## Summary
@@ -325,3 +326,46 @@ The prediction was written before the work.
 - At the cap 1.5, a run with a small stretch gets no credit for it. A caller with a smaller stretch limit needs the optimum of that cap.
 - The rule `all` keeps 47% to 93% of its gain with a set of 3 to 8. The rule `collection` needs more strategies: k = 8 keeps 73%.
 - The item adds no strategy and changes no default, so it needs no release.
+
+## The portfolio at each cap (EXACT-BOUNDS)
+
+This section is the result of the item EXACT-BOUNDS of the [roadmap](../ROADMAP.md). The curve of PORTFOLIO-RULE also runs at each cap: 1.1, 1.25 and 1.5. [`BOUNDS.md`](BOUNDS.md) gives the bounds past 10 nodes.
+
+- The records come from the CI run [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) of the workflow `Screen` on `exact-v1`. The run has 11880 records of 297 strategies, with wave 3F.
+- The report comes from the CI run [40633116748](https://github.com/mark1russell7/highways/actions/runs/40633116748) of the workflow `Portfolio`.
+- At one cap, the portfolio chooses by B1 only among the runs at or below the cap. Each input has a proven optimum at each cap and each rule.
+- The baseline `shared` stays the fallback output at each cap. Its stretch is above 1.1 on 5 of 40 inputs. There it keeps its gap closed.
+- An input counts at a cap only when the optimum at the cap is above the baseline of the rule. At the cap 1.1 with the rule `all`, 38 of 40 inputs count.
+
+The share of the oracle gain for each k, on the test inputs of both splits:
+
+| rule | cap | best single | oracle | oracle gain | k = 1 | k = 2 | k = 3 | k = 5 | k = 8 | all 296 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `collection` | 1.1 | 0.106 | 0.431 | 0.325 | 0% | 3% | 8% | 28% | 54% | 100% |
+| `collection` | 1.25 | 0.047 | 0.430 | 0.383 | 0% | 3% | 7% | 12% | 26% | 100% |
+| `collection` | 1.5 | 0.021 | 0.392 | 0.370 | 0% | 0% | 12% | 27% | 76% | 100% |
+| `all` | 1.1 | 0.201 | 0.813 | 0.613 | 0% | 13% | 30% | 87% | 87% | 100% |
+| `all` | 1.25 | 0.468 | 0.665 | 0.197 | 0% | 48% | 55% | 70% | 84% | 100% |
+| `all` | 1.5 | 0.565 | 0.701 | 0.136 | 0% | 23% | 45% | 46% | 89% | 100% |
+
+- At each cap, the whole pool reaches the oracle of the rule, as at the cap 1.5.
+- At the cap 1.5, wave 3F changes the values of PORTFOLIO-RULE a little. The oracle of `collection` goes from 0.378 to 0.392.
+- The rule `all` at the cap 1.1 has the largest oracle gain: 0.613. Few strategies stay in the cap, so the best single strategy is low (0.201). A set of 5 keeps 87%.
+- The rule `collection` at the cap 1.1 has a smaller oracle gain than at the cap 1.5: 0.325 against 0.370. The optimum at 1.1 is lower, and the best single strategy is higher.
+
+### The greedy sets for PORTFOLIO-API
+
+The greedy choice on all inputs of the cap, for each rule and cap of the caller. Each set also runs `shared`. The item PORTFOLIO-API builds a strategy from these sets.
+
+| rule | cap | inputs | k = 3 | k = 5 adds | k = 8 adds |
+|---|---:|---:|---|---|---|
+| `collection` | 1.1 | 40 | `corners-side`, `hw:zipper`, `trunks-gilbert-a05` | `w3a:spiral-a15`, `w2c:select+stretch` | `trunks-tree-bf08`, `w3a:diffusion-g2`, `w2b:zipper-near2` |
+| `collection` | 1.25 | 40 | `corners-side`, `trunks-tree-bf08`, `w3a:mingle+stretch` | `w3e:crossbars+stretch`, `w3f:p-hub-a0.2` | `trunks-tree-bf06`, `hw:spiral`, `w3f:p-hub-multiple` |
+| `collection` | 1.5 | 40 | `trunks-gilbert-a07`, `hw:zipper`, `w3e:areas-keys` | `w3a:mingle+stretch`, `w3f:p-hub-a0.2` | `trunks-tree-bf02`, `w3f:resistance-sparse`, `w2b:zipper-a1` |
+| `all` | 1.1 | 38 | `w2b:zipper-p2`, `hw:cubu`, `w3d:kdeeb-routes` | `w3e:sbeb-routes`, `w3c:hough-wide` | `hw:stubs`, `w3a:spiral+stretch`, `hw:mesh` |
+| `all` | 1.25 | 40 | `w3e:mlseb+stretch`, `w3d:kdeeb-routes`, `hw:growth` | `w3d:kdeeb-nomask`, `w3f:p-hub-a0.2` | `w3b:growth-s0.7`, `hw:level-links`, `w3b:growth-input` |
+| `all` | 1.5 | 40 | `w3b:growth-s0.3`, `w3e:mlseb-parabola`, `w3e:mlseb-routes` | `hw:mlseb`, `hw:growth` | `w3b:growth-input`, `w3e:mlseb-a0`, `w3a:traclus-m2` |
+
+- The sets of the rule `collection` share no strategy between the caps 1.1 and 1.5. `corners-side` is first at 1.1 and 1.25.
+- The sets of the rule `all` hold `growth` only from the cap 1.25. At the cap 1.1, the forms of `zipper`, `cubu` and `kdeeb` lead.
+- The sets come from all 40 inputs of `exact-v1` (1 board size). They need a check on other seeds and sizes before PORTFOLIO-API uses them.

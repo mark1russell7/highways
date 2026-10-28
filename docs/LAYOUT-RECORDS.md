@@ -492,3 +492,22 @@ The screen of `exact-v1` adds the gap closed (B10) to each record of the step `r
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
 ```
+
+### The screen set `exact-v1-bounds`
+
+The set `exact-v1-bounds` (EXACT-BOUNDS) has the boards of `exact-v1` at 18, 24 and 40 nodes. Its files are in [`corpus/exact-v1-bounds`](../corpus/exact-v1-bounds). `EXACT_V1_BOUNDS` of `bench/screen/exact-set.ts` makes them.
+
+- The set has 12 families: each class at each size. The name of a family is `<class>-n<nodes>`, for example `hubs-n24`.
+- Each family has 10 seeds, with the seeds of `exact-v1`. Thus the member `k` of a class has the same seed at each size.
+- Each id is `exact-v1-bounds/<class>-n<nodes>/s<k>`. Each board has 1.5 edges for each node.
+- At these sizes, HiGHS proves few optima in 300 s. Thus the file of the set keeps the best solution and the bound of each solve.
+
+The file [`optima-exact-v1-bounds.json`](../packages/core/src/bench/exact/optima-exact-v1-bounds.json) has the schema `exact-optima/1`. It has one row for each input, each rule and each cap: 720 rows.
+
+- A row with `proven` false has the B1 of the best solution in `b1`, and the dual bound of HiGHS in `bound`.
+- The screen gives the gap closed (B10) only at a proven optimum. The script `pnpm bounds` gives an interval at a bound. [`BOUNDS.md`](research/BOUNDS.md) tells the interval.
+
+```sh
+gh workflow run exact.yml --ref main -f args="--set exact-v1-bounds --caps 1.1,1.25,1.5 --rules collection,all --seconds 300 --shards 60" -f minutes=150
+gh workflow run screen.yml --ref main -f step=router -f set=exact-v1-bounds -f families=hubs-n24 -f module=packages/core/scripts/screens/meas2.ts
+```

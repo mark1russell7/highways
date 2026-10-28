@@ -73,3 +73,28 @@ export const EXACT_V1: ScreenSet = {
   id: "exact-v1",
   families: EXACT_CLASSES.map((cls) => exactFamily(cls, EXACT_V1_SIZES, EXACT_V1_SEEDS)),
 };
+
+/** The node counts of the boards of `EXACT_V1_BOUNDS`. HiGHS proves few optima at these sizes within 300 s, so the set keeps bounds (EXACT-BOUNDS). */
+export const EXACT_V1_BOUNDS_SIZES: readonly number[] = [18, 24, 40];
+
+/** This function gives the name of the family of a class at a size in `EXACT_V1_BOUNDS`: `<class>-n<nodes>`. */
+export function boundsFamilyName(cls: ExactClass, nodes: number): string {
+  return `${cls}-n${nodes}`;
+}
+
+/**
+ * The screen set `exact-v1-bounds` (EXACT-BOUNDS): the boards of the classes of `exact-v1` at 18, 24 and 40 nodes, with 10 seeds each.
+ * Each family is one class at one size. The member `k` uses the seed `exactSeed(class, k)`, as in `exact-v1`.
+ * The file `optima-exact-v1-bounds.json` of `bench/exact` keeps the best bound and the best solution of each input, each rule and each cap.
+ * This set does not change. The tests compare it with the files in `corpus/exact-v1-bounds`.
+ */
+export const EXACT_V1_BOUNDS: ScreenSet = {
+  id: "exact-v1-bounds",
+  families: EXACT_V1_BOUNDS_SIZES.flatMap((n) =>
+    EXACT_CLASSES.map((cls) => ({
+      ...exactFamily(cls, [n], EXACT_V1_SEEDS),
+      name: boundsFamilyName(cls, n),
+      shows: `Boards of the class ${cls} with ${n} nodes, with a bound of the optimum.`,
+    })),
+  ),
+};

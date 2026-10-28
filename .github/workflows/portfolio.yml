@@ -21,7 +21,7 @@ on:
         description: "The arguments of pnpm portfolio:time, without --shard and --out. --shards gives the number of shards (default 16)."
         default: "--sizes 10,24,40 --seeds 0,1,2 --repeats 5 --shards 16"
       report:
-        description: "The ids of CI runs, with commas: --exact <id> --screen <id,...> --time <id>. The job then writes the report of pnpm portfolio from their artifacts, and times nothing."
+        description: "The ids of CI runs, with commas: --exact <id> --screen <id,...> --time <id>, and --bounds <id,...> for pnpm bounds. The job then writes the reports from their artifacts, and times nothing."
         default: ""
       minutes:
         description: "The time limit of each shard, in minutes."
@@ -124,12 +124,13 @@ jobs:
       - name: Check the script of the report
         run: |
           pnpm --filter @mark1russell7/highways typecheck
-          pnpm --filter @mark1russell7/highways exec vitest run src/bench/screen/portfolio.test.ts
+          pnpm --filter @mark1russell7/highways exec vitest run src/bench/screen/portfolio.test.ts src/bench/screen/bounds.test.ts
       - name: Download the artifacts and write the report
         run: |
           set -o pipefail
           read -ra words <<< "$REPORT"
           args=()
+          bounds=""
           for ((i = 0; i < ${#words[@]}; i += 2)); do
             flag=${words[i]}
             dirs=""
@@ -141,10 +142,18 @@ jobs:
               gh run download "$id" -p "$pattern" -D "$GITHUB_WORKSPACE/runs/$id"
               dirs="${dirs:+$dirs,}$GITHUB_WORKSPACE/runs/$id"
             done
-            args+=("$flag" "$dirs")
+            # The runs of --bounds go only to pnpm bounds (EXACT-BOUNDS), with the records of --exact.
+            if [ "$flag" = "--bounds" ]; then bounds="$dirs"; else args+=("$flag" "$dirs"); fi
           done
           pnpm --filter @mark1russell7/highways portfolio "${args[@]}" --out "$GITHUB_WORKSPACE/portfolio.md" --json "$GITHUB_WORKSPACE/portfolio.json" > /dev/null
           cat portfolio.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$bounds" ]; then
+            for ((i = 0; i < ${#args[@]}; i += 2)); do
+              if [ "${args[i]}" = "--exact" ]; then bounds="${args[i + 1]},$bounds"; fi
+            done
+            pnpm --filter @mark1russell7/highways bounds --records "$bounds" --out "$GITHUB_WORKSPACE/bounds.md" --json "$GITHUB_WORKSPACE/bounds.json" > /dev/null
+            cat bounds.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -152,4 +161,6 @@ jobs:
           path: |
             portfolio.md
             portfolio.json
+            bounds.md
+            bounds.json
           if-no-files-found: warn
