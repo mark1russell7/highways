@@ -301,3 +301,6 @@ export function strategiesData(input: StrategiesInput): StrategiesData {
 export function statusCounts(cards: readonly StrategyCard[]): { readonly status: CardStatus; readonly count: number }[] {
   return STATUSES.map(({ id }) => ({ status: id, count: cards.filter((c) => c.status === id).length }));
 }
+
+/** This function gives the element id of the card of a strategy, for a link `strategies.html#<id>`. */
+export const cardId = (step: string, name: string): string => `s-${step}-${name}`;

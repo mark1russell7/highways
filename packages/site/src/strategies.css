@@ -1,0 +1,175 @@
+/* The strategies page: a grid of cards, one for each strategy. The colors come from style.css. */
+.sc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.sc-card {
+  gap: 8px;
+  scroll-margin-top: 12px;
+  min-width: 0;
+}
+
+.sc-card.target {
+  outline: 3px solid var(--hi);
+  outline-offset: 2px;
+}
+
+.sc-card header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.sc-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--sign);
+  overflow-wrap: anywhere;
+}
+
+.sc-card h4 {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.sc-card p,
+.sc-card ul,
+.sc-card dl {
+  margin: 0;
+}
+
+.sc-tags {
+  display: flex;
+  gap: 6px;
+}
+
+.sc-step,
+.sc-status,
+.sc-stage {
+  display: inline-block;
+  padding: 0.12rem 0.5rem 0.05rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sc-step {
+  border: 1px solid var(--rule);
+  background: var(--map);
+}
+
+.sc-status {
+  background: color-mix(in srgb, var(--st) 18%, transparent);
+  border: 2px solid var(--st);
+}
+
+.sc-stage {
+  font-weight: 600;
+  border: 1px solid var(--rule);
+}
+
+.sc-st-default { --st: var(--sign); --lab: var(--sign); }
+.sc-st-kept { --st: var(--lab-better); --lab: var(--lab-better); }
+.sc-st-screened { --st: var(--lab-mix); --lab: var(--lab-mix); }
+.sc-st-dropped { --st: var(--lab-worse); --lab: var(--lab-worse); }
+.sc-st-built { --st: var(--lab-none); --lab: var(--lab-none); }
+
+.sc-ideas,
+.sc-verdicts,
+.sc-sources {
+  list-style: none;
+  padding: 0;
+}
+
+.sc-ideas > li + li {
+  margin-top: 4px;
+}
+
+.sc-card details > summary {
+  cursor: pointer;
+}
+
+.sc-card details[open] > summary {
+  margin-bottom: 6px;
+}
+
+.sc-via {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.sc-sources li {
+  font-size: 0.9rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--rule);
+  margin-bottom: 4px;
+}
+
+.sc-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 10px;
+  font-size: 0.9rem;
+  margin: 6px 0 !important;
+}
+
+.sc-facts dt {
+  font-weight: 800;
+}
+
+.sc-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.sc-verdicts li {
+  font-size: 0.9rem;
+}
+
+.sc-verdicts b {
+  color: var(--lab);
+}
+
+.sc-set + .sc-set {
+  margin-top: 6px;
+}
+
+.sc-set > p {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.sc-options table {
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.sc-options th,
+.sc-options td {
+  text-align: left;
+  padding: 2px 6px 2px 0;
+  vertical-align: top;
+}
+
+.sc-none,
+.sc-sweeps,
+.sc-bench,
+.sc-guarantee {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.sc-links {
+  margin-top: auto !important;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+}
