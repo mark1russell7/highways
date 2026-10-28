@@ -5,15 +5,22 @@
 // With `--members` (PORTFOLIO-FIT), the script times the members of the portfolio router (`MEMBER_FORMS`) instead, and the key of the router on each output (`keyMs`).
 // Then each board also gets one line of the strategy `@key-setup`: the time to build the network of the stretch and to read the facts of the output of `shared`.
 // After a size where the median time of a strategy is above `--stop` ms, the strategy skips the larger sizes.
-import { writeFileSync } from "node:fs";
+// With `--breakdown` (PORTFOLIO-SPEED), the script times the parts of the setup of the key and the router on each board instead (`breakdownLines`).
+// Then `--shard` splits the boards, not the strategies. `pnpm portfolio:time --summary <path,...>` writes the table of such lines, and times nothing.
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
+import { exactStretches } from "../src/bench/exact/index.ts";
+import { quantile } from "../src/bench/measures/stats.ts";
 import { checkProperties } from "../src/bench/properties.ts";
+import { mixedSegments } from "../src/bench/screen/gap.ts";
 import { EXACT_CLASSES, exactBoard, type ExactClass } from "../src/bench/screen/exact-set.ts";
 import { MEMBER_FORMS, portfolioMember } from "../src/portfolio/members.ts";
 import { portfolioFacts } from "../src/portfolio/key.ts";
+import { routePortfolio, type PortfolioRouterOptions } from "../src/portfolio/router.ts";
+import type { Graph } from "../src/model.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { asRouter, getStrategy, listStrategies, type Strategy } from "../src/strategies/model.ts";
 import { strategies as gapStrategies } from "./screens/meas2.ts";
@@ -49,6 +56,118 @@ export function poolStrategies(): Strategy<"router", object>[] {
   return all.filter((s, i) => all.findIndex((t) => t.name === s.name) === i);
 }
 
+/** The parts of the setup of the key in the lines of `--breakdown`: the network of the stretch, the shortest ways, the hard rules and the mixed segments of the base. */
+export const SETUP_PARTS = ["@setup-network", "@setup-dist", "@setup-hard", "@setup-mixed"] as const;
+
+/** The forms of the router in the lines of `--breakdown`: the default (the fit) and k = 3, at each rule and cap. */
+export const BREAKDOWN_FORMS: readonly { readonly id: string; readonly options: PortfolioRouterOptions }[] = (["collection", "all"] as const).flatMap((rule) =>
+  ([1.1, 1.25, 1.5] as const).flatMap((cap) => [
+    { id: `${rule}-${cap}-fit`, options: { rule, cap } },
+    { id: `${rule}-${cap}-k3`, options: { rule, cap, k: 3 } },
+  ]),
+);
+
+/** One line of `--breakdown`: one part of the setup, or one pick of the router, on one board. */
+export interface BreakdownRecord {
+  /** `@shared`, a part of `SETUP_PARTS`, or `@router:<rule>-<cap>-<form>`. */
+  readonly part: string;
+  readonly cls: string;
+  readonly seed: number;
+  readonly nodes: number;
+  readonly edges: number;
+  readonly rep: number;
+  readonly ms: number;
+  /** For a pick: the run of the base, the runs of the other members, and the count of the members that ran. The rest of `ms` is the key and the pick. */
+  readonly baseMs?: number;
+  readonly membersMs?: number;
+  readonly members?: number;
+}
+
+/**
+ * This function times the parts of the setup of the key, and each form of the router, on one board (`--breakdown`).
+ * Each repeat builds the setup from nothing. A pick slower than `slow` ms gets no more repeats.
+ */
+export function breakdownLines(head: { readonly cls: string; readonly seed: number; readonly graph: Graph }, repeats: number, slow: number): BreakdownRecord[] {
+  const { graph } = head;
+  const at = { cls: head.cls, seed: head.seed, nodes: graph.nodes.length, edges: graph.edges.length };
+  const shared = asRouter(portfolioMember("shared")!);
+  const out: BreakdownRecord[] = [];
+  shared.route(graph);
+  for (let rep = 0; rep < repeats; rep++) {
+    let t = performance.now();
+    const base = shared.route(graph);
+    out.push({ part: "@shared", ...at, rep, ms: performance.now() - t });
+    t = performance.now();
+    const stretches = exactStretches(graph);
+    const network = performance.now() - t;
+    t = performance.now();
+    stretches(base.routes);
+    const dist = performance.now() - t;
+    t = performance.now();
+    checkProperties(graph, base, 1_000_000);
+    const hard = performance.now() - t;
+    t = performance.now();
+    mixedSegments(graph, base);
+    const mixed = performance.now() - t;
+    [network, dist, hard, mixed].forEach((ms, i) => out.push({ part: SETUP_PARTS[i]!, ...at, rep, ms }));
+    if (network + dist > slow) break;
+  }
+  for (const form of BREAKDOWN_FORMS) {
+    for (let rep = 0; rep < repeats; rep++) {
+      const t = performance.now();
+      const r = routePortfolio(graph, form.options);
+      const ms = performance.now() - t;
+      const ran = r.trace.members.filter((m) => m.status === "ran");
+      const baseMs = ran[0]?.ms ?? 0;
+      const membersMs = ran.slice(1).reduce((sum, m) => sum + (m.ms ?? 0), 0);
+      out.push({ part: `@router:${form.id}`, ...at, rep, ms, baseMs, membersMs, members: ran.length });
+      if (ms > slow) break;
+    }
+  }
+  return out;
+}
+
+/**
+ * This function writes the table of the lines of `--breakdown` as Markdown. Each cell is the median over the boards of the median over the repeats, in ms.
+ * The share of the setup is the setup over the pick of k = 3 under `collection` at 1.5. The key and the pick are the rest of that pick after the runs.
+ */
+export function breakdownSummary(lines: readonly BreakdownRecord[]): string {
+  const sizes = [...new Set(lines.map((l) => l.nodes))].sort((a, b) => a - b);
+  const med = (part: string, n: number, f: (l: BreakdownRecord) => number = (l) => l.ms): number | undefined => {
+    const boards = new Map<string, number[]>();
+    for (const l of lines) {
+      if (l.part !== part || l.nodes !== n) continue;
+      const k = `${l.cls}|${l.seed}`;
+      if (!boards.has(k)) boards.set(k, []);
+      boards.get(k)!.push(f(l));
+    }
+    const xs = [...boards.values()].map((v) => quantile(v, 0.5));
+    return xs.length === 0 ? undefined : quantile(xs, 0.5);
+  };
+  const f1 = (v: number | undefined): string => (v === undefined ? "-" : v.toFixed(1));
+  const pct = (v: number | undefined): string => (v === undefined || !Number.isFinite(v) ? "-" : `${(100 * v).toFixed(0)}%`);
+  const k3 = "@router:collection-1.5-k3";
+  const out = [
+    "## The parts of the setup of the key (median ms)",
+    "",
+    `| nodes | \`shared\` | ${SETUP_PARTS.map((p) => `\`${p}\``).join(" | ")} | setup | k = 3 | key and pick in k = 3 | share of the setup |`,
+    `|---:|---:|${SETUP_PARTS.map(() => "---:").join("|")}|---:|---:|---:|---:|`,
+  ];
+  for (const n of sizes) {
+    const parts = SETUP_PARTS.map((p) => med(p, n));
+    const setup = parts.every((p) => p !== undefined) ? parts.reduce((a, b) => a! + b!, 0)! : undefined;
+    const pick = med(k3, n);
+    const key = med(k3, n, (l) => l.ms - (l.baseMs ?? 0) - (l.membersMs ?? 0));
+    out.push(`| ${n} | ${f1(med("@shared", n))} | ${parts.map(f1).join(" | ")} | ${f1(setup)} | ${f1(pick)} | ${f1(key)} | ${pct(setup === undefined || pick === undefined ? undefined : setup / pick)} |`);
+  }
+  out.push("", "## The router (median ms, and the median count of the members that ran)", "", `| form | ${sizes.join(" | ")} |`, `|---|${sizes.map(() => "---:").join("|")}|`);
+  for (const form of BREAKDOWN_FORMS) {
+    const part = `@router:${form.id}`;
+    out.push(`| \`${form.id}\` | ${sizes.map((n) => `${f1(med(part, n))} (${f1(med(part, n, (l) => l.members ?? 0))})`).join(" | ")} |`);
+  }
+  return out.join("\n") + "\n";
+}
+
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
   const i = args.indexOf(name);
@@ -57,6 +176,14 @@ const opt = (name: string): string | undefined => {
 const nums = (name: string, fallback: string): number[] => (opt(name) ?? fallback).split(",").map(Number);
 
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+  const summary = opt("--summary");
+  if (summary !== undefined) {
+    const lines = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as BreakdownRecord));
+    const md = breakdownSummary(lines.filter((l) => l.part !== undefined));
+    if (opt("--out") !== undefined) writeFileSync(opt("--out")!, md);
+    console.log(md);
+    process.exit(0);
+  }
   const sizes = nums("--sizes", "10,24,40");
   const seeds = nums("--seeds", "0,1,2");
   const repeats = Number(opt("--repeats") ?? "5");
@@ -65,6 +192,14 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const members = args.includes("--members");
   const [shard, shards] = (opt("--shard") ?? "0/1").split("/").map(Number) as [number, number];
   const out = opt("--out") ?? "time.jsonl";
+  if (args.includes("--breakdown")) {
+    const boards = sizes.flatMap((n) => EXACT_CLASSES.flatMap((cls: ExactClass) => seeds.map((k) => ({ cls, n, k }))));
+    const mine = boards.filter((_, i) => i % shards === shard);
+    process.stderr.write(`${mine.length} of ${boards.length} boards in the shard ${shard}/${shards}.\n`);
+    const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
+    writeFileSync(out, lines.join("\n") + "\n");
+    process.exit(0);
+  }
   const pool = members ? memberStrategies() : poolStrategies();
   const mine = pool.filter((_, i) => i % shards === shard);
   process.stderr.write(`${mine.length} of ${pool.length} strategies in the shard ${shard}/${shards}.\n`);
