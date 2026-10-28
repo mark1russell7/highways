@@ -16,7 +16,8 @@
     "test:ai-review": "node --test \"scripts/ai-review/*.test.mjs\"",
     "typecheck": "pnpm -r run typecheck",
     "lint:ste": "ste-lint",
-    "ideas": "pnpm --filter @mark1russell7/highways ideas"
+    "ideas": "pnpm --filter @mark1russell7/highways ideas",
+    "queue": "pnpm --filter @mark1russell7/highways queue"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
