@@ -107,6 +107,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | ROUTE-SCALE | [The dense board](research/SCALE.md#the-dense-board-route-scale). A route of `shared` on 1000 boxes and 4000 edges goes from 302 s to 21 s, and `portfolio` from 300 s to 28 s on the same CPU. Each sorted list of link users gets a number one time, and the lane order skips the distance of a point to itself. No output byte changes. | 2026-10-28 | #132 |
 | REL15 | Version 0.8.1 on npm. PATCH: ROUTE-SCALE (#132) routes a dense board of 1000 boxes approximately 10 times faster with `shared`, `shared-all` and `portfolio`. The output does not change. | 2026-10-28 | #135 |
 | CORPUS-SEEDS | [The corpus `screen-v2`](research/CATALOG.md#the-corpus-screen-v2-corpus-seeds): the 6 families of `screen-v1` with 10 seeds each, and the split file `corpus-split/1`, which holds out the seeds 7 to 9. The seeds 0 to 2 give the boards and the records of `screen-v1`. With 10 seeds, `territories` leaves the highway front. | 2026-10-28 | #136 |
+| VERDICT | The shared block "The verdict over families" from layout-contract #49. The family is the unit of a verdict, and a verdict counts only when it holds under both weightings. Step 1 of SCREEN-WEIGHT. | 2026-10-28 | #139 |
 
 ## Calibration
 
@@ -149,6 +150,7 @@ The rule for the next predictions:
 | LANE-WALK | The lane order of a dense run without a walk for each compare. After ROUTE-SCALE, `partBefore` and `partAfter` take approximately 55% of a `shared` route on the dense board. The lane order stays the same. | `later` | ROUTE-SCALE | P2 |
 | BENCH-STEPS | Cheaper measures on a dense board: `exactStretches` (a landmark guide for `distancesTo`), `measureQuality` and `checkProperties`. The values stay the same. | `later` | ROUTE-SCALE | P3 |
 | STAGE-DATA | The stages of the routers and their options as data (`strategy-space/1` of layout-contract 0.2.10): `routeSpace`, `routeConfig` and each router of today as a named point with an equal route hash. | `later` | LANE-STRETCH, OPTS | P1 |
+| TIME-PAIR | The time test runs each candidate and its default in one job, in alternate runs, so both use the same CPU. | `later` | SHARED-RULE | P1 |
 | SELECT | A selector for each input from its features, or from a cheap trial run of a few strategies. The oracle bound is large: 0.352 of gap closed on `exact-v1`, and 39% or more of B1 on 4 of 4 boards. A choice by class keeps none of it, so the selector needs finer features and more seeds of each board. A portfolio with a score of the output alone keeps 6% on `exact-v1` (PORTFOLIO), so the selector needs a score that knows the rule of the run. PORTFOLIO-RULE gives that score: B1 among the runs that obey the rule of the caller, at one cap. | `later` | ORACLE | P1 |
 | HWC-E | Room for the plug stubs, and the spacing rise of the bends: most arcs under the smallest radius sit on short plug stubs or on legs along one box. | `later` | HWC-D | P2 |
 | MEAS-FLAT | Z2 is 0 on each record, and B8 `runs` is degenerate where `shared` has 0. Correct each definition, or mark it inactive with its reason. | `later` | MEAS3A | P2 |
