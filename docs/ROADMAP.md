@@ -87,6 +87,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PORTFOLIO-RULE | [The rule of the caller](research/PORTFOLIO.md#the-rule-of-the-caller-portfolio-rule): each reversed pair of B1 and B10 has another rule or another cap. With the rule of the caller and the one cap 1.5, the whole pool reaches the oracle. k = 3 keeps 47% of the gain for `all` and 12% for `collection`. | 2026-10-27 | #105 |
 | GUARDS | Two guards in [the promotion rule](PROMOTION.md#activation), with the same text as packing and layout-contract. A verdict counts only when the candidate is exercised. Candidates with the same `outputHash` on each decision input count as one output group. | 2026-10-28 | #102 |
 | ACTIVATION | Each screen record gets its `outputHash` and the move counts of its strategy. A verdict counts only when a candidate is exercised on a decision board. Of 289 strategies, 17 are silent on the static screen. 15 of them go to a rebuild wave. The edit screen of the gate `ids` shows its move. No verdict changes. | 2026-10-28 | #107 |
+| EXACT-BOUNDS | [The bounds of the gap closed](research/BOUNDS.md) at 18, 24 and 40 nodes and at the caps 1.1, 1.25 and 1.5, from 720 solves. The intervals are narrow: the median width of the first 5 is 0.1 or less. The [portfolio](research/PORTFOLIO.md#the-portfolio-at-each-cap-exact-bounds) gets a curve and greedy sets for each rule and cap. | 2026-10-28 | #110 |
 
 ## Open
 
