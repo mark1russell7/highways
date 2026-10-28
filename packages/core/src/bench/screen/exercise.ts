@@ -203,7 +203,8 @@ export function recordMoves(record: LayoutRecord): Record<string, number> {
 
 /**
  * This function gives the activation report of the records of a screen.
- * A strategy is exercised when a move count is above 0, or its output differs from the output of its base, on one decision input or more.
+ * A strategy is exercised when a move count is above 0 on a decision input.
+ * It is also exercised when its output differs from the output of its base on a decision input.
  * The decision inputs are the inputs of the families `families`, or each input. `bases` gives the base of each strategy, or `activationBase` gives it.
  */
 export function activationReport(

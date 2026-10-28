@@ -125,7 +125,10 @@
         },
         "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
         "run": { "type": "string", "minLength": 1, "description": "The link of the CI run of the screen." },
-        "verdict": { "enum": ["kept", "dropped", "screened"], "description": "The decision of the screen." },
+        "verdict": {
+          "enum": ["kept", "dropped", "screened", "not-exercised"],
+          "description": "The decision of the screen. `not-exercised` tells that no candidate of the idea did its own move on a decision board (ACTIVATION)."
+        },
         "note": { "type": "string", "minLength": 1 },
         "summary": { "type": "string", "minLength": 1 },
         "strict": {
@@ -148,6 +151,26 @@
             "candidate": { "type": "string", "minLength": 1, "description": "The candidate and its baseline, for example `divided against shared`." },
             "verdict": { "enum": ["kept", "dropped", "screened"] },
             "old": { "enum": ["kept", "dropped", "screened"] },
+            "note": { "type": "string", "minLength": 1 }
+          }
+        },
+        "activation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["date", "run", "verdict", "old", "note"],
+          "description": "The verdict again, with the activation rule of ACTIVATION: a verdict counts only when a candidate of the idea is exercised on a decision board. `verdict` is the new decision, and `old` is the decision before the rule.",
+          "properties": {
+            "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+            "run": { "type": "string", "minLength": 1, "description": "The link of the CI run of the activation screen." },
+            "candidates": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "The strategies of the idea in the activation screen." },
+            "exercised": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "The candidates that are exercised on a decision board." },
+            "verdict": { "enum": ["kept", "dropped", "screened", "not-exercised"] },
+            "old": { "enum": ["kept", "dropped", "screened", "not-exercised"] },
+            "oldStage": {
+              "enum": ["cataloged", "screened", "prototyped", "built", "kept", "dropped"],
+              "description": "The stage before the rule, when the rule changes the stage."
+            },
+            "reason": { "type": "string", "minLength": 1, "description": "The reason that the candidates are silent, when it is known." },
             "note": { "type": "string", "minLength": 1 }
           }
         },
