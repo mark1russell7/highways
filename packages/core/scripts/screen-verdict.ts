@@ -1,8 +1,13 @@
-// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>]`.
+// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot]`.
 // It reads the records of one artifact of the workflow `Screen`. For each strategy of the step against the default, it gives the verdict of each guard measure.
 // The guard measures are the measures of the step in `docs/PROMOTION.md`. The tie is the `minEffect` of the measure, and the level is 0.05.
 // The script also gives the old verdict: the mean of the inputs, as the screen gives it today.
+// The option `--snapshot` writes the verdict snapshot `docs/research/verdicts/<set>-<step>.json` that the site reads (SITE-LIVE).
+// The header of a snapshot has the run of the artifact (`--run`), the commit of the records (`--commit`), the date (`--date`) and the core version (`--core`).
+// With no option, the run and the commit come from the path of the artifact, `<run>/screen-<set>-<step>-...-<sha>/screen.jsonl`.
+import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
 import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
@@ -99,6 +104,45 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string): GuardVe
   return out;
 }
 
+/** The header of a verdict snapshot. The rows follow it. */
+interface SnapshotHeader {
+  readonly set: string | undefined;
+  readonly step: string;
+  readonly base: string;
+  readonly level: number;
+  /** The id of the run of the workflow `Screen` that gave the records. */
+  readonly run: number | null;
+  /** The commit of the records. */
+  readonly commit: string | null;
+  /** The date of the run, `YYYY-MM-DD`. */
+  readonly date: string;
+  /** The version of `@mark1russell7/highways` at the commit of the records. */
+  readonly core: string;
+}
+
+/** This function gives the JSON text of a snapshot, with one row on each line. Thus a diff shows each changed verdict. */
+function snapshotText(header: SnapshotHeader, rows: readonly GuardVerdict[]): string {
+  const head = JSON.stringify(header, null, 2).replace(/\n}$/, ",");
+  return `${head}\n  "rows": [\n${rows.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]\n}\n`;
+}
+
+/** This function gives the run id and the commit from the path of an artifact that `gh run download <run> -D <dir>/<run>` wrote. */
+function fromPath(file: string): { readonly run: number | null; readonly commit: string | null } {
+  const parts = file.split(/[\\/]/);
+  const run = parts.map((p) => /^(\d{8,})$/.exec(p)?.[1]).filter((p) => p !== undefined).pop();
+  const commit = parts.map((p) => /-([0-9a-f]{40})$/.exec(p)?.[1]).filter((p) => p !== undefined).pop();
+  return { run: run === undefined ? null : Number(run), commit: commit ?? null };
+}
+
+/** This function gives the commit of the checkout, or null outside git. */
+function headCommit(): string | null {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  } catch {
+    return null;
+  }
+}
+
 const SIGN = { 1: "+", 0: "0", [-1]: "−" } as const;
 const f3 = (v: number): string => (Math.abs(v) < 5e-4 ? "0" : v.toFixed(3));
 
@@ -110,15 +154,28 @@ function main(): void {
   };
   const file = args[0];
   if (file === undefined || file.startsWith("--")) {
-    console.error("Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>]");
+    console.error("Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--run <id>] [--commit <sha>] [--date <YYYY-MM-DD>] [--core <version>]");
     process.exit(2);
   }
   const base = opt("--default") ?? "shared";
   const records = parseLines<LayoutRecord>(readFileSync(file, "utf8"));
   const rows = screenVerdicts(records, base);
-  const json = opt("--json");
   const step = stepOf(records);
-  if (json !== undefined) writeFileSync(json, JSON.stringify({ set: records[0]?.set, step, base, level: LEVEL, rows }, null, 2) + "\n");
+  const set = records[0]?.set;
+  const path = fromPath(file);
+  const run = opt("--run");
+  const header: SnapshotHeader = {
+    set,
+    step,
+    base,
+    level: LEVEL,
+    run: run === undefined ? path.run : Number(run),
+    commit: opt("--commit") ?? path.commit ?? headCommit(),
+    date: opt("--date") ?? new Date().toISOString().slice(0, 10),
+    core: opt("--core") ?? (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version,
+  };
+  const snapshot = args.includes("--snapshot") ? fileURLToPath(new URL(`../../../docs/research/verdicts/${set}-${step}.json`, import.meta.url)) : undefined;
+  for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows));
   const families = rows[0]?.families.map((f) => f.family) ?? [];
   console.log(`## The verdicts of the step \`${step}\` on \`${records[0]?.set}\` against \`${base}\`\n`);
   console.log(`The level is ${LEVEL}. The families: ${families.map((f) => `\`${f}\``).join(", ")}. A positive mean tells that the strategy is better.\n`);
