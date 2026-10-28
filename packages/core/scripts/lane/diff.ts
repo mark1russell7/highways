@@ -36,22 +36,22 @@ function boardOf(input: object): string {
   return id;
 }
 
+/**
+ * This function gives a copy of a strategy with the name `<name>-lane`, because the screen refuses a new strategy with a built-in name.
+ * A run of the copy starts a record. The lane orders count for the record that started last, also in the routes of the other steps.
+ * A second run of a record does not count.
+ */
 function wrap<T extends { name: string; run: (input: never, options?: never) => unknown }>(s: T): T {
   return {
     ...s,
+    name: `${s.name}-lane`,
     run(input: never, options?: never) {
       const board = boardOf(input as object);
       const record = `${s.name}|${board}`;
-      // Only the first run of a record counts, so a repeated run does not count again.
-      const outer = current;
-      current = records.has(record) && outer === undefined ? undefined : { record, board };
+      current = records.has(record) ? undefined : { record, board };
       records.add(record);
       boards.add(board);
-      try {
-        return s.run(input, options);
-      } finally {
-        current = outer;
-      }
+      return s.run(input, options);
     },
   };
 }

@@ -70,7 +70,7 @@ const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.ab
 
 /**
  * This function is the relation of the order `run`: the side after the run, else the side before the run, else the order of the edges.
- * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle. The item LANE-STRETCH removes the cycles.
+ * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle.
  */
 export const byRun = (P: Placed, Q: Placed): number => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q);
 
