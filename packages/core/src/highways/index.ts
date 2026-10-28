@@ -78,4 +78,24 @@ export { bicliqueGroups, CONFLUENT_DEFAULTS, confluentPlan, GROUP_SCOPES, greedy
 export { jaccardIndex, MODULE_RULES, modulesOf, POWER_DEFAULTS, powerPlan, type ModuleRule, type PowerOptions } from "./power/index.ts";
 export { CROSSBAR_DEFAULTS, crossbarPlan, greedyCrossbars, routeCrossings, type Crossbar, type CrossbarOptions, type RouteCrossing } from "./crossbars/index.ts";
 export { FRECHET_DEFAULTS, frechetBundles, frechetPlan, nextRow, partWithin, samplesOf, type FrechetBundle, type FrechetOptions } from "./frechet/index.ts";
+export {
+  compatibilityMatrix,
+  edgeBlocks,
+  edgeEnds,
+  kMeans,
+  labelGroups,
+  SPECTRAL_DEFAULTS,
+  spectralClusters,
+  spectralLabels,
+  spectralPlan,
+  symmetricEigen,
+  type EdgeEnds,
+  type SpectralOptions,
+} from "./spectral/index.ts";
+export { edgeResistance, RESISTANCE_DEFAULTS, resistanceClusters, resistancePlan, type ResistanceOptions } from "./resistance/index.ts";
+export { LINK_COMMUNITY_DEFAULTS, linkCommunities, linkCommunityGroups, linkCommunityPlan, type LinkCommunityOptions, type LinkEdge } from "./link-communities/index.ts";
+export { cellSteps, nearestCentre, pointGroups, TERRITORY_DEFAULTS, TERRITORY_POINTS, territoryPlan, type CellStep, type TerritoryOptions, type TerritoryPoints } from "./territories/index.ts";
+export { coAssociation, CONSENSUS_DEFAULTS, CONSENSUS_LINKAGES, consensusGroups, consensusLabels, consensusPlan, type ConsensusLinkage, type ConsensusOptions } from "./consensus/index.ts";
+export { HUB_ALLOCATIONS, HUB_CANDIDATES, hubCandidates, P_HUB_DEFAULTS, pHubPlan, pMedian, type HubAllocation, type HubCandidates, type PHubOptions } from "./p-hub/index.ts";
+export { SCALE_SPACE_DEFAULTS, scaleClusters, scaleSpaceGroups, scaleSpacePlan, type ScaleCluster, type ScaleSpaceOptions } from "./scale-space/index.ts";
 export * from "./gates/index.ts";

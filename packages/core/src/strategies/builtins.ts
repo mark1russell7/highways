@@ -37,6 +37,13 @@ import { CONFLUENT_DEFAULTS, confluentPlan, type ConfluentOptions } from "../hig
 import { POWER_DEFAULTS, powerPlan, type PowerOptions } from "../highways/power/index.ts";
 import { CROSSBAR_DEFAULTS, crossbarPlan, type CrossbarOptions } from "../highways/crossbars/index.ts";
 import { FRECHET_DEFAULTS, frechetPlan, type FrechetOptions } from "../highways/frechet/index.ts";
+import { SPECTRAL_DEFAULTS, spectralPlan, type SpectralOptions } from "../highways/spectral/index.ts";
+import { RESISTANCE_DEFAULTS, resistancePlan, type ResistanceOptions } from "../highways/resistance/index.ts";
+import { LINK_COMMUNITY_DEFAULTS, linkCommunityPlan, type LinkCommunityOptions } from "../highways/link-communities/index.ts";
+import { TERRITORY_DEFAULTS, territoryPlan, type TerritoryOptions } from "../highways/territories/index.ts";
+import { CONSENSUS_DEFAULTS, consensusPlan, type ConsensusOptions } from "../highways/consensus/index.ts";
+import { P_HUB_DEFAULTS, pHubPlan, type PHubOptions } from "../highways/p-hub/index.ts";
+import { SCALE_SPACE_DEFAULTS, scaleSpacePlan, type ScaleSpaceOptions } from "../highways/scale-space/index.ts";
 import { RIDGE_DEFAULTS, ridgePlan, type RidgeOptions } from "../highways/ridges/index.ts";
 import { SOFT_KEY_DEFAULTS, softKeyPlan, type SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
@@ -72,7 +79,7 @@ import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../section
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -444,6 +451,13 @@ export const highwayStrategies: {
   readonly power: Strategy<"highway", PowerOptions>;
   readonly crossbars: Strategy<"highway", CrossbarOptions>;
   readonly frechet: Strategy<"highway", FrechetOptions>;
+  readonly spectral: Strategy<"highway", SpectralOptions>;
+  readonly resistance: Strategy<"highway", ResistanceOptions>;
+  readonly "link-communities": Strategy<"highway", LinkCommunityOptions>;
+  readonly territories: Strategy<"highway", TerritoryOptions>;
+  readonly consensus: Strategy<"highway", ConsensusOptions>;
+  readonly "p-hub": Strategy<"highway", PHubOptions>;
+  readonly "scale-space": Strategy<"highway", ScaleSpaceOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -810,6 +824,69 @@ export const highwayStrategies: {
     schema: FRECHET_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<FrechetOptions>) => frechetPlan(input, o),
+  }),
+  spectral: defineStrategy({
+    step: "highway",
+    name: "spectral",
+    describe: "Spectral clustering of the compatibility graph of the edges (HWY-029). The largest eigengap gives the number of clusters, and each cluster gets highways.",
+    defaults: { ...SPECTRAL_DEFAULTS } as SpectralOptions,
+    schema: SPECTRAL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SpectralOptions>) => spectralPlan(input, o),
+  }),
+  resistance: defineStrategy({
+    step: "highway",
+    name: "resistance",
+    describe: "Spectral bundling with the effective resistance (HWY-021). A pair of two bridges of the graph gets a lower weight, then the clusters of `spectral` apply.",
+    defaults: { ...RESISTANCE_DEFAULTS } as ResistanceOptions,
+    schema: RESISTANCE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ResistanceOptions>) => resistancePlan(input, o),
+  }),
+  "link-communities": defineStrategy({
+    step: "highway",
+    name: "link-communities",
+    describe: "Link communities on the line graph (HWY-030). The edges with a common node and similar neighbours form communities, and each community gets highways.",
+    defaults: { ...LINK_COMMUNITY_DEFAULTS } as LinkCommunityOptions,
+    schema: LINK_COMMUNITY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<LinkCommunityOptions>) => linkCommunityPlan(input, o),
+  }),
+  territories: defineStrategy({
+    step: "highway",
+    name: "territories",
+    describe: "Territory aggregation of flows (HWY-033). The plugs and bends form cells, and the strong flows between two neighbour cells become highways.",
+    defaults: { ...TERRITORY_DEFAULTS } as TerritoryOptions,
+    schema: TERRITORY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<TerritoryOptions>) => territoryPlan(input, o),
+  }),
+  consensus: defineStrategy({
+    step: "highway",
+    name: "consensus",
+    describe: "A consensus of clusterings (HWY-035). The finders vote on the pairs of edges, and the pairs that most finders agree on form the highways.",
+    defaults: { ...CONSENSUS_DEFAULTS } as ConsensusOptions,
+    schema: CONSENSUS_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ConsensusOptions>) => consensusPlan(input, o),
+  }),
+  "p-hub": defineStrategy({
+    step: "highway",
+    name: "p-hub",
+    describe: "Hub location with the p-hub median (HWY-041). The p-median of the plugs gives the hubs, and the links between two hubs become highways.",
+    defaults: { ...P_HUB_DEFAULTS } as PHubOptions,
+    schema: P_HUB_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<PHubOptions>) => pHubPlan(input, o),
+  }),
+  "scale-space": defineStrategy({
+    step: "highway",
+    name: "scale-space",
+    describe: "A scale space with persistence (HWY-053). The clusters of edges that live over a long range of scales get highways at the scale of the plan.",
+    defaults: { ...SCALE_SPACE_DEFAULTS } as ScaleSpaceOptions,
+    schema: SCALE_SPACE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ScaleSpaceOptions>) => scaleSpacePlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
