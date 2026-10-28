@@ -68,7 +68,8 @@ describe("the declarations of the built-in strategies (OPTS)", () => {
       expect(checkOptions(s, defaults), s.name).toEqual([]);
       expect(sameData(runOn(s, defaults), runOn(s)), `${s.step} ${s.name}`).toBe(true);
     }
-  });
+    // Each built-in strategy runs two times, so the test needs more than the default time of 5 s.
+  }, 30_000);
 
   it("keep the defaults of version 0.2.0", () => {
     expect(routerStrategies.sections.defaults).toEqual({});

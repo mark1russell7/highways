@@ -1,3 +1,10 @@
+import type { AreaOptions } from "../highways/areas/index.ts";
+import type { ConfluentOptions, GroupScope } from "../highways/confluent/index.ts";
+import type { CrossbarOptions } from "../highways/crossbars/index.ts";
+import type { FrechetOptions } from "../highways/frechet/index.ts";
+import type { MlsebOptions } from "../highways/mlseb/index.ts";
+import type { PowerOptions } from "../highways/power/index.ts";
+import type { SbebOptions } from "../highways/sbeb/index.ts";
 import type { CutOptions } from "../groups/cut/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
@@ -43,7 +50,7 @@ import type { SectionOptions } from "../sections.ts";
 import type { WayOptions } from "../ways.ts";
 import type { RunOrder } from "../segments.ts";
 import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
-import type { EnumOption, OptionSchema } from "./options.ts";
+import type { EnumOption, NumberOption, OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
 // The test of the defaults runs each strategy with `optionDefaults` and with no option, and compares the output.
@@ -675,4 +682,111 @@ export const CUBU_SCHEMA: OptionSchema<CubuOptions> = {
   ...KDEEB_SCHEMA,
   kernel: { type: "enum", values: ["separable", "fft"], default: "separable", describe: "The blur of the counts of the cells: a separable kernel (CUBu) or a Fourier transform (FFTEB)." },
   resample: { type: "number", min: 0, max: 32, step: 2, marks: [0, 8], default: 8, describe: "The spacing of the sample points after each step, in units of the board. The value 0 keeps the points." },
+};
+
+/** The declarations of the options of the highway strategy `mlseb` (HWY-008). */
+export const MLSEB_SCHEMA: OptionSchema<MlsebOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  source: { type: "enum", values: ["lines", "routes"], default: "lines", describe: "The first lines of the edges: their straight lines, or their first routes." },
+  radius: { type: "number", min: 0.25, max: 8, step: 0.25, marks: [1, 2, 4], default: 2, describe: "The radius of the fit at the first step, as a multiple of the median short side of the boxes." },
+  decay: { type: "number", min: 0.3, max: 1, step: 0.05, marks: [0.8], default: 0.8, describe: "Each step multiplies the radius by this value." },
+  steps: { type: "integer", min: 0, max: 20, step: 1, marks: [6], default: 6, describe: "The number of steps." },
+  fit: { type: "enum", values: ["line", "parabola"], default: "line", describe: "The local fit of the moving least squares: a line, or a parabola along the line." },
+  angleWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1], default: 1, describe: "The weight of the angle in the weight of a near point. The value 0 uses only the distance." },
+  spacing: { type: "number", min: 2, max: 32, step: 1, marks: [8, 16], default: 8, describe: "The distance between two sample points of a line, in units of the board." },
+  snap: { type: "number", min: 0, max: 32, step: 2, marks: [8, 16], default: 8, describe: "The side of the grid that the points of the edges snap to, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `sbeb` (HWY-009). */
+export const SBEB_SCHEMA: OptionSchema<SbebOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  group: { type: "enum", values: ["quickbundles", "keys"], default: "quickbundles", describe: "The clusterer of the groups: `quickbundles`, or the key of each edge." },
+  source: { type: "enum", values: ["lines", "routes"], default: "lines", describe: "The lines of the edges that make the shape: their straight lines, or their first routes." },
+  radius: { type: "number", min: 0.25, max: 8, step: 0.25, marks: [1, 1.5, 3], default: 1.5, describe: "The radius of the shape of a group, as a multiple of the median short side of the boxes." },
+  attraction: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.5], default: 0.5, describe: "The share of the move of each point to its target at each step." },
+  steps: { type: "integer", min: 0, max: 20, step: 1, marks: [4], default: 4, describe: "The number of steps." },
+  smoothing: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.5], default: 0.5, describe: "The share of the smoothing of each polyline after each step." },
+  target: { type: "enum", values: ["skeleton", "mean"], default: "skeleton", describe: "The target of the points: the skeleton of the shape, or the mean line of the group." },
+  cell: { type: "number", min: 1, max: 16, step: 1, marks: [4, 8], default: 4, describe: "The side of a cell of the image of the shape, in units of the board." },
+  snap: { type: "number", min: 0, max: 32, step: 2, marks: [8, 16], default: 8, describe: "The side of the grid that the points of the edges snap to, in units of the board." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `areas` (HWY-010). */
+export const AREA_SCHEMA: OptionSchema<AreaOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  group: SBEB_SCHEMA.group,
+  source: SBEB_SCHEMA.source,
+  radius: SBEB_SCHEMA.radius,
+  width: { type: "enum", values: ["spread", "count"], default: "spread", describe: "The half width of an area: the spread of the edges of the group, or the number of its lanes." },
+  laneWidth: { type: "number", min: 1, max: 12, step: 1, marks: [4], default: 4, describe: "The width of one lane for the rule `count`, in units of the board." },
+  cell: SBEB_SCHEMA.cell,
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declaration of the limit of the legs of a trunk for the strategies `confluent` and `power`. */
+const LEG_MAX: NumberOption = {
+  type: "number",
+  min: 0.1,
+  max: 1,
+  step: 0.05,
+  special: [Infinity],
+  marks: [0.3, 1, Infinity],
+  default: 1,
+  describe: "An edge rides the trunk only when each of its legs is this share of the trunk or shorter. `Infinity` sets no limit.",
+};
+
+/** The declaration of the edges that one group holds for the strategies `confluent` and `power`. */
+const GROUP_SCOPE: EnumOption<GroupScope> = {
+  type: "enum",
+  values: ["collection", "all"],
+  default: "all",
+  describe: "The edges of one group: the edges of one collection, or each edge.",
+};
+
+/** The declarations of the options of the highway strategy `confluent` (HWY-013). */
+export const CONFLUENT_SCHEMA: OptionSchema<ConfluentOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  minBiclique: { type: "integer", min: 2, max: 32, step: 1, marks: [4, 6, 9], default: 4, describe: "A biclique becomes a track when the product of the sizes of its two sets is this value or more." },
+  scope: GROUP_SCOPE,
+  spine: { ...GROUP_SPINE, default: "trunk" },
+  legMax: LEG_MAX,
+};
+
+/** The declarations of the options of the highway strategy `power` (HWY-014). */
+export const POWER_SCHEMA: OptionSchema<PowerOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  modules: { type: "enum", values: ["exact", "near"], default: "exact", describe: "The rule of a module: the same neighbours, or near neighbours by the Jaccard index." },
+  jaccard: { type: "number", min: 0.3, max: 1, step: 0.05, marks: [0.6, 0.8], default: 0.8, describe: "With the rule `near`, a node joins a module at this Jaccard index or more." },
+  minSaved: { type: "integer", min: 1, max: 16, step: 1, marks: [1, 2, 4], default: 2, describe: "A power edge becomes a highway when it saves this number of edges or more." },
+  scope: GROUP_SCOPE,
+  spine: { ...GROUP_SPINE, default: "trunk" },
+  legMax: LEG_MAX,
+};
+
+/** The declarations of the options of the highway strategy `crossbars` (HWY-022). */
+export const CROSSBAR_SCHEMA: OptionSchema<CrossbarOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  from: HIGHWAY_BASE,
+  tolerance: { type: "number", min: 0, max: 45, step: 1, marks: [5, 15, 30], default: 15, describe: "Two segments are parallel when the angle between them is this value or less, in degrees." },
+  minBar: { type: "integer", min: 1, max: 8, step: 1, marks: [2, 3], default: 2, describe: "Each side of a crossbar has this number of edges or more." },
+  reach: { type: "number", min: 0.5, max: 8, step: 0.5, marks: [2, 3, 4], default: 3, describe: "The crossings of one crossbar are this distance or nearer to its first crossing, as a multiple of the median short side of the boxes." },
+};
+
+/** The declarations of the options of the highway strategy `frechet` (HWY-027). */
+export const FRECHET_SCHEMA: OptionSchema<FrechetOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  eps: { type: "number", min: 0.1, max: 4, step: 0.1, marks: [0.5, 1, 2], default: 1, describe: "The largest discrete Fréchet distance in a bundle, as a multiple of the median short side of the boxes." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A bundle has this number of edges or more." },
+  minLength: { type: "number", min: 0.5, max: 16, step: 0.5, marks: [2, 4], default: 2, describe: "The reference part of a bundle is this length or longer, as a multiple of the median short side of the boxes." },
+  step: { type: "number", min: 0.1, max: 2, step: 0.1, marks: [0.5], default: 0.5, describe: "The distance between two samples of a route, as a multiple of the median short side of the boxes." },
+  stride: { type: "integer", min: 1, max: 8, step: 1, marks: [1, 2, 4], default: 2, describe: "A search starts at each sample of this number along each route." },
 };
