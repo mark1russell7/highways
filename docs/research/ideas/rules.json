@@ -2433,10 +2433,28 @@
             "sections": 1.313,
             "sections-tree": 1.313
           }
+        },
+        "Z2 sum over 9 routers and 14 inputs, repair against no repair": {
+          "base": 0,
+          "new": 0
         }
       },
       "verdict": "kept",
-      "note": "R9 is the sum of route.through by router over the 14 inputs. R1 is route.ink and R5 the median detour, by router on packed-grid. The hard breaks go to 0 for each router on each input, packed-grid too. On packed-grid the ink grows by 20% to 23% for most routers, 13% for sections, and drops 9% for sections-tree. A route without a fault keeps its points."
+      "note": "R9 is the sum of route.through by router over the 14 inputs. R1 is route.ink and R5 the median detour, by router on packed-grid. The hard breaks go to 0 for each router on each input, packed-grid too. On packed-grid the ink grows by 20% to 23% for most routers, 13% for sections, and drops 9% for sections-tree. A route without a fault keeps its points.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611434061"
+        ],
+        "beats": {
+          "<router>+repair against <router>": {
+            "Z2": "equal on each input",
+            "newBreaks": 0
+          }
+        },
+        "note": "Z2 is 0 for each router, with and without the repair step, on each of the 14 inputs. Thus the repair is equal on Z2."
+      }
     }
   },
   {
