@@ -7,15 +7,20 @@
 // After a size where the median time of a strategy is above `--stop` ms, the strategy skips the larger sizes.
 // With `--breakdown` (PORTFOLIO-SPEED), the script times the parts of the setup of the key and the router on each board instead (`breakdownLines`).
 // Then `--shard` splits the boards, not the strategies. `pnpm portfolio:time --summary <path,...>` writes the table of such lines, and times nothing.
+// With `--check-stretch`, the script times nothing. It routes each input of `exact-v1`, `exact-v1-bounds` and `screen-v1` with each strategy of the pool.
+// Then it compares the stretch of each edge of `exactStretches` with the stretch of `exactStretchesReference` (`stretchCheck`). The summary counts each difference above `RECORD_EPS`.
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
-import { exactStretches } from "../src/bench/exact/index.ts";
+import { exactStretches, exactStretchesReference } from "../src/bench/exact/index.ts";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { checkProperties } from "../src/bench/properties.ts";
 import { mixedSegments } from "../src/bench/screen/gap.ts";
+import { inputGraph } from "../src/bench/screen/forms.ts";
+import { RECORD_EPS } from "../src/bench/screen/hash.ts";
+import { SCREEN_SETS, screenInputs } from "../src/bench/screen/set.ts";
 import { EXACT_CLASSES, exactBoard, type ExactClass } from "../src/bench/screen/exact-set.ts";
 import { MEMBER_FORMS, portfolioMember } from "../src/portfolio/members.ts";
 import { portfolioFacts } from "../src/portfolio/key.ts";
@@ -168,6 +173,60 @@ export function breakdownSummary(lines: readonly BreakdownRecord[]): string {
   return out.join("\n") + "\n";
 }
 
+/** The screen sets of the check of the stretch (`--check-stretch`): the sets of the records of the portfolio. */
+export const CHECK_SETS: readonly string[] = ["exact-v1", "exact-v1-bounds", "screen-v1"];
+
+/** One line of `--check-stretch`: the largest difference of the stretch of an edge between the two functions, for one strategy on one input. */
+export interface StretchCheck {
+  readonly check: "stretch";
+  readonly strategy: string;
+  readonly input: string;
+  readonly nodes: number;
+  /** The count of the edges with a stretch in either function. */
+  readonly edges: number;
+  /** The count of the edges with a stretch in one function only. */
+  readonly missing: number;
+  readonly maxDiff: number;
+  /** The largest stretch of the reference function, as the records keep it in `gap.stretch`, and the same value of `exactStretches`. */
+  readonly max: number;
+  readonly maxNew: number;
+  readonly skipped?: string;
+}
+
+/** This function compares `exactStretches` with `exactStretchesReference` on the routes of one strategy on one graph. */
+export function stretchCheck(strategy: Strategy<"router", object>, input: string, graph: Graph): StretchCheck {
+  const head = { check: "stretch" as const, strategy: strategy.name, input, nodes: graph.nodes.length };
+  if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) return { ...head, edges: 0, missing: 0, maxDiff: 0, max: 1, maxNew: 1, skipped: `over ${strategy.maxNodes} nodes` };
+  const routes = asRouter(strategy).route(graph).routes;
+  const a = exactStretchesReference(graph)(routes);
+  const b = exactStretches(graph)(routes);
+  let missing = 0;
+  let maxDiff = 0;
+  for (const k of new Set([...a.keys(), ...b.keys()])) {
+    const x = a.get(k);
+    const y = b.get(k);
+    if (x === undefined || y === undefined) missing++;
+    else maxDiff = Math.max(maxDiff, Math.abs(x - y));
+  }
+  const top = (m: Map<string, number>): number => Math.max(1, ...m.values());
+  return { ...head, edges: new Set([...a.keys(), ...b.keys()]).size, missing, maxDiff, max: top(a), maxNew: top(b) };
+}
+
+/** This function writes the summary of the lines of `--check-stretch`: the counts of the records and of the differences above `RECORD_EPS`, by set. */
+export function stretchCheckSummary(lines: readonly StretchCheck[]): string {
+  const out = ["## The check of the cheaper stretch", "", `| set | records | edges | missing | largest difference | edges above ${RECORD_EPS} | records with another \`gap.stretch\` |`, "|---|---:|---:|---:|---:|---:|---:|"];
+  for (const set of CHECK_SETS) {
+    const mine = lines.filter((l) => l.input.startsWith(`${set}/`) && l.skipped === undefined);
+    const edges = mine.reduce((n, l) => n + l.edges, 0);
+    const missing = mine.reduce((n, l) => n + l.missing, 0);
+    const largest = mine.reduce((m, l) => Math.max(m, l.maxDiff), 0);
+    const above = mine.filter((l) => l.maxDiff > RECORD_EPS).length;
+    const gap = mine.filter((l) => Math.abs(l.max - l.maxNew) > RECORD_EPS).length;
+    out.push(`| \`${set}\` | ${mine.length} | ${edges} | ${missing} | ${largest.toExponential(2)} | ${above} | ${gap} |`);
+  }
+  return out.join("\n") + "\n";
+}
+
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
   const i = args.indexOf(name);
@@ -179,7 +238,8 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const summary = opt("--summary");
   if (summary !== undefined) {
     const lines = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as BreakdownRecord));
-    const md = breakdownSummary(lines.filter((l) => l.part !== undefined));
+    const checks = lines.filter((l) => (l as unknown as { check?: string }).check === "stretch") as unknown as StretchCheck[];
+    const md = breakdownSummary(lines.filter((l) => l.part !== undefined)) + (checks.length > 0 ? "\n" + stretchCheckSummary(checks) : "");
     if (opt("--out") !== undefined) writeFileSync(opt("--out")!, md);
     console.log(md);
     process.exit(0);
@@ -197,6 +257,18 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     const mine = boards.filter((_, i) => i % shards === shard);
     process.stderr.write(`${mine.length} of ${boards.length} boards in the shard ${shard}/${shards}.\n`);
     const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
+    writeFileSync(out, lines.join("\n") + "\n");
+    process.exit(0);
+  }
+  if (args.includes("--check-stretch")) {
+    const pool = poolStrategies().filter((_, i) => i % shards === shard);
+    const inputs = CHECK_SETS.flatMap((id) => screenInputs(SCREEN_SETS[id]!).map((input) => ({ id: input.id, graph: inputGraph(input) })));
+    process.stderr.write(`${pool.length} strategies and ${inputs.length} inputs in the shard ${shard}/${shards}.\n`);
+    const lines: string[] = [];
+    for (const s of pool) {
+      for (const i of inputs) lines.push(JSON.stringify(stretchCheck(s, i.id, i.graph)));
+      process.stderr.write(`${s.name}: done\n`);
+    }
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
