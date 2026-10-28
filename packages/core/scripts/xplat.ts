@@ -17,6 +17,7 @@
 // - `routes.jsonl`: one line for each input and router, with the hashes, the count of the Math calls and the hashes of the joint bench.
 // - `routes/<input>.<router>.txt.gz`: the exact result. Each line is `<key>\t<canonical JSON>`, with the numbers of `JSON.stringify` (each number round trips).
 //   The keys are `route <edge>` in the order of the edges, then `levels`, `bundles` and `runs`.
+//   The field `lanes` of a line counts the runs of 2 or more lanes that `orderLanes` orders, the runs with a cycle and the broken cycles (LANE-ORDER).
 // - With `XPLAT_CALLS=1`: `calls/<input>.<router>.txt.gz`. The script routes the graph a third time with a wrapper on each Math function of `TRACED`.
 //   Each line is the hash of 1000 calls in turn: the index of the function, the bits of each argument and the bits of the result.
 //   The wrapper is only in this script. The source of the core does not change.
@@ -32,6 +33,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { canonicalJson, outputHash, RECORD_EPS } from "@mark1russell7/layout-contract";
 import { asRouter, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { currentLaneSort, observeLanes } from "../src/lane-order.ts";
 
 /** The Math functions that the log wraps. The index of a name in this list is its id in the hash of a chunk. */
 export const TRACED = ["hypot", "atan2", "sin", "cos", "tan", "acos", "asin", "atan", "exp", "log", "pow"] as const;
@@ -282,7 +284,7 @@ async function main(): Promise<void> {
   mkdirSync(join(out, "calls"), { recursive: true });
   if (targets !== undefined) mkdirSync(join(out, "near"), { recursive: true });
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
-  const meta = { os: platform(), arch: arch(), node: process.version, v8: process.versions.v8, highways: pkg.version, near: targets !== undefined };
+  const meta = { os: platform(), arch: arch(), node: process.version, v8: process.versions.v8, highways: pkg.version, near: targets !== undefined, laneSort: currentLaneSort() };
   writeFileSync(join(out, "meta.json"), JSON.stringify(meta, null, 2) + "\n");
   writeFileSync(join(out, "sort.json"), JSON.stringify(sortProbe(), null, 2) + "\n");
   const lines = join(out, targets === undefined ? "routes.jsonl" : "near.jsonl");
@@ -315,8 +317,20 @@ async function main(): Promise<void> {
         console.log(`xplat: ${key}: ${log.near.length} calls of the chunks ${chunks.join(", ")}.`);
         continue;
       }
+      const lanes = { runs: 0, cyclic: 0, breaks: 0 };
+      observeLanes((n, breaks) => {
+        if (n < 2) return;
+        lanes.runs++;
+        if (breaks > 0) lanes.cyclic++;
+        lanes.breaks += breaks;
+      });
       const t0 = performance.now();
-      const first = route(input.graph);
+      let first: Result;
+      try {
+        first = route(input.graph);
+      } finally {
+        observeLanes(undefined);
+      }
       const ms = performance.now() - t0;
       const hash = routeHash(first);
       const exact = exactLines(first);
@@ -346,6 +360,7 @@ async function main(): Promise<void> {
         traced,
         exact: exactHash,
         ms: Math.round(ms),
+        lanes,
         calls: log?.count ?? null,
         perFn: log?.perFn ?? null,
         joint: jointHashes(input, router),

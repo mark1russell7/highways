@@ -13,6 +13,9 @@ on:
       run:
         description: "The id of the layout-contract run with the artifact xplat-graphs."
         default: "40688908137"
+      lane:
+        description: "MEASURE-ONLY (LANE-ORDER): the candidate of the lane order, engine, merge, kahn, kahn-fewest or rank. Empty: the default."
+        default: ""
   pull_request:
     paths:
       - .github/workflows/xplat.yml
@@ -24,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: xplat-${{ github.ref }}
+  group: xplat-${{ github.ref }}-${{ inputs.lane }}
   cancel-in-progress: true
 
 defaults:
@@ -90,6 +93,7 @@ jobs:
       - name: Trace the routes
         env:
           XPLAT_CALLS: "1"
+          HIGHWAYS_LANE_SORT: ${{ inputs.lane || '' }}
         run: |
           set -o pipefail
           node --version
@@ -101,6 +105,34 @@ jobs:
           name: xplat-trace-${{ matrix.os }}-node${{ matrix.node }}
           path: trace/
           if-no-files-found: warn
+
+  # MEASURE-ONLY (LANE-ORDER): the tests of core and site with the candidate. The JSON reports name each test that fails.
+  digests:
+    if: ${{ inputs.lane }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HIGHWAYS_LANE_SORT: ${{ inputs.lane }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run the tests
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/tests"
+          (cd packages/core && npx vitest run --reporter=json --outputFile="$GITHUB_WORKSPACE/tests/core.json") || true
+          (cd packages/site && npx vitest run --reporter=json --outputFile="$GITHUB_WORKSPACE/tests/site.json") || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: xplat-tests-${{ inputs.lane }}
+          path: tests/
 
   locate:
     needs: trace
@@ -152,6 +184,8 @@ jobs:
           name: xplat-targets
           path: targets
       - name: Log the calls of the chunks that differ
+        env:
+          HIGHWAYS_LANE_SORT: ${{ inputs.lane || '' }}
         run: |
           set -o pipefail
           cd packages/core

@@ -1,4 +1,5 @@
 import { dist, type Point } from "./geom.ts";
+import { currentLaneSort, laneObserver, mergeSort, precedenceOrder } from "./lane-order.ts";
 import type { Result, Route } from "./model.ts";
 
 /** A piece of drawn way. A shared segment carries several edges, in lane order. A private segment carries one edge. */
@@ -261,6 +262,17 @@ const byEdge = (P: Placed, Q: Placed): number => (P.edge < Q.edge ? -1 : P.edge 
 /** This function puts the point `a` before the point `b`: the smaller x first, then the smaller y. */
 const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.abs(a.x - b.x) <= SAME && a.y < b.y);
 
+/** The relation of the order `run`: the side after the run, else the side before the run, else the order of the edges. */
+const byRun = (P: Placed, Q: Placed): number => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q);
+
+/** The relation of the order `bundle`. When the two ends disagree, the end with the smaller x, then the smaller y, tells the side. */
+const byBundle = (P: Placed, Q: Placed): number => {
+  const after = partAfter(P, Q);
+  const before = partBefore(P, Q);
+  if (after && before && Math.sign(after.side) !== Math.sign(before.side)) return firstPoint(after.at, before.at) ? after.side : before.side;
+  return after?.side ?? before?.side ?? byEdge(P, Q);
+};
+
 /**
  * This function gives the lane order of the edges on a shared way `run` (metro-line order).
  * The routes are polylines that hold the points of the run in a row, in either direction. A route that does not hold the run goes last.
@@ -285,16 +297,18 @@ export function orderLanes(run: readonly Point[], routes: readonly Route[], orde
       else lost.push(r.edge);
     }
   }
-  if (order === "run") placed.sort((P, Q) => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q));
-  else {
-    // The sort starts from the order of the edges, so that each run sorts the same edges the same way.
+  const compare = order === "run" ? byRun : byBundle;
+  let lanes: Placed[];
+  const sort = currentLaneSort();
+  if (sort === "kahn" || sort === "kahn-fewest" || sort === "rank") {
     placed.sort(byEdge);
-    placed.sort((P, Q) => {
-      const after = partAfter(P, Q);
-      const before = partBefore(P, Q);
-      if (after && before && Math.sign(after.side) !== Math.sign(before.side)) return firstPoint(after.at, before.at) ? after.side : before.side;
-      return after?.side ?? before?.side ?? byEdge(P, Q);
-    });
+    const { order: ranks, breaks } = precedenceOrder(placed.length, (i, j) => compare(placed[i]!, placed[j]!));
+    laneObserver()?.(placed.length, breaks);
+    lanes = ranks.map((i) => placed[i]!);
+  } else {
+    // The sort of the order `bundle` starts from the order of the edges, so that each run sorts the same edges the same way.
+    if (order === "bundle") placed.sort(byEdge);
+    lanes = sort === "merge" ? mergeSort(placed, compare) : placed.sort(compare);
   }
-  return [...placed.map((x) => x.edge), ...lost.sort()];
+  return [...lanes.map((x) => x.edge), ...lost.sort()];
 }
