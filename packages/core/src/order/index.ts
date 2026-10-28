@@ -1,13 +1,8 @@
 import { fnv1a32 } from "../bench/screen/hash.ts";
+import { byHash } from "../compare.ts";
 import { rng } from "../fixtures.ts";
-import type { Edge, Graph, Result, Router } from "../model.ts";
+import type { Graph, Result, Router } from "../model.ts";
 import { defineStrategy, type Strategy } from "../strategies/model.ts";
-
-/** This function compares two edges by the hash of their ids, and then by their ids. Thus the order of two edges does not depend on the input. */
-function byHash(a: { readonly h: number; readonly e: Edge }, b: { readonly h: number; readonly e: Edge }): number {
-  if (a.h !== b.h) return a.h - b.h;
-  return a.e.id < b.e.id ? -1 : a.e.id > b.e.id ? 1 : 0;
-}
 
 /**
  * This function gives the graph with its edges in the stable order of WILD-053: by the FNV-1a hash of the id, then by the id.

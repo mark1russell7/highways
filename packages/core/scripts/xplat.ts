@@ -33,7 +33,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { canonicalJson, outputHash, RECORD_EPS } from "@mark1russell7/layout-contract";
 import { asRouter, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
-import { currentLaneSort, observeLanes } from "../src/lane-order.ts";
+import { observeLanes } from "../src/lane-order.ts";
 
 /** The Math functions that the log wraps. The index of a name in this list is its id in the hash of a chunk. */
 export const TRACED = ["hypot", "atan2", "sin", "cos", "tan", "acos", "asin", "atan", "exp", "log", "pow"] as const;
@@ -284,7 +284,7 @@ async function main(): Promise<void> {
   mkdirSync(join(out, "calls"), { recursive: true });
   if (targets !== undefined) mkdirSync(join(out, "near"), { recursive: true });
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
-  const meta = { os: platform(), arch: arch(), node: process.version, v8: process.versions.v8, highways: pkg.version, near: targets !== undefined, laneSort: currentLaneSort() };
+  const meta = { os: platform(), arch: arch(), node: process.version, v8: process.versions.v8, highways: pkg.version, near: targets !== undefined };
   writeFileSync(join(out, "meta.json"), JSON.stringify(meta, null, 2) + "\n");
   writeFileSync(join(out, "sort.json"), JSON.stringify(sortProbe(), null, 2) + "\n");
   const lines = join(out, targets === undefined ? "routes.jsonl" : "near.jsonl");

@@ -1,5 +1,90 @@
-// The total order of the lanes of a run (LANE-ORDER). `orderLanes` of `segments.ts` uses it.
+// The lane order of a run (LANE-ORDER): the relation of two lanes, and a total order from it. `orderLanes` of `segments.ts` uses this module.
 // The package index does not export this module.
+import { byText } from "./compare.ts";
+import { dist, type Point } from "./geom.ts";
+
+/** Two points nearer than this distance are the same point. The value is the same as in `segments.ts`. */
+const SAME = 1e-6;
+
+/** The place of a route on a run. The points go in the direction of the run. `s` and `e` are the indexes of the ends of the run. */
+export interface Placed {
+  readonly edge: string;
+  readonly p: readonly Point[];
+  readonly s: number;
+  readonly e: number;
+}
+
+/** The place where two routes part past one end of their common stretch, and the side of the first route there. */
+interface Parting {
+  /** The last common point. */
+  readonly at: Point;
+  /** This value is below 0 when the first route goes to the left of the second route. It is above 0 when it goes to the right. */
+  readonly side: number;
+}
+
+/** The angle, from -π to π, of the turn at `base` from the direction `from` → `base` to the point `to`. */
+function turn(from: Point, base: Point, to: Point): number {
+  const dx = base.x - from.x;
+  const dy = base.y - from.y;
+  const vx = to.x - base.x;
+  const vy = to.y - base.y;
+  return Math.atan2(dx * vy - dy * vx, dx * vx + dy * vy);
+}
+
+/** This function gives the place where the routes `P` and `Q` part after the last point of the run, or nothing. */
+function partAfter(P: Placed, Q: Placed): Parting | undefined {
+  for (let j = 1; ; j++) {
+    const a = P.p[P.e + j];
+    const b = Q.p[Q.e + j];
+    if (a === undefined || b === undefined) return undefined;
+    if (dist(a, b) > SAME) {
+      const from = P.p[P.e + j - 2]!;
+      const at = P.p[P.e + j - 1]!;
+      const side = turn(from, at, a) - turn(from, at, b);
+      return side === 0 ? undefined : { at, side };
+    }
+  }
+}
+
+/** This function gives the place where the routes `P` and `Q` part before the first point of the run, or nothing. */
+function partBefore(P: Placed, Q: Placed): Parting | undefined {
+  for (let j = 1; ; j++) {
+    const a = P.p[P.s - j];
+    const b = Q.p[Q.s - j];
+    if (a === undefined || b === undefined) return undefined;
+    if (dist(a, b) > SAME) {
+      const from = P.p[P.s - j + 2]!;
+      const at = P.p[P.s - j + 1]!;
+      // Seen backward, the left side is the right side. Thus the order turns around.
+      const side = turn(from, at, b) - turn(from, at, a);
+      return side === 0 ? undefined : { at, side };
+    }
+  }
+}
+
+
+/** This function compares two placed routes by their edge ids. */
+export const byEdge = (P: Placed, Q: Placed): number => byText(P.edge, Q.edge);
+
+/** This function puts the point `a` before the point `b`: the smaller x first, then the smaller y. */
+const firstPoint = (a: Point, b: Point): boolean => a.x < b.x - SAME || (Math.abs(a.x - b.x) <= SAME && a.y < b.y);
+
+/**
+ * This function is the relation of the order `run`: the side after the run, else the side before the run, else the order of the edges.
+ * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle.
+ */
+export const byRun = (P: Placed, Q: Placed): number => partAfter(P, Q)?.side ?? partBefore(P, Q)?.side ?? byEdge(P, Q);
+
+/**
+ * This function is the relation of the order `bundle`. When the two ends disagree, the end with the smaller x, then the smaller y, tells the side.
+ * A value below 0 puts `P` before `Q`. The relation is not transitive: three lanes can make a cycle.
+ */
+export const byBundle = (P: Placed, Q: Placed): number => {
+  const after = partAfter(P, Q);
+  const before = partBefore(P, Q);
+  if (after && before && Math.sign(after.side) !== Math.sign(before.side)) return firstPoint(after.at, before.at) ? after.side : before.side;
+  return after?.side ?? before?.side ?? byEdge(P, Q);
+};
 
 /** The result of `precedenceOrder`. */
 export interface PrecedenceOrder {
@@ -16,8 +101,9 @@ export interface PrecedenceOrder {
  * The function calls `before` one time for each pair, with `i < j`.
  *
  * Each step takes the free item with the smallest index. An item is free when no remaining item must come before it.
- * When no item is free, the remaining items hold a cycle. Then the step takes the remaining item with the smallest index, and drops its incoming constraints.
- * `breaks` counts these steps.
+ * When no item is free, the remaining items hold a cycle. Then the step takes the remaining item with the fewest remaining predecessors, then the smallest index.
+ * It drops the incoming constraints of that item. `breaks` counts these steps.
+ * That item is in the source component of the remaining items, so the step drops only constraints inside a cycle.
  *
  * The result depends only on the relation. When the relation has no cycle, the result is the only order that keeps each pair.
  */
@@ -39,86 +125,24 @@ export function precedenceOrder(n: number, before: (i: number, j: number) => num
   let breaks = 0;
   for (let step = 0; step < n; step++) {
     let pick = -1;
-    let first = -1;
     let fewest = -1;
     for (let k = 0; k < n; k++) {
       if (done[k]) continue;
-      if (first < 0) first = k;
-      if (fewest < 0 || waits[k]! < waits[fewest]!) fewest = k;
       if (waits[k] === 0) {
         pick = k;
         break;
       }
+      if (fewest < 0 || waits[k]! < waits[fewest]!) fewest = k;
     }
     if (pick < 0) {
-      pick = breakRule === "fewest" ? fewest : breakRule === "scc" ? Math.min(...sourceComponent(next, done)) : first;
+      pick = fewest;
       breaks++;
     }
     done[pick] = 1;
     order.push(pick);
     for (const k of next[pick]!) waits[k]!--;
   }
-  if (breaks > 0 && laneSort === "rank") {
-    // MEASURE-ONLY: the rank by the count of the items that each item comes before, then the index.
-    const wins = new Int32Array(n);
-    for (let i = 0; i < n; i++) wins[i] = next[i]!.length;
-    const ranked = Array.from({ length: n }, (_, i) => i).sort((a, b) => wins[b]! - wins[a]! || a - b);
-    return { order: ranked, breaks };
-  }
   return { order, breaks };
-}
-
-/**
- * This function gives the items of the source component of the items that are not `done`, with the algorithm of Tarjan.
- * `next[i]` holds the items that come after the item `i`. The source component is the strong component with no predecessor outside itself.
- * Tarjan gives the components in the reverse order of a topological sort, so the last component is a source.
- */
-export function sourceComponent(next: readonly (readonly number[])[], done: Uint8Array): number[] {
-  const n = next.length;
-  const index = new Int32Array(n).fill(-1);
-  const low = new Int32Array(n);
-  const on = new Uint8Array(n);
-  const stack: number[] = [];
-  let counter = 0;
-  let last: number[] = [];
-  for (let root = 0; root < n; root++) {
-    if (done[root] || index[root]! >= 0) continue;
-    const frames: [number, number][] = [[root, 0]];
-    index[root] = low[root] = counter++;
-    stack.push(root);
-    on[root] = 1;
-    while (frames.length > 0) {
-      const frame = frames[frames.length - 1]!;
-      const v = frame[0];
-      const out = next[v]!;
-      if (frame[1] < out.length) {
-        const w = out[frame[1]++]!;
-        if (done[w]) continue;
-        if (index[w]! < 0) {
-          index[w] = low[w] = counter++;
-          stack.push(w);
-          on[w] = 1;
-          frames.push([w, 0]);
-        } else if (on[w]) low[v] = Math.min(low[v]!, index[w]!);
-        continue;
-      }
-      frames.pop();
-      if (frames.length > 0) {
-        const u = frames[frames.length - 1]![0];
-        low[u] = Math.min(low[u]!, low[v]!);
-      }
-      if (low[v] === index[v]) {
-        last = [];
-        let w: number;
-        do {
-          w = stack.pop()!;
-          on[w] = 0;
-          last.push(w);
-        } while (w !== v);
-      }
-    }
-  }
-  return last;
 }
 
 /** The function that `observeLanes` installs. It gets the count of the lanes of each run that `orderLanes` orders, and the count of the broken cycles. */
@@ -131,46 +155,11 @@ export function observeLanes(fn: LaneObserver | undefined): void {
   observer = fn;
 }
 
-/** This function gives the observer of `observeLanes`, or nothing. */
-export function laneObserver(): LaneObserver | undefined {
-  return observer;
-}
-
-// MEASURE-ONLY: the switch of the candidates of LANE-ORDER. The final change removes it.
-/** The candidates of LANE-ORDER: the sort of the engine (before), a merge sort of the package, and the order of Kahn. */
-export type LaneSort = "engine" | "merge" | "kahn" | "kahn-fewest" | "kahn-scc" | "rank";
-const SORTS: readonly string[] = ["engine", "merge", "kahn", "kahn-fewest", "kahn-scc", "rank"];
-
-const fromEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.["HIGHWAYS_LANE_SORT"];
-let laneSort: LaneSort = fromEnv !== undefined && SORTS.includes(fromEnv) ? (fromEnv as LaneSort) : "kahn";
-const ruleOf = (s: LaneSort): "first" | "fewest" | "scc" => (s === "kahn-fewest" ? "fewest" : s === "kahn-scc" ? "scc" : "first");
-let breakRule = ruleOf(laneSort);
-
-/** This function sets the candidate. */
-export function setLaneSort(s: LaneSort): void {
-  laneSort = s;
-  breakRule = ruleOf(s);
-}
-
-/** This function gives the candidate. */
-export function currentLaneSort(): LaneSort {
-  return laneSort;
-}
-
-/** This function sorts a list with a stable merge sort. The sequence of the pairs to `compare` depends only on the list and the results. */
-export function mergeSort<T>(list: readonly T[], compare: (a: T, b: T) => number): T[] {
-  if (list.length < 2) return [...list];
-  const mid = list.length >> 1;
-  const left = mergeSort(list.slice(0, mid), compare);
-  const right = mergeSort(list.slice(mid), compare);
-  const out: T[] = [];
-  let i = 0;
-  let j = 0;
-  while (i < left.length && j < right.length) {
-    if (!(compare(left[i]!, right[j]!) > 0)) out.push(left[i++]!);
-    else out.push(right[j++]!);
-  }
-  while (i < left.length) out.push(left[i++]!);
-  while (j < right.length) out.push(right[j++]!);
-  return out;
+/** This function gives the lane order of the placed routes of a run. The routes are in any order. `order` selects the relation. */
+export function orderPlaced(placed: readonly Placed[], order: "run" | "bundle"): Placed[] {
+  const compare = order === "run" ? byRun : byBundle;
+  const sorted = [...placed].sort(byEdge);
+  const { order: ranks, breaks } = precedenceOrder(sorted.length, (i, j) => compare(sorted[i]!, sorted[j]!));
+  observer?.(sorted.length, breaks);
+  return ranks.map((i) => sorted[i]!);
 }

@@ -1,6 +1,7 @@
 import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
+import { byText } from "../compare.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
@@ -84,8 +85,6 @@ interface Run {
   readonly points: Point[];
   readonly ways: Way[];
 }
-
-const byText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /** The angle, from -π to π, of the turn at `base` from the direction `from` → `base` to the point `to`. */
 function turn(from: Point, base: Point, to: Point): number {
