@@ -77,6 +77,21 @@ export interface SharedOptions extends WayOptions {
   readonly maxNodes?: number;
 }
 
+/**
+ * The negotiation of the router `attraction` (HWY-044, PathFinder turned around). Each pass routes each edge again from no ways.
+ * A link costs `len (1 - attraction h) (1 + weight max(0, use - cap))` more than in `shared`, with `h` the history of the link.
+ */
+export interface SharedNegotiation {
+  /** The number of passes, 1 or more. */
+  readonly passes: number;
+  /** The pull of the history of a link, from 0 to 1. */
+  readonly attraction: number;
+  /** The cost weight of each edge over the capacity of a link, 0 or more. */
+  readonly capacityWeight: number;
+  /** The width of one lane. The capacity of a link is its free width divided by this width, and 1 or more. */
+  readonly laneWidth: number;
+}
+
 /** A way of one edge through the corner graph. */
 export interface Way {
   readonly edge: Edge;
@@ -114,7 +129,7 @@ function turn(from: Point, base: Point, to: Point): number {
  * Thus the edges of a key come together on common ways. Each stretch that several edges share has the same points in each route.
  * The result gives each stretch as a run, with the order of its lanes.
  */
-export function sharedRouter(options: SharedOptions): Router {
+export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotiation): Router {
   const discount = Math.min(1, Math.max(0.05, options.discount ?? 0.5));
   const flow = options.cost === "flow";
   const alpha = Math.min(1, Math.max(0.1, options.alpha ?? 0.6));
@@ -172,8 +187,11 @@ export function sharedRouter(options: SharedOptions): Router {
         if (wd === undefined) widths.set(k, (wd = channelWidth(ways.obstacles, corners.points[i]!, corners.points[j]!)));
         return wd;
       };
-      /** This function routes one way. `before` holds the edges of the key on each link in the pass before, for the option `reuse`. */
-      const route = (w: Way, before?: ReadonlyMap<number, number>): void => {
+      /**
+       * This function routes one way. `before` holds the edges of the key on each link in the pass before, for the option `reuse`.
+       * `history` holds the history of each link of the key, for the negotiation of `attraction`.
+       */
+      const route = (w: Way, before?: ReadonlyMap<number, number>, history?: ReadonlyMap<number, number>): void => {
         let used = discounted.get(w.key);
         if (!used) discounted.set(w.key, (used = new Map()));
         const mine = used;
@@ -192,6 +210,20 @@ export function sharedRouter(options: SharedOptions): Router {
           cost = (i, j, d) => plain(i, j, d) / (1 + reuse * (before.get(link(i, j)) ?? 0)) ** reuseExponent;
           floor /= (1 + reuse * most) ** reuseExponent;
         }
+        if (negotiation !== undefined && history !== undefined) {
+          const plain = cost;
+          const a = negotiation.attraction;
+          const b = negotiation.capacityWeight;
+          let most = 0;
+          for (const h of history.values()) most = Math.max(most, h);
+          cost = (i, j, d) => {
+            const k = link(i, j);
+            const use = (mine.get(k)?.length ?? 0) + 1;
+            const cap = Math.max(1, Math.floor(widthOf(i, j) / negotiation.laneWidth));
+            return plain(i, j, d) * (1 - a * (history.get(k) ?? 0)) * (1 + b * Math.max(0, use - cap));
+          };
+          floor *= 1 - a * most;
+        }
         const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
         if (!way) return;
         w.found = true;
@@ -207,9 +239,39 @@ export function sharedRouter(options: SharedOptions): Router {
           if (flow) top.set(w.key, Math.max(top.get(w.key) ?? 0, mine.get(link(a, b))!.length));
         }
       };
-      for (const w of order) route(w);
+      /**
+       * This function gives the passes of the negotiation (HWY-044). After each pass, the history of each link grows by `use / m`,
+       * with `m` the edges of the key, up to `0.9 / attraction`. Each later pass routes each edge again from no ways.
+       */
+      const negotiate = (list: readonly Way[]): void => {
+        const nego = negotiation!;
+        const histories = new Map<string, Map<number, number>>();
+        const size = new Map<string, number>();
+        for (const w of list) size.set(w.key, (size.get(w.key) ?? 0) + 1);
+        const most = nego.attraction > 0 ? 0.9 / nego.attraction : Infinity;
+        for (let pass = 0; pass < Math.max(1, Math.floor(nego.passes)); pass++) {
+          if (pass > 0) {
+            for (const [key, links] of discounted) {
+              let h = histories.get(key);
+              if (!h) histories.set(key, (h = new Map()));
+              const m = size.get(key) ?? 1;
+              for (const [k, users] of links) h.set(k, Math.min(most, (h.get(k) ?? 0) + users.length / m));
+            }
+            discounted.clear();
+            top.clear();
+            for (const w of list) {
+              w.found = false;
+              w.seq = [];
+              w.ids = [];
+            }
+          }
+          for (const w of list) route(w, undefined, histories.get(w.key) ?? new Map());
+        }
+      };
+      if (negotiation !== undefined) negotiate(order);
+      else for (const w of order) route(w);
       // Each later pass takes each edge off its links and finds its way again, with the ways of the other edges fixed.
-      for (let pass = 1; pass < passes; pass++) {
+      for (let pass = 1; negotiation === undefined && pass < passes; pass++) {
         if (reuse > 0) {
           // Winding Roads (HWY-005): each edge finds its way again from no ways, and the busy links of the pass before pull it.
           const before = new Map<string, Map<number, number>>();

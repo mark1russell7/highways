@@ -97,5 +97,11 @@ export { LINK_COMMUNITY_DEFAULTS, linkCommunities, linkCommunityGroups, linkComm
 export { cellSteps, nearestCentre, pointGroups, TERRITORY_DEFAULTS, TERRITORY_POINTS, territoryPlan, type CellStep, type TerritoryOptions, type TerritoryPoints } from "./territories/index.ts";
 export { coAssociation, CONSENSUS_DEFAULTS, CONSENSUS_LINKAGES, consensusGroups, consensusLabels, consensusPlan, type ConsensusLinkage, type ConsensusOptions } from "./consensus/index.ts";
 export { HUB_ALLOCATIONS, HUB_CANDIDATES, hubCandidates, P_HUB_DEFAULTS, pHubPlan, pMedian, type HubAllocation, type HubCandidates, type PHubOptions } from "./p-hub/index.ts";
+export { freeLines, STREET_SOURCES, streetEdges, streetPoint, streetRide, type FreeLine, type StreetEdge, type StreetRide, type StreetSource } from "./free-lines.ts";
+export { oneSteiner, spanningTree, STEINER_DEFAULTS, STEINER_GROUPS, STEINER_METHODS, STEINER_METRICS, steinerPlan, type SteinerGroup, type SteinerMethod, type SteinerMetric, type SteinerOptions } from "./steiner/index.ts";
+export { GAP_DEFAULTS, gapPlan, type GapOptions } from "./gaps/index.ts";
+export { STREET_DEFAULTS, streetPlan, type StreetOptions } from "./streets/index.ts";
+export { SEARCH_DEFAULTS, SEARCH_MOVES, searchPlan, searchScore, type SearchMove, type SearchOptions } from "./search/index.ts";
+export { INTERCHANGE_BASES, INTERCHANGE_DEFAULTS, interchangeCandidates, interchangePlan, type Interchange, type InterchangeBase, type InterchangeOptions } from "./interchanges/index.ts";
 export { SCALE_SPACE_DEFAULTS, scaleClusters, scaleSpaceGroups, scaleSpacePlan, type ScaleCluster, type ScaleSpaceOptions } from "./scale-space/index.ts";
 export * from "./gates/index.ts";

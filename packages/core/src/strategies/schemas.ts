@@ -39,6 +39,11 @@ import type { ResistanceOptions } from "../highways/resistance/index.ts";
 import type { RidgeOptions } from "../highways/ridges/index.ts";
 import type { RoadClassOptions } from "../highways/road-classes/index.ts";
 import type { ScaleSpaceOptions } from "../highways/scale-space/index.ts";
+import type { GapOptions } from "../highways/gaps/index.ts";
+import type { InterchangeOptions } from "../highways/interchanges/index.ts";
+import type { SearchOptions } from "../highways/search/index.ts";
+import type { SteinerOptions } from "../highways/steiner/index.ts";
+import type { StreetOptions } from "../highways/streets/index.ts";
 import type { SelectOptions } from "../highways/select/index.ts";
 import type { SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import type { SpectralOptions } from "../highways/spectral/index.ts";
@@ -924,4 +929,55 @@ export const PIPELINE_SCHEMA: OptionSchema<PipelineOptions> = {
   levelOptions: { type: "object", describe: "The options of the level rule." },
   room: { type: "strategy", step: "room", describe: "The room strategy. With it, the gaps of the board open before the routes. Without it, the board stays." },
   roomOptions: { type: "object", describe: "The options of the room strategy." },
+};
+
+/** The declarations of the options of the highway strategy `steiner` (HWY-036 with EDA-015). */
+export const STEINER_SCHEMA: OptionSchema<SteinerOptions> = {
+  group: { type: "enum", values: ["source", "key"], default: "source", describe: "The groups of the trees: the edges from one source node, or the edges of one collection." },
+  method: { type: "enum", values: ["one-steiner", "spanning"], default: "one-steiner", describe: "The method of the tree: the iterated 1-Steiner method, or the spanning tree of the terminals." },
+  maxGroup: { type: "integer", min: 3, max: 32, step: 1, marks: [8, 12, 16], default: 12, describe: "A group with more terminals than this number gets the spanning tree alone." },
+  metric: { type: "enum", values: ["rectilinear", "octilinear"], default: "rectilinear", describe: "The metric of the tree: two directions or four directions." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the tree only when its path in the tree is this many times its first route or less." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A stretch of a tree with fewer edges than this number is not a highway." },
+};
+
+/** The declarations of the options of the highway strategy `gaps` (HWY-057). */
+export const GAP_SCHEMA: OptionSchema<GapOptions> = {
+  minSize: { type: "integer", min: 2, max: 16, step: 1, marks: [2, 3, 6], default: 3, describe: "A street with fewer edges than this number (the demand) is not a highway." },
+  discount: { type: "number", min: 0.1, max: 0.8, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "The cost of a length on a street against a length off the streets." },
+  detour: { type: "number", min: 1, max: 2, step: 0.05, marks: [1.2, 1.3, 1.5], default: 1.3, describe: "An edge rides a street only when its way along the street is this many times its first route or less." },
+  source: { type: "enum", values: ["room", "corners"], default: "room", describe: "The source of the streets: the gaps of the room step, or the lines through the corners." },
+};
+
+/** The declarations of the options of the highway strategy `streets` (HWY-058). */
+export const STREET_SCHEMA: OptionSchema<StreetOptions> = {
+  detour: { type: "number", min: 1, max: 1.5, step: 0.05, marks: [1.1, 1.2, 1.3], default: 1.2, describe: "A street covers an edge when the way of the edge along it is this many times its first route or less." },
+  minGain: { type: "number", min: 1, max: 8, step: 0.25, marks: [1.5, 2, 4], default: 2, describe: "The cover stops when the best street gives less gain: the length that its edges ride over its length." },
+  maxStreets: { type: "integer", min: 4, max: 64, step: 4, marks: [16, 32], default: 32, describe: "The largest number of streets." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A street with fewer new edges than this number is not a highway." },
+  source: { type: "enum", values: ["room", "corners"], default: "corners", describe: "The source of the streets: the gaps of the room step, or the lines through the corners." },
+};
+
+/** The declarations of the options of the highway strategy `search` (HWY-059). */
+export const SEARCH_SCHEMA: OptionSchema<SearchOptions> = {
+  from: { type: "enum", values: ["corridors", "quickbundles", "wspd", "road-classes", "flow-field", "od-cells", "shared-ways"], default: "corridors", describe: "The plan where the search starts." },
+  pool: { type: "list", default: ["quickbundles", "road-classes"], describe: "The generators of the highways that the move `add` takes." },
+  evaluations: { type: "integer", min: 0, max: 400, step: 4, marks: [0, 16, 64], default: 16, describe: "The number of plans that the search measures. The value 0 gives the start plan." },
+  temperature: { type: "number", min: 0, max: 0.2, step: 0.005, marks: [0, 0.02, 0.05], default: 0.02, describe: "The first temperature of the annealing, on the scale of the score." },
+  inkWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [1], default: 1, describe: "The weight of the ink that the routes save (B1)." },
+  stretchWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the 0.95 quantile of the stretch (B3)." },
+  ambiguityWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the ambiguity (B4)." },
+  angleWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.25], default: 0.25, describe: "The weight of the largest merge angle (B6), divided by 180 degrees." },
+  seed: { type: "integer", min: 0, max: 1000, step: 1, default: 1, describe: "The seed of the moves." },
+};
+
+/** The declarations of the options of the highway strategy `interchanges` (HWY-060). */
+export const INTERCHANGE_SCHEMA: OptionSchema<InterchangeOptions> = {
+  from: { type: "enum", values: ["corridors", "shared-ways"], default: "corridors", describe: "The plan that gives the highways of the network." },
+  changeCost: { type: "number", min: 0, max: 8, step: 0.5, marks: [0, 2, 4], default: 2, describe: "The cost of a change between two highways, in units of the board." },
+  interchanges: { type: "integer", min: 1, max: 32, step: 1, marks: [4, 16], default: 16, describe: "The largest number of interchanges." },
+  perEdge: { type: "integer", min: 1, max: 3, step: 1, default: 2, describe: "The largest number of highways on the way of one edge." },
+  radius: { type: "number", min: 0.5, max: 8, step: 0.5, marks: [1, 2, 4], default: 2, describe: "Two highways get an interchange where they come this near, in units of the board." },
+  discount: { type: "number", min: 0.1, max: 1, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "The cost of a length on a highway against a length off the highways." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the network only when its way is this many times its first route or less." },
 };

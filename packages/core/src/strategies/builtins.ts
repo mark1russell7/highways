@@ -44,6 +44,11 @@ import { TERRITORY_DEFAULTS, territoryPlan, type TerritoryOptions } from "../hig
 import { CONSENSUS_DEFAULTS, consensusPlan, type ConsensusOptions } from "../highways/consensus/index.ts";
 import { P_HUB_DEFAULTS, pHubPlan, type PHubOptions } from "../highways/p-hub/index.ts";
 import { SCALE_SPACE_DEFAULTS, scaleSpacePlan, type ScaleSpaceOptions } from "../highways/scale-space/index.ts";
+import { GAP_DEFAULTS, gapPlan, type GapOptions } from "../highways/gaps/index.ts";
+import { INTERCHANGE_DEFAULTS, interchangePlan, type InterchangeOptions } from "../highways/interchanges/index.ts";
+import { SEARCH_DEFAULTS, searchPlan, type SearchOptions } from "../highways/search/index.ts";
+import { STEINER_DEFAULTS, steinerPlan, type SteinerOptions } from "../highways/steiner/index.ts";
+import { STREET_DEFAULTS, streetPlan, type StreetOptions } from "../highways/streets/index.ts";
 import { RIDGE_DEFAULTS, ridgePlan, type RidgeOptions } from "../highways/ridges/index.ts";
 import { SOFT_KEY_DEFAULTS, softKeyPlan, type SoftKeyOptions } from "../highways/soft-keys/index.ts";
 import { FLOW_FIELD_DEFAULTS, flowFieldPlan, type FlowFieldOptions } from "../highways/flow-field/index.ts";
@@ -83,7 +88,7 @@ import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
 import { DEPTHS_SCHEMA, PIPELINE_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -462,6 +467,11 @@ export const highwayStrategies: {
   readonly consensus: Strategy<"highway", ConsensusOptions>;
   readonly "p-hub": Strategy<"highway", PHubOptions>;
   readonly "scale-space": Strategy<"highway", ScaleSpaceOptions>;
+  readonly steiner: Strategy<"highway", SteinerOptions>;
+  readonly gaps: Strategy<"highway", GapOptions>;
+  readonly streets: Strategy<"highway", StreetOptions>;
+  readonly search: Strategy<"highway", SearchOptions>;
+  readonly interchanges: Strategy<"highway", InterchangeOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -891,6 +901,51 @@ export const highwayStrategies: {
     schema: SCALE_SPACE_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<ScaleSpaceOptions>) => scaleSpacePlan(input, o),
+  }),
+  steiner: defineStrategy({
+    step: "highway",
+    name: "steiner",
+    describe: "Obstacle-avoiding rectilinear Steiner trees (HWY-036 with EDA-015). Each group of edges gets one tree, and the stretches that edges share become highways.",
+    defaults: { ...STEINER_DEFAULTS } as SteinerOptions,
+    schema: STEINER_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SteinerOptions>) => steinerPlan(input, o),
+  }),
+  gaps: defineStrategy({
+    step: "highway",
+    name: "gaps",
+    describe: "Gap highways (HWY-057). The free middle lines of the gaps are streets, and a street that enough edges choose becomes a highway.",
+    defaults: { ...GAP_DEFAULTS } as GapOptions,
+    schema: GAP_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<GapOptions>) => gapPlan(input, o),
+  }),
+  streets: defineStrategy({
+    step: "highway",
+    name: "streets",
+    describe: "Orthogonal streets by a greedy set cover (HWY-058). Each step takes the street that its new edges ride the most per unit of its length.",
+    defaults: { ...STREET_DEFAULTS } as StreetOptions,
+    schema: STREET_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<StreetOptions>) => streetPlan(input, o),
+  }),
+  search: defineStrategy({
+    step: "highway",
+    name: "search",
+    describe: "A local search over the set of highways (HWY-059). The annealing adds, drops and moves highways, edges and points on a score of the bundle measures.",
+    defaults: { ...SEARCH_DEFAULTS } as SearchOptions,
+    schema: SEARCH_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SearchOptions>) => searchPlan(input, o),
+  }),
+  interchanges: defineStrategy({
+    step: "highway",
+    name: "interchanges",
+    describe: "A network of highways with interchanges (HWY-060). Each edge rides up to a number of highways, with a cost for each change.",
+    defaults: { ...INTERCHANGE_DEFAULTS } as InterchangeOptions,
+    schema: INTERCHANGE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<InterchangeOptions>) => interchangePlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

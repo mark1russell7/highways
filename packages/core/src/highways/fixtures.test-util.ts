@@ -49,6 +49,19 @@ export const parallel: Graph = {
   edges: [0, 1, 2].map((i) => ({ id: `e${i}`, source: { node: `l${i}` }, target: { node: `r${i}` } })),
 };
 
+/** Three rows of nodes on the left and on the right, with three edges between the rows. The gaps between the rows are 40 wide. */
+export const rows: Graph = {
+  nodes: [0, 1, 2].flatMap((i) => [
+    { id: `l${i}`, box: box(0, 60 * i) },
+    { id: `r${i}`, box: box(600, 60 * i) },
+  ]),
+  edges: [
+    { id: "a", source: { node: "l0" }, target: { node: "r2" } },
+    { id: "b", source: { node: "l1" }, target: { node: "r1" } },
+    { id: "c", source: { node: "l2" }, target: { node: "r0" } },
+  ],
+};
+
 /**
  * This function adds the common tests of a highway strategy. The strategy is in the registry, and it gives a correct plan the same each time.
  * Its routes break no hard rule after `follow`.

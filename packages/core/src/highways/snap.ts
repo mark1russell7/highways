@@ -28,6 +28,8 @@ export interface SnapLine {
 export interface SnapOptions extends Pick<WayOptions, "margin" | "k"> {
   /** A highway has this number of edges or more. The value is 2 or more. */
   readonly minSize: number;
+  /** With `true`, a line in clear view is its own spine, with no path through the corner graph. The default is `false`. */
+  readonly direct?: boolean;
 }
 
 /** This function gives the line `u d + rho n` of the direction angle `theta`, with `d = (cos, sin)` and the normal `n = (-sin, cos)`. */
@@ -61,9 +63,9 @@ export function snapPlan(input: HighwayInput, lines: readonly SnapLine[], o: Rea
     const a = free(line.a);
     const b = free(line.b);
     if (dist(a, b) <= finder.margin) continue;
-    const raw = corners.path(a, b);
+    const raw = o.direct === true && finder.obstacles.clear(a, b, pad) ? [a, b] : corners.path(a, b);
     if (!raw) continue;
-    const spine = corners.pull(raw);
+    const spine = o.direct === true && raw.length === 2 ? raw : corners.pull(raw);
     if (spine.length < 2 || polylineLength(spine) <= 1e-6) continue;
     const riders: { edge: string; on: number; off: number; points: Point[] }[] = [];
     for (const m of line.members) {
