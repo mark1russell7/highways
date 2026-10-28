@@ -9,7 +9,7 @@ This note joins the ideas of the five research notes into one catalog (IDEA0). B
 - No idea leaves the catalog without a screen result.
 - The three forms of the merge-angle law agree. The router `shared` follows a different model: a greedy Snell merge with a fixed charge.
 - The build order has seven waves. Wave 1 holds 11 cheap ideas that need no new step. Wave 2 holds 17 ideas of the step `highway`.
-- The ideas need 26 measures of MEAS0 that the screen does not have yet. MEAS3 adds them, and the first three are `B2`, `B3` and `B6`.
+- The ideas need 26 measures of MEAS0 that the screen did not have. MEAS3 adds them. The screen has 13 of them since MEAS3A, and 13 are left.
 
 ## The files
 
@@ -540,23 +540,10 @@ Wave 7 holds the other ideas of the note of rules, in the build order of that no
 
 ## The measures that the screen does not have (MEAS3)
 
-The `MEASURES` table of the screen (`packages/core/src/bench/screen/measures.ts`) has 34 ids of MEAS0. The ideas use 26 more ids of [MEAS0](MEASURES.md). [`ideas/meas3.json`](ideas/meas3.json) lists them. When the screen adds an id, the id leaves `meas3.json`, and the test makes sure of it.
+The `MEASURES` table of the screen (`packages/core/src/bench/screen/measures.ts`) has 47 ids of MEAS0. The ideas use 13 more ids of [MEAS0](MEASURES.md). [`ideas/meas3.json`](ideas/meas3.json) lists them. When the screen adds an id, the id leaves `meas3.json`, and the test makes sure of it.
 
 | Id | Measure | Ideas | First wave |
 |---|---|---|---|
-| `B3` | Bundle stretch | 61 | 1 |
-| `B2` | Bundled share | 50 | 1 |
-| `R12` | Lane separation | 44 | 1 |
-| `M4` | Lane routes through boxes | 33 | 1 |
-| `B7` | Occupied area | 24 | 1 |
-| `B6` | Merge angle | 23 | 1 |
-| `M1` | Area | 23 | 1 |
-| `R14` | Orthogonality | 22 | 1 |
-| `B5` | Lane crossings | 17 | 1 |
-| `Z2` | Link ends | 1 | 1 |
-| `B8` | Run profile | 23 | 2 |
-| `Z9` | Link agreement | 21 | 2 |
-| `B9` | Lane fidelity | 22 | 3 |
 | `G5` | Overlaps | 7 | 3 |
 | `M3` | Displacement | 8 | 4 |
 | `G4` | Fill | 7 | 4 |
@@ -571,7 +558,7 @@ The `MEASURES` table of the screen (`packages/core/src/bench/screen/measures.ts`
 | `G7` | Silhouette | 2 | 6 |
 | `H3` | Symmetry | 1 | 7 |
 
-`M1` and `M4` are values of the suite already. Only the table of the screen does not have them.
+MEAS3A added `R12`, `M4`, `B7`, `M1`, `R14`, `B5`, `Z2`, `B8`, `Z9` and `B9`, ten ids of waves 1 to 3. `G5` of wave 3 and the ids of waves 4 to 7 are left.
 
 The notes also propose new measures that MEAS0 does not have. `meas3.json` gives them the ids below.
 
@@ -591,7 +578,7 @@ The notes also propose new measures that MEAS0 does not have. `meas3.json` gives
 
 ## Gaps
 
-- The screen does not have `B2`, `B3` and `B6` yet. Wave 1 needs them, so MEAS3 comes before wave 1 or with it.
+- The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
 - The screen of `corridors` (`HWY-031`) against its rule is not done. Until then, `HWY-031` stays at `prototyped`.
 - The near pairs are a judgment. BUILD-W can find more pairs while it builds. Then it adds them to `related` or to a group.
 - The stage of each record is `cataloged`. The screen results of BUILD-W move the stages.

@@ -45,6 +45,9 @@ const ROWS: readonly Row[] = [
   ["R11.q05", "R11", "route.plug-spacing.q05", "0 to 1", "higher", true],
   ["R13.outside", "R13", "route.outside", "count", "lower", false],
   ["R15.inflections", "R15", "route.inflections", "count for each route", "lower", false],
+  // MEAS3A, for the steps `router` and `highway`. R12 is the share of the ink near a parallel leg of other edges. A narrow channel between boxes moves it.
+  ["R12.share", "R12", "route.lane.separation", "0 to 1", "lower", true],
+  ["R14.share", "R14", "route.orthogonality", "0 to 1", "higher", false],
   ["ink", "R1", "route.ink", "units", "lower", true],
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
@@ -54,6 +57,18 @@ const ROWS: readonly Row[] = [
   ["B3.median", "B3", "route.bundle.stretch.median", "ratio", "lower", false],
   ["B3.q95", "B3", "route.bundle.stretch.q95", "ratio", "lower", false],
   ["B6.max", "B6", "route.bundle.merge-angle.max", "degrees", "lower", false],
+  // MEAS3A, for the steps `router` and `highway`. B5, B8 and B9 read the runs and the trunks of the result. B8 is good or bad only in context, as B2.
+  ["B5.crossings", "B5", "route.bundle.lane-crossings", "count", "lower", false],
+  ["B7.ratio", "B7", "route.bundle.occupied-area", "ratio", "lower", false],
+  ["B8.runs", "B8", "route.bundle.runs", "count", "lower", false],
+  ["B8.median", "B8", "route.bundle.run-edges.median", "count", "higher", false],
+  ["B8.max", "B8", "route.bundle.run-edges.max", "count", "higher", false],
+  ["B9.median", "B9", "route.bundle.lane-fidelity.median", "ratio", "lower", false],
+  ["B9.max", "B9", "route.bundle.lane-fidelity.max", "ratio", "lower", false],
+  // M1 and M4 of the room, for the steps `router` and `highway`: the lanes of each shared segment open at `MEASURE_LANE_WIDTH`.
+  // The step `room` of `runSuite` gives the same keys for the boards that a room strategy opens.
+  ["M1.area", "M1", "route.lane.area", "ratio", "lower", false],
+  ["M4.laneThrough", "M4", "route.lane.through", "count", "lower", true],
   // The order fragility (W3 of MEAS3, from WILD-056): the spread of a measure over random orders of the edges. The placement can move it.
   ["W3.crossings", "W3", "route.order.crossings", "IQR over the median", "lower", true],
   ["W3.detour", "W3", "route.order.detour", "IQR over the median", "lower", true],
@@ -75,6 +90,9 @@ const ROWS: readonly Row[] = [
   ["Z10.ids", "Z10", "route.stability.highway-ids", "0 to 1", "higher", false],
   // The zoom levels and the groups. The default grouping rule reads the positions, so most of these measures depend on the placement.
   ["level-nesting", "Z6", "route.level.nesting", "count", "lower", false],
+  // MEAS3A, for the steps `router`, `highway` and `group`. Z2 is the count of the hard rule `link-ends`. Z9 needs a result with zoom levels.
+  ["Z2.linkEnds", "Z2", "route.level.link-ends", "count", "lower", false],
+  ["Z9.mean", "Z9", "route.level.link-agreement", "no unit", "lower", true],
   ["Z3.through", "Z3", "route.level.through", "count", "lower", true],
   ["Z3.length", "Z3", "route.level.link-length", "units", "lower", true],
   ["Z4.farItems", "Z4", "route.level.far-items", "count", "lower", true],

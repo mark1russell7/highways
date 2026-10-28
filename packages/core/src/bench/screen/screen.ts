@@ -7,8 +7,11 @@ import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS,
 import { compareStep, type CompareRow, type CompareStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
+import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
+import { linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
+import { boardUnit } from "../measures/routes.ts";
 import { routeStability } from "../measures/stability.ts";
 import { quantile } from "../measures/stats.ts";
 import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
@@ -208,6 +211,8 @@ const givesRoutes = (step: ScreenStep): step is "router" | "highway" => step ===
 /**
  * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
  * A router also gets the bundled share (B2), the merge angle (B6) and the bundle stretch (B3) against the routes `base` of `corners`.
+ * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
+ * A result with zoom levels also gets the link agreement (Z9), for a router and for a grouping rule.
  */
 function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => readonly Route[]): Record<string, number> {
   const values: Record<string, number> = { ...row.values };
@@ -224,6 +229,27 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     values["B3.median"] = st.median;
     values["B3.q95"] = st.q95;
     values["B6.max"] = mergeAngle(row.result.routes);
+    const routes = row.result.routes;
+    const open = openLanes(row.result);
+    values["R12.share"] = routeSeparation(routes);
+    values["R14.share"] = orthogonality(routes);
+    values["B5.crossings"] = laneCrossings(open.graph);
+    values["B7.ratio"] = occupiedArea(routes, boardUnit(graph));
+    const runs = runProfile(open.graph);
+    values["B8.runs"] = runs.runs;
+    values["B8.median"] = runs.median;
+    values["B8.max"] = runs.max;
+    const lf = laneFidelity(routes, open);
+    if (lf) {
+      values["B9.median"] = lf.median;
+      values["B9.max"] = lf.max;
+    }
+    values["M1.area"] = laneArea(graph, open);
+    values["M4.laneThrough"] = lanesThrough(graph, open);
+  }
+  if ((givesRoutes(step) || step === "group") && row.result?.levels) {
+    const la = linkAgreement(graph, row.result.levels, row.result.routes, boardUnit(graph));
+    if (la !== undefined) values["Z9.mean"] = la;
   }
   return values;
 }
@@ -350,6 +376,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
       }
       const { hard, deterministic } = rowRules(step, graph, row, again?.rows[i]);
       const values = rowValues(step, graph, row, cornersBase);
+      // Z2 is the count of the hard rule `link-ends`, as a measure. The steps `router`, `highway` and `group` check the rule.
+      if (hard["link-ends"] !== undefined) values["Z2.linkEnds"] = hard["link-ends"];
       if (shuffles > 0 && row.result) {
         const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);
         const f = orderFragility(graph, (g) => router.route(g), { orders: shuffles, seed, base: row.result });

@@ -105,6 +105,24 @@ The bench gives these values. The tables of these values use one seed of each fi
 - No value gives the angle of a crossing, the space between plugs, the shape of a curve or the quality of a group.
 - No value of the bench compares two zoom levels, or two results of inputs with a small change.
 
+### The exact forms of MEAS3A
+
+Since MEAS3A, the screen computes ten more measures. Some formulas below leave a choice open, so the screen uses the forms of this list. The code is in [`measures/lanes.ts`](../../packages/core/src/bench/measures/lanes.ts) and [`measures/levels.ts`](../../packages/core/src/bench/measures/levels.ts).
+
+- R12: The legs are the drawn segments of `S`, each one time, with the set of edges that use it. Two legs count only when their sets of edges are different.
+- R12: The limit `s_min` is the lane width, 4 units. The value adds the length of the near parts of each leg, without overlap, and divides it by `ink(S)`.
+- R14: A leg counts when it is within 1° of an axis. A result without length gives 1.
+- B5: The screen opens the lanes at the width 4. Along the route of `e`, it reads the side of each other edge `f` on each shared segment of both edges.
+- B5: The side follows the direction of the route of `e`. A pair counts one time when the side changes between two consecutive shared segments of both edges.
+- B7: The cells are a grid of side `u` from the origin, with `u` from `boardUnit`. The straight line of an edge joins the first and the last point of its route. An empty result gives 1.
+- B8: The shared segments are the runs and the trunks of the bundles with two edges or more. In the screen, fewer runs is better, and a higher median and max are better.
+- B9: The screen opens the lanes at the width 4. `frechet` is the discrete Fréchet distance. The screen gives the median and the max over the edges with a shared segment.
+- M1: The screen does not open gaps. It divides the bounding box of the boxes and the open lanes at the width 4 by the bounding box of the boxes.
+- M4: The screen counts the open lanes of the result at the width 4 that go through a box. The suite counts the lanes of `sections` after `openGaps`.
+- Z2: The screen gives the count of the hard rule `link-ends` as a value.
+- Z9: The screen reads only the levels with an item of two nodes or more. The edges of a link are the edges between its two items, in either direction.
+- Z9: The screen samples each polyline at points `max(u / 4, L / 64)` apart and keeps the points outside both items. A link without such points on both sides does not count.
+
 ## Routes
 
 The evidence for routes is strong. [Purchase 1997][purchase97] found that the number of crossings has the largest effect on the understanding of a drawing. Bends and symmetry had a smaller effect. [Ware 2002][ware02] found that the path length has the largest effect on a path task, before the continuity of the path and the crossings. [Huang 2014][huang14] found that a crossing at a large angle costs less than a crossing at a small angle. [Wybrow 2009][wybrow09] routes for length and bends first, then moves the parallel legs apart.
@@ -122,9 +140,9 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R9 | Through | No route through a box | `count(e : r_e cuts the inside of a box that is not an end)` | count, `↓` | `n log n` | rule for routes, fault for level links | yes, `through` and `no-pass-through` | [Dunne 2009][dunne09] (edge tunnels) |
 | R10 | Plug angle | Routes that leave along the normal of the side | `mean(angle(p_1 - p_0, normal))` at each end | degrees 0..180, `↓` | `linear` | score | yes, `plugAngle` | Own (H1) |
 | R11 | Plug spacing | Plugs that are far apart on each side | For a side with `k` plugs, `ps = min gap / (side / (k + 1))`. Report `min` and `q_0.05` over the sides. | 0..1, `↑`. A value of 1 is even spacing. | `n log n`, a sort for each side | score | yes, `R11.min` and `R11.q05` of the suite | [Formann 1993][formann93], [Dunne 2009][dunne09] |
-| R12 | Lane separation | Parallel legs of two edges with space between them | For the legs of two edges within 5° of parallel, with an overlap of their projections: `ns = Σ overlap(dist < s_min) / ink(S)` | share 0..1, `↓` | `n log n` | score | no | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
+| R12 | Lane separation | Parallel legs of two edges with space between them | For the legs of two edges within 5° of parallel, with an overlap of their projections: `ns = Σ overlap(dist < s_min) / ink(S)` | share 0..1, `↓` | `n log n` | score | yes, `R12.share` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
 | R13 | Outside | Routes in the bounding box of the board | `count(e : a point of r_e is more than 24 units outside the bounding box)` | count, `↓` | `linear` | fault | yes, `outside` | Own (QFIX, ER3c) |
-| R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | no | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
+| R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
 
 ### Notes on the routes
@@ -144,11 +162,11 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B2 | Bundled share | Edges that share their ways | `count(e : e is in a run or a bundle) / m` | 0..1, `↑` in context | `linear` | score | yes, `B2.share` of the screen | [Holten 2006][holten06] |
 | B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | yes, `B3.median` and `B3.q95` of the screen | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
 | B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.ambiguity` of the suite, sampled above 1000 nodes | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
-| B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | part, ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
+| B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | yes, `B5.crossings` of the screen. ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
 | B6 | Merge angle | Smooth merges and splits | `ma = max angle of the turn of a lane where it joins or leaves a run` | degrees, `↓` | `linear` | score | yes, `B6.max` of the screen | [Gansner 2011][gansner11] (a limit of 40° on the turn) |
-| B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | no | [Saga 2016][saga16] |
-| B8 | Run profile | Bundles of a useful size | `runs`, `q_0.5` and `max` of the edges of each run | counts, in context | `linear` | score | part, `runs` | [Holten 2006][holten06], [Lhuillier 2017][lhuillier17] |
-| B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | no | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
+| B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | yes, `B7.ratio` of the screen | [Saga 2016][saga16] |
+| B8 | Run profile | Bundles of a useful size | `runs`, `q_0.5` and `max` of the edges of each run | counts, in context | `linear` | score | yes, `B8.runs`, `B8.median` and `B8.max` of the screen | [Holten 2006][holten06], [Lhuillier 2017][lhuillier17] |
+| B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
 
 ### Notes on the bundles
 
@@ -212,14 +230,14 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
 | Z1 | Counts sum | Links that stand for each edge | The items hold each node one time, and `Σ counts = edges between items` | violations, `↓` | `linear` | rule | yes, `counts-sum` | Own (H3) |
-| Z2 | Link ends | Links that touch their items | Each link starts and ends on the boundary of its items | violations, `↓` | `linear` | rule | yes, `link-ends` | Own (ER2) |
+| Z2 | Link ends | Links that touch their items | Each link starts and ends on the boundary of its items | violations, `↓` | `linear` | rule | yes, `link-ends`, and `Z2.linkEnds` of the screen | Own (ER2) |
 | Z3 | Level link faults | Level links with no fault | R6, R7, R9 and R13 on the links of each level | counts and ratio, `↓` | `n log n` | fault | yes, the level columns | Own (ER3a, ER3b, ER3c) |
 | Z4 | Item budget | Few shown elements at each level | `eb = max_d (items_d + links_d) / B`, with `B` the budget of the host | ratio, `≤ 1` is correct, `↓` | `linear` | score | part, `farItems` and `levels` | [Nachmanson 2015][nachmanson15] |
 | Z5 | Level ratio | Even steps from level to level | `lr_d = items_(d+1) / items_d`. Report `max` and the spread of `log(lr_d)`. | ratio, `↓` for the spread | `linear` | score | no | [Mondal 2018][mondal18] |
 | Z6 | Nesting | Levels that refine each other | `count(items of level d+1 whose nodes are in more than one item of level d)` | count, `↓` | `linear` | rule candidate | yes, the count `level-nesting` of the suite | [Elmqvist 2010][elmqvist10] |
 | Z7 | Position stability | Items that stay near their parts | `ps = mean_(v,d) dist(center(item_d(v)), center(item_(d+1)(v))) / size(item_d(v))` | no unit, `↓` | `linear` | score | yes, `Z7.position` of the suite | [Bridgeman 2000][bridgeman00] |
 | Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | yes, `Z8.order` of the suite, sampled above 1500 items | [Misue 1995][misue95], [Kendall 1938][kendall38] |
-| Z9 | Link agreement | Level links that follow the routes of their edges | `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u` | no unit, `↓` | `quadratic` for each link, sampled | score | no | [Elmqvist 2010][elmqvist10], [Perlin 1993][perlin93] |
+| Z9 | Link agreement | Level links that follow the routes of their edges | `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u` | no unit, `↓` | `quadratic` for each link, sampled | score | yes, `Z9.mean` of the screen | [Elmqvist 2010][elmqvist10], [Perlin 1993][perlin93] |
 | Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z10.mean`, `Z10.max` and `Z10.moved` of the suite, up to 1000 nodes | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
 
 ### Notes on the zoom levels
@@ -235,10 +253,10 @@ A zoom level shows a group as one item, and the edges between two items as one l
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| M1 | Area | Little growth of the board | `area(open) / area(packed)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `area`, and `M1.area` of the suite | Own (ROOM) |
+| M1 | Area | Little growth of the board | `area(open) / area(packed)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `area`, `M1.area` of the suite, and `M1.area` of the screen for the lanes of a route | Own (ROOM) |
 | M2 | Order kept | The same rows, columns and order | `count(pairs of boxes whose order or alignment on an axis changes)` | count, `↓` | `n log n` | rule candidate | yes, the count `room-order` of the suite | [Misue 1995][misue95] |
 | M3 | Displacement | Boxes that move little | `mean_v dist(box_open(v), box_packed(v)) / u` | no unit, `↓` | `linear` | score | no | [Bridgeman 2000][bridgeman00] |
-| M4 | Lane routes through boxes | Room for each lane | `count(lane routes of laneRoutes that go through a box)` | count, `↓` | `n log n` | fault | yes, `laneThrough`, and `M4.laneThrough` of the suite | Own (ROOM) |
+| M4 | Lane routes through boxes | Room for each lane | `count(lane routes of laneRoutes that go through a box)` | count, `↓` | `n log n` | fault | yes, `laneThrough`, `M4.laneThrough` of the suite, and `M4.laneThrough` of the screen for the lanes of a route | Own (ROOM) |
 | M5 | Distance distortion | Distances that keep their ratios | Kruskal stress of the centers: `σ = sqrt(Σ (α d'_ij - d_ij)^2 / Σ d_ij^2)`, with `α` the best scale and the pairs of neighbour boxes only | 0..1, `↓` | `n log n` | score | no | [Ahmed 2024][ahmed24], [Gansner 2004][gansner04] |
 
 ## The layout of the host

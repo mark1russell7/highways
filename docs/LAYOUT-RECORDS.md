@@ -256,6 +256,8 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.plug-spacing.q05` | R11 | `R11.q05` | 0 to 1 | higher | yes |
 | `route.outside` | R13 | `R13.outside` | count | lower | no |
 | `route.inflections` | R15 | `R15.inflections` | count for each route | lower | no |
+| `route.lane.separation` | R12 | `R12.share` | 0 to 1 | lower | yes |
+| `route.orthogonality` | R14 | `R14.share` | 0 to 1 | higher | no |
 | `route.ink` | R1 | `ink` | units | lower | yes |
 | `route.bundle.ink-saved` | B1 | `B1.inkSaved` | 0 to 1 | higher | no |
 | `route.bundle.ambiguity` | B4 | `B4.ambiguity` | 0 to 1 | lower | no |
@@ -263,6 +265,15 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.bundle.stretch.median` | B3 | `B3.median` | ratio | lower | no |
 | `route.bundle.stretch.q95` | B3 | `B3.q95` | ratio | lower | no |
 | `route.bundle.merge-angle.max` | B6 | `B6.max` | degrees | lower | no |
+| `route.bundle.lane-crossings` | B5 | `B5.crossings` | count | lower | no |
+| `route.bundle.occupied-area` | B7 | `B7.ratio` | ratio | lower | no |
+| `route.bundle.runs` | B8 | `B8.runs` | count | lower | no |
+| `route.bundle.run-edges.median` | B8 | `B8.median` | count | higher | no |
+| `route.bundle.run-edges.max` | B8 | `B8.max` | count | higher | no |
+| `route.bundle.lane-fidelity.median` | B9 | `B9.median` | ratio | lower | no |
+| `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | lower | no |
+| `route.lane.area` | M1 | `M1.area` | ratio | lower | no |
+| `route.lane.through` | M4 | `M4.laneThrough` | count | lower | yes |
 | `route.order.crossings` | W3 | `W3.crossings` | IQR over the median | lower | yes |
 | `route.order.detour` | W3 | `W3.detour` | IQR over the median | lower | yes |
 | `route.order.ink-saved` | W3 | `W3.inkSaved` | IQR over the median | lower | yes |
@@ -280,6 +291,8 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.stability.highway-churn` | Z10 | `Z10.churn` | 0 to 1 | lower | no |
 | `route.stability.highway-ids` | Z10 | `Z10.ids` | 0 to 1 | higher | no |
 | `route.level.nesting` | Z6 | `level-nesting` | count | lower | no |
+| `route.level.link-ends` | Z2 | `Z2.linkEnds` | count | lower | no |
+| `route.level.link-agreement` | Z9 | `Z9.mean` | no unit | lower | yes |
 | `route.level.through` | Z3 | `Z3.through` | count | lower | yes |
 | `route.level.link-length` | Z3 | `Z3.length` | units | lower | yes |
 | `route.level.far-items` | Z4 | `Z4.farItems` | count | lower | yes |
@@ -310,6 +323,19 @@ The screen adds the bundle measures for each router record:
 - `route.bundle.share` (B2) is the share of the edges that share a way. Such an edge is in a run, in a bundle of two edges or more, or on a shared segment.
 - `route.bundle.stretch.*` (B3) is the length of each route divided by the length of the route of `corners` on the same input. The record gives the median and the `0.95` quantile.
 - `route.bundle.merge-angle.max` (B6) is the largest turn of a route where it joins or leaves a shared segment, in degrees.
+
+Since MEAS3A, the screen also adds these measures for each record of the steps `router` and `highway`. `docs/research/MEASURES.md` gives the exact forms.
+
+- `route.lane.separation` (R12) is the share of the ink within 4 units of a parallel leg of another edge.
+- `route.orthogonality` (R14) is the share of the length on legs within 1° of an axis.
+- `route.bundle.lane-crossings` (B5) counts the pairs of edges whose lane order flips from one shared segment to the next.
+- `route.bundle.occupied-area` (B7) divides the grid cells that the routes touch by the cells that straight lines touch.
+- `route.bundle.runs` and `route.bundle.run-edges.*` (B8) give the shared segments, and the median and the most edges of each.
+- `route.bundle.lane-fidelity.*` (B9) divides the Fréchet distance of each lane and its route by half the width of its run.
+- `route.lane.area` (M1) and `route.lane.through` (M4) open the lanes of the result at the width 4, without `openGaps`.
+- The suite keeps its own `M1.area` and `M4.laneThrough` of the room step.
+- `route.level.link-ends` (Z2) is the count of the hard rule `link-ends`. The steps `router`, `highway` and `group` write it.
+- `route.level.link-agreement` (Z9) is the mean Hausdorff distance of each link to the routes of its edges, in units of the board. It needs zoom levels.
 
 `route.order.*` (W3 of MEAS3) is the order fragility of WILD-056. The screen writes it only with the option `shuffles`.
 

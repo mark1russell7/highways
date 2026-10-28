@@ -9,3 +9,4 @@ export * from "./room.ts";
 export * from "./pareto.ts";
 export * from "./order.ts";
 export * from "./highways.ts";
+export * from "./lanes.ts";
