@@ -22,7 +22,8 @@ const RESULTS_ID = "virtual:results";
  * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
  */
 function committedResults(): Plugin {
-  const line = dataLineHtml(buildInfo(root, env));
+  const info = buildInfo(root, env);
+  const line = dataLineHtml(info);
   return {
     name: "highways-committed-results",
     resolveId: (id) => (id === RESULTS_ID ? `\0${RESULTS_ID}` : undefined),
@@ -31,7 +32,8 @@ function committedResults(): Plugin {
       for (const f of Object.values(RESULT_FILES)) this.addWatchFile(join(root, f));
       return `export default ${JSON.stringify(readResults(root))};`;
     },
-    transformIndexHtml: (html) => html.replace("<!--data-line-->", line),
+    // The demo page compares the date of the benchmark snapshot with the build date, and warns when the snapshot is old.
+    transformIndexHtml: (html) => html.replace("<!--data-line-->", line).replace("<!--build-date-->", info.date),
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const name = BENCH_FILES.find((f) => req.url === `${base}${f}`);
