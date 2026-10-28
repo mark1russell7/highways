@@ -206,6 +206,21 @@ jobs:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Measure the bytes of the contract in a bundle of the core
+        run: |
+          esbuild=$(find node_modules/.pnpm -path "*/node_modules/esbuild/bin/esbuild" | head -1)
+          for mode in with without; do
+            ext=""; if [ "$mode" = without ]; then ext="--external:@mark1russell7/layout-contract"; fi
+            "$esbuild" packages/core/src/index.ts --bundle --minify --format=esm --platform=node $ext --outfile="$GITHUB_WORKSPACE/bundle-$mode.js" --log-level=warning
+          done
+          w=$(wc -c < "$GITHUB_WORKSPACE/bundle-with.js"); o=$(wc -c < "$GITHUB_WORKSPACE/bundle-without.js")
+          {
+            echo "| bundle | bytes |"
+            echo "|---|---:|"
+            echo "| the core with the contract | $w |"
+            echo "| the core without the contract | $o |"
+            echo "| the contract | $((w - o)) |"
+          } | tee bundle.md >> "$GITHUB_STEP_SUMMARY"
       - name: Write the sets and the fit
         if: ${{ env.SETS != '' }}
         run: |
@@ -242,4 +257,5 @@ jobs:
             portfolio-sets.md
             portfolio-api.md
             portfolio-api.json
+            bundle.md
           if-no-files-found: warn
