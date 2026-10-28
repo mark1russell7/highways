@@ -77,6 +77,11 @@ export const MOVE_NAMES: Readonly<Record<string, string>> = Object.freeze({
   consensus: "cluster",
   "p-hub": "hubLink",
   "scale-space": "cluster",
+  steiner: "tree",
+  gaps: "gap",
+  streets: "street",
+  search: "searched",
+  interchanges: "networkRoad",
 });
 
 /**

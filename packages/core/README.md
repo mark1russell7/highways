@@ -453,6 +453,11 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `consensus` | The consensus of HWY-035. The finders vote on the pairs of edges, and the pairs that most finders agree on stay. |
 | `p-hub` | The p-hub median of HWY-041. The p-median of the plugs gives the hubs, and the links between two hubs become highways. |
 | `scale-space` | The scale space of HWY-053. Only the clusters that live over a long range of scales get highways. |
+| `steiner` | The Steiner trees of HWY-036. Each group of edges gets one rectilinear tree around the boxes, and the shared parts of the tree become highways. |
+| `gaps` | The gap highways of HWY-057. A free line in a gap between boxes holds a highway when enough edges can ride it. |
+| `streets` | The orthogonal streets of HWY-058. A greedy set cover picks the free horizontal and vertical lines that carry the most edge length. |
+| `search` | The local search of HWY-059. It adds, drops and changes the highways of a start plan, and it keeps the plan with the best score. |
+| `interchanges` | The interchanges of HWY-060. An edge can change from one highway to another at an interchange, where two spines come near. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided` and `crossbars` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
@@ -517,6 +522,16 @@ import { repairStrategy, routerStrategies, stableOrderStrategy } from "@mark1rus
 const shared = stableOrderStrategy(routerStrategies.shared);
 const result = repairStrategy(shared).run(graph); // The router `shared+stable+repair`.
 ```
+
+### The router `attraction`
+
+The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change.
+
+- `attractionRouter(options)` gives the negotiated attraction of HWY-044, and `attractionStrategy` is its router strategy.
+- Each pass after the first routes each edge again. A link that many edges used in the passes before gets a lower cost.
+- The options are `passes` (1 to 10), `attraction` (0 to 1), `capacityWeight` (0 to 10) and `laneWidth` (1 to 12).
+- A capacity term raises the cost of a link when its users are more than its width holds.
+- With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
 
 ### The portfolio router
 
