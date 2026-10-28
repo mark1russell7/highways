@@ -219,31 +219,177 @@ export function exactModel(graph: Graph, o: Readonly<ExactOptions>): ExactModel 
   return { lp, columns: binaries.length, rows: rows.length, edges: arcsOf.length, lengths, decode };
 }
 
+/** A binary heap of node indexes by a key, smallest first. A node can be in the heap more than one time. The search skips an old entry. */
+class NodeHeap {
+  #key: Float64Array = new Float64Array(64);
+  #node: Int32Array = new Int32Array(64);
+  size = 0;
+
+  push(key: number, node: number): void {
+    if (this.size === this.#key.length) {
+      const k = new Float64Array(2 * this.size);
+      k.set(this.#key);
+      this.#key = k;
+      const n = new Int32Array(2 * this.size);
+      n.set(this.#node);
+      this.#node = n;
+    }
+    const keys = this.#key;
+    const nodes = this.#node;
+    let i = this.size++;
+    while (i > 0) {
+      const up = (i - 1) >> 1;
+      if (keys[up]! <= key) break;
+      keys[i] = keys[up]!;
+      nodes[i] = nodes[up]!;
+      i = up;
+    }
+    keys[i] = key;
+    nodes[i] = node;
+  }
+
+  /** This method removes the node with the smallest key, and gives it. */
+  pop(): number {
+    const keys = this.#key;
+    const nodes = this.#node;
+    const top = nodes[0]!;
+    const n = --this.size;
+    const key = keys[n]!;
+    const node = nodes[n]!;
+    let i = 0;
+    for (;;) {
+      let c = 2 * i + 1;
+      if (c >= n) break;
+      if (c + 1 < n && keys[c + 1]! < keys[c]!) c++;
+      if (keys[c]! >= key) break;
+      keys[i] = keys[c]!;
+      nodes[i] = nodes[c]!;
+      i = c;
+    }
+    keys[i] = key;
+    nodes[i] = node;
+    return top;
+  }
+}
+
+/**
+ * This function gives the shortest distance from `start` to each node of `targets` (A*). The search stops when it has each target.
+ * The guide is the straight distance to the nearest target. Each link is a straight line, so the guide is not above the true distance at any time.
+ * Thus the distances are the distances of Dijkstra. Only the order of the search changes.
+ * A target that the search cannot reach gets `Infinity`.
+ */
+function distancesTo(points: readonly Point[], adj: readonly (readonly { to: number; len: number }[])[], start: number, targets: readonly number[]): Map<number, number> {
+  const d = new Float64Array(adj.length).fill(Infinity);
+  const done = new Uint8Array(adj.length);
+  const goal = new Set(targets);
+  const ends = targets.map((t) => points[t]!);
+  const guide = (v: number): number => {
+    let h = Infinity;
+    for (const t of ends) h = Math.min(h, dist(points[v]!, t));
+    return h;
+  };
+  const heap = new NodeHeap();
+  d[start] = 0;
+  heap.push(guide(start), start);
+  let left = goal.size;
+  while (heap.size > 0 && left > 0) {
+    const u = heap.pop();
+    if (done[u]) continue;
+    done[u] = 1;
+    if (goal.has(u)) left--;
+    for (const { to, len } of adj[u]!) {
+      const nd = d[u]! + len;
+      if (nd < d[to]!) {
+        d[to] = nd;
+        // A rounding error can make the guide a little too large. Then a node opens again, so its distance stays the least.
+        done[to] = 0;
+        heap.push(nd + guide(to), to);
+      }
+    }
+  }
+  return new Map(targets.map((t) => [t, d[t]!]));
+}
+
+/**
+ * This function gives the shortest distance in the network between the two end points of each edge, by the pair `a,b` of the end points.
+ * The distance does not depend on the direction, so one search serves each edge between the same two points.
+ * An end point of many edges starts one search to all its other end points. The function starts the searches from the end points with the most edges first.
+ */
+function pairDistances(network: ExactNetwork): Map<string, number> {
+  const pairKey = (a: number, b: number): string => (a < b ? `${a},${b}` : `${b},${a}`);
+  const partners = new Map<number, Set<number>>();
+  const open = new Set<string>();
+  for (const e of network.ends) {
+    if (e.a === e.b) continue;
+    const k = pairKey(e.a, e.b);
+    if (open.has(k)) continue;
+    open.add(k);
+    for (const [u, v] of [
+      [e.a, e.b],
+      [e.b, e.a],
+    ] as const) {
+      if (!partners.has(u)) partners.set(u, new Set());
+      partners.get(u)!.add(v);
+    }
+  }
+  const out = new Map<string, number>();
+  const order = [...partners.keys()].sort((u, v) => partners.get(v)!.size - partners.get(u)!.size || u - v);
+  for (const u of order) {
+    const targets = [...partners.get(u)!].filter((v) => open.has(pairKey(u, v)));
+    if (targets.length === 0) continue;
+    for (const [v, len] of distancesTo(network.points, network.adj, u, targets)) {
+      const k = pairKey(u, v);
+      out.set(k, len);
+      open.delete(k);
+    }
+  }
+  return out;
+}
+
+/** This function gives the function of the stretch of each route of the graph, from the network and the shortest distance of each edge. */
+function stretchesOf(network: ExactNetwork, best: (e: ExactNetwork["ends"][number]) => number): (routes: readonly Route[]) => Map<string, number> {
+  return (routes) => {
+    const byEdge = new Map(routes.map((r) => [r.edge, r]));
+    const out = new Map<string, number>();
+    for (const e of network.ends) {
+      const r = byEdge.get(e.edge.id);
+      if (!r || r.points.length < 2 || e.a === e.b) continue;
+      const b = best(e);
+      if (!Number.isFinite(b) || b <= 1) continue;
+      out.set(e.edge.id, (polylineLength(r.points) - 2 * network.margin) / b);
+    }
+    return out;
+  };
+}
+
 /**
  * This function gives the stretch of each route as the exact model counts it, by the edge id.
  * The stretch of a route is its length without its two plug ends, divided by the shortest way in the network of the model.
  * The function builds the network one time. The result function then measures each list of routes of the graph, so a portfolio pays for the network once.
+ * The first call finds the shortest ways with one A* search for each end point with edges (PORTFOLIO-SPEED). The later calls use them again.
  * An edge without a route or without a way in the network has no value.
  */
 export function exactStretches(graph: Graph, o: Readonly<WayOptions> = {}): (routes: readonly Route[]) => Map<string, number> {
-  const { adj, ends, margin } = exactNetwork(graph, o);
+  const network = exactNetwork(graph, o);
+  let best: Map<string, number> | undefined;
+  return stretchesOf(network, (e) => {
+    best ??= pairDistances(network);
+    return best.get(e.a < e.b ? `${e.a},${e.b}` : `${e.b},${e.a}`) ?? Infinity;
+  });
+}
+
+/**
+ * This function gives the same values as `exactStretches` with the search of the first version. That search is one full Dijkstra with a scan, from the first end point of each edge.
+ * It is slow on large boards. The tests and the check `portfolio:time --check-stretch` compare the two functions.
+ */
+export function exactStretchesReference(graph: Graph, o: Readonly<WayOptions> = {}): (routes: readonly Route[]) => Map<string, number> {
+  const network = exactNetwork(graph, o);
   const best = new Map<number, Float64Array>();
   const from = (a: number): Float64Array => {
-    if (!best.has(a)) best.set(a, distances(adj, a));
+    if (!best.has(a)) best.set(a, distances(network.adj, a));
     return best.get(a)!;
   };
-  return (routes) => {
-    const byEdge = new Map(routes.map((r) => [r.edge, r]));
-    const out = new Map<string, number>();
-    for (const e of ends) {
-      const r = byEdge.get(e.edge.id);
-      if (!r || r.points.length < 2 || e.a === e.b) continue;
-      const b = from(e.a)[e.b]!;
-      if (!Number.isFinite(b) || b <= 1) continue;
-      out.set(e.edge.id, (polylineLength(r.points) - 2 * margin) / b);
-    }
-    return out;
-  };
+  return stretchesOf(network, (e) => from(e.a)[e.b]!);
 }
 
 /**

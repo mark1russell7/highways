@@ -29,6 +29,8 @@ export * from "./bench/suite.ts";
 export * from "./strategies/index.ts";
 export * from "./bench/compare.ts";
 export * from "./bench/screen/index.ts";
+// The stretch of the exact model, for a benchmark that compares routers with the measures of the portfolio (PORTFOLIO-SPEED).
+export { exactStretch, exactStretches } from "./bench/exact/index.ts";
 export * from "./highways/index.ts";
 export * from "./order/index.ts";
 export * from "./repair/index.ts";

@@ -20,11 +20,16 @@ export interface PortfolioBand {
   readonly maxNodes: number;
 }
 
-/** The size bands: up to 12 nodes, 13 to 24 nodes, and 25 to 40 nodes. An input above 40 nodes uses the band `n25-40`. */
+/**
+ * The size bands: up to 12 nodes, 13 to 24 nodes, 25 to 40 nodes, 41 to 64 nodes and 65 to 128 nodes. An input above 128 nodes uses the band `n65-128`.
+ * The two large bands come from PORTFOLIO-SPEED. Their boards have no optima, so their sets come from the B1 under the guard.
+ */
 export const PORTFOLIO_BANDS: readonly PortfolioBand[] = [
   { id: "n1-12", maxNodes: 12 },
   { id: "n13-24", maxNodes: 24 },
   { id: "n25-40", maxNodes: 40 },
+  { id: "n41-64", maxNodes: 64 },
+  { id: "n65-128", maxNodes: 128 },
 ];
 
 /** This function gives the band of a node count: the first band whose `maxNodes` is the count or more, else the last band. */
