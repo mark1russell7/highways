@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadIdeas, type Idea } from "../../../scripts/ideas.ts";
 import { builders, strategyIdeas } from "../../../scripts/strategy-ideas.ts";
 import { STEPS, STRATEGIES, listStrategies } from "../../strategies/index.ts";
-import { buildQueue, committedQueue, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openTargets, queueText, readQueue, spearman, type QueueSnapshot } from "../../../scripts/queue.ts";
+import { bootstrap, buildQueue, committedQueue, ENABLERS, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openTargets, queueText, readQueue, spearman, unblocked, type QueueSnapshot } from "../../../scripts/queue.ts";
 
 const ideas = loadIdeas();
 const old = committedQueue();
@@ -22,15 +22,55 @@ describe("the idea queue (IDEA-QUEUE)", () => {
     expect(new Set(queue.rows.map((r) => r.id)).size).toBe(queue.rows.length);
   });
 
-  it("gives a rank only to the canonical rows that are not built, from 1 with no gap", () => {
+  it("gives a rank only to the enablers and the canonical rows that are not built, from 1 with no gap", () => {
     for (const r of queue.rows) {
       if (r.canonical !== r.id || r.status === "built") expect(r.rank, r.id).toBeNull();
       else expect(r.rank, r.id).not.toBeNull();
     }
-    const ranks = queue.rows.flatMap((r) => (r.rank === null ? [] : [r.rank]));
-    expect(ranks).toEqual(ranks.map((_, i) => i + 1));
-    const scores = queue.rows.filter((r) => r.rank !== null).map((r) => r.score);
+    const joint = [...queue.enablers, ...queue.rows.flatMap((r) => (r.rank === null ? [] : [{ id: r.id, rank: r.rank, score: r.score }]))].sort((a, b) => a.rank - b.rank);
+    expect(joint.map((r) => r.rank)).toEqual(joint.map((_, i) => i + 1));
+    const scores = joint.map((r) => r.score);
     expect(scores).toEqual([...scores].sort((a, b) => b - a));
+  });
+
+  it("gives each enabler the sum of the scores that it unblocks, divided by its cost", () => {
+    expect(queue.enablers.map((e) => e.id).sort()).toEqual(ENABLERS.map((e) => e.id).sort());
+    const score = new Map(queue.rows.map((r) => [r.id, r.score]));
+    for (const e of queue.enablers) {
+      expect(e.unblocks.length, e.id).toBeGreaterThan(0);
+      const sum = e.unblocks.reduce((t, id) => t + score.get(id)!, 0);
+      expect(e.sum, e.id).toBeCloseTo(sum, 2);
+      expect(e.score, e.id).toBeCloseTo(e.sum / e.cost, 2);
+      // An unblocked idea is ranked, and each of its blocks is a block of the enabler or an idea that the enabler unblocks.
+      for (const id of e.unblocks) {
+        const row = queue.rows.find((r) => r.id === id)!;
+        expect(row.rank, id).not.toBeNull();
+        expect(row.blockedBy.length, id).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("unblocks a chain of ideas, and leaves an idea with the blocks of two enablers to both", () => {
+    const slots = { id: "SLOTS", name: "slots", removes: ["step:"], size: "L" };
+    const measures = { id: "MEASURES", name: "measures", removes: ["measure:"], size: "L" };
+    const rows = [
+      { id: "A", blockedBy: ["step:whole"], status: "queued" as const },
+      { id: "B", blockedBy: ["idea:A"], status: "queued" as const },
+      { id: "C", blockedBy: ["step:whole", "measure:Z9"], status: "queued" as const },
+      { id: "D", blockedBy: ["idea:E"], status: "queued" as const },
+      { id: "E", blockedBy: [], status: "queued" as const },
+    ];
+    expect(unblocked(slots, rows)).toEqual(["A", "B"]);
+    expect(unblocked(measures, rows)).toEqual([]);
+  });
+
+  it("gives the back test with a bootstrap interval that holds the rank correlation", () => {
+    const b = queue.backtest;
+    expect(b.ideas).toBeGreaterThanOrEqual(50);
+    expect(b.low).toBeLessThanOrEqual(b.rho);
+    expect(b.high).toBeGreaterThanOrEqual(b.rho);
+    const same = [1, 2, 3, 4, 5, 6].map((x) => ({ id: String(x), strategy: "s", predicted: x, measured: 2 * x }));
+    expect(bootstrap(same, 100, 1)).toMatchObject({ rho: 1, high: 1 });
   });
 
   it("keeps the frozen numbers of each taken idea, and a measured gain for each built row", () => {
@@ -102,6 +142,7 @@ describe("the idea queue (IDEA-QUEUE)", () => {
       strategies: [],
       measures: new Set(["B1"]),
       steps: ["highway"],
+      enablers: [],
       date: "d",
       commit: "c",
       inputs: [],

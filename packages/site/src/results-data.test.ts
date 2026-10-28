@@ -88,6 +88,15 @@ describe("the committed files of the results page", () => {
     expect(data.queue.statuses.filter((s) => s.status !== "built").reduce((n, s) => n + s.count, 0)).toBe(data.queue.ranked);
     expect(data.text["The build queue"]).toContain("<p>");
     expect(() => queueView("{}")).toThrow(/queue.json/);
+    expect(data.queue.enablers.length).toBeGreaterThanOrEqual(1);
+    for (const e of data.queue.enablers) {
+      expect(e.kind, e.id).toBe("enabler");
+      expect(e.unblocks, e.id).toBeGreaterThan(0);
+      // An enabler in the top ranks is on the joint list of the top rows.
+      if (e.rank <= QUEUE_TOP) expect(data.queue.top.some((r) => r.id === e.id), e.id).toBe(true);
+    }
+    const b = data.queue.backtest;
+    expect(b.low <= b.rho && b.rho <= b.high).toBe(true);
   });
 
   it("gives the data line of the build", () => {

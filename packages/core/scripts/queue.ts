@@ -4,6 +4,7 @@
 // With `--check`, the script writes nothing. It stops with an error when `queue.json` is old.
 // With `--take`, the script freezes the predicted numbers of one idea in `queue-taken.json`, then writes the queue.
 // With `--calibration`, the script writes the table of the predicted and the measured gain, and the rank correlation.
+// The queue also scores the enablers: each one removes a block of ideas. The header has the back test with its bootstrap interval.
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -14,7 +15,7 @@ import { FAMILIES, knownMeasures, loadIdeas, loadMeas3, measureIdsIn, type Idea 
 import { builders, strategyIdeas, type StrategyIdeas } from "./strategy-ideas.ts";
 
 /** The version of the formula. A change of the formula changes this text. */
-export const FORMULA = "queue/1";
+export const FORMULA = "queue/2";
 
 const RESEARCH = new URL("../../../docs/research/", import.meta.url);
 /** The URL of `queue.json`. */
@@ -34,6 +35,26 @@ export const SIZE: Readonly<Record<string, number>> = { S: 1, M: 2, L: 4 };
 export const SLOW = /CI only|slow|100 s|60 s/i;
 /** The stages of an idea that is not built. */
 export const OPEN_STAGES: readonly string[] = ["cataloged", "prototyped"];
+/** The number of resamples of the bootstrap interval of the back test. */
+export const RESAMPLES = 2000;
+/** The seed of the random numbers of the bootstrap. A fixed seed gives the same interval on each run. */
+export const SEED = 1;
+
+/** An enabler: an item that removes a block of ideas. It gets a score on the same list as the ideas. */
+export interface Enabler {
+  readonly id: string;
+  readonly name: string;
+  /** The blocks that the enabler removes. A text that ends in `:` removes each block that starts with it. */
+  readonly removes: readonly string[];
+  /** The size of the item: `S`, `M` or `L`, on the scale of `SIZE`. */
+  readonly size: string;
+}
+
+/**
+ * The enablers of the queue. Each one is an open item of `docs/ROADMAP.md`.
+ * A built enabler leaves the list. `STEP-SLOTS` (#154) removed each block `step:`, so it is not on the list.
+ */
+export const ENABLERS: readonly Enabler[] = [{ id: "SCREEN-MEASURES", name: "The measures that the screen does not have", removes: ["measure:"], size: "L" }];
 
 /** The fields of a verdict snapshot that the queue reads. */
 export interface QueueSnapshot {
@@ -94,7 +115,7 @@ export interface QueueRow {
   readonly uncertainty: number;
   readonly cost: number;
   readonly score: number;
-  /** The rank among the canonical rows that are not built. A duplicate and a built row have no rank. */
+  /** The rank on the joint list of the enablers and the canonical rows that are not built. A duplicate and a built row have no rank. */
   readonly rank: number | null;
   /** True when the step of the idea has a strategy slot in `STEPS`. */
   readonly slot: boolean;
@@ -110,7 +131,31 @@ export interface QueueRow {
   readonly measured?: number;
 }
 
-/** The queue: the header and the rows, from the first rank to the last. */
+/** One enabler of the queue, with its score and its rank on the joint list. */
+export interface EnablerRow {
+  readonly id: string;
+  readonly name: string;
+  readonly removes: readonly string[];
+  readonly cost: number;
+  /** The ranked ideas that the enabler unblocks, transitively, from the first rank to the last. */
+  readonly unblocks: readonly string[];
+  /** The sum of the scores of the ideas that the enabler unblocks. */
+  readonly sum: number;
+  readonly score: number;
+  readonly rank: number;
+}
+
+/** The back test of the gain, with its bootstrap interval of 95 %. */
+export interface Backtest {
+  readonly ideas: number;
+  readonly rho: number;
+  readonly low: number;
+  readonly high: number;
+  readonly resamples: number;
+  readonly seed: number;
+}
+
+/** The queue: the header, the enablers and the rows, from the first rank to the last. */
 export interface Queue {
   readonly formula: string;
   readonly date: string;
@@ -118,6 +163,8 @@ export interface Queue {
   readonly inputs: readonly string[];
   readonly snapshots: readonly { readonly set: string; readonly step: string; readonly run: number }[];
   readonly counts: Readonly<Record<string, unknown>>;
+  readonly backtest: Backtest;
+  readonly enablers: readonly EnablerRow[];
   readonly rows: readonly QueueRow[];
 }
 
@@ -189,6 +236,8 @@ export interface QueueInput {
   /** The measure ids of the screen. */
   readonly measures: ReadonlySet<string>;
   readonly steps: readonly string[];
+  /** The enablers that get a score on the joint list. */
+  readonly enablers: readonly Enabler[];
   readonly date: string;
   readonly commit: string;
   readonly inputs: readonly string[];
@@ -251,7 +300,16 @@ export function buildQueue(input: QueueInput): Queue {
   const ranked = rows
     .filter((r) => r.canonical === r.id && r.status !== "built")
     .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
-  const rank = new Map(ranked.map((r, i) => [r.id, i + 1]));
+  const scored = input.enablers.map((e) => {
+    const unblocks = unblocked(e, rows).filter((id) => ranked.some((r) => r.id === id));
+    const sum = round(ranked.filter((r) => unblocks.includes(r.id)).reduce((t, r) => t + r.score, 0));
+    const cost = SIZE[e.size] ?? 2;
+    return { id: e.id, name: e.name, removes: e.removes, cost, unblocks: ranked.filter((r) => unblocks.includes(r.id)).map((r) => r.id), sum, score: round(sum / cost) };
+  });
+  // The joint list: the enablers and the ranked ideas, by score, then by id.
+  const joint = [...ranked, ...scored].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  const rank = new Map(joint.map((r, i) => [r.id, i + 1]));
+  const enablers: EnablerRow[] = scored.map((e) => ({ ...e, rank: rank.get(e.id)! })).sort((a, b) => a.rank - b.rank);
   const order = (r: { readonly id: string }): number => rank.get(r.id) ?? Number.POSITIVE_INFINITY;
   const out: QueueRow[] = rows
     .map((r) => {
@@ -278,19 +336,49 @@ export function buildQueue(input: QueueInput): Queue {
       ranked: ranked.length,
       duplicates: out.length - canonicalRows.length,
       blocked: ranked.filter((r) => r.blockedBy.length > 0).length,
+      blockedByStepAndMeasure: ranked.filter((r) => r.blockedBy.some((b) => b.startsWith("step:")) && r.blockedBy.some((b) => b.startsWith("measure:"))).length,
       openTargets: targets.length,
       byStatus: count((r) => r.status, canonicalRows),
       byStep: count((r) => r.step, ranked),
     },
+    backtest: bootstrap(backtest(input.ideas, input.snapshots, input.strategies), RESAMPLES, SEED),
+    enablers,
     rows: out,
   };
 }
 
-/** This function gives the text of `queue.json`: the header, and one row on each line. */
+/** This function tells if an enabler removes a block. */
+export function removes(e: Enabler, block: string): boolean {
+  return e.removes.some((x) => (x.endsWith(":") ? block.startsWith(x) : block === x));
+}
+
+/**
+ * This function gives the ids of the rows that an enabler unblocks, transitively.
+ * A blocked row is unblocked when the enabler removes each block of it, or when the block is an idea that the enabler unblocks.
+ * A row with blocks of two enablers needs both. Neither one unblocks it alone.
+ */
+export function unblocked(e: Enabler, rows: readonly Pick<QueueRow, "id" | "blockedBy" | "status">[]): string[] {
+  const open = rows.filter((r) => r.status !== "built" && r.blockedBy.length > 0);
+  const out = new Set<string>();
+  for (let grew = true; grew; ) {
+    grew = false;
+    for (const r of open) {
+      if (out.has(r.id)) continue;
+      if (r.blockedBy.every((b) => removes(e, b) || (b.startsWith("idea:") && out.has(b.slice(5))))) {
+        out.add(r.id);
+        grew = true;
+      }
+    }
+  }
+  return [...out].sort();
+}
+
+/** This function gives the text of `queue.json`: the header, one enabler on each line, and one row on each line. */
 export function queueText(q: Queue): string {
-  const { rows, ...header } = q;
+  const { rows, enablers, ...header } = q;
   const head = JSON.stringify(header, null, 2).replace(/\n}$/, "");
-  return `${head},\n  "rows": [\n${rows.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]\n}\n`;
+  const lines = (xs: readonly unknown[]): string => xs.map((x) => `    ${JSON.stringify(x)}`).join(",\n");
+  return `${head},\n  "enablers": [\n${lines(enablers)}\n  ],\n  "rows": [\n${lines(rows)}\n  ]\n}\n`;
 }
 
 /** The files that the queue reads, relative to the root of the repository. */
@@ -316,6 +404,7 @@ export function readQueue(date: string, commit: string): Queue {
     strategies: strategyIdeas(),
     measures: knownMeasures(loadMeas3()).screen,
     steps: STEPS,
+    enablers: ENABLERS,
     date,
     commit,
     inputs: inputNames(snaps.map((s) => s.name)),
@@ -397,10 +486,35 @@ export function backtest(ideas: readonly Idea[], snapshots: readonly QueueSnapsh
   return out;
 }
 
+/** This function gives a list of random numbers from 0 to 1 (mulberry32). The same seed gives the same list. */
+export function random(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * This function gives the rank correlation of the back test and its percentile bootstrap interval of 95 %.
+ * Each resample takes as many pairs as the back test has, with replacement.
+ */
+export function bootstrap(pairs: readonly BacktestPair[], resamples: number, seed: number): Backtest {
+  const rho = (xs: readonly BacktestPair[]): number => spearman(xs.map((p) => p.predicted), xs.map((p) => p.measured));
+  const next = random(seed);
+  const values: number[] = [];
+  for (let i = 0; i < resamples; i++) values.push(rho(Array.from({ length: pairs.length }, () => pairs[Math.floor(next() * pairs.length)]!)));
+  values.sort((a, b) => a - b);
+  const at = (q: number): number => values[Math.min(values.length - 1, Math.max(0, Math.ceil(q * values.length) - 1))] ?? 0;
+  return { ideas: pairs.length, rho: round(rho(pairs)), low: round(at(0.025)), high: round(at(0.975)), resamples, seed };
+}
+
 /** This function gives the line of the back test as Markdown. */
-export function backtestText(pairs: readonly BacktestPair[]): string {
-  const rho = spearman(pairs.map((p) => p.predicted), pairs.map((p) => p.measured));
-  return `The back test: ${pairs.length} ideas with a screen result from before the queue. The rank correlation of the predicted and the measured gain is ${rho.toFixed(2)}.\n`;
+export function backtestText(b: Backtest): string {
+  return `The back test: ${b.ideas} ideas with a screen result from before the queue. The rank correlation of the predicted and the measured gain is ${b.rho.toFixed(2)}, with a bootstrap interval of 95 % from ${b.low.toFixed(2)} to ${b.high.toFixed(2)} (${b.resamples} resamples).\n`;
 }
 
 const today = (): string => new Date().toISOString().slice(0, 10);
@@ -426,7 +540,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     }
   } else if (process.argv.includes("--calibration")) {
     console.log(calibrationText(readQueue(old?.queue.date ?? "", old?.queue.commit ?? "")));
-    console.log(backtestText(backtest(loadIdeas(), loadSnapshots().map((s) => s.snapshot), strategyIdeas())));
+    console.log(backtestText(bootstrap(backtest(loadIdeas(), loadSnapshots().map((s) => s.snapshot), strategyIdeas()), RESAMPLES, SEED)));
   } else {
     const take = argOf("--take");
     if (take !== undefined) {

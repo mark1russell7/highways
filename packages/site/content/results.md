@@ -22,7 +22,9 @@ The [idea catalog](https://github.com/mark1russell7/highways/blob/main/docs/rese
 
 ## The build queue
 
-The queue puts each idea that is not built in the order of its score. The score is the expected gain times the uncertainty, divided by the cost. The builds take the ideas from the top. A blocked idea waits for a step, a measure or an other idea. The [catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md#the-build-queue) tells the formula, and [`queue.json`](https://github.com/mark1russell7/highways/blob/main/docs/research/queue.json) has all the rows.
+The queue puts each idea that is not built in the order of its score. The score is the expected gain times the uncertainty, divided by the cost. The builds take the ideas from the top. A blocked idea waits for a step, a measure or an other idea.
+
+An enabler is an item that removes a block. Its score is the sum of the scores of the ideas that it unblocks, divided by its cost. The enablers and the ideas are on one list. The back test compares the predicted gain with the measured gain of the ideas that are built. The [catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md#the-build-queue) tells the formula, and [`queue.json`](https://github.com/mark1russell7/highways/blob/main/docs/research/queue.json) has all the rows.
 
 ## What is new
 

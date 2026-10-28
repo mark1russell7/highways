@@ -189,11 +189,16 @@ function queue(): void {
   const q = data.queue;
   $("queue-counts").innerHTML = `${q.statuses.map((s) => `<li><span class="res-tag ${s.status === "built" ? "lab-better" : s.status === "building" ? "lab-mix" : "lab-none"}">${esc(s.status)}</span> <b>${s.count}</b></li>`).join("")}<li>ranked <b>${q.ranked}</b></li><li>blocked <b>${q.blocked}</b></li>`;
   const rows = q.top
-    .map(
-      (r) =>
-        `<tr><td>${r.rank}</td><th scope="row">${esc(r.id)}<div class="hint">${esc(r.name)}</div></th><td>${esc(r.step)}</td><td>${r.score}</td><td><span class="res-tag ${r.status === "building" ? "lab-mix" : "lab-none"}">${esc(r.status)}</span>${r.blockedBy.length > 0 ? `<div class="hint">blocked by ${r.blockedBy.map((b) => `<code>${esc(b)}</code>`).join(" ")}</div>` : ""}</td></tr>`,
+    .map((r) =>
+      r.kind === "enabler"
+        ? `<tr><td>${r.rank}</td><th scope="row">${esc(r.id)}<div class="hint">${esc(r.name)}</div></th><td><span class="res-tag lab-better">enabler</span></td><td>${r.score}</td><td><span class="res-tag lab-none">${esc(r.status)}</span><div class="hint">unblocks ${r.unblocks} ideas</div></td></tr>`
+        : `<tr><td>${r.rank}</td><th scope="row">${esc(r.id)}<div class="hint">${esc(r.name)}</div></th><td>${esc(r.step)}</td><td>${r.score}</td><td><span class="res-tag ${r.status === "building" ? "lab-mix" : "lab-none"}">${esc(r.status)}</span>${r.blockedBy.length > 0 ? `<div class="hint">blocked by ${r.blockedBy.map((b) => `<code>${esc(b)}</code>`).join(" ")}</div>` : ""}</td></tr>`,
     )
     .join("");
+  // The back test: the rank correlation on a scale from -1 to 1, with its bootstrap interval of 95 %.
+  const b = q.backtest;
+  const x = (v: number): number => Math.round(((v + 1) / 2) * 200 + 10);
+  $("queue-backtest").innerHTML = `<svg viewBox="0 0 220 28" width="220" height="28" role="img" aria-label="Rank correlation ${b.rho.toFixed(2)}, interval ${b.low.toFixed(2)} to ${b.high.toFixed(2)}"><line x1="10" y1="14" x2="210" y2="14" stroke="currentColor" stroke-opacity="0.3"/><line x1="${x(0)}" y1="8" x2="${x(0)}" y2="20" stroke="currentColor" stroke-opacity="0.5"/><rect x="${x(b.low)}" y="9" width="${x(b.high) - x(b.low)}" height="10" rx="3" fill="currentColor" fill-opacity="0.25"/><circle cx="${x(b.rho)}" cy="14" r="4" fill="currentColor"/><text x="10" y="27" font-size="8" fill="currentColor">-1</text><text x="${x(0) - 2}" y="27" font-size="8" fill="currentColor">0</text><text x="204" y="27" font-size="8" fill="currentColor">1</text></svg> The back test of the gain on ${b.ideas} built ideas: the rank correlation is <b>${b.rho.toFixed(2)}</b>, with a bootstrap interval of 95 % from <b>${b.low.toFixed(2)}</b> to <b>${b.high.toFixed(2)}</b> (${b.resamples} resamples).`;
   $("queue-top").innerHTML = `<table class="res-kept"><caption>The top ${q.top.length} of the queue on ${esc(q.date)} (formula <code>${esc(q.formula)}</code>)</caption><thead><tr><th scope="col">Rank</th><th scope="col">Idea</th><th scope="col">Step</th><th scope="col">Score</th><th scope="col">Status</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 

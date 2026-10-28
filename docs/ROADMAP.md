@@ -118,6 +118,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BENCH-GREEN | The push runs of `Bench` ended cancelled: the part `small` went past its 30 min limit, and the step `highway` took approximately 43 min of it. After the fix, 10 shards run the step `highway`, a push run caps `mlseb` at 400 nodes, and each part to 1 000 nodes pairs each strategy with `shared`. The dispatch 40762459102 (6 shards) ended green in 21.8 min. The control `shared` against `shared` gave 0.97 to 1.01 from 100 nodes. The demo page warns when its snapshot is old. | 2026-10-28 | #144, #145 |
 | STEP-SLOTS | A strategy slot for each of the steps `plugs`, `levels` and `whole`, with one default each: `facing`, `depths` and `pipeline`. Each default gives the routes of today, by `resultHash` on the 14 boards of `screen-v1`. The demo runs `pipeline`. No idea of the queue waits for a step: 38 ideas are blocked, against 77 before. | 2026-10-28 | #154 |
 | STRATEGY-CARDS-1 | The [strategies page](https://mark1russell7.github.io/highways/strategies.html) has a card for each of the 79 strategies of `STRATEGIES`. A card shows the status, the idea records with their papers, math, cost and guarantee, the options, the verdicts and the bench time. The map [`strategy-ideas.ts`](../packages/core/scripts/strategy-ideas.ts) of IDEA-QUEUE links each strategy and its options to their records. 58 strategies have a record. | 2026-10-28 | #148 |
+| QUEUE-ENABLERS | The [enablers](research/CATALOG.md#the-enablers-queue2) of the build queue: each item that removes a block of ideas gets a score on the same list. The score is the sum of the scores that it unblocks, divided by its cost. At the build, `STEP-SLOTS` got rank 1 and `SCREEN-MEASURES` rank 18. After STEP-SLOTS shipped, `SCREEN-MEASURES` is rank 19 and unblocks 21 ideas. The results page shows the back test 0.39, with the bootstrap interval 0.11 to 0.62. | 2026-10-28 | #153 |
 
 ## Calibration
 
@@ -158,6 +159,7 @@ The rule for the next predictions:
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
+| SCREEN-MEASURES | The 11 measures that the screen does not have, for example `G4`, `Z5` and `M2`. It is the only enabler of the [build queue](research/CATALOG.md#the-enablers-queue2): rank 19, and it unblocks 21 ideas. | `later` | IDEA-QUEUE | P1 |
 | CORPUS-GEN | The example boards of the site become the corpus generator, with sliders for each parameter of a board. | `later` | CORPUS-SEEDS | P1 |
 | LANE-WALK | The lane order of a dense run without a walk for each compare. After ROUTE-SCALE, `partBefore` and `partAfter` take approximately 55% of a `shared` route on the dense board. The lane order stays the same. | `later` | ROUTE-SCALE | P2 |
 | BENCH-STEPS | Cheaper measures on a dense board: `exactStretches` (a landmark guide for `distancesTo`), `measureQuality` and `checkProperties`. The values stay the same. | `later` | ROUTE-SCALE | P3 |
