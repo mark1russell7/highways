@@ -340,10 +340,71 @@
             "hub-chain": 2,
             "many-groups": 86
           }
+        },
+        "B7, shared-all against shared-all": {
+          "base": {
+            "small-clustered": 0.833,
+            "dense-groups": 0.843,
+            "hub-chain": 0.688,
+            "many-groups": 0.643
+          },
+          "new": {
+            "small-clustered": 0.728,
+            "dense-groups": 0.732,
+            "hub-chain": 0.658,
+            "many-groups": 0.579
+          }
         }
       },
       "verdict": "screened",
-      "note": "NAT-005 is screened with HWY-005, as the option `reuse` of the router `shared`. The baseline is `shared-all`. With 2 passes and `reuse: 1`, B1 rises on each board (0.430 to 0.624 on small-clustered), and crossings fall 23% to 89%. But the q95 rises on each board (1.359 to 2.475 on small-clustered), so neither dominates the other."
+      "note": "NAT-005 is screened with HWY-005, as the option `reuse` of the router `shared`. The baseline is `shared-all`. With 2 passes and `reuse: 1`, B1 rises on each board (0.430 to 0.624 on small-clustered), and crossings fall 23% to 89%. But the q95 rises on each board (1.359 to 2.475 on small-clustered), so neither dominates the other.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611429087",
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "beats": {
+          "shared-all-wind-p2-r1 against shared-all": {
+            "B7": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "all": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "better": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "newBreaks": 0
+          }
+        },
+        "gapClosed": {
+          "strategy": "shared-all-wind-p2-r1",
+          "rule": "all",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.5
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": -0.004,
+            "s2": 0.32
+          }
+        },
+        "note": "`shared-all-wind-p2-r1` is at least as good as `shared-all` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -1045,7 +1106,30 @@
         }
       },
       "verdict": "screened",
-      "note": "The option `fan: tree` of `trunks` is off by default. bf 0.2 and 0.4 beat `trunks` on B1 and the B3 q95 on dense-groups (B1 0.081 to 0.095 with bf 0.2). On small-clustered, the q95 falls but B1 falls 4%. hub-chain and many-groups do not change. A smaller bf gives more B1, so a screen of bf 0 and 0.1 is next."
+      "note": "The option `fan: tree` of `trunks` is off by default. bf 0.2 and 0.4 beat `trunks` on B1 and the B3 q95 on dense-groups (B1 0.081 to 0.095 with bf 0.2). On small-clustered, the q95 falls but B1 falls 4%. hub-chain and many-groups do not change. A smaller bf gives more B1, so a screen of bf 0 and 0.1 is next.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "trunks-tree-bf02",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.5
+          },
+          "median": 0.071,
+          "values": {
+            "s0": 0.071,
+            "s1": -0.01,
+            "s2": 0.161
+          }
+        },
+        "note": "The option `trunks-tree-bf04` closes a median of 0.071 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -1349,7 +1433,7 @@
           "new": {
             "small-clustered": 1.164,
             "dense-groups": 1.197,
-            "hub-chain": 1.0,
+            "hub-chain": 1,
             "many-groups": 1.007
           }
         },
@@ -1391,7 +1475,7 @@
           "new": {
             "small-clustered": 1.164,
             "dense-groups": 1.197,
-            "hub-chain": 1.0,
+            "hub-chain": 1,
             "many-groups": 1.007
           }
         },
@@ -1464,10 +1548,88 @@
             "hub-chain": 1.001,
             "many-groups": 1.015
           }
+        },
+        "B7 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.925,
+            "dense-groups": 0.911,
+            "hub-chain": 0.937,
+            "many-groups": 0.951
+          }
+        },
+        "R12 against shared": {
+          "base": {
+            "small-clustered": 0.126,
+            "dense-groups": 0.12,
+            "hub-chain": 0.689,
+            "many-groups": 0.564
+          },
+          "new": {
+            "small-clustered": 0.061,
+            "dense-groups": 0.06,
+            "hub-chain": 0.549,
+            "many-groups": 0.423
+          }
         }
       },
       "verdict": "dropped",
-      "note": "The strategy `zipper` beats `shared` on 2 of the 4 boards, and `adhesion: 1` also on 2. It fails only on the q95, by 0.1% to 1.5%. Against `shared-ways`, B1 rises 12% to 199% on all 4 boards, B2 rises, and R1 falls on 3 boards. B6 and R4 rise. The screen has no measure of B7 or R12. A stretch gate can make it pass. The strategy stays in the registry."
+      "note": "The strategy `zipper` beats `shared` on 2 of the 4 boards, and `adhesion: 1` also on 2. It fails only on the q95, by 0.1% to 1.5%. Against `shared-ways`, B1 rises 12% to 199% on all 4 boards, B2 rises, and R1 falls on 3 boards. B6 and R4 rise. The screen has no measure of B7 or R12. A stretch gate can make it pass. The strategy stays in the registry.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611431692",
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "beats": {
+          "zipper against shared": {
+            "B7": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain"
+            ],
+            "R12": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "all": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain"
+            ],
+            "better": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain"
+            ],
+            "newBreaks": 0
+          }
+        },
+        "gapClosed": {
+          "strategy": "zipper",
+          "rule": "all",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0.396,
+          "values": {
+            "s0": 0.276,
+            "s1": 0.456,
+            "s2": 0.396
+          }
+        },
+        "note": "`zipper` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`, `hub-chain`. It is better on `small-clustered`, `dense-groups`, `hub-chain`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -2074,7 +2236,30 @@
         }
       },
       "verdict": "dropped",
-      "note": "This rider of WILD-002 is the option `plugGap: 8`. The R11 q05 rises by more than 0.2, but R1 grows 3% to 5% on dense-groups and small-clustered."
+      "note": "This rider of WILD-002 is the option `plugGap: 8`. The R11 q05 rises by more than 0.2, but R1 grows 3% to 5% on dense-groups and small-clustered.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "corners-gap8",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.25
+          },
+          "median": -0.045,
+          "values": {
+            "s0": 0,
+            "s1": -0.353,
+            "s2": -0.045
+          }
+        },
+        "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -2291,7 +2476,7 @@
           },
           "new": {
             "small-clustered": 98.3,
-            "dense-groups": 129.0,
+            "dense-groups": 129,
             "hub-chain": 50.4,
             "many-groups": 90
           }
@@ -2342,13 +2527,13 @@
           "base": {
             "small-clustered": 36844.7,
             "dense-groups": 52612.8,
-            "hub-chain": 12293.0,
+            "hub-chain": 12293,
             "many-groups": 17622.5
           },
           "new": {
             "small-clustered": 36942.3,
-            "dense-groups": 52776.0,
-            "hub-chain": 12348.0,
+            "dense-groups": 52776,
+            "hub-chain": 12348,
             "many-groups": 17649.5
           }
         },
@@ -2368,7 +2553,30 @@
         }
       },
       "verdict": "kept",
-      "note": "The option `merge: snell` of `shared` is off by default. The B6 max falls on each board with merges: 8% to 27%. The ink rises 0.5% at most. The crossings rise 6% to 13% (18 to 24 on hub-chain), because the new merge lines cut across other routes. The option is only in `shared`, not in `trunks`."
+      "note": "The option `merge: snell` of `shared` is off by default. The B6 max falls on each board with merges: 8% to 27%. The ink rises 0.5% at most. The crossings rise 6% to 13% (18 to 24 on hub-chain), because the new merge lines cut across other routes. The option is only in `shared`, not in `trunks`.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "shared-snell",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": 0,
+            "s2": 0
+          }
+        },
+        "note": "The option `shared-all-snell` closes a median of -0.004 of the gap, with the rule `all`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {

@@ -248,7 +248,15 @@
         }
       },
       "verdict": "kept",
-      "note": "The option `tracks: left-edge` of `gapLanes` is off by default. The sum of lanes falls 5% to 26% on 7 boards. Crossings stay the same or fall, except +0.1% on grid-400. R12 falls. M1 and M4 do not change, because `roomDemand` already reads the density. The screen has no room step, so the side table of the bench measured it."
+      "note": "The option `tracks: left-edge` of `gapLanes` is off by default. The sum of lanes falls 5% to 26% on 7 boards. Crossings stay the same or fall, except +0.1% on grid-400. R12 falls. M1 and M4 do not change, because `roomDemand` already reads the density. The screen has no room step, so the side table of the bench measured it.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611429087"
+        ],
+        "note": "The screen has no step `room`, so M1, M4 and R12 of `tracks: left-edge` have no new value."
+      }
     }
   },
   {
@@ -1544,10 +1552,102 @@
             "hub-chain": 1.055,
             "many-groups": 1.479
           }
+        },
+        "B7, shared a0.6 against shared": {
+          "base": {
+            "small-clustered": 0.93,
+            "dense-groups": 0.923,
+            "hub-chain": 0.946,
+            "many-groups": 0.949
+          },
+          "new": {
+            "small-clustered": 0.935,
+            "dense-groups": 0.914,
+            "hub-chain": 0.946,
+            "many-groups": 0.946
+          }
+        },
+        "B7, shared-all a0.7 against shared-all": {
+          "base": {
+            "small-clustered": 0.833,
+            "dense-groups": 0.843,
+            "hub-chain": 0.688,
+            "many-groups": 0.643
+          },
+          "new": {
+            "small-clustered": 0.816,
+            "dense-groups": 0.83,
+            "hub-chain": 0.686,
+            "many-groups": 0.635
+          }
         }
       },
       "verdict": "dropped",
-      "note": "The option `cost: flow` of `shared` is off by default. No alpha from 0.5 to 0.8 beats `discount` 0.5 on B1 and the B3 q95 on more than 1 of the 4 boards. A smaller alpha gives more B1 and fewer crossings, but a longer stretch. For example, `shared-all` alpha 0.5 on small-clustered: B1 0.430 to 0.558, R1 305 to 209, B3 q95 1.359 to 2.218. An alpha of 0.8 gives the inverse. The only win is many-groups with `shared` (B1 0.083 to 0.085, q95 1.000 both). hub-chain does not change. The group stays screened, because its rider HWY-039 (the rip-up) is a win."
+      "note": "The option `cost: flow` of `shared` is off by default. No alpha from 0.5 to 0.8 beats `discount` 0.5 on B1 and the B3 q95 on more than 1 of the 4 boards. A smaller alpha gives more B1 and fewer crossings, but a longer stretch. For example, `shared-all` alpha 0.5 on small-clustered: B1 0.430 to 0.558, R1 305 to 209, B3 q95 1.359 to 2.218. An alpha of 0.8 gives the inverse. The only win is many-groups with `shared` (B1 0.083 to 0.085, q95 1.000 both). hub-chain does not change. The group stays screened, because its rider HWY-039 (the rip-up) is a win.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611429087",
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "beats": {
+          "shared-flow-a06 against shared": {
+            "B7": [
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "all": [
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "better": [
+              "dense-groups",
+              "many-groups"
+            ],
+            "newBreaks": 0
+          },
+          "shared-all-flow-a07 against shared-all": {
+            "B7": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "all": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "better": [
+              "small-clustered",
+              "dense-groups",
+              "hub-chain",
+              "many-groups"
+            ],
+            "newBreaks": 0
+          }
+        },
+        "gapClosed": {
+          "strategy": "shared-flow-a06",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": 0,
+            "s2": 0
+          }
+        },
+        "note": "`shared-flow-a06` is at least as good as `shared` on each new win on `dense-groups`, `hub-chain`, `many-groups`. It is better on `dense-groups`, `many-groups` and equal on `hub-chain`. `shared-all-flow-a07` is at least as good as `shared-all` on each new win on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. It is better on `small-clustered`, `dense-groups`, `hub-chain`, `many-groups`. The option `shared-all-flow-a07` closes a median of 0 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -1663,7 +1763,30 @@
         }
       },
       "verdict": "dropped",
-      "note": "The option `splitAt: gilbert` of `trunks` is off by default. The B6 max rises with each alpha: small-clustered 97.7 to 99.9, dense-groups 110.3 to 118.9. The ink changes 0.6% at most, and hub-chain and many-groups do not change, because they have no group that `trunks` splits. The B3 q95 falls 8% to 12%."
+      "note": "The option `splitAt: gilbert` of `trunks` is off by default. The B6 max rises with each alpha: small-clustered 97.7 to 99.9, dense-groups 110.3 to 118.9. The ink changes 0.6% at most, and hub-chain and many-groups do not change, because they have no group that `trunks` splits. The B3 q95 falls 8% to 12%.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "trunks-gilbert-a05",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.25,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0.16,
+          "values": {
+            "s0": 0.133,
+            "s1": 0.208,
+            "s2": 0.16
+          }
+        },
+        "note": "The option `trunks-gilbert-a03` closes a median of 0.22 of the gap, with the rule `collection`. The option `trunks-gilbert-a07` closes a median of 0.209 of the gap, with the rule `collection`. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -1903,10 +2026,84 @@
             "hub-chain": 1,
             "many-groups": 1
           }
+        },
+        "B8 runs against shared": {
+          "base": {
+            "small-clustered": 63,
+            "dense-groups": 131,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 1,
+            "dense-groups": 2,
+            "hub-chain": 1,
+            "many-groups": 2
+          }
+        },
+        "B8 median against shared": {
+          "base": {
+            "small-clustered": 2,
+            "dense-groups": 3,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 3,
+            "dense-groups": 3.5,
+            "hub-chain": 5,
+            "many-groups": 3
+          }
+        },
+        "B8 max against shared": {
+          "base": {
+            "small-clustered": 6,
+            "dense-groups": 10,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 4,
+            "dense-groups": 4,
+            "hub-chain": 5,
+            "many-groups": 3
+          }
         }
       },
       "verdict": "dropped",
-      "note": "The strategy `od-cells` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.073 and 0.104 on small-clustered and dense-groups, against 0.210 and 0.307. The level 1 wins on 0 boards and the level 3 bundles almost nothing. The screen of the step `highway` has no measure of Z9 or B8. The strategy stays in the registry."
+      "note": "The strategy `od-cells` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.073 and 0.104 on small-clustered and dense-groups, against 0.210 and 0.307. The level 1 wins on 0 boards and the level 3 bundles almost nothing. The screen of the step `highway` has no measure of Z9 or B8. The strategy stays in the registry.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611431692",
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "beats": {
+          "od-cells against shared": {
+            "B8": [],
+            "all": [],
+            "better": [],
+            "newBreaks": 0
+          }
+        },
+        "gapClosed": {
+          "strategy": "od-cells",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": 0,
+            "s2": 0
+          }
+        },
+        "note": "`od-cells` is at least as good as `shared` on each new win on no board. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -2120,7 +2317,30 @@
         }
       },
       "verdict": "dropped",
-      "note": "This record rides HWY-017 in the strategy `spiral`. The strategy beats `shared` on 1 of the 4 boards (hub-chain, a tie with no highway). On hub-chain the B6 max does not change against `shared-ways` (50.4). On the other boards it rises. The strategy stays in the registry."
+      "note": "This record rides HWY-017 in the strategy `spiral`. The strategy beats `shared` on 1 of the 4 boards (hub-chain, a tie with no highway). On hub-chain the B6 max does not change against `shared-ways` (50.4). On the other boards it rises. The strategy stays in the registry.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "spiral",
+          "rule": "all",
+          "cap": {
+            "s0": 1.25,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0.252,
+          "values": {
+            "s0": 0.246,
+            "s1": 0.252,
+            "s2": 0.262
+          }
+        },
+        "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -2720,7 +2940,30 @@
         }
       },
       "verdict": "dropped",
-      "note": "The strategy `flow-field` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.056 and 0.065 on small-clustered and dense-groups, against 0.210 and 0.307. R1 falls on hub-chain and many-groups and rises on the other 2 boards. Few fans share a stretch of corner links. The variant `source` wins on 1 board. The strategy stays in the registry."
+      "note": "The strategy `flow-field` beats `shared` on 2 of the 4 boards (hub-chain, many-groups), alone and with the gate `stretch`. Its q95 is 1.000 on each board, but B1 is 0.056 and 0.065 on small-clustered and dense-groups, against 0.210 and 0.307. R1 falls on hub-chain and many-groups and rises on the other 2 boards. Few fans share a stretch of corner links. The variant `source` wins on 1 board. The strategy stays in the registry.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "gapClosed": {
+          "strategy": "flow-field",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": 0.006,
+            "s2": 0
+          }
+        },
+        "note": "The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
@@ -3036,10 +3279,93 @@
             "hub-chain": 31,
             "many-groups": 248
           }
+        },
+        "B8 runs against shared": {
+          "base": {
+            "small-clustered": 63,
+            "dense-groups": 131,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 49,
+            "dense-groups": 46,
+            "hub-chain": 12,
+            "many-groups": 38
+          }
+        },
+        "B8 median against shared": {
+          "base": {
+            "small-clustered": 2,
+            "dense-groups": 3,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 5,
+            "dense-groups": 9,
+            "hub-chain": 14,
+            "many-groups": 8.5
+          }
+        },
+        "B8 max against shared": {
+          "base": {
+            "small-clustered": 6,
+            "dense-groups": 10,
+            "hub-chain": 0,
+            "many-groups": 0
+          },
+          "new": {
+            "small-clustered": 10,
+            "dense-groups": 18,
+            "hub-chain": 16,
+            "many-groups": 18
+          }
         }
       },
       "verdict": "dropped",
-      "note": "The screen of HWY-034. The strategy `road-classes` beats `shared` on 2 of the 4 boards (small-clustered, dense-groups), alone and with the gate `stretch`. It has the largest B1 of the wave on each board, and R1 falls by 14% to 69%. On hub-chain and many-groups, `shared` bundles almost nothing and has a q95 of 1.000, and `road-classes` has 1.015 and 1.090. The screen has no measure of B8. Z10: the churn is less than the churn of `corridors` on 2 boards (hub-chain, many-groups). The strategy stays in the registry."
+      "note": "The screen of HWY-034. The strategy `road-classes` beats `shared` on 2 of the 4 boards (small-clustered, dense-groups), alone and with the gate `stretch`. It has the largest B1 of the wave on each board, and R1 falls by 14% to 69%. On hub-chain and many-groups, `shared` bundles almost nothing and has a q95 of 1.000, and `road-classes` has 1.015 and 1.090. The screen has no measure of B8. Z10: the churn is less than the churn of `corridors` on 2 boards (hub-chain, many-groups). The strategy stays in the registry.",
+      "rescreen": {
+        "item": "RESCREEN-M3A",
+        "date": "2026-10-27",
+        "runs": [
+          "https://github.com/mark1russell7/highways/actions/runs/40611431692",
+          "https://github.com/mark1russell7/highways/actions/runs/40612683733"
+        ],
+        "beats": {
+          "road-classes against shared": {
+            "B8": [
+              "small-clustered",
+              "dense-groups"
+            ],
+            "all": [
+              "small-clustered",
+              "dense-groups"
+            ],
+            "better": [
+              "small-clustered",
+              "dense-groups"
+            ],
+            "newBreaks": 0
+          }
+        },
+        "gapClosed": {
+          "strategy": "road-classes",
+          "rule": "collection",
+          "cap": {
+            "s0": 1.1,
+            "s1": 1.1,
+            "s2": 1.1
+          },
+          "median": 0,
+          "values": {
+            "s0": 0,
+            "s1": 0,
+            "s2": 0
+          }
+        },
+        "note": "`road-classes` is at least as good as `shared` on each new win on `small-clustered`, `dense-groups`. It is better on `small-clustered`, `dense-groups`. Z9 has no value, because the results of `follow` have no levels. `shared` has 0 runs on `hub-chain` and `many-groups`, so a new run is worse on B8 runs there. The gap closed uses only the 3 boards `tiny-uniform` of 10 nodes. It is a hint, not a verdict."
+      }
     }
   },
   {
