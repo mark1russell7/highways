@@ -1,0 +1,2060 @@
+{
+  "schema": "layout-corpus/1",
+  "corpus": "exact-v1-bounds",
+  "specs": [
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "uniform",
+        "nodes": 18,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "clustered",
+        "nodes": 18,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "hubs",
+        "nodes": 18,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "collections",
+        "nodes": 18,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        400,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        407,
+        408,
+        409
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "uniform",
+        "nodes": 24,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "clustered",
+        "nodes": 24,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "hubs",
+        "nodes": 24,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "collections",
+        "nodes": 24,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        400,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        407,
+        408,
+        409
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "uniform",
+        "nodes": 40,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "clustered",
+        "nodes": 40,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "hubs",
+        "nodes": 40,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ]
+    },
+    {
+      "generator": "fixture",
+      "version": 1,
+      "params": {
+        "kind": "collections",
+        "nodes": 40,
+        "edgesPerNode": 1.5
+      },
+      "seeds": [
+        400,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        407,
+        408,
+        409
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "exact-v1-bounds/uniform-n18/s0",
+      "hash": "2e1cefb058df2a63",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s1",
+      "hash": "2f1d8d0eb3c019ab",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s2",
+      "hash": "f8afbbc253bedff0",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s3",
+      "hash": "ac0eb443df651c1a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s4",
+      "hash": "da8736e734d0a6f3",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s5",
+      "hash": "a0c205d120be4bb7",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s6",
+      "hash": "5c201caa80e051fc",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s7",
+      "hash": "dc7be991596640ff",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s8",
+      "hash": "86ffc8a17c42de84",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n18/s9",
+      "hash": "56e448eba35da71c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s0",
+      "hash": "0fddd27b98024ee0",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s1",
+      "hash": "4b6b60664477168f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s2",
+      "hash": "66d34878f9e63b2d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s3",
+      "hash": "870211bd3e9d9940",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s4",
+      "hash": "4c162382b353087b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s5",
+      "hash": "929f8ff05e82d496",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s6",
+      "hash": "da48c69f0f587fe0",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s7",
+      "hash": "e1b6947af25bdd72",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s8",
+      "hash": "704c5cc766a02a8a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n18/s9",
+      "hash": "7a172f5a92f86fac",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s0",
+      "hash": "b17e8ef5b4654c5d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s1",
+      "hash": "3604d845d53d11be",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s2",
+      "hash": "a54232ef5e8871d7",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s3",
+      "hash": "6b74a21106bb9dbb",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s4",
+      "hash": "1cb9bd86bdaab29e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s5",
+      "hash": "e088d02b89ad593d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s6",
+      "hash": "43ac9b17793d58d3",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s7",
+      "hash": "c7b6630ecb7f3983",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s8",
+      "hash": "7f54821b87c7c1e8",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n18/s9",
+      "hash": "f71276fd22afa83f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s0",
+      "hash": "9ac678a57423ea09",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s1",
+      "hash": "518212dc95c203af",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s2",
+      "hash": "11bac5c0f7a8944c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s3",
+      "hash": "e64ca317cb21ff04",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s4",
+      "hash": "15d077497df447d5",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s5",
+      "hash": "39c38037c0e68f74",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s6",
+      "hash": "de0f606f1435a8c1",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s7",
+      "hash": "5976369489439db8",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s8",
+      "hash": "ff572fb89997e3b2",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n18/s9",
+      "hash": "b3bc49ec0e70592b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s0",
+      "hash": "aa22535262bdcc7c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s1",
+      "hash": "e6b3dff0e6d5bf63",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s2",
+      "hash": "d09aaa68d9e52e29",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s3",
+      "hash": "32707b076911c6c7",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s4",
+      "hash": "b590fd3258d1c6be",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s5",
+      "hash": "55b347a467aae2e3",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s6",
+      "hash": "81864c8917a46a7b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s7",
+      "hash": "7dc7e087da34f26b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s8",
+      "hash": "61c8b90ff7f8d65a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n24/s9",
+      "hash": "a6586197868c3098",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s0",
+      "hash": "21e08b2b1bdb4695",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s1",
+      "hash": "b44667ba61582ff6",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s2",
+      "hash": "c995638d8b401f09",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s3",
+      "hash": "94c68923ba31d9ac",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s4",
+      "hash": "59993a72c6bdf0d5",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s5",
+      "hash": "25ffa20e7028056a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s6",
+      "hash": "53af7b4956728f05",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s7",
+      "hash": "6f96b6bae263b514",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s8",
+      "hash": "3ba8b377604b50dc",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n24/s9",
+      "hash": "50dbcf8d4ed6e07e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s0",
+      "hash": "4471c1999ac4fc2d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s1",
+      "hash": "76329a9837ce0b5b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s2",
+      "hash": "94b0d42986f1bcfe",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s3",
+      "hash": "c596877e41a74010",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s4",
+      "hash": "d4496ce94ecf11d9",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s5",
+      "hash": "68216aef8d8bd9cb",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s6",
+      "hash": "0c3455c3b2545a77",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s7",
+      "hash": "03d881147c829a45",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s8",
+      "hash": "793201fad517b6ea",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n24/s9",
+      "hash": "e8acc3e0addfa15e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s0",
+      "hash": "55d43dc8c59b63dd",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s1",
+      "hash": "34cc6b5fdc77a372",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s2",
+      "hash": "5904d920353d12f6",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s3",
+      "hash": "efd6a62754013204",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s4",
+      "hash": "c1b3250782b69b0d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s5",
+      "hash": "0bc089c8dcdcff1c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s6",
+      "hash": "d11898a2e597e4e4",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s7",
+      "hash": "e51c0208aa994553",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s8",
+      "hash": "a38671982d99c733",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n24/s9",
+      "hash": "8c243b2a75de436b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s0",
+      "hash": "b681166ff2fb865f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s1",
+      "hash": "2183b861acf9498f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s2",
+      "hash": "ba1900d12d1faa18",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s3",
+      "hash": "4ce49af7b555bc59",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s4",
+      "hash": "13b4b3ca215f1e35",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s5",
+      "hash": "47e1ce42d57aacbd",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s6",
+      "hash": "dfe61b472d32b3d5",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s7",
+      "hash": "cfd2947800c2ad9b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s8",
+      "hash": "cea060b8b2c684fd",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/uniform-n40/s9",
+      "hash": "b69d69f1a59f177c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "random"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s0",
+      "hash": "a1e0ca4dbfd52fb5",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s1",
+      "hash": "e1cfd2f2e17050ed",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s2",
+      "hash": "e64149c111b050fa",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s3",
+      "hash": "efd407ed2211b55f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s4",
+      "hash": "293ede071ec8fe0d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s5",
+      "hash": "57f8d623d922750c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s6",
+      "hash": "a131e66a6d1a6d98",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s7",
+      "hash": "bb1305443dbde515",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s8",
+      "hash": "db1c9b41f0439add",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/clustered-n40/s9",
+      "hash": "b464529e2acd7dfe",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "clustered"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s0",
+      "hash": "61284e2bb7710b87",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s1",
+      "hash": "f8aa82bfe697aa61",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s2",
+      "hash": "77c877be1a67683d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s3",
+      "hash": "5dff80d4814f9e19",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s4",
+      "hash": "8d06d135ca347e4c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s5",
+      "hash": "08f6c5993226594b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s6",
+      "hash": "9815caf936ad6628",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s7",
+      "hash": "8b16b5d32cd2b512",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s8",
+      "hash": "1bcc0da6bc0ab981",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/hubs-n40/s9",
+      "hash": "737352c292e3c661",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "hubChain"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s0",
+      "hash": "a1517d4c809723db",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s1",
+      "hash": "3161cfd44a9d3f06",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s2",
+      "hash": "97d6d3e286f6eae3",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s3",
+      "hash": "97c71bf62fa2010f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s4",
+      "hash": "6e02a6d85119b237",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s5",
+      "hash": "4b33759f1ed82c12",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s6",
+      "hash": "3e3ffeeabc3b04f8",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s7",
+      "hash": "50fecf9441a52cf2",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s8",
+      "hash": "442126d91b2d2bb1",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    },
+    {
+      "id": "exact-v1-bounds/fanout-n40/s9",
+      "hash": "a0ce996ca203125b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "ports": "free",
+        "edgeShape": "bundled"
+      }
+    }
+  ]
+}
