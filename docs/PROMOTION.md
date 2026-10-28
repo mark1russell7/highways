@@ -151,7 +151,7 @@ For `pack`, `pack.deterministic` and the hard rules give the hard-rule test. `pa
 
 ### A bound by count
 
-On mixed sizes, a lower bound by count is weak. It drops the largest items first, but a packer leaves out many small items. On the screen 3 of packing, the count bound was 1.5% of the overflow count, but the area bound was 42% to 62% of the overflow area. Judge an overflow by the area excess (`pack.overflow.excessArea`), not by the count excess.
+On mixed sizes, a lower bound by count is weak. It drops the largest items first, but a packer leaves out many small items. On the screen 3 of packing, the count bound was 1.5% of the overflow count. The area bound was 42% to 62% of the overflow area. Judge an overflow by the area excess (`pack.overflow.excessArea`), not by the count excess.
 
 The `pack` step ranks its strategies in fixed cells in two levels:
 
