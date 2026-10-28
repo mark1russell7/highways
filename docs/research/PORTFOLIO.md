@@ -579,3 +579,103 @@ The time of the router in CI, one member after the other. Each cell gives the ra
 | 4. At 50 ms and k = 5, the share falls by less than 15 points in most cells at 13 to 40 nodes, but to near 0 on `screen-v1`. | medium | Partly met: it falls by 15 points or less in 8 of 11 cells. On `screen-v1`, it falls by 0 to 20 points, because the budget cuts only after a slow member. |
 | 5. A deterministic default with a median of 50 ms or less exists in each band up to 40 nodes. Above 40 nodes, it is the base alone or the base and one member. | medium | Met: the medians are 6 to 46 ms. Above 40 nodes, the fit is `shared` alone. |
 
+
+## The speed of the router (PORTFOLIO-SPEED)
+
+This section is the result of the item PORTFOLIO-SPEED of the [roadmap](../ROADMAP.md). It makes the setup of the key cheaper, and it adds two size bands above 40 nodes.
+
+### The profile
+
+The script `portfolio:time --breakdown` times each part of the setup of the key, and the router in each form. It uses the 4 classes of `exact-v1`, the seeds 0 to 2 and 5 repeats. Each cell is a median in ms, before and after the change (CI runs [40664327269](https://github.com/mark1russell7/highways/actions/runs/40664327269) and [40664691452](https://github.com/mark1russell7/highways/actions/runs/40664691452)):
+
+| nodes | `shared` | network | distances | setup | key and pick in k = 3 | share of the setup |
+|---:|---:|---:|---:|---:|---:|---:|
+| 40 | 7.0 | 10.5 | 12.8 to 1.3 | 23.7 to 12.9 | 26.9 to 15.5 | 39% to 26% |
+| 64 | 8.9 | 12.5 | 39.1 to 1.8 | 52.0 to 16.9 | 57.1 to 23.1 | 48% to 22% |
+| 100 | 14.9 | 20.7 | 150.5 to 2.8 | 171.8 to 24.7 | 174.8 to 39.5 | 62% to 18% |
+| 400 | 103.6 | 83.1 | 7 095 to 27.5 | 7 182 to 125.9 | 7 391 to 202.3 | 88% to 13% |
+
+- The setup is the network of the stretch, the shortest distances and the facts of the base. The share of the setup is the setup over the time of `collection` at 1.5 with k = 3.
+- The router made the setup once for each input before this item. `portfolioKey` makes the facts once for each call, and the members do not use the stretch.
+- The distances were the cost. The old search was a full Dijkstra with a linear scan, from each end of each edge.
+- The new search is A* with a binary heap. The straight distance to the nearest open target guides it. One search serves all the pairs of one terminal, and it stops when each target is settled.
+- An update from the base routes does not apply. The shortest distance of a pair does not change with the routes.
+- After the change, the network is the largest part of the setup. It is the graph of the corners of the boxes, with the links of each end point.
+
+The router with k = 3 takes 7% to 17% less time at 40 nodes and 15% to 24% less at 64 nodes. It takes 39% to 54% less at 100 nodes and 86% to 91% less at 400 nodes. A fit with a member takes 26% to 31% less time at 40 nodes.
+
+### The check of the values
+
+The script `portfolio:time --check-stretch` routes each input of 3 sets with each strategy of the pool. It compares the stretch of each edge of the new function and of the old function (CI run [40664694253](https://github.com/mark1russell7/highways/actions/runs/40664694253)):
+
+| set | records | edges | missing | largest difference | edges above 0.001 | records with another `gap.stretch` |
+|---|---:|---:|---:|---:|---:|---:|
+| `exact-v1` | 11 880 | 178 200 | 0 | 4.44e-16 | 0 | 0 |
+| `exact-v1-bounds` | 35 640 | 1 461 240 | 0 | 8.88e-16 | 0 | 0 |
+| `screen-v1` | 4 158 | 549 747 | 0 | 8.88e-16 | 0 | 0 |
+
+- The values are the same, to the rounding of floating point. The records and their digests do not change.
+- The test `stretches.test.ts` compares the two functions on the boards of `exact-v1` at 10, 24 and 40 nodes.
+- `exactStretch` and `exactStretches` are exports of the core. The signature of `exactStretches` stays `(graph, options?) => (routes) => Map<string, number>`.
+
+### The bands above 40 nodes
+
+The script `portfolio:time --guard-records` routes the 4 classes of `exact-v1` at 64 and 100 nodes, with the seeds 0 to 9 and the 75 members (CI run [40665016754](https://github.com/mark1russell7/highways/actions/runs/40665016754)). Each line has the values of the guard: B1, the stretch, the flag of mixed collections and the hard breaks.
+
+- These boards have no optima. So the value of a run is its B1 under the guard, and the oracle is the best member of the pool.
+- `portfolio-sets.ts --large` adds these records to the short table, as the set `exact-large`.
+- The bands are `n1-12`, `n13-24`, `n25-40`, `n41-64` and `n65-128`. An input above 128 nodes uses `n65-128`.
+- Under the cap 1.1 and the rule `collection`, no member gives more B1 than the base. So these 2 sets are empty.
+
+The fit uses the times of the members of the run 40658558076, and the times of the setup of the run [40665256727](https://github.com/mark1russell7/highways/actions/runs/40665256727) (`portfolio-sets.ts --setup-time`). The members did not change. At 40 nodes, the median ratio of the times of the members of the two runs is 1.00. One member can change by a factor of up to 1.8.
+
+The fit of the large bands, on the test seeds 5 to 9 (20 boards in each band):
+
+| band | rule | cap | base | best single | oracle | fit | share at the fit |
+|---|---|---:|---:|---:|---:|---|---:|
+| n41-64 | `collection` | 1.5 | 0.174 | 0.186 | 0.217 | `shared-flow-a06-p3` (64) | 0% |
+| n41-64 | `all` | 1.5 | 0.174 | 0.420 | 0.431 | `hw:growth` (64) | 0% |
+
+- A share of 0% tells that the fit gets the B1 of the best single strategy. Over the base, the fit keeps 28% and 96% of the oracle gain.
+- In the other 4 cells at 64 nodes and in all 6 cells at 100 nodes, the fit is `shared` alone. There, the set is empty, or the model time of `shared`, the setup and the first member is above 40 ms.
+- At 25 to 40 nodes, the cheaper setup lets more members run at 40 nodes. 10 node limits go from 32 to 40.
+- The shares at the fit at 1 to 40 nodes do not change by more than 6 points. The script tests each fit without its node limits.
+
+The time of the router with the new fit, on the seeds 0 to 4 with 5 repeats (CI run [40666269015](https://github.com/mark1russell7/highways/actions/runs/40666269015)). Each cell gives the range of the medians over the 6 rules and caps, then the range of the q95, in ms:
+
+| nodes | `shared` | setup | fit | k = 3 |
+|---:|---:|---:|---|---|
+| 12 | 2.6 | 4.9 | 26 to 58, q95 39 to 99 | 15 to 44, q95 22 to 72 |
+| 24 | 3.3 | 5.3 | 24 to 41, q95 30 to 56 | 24 to 99, q95 31 to 133 |
+| 40 | 5.0 | 8.5 | 38 to 58, q95 46 to 75 | 43 to 75, q95 53 to 98 |
+| 64 | 8.1 | 14.8 | 10 to 46, q95 14 to 59 | 71 to 159, q95 105 to 234 |
+| 100 | 14.7 | 23.0 | 17 to 18, q95 28 | 70 to 150, q95 106 to 228 |
+| 128 | 20.5 | 30.0 | 24 to 25, q95 32 to 36 | 99 to 210, q95 122 to 269 |
+| 400 | 100.0 | 116.5 | 112 to 116, q95 187 to 189 | 436 to 934, q95 674 to 1 616 |
+
+- At 64 nodes, the 2 fits with a member take 39 and 46 ms (median).
+- At 12 nodes, the fit has a median above 50 ms in 2 of 6 cells. At 40 nodes, it has a median above 50 ms in 1 of 6 cells.
+- In the router, the members take approximately 1.4 times their time alone. The model of the fit does not count the key of each member.
+- The share of the setup at 400 nodes is 15%. The members and the base are the cost.
+
+### A cooperative budget
+
+This part is a design. The contract does not change in this item.
+
+- A member gets a second argument: `run(input, context)`. The context has `deadlineMs`, the time at which the member stops, and `signal`, an `AbortSignal`.
+- A member that stops early gives its best output so far, with `partial: true`. A member with no output so far gives the output of its first pass.
+- The router gives each member the time that remains of `budgetMs`. A member with no support for the context runs to its end, as today.
+- `deterministic` is `false` when the router cuts a member or skips one. It stays `true` when no cut occurs.
+- `pickMoves` does not change. A partial output passes the same guard, and `selectBest` ranks it with the others.
+- The iterative members can stop early. They are `hw:growth`, `hw:diffusion`, the families `mlseb` and `kdeeb`, and `shared-p2` and `shared-p3`.
+- A member with one pass, as `corners-side`, cannot stop early. The router keeps the check before each member for these.
+
+### The predictions of PORTFOLIO-SPEED
+
+| Prediction | Result |
+|---|---|
+| 1. A shared setup cuts the time of the router at 40 nodes by 30% or more. | Not met: the setup was shared before this item. The cheaper stretch cuts k = 3 by 7% to 17%, and a fit with a member by 26% to 31%. |
+| 2. One search for each terminal brings the setup at 100 nodes to 30 ms or less. | Met: 24.7 ms, from 171.8 ms. |
+| 3. The default runs a member other than `shared` at 64 and 100 nodes, with a median of 50 ms or less. | Partly met: at 64 nodes in 2 of 6 cells, at 39 and 46 ms. At 100 nodes, the fit is `shared` alone. |
+| 4. The share of the setup at 400 nodes stays above 50%. | Not met: 13% to 15%. |
+| 5. A cooperative budget keeps the q95 within 1.5 times `budgetMs`. | Not tested: this item gives only the design. |

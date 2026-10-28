@@ -274,7 +274,7 @@ class NodeHeap {
 
 /**
  * This function gives the shortest distance from `start` to each node of `targets` (A*). The search stops when it has each target.
- * The guide is the straight distance to the nearest target. Each link is a straight line, so the guide is never above the true distance.
+ * The guide is the straight distance to the nearest target. Each link is a straight line, so the guide is not above the true distance at any time.
  * Thus the distances are the distances of Dijkstra. Only the order of the search changes.
  * A target that the search cannot reach gets `Infinity`.
  */
@@ -379,7 +379,7 @@ export function exactStretches(graph: Graph, o: Readonly<WayOptions> = {}): (rou
 }
 
 /**
- * This function gives the same values as `exactStretches` with the search of the first version: one full Dijkstra with a scan from the first end point of each edge.
+ * This function gives the same values as `exactStretches` with the search of the first version. That search is one full Dijkstra with a scan, from the first end point of each edge.
  * It is slow on large boards. The tests and the check `portfolio:time --check-stretch` compare the two functions.
  */
 export function exactStretchesReference(graph: Graph, o: Readonly<WayOptions> = {}): (routes: readonly Route[]) => Map<string, number> {
