@@ -56,7 +56,7 @@
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "@mark1russell7/layout-contract": "^0.2.11"
+    "@mark1russell7/layout-contract": "^0.2.14"
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue",

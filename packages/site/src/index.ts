@@ -7,6 +7,8 @@ import readme from "../../../README.md?raw";
 import { benchLabel } from "./bench-label.ts";
 import { html, inline, README, sectionOf } from "./content.ts";
 import { demoPickers, groupKey, PICK_LABELS, type DemoPick, type DemoPicker } from "./demo-data.ts";
+import { genPanel } from "./gen-controls.ts";
+import { cleanGen, genGraph, readGen, START_GEN, writeGen, type GenSpec } from "./generated.ts";
 import { optionSet, type OptionValue } from "./option-control.ts";
 import { controlOptions } from "./options.ts";
 import type { RouteDone, RouteReply, RouteRequest } from "./protocol.ts";
@@ -28,6 +30,10 @@ const ROUTERS = pickerOf("router").names.map((name) => getStrategy(STRATEGIES, "
 // The steps whose rule a router reads with an option, for example the grouping rule of `sections`. Only such a router uses the pick.
 const RULE_STEPS = PICKERS.map((p) => p.step).filter((step): step is Exclude<Step, "router"> => step !== "router" && ROUTERS.some((r) => strategyKey(r, step)));
 const START = { fixture: "small-clustered", router: "shared" };
+/** The value of the fixture list for a generated board (CORPUS-GEN). The URL hash keeps its family, its seed and its dimensions. */
+const GENERATED = "generated";
+/** The generated board of the hash, when the hash has the key `family`. */
+const hashGen = (): GenSpec | undefined => (location.hash.includes("family=") ? readGen(new URLSearchParams(location.hash.slice(1))) : undefined);
 const fmt = new Intl.NumberFormat("en-US");
 
 /** This function escapes text for HTML. */
@@ -36,6 +42,8 @@ const esc = (text: string): string =>
 
 interface State {
   fixture: string;
+  /** The generated board, when `fixture` is `generated`. */
+  gen: GenSpec;
   router: string;
   /** The pick of each step other than the router, for example the highway plan, the grouping rule, the room strategy and the curve. An empty string is "none". */
   picks: Record<Exclude<Step, "router">, string>;
@@ -47,8 +55,10 @@ interface State {
   selected: string | undefined;
 }
 
+const firstGen = hashGen();
 const state: State = {
-  fixture: START.fixture,
+  fixture: firstGen ? GENERATED : START.fixture,
+  gen: firstGen ?? START_GEN,
   router: START.router,
   // A step that the demo can skip starts at "none". The curve starts at `straight`, and each other step at its first strategy.
   picks: Object.fromEntries(
@@ -99,22 +109,26 @@ function pump(): void {
   worker.postMessage(job.req);
 }
 
-/** This function gives the key of a route in the cache: the fixture and each part of the pick. */
-const keyOf = (fixture: string, pick: DemoPick): string => JSON.stringify([fixture, pick]);
+/** This function gives the name of a board for the cache: the fixture, or the hash keys of the generated board. */
+const boardKey = (fixture: string, gen?: GenSpec): string => (fixture === GENERATED ? `${GENERATED}:${writeGen(gen ?? state.gen).toString()}` : fixture);
+
+/** This function gives the key of a route in the cache: the board and each part of the pick. */
+const keyOf = (fixture: string, pick: DemoPick, gen?: GenSpec): string => JSON.stringify([boardKey(fixture, gen), pick]);
 
 function route(fixture: string, pick: DemoPick, urgent: boolean): Promise<RouteReply> {
-  const key = keyOf(fixture, pick);
+  const gen = fixture === GENERATED ? state.gen : undefined;
+  const key = keyOf(fixture, pick, gen);
   const hit = cache.get(key);
   if (hit) {
     // A wanted route moves to the front of the queue.
     if (urgent) {
-      const i = waiting.findIndex((w) => keyOf(w.req.fixture, w.req.pick) === key);
+      const i = waiting.findIndex((w) => keyOf(w.req.fixture, w.req.pick, w.req.gen) === key);
       if (i > 0) waiting.unshift(...waiting.splice(i, 1));
     }
     return hit;
   }
   const p = new Promise<RouteReply>((resolve) => {
-    const job = { req: { id: nextId++, fixture, pick }, resolve, urgent };
+    const job = { req: { id: nextId++, fixture, pick, ...(gen ? { gen } : {}) }, resolve, urgent };
     if (urgent) waiting.unshift(job);
     else waiting.push(job);
   });
@@ -125,10 +139,12 @@ function route(fixture: string, pick: DemoPick, urgent: boolean): Promise<RouteR
 
 const graphs = new Map<string, Graph>();
 function graphOf(name: string): Graph {
-  let g = graphs.get(name);
+  const key = boardKey(name);
+  let g = graphs.get(key);
   if (!g) {
-    g = makeFixture(DEMO_FIXTURES.find((f) => f.name === name)!);
-    graphs.set(name, g);
+    // The registry of the core makes a generated board in less than a millisecond, so the page draws it at once. The worker makes the same board.
+    g = name === GENERATED ? genGraph(state.gen) : makeFixture(DEMO_FIXTURES.find((f) => f.name === name)!);
+    graphs.set(key, g);
   }
   return g;
 }
@@ -193,10 +209,43 @@ for (const f of DEMO_FIXTURES) {
   o.textContent = `${f.name} (${fmt.format(f.nodes)} nodes)`;
   fixtureSelect.append(o);
 }
+fixtureSelect.append(new Option("Generated: a family, a seed and its dimensions", GENERATED));
 fixtureSelect.value = state.fixture;
 fixtureSelect.addEventListener("change", () => {
   state.fixture = fixtureSelect.value;
   state.selected = undefined;
+  genBoard();
+  update();
+});
+
+/** This function shows the controls of the generated board, and writes its keys into the hash. Another fixture takes the keys out of the hash. */
+function genBoard(): void {
+  const field = $("gen-board");
+  field.hidden = state.fixture !== GENERATED;
+  field.replaceChildren(
+    ...(state.fixture === GENERATED
+      ? [
+          genPanel("demo", state.gen, (spec) => {
+            state.gen = cleanGen(spec);
+            state.selected = undefined;
+            genBoard();
+            update();
+          }),
+        ]
+      : []),
+  );
+  const hash = state.fixture === GENERATED ? `#${writeGen(state.gen).toString()}` : "";
+  if (hash && location.hash !== hash) history.replaceState(null, "", hash);
+  else if (!hash && location.hash.includes("family=")) history.replaceState(null, "", location.pathname + location.search);
+}
+genBoard();
+addEventListener("hashchange", () => {
+  const gen = hashGen();
+  if (!gen || (state.fixture === GENERATED && writeGen(gen).toString() === writeGen(state.gen).toString())) return;
+  state.fixture = GENERATED;
+  state.gen = gen;
+  fixtureSelect.value = GENERATED;
+  genBoard();
   update();
 });
 
@@ -555,6 +604,7 @@ async function bench(): Promise<void> {
         if (DEMO_FIXTURES.some((f) => f.name === pick)) {
           state.fixture = pick;
           fixtureSelect.value = pick;
+          genBoard();
         }
         pickRouter(b.dataset["router"]!);
         $("map").scrollIntoView({ block: "center" });

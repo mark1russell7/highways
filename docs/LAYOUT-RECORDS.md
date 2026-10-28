@@ -83,7 +83,25 @@ The corpus comes from seeded generators. The same generator, version, parameters
 - Each number in a file is a JSON number, rounded to 3 decimals. `round3` rounds it, and `-0` becomes `0`.
 - A routing input needs positions. Either its generator gives positions, or it names a packing input in `base` with `"change": "packed"`. Then it routes the packed output of that input.
 
-The generators of `screen-v1` wrap the fixtures and the case boards of the benchmark: `fixture`, `case.hub-chain`, `case.many-groups` and `case.packed-grid`, all version 1. Their output does not change. Their own random numbers do not use `mulberry32` yet.
+The generators of `screen-v1` wrap the fixtures and the case boards of the benchmark: `fixture`, `case.hub-chain`, `case.many-groups` and `case.packed-grid`, all version 1. Their output does not change.
+
+### The corpus families (CORPUS-GEN)
+
+The core registers its generators as families of the shared registry of `@mark1russell7/layout-contract` (L45). `HIGHWAYS_FAMILIES` in `packages/core/src/families` lists them. An import registers nothing. A host makes a registry with `createFamilyRegistry(HIGHWAYS_FAMILIES)`. The screen sets and the site use such a registry, so they make the same boards.
+
+| Family | Dimensions | Random numbers | `crossEngine` |
+|---|---|---|---|
+| `tiny-uniform`, `small-clustered`, `dense-groups` | `layout`, `nodes`, `edgesPerNode`, `locality`, `fixedPorts` | `mulberry32` of `(seed × 2654435761 + nodes) >>> 0` | `libm-dependent` |
+| `hub-chain` | `rows`, `cols`, `long`, `gap` | `mulberry32` of the seed | `exact` |
+| `many-groups` | `groupCols`, `groupRows`, `perGroup`, `crossLinksPerGroup`, `groupGap` | `mulberry32` of the seed | `exact` |
+| `packed-grid` | `cols`, `rows`, `long`, `reach` | `mulberry32` of the seed | `exact` |
+
+- The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
+- Each family has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
+- The generator record has only the dimensions away from their defaults. `packed-grid` always has `cols`, `rows` and `long`, as the screen sets of today.
+- The 3 fixture families are separate families, not 1 family with explicit dimensions. Then the defaults of each family give the exact record of its screen boards.
+- A fixture family can choose the kind `clustered`, `hubs` or `collections`. These kinds use `Math.log`, `Math.cos` and `**`, so each fixture family is `libm-dependent`.
+- The rule of the members, `base + 1009 × k`, stays in `bench/screen/set.ts`. The hash of an input is the `documentHash` of the core, with no grid.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
 
@@ -117,7 +135,7 @@ No input of `screen-v1` declares groups, thus each one has `groups` set to `none
 
 ### The shared generator `rect-scattered`
 
-The two repositories check their pipelines with one shared generator. `rectScattered` makes it. Packing gives its steps in its `FORMAT.md`. A test pins these hashes for `{ "count": 40 }`:
+The two repositories check their pipelines with one shared generator. The shared family `RECT_SCATTERED` of the contract makes it, and highways has no copy. The old function `rectScattered` uses the shared family. Packing gives its steps in its `FORMAT.md`. A test pins these hashes for `{ "count": 40 }`:
 
 | Seed | Container | Obstacles | `hash` |
 |---|---|---:|---|

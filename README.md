@@ -178,6 +178,12 @@ The benchmark also races the routers on three case boards of made-up data. Each 
 | `packages/core` | The geometry, the model, the fixtures, the routers and the benchmark |
 | `packages/site` | The GitHub Pages site: a live map of the routers, the idea, the benchmark, the examples and the compare page. The workflow `Pages` deploys it from `main`. |
 
+### The generator of the site
+
+The examples page has a tab `Generator`. Pick a family of `HIGHWAYS_FAMILIES`, a seed and a value for each dimension of the family. A web worker generates the board and routes it with the default pipeline. The URL keeps the board, for example `#family=hub-chain&seed=12&rows=6`. The list "Named examples" sets the controls to a known board.
+
+The compare page and the live demo have the choice "Generated", with the same controls and the same keys of the URL. The screen sets make their boards with the same families.
+
 ## Development
 
 - `pnpm install` installs the workspace.

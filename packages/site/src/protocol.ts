@@ -1,12 +1,15 @@
-import type { Node, Quality, Result, Route, SegmentGraph } from "@mark1russell7/highways";
+import type { Graph, Node, Quality, Result, Route, SegmentGraph } from "@mark1russell7/highways";
 import type { ComparePanels, CompareState, PanelProgress } from "./compare-data.ts";
 import type { DemoPick } from "./demo-data.ts";
+import type { GenSpec } from "./generated.ts";
 
-/** A request to the worker: route one fixture as the demo picks it. */
+/** A request to the worker: route one fixture, or one generated board, as the demo picks it. */
 export interface RouteRequest {
   readonly id: number;
   readonly fixture: string;
   readonly pick: DemoPick;
+  /** The generated board (CORPUS-GEN). With it, the worker generates the board and does not read `fixture`. */
+  readonly gen?: GenSpec;
 }
 
 /** The routes of one router on one fixture, with the measures of their quality. */
@@ -14,6 +17,8 @@ export interface RouteDone {
   readonly id: number;
   readonly ok: true;
   readonly result: Result;
+  /** The generated board, when the request has `gen`. The page draws it. */
+  readonly graph?: Graph;
   /** The nodes of the board after a room strategy opened its gaps. Without a room strategy, the board is the fixture. */
   readonly nodes?: readonly Node[];
   /** The time of the route, in milliseconds. */

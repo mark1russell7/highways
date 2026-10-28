@@ -1743,3 +1743,64 @@ pre code {
     grid-column: 1 / -1;
   }
 }
+
+/* The generator of boards (CORPUS-GEN): a family, a seed and one control for each dimension. */
+.gen h3 {
+  margin: 0 0 6px;
+}
+
+.gen-named {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+}
+
+.gen-named button[aria-pressed="true"] {
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.gen-panel .cmp-option {
+  grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+}
+
+.gen-meaning {
+  margin: 6px 0 2px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.gen-slider,
+.gen-seed-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gen-slider input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--ink);
+}
+
+.gen-slider output {
+  min-width: 3.2rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen-seed-box input[type="number"] {
+  flex: 1;
+}
+
+.gen-status {
+  min-height: 1.2em;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}

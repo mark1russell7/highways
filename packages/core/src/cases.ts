@@ -51,6 +51,18 @@ export function denseGroupsBoard(): Graph {
   return makeFixture({ name: "dense-groups", kind: "clustered", nodes: 150, edgesPerNode: 2, seed: 3 });
 }
 
+/** The options of `hubChainBoard`. Each option at its default keeps the board of today. */
+export interface HubChainOptions extends CaseSeedOptions {
+  /** The number of rows of cards. The default is 3. */
+  readonly rows?: number;
+  /** The number of cards in each row. The default is 32. */
+  readonly cols?: number;
+  /** The number of tries for a long link. The default is 40. */
+  readonly long?: number;
+  /** The free space between two cards, in units. The default is 48. */
+  readonly gap?: number;
+}
+
 /**
  * This function makes a board of three rows of 32 cards. Each card links to the next card of its row.
  * Forty long links join cards far apart. The hub of a section is near the middle of its cards.
@@ -58,23 +70,39 @@ export function denseGroupsBoard(): Graph {
  *
  * The seed changes only the long links. The rows of cards, and thus the chain of hubs, do not change.
  * The default seed is 3. Without options, the board does not change.
+ * The default source of random numbers is `rng(seed)`. A corpus family gives the same stream from its registry.
  */
-export function hubChainBoard(options: CaseSeedOptions = {}): Graph {
-  const R = rng(options.seed ?? 3);
+export function hubChainBoard(options: HubChainOptions = {}, random: () => number = rng(options.seed ?? 3)): Graph {
+  const R = random;
   const b = new Board();
-  const rows = 3;
-  const cols = 32;
-  const gap = 48;
+  const rows = options.rows ?? 3;
+  const cols = options.cols ?? 32;
+  const gap = options.gap ?? 48;
+  const long = options.long ?? 40;
   const id = (r: number, c: number): string => `c${r}-${c}`;
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) b.node(id(r, c), c * (80 + gap), r * (36 + gap), 80, 36);
   for (let r = 0; r < rows; r++) for (let c = 0; c + 1 < cols; c++) b.link(id(r, c), id(r, c + 1));
-  for (let n = 0; n < 40; n++) {
+  for (let n = 0; n < long; n++) {
     const r = Math.floor(R() * rows);
     const c = Math.floor(R() * cols);
     const span = Math.floor(cols / 8 + (R() * cols) / 2);
     if (c + span < cols) b.link(id(r, c), id((r + 1) % rows, c + span));
   }
   return b.graph();
+}
+
+/** The options of `manyGroupsBoard`. Each option at its default keeps the board of today. */
+export interface ManyGroupsOptions extends CaseSeedOptions {
+  /** The number of columns of groups. The default is 8. */
+  readonly groupCols?: number;
+  /** The number of rows of groups. The default is 4. */
+  readonly groupRows?: number;
+  /** The number of cards in each group. The default is 4. */
+  readonly perGroup?: number;
+  /** The number of random links between groups, for each group. The default is 3. */
+  readonly crossLinksPerGroup?: number;
+  /** The free space between two groups, in units. The default is 60. */
+  readonly groupGap?: number;
 }
 
 /**
@@ -84,17 +112,19 @@ export function hubChainBoard(options: CaseSeedOptions = {}): Graph {
  *
  * The seed changes only the 96 links between groups. The 32 groups and their chains do not change.
  * The default seed is 7. Without options, the board does not change.
+ * The default source of random numbers is `rng(seed)`. A corpus family gives the same stream from its registry.
  */
-export function manyGroupsBoard(options: CaseSeedOptions = {}): Graph {
-  const R = rng(options.seed ?? 7);
+export function manyGroupsBoard(options: ManyGroupsOptions = {}, random: () => number = rng(options.seed ?? 7)): Graph {
+  const R = random;
   const b = new Board();
-  const cols = 8;
-  const rows = 4;
-  const per = 4;
+  const cols = options.groupCols ?? 8;
+  const rows = options.groupRows ?? 4;
+  const per = options.perGroup ?? 4;
+  const cross = options.crossLinksPerGroup ?? 3;
   const w = 60;
   const h = 30;
   const cardGap = 12;
-  const groupGap = 60;
+  const groupGap = options.groupGap ?? 60;
   const side = Math.ceil(Math.sqrt(per));
   const gw = side * w + (side - 1) * cardGap;
   const gh = Math.ceil(per / side) * h + (Math.ceil(per / side) - 1) * cardGap;
@@ -111,7 +141,7 @@ export function manyGroupsBoard(options: CaseSeedOptions = {}): Graph {
     }
   for (const list of groups) for (let i = 1; i < list.length; i++) b.link(list[i - 1]!, list[i]!);
   const pick = (list: readonly string[]): string => list[Math.floor(R() * list.length)]!;
-  for (let n = 0; n < groups.length * 3; n++) b.link(pick(groups[Math.floor(R() * groups.length)]!), pick(groups[Math.floor(R() * groups.length)]!));
+  for (let n = 0; n < groups.length * cross; n++) b.link(pick(groups[Math.floor(R() * groups.length)]!), pick(groups[Math.floor(R() * groups.length)]!));
   return b.graph();
 }
 
@@ -125,6 +155,8 @@ export interface PackedGridOptions {
   readonly rows?: number;
   /** The number of long links between boxes far apart. The default is 48. */
   readonly long?: number;
+  /** The largest step, in rows and in columns, of the link of a box to a box near it. The default is 2. */
+  readonly reach?: number;
 }
 
 /**
@@ -135,18 +167,20 @@ export interface PackedGridOptions {
  *
  * The board is not in `CASES`, because the digests of the router fix the output on each board of `CASES`.
  * The options make a family of such boards for the measure suite. Without options, the board does not change.
+ * The default source of random numbers is `rng(seed)`. A corpus family gives the same stream from its registry.
  */
-export function packedGridBoard(options: PackedGridOptions = {}): Graph {
-  const R = rng(options.seed ?? 11);
+export function packedGridBoard(options: PackedGridOptions = {}, random: () => number = rng(options.seed ?? 11)): Graph {
+  const R = random;
   const b = new Board();
   const cols = options.cols ?? 12;
   const rows = options.rows ?? 8;
   const long = options.long ?? 48;
+  const reach = options.reach ?? 2;
   const w = 140;
   const h = 90;
   const id = (r: number, c: number): string => `p${r}-${c}`;
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) b.node(id(r, c), c * w, r * h, w, h);
-  const step = (): number => Math.floor(R() * 5) - 2;
+  const step = (): number => Math.floor(R() * (2 * reach + 1)) - reach;
   for (let r = 0; r < rows; r++)
     for (let c = 0; c < cols; c++) {
       const rr = Math.max(0, Math.min(rows - 1, r + step()));

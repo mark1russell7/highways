@@ -1,8 +1,6 @@
 import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
-import { hubChainBoard, manyGroupsBoard, packedGridBoard } from "../../cases.ts";
-import { FIXTURES, makeFixture, type FixtureSpec } from "../../fixtures.ts";
+import { highwaysRegistry, type HighwaysBoard } from "../../families/index.ts";
 import type { Graph } from "../../model.ts";
-import { familySeed } from "../suite.ts";
 import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
 
@@ -46,21 +44,20 @@ export interface ScreenSet {
   readonly heldOut?: readonly number[];
 }
 
-const fixture = (name: string): FixtureSpec => FIXTURES.find((f) => f.name === name)!;
-const DENSE: FixtureSpec = { name: "dense-groups", kind: "clustered", nodes: 150, edgesPerNode: 2, seed: 3 };
-const PACKED = { cols: 12, rows: 8, long: 48 } as const;
+/** The registry of the screen sets (CORPUS-GEN). The screens and the site make each board with the same families. */
+const REGISTRY = highwaysRegistry();
 
-/** This function gives a family of `makeFixture`. The member `k` has the seed `familySeed(spec, k)`, as in `runSuite`. */
-function fixtureFamily(spec: FixtureSpec, shows: string, seeds: number, cell: LayoutCell): ScreenFamily {
-  const { name, seed: _seed, ...params } = spec;
-  return {
-    name,
-    shows,
-    seeds,
-    cell,
-    make: (k) => makeFixture({ ...spec, seed: familySeed(spec, k) }),
-    generator: (k) => ({ name: "fixture", version: 1, params, seed: familySeed(spec, k) }),
+/**
+ * This function gives a screen family of a corpus family at its defaults. The member `k` has the input seed `base + 1009 * k`, the rule of `familySeed`.
+ * The family keeps the board of its last member, so `make(k)` and `generator(k)` of one member generate one time.
+ */
+function registryFamily(name: string, base: number, shows: string, seeds: number, cell: LayoutCell): ScreenFamily {
+  let last: { readonly k: number; readonly board: HighwaysBoard } | undefined;
+  const board = (k: number): HighwaysBoard => {
+    if (last?.k !== k) last = { k, board: REGISTRY.generate(name, caseSeed(base, k)) };
+    return last.board;
   };
+  return { name, shows, seeds, cell, make: (k) => board(k).graph, generator: (k) => board(k).generator };
 }
 
 /** The cell dimensions that each family of `screen-v1` shares. */
@@ -74,36 +71,16 @@ export function caseSeed(base: number, k: number): number {
 /**
  * This function gives the 6 families of the screen. Each fixture family and `packed-grid` has `seeds` members.
  * The case boards `hub-chain` and `many-groups` have `caseSeeds` members. The member `k` of a family has the seed of its rule for `k`.
+ * Each family is a family of `HIGHWAYS_FAMILIES` at its defaults. The base seeds are the seeds of the fixtures and the case boards of the benchmark.
  */
 function screenFamilies(seeds: number, caseSeeds: number): ScreenFamily[] {
   return [
-    fixtureFamily(fixture("tiny-uniform"), "A tiny board: the cost of a strategy at its start.", seeds, { ...BASE, count: "10", edgeDensity: "medium", edgeShape: "random", ports: "free" }),
-    fixtureFamily(fixture("small-clustered"), "Clusters, and fixed plugs on 20% of the nodes.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "fixed" }),
-    fixtureFamily(DENSE, "Dense groups whose boxes overlap at the far view.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "free" }),
-    {
-      name: "hub-chain",
-      shows: "A chain of hubs: routes climb away from their targets.",
-      seeds: caseSeeds,
-      cell: { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "hubChain", ports: "free" },
-      make: (k) => hubChainBoard({ seed: caseSeed(3, k) }),
-      generator: (k) => ({ name: "case.hub-chain", version: 1, params: {}, seed: caseSeed(3, k) }),
-    },
-    {
-      name: "many-groups",
-      shows: "Many groups: level links go around the board.",
-      seeds: caseSeeds,
-      cell: { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "free" },
-      make: (k) => manyGroupsBoard({ seed: caseSeed(7, k) }),
-      generator: (k) => ({ name: "case.many-groups", version: 1, params: {}, seed: caseSeed(7, k) }),
-    },
-    {
-      name: "packed-grid",
-      shows: "A packed grid: boxes touch, with no channel for the routes.",
-      seeds,
-      cell: { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "longRange", ports: "free" },
-      make: (k) => packedGridBoard({ ...PACKED, seed: caseSeed(11, k) }),
-      generator: (k) => ({ name: "case.packed-grid", version: 1, params: PACKED, seed: caseSeed(11, k) }),
-    },
+    registryFamily("tiny-uniform", 1, "A tiny board: the cost of a strategy at its start.", seeds, { ...BASE, count: "10", edgeDensity: "medium", edgeShape: "random", ports: "free" }),
+    registryFamily("small-clustered", 2, "Clusters, and fixed plugs on 20% of the nodes.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "fixed" }),
+    registryFamily("dense-groups", 3, "Dense groups whose boxes overlap at the far view.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "free" }),
+    registryFamily("hub-chain", 3, "A chain of hubs: routes climb away from their targets.", caseSeeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "hubChain", ports: "free" }),
+    registryFamily("many-groups", 7, "Many groups: level links go around the board.", caseSeeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "clustered", ports: "free" }),
+    registryFamily("packed-grid", 11, "A packed grid: boxes touch, with no channel for the routes.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "longRange", ports: "free" }),
   ];
 }
 
