@@ -85,6 +85,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BUILD-W3F | Seven highway finders: `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub` and `scale-space`. No finder beats `shared` on more than 2 of 4 boards, alone or with the gate `stretch`. All seven are dropped. `p-hub` closes 0.356 of the gap on tiny-uniform. | 2026-10-27 | #95 |
 | PORTFOLIO | [The portfolio of strategies](research/PORTFOLIO.md): `shared` and k more strategies, and the output with the best guarded B1. On `exact-v1`, k = 3 keeps 6% of the oracle gain, because B10 needs the optimum. On `screen-v1`, k = 3 keeps 72%, but at most 4.3% over the best single strategy on each board. At 40 nodes, it takes 42 ms one after the other. | 2026-10-27 | #101 |
 | PORTFOLIO-RULE | [The rule of the caller](research/PORTFOLIO.md#the-rule-of-the-caller-portfolio-rule): each reversed pair of B1 and B10 has another rule or another cap. With the rule of the caller and the one cap 1.5, the whole pool reaches the oracle. k = 3 keeps 47% of the gain for `all` and 12% for `collection`. | 2026-10-27 | #105 |
+| GUARDS | Two guards in [the promotion rule](PROMOTION.md#activation), with the same text as packing and layout-contract. A verdict counts only when the candidate is exercised. Candidates with the same `outputHash` on each decision input count as one output group. | 2026-10-28 | #102 |
 
 ## Open
 
