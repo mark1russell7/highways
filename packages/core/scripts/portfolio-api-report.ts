@@ -20,7 +20,8 @@ import { chooseSets, midValue, readOptima, readShortRuns, readTimes, runTableOf,
 export { formName };
 
 /** This function gives a trace measure of a record, from the screen module. */
-const traceOf = (r: OracleRecord, key: string): number | undefined => (r as OracleRecord & { trace?: { measures?: Readonly<Record<string, number>> } }).trace?.measures?.[key];
+const traceOf = (r: OracleRecord, key: string): number | undefined =>
+  (r as OracleRecord & { trace?: readonly { readonly id: string; readonly measures: Readonly<Record<string, number>> }[] }).trace?.find((t) => t.measures[key] !== undefined)?.measures[key];
 
 /** This function tells if a variant cuts by the time budget. Its output depends on the machine, so the report does not count its `same-twice` break. */
 const timed = (v: PortfolioVariant): boolean => v.options.budgetMs !== undefined;

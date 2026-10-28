@@ -377,7 +377,7 @@ This section is the result of the item PORTFOLIO-API of the [roadmap](../ROADMAP
 
 - `routePortfolio(graph, { rule, cap, k, budgetMs, maxMembers })` runs the base `shared`, then the first k members of the set of its rule, cap and size band.
 - The rule is `collection` (the default) or `all`. The cap is 1.1, 1.25 or 1.5 (the default). k is 3 (the default), 5 or 8.
-- The combinator is a local copy of `portfolio` of `@mark1russell7/layout-contract` 0.2.6, in `src/bench/screen/portfolio-pick.ts`. The test `portfolio-pick.test.ts` runs 2 000 seeded cases through the copy and the contract. The picks, the errors and the clock reads are equal on each case. `selectBest` and `pickMoves` are also equal.
+- The combinator was a local copy of `portfolio` of `@mark1russell7/layout-contract` 0.2.6. A test compared the copy and the contract on 2 000 seeded cases. Since PORTFOLIO-FIT, the core imports the combinator from the contract.
 - The key of the pick:
   - `hard` counts the breaks of the hard rules, plus each edge with a stretch above the cap. Under `collection`, it also counts each shared segment that holds edges of two collections.
   - The one level `B1` is the ink saved (higher is better), with the `minEffect` of the table `MEASURES`.
@@ -476,3 +476,30 @@ The median time of the router, one member after the other, on a CI machine. `sha
 | 6. At 13 to 24 and 25 to 40 nodes, the band set at k = 5 beats the 10-node set in each rule and cap, by 10 points or more in at least half of the 12 cells. | medium | Not met: it beats the 10-node set in 10 of 12 cells, and by 10 points or more in 9. It loses under `all` at 1.25 and 13 to 24 nodes (74% against 100%). At 25 to 40 nodes under `collection` at 1.1, no set has a gain. |
 | 7. Under `collection`, the band set at k = 5 keeps 20% or more at 13 to 24 nodes at each cap. | low | Not met: 4% at 1.1, 38% at 1.25 and 45% at 1.5. |
 | 8. At 25 to 40 nodes under `all` at the caps 1.1 and 1.25, the base wins on half of the test inputs or more. | medium | Not met: 4 of 20 and 0 of 19. The base wins most under `collection` at 1.1: 18 of 20. |
+
+## The fit of the router (PORTFOLIO-FIT)
+
+This section is the result of the item PORTFOLIO-FIT of the [roadmap](../ROADMAP.md). It has three parts: one key, the import of the contract and a deterministic default.
+
+### The decision: the core imports the contract
+
+The core imports the shared functions from `@mark1russell7/layout-contract` (0.2.6 or later):
+
+- `portfolio`, `selectBest` and `pickMoves`;
+- `compareMeasure`, `minEffectOf` and `RECORD_EPS`;
+- `outputHash`, `outputGroups`, `exercised`, `canonicalJson` and `sha256Hex`.
+
+The reasons:
+
+- Two copies of the pick can disagree. PORTFOLIO-API found such a difference between the key of the router and the guard of the records.
+- The contract has no dependencies, so the import adds only the contract.
+- The parity tests of the copies are not necessary, so the core loses 2 test files.
+
+The published package `@mark1russell7/highways` now has one run-time dependency. The core keeps only the functions that the contract does not have:
+
+- `documentHash`, because the function of the contract rounds to a grid, and the hash of a document keeps the exact numbers;
+- `utf8`, because the contract does not export it;
+- the seeds, the random generator and `round3`.
+
+BUNDLE_PLACEHOLDER
+

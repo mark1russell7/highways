@@ -105,7 +105,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PLAY | The playground page: choose a strategy for each step and move the options. The measures change live, and a link keeps the setting. | `later` | OPTS, MEAS1 | P2 |
 | EX3 | More example boards of made-up data: charts of teams, pipelines, network maps, timelines and dense grids, each with its page. | `later` | EX2 | P3 |
 | SHARED-SMOOTH | The routers `shared` and `shared-all` read their option `smooth`, or the schema loses it. Today the control does nothing. | `later` | EX2-FIX | P2 |
-| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at the rule `collection` first, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. The second aim is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
+| BUILD-W | Build and screen each idea of the catalog, in waves by family and by expected value. Each kept idea gets its folder, its tests and a row in the benchmark. The next waves aim at two holes of the portfolio first. The first hole is the rule `collection` at the cap 1.1 on large boards: there the base `shared` wins on 18 of 20 test inputs. The second hole is the rule `all` at a tight cap (1.1, 1.25) on large boards, where the medians of gap closed are negative. After them, the waves aim at the rule `collection`, because there the best single strategy reaches 0.021 of gap closed, against an oracle of 0.378. | `later` | IDEA0, SCREEN, HWY-STEP | P1 |
 
 ## Rules for each item
 
