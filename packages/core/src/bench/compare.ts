@@ -50,7 +50,8 @@ function laneBoard(result: Result, lanes: { readonly width: number; readonly max
 
 /**
  * The steps whose strategies give no routes alone. `compareAnyStep` and the screen compare each strategy of these steps as a router (`stepRouterStrategy`).
- * The step `highway` gives a plan, the step `plugs` gives the plugs, the step `levels` gives the zoom levels, and the step `whole` gives a board with its routes.
+ * The step `highway` gives a plan, and the step `plugs` gives the plugs.
+ * The step `levels` gives the zoom levels, and the step `whole` gives a board with its routes.
  */
 export type RoutedStep = "plugs" | "highway" | "levels" | "whole";
 

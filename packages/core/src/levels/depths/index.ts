@@ -13,7 +13,8 @@ export interface DepthLevelOptions extends Omit<LevelLinkOptions, "smooth"> {
 }
 
 /**
- * This function gives the zoom levels of the level strategy `depths`: one level for each depth of the tree, and a last level with each node alone.
+ * This function gives the zoom levels of the level strategy `depths`.
+ * It gives one level for each depth of the tree, and a last level with each node alone.
  * It is the default of the router `sections`. With the option `levels`, only those depths get a level with groups.
  * At depth d, a section of depth d is one item. A link joins two items and counts the edges between them.
  * In a level with groups, a link goes around the boxes of the other items (`levelLinks`).

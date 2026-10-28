@@ -36,7 +36,8 @@ export interface PipelineOptions {
 }
 
 /**
- * This function gives the key of the option of a router that takes a strategy of one step, or `undefined` when the router has no such option.
+ * This function gives the key of the option of a router that takes a strategy of one step.
+ * It gives `undefined` when the router has no such option.
  * The schema of the router declares the option with the type `strategy` and the step. The options of that strategy have the key `<key>Options`.
  */
 export function strategyKey(router: Strategy<"router">, step: Step): string | undefined {

@@ -28,7 +28,7 @@ import { SCREEN_V1, screenInputs, type ScreenSet } from "./set.ts";
 /**
  * The steps of the screen: the steps of `compareStep` and the steps of `RoutedStep`.
  * The screen of the step `highway` routes the plan of each strategy with `follow`, and measures the routes as the routes of a router.
- * The screen of the steps `plugs`, `levels` and `whole` runs each strategy as a router (`stepRouterStrategy`), and measures the routes as the routes of a router.
+ * The screen of the steps `plugs`, `levels` and `whole` runs each strategy as a router (`stepRouterStrategy`). It measures the routes as the routes of a router.
  */
 export type ScreenStep = CompareStep | RoutedStep;
 

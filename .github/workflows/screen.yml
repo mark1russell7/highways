@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "The step: router, highway, curve or group."
+        description: "The step: group, plugs, router, highway, levels, curve or whole."
         default: "router"
       strategy:
         description: "Names of the registry, with commas. Empty: the built-in strategies of the step."

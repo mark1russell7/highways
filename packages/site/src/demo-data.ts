@@ -17,7 +17,7 @@ import {
 /** The option values of the demo, by step, then by the name of the strategy, then by the key of the option. */
 export type DemoOptions = Readonly<Partial<Record<Step, Readonly<Record<string, Readonly<Record<string, number | boolean | string>>>>>>>;
 
-/** What the demo routes: a router or a highway plan, the rules that the router reads, a room strategy, the whole strategy and the options of each one. */
+/** What the demo routes: a router or a highway plan, its rules, a room strategy and the whole strategy, each with its options. */
 export interface DemoPick {
   readonly router: string;
   /** The highway strategy. With it, the plan of the strategy and `follow` give the routes, not the router. */
