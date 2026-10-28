@@ -82,6 +82,16 @@ describe("the committed files of the results page", () => {
     for (const t of data.tables) for (const s of t.strategies) expect(s.cells.length, `${t.set} ${s.name}`).toBe(t.guards.length);
   });
 
+  it("gives the measures of the core with the definition of each new measure (SCREEN-MEASURES)", () => {
+    const data = readResults(root);
+    expect(data.measures.length).toBeGreaterThan(100);
+    expect(data.text["The measures"]).toContain("<p>");
+    for (const id of ["C4", "C8", "G4", "G5", "G7", "H3", "M2", "M3", "M5", "Z1", "Z5"]) {
+      const rows = data.measures.filter((m) => m.id === id && m.definition !== "");
+      expect(rows.length, id).toBeGreaterThan(0);
+    }
+  });
+
   it("shows the top of the idea queue and the count of each status", () => {
     const data = readResults(root);
     expect(data.queue.top).toHaveLength(QUEUE_TOP);
@@ -90,7 +100,6 @@ describe("the committed files of the results page", () => {
     expect(data.queue.statuses.filter((s) => s.status !== "built").reduce((n, s) => n + s.count, 0)).toBe(data.queue.ranked);
     expect(data.text["The build queue"]).toContain("<p>");
     expect(() => queueView("{}")).toThrow(/queue.json/);
-    expect(data.queue.enablers.length).toBeGreaterThanOrEqual(1);
     for (const e of data.queue.enablers) {
       expect(e.kind, e.id).toBe("enabler");
       expect(e.unblocks, e.id).toBeGreaterThan(0);

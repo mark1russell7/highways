@@ -1,4 +1,7 @@
+import { rng } from "../../fixtures.ts";
+import { center, dist, type Point } from "../../geom.ts";
 import type { Graph, Level } from "../../model.ts";
+import { countOverlaps } from "../links.ts";
 import type { Section } from "../../sections.ts";
 import { adjustedRandIndex } from "./stats.ts";
 
@@ -119,4 +122,72 @@ export function leafGroups(root: Section, count: number): string[] {
  */
 export function groupStability(before: Section, after: Section, count: number): number {
   return adjustedRandIndex(leafGroups(before, count), leafGroups(after, count));
+}
+
+/**
+ * This function gives the fill of the groups of one level (G4 of MEAS0): the mean of `fill(c) = Σ_(v in c) area(box(v)) / area(box(c))`.
+ * `box(c)` is the box of the item. Only an item with 2 or more nodes counts, and a fill above 1 counts as 1.
+ * The scale is 0 to 1, and higher is better. A level without such an item gives `undefined`. The cost is linear.
+ */
+export function groupFill(graph: Graph, level: Level): number | undefined {
+  const area = new Map(graph.nodes.map((n) => [n.id, n.box.w * n.box.h] as const));
+  const fills: number[] = [];
+  for (const item of level.items) {
+    if (item.nodes.length < 2) continue;
+    const own = item.box.w * item.box.h;
+    const inside = item.nodes.reduce((s, v) => s + (area.get(v) ?? 0), 0);
+    fills.push(own > 0 ? Math.min(1, inside / own) : 1);
+  }
+  return fills.length === 0 ? undefined : fills.reduce((s, f) => s + f, 0) / fills.length;
+}
+
+/**
+ * This function counts the overlaps of the items of the levels (G5 of MEAS0).
+ * An overlap is a pair of items of one level whose boxes overlap by more than `TOLERANCE`.
+ * It is the sum over the levels of `countOverlaps`. Lower is better. The cost is `n log n` for each level.
+ */
+export function itemOverlaps(levels: readonly Level[]): number {
+  return levels.reduce((n, level) => n + countOverlaps(level.items.map((i) => i.box)), 0);
+}
+
+/** Up to this number of nodes, `silhouette` examines each node. Above it, two seeded samples of this size give an estimate. */
+const SILHOUETTE_NODES = 2000;
+
+/**
+ * This function gives the silhouette of the groups of one level (G7 of MEAS0, Rousseeuw 1987): the mean of `s(v) = (b_v - a_v) / max(a_v, b_v)`.
+ * `a_v` is the mean distance from the center of `v` to the centers of the other nodes of its item. `b_v` is the smallest mean distance to the nodes of another item.
+ * A node alone in its item gets `s(v) = 0`. The scale is -1 to 1, and higher is better.
+ * A level with fewer than 2 items gives `undefined`. The cost is quadratic up to 2000 nodes.
+ * Above 2000 nodes, a seeded sample of 2000 nodes gets `s(v)`, against a second seeded sample of 2000 nodes. Thus the value is an estimate.
+ */
+export function silhouette(graph: Graph, level: Level): number | undefined {
+  const at = new Map(graph.nodes.map((n) => [n.id, center(n.box)] as const));
+  const all = level.items.flatMap((item, k) => item.nodes.flatMap((v) => (at.has(v) ? [{ p: at.get(v)!, k }] : [])));
+  if (new Set(all.map((x) => x.k)).size < 2) return undefined;
+  const R = rng(all.length);
+  const sample = (): typeof all => (all.length <= SILHOUETTE_NODES ? all : Array.from({ length: SILHOUETTE_NODES }, () => all[Math.floor(R() * all.length)]!));
+  const chosen = sample();
+  const ref = sample();
+  const groups = new Map<number, Point[]>();
+  for (const { p, k } of ref) {
+    const g = groups.get(k);
+    if (g) g.push(p);
+    else groups.set(k, [p]);
+  }
+  let sum = 0;
+  for (const { p, k } of chosen) {
+    const own = groups.get(k);
+    if (!own || own.length < 2) continue;
+    let a = 0;
+    let b = Number.POSITIVE_INFINITY;
+    for (const [j, g] of groups) {
+      const d = g.reduce((s, q) => s + dist(p, q), 0);
+      if (j === k) a = d / (g.length - 1);
+      else b = Math.min(b, d / g.length);
+    }
+    if (!Number.isFinite(b)) continue;
+    const m = Math.max(a, b);
+    sum += m > 0 ? (b - a) / m : 0;
+  }
+  return sum / chosen.length;
 }

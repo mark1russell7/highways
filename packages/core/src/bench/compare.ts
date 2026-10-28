@@ -235,7 +235,19 @@ export function stepRouterStrategy(strategy: Strategy<RoutedStep>): Strategy<"ro
     });
   if (strategy.step === "plugs") return own(strategy.maxNodes ?? 10_000, (graph, o) => cornersRouter({ name, plug: strategy as Strategy<"plugs">, plugOptions: o }).route(graph));
   if (strategy.step === "levels") return own(strategy.maxNodes ?? 100_000, (graph, o) => sectionsRouter({ name, level: strategy as Strategy<"levels">, levelOptions: o }).route(graph));
-  return own(strategy.maxNodes, (graph, o) => (strategy as Strategy<"whole">).run(graph, o).result);
+  return own(strategy.maxNodes, (graph, o) => {
+    const out = (strategy as Strategy<"whole">).run(graph, o);
+    WHOLE_BOARDS.set(out.result, out.graph);
+    return out.result;
+  });
+}
+
+/** The board of the output of each whole strategy that `stepRouterStrategy` runs, by its result. The screen reads it for the measures of the moved boxes. */
+const WHOLE_BOARDS = new WeakMap<Result, Graph>();
+
+/** This function gives the board of the output of a whole strategy that `stepRouterStrategy` ran, or `undefined` for another result. A room strategy can move the boxes of this board. */
+export function wholeBoard(result: Result): Graph | undefined {
+  return WHOLE_BOARDS.get(result);
 }
 
 /** This function gives a router for each strategy of one step of `RoutedStep` in a registry, in the order of the registry (`stepRouterStrategy`). */

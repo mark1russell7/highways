@@ -937,6 +937,13 @@ The enabler on 2026-10-28, after STEP-SLOTS:
 - `SCREEN-MEASURES` unblocks each of the 21 ideas with a measure block. For each one, the measure is the only block.
 - `SCREEN-MEASURES` gets a low score because a missing measure has no open targets. Each win on it adds only 0.5 to the gain.
 
+SCREEN-MEASURES is built. The screen has the 11 measures, so no block `measure:` is left. It left the list `ENABLERS`, so the list is empty.
+
+- The blocked ideas went from 38 to 17. Each of the 17 waits for an other idea.
+- Each of the 21 ideas is ranked and has no block. The ranks go from 50 (`RULE-035`) to 162 (`EDA-036`).
+- The top 10 keeps the same ideas in the same sequence. Each rank below 25 goes up by 1, because the enabler left the list.
+- The measure `M2` has two definitions in the records. `RULE-016` uses it for the order of the edges at a station of a highway. Five other records use the order of the boxes. The screen uses the order of the boxes, as `MEASURES.md` does.
+
 The joint top 10 after STEP-SLOTS:
 
 | Rank | Item | Step | Score | Blocked by |

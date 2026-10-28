@@ -49,6 +49,12 @@ $("split-body").innerHTML = data.text["Where no single default wins"] ?? "";
 $("ideas-body").innerHTML = data.text["The ideas"] ?? "";
 $("new-body").innerHTML = data.text["What is new"] ?? "";
 $("queue-body").innerHTML = data.text["The build queue"] ?? "";
+$("measures-body").innerHTML = data.text["The measures"] ?? "";
+
+/** The definition of each measure by its name in a record, from `MEASURES` of the core. */
+const DEFINITION = new Map(data.measures.filter((m) => m.definition !== "").map((m) => [m.name, m.definition] as const));
+/** This function gives the hint of a guard measure: its definition, or its name when the core has no definition. */
+const hint = (measure: string): string => DEFINITION.get(measure) ?? measure;
 
 // The tiles at the top: four numbers that a visitor reads first.
 function tiles(): void {
@@ -113,7 +119,7 @@ function grid(): void {
   $("summary").innerHTML = `${rows.length} of ${t.strategies.length} strategies of the step <code>${esc(t.step)}</code> on <code>${esc(t.set)}</code> against <code>${esc(t.base)}</code>. ${counts
     .map(([l, n]) => `<span class="res-count ${CLS[l]}"><b aria-hidden="true">${GLYPH[l]}</b> ${n} ${esc(l)}</span>`)
     .join(" ")}`;
-  const head = `<tr><th scope="col">Strategy</th>${t.guards.map((g) => `<th scope="col" title="${esc(g.measure)}">${esc(g.id)}<small>${esc(g.measure)}</small></th>`).join("")}</tr>`;
+  const head = `<tr><th scope="col">Strategy</th>${t.guards.map((g) => `<th scope="col" title="${esc(hint(g.measure))}">${esc(g.id)}<small>${esc(g.measure)}</small></th>`).join("")}</tr>`;
   const body = rows
     .map(
       (s) =>
@@ -147,6 +153,7 @@ function detail(t: VerdictTable): void {
   const word = (sign: string): string => (sign === "+" ? "wins" : sign === "-" ? "loses" : "tie");
   $("detail").innerHTML = `<p class="method"><strong><code>${esc(s.name)}</code></strong> against <code>${esc(t.base)}</code></p>
     <p><span class="res-count ${CLS[c.label]}"><b aria-hidden="true">${GLYPH[c.label]}</b> ${esc(c.label)}</span> on ${esc(c.guard)} <small>(${esc(g?.measure ?? "")})</small></p>
+    ${g && DEFINITION.has(g.measure) ? `<p class="hint">${esc(DEFINITION.get(g.measure)!)}</p>` : ""}
     <p>${esc(breadth(c))}. Permutation p: ${c.p}.</p>
     <ul class="res-fams">${t.families.map((f, i) => `<li class="${word(c.signs[i] ?? "0")}"><span aria-hidden="true">${c.signs[i] === "+" ? "+" : c.signs[i] === "-" ? "−" : "·"}</span> <code>${esc(f)}</code> ${word(c.signs[i] ?? "0")}</li>`).join("")}</ul>`;
 }
@@ -202,6 +209,18 @@ function queue(): void {
   $("queue-top").innerHTML = `<table class="res-kept"><caption>The top ${q.top.length} of the queue on ${esc(q.date)} (formula <code>${esc(q.formula)}</code>)</caption><thead><tr><th scope="col">Rank</th><th scope="col">Idea</th><th scope="col">Step</th><th scope="col">Score</th><th scope="col">Status</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+// The measures of the records: each measure with a definition in a table, and the others in a list that opens.
+function measures(): void {
+  const row = (m: (typeof data.measures)[number]): string =>
+    `<tr><th scope="row">${esc(m.id)}</th><td><code>${esc(m.name)}</code></td><td>${esc(m.unit)}</td><td>${m.better === "lower" ? "lower" : "higher"}</td><td>${esc(m.definition)}</td></tr>`;
+  const head = `<thead><tr><th scope="col">Id</th><th scope="col">Name in a record</th><th scope="col">Unit</th><th scope="col">Better</th><th scope="col">Definition</th></tr></thead>`;
+  const defined = data.measures.filter((m) => m.definition !== "");
+  const rest = data.measures.filter((m) => m.definition === "");
+  $("measure-list").innerHTML =
+    `<table class="res-kept"><caption>The ${defined.length} measures with a definition in the core</caption>${head}<tbody>${defined.map(row).join("")}</tbody></table>` +
+    `<details><summary>The other ${rest.length} measures</summary><table class="res-kept">${head}<tbody>${rest.map(row).join("")}</tbody></table></details>`;
+}
+
 // What is new: the last Shipped rows of the roadmap.
 function news(): void {
   $("news").innerHTML = data.shipped
@@ -226,5 +245,6 @@ draw();
 split();
 ideas();
 queue();
+measures();
 news();
 snapshots();

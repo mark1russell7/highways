@@ -315,6 +315,10 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | lower | no |
 | `route.lane.area` | M1 | `M1.area` | ratio | lower | no |
 | `route.lane.through` | M4 | `M4.laneThrough` | count | lower | yes |
+| `route.room.order` | M2 | `M2.order` | count | lower | no |
+| `route.room.displacement` | M3 | `M3.displacement` | no unit | lower | no |
+| `route.room.distortion` | M5 | `M5.stress` | 0 to 1 | lower | no |
+| `route.symmetry` | H3 | `H3.share` | 0 to 1 | higher | yes |
 | `route.order.crossings` | W3 | `W3.crossings` | IQR over the median | lower | yes |
 | `route.order.detour` | W3 | `W3.detour` | IQR over the median | lower | yes |
 | `route.order.ink-saved` | W3 | `W3.inkSaved` | IQR over the median | lower | yes |
@@ -339,17 +343,27 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.level.far-items` | Z4 | `Z4.farItems` | count | lower | yes |
 | `route.level.position` | Z7 | `Z7.position` | no unit | lower | yes |
 | `route.level.order` | Z8 | `Z8.order` | -1 to 1 | higher | yes |
+| `route.level.counts-sum` | Z1 | `Z1.countsSum` | count | lower | no |
+| `route.level.ratio.max` | Z5 | `Z5.max` | ratio | lower | yes |
+| `route.level.ratio.spread` | Z5 | `Z5.spread` | no unit | lower | yes |
 | `route.group.modularity` | G1 | `G1.modularity` | -0.5 to 1 | higher | yes |
 | `route.group.cut` | G2 | `G2.cut` | 0 to 1 | lower | yes |
 | `route.group.balance` | G6 | `G6.balance` | 0 to 1 | higher | yes |
 | `route.group.tree-cost` | G8 | `G8.treeCost` | 0 to 1 | lower | yes |
 | `route.group.stability` | G9 | `G9.ari` | -1 to 1 | higher | yes |
+| `route.group.fill` | G4 | `G4.fill` | 0 to 1 | higher | yes |
+| `route.group.overlaps` | G5 | `G5.overlaps` | count | lower | yes |
+| `route.group.silhouette` | G7 | `G7.silhouette` | -1 to 1 | higher | yes |
 | `route.curve.c1.max` | C1 | `C1.max` | degrees | lower | no |
 | `route.curve.c1.share` | C1 | `C1.share` | 0 to 1 | lower | no |
 | `route.curve.c2.median` | C2 | `C2.median` | no unit | lower | no |
 | `route.curve.c2.max` | C2 | `C2.max` | no unit | lower | no |
 | `route.curve.c3.median` | C3 | `C3.median` | no unit | lower | no |
 | `route.curve.c3.q95` | C3 | `C3.q95` | no unit | lower | no |
+| `route.curve.c4.median` | C4 | `C4.median` | no unit | lower | no |
+| `route.curve.c4.q95` | C4 | `C4.q95` | no unit | lower | no |
+| `route.curve.c8.median` | C8 | `C8.median` | no unit | lower | no |
+| `route.curve.c8.max` | C8 | `C8.max` | no unit | lower | no |
 | `route.curve.c5.peak` | C5 | `C5.peak` | curvature times the unit of the board | lower | no |
 | `route.curve.c6.length` | C6 | `C6.length` | ratio | lower | no |
 | `route.curve.rule.clear` | C7 | `curve-clear` | count | lower | no |
@@ -377,6 +391,14 @@ Since MEAS3A, the screen also adds these measures for each record of the steps `
 - The suite keeps its own `M1.area` and `M4.laneThrough` of the room step.
 - `route.level.link-ends` (Z2) is the count of the hard rule `link-ends`. The steps `router`, `highway` and `group` write it.
 - `route.level.link-agreement` (Z9) is the mean Hausdorff distance of each link to the routes of its edges, in units of the board. It needs zoom levels.
+
+Since SCREEN-MEASURES, the screen adds 11 more measures. `docs/research/MEASURES.md` gives the exact forms, and `definition` of `MEASURES` gives a short text of each one.
+
+- `route.curve.c4.*` (C4) is the curvature variation of each curve, and `route.curve.c8.*` (C8) is the Fréchet distance of each curve from its route. The step `curve` writes them.
+- `route.group.fill` (G4), `route.group.overlaps` (G5) and `route.group.silhouette` (G7) read the items of the levels. A record with zoom levels gets them.
+- `route.level.counts-sum` (Z1) is the count of the hard rule `counts-sum`, as Z2. `route.level.ratio.*` (Z5) needs 2 levels or more.
+- `route.symmetry` (H3) is the share of the routes that a mirror or a half turn of the board sends onto a route. Each record with routes gets it.
+- `route.room.*` (M2, M3 and M5) compare the board of the output of a whole strategy with the input board. Only the step `whole` writes them.
 
 `route.order.*` (W3 of MEAS3) is the order fragility of WILD-056. The screen writes it only with the option `shuffles`.
 

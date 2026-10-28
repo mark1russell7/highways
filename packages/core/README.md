@@ -659,10 +659,14 @@ The [note on the measures](https://github.com/mark1russell7/highways/blob/main/d
 | R11 | `plugSpacing`: the gaps between the plugs of each side |
 | B1, B4 | `inkSaved`, `ambiguity` |
 | C1, C2, C3 | `g1Defect`, `g2Defect`, `bendingEnergy` |
+| C4, C8 | `curvatureVariation`, `curveDeviation` |
+| Z5 | `levelRatio`: the largest ratio of the item counts of two levels, and the spread of the ratios |
 | Z6, Z7, Z8 | `nestingFaults`, `positionStability`, `orderStability` |
 | Z10 | `changeGraph` makes a seeded small change, and `routeStability` compares the routes |
 | G1, G2, G8, G9 | `modularity`, `cutShare`, `treeCost`, `groupStability` |
-| M2 | `roomOrderFaults` |
+| G4, G5, G7 | `groupFill`, `itemOverlaps`, `silhouette` |
+| M2, M3, M5 | `roomOrderFaults`, `boxDisplacement`, `distanceDistortion` |
+| H3 | `routeSymmetry`: the share of the routes that a mirror or a half turn of the board keeps |
 
 A quadratic measure examines a seeded sample above its limit, so the values of a large board are estimates.
 

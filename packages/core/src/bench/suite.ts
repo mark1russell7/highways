@@ -15,7 +15,7 @@ import { asRouter, listStrategies, STEPS, type LaneBoard, type Registry, type St
 import { measureLevelFaults, sumFaults } from "./links.ts";
 import { checkLevels } from "./properties.ts";
 import { ambiguity, inkSaved } from "./measures/bundles.ts";
-import { bendingEnergy, curveFaults, g1Defect, g2Defect } from "./measures/curves.ts";
+import { bendingEnergy, curvatureVariation, curveDeviation, curveFaults, g1Defect, g2Defect } from "./measures/curves.ts";
 import { balance, cutShare, farLevel, groupStability, levelGrouping, modularity, treeCost } from "./measures/groups.ts";
 import { nestingFaults, orderStability, positionStability } from "./measures/levels.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
@@ -328,7 +328,7 @@ export interface CurveRun {
   readonly edges: readonly string[];
 }
 
-/** This function draws the routes of a result with each curve strategy and measures the curves (C1, C2, C3, C6 and the curve rules). */
+/** This function draws the routes of a result with each curve strategy and measures the curves (C1, C2, C3, C4, C6, C8 and the curve rules). */
 export function curveRuns(graph: Graph, result: Result, curves: readonly Strategy<"curve">[], options: CurveRunOptions): CurveRun[] {
   const byId = nodeIndex(graph);
   const edges = new Map(graph.edges.map((e) => [e.id, e]));
@@ -363,6 +363,8 @@ export function curveRuns(graph: Graph, result: Result, curves: readonly Strateg
     const g1: number[] = [];
     const g2: number[] = [];
     const energy: number[] = [];
+    const variation: number[] = [];
+    const deviation: number[] = [];
     const rules = { "curve-clear": 0, "curve-ends": 0, "curve-g1": 0, "curve-simple": 0 };
     let length = 0;
     drawn.forEach((segments, i) => {
@@ -371,6 +373,8 @@ export function curveRuns(graph: Graph, result: Result, curves: readonly Strateg
       g1.push(g1Defect(segments));
       g2.push(g2Defect(segments, u));
       energy.push(bendingEnergy(s, 0.25));
+      variation.push(curvatureVariation(s, 0.25));
+      deviation.push(curveDeviation(s, r.points, u / 4) / u);
       length += polylineLength(s);
       const normals = options.normals.has(curve.name);
       const f = curveFaults({
@@ -394,6 +398,10 @@ export function curveRuns(graph: Graph, result: Result, curves: readonly Strateg
       "C2.max": g2.reduce((m, x) => Math.max(m, x), 0),
       "C3.median": quantile(energy, 0.5) || 0,
       "C3.q95": quantile(energy, 0.95) || 0,
+      "C4.median": quantile(variation, 0.5) || 0,
+      "C4.q95": quantile(variation, 0.95) || 0,
+      "C8.median": quantile(deviation, 0.5) || 0,
+      "C8.max": deviation.reduce((m, x) => Math.max(m, x), 0),
       "C6.length": ink > 0 ? length / ink : 1,
       ...rules,
     };

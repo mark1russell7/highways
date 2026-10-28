@@ -4,8 +4,9 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { MEASURES } from "@mark1russell7/highways";
 import { marked } from "marked";
-import { resultsData, type IdeaRecord, type ResultsData } from "./results-data.ts";
+import { resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
 
 /** The folders of the committed files, relative to the root of the repository. */
 export const RESULT_FILES = {
@@ -52,6 +53,11 @@ export function textSections(markdown: string): Record<string, string> {
   return out;
 }
 
+/** This function gives the measures of the records from `MEASURES` of the core, with the definition of each measure that has one. */
+export function measureRows(): MeasureRow[] {
+  return MEASURES.map((m) => ({ id: m.id, name: m.name, unit: m.unit, better: m.better, definition: m.definition ?? "" }));
+}
+
 /** This function makes the data of the results page from the files of the repository at `root`. */
 export function readResults(root: string): ResultsData {
   return resultsData({
@@ -61,6 +67,7 @@ export function readResults(root: string): ResultsData {
     inline: (md) => marked.parseInline(md, { async: false }),
     text: textSections(readFileSync(join(root, RESULT_FILES.text), "utf8")),
     queue: readFileSync(join(root, RESULT_FILES.queue), "utf8"),
+    measures: measureRows(),
   });
 }
 

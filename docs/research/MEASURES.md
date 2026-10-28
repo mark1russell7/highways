@@ -123,6 +123,23 @@ Since MEAS3A, the screen computes ten more measures. Some formulas below leave a
 - Z9: The screen reads only the levels with an item of two nodes or more. The edges of a link are the edges between its two items, in either direction.
 - Z9: The screen samples each polyline at points `max(u / 4, L / 64)` apart and keeps the points outside both items. A link without such points on both sides does not count.
 
+### The exact forms of SCREEN-MEASURES
+
+SCREEN-MEASURES adds 11 measures to the screen: C4, C8, G4, G5, G7, H3, M2, M3, M5, Z1 and Z5. The code is in [`measures/`](../../packages/core/src/bench/measures/), and [`screen/measures.ts`](../../packages/core/src/bench/screen/measures.ts) gives the definition of each key.
+
+- C4: Each inner sample gets the signed curvature `κ = φ / l` of C3. The sum is `L^3 · Σ (κ_(i+1) - κ_i)^2 / d_i` over the inner samples. The step `curve` gives `C4.median` and `C4.q95`.
+- C8: The samples of the curve and the polyline of the route get points `u / 4` apart, or `L / 400` for a long route. The value is the discrete Fréchet distance over `u`. The step `curve` gives `C8.median` and `C8.max`.
+- G4: The far view is the first level with 2 items or more. Only an item with 2 nodes or more counts, and a fill above 1 counts as 1.
+- G5: The screen counts the overlaps on each level and adds the counts.
+- G7: The far view gives the groups. A node alone in its group gets 0. Above 2000 nodes, two seeded samples of 2000 nodes give an estimate.
+- Z1: The screen gives the count of the hard rule `counts-sum` as a value, as Z2 does.
+- Z5: The levels sort by depth, and a level without items does not count. The screen gives `Z5.max` and `Z5.spread`, the population standard deviation of `log(lr_d)`.
+- H3: The screen reads the routes, not the edges, because the router keeps the symmetry of the boxes or loses it. The maps are the two mirrors on the axes and the half turn about the center of the boxes.
+- H3: A route maps when the map sends its ends to the centers of two nodes. An edge of those nodes must have a route with the same corners. The tolerance is `u / 4`.
+- M2, M3 and M5: Only the step `whole` gives them. They compare the board of the output of the strategy with the input board. A whole strategy without a room strategy gives 0.
+- M5: The pairs are each box and its 4 nearest boxes on the input board.
+- M2: The records use M2 in two ways. `RULE-016` uses it for the order of the edges at a station. Five records use the order of the boxes, as this file does. The screen uses the order of the boxes.
+
 ## Routes
 
 The evidence for routes is strong. [Purchase 1997][purchase97] found that the number of crossings has the largest effect on the understanding of a drawing. Bends and symmetry had a smaller effect. [Ware 2002][ware02] found that the path length has the largest effect on a path task, before the continuity of the path and the crossings. [Huang 2014][huang14] found that a crossing at a large angle costs less than a crossing at a small angle. [Wybrow 2009][wybrow09] routes for length and bends first, then moves the parallel legs apart.
@@ -187,11 +204,11 @@ A curve must stay near its route, keep clear of the boxes and look smooth. G0 co
 | C1 | G1 defect | Tangents that agree at each joint | `g1 = max_j angle(T_j^-, T_j^+)` at each joint `j` of two segments | degrees, `↓`. G1 when `g1 ≤ 0.5°`. | `linear` | rule candidate | yes, `C1.max` and `C1.share` of the suite, and the count `curve-g1` | [Levien 2009][levien09], [Hobby 1986][hobby86] |
 | C2 | G2 defect | Curvature with no jump | `g2 = max_j abs(κ_j^- - κ_j^+) · u` | no unit, `↓` | `linear` | score | yes, `C2.median` and `C2.max` of the suite | [Levien 2009][levien09], [Moreton 1993][moreton93] |
 | C3 | Bending energy | Curves that bend little | `E = L · ∫ κ(s)^2 ds` | no unit, `↓`. A full circle gives `4π^2`. | `linear` on the samples | score | yes, `C3.median` and `C3.q95` of the suite | [Horn 1983][horn83], [Levien 2009][levien09] |
-| C4 | Curvature variation | Even change of the curvature | `V = L^3 · ∫ (dκ/ds)^2 ds` | no unit, `↓`. A circle gives 0. | `linear` on the samples | score | no | [Moreton 1993][moreton93] |
+| C4 | Curvature variation | Even change of the curvature | `V = L^3 · ∫ (dκ/ds)^2 ds` | no unit, `↓`. A circle gives 0. | `linear` on the samples | score | yes, `C4.median` and `C4.q95` of the screen | [Moreton 1993][moreton93] |
 | C5 | Smallest radius | No tight kink | `rmin = 1 / max_s κ(s)`. Report `rmin / radius` and `rmin / u`. | ratio, `↑` | `linear` | score | no | [Gansner 2011][gansner11] (a limit on the curvature) |
 | C6 | Length ratio | Curves that stay short | `Σ L(curve) / Σ L(polyline)` | ratio near 1, `↓` | `linear` | score | yes, `length`, and `C6.length` of the suite | Own (CURVE) |
 | C7 | Curve clearance | Curves clear of the boxes | R8 on the output of `sampleCurve`, and `count(curves through a box that the polyline avoids)` | units, `↑`, and count, `↓` | `n log n` | rule candidate for the count | part, `clamped`, and the count `curve-clear` of the suite | Own (CURVE), [Wybrow 2009][wybrow09] |
-| C8 | Deviation | Curves near their routes | `dev(e) = frechet(sampleCurve(c_e), r_e) / u`. Report `q_0.5` and `max`. | no unit, `↓` | `quadratic` for each route | score | no | [Eiter 1994][eiter94], [Yuksel 2011][yuksel11] |
+| C8 | Deviation | Curves near their routes | `dev(e) = frechet(sampleCurve(c_e), r_e) / u`. Report `q_0.5` and `max`. | no unit, `↓` | `quadratic` for each route | score | yes, `C8.median` and `C8.max` of the screen | [Eiter 1994][eiter94], [Yuksel 2011][yuksel11] |
 | C9 | Loops and cusps | Curves with no loop | `count(curves that cross themselves, or have a point of zero speed, where the polyline does not cross itself)` | count, `↓` | `n log n` for each curve | rule candidate | yes, the count `curve-simple` of the suite | [Yuksel 2011][yuksel11] |
 | C10 | End tangent | Curves that leave and enter along the plug normal | `angle(T(0), normal)` and `angle(-T(L), normal)` | degrees, `↓` | `linear` | rule candidate for `spline` with normals | yes, the count `curve-ends` of the suite | Own (CURVE), [Hobby 1986][hobby86] |
 | C11 | Curvature extrema | Few changes in the bend | `count(local extrema of κ) + count(sign changes of κ)` for each curve | count, `↓` | `linear` | score | no | [Levien 2009][levien09], [Moreton 1993][moreton93] |
@@ -211,10 +228,10 @@ A group of the far view stands for its nodes. A good group holds many edges insi
 | G1 | Modularity | Many edges inside the groups | `Q = Σ_c (e_c / m - (d_c / (2m))^2)`, with `e_c` the edges inside `c` and `d_c` the sum of the degrees in `c` | -0.5..1, `↑` | `linear` | score | yes, `G1.modularity` of the suite, on the far level | [Newman 2004][newman04] |
 | G2 | Cut share | Few edges between the groups | `cut_d = Σ counts of the links of level d / m` | 0..1, `↓` | `linear` | score | yes, `G2.cut` of the suite, on the far level | [Kannan 2004][kannan04] |
 | G3 | Conductance | No group that leaks | `φ(c) = cut(c) / min(vol(c), vol(V) - vol(c))`, with `vol` the sum of the degrees. Report `max` and `q_0.5`. | 0..1, `↓` | `linear` | score | no | [Kannan 2004][kannan04] |
-| G4 | Fill | Compact groups | `fill(c) = Σ_(v in c) area(box(v)) / area(box(c))` | 0..1, `↑` | `linear` | score | no | Own (ER3), [Elmqvist 2010][elmqvist10] |
-| G5 | Overlaps | Groups that do not cover each other | `count(pairs of items whose boxes overlap by more than TOLERANCE)` | count, `↓` | `n log n` | fault | yes, `overlaps` | [Misue 1995][misue95] |
+| G4 | Fill | Compact groups | `fill(c) = Σ_(v in c) area(box(v)) / area(box(c))` | 0..1, `↑` | `linear` | score | yes, `G4.fill` of the screen | Own (ER3), [Elmqvist 2010][elmqvist10] |
+| G5 | Overlaps | Groups that do not cover each other | `count(pairs of items whose boxes overlap by more than TOLERANCE)` | count, `↓` | `n log n` | fault | yes, `overlaps`, and `G5.overlaps` of the screen | [Misue 1995][misue95] |
 | G6 | Balance | Groups of similar size | `bal = H(s) / log(k)`, with `s` the shares of the nodes of the `k` groups and `H` the entropy | 0..1, `↑` | `linear` | score | no | [Dasgupta 2016][dasgupta16] |
-| G7 | Silhouette | Groups that are near on the board | `s(v) = (b_v - a_v) / max(a_v, b_v)`, with `a_v` the mean distance to the centers of its group and `b_v` the smallest mean distance to another group | -1..1, `↑` | `quadratic`, sampled | score | no | [Rousseeuw 1987][rousseeuw87] |
+| G7 | Silhouette | Groups that are near on the board | `s(v) = (b_v - a_v) / max(a_v, b_v)`, with `a_v` the mean distance to the centers of its group and `b_v` the smallest mean distance to another group | -1..1, `↑` | `quadratic`, sampled | score | yes, `G7.silhouette` of the screen | [Rousseeuw 1987][rousseeuw87] |
 | G8 | Tree cost | Edges that close low in the tree | `D = Σ_((u,v) in E) leaves(lca(u, v)) / (m n)` | 0..1, `↓` | `linear` times the depth | score | yes, `G8.treeCost` of the suite | [Dasgupta 2016][dasgupta16] |
 | G9 | Group stability | The same groups after a small change | `ARI(groups(G), groups(G'))`, with `G'` the graph after one node moves by `u`, or after one edge is added or removed | -1..1, `↑`. A value of 1 is the same grouping. | `extra run`, then `linear` | score | yes, `G9.ari` of the suite, after `changeGraph` | [Hubert 1985][hubert85], [von Luxburg 2010][luxburg10] |
 
@@ -231,11 +248,11 @@ A zoom level shows a group as one item, and the edges between two items as one l
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| Z1 | Counts sum | Links that stand for each edge | The items hold each node one time, and `Σ counts = edges between items` | violations, `↓` | `linear` | rule | yes, `counts-sum` | Own (H3) |
+| Z1 | Counts sum | Links that stand for each edge | The items hold each node one time, and `Σ counts = edges between items` | violations, `↓` | `linear` | rule | yes, `counts-sum`, and `Z1.countsSum` of the screen | Own (H3) |
 | Z2 | Link ends | Links that touch their items | Each link starts and ends on the boundary of its items | violations, `↓` | `linear` | rule | yes, `link-ends`, and `Z2.linkEnds` of the screen | Own (ER2) |
 | Z3 | Level link faults | Level links with no fault | R6, R7, R9 and R13 on the links of each level | counts and ratio, `↓` | `n log n` | fault | yes, the level columns | Own (ER3a, ER3b, ER3c) |
 | Z4 | Item budget | Few shown elements at each level | `eb = max_d (items_d + links_d) / B`, with `B` the budget of the host | ratio, `≤ 1` is correct, `↓` | `linear` | score | part, `farItems` and `levels` | [Nachmanson 2015][nachmanson15] |
-| Z5 | Level ratio | Even steps from level to level | `lr_d = items_(d+1) / items_d`. Report `max` and the spread of `log(lr_d)`. | ratio, `↓` for the spread | `linear` | score | no | [Mondal 2018][mondal18] |
+| Z5 | Level ratio | Even steps from level to level | `lr_d = items_(d+1) / items_d`. Report `max` and the spread of `log(lr_d)`. | ratio, `↓` for the spread | `linear` | score | yes, `Z5.max` and `Z5.spread` of the screen | [Mondal 2018][mondal18] |
 | Z6 | Nesting | Levels that refine each other | `count(items of level d+1 whose nodes are in more than one item of level d)` | count, `↓` | `linear` | rule candidate | yes, the count `level-nesting` of the suite | [Elmqvist 2010][elmqvist10] |
 | Z7 | Position stability | Items that stay near their parts | `ps = mean_(v,d) dist(center(item_d(v)), center(item_(d+1)(v))) / size(item_d(v))` | no unit, `↓` | `linear` | score | yes, `Z7.position` of the suite | [Bridgeman 2000][bridgeman00] |
 | Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | yes, `Z8.order` of the suite, sampled above 1500 items | [Misue 1995][misue95], [Kendall 1938][kendall38] |
@@ -256,10 +273,10 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
 | M1 | Area | Little growth of the board | `area(open) / area(packed)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `area`, `M1.area` of the suite, and `M1.area` of the screen for the lanes of a route | Own (ROOM) |
-| M2 | Order kept | The same rows, columns and order | `count(pairs of boxes whose order or alignment on an axis changes)` | count, `↓` | `n log n` | rule candidate | yes, the count `room-order` of the suite | [Misue 1995][misue95] |
-| M3 | Displacement | Boxes that move little | `mean_v dist(box_open(v), box_packed(v)) / u` | no unit, `↓` | `linear` | score | no | [Bridgeman 2000][bridgeman00] |
+| M2 | Order kept | The same rows, columns and order | `count(pairs of boxes whose order or alignment on an axis changes)` | count, `↓` | `n log n` | rule candidate | yes, the count `room-order` of the suite, and `M2.order` of the step `whole` of the screen | [Misue 1995][misue95] |
+| M3 | Displacement | Boxes that move little | `mean_v dist(box_open(v), box_packed(v)) / u` | no unit, `↓` | `linear` | score | yes, `M3.displacement` of the step `whole` of the screen | [Bridgeman 2000][bridgeman00] |
 | M4 | Lane routes through boxes | Room for each lane | `count(lane routes of laneRoutes that go through a box)` | count, `↓` | `n log n` | fault | yes, `laneThrough`, `M4.laneThrough` of the suite, and `M4.laneThrough` of the screen for the lanes of a route | Own (ROOM) |
-| M5 | Distance distortion | Distances that keep their ratios | Kruskal stress of the centers: `σ = sqrt(Σ (α d'_ij - d_ij)^2 / Σ d_ij^2)`, with `α` the best scale and the pairs of neighbour boxes only | 0..1, `↓` | `n log n` | score | no | [Ahmed 2024][ahmed24], [Gansner 2004][gansner04] |
+| M5 | Distance distortion | Distances that keep their ratios | Kruskal stress of the centers: `σ = sqrt(Σ (α d'_ij - d_ij)^2 / Σ d_ij^2)`, with `α` the best scale and the pairs of neighbour boxes only | 0..1, `↓` | `n log n` | score | yes, `M5.stress` of the step `whole` of the screen | [Ahmed 2024][ahmed24], [Gansner 2004][gansner04] |
 
 ## The layout of the host
 
@@ -269,7 +286,7 @@ The host places the boxes, so these measures are not scores of this library. The
 |---|---|---|---|---|---|---|---|---|
 | H1 | Stress | Distances on the board that match the distances in the graph | `stress = Σ_(i<j) w_ij (dist(i, j) - d_ij)^2`, with `w_ij = d_ij^-2` | `↓`. Use the scale-free form of Kruskal. | `quadratic`, sampled | not a score | no | [Gansner 2004][gansner04], [Ahmed 2024][ahmed24] |
 | H2 | Edge length spread | Edges of similar length | `cv = sd(span(e)) / mean(span(e))` | no unit, `↓` | `linear` | not a score | no | [Purchase 2002][purchase02], [Kobourov 2012][kobourov12] |
-| H3 | Symmetry | Mirror and turn symmetry of the drawing | The share of the edges that map to an edge under the best axis of symmetry | 0..1, `↑` | `quadratic` | not a score | no | [Purchase 1997][purchase97], [Bennett 2007][bennett07] |
+| H3 | Symmetry | Mirror and turn symmetry of the drawing | The share of the edges that map to an edge under the best axis of symmetry | 0..1, `↑` | `quadratic` | not a score | yes, `H3.share` of the screen, for the routes | [Purchase 1997][purchase97], [Bennett 2007][bennett07] |
 
 ## Method
 

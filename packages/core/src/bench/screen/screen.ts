@@ -1,17 +1,20 @@
-import type { Graph, Result, Route } from "../../model.ts";
+import type { Graph, Level, Result, Route } from "../../model.ts";
 import { stableOrderStrategy } from "../../order/index.ts";
 import { repairStrategy } from "../../repair/index.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS, type AnyStrategy, type Registry, type Strategy } from "../../strategies/model.ts";
-import { compareStep, highwayRouters, isRoutedStep, stepRouters, type CompareRow, type CompareStep, type RoutedStep, type StepComparison } from "../compare.ts";
+import { compareStep, highwayRouters, isRoutedStep, stepRouters, wholeBoard, type CompareRow, type CompareStep, type RoutedStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
 import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
-import { linkAgreement } from "../measures/levels.ts";
+import { farLevel, groupFill, itemOverlaps, silhouette } from "../measures/groups.ts";
+import { levelRatio, linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { boardUnit } from "../measures/routes.ts";
+import { boxDisplacement, distanceDistortion, roomOrderFaults } from "../measures/room.ts";
 import { routeStability } from "../measures/stability.ts";
+import { routeSymmetry } from "../measures/symmetry.ts";
 import { quantile } from "../measures/stats.ts";
 import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
@@ -227,11 +230,30 @@ function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenS
 /** This function tells if a step of the screen gives routes. The step `router` gives routes, and each step of `RoutedStep` gives routes as a router. */
 const givesRoutes = (step: ScreenStep): step is "router" | RoutedStep => step === "router" || isRoutedStep(step);
 
+/** This function gives the measures of the shape of the groups and of the levels: G4, G5, G7 and Z5. A value without its data is not in the result. */
+function groupShapeValues(graph: Graph, levels: readonly Level[]): Record<string, number> {
+  const values: Record<string, number> = {};
+  if (levels.length === 0) return values;
+  values["G5.overlaps"] = itemOverlaps(levels);
+  const far = farLevel(levels);
+  const fill = far && groupFill(graph, far);
+  if (fill !== undefined) values["G4.fill"] = fill;
+  const sil = far && silhouette(graph, far);
+  if (sil !== undefined) values["G7.silhouette"] = sil;
+  const ratio = levelRatio(levels);
+  if (ratio) {
+    values["Z5.max"] = ratio.max;
+    values["Z5.spread"] = ratio.spread;
+  }
+  return values;
+}
+
 /**
  * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
  * A router also gets the bundled share (B2), the merge angle (B6) and the bundle stretch (B3) against the routes `base` of `corners`.
  * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
- * A result with zoom levels also gets the link agreement (Z9), for a router and for a grouping rule.
+ * A result with zoom levels also gets the link agreement (Z9) and `groupShapeValues`, for a router and for a grouping rule.
+ * A router also gets the symmetry of its routes (H3). A whole strategy also gets M2, M3 and M5 of the board of its output.
  */
 function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => readonly Route[]): Record<string, number> {
   const values: Record<string, number> = { ...row.values };
@@ -265,10 +287,21 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     }
     values["M1.area"] = laneArea(graph, open);
     values["M4.laneThrough"] = lanesThrough(graph, open);
+    const h3 = routeSymmetry(graph, routes);
+    if (h3 !== undefined) values["H3.share"] = h3;
   }
   if ((givesRoutes(step) || step === "group") && row.result?.levels) {
-    const la = linkAgreement(graph, row.result.levels, row.result.routes, boardUnit(graph));
+    const levels = row.result.levels;
+    const la = linkAgreement(graph, levels, row.result.routes, boardUnit(graph));
     if (la !== undefined) values["Z9.mean"] = la;
+    Object.assign(values, groupShapeValues(graph, levels));
+  }
+  // The step `whole` can move the boxes with a room strategy. M2, M3 and M5 compare the board of the output with the input board.
+  if (step === "whole" && row.result) {
+    const board = wholeBoard(row.result) ?? graph;
+    values["M2.order"] = roomOrderFaults(graph.nodes, board.nodes);
+    values["M3.displacement"] = boxDisplacement(graph.nodes, board.nodes, boardUnit(graph));
+    values["M5.stress"] = distanceDistortion(graph.nodes, board.nodes);
   }
   return values;
 }
@@ -426,6 +459,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
       const values = rowValues(step, graph, row, cornersBase);
       // Z2 is the count of the hard rule `link-ends`, as a measure. The steps `router`, `highway` and `group` check the rule.
       if (hard["link-ends"] !== undefined) values["Z2.linkEnds"] = hard["link-ends"];
+      // Z1 is the count of the hard rule `counts-sum`, as a measure, the same way.
+      if (hard["counts-sum"] !== undefined) values["Z1.countsSum"] = hard["counts-sum"];
       if (optima && withOptima.has(input.id) && row.result) Object.assign(values, gapValues(input, graph, row.result, cornersBase(), gapBase(), optima));
       if (shuffles > 0 && row.result) {
         const router = asRouter(strategy as Strategy<"router">, own[row.strategy]);

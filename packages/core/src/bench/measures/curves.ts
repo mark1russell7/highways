@@ -1,6 +1,6 @@
 import type { CurveSegment } from "../../curves/model.ts";
 import type { CurveSpace } from "../../curves/space.ts";
-import { dist, polylineLength, segmentsCross, turns, type Point } from "../../geom.ts";
+import { dist, frechet, polylineLength, segmentsCross, turns, type Point } from "../../geom.ts";
 import { Grid } from "../../grid.ts";
 import { TOLERANCE } from "../properties.ts";
 
@@ -107,6 +107,60 @@ export function bendingEnergy(points: readonly Point[], tolerance = 0.25): numbe
     sum += (t * t) / l;
   }
   return polylineLength(q) * sum;
+}
+
+/**
+ * This function gives the curvature variation of a sampled curve (C4 of MEAS0, Moreton 1993): `V = L^3 · ∫ (dκ/ds)^2 ds`.
+ * Each inner sample gets the curvature `κ = φ / l` of `bendingEnergy`, with its sign. `L` is the length of the curve.
+ * The sum is `L^3 · Σ (κ_(i+1) - κ_i)^2 / d_i`, with `d_i` the distance of two inner samples in sequence.
+ *
+ * The value has no unit, and lower is better. A straight line and an arc of a circle give 0. Fewer than 4 points give 0. The cost is linear.
+ */
+export function curvatureVariation(points: readonly Point[], tolerance = 0.25): number {
+  const q: Point[] = [];
+  for (const v of points) if (q.length === 0 || dist(q[q.length - 1]!, v) > EPS) q.push(v);
+  if (q.length < 4) return 0;
+  const phi = turns(q);
+  const kappa: number[] = [];
+  for (let i = 1; i + 1 < q.length; i++) {
+    const t = phi[i - 1]!;
+    const l = Math.min((dist(q[i - 1]!, q[i]!) + dist(q[i]!, q[i + 1]!)) / 2, (8 * tolerance) / Math.max(EPS, Math.abs(t)));
+    kappa.push(Math.abs(t) < EPS ? 0 : t / l);
+  }
+  let sum = 0;
+  for (let i = 0; i + 1 < kappa.length; i++) sum += (kappa[i + 1]! - kappa[i]!) ** 2 / dist(q[i + 1]!, q[i + 2]!);
+  return polylineLength(q) ** 3 * sum;
+}
+
+/** This function gives the points of a polyline with no leg longer than `step`. It keeps each vertex. */
+function densify(points: readonly Point[], step: number): Point[] {
+  const out: Point[] = [];
+  for (let i = 0; i < points.length; i++) {
+    const b = points[i]!;
+    if (i > 0) {
+      const a = points[i - 1]!;
+      const n = Math.ceil(dist(a, b) / step);
+      for (let k = 1; k < n; k++) out.push({ x: a.x + ((b.x - a.x) * k) / n, y: a.y + ((b.y - a.y) * k) / n });
+    }
+    out.push(b);
+  }
+  return out;
+}
+
+/** The most points of each of the two lists of `curveDeviation`. More points give a longer step. */
+const DEVIATION_POINTS = 400;
+
+/**
+ * This function gives the deviation of a curve from its route (C8 of MEAS0).
+ * The value is the Fréchet distance of the samples of the curve and the polyline of the route.
+ * Each list gets points with no leg longer than `step`, or longer when a list has more than 400 points. Then the discrete Fréchet distance is near the true distance.
+ *
+ * The value is in units of the board, and lower is better. The caller divides it by the unit of the board. The cost is quadratic for each route.
+ */
+export function curveDeviation(samples: readonly Point[], polyline: readonly Point[], step: number): number {
+  const long = Math.max(polylineLength(samples), polylineLength(polyline));
+  const h = Math.max(step, long / DEVIATION_POINTS, EPS);
+  return frechet(densify(samples, h), densify(polyline, h));
 }
 
 /** This function tells if a polyline crosses itself. Two legs next to each other do not count. The cost is `n log n`. */
