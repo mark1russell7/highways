@@ -64,7 +64,7 @@ describe("compareStep: the move response (Z11) and the seed stability (Z12)", ()
       name: "seeded",
       describe: "Straight routes with a middle point that the seed moves.",
       defaults: { seed: 1 },
-      schema: {},
+      schema: { seed: { type: "integer", min: 0, max: 10, step: 1, default: 1, describe: "The seed of the middle point." } },
       run: (g, o) => {
         const r = straight.run(g, {});
         const k = o?.seed ?? 1;

@@ -92,7 +92,7 @@ export function routeSeparation(routes: readonly Route[], near: number = MEASURE
   if (ink <= 0) return 0;
   const grid = new Grid<number>(Math.max(16, 4 * near));
   legs.forEach((l, i) => grid.addSegment(i, l.a, l.b));
-  const sin = Math.sin((maxAngle * Math.PI) / 180);
+  const sin = parallelSine(maxAngle);
   let close = 0;
   legs.forEach((s, i) => {
     const length = dist(s.a, s.b);
@@ -116,6 +116,11 @@ export function routeSeparation(routes: readonly Route[], near: number = MEASURE
     close += unionLength(cover);
   });
   return Math.min(1, close / ink);
+}
+
+/** This function gives the sine of the largest angle between two legs that R12 and R16 count as parallel. */
+function parallelSine(maxAngle: number): number {
+  return Math.sin((maxAngle * Math.PI) / 180);
 }
 
 /** The lane balance of the routes (R16 of MEAS0). */
@@ -146,7 +151,7 @@ export function routeBalance(routes: readonly Route[], reach: number = MEASURE_B
   const legs = legsOf(routes);
   const grid = new Grid<number>(Math.max(16, reach));
   legs.forEach((l, i) => grid.addSegment(i, l.a, l.b));
-  const sin = Math.sin((maxAngle * Math.PI) / 180);
+  const sin = parallelSine(maxAngle);
   // The key of a pair is the two indices in order, so a pair that each leg finds counts one time.
   const gaps = new Map<string, { g: number; w: number }>();
   legs.forEach((s, i) => {
@@ -161,8 +166,10 @@ export function routeBalance(routes: readonly Route[], reach: number = MEASURE_B
       if (j === i || t.edges === s.edges) return;
       const tx = t.b.x - t.a.x;
       const ty = t.b.y - t.a.y;
-      const tl = Math.hypot(tx, ty);
-      if (tl <= 0 || Math.abs(ux * ty - uy * tx) > sin * tl) return;
+      // The squared length of `t`. The test of the angle compares squares, so it needs no square root.
+      const tl2 = tx * tx + ty * ty;
+      const cross = ux * ty - uy * tx;
+      if (tl2 <= 0 || cross * cross > sin * sin * tl2) return;
       const p = (t.a.x - s.a.x) * ux + (t.a.y - s.a.y) * uy;
       const q = (t.b.x - s.a.x) * ux + (t.b.y - s.a.y) * uy;
       const lo = Math.max(0, Math.min(p, q));
@@ -172,7 +179,7 @@ export function routeBalance(routes: readonly Route[], reach: number = MEASURE_B
       const m = (lo + hi) / 2;
       const px = s.a.x + ux * m;
       const py = s.a.y + uy * m;
-      const k = ((px - t.a.x) * tx + (py - t.a.y) * ty) / (tl * tl);
+      const k = ((px - t.a.x) * tx + (py - t.a.y) * ty) / tl2;
       const o = (t.a.x + tx * k - px) * -uy + (t.a.y + ty * k - py) * ux;
       const g = Math.abs(o);
       if (g >= reach) return;
