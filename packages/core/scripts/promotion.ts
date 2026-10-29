@@ -262,7 +262,8 @@ function winText(name: string, t: WinTest, all: number): string {
   lines.push(`- Hard rules: ${yes(t.hard.pass)}${t.hard.worse.length > 0 ? ` (${t.hard.worse.length} worse, for example ${t.hard.worse.slice(0, 3).join(", ")})` : ""}.`);
   lines.push(`- Time: median ${fmt(t.time.median, 2)}, q0.95 ${fmt(t.time.tail, 2)}: ${yes(t.time.pass)}.`);
   lines.push("", "| Guard | Inputs | Median ratio | Tail share | Result |", "|---|---|---|---|---|");
-  for (const g of t.guards) lines.push(`| \`${g.key}\` | ${g.n} | ${fmt(g.median)} | ${fmt(g.tail, 2)} | ${yes(g.pass)} |`);
+  // A guard with no value in the records, for example a curve measure of a step without curves, has no row.
+  for (const g of t.guards.filter((x) => x.n > 0)) lines.push(`| \`${g.key}\` | ${g.n} | ${fmt(g.median)} | ${fmt(g.tail, 2)} | ${yes(g.pass)} |`);
   lines.push("", t.gain.length === 0 ? "No measure has a median ratio of 0.95 or better, so the gain test fails." : "| Gain measure | Median ratio | Better | Worse | Sign p | Holm p | Bootstrap | Result |");
   if (t.gain.length > 0) {
     lines.push("|---|---|---|---|---|---|---|---|");

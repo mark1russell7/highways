@@ -1395,6 +1395,50 @@ The steps `highway` and `whole` get new snapshots. For the other strategies, eac
 - The screen has no measure of the tracing load W4. Thus the real win of WILD-057 has no value, and R1 and B4 take its place.
 - B9 has records on 3 families only, on `screen-v2` and on `screen-v3`.
 
+## The promotion test of canals and preferences
+
+PROMO-CANALS applies [the promotion rule](../PROMOTION.md) to the two candidates of wave 4C with the most support. `pnpm promotion` of `packages/core` reads the records of the screens and gives the tests.
+
+- `canals` is the candidate of the step `router`. Its baseline is the router default `shared`.
+- `preferences` is the candidate of the step `whole`. Its baseline is the step default `pipeline`.
+- The promotion corpus is `screen-v3`: 150 inputs in 15 families. It holds the boards of `screen-v1` and `screen-v2`.
+- The fresh set is the members 10 to 23 of each family: 210 inputs (`pnpm screen --members 10-23`). No screen used these seeds before.
+- The guards are the guards of the step in the promotion rule. `whole` has no row, so it takes the guards of `router` and `highway`. `Z10.mean` is the stability guard.
+- The gain test takes each measure. The sign tests get the Holm correction over the measures. The verdict over families also gets the Holm correction.
+- The literal reading takes all the inputs. The exercised reading takes only the inputs where the output of the candidate is different.
+
+The runs are [router on `screen-v3`](https://github.com/mark1russell7/highways/actions/runs/40882200381), [router on the fresh set](https://github.com/mark1russell7/highways/actions/runs/40882204699), [`whole` on `screen-v3`](https://github.com/mark1russell7/highways/actions/runs/40882209077) and [`whole` on the fresh set](https://github.com/mark1russell7/highways/actions/runs/40882213011).
+
+### The results
+
+| Candidate | Set | Changed inputs | Literal reading | Exercised reading |
+|---|---|---|---|---|
+| `canals` | `screen-v3` | 21 of 150 | Fail: no gain | Fail: `R4.turn` 1.046, `Z10.mean` tail 0.43, time 1.69 |
+| `canals` | fresh | 28 of 210 | Fail: no gain | Fail: `R4.turn` 1.039, `Z10.mean` tail 0.39, time 1.64 |
+| `preferences` | `screen-v3` | 53 of 150 | Fail: no gain, time 3.47, 3 tails | Fail: no gain, time 4.25, 4 tails |
+| `preferences` | fresh | 70 of 210 | Fail: no gain, time 3.42, 4 tails | Fail: time 4.44, 4 tails |
+
+- The hard rules pass for the two candidates on each set.
+- `canals` changes only the families `dense-groups` and `small-clustered`. There it removes 6% of the crossings, and it saves more ink. The two gains pass the sign test and the bootstrap.
+- But on these inputs, `canals` adds 4% of turn, and its routes move more on a change. As a rule of the selector for clustered inputs, it also fails the guard `R4.turn`.
+- `preferences` changes a third of the inputs. It removes 2% to 3% of the crossings, but the median time ratio is 3.4 against the limit of 1.5.
+- The tails of `preferences` fail on `R4.turn`, `Z10.mean`, `B3.q95` and `B6.max`. Its `Z10.mean` verdict is `worse` on 6 families with 0 for it.
+- The verdicts agree in sign between `screen-v3` and the fresh set on each measure with a verdict on the two sets.
+
+Thus no default changes, and each candidate stays opt-in. A next version of `canals` needs fewer turns. A next version of `preferences` needs less time.
+
+### The prediction of PROMO-CANALS
+
+This prediction was written before the runs, on 2026-10-29.
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. `canals` passes the promotion rule. | 0.55 | Not met: it fails the gain test on all the inputs. |
+| 2. `canals` is `worse` with significance on 1 or more measures that the screens did not name. | 0.45 | Met: 11 measures on `screen-v3` and 12 on the fresh set, for example `R4.turn` and `Z10.moved`. |
+| 3. `preferences` passes the promotion rule. | 0.35 | Not met: it fails the time test and 4 tails. |
+| 4. On the fresh set, the signs of `canals` on R1, B1 and B2 agree with the screens. | 0.7 | Met: R1, B1 and B2 are `better` on the two sets. |
+| 5. No default changes in this PR. | 0.95 | Met: the PR changes only scripts and docs. |
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
