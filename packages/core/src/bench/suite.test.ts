@@ -95,7 +95,8 @@ describe("runSuite in parts (BENCH-CI)", () => {
     const medians = (s: (typeof one.summaries)[number]) => [s.step, s.fixture, s.strategy, s.seeds, s.violations, Object.keys(s.measures)];
     expect(joined.summaries.map(medians)).toEqual(one.summaries.map(medians));
     // The parts run the whole suite again, and each built-in strategy adds rows. Thus the test gets more time than the default.
-  }, 30_000);
+    // On the CI runner the test takes 17 s to 30 s, so the limit is 60 s.
+  }, 60_000);
 });
 
 describe("runSuite in shards, with caps and the paired arm (BENCH-GREEN)", () => {
