@@ -6,7 +6,8 @@
 // The cap is the measured peak RSS times `margin`, and at least `floorMb`.
 // The peak RSS does not include the heap that V8 reserved but did not use. Thus a router can need a cap above its peak RSS: `shared`, `shared-all` and `gaps` stopped at 512 MB with a peak RSS of 220 to 345 MB. The floor is for these routers.
 // After the route, the process writes its peak RSS, its heap and its route hash.
-// The gate fails when a process stops with an error, or when a peak RSS is more than its budget: the measured peak RSS times `margin`, and at least `floorMb`.
+// The gate fails when a process stops with an error, or when a peak RSS is more than its budget (HEAP-BUDGET).
+// The budget is the larger of the measured peak RSS times `margin` and the measured peak RSS plus `slackMb`. It has no floor, so a router with a small peak keeps a tight budget.
 // A router with no measure in the budget file runs with the cap `measureCapMb` and does not fail the gate. Thus its first run gives the measure.
 //
 // One process: `node --max-old-space-size=<MB> scripts/heap.ts --router <name> [--fixture <file>] [--out <file>]` routes once and appends one row to `--out`.
@@ -27,6 +28,8 @@ interface Budgets {
   readonly run: string;
   readonly margin: number;
   readonly floorMb: number;
+  /** The least room of the RSS budget above the measured peak RSS, in MB (HEAP-BUDGET). */
+  readonly slackMb: number;
   readonly measureCapMb: number;
   /** The measures of each router: its peak RSS and its committed heap after the route, in MB. The heap is for information only. A router with `null` has no measure yet. */
   readonly routers: Readonly<Record<string, { readonly rssMb: number; readonly heapMb: number } | null>>;
@@ -71,7 +74,12 @@ function one(name: string, fixture: string, out: string): void {
   appendFileSync(out, JSON.stringify(row) + "\n");
 }
 
-/** This function runs each router of the budget file in its own process, and gives the rows of the summary and the count of the breaks. */
+/** This function gives the RSS budget of a router in MB. The budget is the larger of the measured peak RSS times `margin` and the peak plus `slackMb`. */
+function rssBudget(budgets: Pick<Budgets, "margin" | "slackMb">, rssMb: number): number {
+  return Math.max(Math.ceil(rssMb * budgets.margin), rssMb + budgets.slackMb);
+}
+
+/** This function runs each router of the budget file in its own process. It gives the rows of the summary and the count of the breaks. */
 function gate(budgets: Budgets, fixture: string, out: string): number {
   const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
   let breaks = 0;
@@ -88,7 +96,7 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
     const row = existsSync(tmp) ? (JSON.parse(readFileSync(tmp, "utf8").trim()) as Row) : undefined;
     rmSync(tmp, { force: true });
     if (row !== undefined) appendFileSync(out, JSON.stringify({ ...row, cap }) + "\n");
-    const budgetRss = measure === null ? undefined : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));
+    const budgetRss = measure === null ? undefined : rssBudget(budgets, measure.rssMb);
     let result = "pass";
     if (measure === null) result = error === "" ? "measured" : `measure ${error}`;
     else if (error !== "" || row === undefined) result = `fail: ${error || "no row"}`;
