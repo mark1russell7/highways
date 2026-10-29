@@ -91,7 +91,9 @@ function wallGap(n: number, fixed: readonly number[], lo: number, hi: number, ga
     if (fits(mid)) a = mid;
     else b = mid;
   }
-  return a;
+  // The largest gap puts the last plug at the end of the room, within a rounding error. The places of a plan are a start plus a multiple of the gap,
+  // and these sums round in a different way. A small margin keeps the last place in the room.
+  return Math.max(0, a - 1e-7);
 }
 
 /** One item of the order of a wall: an end with its plug in its interval or not, or a fixed plug. */
@@ -212,7 +214,8 @@ function bestPlan(order: readonly number[], win: readonly ([number, number] | un
     return most;
   };
   // The chain of the free plugs: `chain[q][i]` is the most ends in their intervals before the free plug number q at T[i].
-  let total = r === n ? count(r, -1, m) : -1;
+  // A plan with no free plug is complete only when all the ends are in their intervals. Otherwise the ends out of their intervals need free plugs.
+  let total = r === n && count(r, -1, m) === n ? n : -1;
   let bestQ = 0;
   let bestI = -1;
   const chain: Float64Array[] = [];
