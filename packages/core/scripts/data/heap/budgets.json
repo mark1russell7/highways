@@ -1,0 +1,68 @@
+{
+  "run": "40930460078 (main 8c2702b + the gate) for 14 routers; 40933904789 (the fix of streetPlan) for streets",
+  "margin": 1.5,
+  "floorMb": 1024,
+  "measureCapMb": 12288,
+  "routers": {
+    "straight": {
+      "rssMb": 110,
+      "heapMb": 28
+    },
+    "plugs": {
+      "rssMb": 123,
+      "heapMb": 41
+    },
+    "corners": {
+      "rssMb": 153,
+      "heapMb": 65
+    },
+    "corners-smooth": {
+      "rssMb": 218,
+      "heapMb": 127
+    },
+    "trunks": {
+      "rssMb": 153,
+      "heapMb": 61
+    },
+    "sections": {
+      "rssMb": 215,
+      "heapMb": 119
+    },
+    "sections-tree": {
+      "rssMb": 215,
+      "heapMb": 118
+    },
+    "shared": {
+      "rssMb": 306,
+      "heapMb": 193
+    },
+    "shared-all": {
+      "rssMb": 345,
+      "heapMb": 225
+    },
+    "steiner": {
+      "rssMb": 236,
+      "heapMb": 138
+    },
+    "gaps": {
+      "rssMb": 220,
+      "heapMb": 122
+    },
+    "streets": {
+      "rssMb": 276,
+      "heapMb": 118
+    },
+    "search": {
+      "rssMb": 1268,
+      "heapMb": 482
+    },
+    "interchanges": {
+      "rssMb": 725,
+      "heapMb": 623
+    },
+    "portfolio": {
+      "rssMb": 290,
+      "heapMb": 176
+    }
+  }
+}
