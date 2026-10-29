@@ -96,10 +96,14 @@ import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../section
 import { runPipeline, type PipelineOptions } from "../whole/pipeline/index.ts";
 import { BOARD_PORTFOLIO_DEFAULTS, boardPortfolio, type BoardPortfolioOptions, type PortfolioSetting } from "../whole/portfolio/index.ts";
 import { CURRICULUM_DEFAULTS, curriculum, type CurriculumOptions } from "../whole/curriculum/index.ts";
+import { SLOT_DEFAULTS, slotPlan, type SlotOptions } from "../highways/slots/index.ts";
+import { PREFERENCE_DEFAULTS, preferences, type PreferenceOptions } from "../whole/preferences/index.ts";
+import { FIREFLY_DEFAULTS, fireflies, type FireflyOptions } from "../whole/fireflies/index.ts";
+import { TRACING_DEFAULTS, tracing, type TracingOptions } from "../whole/tracing/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA } from "./schemas.ts";
+import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -487,6 +491,7 @@ export const highwayStrategies: {
   readonly bronchial: Strategy<"highway", BronchialOptions>;
   readonly balance: Strategy<"highway", BalanceOptions>;
   readonly manifolds: Strategy<"highway", ManifoldOptions>;
+  readonly slots: Strategy<"highway", SlotOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -998,6 +1003,15 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<ManifoldOptions>) => manifoldPlan(input, o),
   }),
+  slots: defineStrategy({
+    step: "highway",
+    name: "slots",
+    describe: "A pull toward the lane slots of the trunks (RULE-047). An edge near a trunk joins it on a new lane when the pull is larger than its detour.",
+    defaults: { ...SLOT_DEFAULTS } as SlotOptions,
+    schema: SLOT_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SlotOptions>) => slotPlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -1117,6 +1131,9 @@ export const wholeStrategies: {
   readonly pipeline: Strategy<"whole", PipelineOptions>;
   readonly "board-portfolio": Strategy<"whole", BoardPortfolioOptions>;
   readonly curriculum: Strategy<"whole", CurriculumOptions>;
+  readonly preferences: Strategy<"whole", PreferenceOptions>;
+  readonly fireflies: Strategy<"whole", FireflyOptions>;
+  readonly tracing: Strategy<"whole", TracingOptions>;
 } = Object.freeze({
   pipeline: defineStrategy<"whole", PipelineOptions>({
     step: "whole",
@@ -1141,6 +1158,30 @@ export const wholeStrategies: {
     defaults: { ...CURRICULUM_DEFAULTS },
     schema: CURRICULUM_SCHEMA,
     run: (graph, o) => curriculum(graph, CURRICULUM_POOL, o),
+  }),
+  preferences: defineStrategy<"whole", PreferenceOptions>({
+    step: "whole",
+    name: "preferences",
+    describe: "Rule weights from preferences (RULE-038). A fit to made-up pairs gives the weights, and each edge takes the route of a pool with the least weighted cost.",
+    defaults: { ...PREFERENCE_DEFAULTS },
+    schema: PREFERENCE_SCHEMA,
+    run: (graph, o) => preferences(graph, CURRICULUM_POOL, o),
+  }),
+  fireflies: defineStrategy<"whole", FireflyOptions>({
+    step: "whole",
+    name: "fireflies",
+    describe: "Firefly and bee searches (NAT-047). A seeded swarm searches the discount and the margin of `shared` on the board, within a budget of settings.",
+    defaults: { ...FIREFLY_DEFAULTS },
+    schema: FIREFLY_SCHEMA,
+    run: (graph, o) => fireflies(graph, routerStrategies.shared as Strategy<"router">, o).output,
+  }),
+  tracing: defineStrategy<"whole", TracingOptions>({
+    step: "whole",
+    name: "tracing",
+    describe: "The least tracing load (WILD-057). The pipeline tries a fixed list of settings, and the least load of crossings, merges and bends on one edge wins.",
+    defaults: { ...TRACING_DEFAULTS },
+    schema: TRACING_SCHEMA,
+    run: (graph, o) => tracing(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
   }),
 });
 

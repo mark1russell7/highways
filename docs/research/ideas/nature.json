@@ -216,14 +216,93 @@
     "placementDependent": true,
     "screen": "Router sections on mid-clustered (100-node and 1000-node seeds) and case-hub-chain. Keep if B1 rises by 0.05 or more over today's sections, with R7 not worse.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "NAT-001",
       "NAT-011",
       "NAT-015",
       "NAT-010"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40812972853",
+      "records": [
+        "screen-v2/*/shared@6605f5d",
+        "screen-v2/*/canals@6605f5d",
+        "screen-v2/*/canals-mu1@6605f5d",
+        "screen-v2/*/canals-mu3@6605f5d",
+        "screen-v2/*/canals-decay2@6605f5d",
+        "screen-v3/*/shared@6605f5d",
+        "screen-v3/*/canals@6605f5d",
+        "screen-v3/*/canals-mu1@6605f5d",
+        "screen-v3/*/canals-mu3@6605f5d",
+        "screen-v3/*/canals-decay2@6605f5d",
+        "screen-v1/*/shared@6605f5d",
+        "screen-v1/*/canals@6605f5d",
+        "screen-v1/*/canals-mu1@6605f5d",
+        "screen-v1/*/canals-mu3@6605f5d",
+        "screen-v1/*/canals-decay2@6605f5d"
+      ],
+      "measures": {
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 599.7,
+            "dense-groups": 1001.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          }
+        },
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.019,
+            "small-clustered": 0.245,
+            "dense-groups": 0.342,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "tiny-uniform": 0.18,
+            "small-clustered": 0.542,
+            "dense-groups": 0.504,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006
+          },
+          "new": {
+            "tiny-uniform": 0.193,
+            "small-clustered": 0.555,
+            "dense-groups": 0.514,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The records are the screen-v2 run 40812972853, the screen-v3 run 40812979037 and the screen-v1 run 40814235847, at 6605f5d. The opt-in router canals gets R1, B1 and B2 better with 0 families against on screen-v2 and screen-v3. B2 has no verdict on screen-v1. It changes the routes of 21 of 60 inputs of screen-v2. Only 2 or 3 families change, and the others are ties. The risk R5 is worse on screen-v2 and screen-v3 with 0 families against, and R7 is a tie. The median time is 0.83 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-005",
@@ -3581,12 +3660,73 @@
     "placementDependent": true,
     "screen": "As NAT-046. Keep only if it finds a second distinct optimum that NAT-046 misses (hypervolume +5%). Expected to drop.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-046",
       "NAT-045"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40812975829",
+      "records": [
+        "screen-v2/*/pipeline@6605f5d",
+        "screen-v2/*/fireflies@6605f5d",
+        "screen-v2/*/fireflies-bees@6605f5d",
+        "screen-v2/*/fireflies-b24@6605f5d",
+        "screen-v2/*/fireflies-seed2@6605f5d",
+        "screen-v3/*/pipeline@6605f5d",
+        "screen-v3/*/fireflies@6605f5d",
+        "screen-v3/*/fireflies-bees@6605f5d",
+        "screen-v3/*/fireflies-b24@6605f5d",
+        "screen-v3/*/fireflies-seed2@6605f5d",
+        "screen-v1/*/pipeline@6605f5d",
+        "screen-v1/*/fireflies@6605f5d",
+        "screen-v1/*/fireflies-bees@6605f5d",
+        "screen-v1/*/fireflies-b24@6605f5d",
+        "screen-v1/*/fireflies-seed2@6605f5d"
+      ],
+      "measures": {
+        "B1 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.007,
+            "small-clustered": 0.045,
+            "dense-groups": 0.066,
+            "hub-chain": 0.041,
+            "many-groups": 0.082,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.032,
+            "small-clustered": 0.27,
+            "dense-groups": 0.371,
+            "hub-chain": 0.118,
+            "many-groups": 0.112,
+            "packed-grid": 0
+          }
+        },
+        "R5 against pipeline": {
+          "base": {
+            "tiny-uniform": 1.176,
+            "small-clustered": 1.143,
+            "dense-groups": 1.102,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.237,
+            "small-clustered": 1.431,
+            "dense-groups": 1.475,
+            "hub-chain": 1.058,
+            "many-groups": 1.204,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40812975829, the screen-v3 run 40812981446 and the screen-v1 run 40814238249, at 6605f5d. The strategy fireflies gets B1 better with 0 families against on screen-v1 and screen-v2. On screen-v3, B1 has 1 family against. R5 is worse on screen-v2 with 1 family against, and on screen-v3 with 5 of 15 against. The risk Z10 is worse on screen-v2 and screen-v3. The median time is 19.95 times pipeline and 3.49 times board-portfolio on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-048",
