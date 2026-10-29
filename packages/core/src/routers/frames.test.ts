@@ -109,9 +109,10 @@ function variant(seed: number): Graph {
 
 describe("the inner routes of a frame (INTERIOR-ROUTE)", () => {
   it("routes each inner edge in the bounds of its frame, around the other rows, on the fixture and 3 seeded variants", () => {
-    for (const options of [{}, { smooth: true }, { frameInset: 8 }, { frameInset: 2 }] satisfies Partial<CornersOptions>[]) {
+    for (const options of [{}, { smooth: true }, { frameInset: 8 }, { frameInset: 2 }, { inner: "gutter" }] satisfies Partial<CornersOptions>[]) {
       const router = cornersRouter({ name: "corners", ...options });
-      const inset = options.frameInset ?? 5;
+      // The mode gutter routes in the whole box of the frame (INTERIOR-GUTTER).
+      const inset = "inner" in options ? 0 : (options.frameInset ?? 5);
       for (const [name, g] of [["fixture", board()], ...[1, 2, 3].map((s) => [`seed ${s}`, variant(s)] as const)] as const) {
         const routes = router.route(g).routes;
         expect(problems(g, routes, inset), `${name} ${JSON.stringify(options)}`).toEqual([]);

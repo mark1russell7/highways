@@ -55,6 +55,13 @@
           </div>
           <aside class="panel">
             <div class="try" id="board-try"></div>
+            <div class="inner-mode" id="inner-mode" hidden>
+              <h3 id="inner-mode-title">Routes inside a card</h3>
+              <div class="run-buttons" role="radiogroup" aria-labelledby="inner-mode-title">
+                <button type="button" class="exit" role="radio" data-inner="corners" aria-checked="true">Corners</button>
+                <button type="button" class="exit" role="radio" data-inner="gutter" aria-checked="false">Gutters</button>
+              </div>
+            </div>
             <div class="gen" id="gen" hidden>
               <h3>Named examples</h3>
               <ul class="gen-named" id="gen-named"></ul>
