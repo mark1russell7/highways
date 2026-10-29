@@ -52,10 +52,10 @@
     }
   },
   "backtest": {
-    "ideas": 60,
-    "rho": 0.394,
-    "low": 0.132,
-    "high": 0.614,
+    "ideas": 58,
+    "rho": 0.396,
+    "low": 0.13,
+    "high": 0.633,
     "resamples": 2000,
     "seed": 1
   },

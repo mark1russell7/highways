@@ -3,10 +3,11 @@
  * Thus the first leg goes straight out to the first corner of the way, and the plug is the foot of that leg.
  */
 import { center, dist, type Box, type Point } from "../geom.ts";
-import { fixedPortPoint, type End, type Node, type Side } from "../model.ts";
+import { fixedPortPoint, nodeIndex, type End, type Node, type Side } from "../model.ts";
 import { placePlug, pointOnSide, SIDE_NORMAL, sideToward, type Plug } from "../plugs.ts";
+import type { PlugInput, PlugPair } from "../strategies/model.ts";
 import type { Terminal } from "../visibility.ts";
-import type { WayFinder } from "../ways.ts";
+import { WayFinder } from "../ways.ts";
 
 /** The options of `sidePlugs`. */
 export interface SidePlugOptions {
@@ -135,4 +136,24 @@ export function sidePlugs(ways: WayFinder, s: Node, es: End, t: Node, et: End, o
   const way = ways.corners.pathAmong(from, to);
   if (!way) return [ps, pt];
   return [from[way.from]!.plug, to[way.to]!.plug];
+}
+
+/**
+ * This function gives the plugs of the plug strategy `side` (WILD-001): the plugs of `sidePlugs` for each edge.
+ * It uses the way finder of the input, or a way finder with the default margin when the input has none.
+ * The router `corners` with the option `plugs: "side"` gives the same plugs.
+ */
+export function sideEnds(input: PlugInput, options: SidePlugOptions = {}): PlugPair[] {
+  const { graph } = input;
+  const byId = nodeIndex(graph);
+  const ways = input.ways ?? new WayFinder(graph.nodes);
+  const out: PlugPair[] = [];
+  for (const e of graph.edges) {
+    const s = byId.get(e.source.node);
+    const t = byId.get(e.target.node);
+    if (!s || !t) continue;
+    const [source, target] = sidePlugs(ways, s, e.source, t, e.target, options);
+    out.push({ edge: e.id, source, target });
+  }
+  return out;
 }
