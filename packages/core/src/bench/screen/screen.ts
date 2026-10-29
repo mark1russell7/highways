@@ -6,7 +6,7 @@ import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS,
 import { compareStep, highwayRouters, isRoutedStep, stepRouters, wholeBoard, type CompareRow, type CompareStep, type RoutedStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
-import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
+import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeBalance, routeSeparation, runProfile } from "../measures/lanes.ts";
 import { farLevel, groupFill, itemOverlaps, silhouette } from "../measures/groups.ts";
 import { levelRatio, linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
@@ -274,6 +274,9 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     const open = openLanes(row.result);
     values["R12.share"] = routeSeparation(routes);
     values["R14.share"] = orthogonality(routes);
+    const balance = routeBalance(routes);
+    values["R16.cv"] = balance.cv;
+    values["R16.low"] = balance.low;
     values["B5.crossings"] = laneCrossings(open.graph);
     values["B7.ratio"] = occupiedArea(routes, boardUnit(graph));
     const runs = runProfile(open.graph);

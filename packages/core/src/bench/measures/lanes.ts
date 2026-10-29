@@ -92,7 +92,7 @@ export function routeSeparation(routes: readonly Route[], near: number = MEASURE
   if (ink <= 0) return 0;
   const grid = new Grid<number>(Math.max(16, 4 * near));
   legs.forEach((l, i) => grid.addSegment(i, l.a, l.b));
-  const sin = Math.sin((maxAngle * Math.PI) / 180);
+  const sin = parallelSine(maxAngle);
   let close = 0;
   legs.forEach((s, i) => {
     const length = dist(s.a, s.b);
@@ -116,6 +116,100 @@ export function routeSeparation(routes: readonly Route[], near: number = MEASURE
     close += unionLength(cover);
   });
   return Math.min(1, close / ink);
+}
+
+/** This function gives the sine of the largest angle between two legs that R12 and R16 count as parallel. */
+function parallelSine(maxAngle: number): number {
+  return Math.sin((maxAngle * Math.PI) / 180);
+}
+
+/** The lane balance of the routes (R16 of MEAS0). */
+export interface RouteBalance {
+  /** The coefficient of variation of the gaps, weighted by the overlap: the standard deviation over the mean. 0 is even. */
+  readonly cv: number;
+  /** The share of the overlap with a gap less than half of the weighted median gap. */
+  readonly low: number;
+  /** The count of the pairs of neighbor legs. */
+  readonly pairs: number;
+}
+
+/** The distance in units of the board up to which two parallel legs are neighbors for R16. It is 8 lane widths. */
+export const MEASURE_BALANCE_REACH: number = 8 * MEASURE_LANE_WIDTH;
+
+/**
+ * This function gives the lane balance of the routes (R16 of MEAS0): the spread of the gaps between parallel routes.
+ *
+ * The legs are the legs of R12. For each leg `s`, its neighbor at each side is the nearest leg `t` of other edges with three properties.
+ * It is within `maxAngle` degrees of parallel. Its projection overlaps `s`. Its distance at the middle of the overlap is less than `reach`.
+ * Each neighbor pair gives a gap `g` with the weight `w`, the length of the overlap. A pair counts one time.
+ * Two legs on one line have the gap 0.
+ *
+ * `cv = sqrt(Σ w (g − ḡ)² / Σ w) / ḡ`, with `ḡ = Σ w g / Σ w`. Lower is better. Routes without a neighbor pair give 0.
+ * R12 counts the parallel ink that is too near. R16 counts uneven gaps, also when each gap is wide.
+ */
+export function routeBalance(routes: readonly Route[], reach: number = MEASURE_BALANCE_REACH, maxAngle = 5): RouteBalance {
+  const legs = legsOf(routes);
+  const grid = new Grid<number>(Math.max(16, reach));
+  legs.forEach((l, i) => grid.addSegment(i, l.a, l.b));
+  const sin = parallelSine(maxAngle);
+  // The key of a pair is the two indices in order, so a pair that each leg finds counts one time.
+  const gaps = new Map<string, { g: number; w: number }>();
+  legs.forEach((s, i) => {
+    const length = dist(s.a, s.b);
+    if (length <= 0) return;
+    const ux = (s.b.x - s.a.x) / length;
+    const uy = (s.b.y - s.a.y) / length;
+    // The nearest neighbor on each side of `s`: the side +1 is the left of its direction, and -1 is the right. A gap of 0 goes to the side +1.
+    const best = new Map<number, { j: number; g: number; w: number }>();
+    grid.querySegment(s.a, s.b, reach, (j) => {
+      const t = legs[j]!;
+      if (j === i || t.edges === s.edges) return;
+      const tx = t.b.x - t.a.x;
+      const ty = t.b.y - t.a.y;
+      // The squared length of `t`. The test of the angle compares squares, so it needs no square root.
+      const tl2 = tx * tx + ty * ty;
+      const cross = ux * ty - uy * tx;
+      if (tl2 <= 0 || cross * cross > sin * sin * tl2) return;
+      const p = (t.a.x - s.a.x) * ux + (t.a.y - s.a.y) * uy;
+      const q = (t.b.x - s.a.x) * ux + (t.b.y - s.a.y) * uy;
+      const lo = Math.max(0, Math.min(p, q));
+      const hi = Math.min(length, Math.max(p, q));
+      if (hi - lo <= 1e-9) return;
+      // The offset of the line of `t` from the middle of the overlap on `s`, along the normal of `s`.
+      const m = (lo + hi) / 2;
+      const px = s.a.x + ux * m;
+      const py = s.a.y + uy * m;
+      const k = ((px - t.a.x) * tx + (py - t.a.y) * ty) / tl2;
+      const o = (t.a.x + tx * k - px) * -uy + (t.a.y + ty * k - py) * ux;
+      const g = Math.abs(o);
+      if (g >= reach) return;
+      const side = o < -1e-9 ? -1 : 1;
+      const now = best.get(side);
+      if (!now || g < now.g) best.set(side, { j, g, w: hi - lo });
+    });
+    for (const n of best.values()) {
+      const key = i < n.j ? `${i},${n.j}` : `${n.j},${i}`;
+      if (!gaps.has(key)) gaps.set(key, { g: n.g, w: n.w });
+    }
+  });
+  const list = [...gaps.values()];
+  const W = list.reduce((sum, x) => sum + x.w, 0);
+  if (list.length === 0 || W <= 0) return { cv: 0, low: 0, pairs: 0 };
+  const mean = list.reduce((sum, x) => sum + x.w * x.g, 0) / W;
+  const variance = list.reduce((sum, x) => sum + x.w * (x.g - mean) ** 2, 0) / W;
+  // The weighted median: the gap where the sorted weights reach half of the sum.
+  const sorted = [...list].sort((x, y) => x.g - y.g);
+  let acc = 0;
+  let median = sorted[sorted.length - 1]!.g;
+  for (const x of sorted) {
+    acc += x.w;
+    if (acc >= W / 2) {
+      median = x.g;
+      break;
+    }
+  }
+  const low = list.filter((x) => x.g < median / 2).reduce((sum, x) => sum + x.w, 0) / W;
+  return { cv: mean > 0 ? Math.sqrt(variance) / mean : 0, low, pairs: list.length };
 }
 
 /**
