@@ -27,7 +27,7 @@ export const NUDGE_SCHEMA: OptionSchema<NudgeOptions> = {
   spacing: { type: "number", min: 0, max: 32, step: 1, marks: [0, 4, 8], default: 4, describe: "The smallest free gap between the lanes of two neighbor tracks." },
 };
 
-/** One leg of a route that is parallel to an axis. It has its route, the index of its first point, its place and its span. */
+/** One leg of a route in a direction class. It has its route, the index of its first point, its place along the normal and its span along the class. */
 interface Leg {
   readonly route: number;
   readonly i: number;
@@ -38,7 +38,7 @@ interface Leg {
   readonly end: boolean;
 }
 
-/** One track: the legs of one axis on one line whose spans overlap. The edges of a lane of `shared` are on one track. */
+/** One track: the legs of one direction class on one line whose spans overlap. The edges of a lane of `shared` are on one track. */
 interface Track {
   readonly c: number;
   readonly lo: number;
@@ -51,7 +51,7 @@ interface Track {
 /** The tolerance of the place of a leg, in units of the board. */
 const EPS = 1e-6;
 
-/** This function gives the tracks of the legs of one axis. The legs with one place and overlapping spans go into one track. */
+/** This function gives the tracks of the legs of one direction class. The legs with one place and overlapping spans go into one track. */
 function tracksOf(legs: Leg[]): Track[] {
   legs.sort((a, b) => a.c - b.c || a.lo - b.lo || a.route - b.route || a.i - b.i);
   const out: Track[] = [];
@@ -121,6 +121,37 @@ export function spread(places: readonly number[], widths: readonly number[], spa
   return out;
 }
 
+/** The largest difference of the pseudo angles of two neighbor legs of one direction class. It is near 1 degree. */
+const TURN = 0.012;
+
+/**
+ * This function gives the direction classes of the legs of the routes. A class holds the legs that are near parallel.
+ * Each leg is a pair of its route and the index of its first point.
+ * The pseudo angle `dy / (|dx| + |dy|)` of a leg with `dx >= 0` sorts the legs by direction with no `Math.atan2`. A class is a chain of legs whose neighbor pseudo angles differ by `TURN` or less.
+ */
+function directionClasses(routes: readonly (readonly Point[])[]): { readonly route: number; readonly i: number }[][] {
+  const legs: { readonly route: number; readonly i: number; readonly q: number }[] = [];
+  routes.forEach((points, route) => {
+    for (let i = 0; i + 1 < points.length; i++) {
+      let dx = points[i + 1]!.x - points[i]!.x;
+      let dy = points[i + 1]!.y - points[i]!.y;
+      if (Math.abs(dx) + Math.abs(dy) < EPS) continue;
+      if (dx < 0 || (dx === 0 && dy < 0)) [dx, dy] = [-dx, -dy];
+      legs.push({ route, i, q: dy / (Math.abs(dx) + Math.abs(dy)) });
+    }
+  });
+  legs.sort((a, b) => a.q - b.q || a.route - b.route || a.i - b.i);
+  const out: { route: number; i: number }[][] = [];
+  legs.forEach((l, k) => {
+    const last = out[out.length - 1];
+    if (last && l.q - legs[k - 1]!.q <= TURN) last.push({ route: l.route, i: l.i });
+    else out.push([{ route: l.route, i: l.i }]);
+  });
+  // The pseudo angles -1 and 1 are both the vertical direction, so the first and the last class can be one class.
+  if (out.length >= 2 && legs[0]!.q + 2 - legs[legs.length - 1]!.q <= TURN) out[0]!.push(...out.pop()!);
+  return out;
+}
+
 /**
  * This function moves the parallel legs of the routes to even gaps (PHYSICAL, after the nudging of Wybrow, Marriott and Stuckey 2009).
  * A track is the legs of one axis on one line, so each lane of `shared` stays one lane. A track at an end of a route stays.
@@ -132,16 +163,26 @@ export function nudgeRoutes(graph: Graph, start: readonly Route[], o: Readonly<N
   const grid = new Grid<Node>(180);
   for (const n of graph.nodes) grid.add(n, n.box);
   const ends = new Map(graph.edges.map((e) => [e.id, [byId.get(e.source.node), byId.get(e.target.node)] as const]));
-  for (const axis of ["y", "x"] as const) {
-    const along = axis === "y" ? "x" : "y";
-    const legs: Leg[] = [];
-    routes.forEach((points, route) => {
-      for (let i = 0; i + 1 < points.length; i++) {
-        const a = points[i]!;
-        const b = points[i + 1]!;
-        if (Math.abs(a[axis] - b[axis]) > EPS || Math.abs(a[along] - b[along]) < EPS) continue;
-        legs.push({ route, i, c: a[axis], lo: Math.min(a[along], b[along]), hi: Math.max(a[along], b[along]), end: i === 0 || i + 2 === points.length });
-      }
+  for (const ids of directionClasses(routes)) {
+    // The direction of the class is the direction of its longest leg. A track moves along the normal `n`.
+    let ux = 0;
+    let uy = 0;
+    let best = -1;
+    for (const { route, i } of ids) {
+      const a = routes[route]![i]!;
+      const b = routes[route]![i + 1]!;
+      const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+      if (l2 > best) [best, ux, uy] = [l2, b.x - a.x, b.y - a.y];
+    }
+    const ul = Math.sqrt(best);
+    ux /= ul;
+    uy /= ul;
+    const legs: Leg[] = ids.map(({ route, i }) => {
+      const a = routes[route]![i]!;
+      const b = routes[route]![i + 1]!;
+      const ta = ux * a.x + uy * a.y;
+      const tb = ux * b.x + uy * b.y;
+      return { route, i, c: -uy * ((a.x + b.x) / 2) + ux * ((a.y + b.y) / 2), lo: Math.min(ta, tb), hi: Math.max(ta, tb), end: i === 0 || i + 2 === routes[route]!.length };
     });
     for (const group of neighborGroups(tracksOf(legs), o.reach)) {
       if (group.every((t) => t.fixed)) continue;
@@ -150,13 +191,17 @@ export function nudgeRoutes(graph: Graph, start: readonly Route[], o: Readonly<N
         group.map((t) => t.edges * o.lane),
         o.spacing,
       );
-      const moves: { readonly p: Point & { x: number; y: number }; readonly from: number }[] = [];
+      // Each point moves one time, with the move of the first track that holds it.
+      const moved = new Map<{ x: number; y: number }, Point>();
       group.forEach((t, k) => {
-        if (t.fixed || Math.abs(places[k]! - t.c) < EPS) return;
+        const d = places[k]! - t.c;
+        if (t.fixed || Math.abs(d) < EPS) return;
         for (const l of t.legs)
           for (const p of [routes[l.route]![l.i]!, routes[l.route]![l.i + 1]!]) {
-            moves.push({ p, from: p[axis] });
-            p[axis] = places[k]!;
+            if (moved.has(p)) continue;
+            moved.set(p, { x: p.x, y: p.y });
+            p.x -= uy * d;
+            p.y += ux * d;
           }
       });
       const touched = new Set(group.flatMap((t) => (t.fixed ? [] : t.legs.map((l) => l.route))));
@@ -164,7 +209,11 @@ export function nudgeRoutes(graph: Graph, start: readonly Route[], o: Readonly<N
         const [s, t] = ends.get(start[route]!.edge) ?? [undefined, undefined];
         return passesThrough(grid, { edge: start[route]!.edge, points: routes[route]! }, s, t);
       });
-      if (bad) for (const m of moves.reverse()) m.p[axis] = m.from;
+      if (bad)
+        for (const [p, from] of moved) {
+          p.x = from.x;
+          p.y = from.y;
+        }
     }
   }
   return start.map((r, e) => ({ edge: r.edge, points: routes[e]! }));

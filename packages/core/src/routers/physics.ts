@@ -7,8 +7,8 @@ import { cornersRouter } from "./corners.ts";
 export interface RelaxOptions {
   /** The number of the steps of the forces. The default of `repel` is 60. */
   readonly iterations: number;
-  /** The number of the legs of each route after the resampling. Each route gets this number of legs, so a small move of the input gives a small move of the points. */
-  readonly legs: number;
+  /** The largest length of a leg after the resampling, in units of the board. A long route gets more legs, so it can go round a box. */
+  readonly leg: number;
   /** The distance in units of the board up to which a box pushes a point. */
   readonly clearance: number;
   /** The weight of the push of the boxes. The value 0 turns it off. */
@@ -26,6 +26,21 @@ const STEP = 0.25;
 
 /** The tolerance of the rule `no-pass-through` of `checkProperties`, in units of the board. */
 const TOLERANCE = 0.5;
+
+/** The space between a box and a point that moves out of it, in units of the board. A leg across the corner of a box then stays out of the box. */
+const PAD = 2.5;
+
+/** The largest number of the legs of one route. */
+const MAX_LEGS = 512;
+
+/**
+ * The side through which a point of a route leaves a box.
+ * With `chord`, a point leaves the box at one side of the chord of its route, the line from its source to its target.
+ * It leaves at the side away from the center of the box.
+ * So all the points of one route go round the box on one side.
+ * With `near`, a point leaves through the nearest side. It suits routes that go round the boxes before the forces.
+ */
+export type RelaxSide = "chord" | "near";
 
 /** The squared length of the vector `(x, y)`. */
 const sq = (x: number, y: number): number => x * x + y * y;
@@ -68,9 +83,15 @@ function pushOfBox(p: Point, b: Box, r: number): Point {
   return { x: m * (p.x - qx), y: m * (p.y - qy) };
 }
 
-/** This function moves the point `p` out of each box of `boxes` with the space `pad`, through the nearest side. It takes at most 4 passes. */
-function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number): Point {
+/**
+ * This function moves the point `p` out of each box of `boxes` with the space `pad`. It takes at most 4 passes.
+ * With a chord `a` to `b`, the point moves along the normal of the chord, away from the center of the box (`RelaxSide`). Without a chord, it moves through the nearest side.
+ */
+function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number, a?: Point, b?: Point): Point {
   let q = p;
+  const dx = a && b ? b.x - a.x : 0;
+  const dy = a && b ? b.y - a.y : 0;
+  const len = Math.sqrt(sq(dx, dy));
   for (let pass = 0; pass < 4; pass++) {
     let hit: Box | undefined;
     boxes.query({ x: q.x - pad, y: q.y - pad, w: 2 * pad, h: 2 * pad }, (n) => {
@@ -79,6 +100,18 @@ function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number
     });
     if (!hit) return q;
     const b = hit;
+    if (a && len > 1e-9) {
+      // The center of the box is at the left of the chord when the cross product is positive. Then the point goes to the right.
+      const cross = dx * (b.y + b.h / 2 - a.y) - dy * (b.x + b.w / 2 - a.x);
+      const k = cross > 0 ? 1 : -1;
+      const mx = (k * dy) / len;
+      const my = (-k * dx) / len;
+      const tx = mx > 1e-12 ? (b.x + b.w + pad - q.x) / mx : mx < -1e-12 ? (b.x - pad - q.x) / mx : Infinity;
+      const ty = my > 1e-12 ? (b.y + b.h + pad - q.y) / my : my < -1e-12 ? (b.y - pad - q.y) / my : Infinity;
+      const t = Math.min(tx, ty) + 1e-6;
+      q = { x: q.x + mx * t, y: q.y + my * t };
+      continue;
+    }
     const moves = [
       { d: q.x - (b.x - pad), p: { x: b.x - pad, y: q.y } },
       { d: b.x + b.w + pad - q.x, p: { x: b.x + b.w + pad, y: q.y } },
@@ -142,13 +175,20 @@ export function boxField(graph: Graph, cell: number): BoxField {
  * - The points of other routes push each point (`edgePush`, `gap`).
  * - A spring pulls each point to the middle of its two neighbors (`spring`).
  *
- * Each route first gets `legs` legs of equal length. The two ends stay. All the points move together in each step, so the order of the edges does not change the result.
- * After the steps, each point that is in a box moves out of it.
+ * Each route first gets legs of equal length, each `leg` long or less. The two ends stay. All the points move together in each step, so the order of the edges does not change the result.
+ * After each step, each point that is in a box moves out of it through the side of `side`. So the routes act as rubber bands round the boxes.
  */
-export function relaxRoutes(graph: Graph, start: readonly Route[], o: Readonly<RelaxOptions>): Route[] {
+export function relaxRoutes(graph: Graph, start: readonly Route[], o: Readonly<RelaxOptions>, side: RelaxSide = "near"): Route[] {
   const field = boxField(graph, 4 * Math.max(o.clearance, o.gap));
-  let lines = start.map((r) => (r.points.length >= 2 ? resample(r.points, o.legs) : [...r.points]));
   const skips = start.map((r) => field.skip(r.edge));
+  const leg = Math.max(1e-3, o.leg);
+  const legsOf = (p: readonly Point[]): number => {
+    let total = 0;
+    for (let i = 1; i < p.length; i++) total += Math.sqrt(sq(p[i]!.x - p[i - 1]!.x, p[i]!.y - p[i - 1]!.y));
+    return Math.min(MAX_LEGS, Math.max(1, Math.ceil(total / leg)));
+  };
+  let lines = start.map((r) => (r.points.length >= 2 ? resample(r.points, legsOf(r.points)) : [...r.points]));
+  const out = (l: readonly Point[], e: number, p: Point): Point => (side === "chord" ? outOf(field.grid, skips[e]!, p, PAD, l[0], l[l.length - 1]) : outOf(field.grid, skips[e]!, p, PAD));
   const gap = Math.max(1e-9, o.gap);
   const clearance = Math.max(1e-9, o.clearance);
   const limit = Math.min(gap, clearance) / 4;
@@ -196,14 +236,14 @@ export function relaxRoutes(graph: Graph, start: readonly Route[], o: Readonly<R
         const a = l[i - 1]!;
         const b = l[i + 1]!;
         const s = Math.min(1, Math.max(0, o.spring));
-        next[i] = { x: p.x + mx + s * ((a.x + b.x) / 2 - p.x), y: p.y + my + s * ((a.y + b.y) / 2 - p.y) };
+        next[i] = out(l, e, { x: p.x + mx + s * ((a.x + b.x) / 2 - p.x), y: p.y + my + s * ((a.y + b.y) / 2 - p.y) });
       }
       return next;
     });
   }
   return start.map((r, e) => {
     const l = lines[e]!;
-    return { edge: r.edge, points: l.map((p, i) => (i === 0 || i === l.length - 1 ? p : outOf(field.grid, skips[e]!, p, 1))) };
+    return { edge: r.edge, points: l.map((p, i) => (i === 0 || i === l.length - 1 ? p : out(l, e, p))) };
   });
 }
 

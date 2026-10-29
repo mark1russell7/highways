@@ -9,19 +9,19 @@ import { byCollection } from "../trunks.ts";
 export type SpringsOptions = Omit<RelaxOptions, "gap" | "edgePush">;
 
 /** The default options of the router `springs`. */
-export const SPRINGS_DEFAULTS: Readonly<SpringsOptions> = Object.freeze({ iterations: 30, legs: 24, clearance: 8, boxPush: 1, spring: 0.3 });
+export const SPRINGS_DEFAULTS: Readonly<SpringsOptions> = Object.freeze({ iterations: 30, leg: 6, clearance: 8, boxPush: 1, spring: 0.3 });
 
 /** The declarations of the options of the router `springs` (PHYSICAL). */
 export const SPRINGS_SCHEMA: OptionSchema<SpringsOptions> = {
   iterations: { type: "integer", min: 0, max: 200, step: 10, marks: [10, 30, 60], default: 30, describe: "The number of the steps of the forces." },
-  legs: { type: "integer", min: 2, max: 64, step: 2, marks: [12, 24, 48], default: 24, describe: "The number of the legs of each route after the resampling." },
+  leg: { type: "number", min: 2, max: 32, step: 1, marks: [4, 6, 12], default: 6, describe: "The largest length of a leg after the resampling." },
   clearance: { type: "number", min: 2, max: 40, step: 2, marks: [4, 8, 16], default: 8, describe: "The distance up to which a box pushes a point." },
   boxPush: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the push of the boxes." },
   spring: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.1, 0.3, 0.6], default: 0.3, describe: "The weight of the spring that pulls each point to the middle of its neighbors." },
 };
 
 /** The largest distance in units of the board between a point of a route of `springs` and the polyline of the forces. */
-const SIMPLIFY = 0.5;
+const SIMPLIFY = 0.25;
 
 /** The base router of `springs`: `shared` with the rule `byCollection`. */
 const BASE = sharedRouter({ name: "shared", rule: byCollection });

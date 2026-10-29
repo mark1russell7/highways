@@ -1,16 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { checkProperties } from "../../bench/properties.ts";
+import { pointSegmentDistance } from "../../geom.ts";
 import { clustered, hub } from "../../highways/fixtures.test-util.ts";
 import type { Graph } from "../../model.ts";
 import { checkOptions } from "../../strategies/options.ts";
 import { resample, simplify } from "../physics.ts";
 import { REPEL_DEFAULTS, REPEL_SCHEMA, repelStrategy } from "./index.ts";
 
-/** Two nodes with a third node on the straight line between them. */
+/** Two nodes with a third node on the straight line between them. The center of the third node is below the line. */
 const blocked: Graph = {
   nodes: [
     { id: "a", box: { x: 0, y: 0, w: 40, h: 20 } },
-    { id: "m", box: { x: 120, y: -10, w: 40, h: 40 } },
+    { id: "m", box: { x: 120, y: -6, w: 40, h: 40 } },
     { id: "b", box: { x: 240, y: 0, w: 40, h: 20 } },
   ],
   edges: [{ id: "ab", source: { node: "a" }, target: { node: "b" } }],
@@ -36,7 +37,7 @@ describe("the router repel (PHYSICAL)", () => {
     const moved: Graph = { ...blocked, nodes: blocked.nodes.map((n) => (n.id === "m" ? { ...n, box: { ...n.box, y: n.box.y + 1 } } : n)) };
     const a = repelStrategy.run(blocked, { ...REPEL_DEFAULTS }).routes[0]!.points;
     const b = repelStrategy.run(moved, { ...REPEL_DEFAULTS }).routes[0]!.points;
-    const far = Math.max(...b.map((p) => Math.min(...a.map((q) => Math.hypot(p.x - q.x, p.y - q.y)))));
+    const far = Math.max(...b.map((p) => Math.min(...a.slice(1).map((q, i) => pointSegmentDistance(p, a[i]!, q)))));
     expect(far).toBeLessThan(4);
   });
 
