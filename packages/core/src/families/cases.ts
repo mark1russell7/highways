@@ -5,16 +5,19 @@ import type { Graph } from "../model.ts";
 import { changedDimensions, numberDimension, numberOf, type HighwaysBoard, type HighwaysFamily } from "./model.ts";
 
 /** This function gives a whole-number dimension with a linear scale. */
-const count = (name: string, min: number, max: number, value: number, meaning: string): CorpusDimension =>
+export const count = (name: string, min: number, max: number, value: number, meaning: string): CorpusDimension =>
   numberDimension({ name, kind: "int", min, max, default: value, meaning });
 
-/** This function gives the numbers of the full dimension values, by name. */
+/** This function gives the numbers of the full dimension values, by name. A dimension that is not `int` or `real` is not in them. */
 function numbers(dimensions: readonly CorpusDimension[], dims: DimensionValues): Record<string, number> {
-  return Object.fromEntries(dimensions.map((d) => [d.name, numberOf(dims, d.name)]));
+  return Object.fromEntries(dimensions.filter((d) => d.kind === "int" || d.kind === "real").map((d) => [d.name, numberOf(dims, d.name)]));
 }
 
+/** The default rule of the random numbers of a case family. */
+const CASE_SEEDING = "mulberry32 of the input seed. The fixed part of the board takes no number. Then one stream gives the random links.";
+
 /** The fields of a case family of `caseFamily`. */
-interface CaseFields {
+export interface CaseFields {
   readonly name: string;
   readonly meaning: string;
   readonly dimensions: readonly CorpusDimension[];
@@ -22,12 +25,17 @@ interface CaseFields {
   readonly generator: string;
   /** This function gives the parameters of the generator record from the full values. The default gives the values that differ from their defaults. */
   readonly params?: (dims: DimensionValues) => Readonly<Record<string, unknown>>;
-  /** This function makes the board. It gets the values by name, the input seed and the source of random numbers of the registry. */
-  readonly make: (values: Readonly<Record<string, number>>, seed: number, random: () => number) => Graph;
+  /** The text of the rule of the random numbers. The default is the rule of the 3 case families of the screen sets. */
+  readonly seeding?: string;
+  /**
+   * This function makes the board. It gets the numeric values by name, the input seed, the source of random numbers of the registry and the full values.
+   * The full values also have the values of the `enum` and `bool` dimensions.
+   */
+  readonly make: (values: Readonly<Record<string, number>>, seed: number, random: () => number, dims: DimensionValues) => Graph;
 }
 
 /** This function gives a case family. Its stream is mulberry32 of the input seed, and it uses only the stream, `Math.floor` and `Math.ceil`. */
-function caseFamily(fields: CaseFields): HighwaysFamily {
+export function caseFamily(fields: CaseFields): HighwaysFamily {
   const { name, meaning, dimensions } = fields;
   const params = fields.params ?? ((dims: DimensionValues) => changedDimensions(dimensions, dims));
   return Object.freeze({
@@ -36,10 +44,10 @@ function caseFamily(fields: CaseFields): HighwaysFamily {
     owner: "highways",
     meaning,
     dimensions,
-    seeding: "mulberry32 of the input seed. The fixed part of the board takes no number. Then one stream gives the random links.",
+    seeding: fields.seeding ?? CASE_SEEDING,
     crossEngine: "exact",
     generate(seed: number, dims: DimensionValues, context: GenerateContext): HighwaysBoard {
-      return { graph: fields.make(numbers(dimensions, dims), seed, context.random), generator: { name: fields.generator, version: 1, params: params(dims), seed } };
+      return { graph: fields.make(numbers(dimensions, dims), seed, context.random, dims), generator: { name: fields.generator, version: 1, params: params(dims), seed } };
     },
   });
 }

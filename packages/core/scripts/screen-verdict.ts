@@ -3,6 +3,7 @@
 // It reads the records of one artifact of the workflow `Screen`. For each strategy of the step against the default, it gives the verdict of each guard measure.
 // The guard measures are the measures of the step in `docs/PROMOTION.md`. The tie is the `minEffect` of the measure, and the level is 0.05.
 // The script also gives the old verdict: the mean of the inputs, as the screen gives it today.
+// It gives the power of the sign test: the least count of families on one side that passes at the level. Each set works, also `screen-v3` with 15 families.
 // The option `--snapshot` writes the verdict snapshot `docs/research/verdicts/<set>-<step>.json` that the site reads (SITE-LIVE).
 // The header of a snapshot has the run of the artifact (`--run`), the commit of the records (`--commit`), the date (`--date`) and the core version (`--core`).
 // With no option, the run and the commit come from the path of the artifact, `<run>/screen-<set>-<step>-...-<sha>/screen.jsonl`.
@@ -12,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
 import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
-import { familyCell, SCREEN_FAMILY_BY } from "../src/bench/screen/set.ts";
+import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 
 /** The significance level of each verdict. */
 const LEVEL = 0.05;
@@ -188,6 +189,12 @@ function main(): void {
   const families = rows[0]?.families.map((f) => f.family) ?? [];
   console.log(`## The verdicts of the step \`${step}\` on \`${records[0]?.set}\` against \`${base}\`\n`);
   console.log(`The level is ${LEVEL}. The families: ${families.map((f) => `\`${f}\``).join(", ")}. A positive mean tells that the strategy is better.\n`);
+  const power = signTestPower(families.length, LEVEL);
+  console.log(
+    power === undefined
+      ? `The sign test over ${families.length} families passes at no count. It needs 6 families or more at the level ${LEVEL}.\n`
+      : `The sign test over ${families.length} families passes at ${power} of ${families.length} families or more on one side, with no ties, at the level ${LEVEL}.\n`,
+  );
   console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against |");
   console.log("|---|---|---|---|---:|---:|---:|---|---:|");
   for (const r of rows) {
