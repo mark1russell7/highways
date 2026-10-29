@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 22, "id": "n0", "w": 35, "x": 20, "y": 25},
+    {"h": 27, "id": "n1", "w": 44, "x": 24, "y": 185},
+    {"h": 28, "id": "n2", "w": 50, "x": 57, "y": 245},
+    {"h": 23, "id": "n3", "w": 35, "x": 147, "y": 42},
+    {"h": 18, "id": "n4", "w": 37, "x": 23, "y": 112},
+    {"h": 27, "id": "n5", "w": 52, "x": 153, "y": 100},
+    {"h": 23, "id": "n6", "w": 36, "x": 94, "y": 115},
+    {"h": 25, "id": "n7", "w": 43, "x": 227, "y": 73},
+    {"h": 19, "id": "n8", "w": 49, "x": 115, "y": 193},
+    {"h": 29, "id": "n9", "w": 53, "x": 140, "y": -12}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"data": {"collection": "speeds"}, "id": "e0", "source": "n8", "target": "n2"},
+    {"data": {"collection": "users"}, "id": "e1", "source": "n3", "target": "n7"},
+    {"data": {"collection": "speeds"}, "id": "e2", "source": "n1", "target": "n2"},
+    {"data": {"collection": "speeds"}, "id": "e3", "source": "n7", "target": "n1"},
+    {"data": {"collection": "scores"}, "id": "e4", "source": "n7", "target": "n9"},
+    {"data": {"collection": "scores"}, "id": "e5", "source": "n3", "target": "n0"},
+    {"data": {"collection": "modes"}, "id": "e6", "source": "n3", "target": "n5"},
+    {"data": {"collection": "scores"}, "id": "e7", "source": "n2", "target": "n9"},
+    {"data": {"collection": "speeds"}, "id": "e8", "source": "n9", "target": "n8"},
+    {"data": {"collection": "speeds"}, "id": "e9", "source": "n4", "target": "n8"},
+    {"data": {"collection": "scores"}, "id": "e10", "source": "n5", "target": "n6"},
+    {"data": {"collection": "speeds"}, "id": "e11", "source": "n5", "target": "n1"},
+    {"data": {"collection": "speeds"}, "id": "e12", "source": "n8", "target": "n1"},
+    {"data": {"collection": "speeds"}, "id": "e13", "source": "n5", "target": "n8"},
+    {"data": {"collection": "modes"}, "id": "e14", "source": "n0", "target": "n5"}
+  ],
+  "family": "tiny-uniform",
+  "generator": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "uniform", "nodes": 10}, "seed": 6055, "version": 1},
+  "hash": "1894c99dfaf2bda4",
+  "id": "screen-v3/tiny-uniform/s6",
+  "schema": "layout-input/1",
+  "seed": 6,
+  "set": "screen-v3",
+  "source": "made-up"
+}

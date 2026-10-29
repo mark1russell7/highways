@@ -126,13 +126,70 @@ export const SCREEN_V2: ScreenSet = {
   heldOut: SCREEN_V2_HELD_OUT,
 };
 
+/** This function gives the 9 families of CORPUS-FAMILIES, each with `seeds` members. Their base seeds are the primes from 13 to 43. */
+function coverageFamilies(seeds: number): ScreenFamily[] {
+  return [
+    registryFamily("frame-rows", 13, "Cards with full-width rows and fixed plugs on their walls.", seeds, { ...BASE, count: "100", edgeDensity: "sparse", edgeShape: "random", groups: "nested", ports: "fixed" }),
+    registryFamily("pipeline", 17, "A long chain of stages in rows that turn.", seeds, { ...BASE, count: "100", edgeDensity: "sparse", edgeShape: "tree", ports: "free" }),
+    registryFamily("fan-out", 19, "A wide fan-out from one hub to the rings around it.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "bundled", ports: "free" }),
+    registryFamily("two-hubs", 23, "Two hubs with many shared targets.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "bundled", ports: "free" }),
+    registryFamily("uneven-sizes", 29, "A few large boxes among many small boxes.", seeds, { ...BASE, sizes: "bimodal", count: "100", edgeDensity: "medium", edgeShape: "random", ports: "free" }),
+    registryFamily("thin-bars", 31, "Long thin bars in lanes, as a timeline.", seeds, { ...BASE, sizes: "extremeAspect", count: "100", edgeDensity: "medium", edgeShape: "random", ports: "free" }),
+    registryFamily("sparse-long", 37, "Few nodes far apart, with long edges.", seeds, { ...BASE, count: "10", edgeDensity: "sparse", edgeShape: "longRange", ports: "free" }),
+    registryFamily("local-mesh", 41, "Many short edges between nodes next to each other.", seeds, { ...BASE, count: "100", edgeDensity: "dense", edgeShape: "clustered", ports: "free" }),
+    registryFamily("bipartite", 43, "A complete bipartite part: crossings that no plan removes.", seeds, { ...BASE, count: "10", edgeDensity: "dense", edgeShape: "random", ports: "free" }),
+  ];
+}
+
+/** The member seeds of each family of `screen-v3` that the split `default` holds out. */
+export const SCREEN_V3_HELD_OUT: readonly number[] = [7, 8, 9];
+
+const V3_FAMILIES = [...screenFamilies(10, 10), ...coverageFamilies(10)];
+
 /**
- * The screen sets by id. `screen-v1` and its larger version `screen-v2` (CORPUS-SEEDS) have the boards of the screen.
+ * The screen set `screen-v3` (CORPUS-FAMILIES): the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
+ * The first 6 families are the families of `screen-v2` with their seeds. Thus their boards are the boards of `screen-v2`, under the ids of `screen-v3`.
+ * The 9 new families cover frames with rows, a long chain, a wide fan-out and two hubs.
+ * They also cover uneven sizes, thin bars, long edges, short edges and a complete bipartite part.
+ *
+ * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
+ * This set does not change. A new family goes into a new set. The tests compare it with the files in `corpus/screen-v3`.
+ */
+export const SCREEN_V3: ScreenSet = {
+  id: "screen-v3",
+  families: V3_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V3_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V3_HELD_OUT,
+};
+
+/**
+ * This function gives the power of the sign test over `families` families at the level `level`.
+ * The power is the least count of families on one side that passes.
+ * A family set without ties and with that count or more on one side passes the two-sided exact sign test, with the p below `level`.
+ * The function gives `undefined` when no count passes, for example for 5 families or fewer at the level 0.05.
+ */
+export function signTestPower(families: number, level = 0.05): number | undefined {
+  for (let k = Math.ceil(families / 2); k <= families; k++) {
+    // The two-sided p of k wins and families - k losses: two times the tail of the smaller count.
+    let tail = 0;
+    let c = 1;
+    for (let i = 0; i <= families - k; i++) {
+      tail += c;
+      c = (c * (families - i)) / (i + 1);
+    }
+    if (Math.min(1, (2 * tail) / 2 ** families) < level) return k;
+  }
+  return undefined;
+}
+
+/**
+ * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
  */
 export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
   [SCREEN_V2.id]: SCREEN_V2,
+  [SCREEN_V3.id]: SCREEN_V3,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
 };

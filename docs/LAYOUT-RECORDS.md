@@ -95,12 +95,32 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `hub-chain` | `rows`, `cols`, `long`, `gap` | `mulberry32` of the seed | `exact` |
 | `many-groups` | `groupCols`, `groupRows`, `perGroup`, `crossLinksPerGroup`, `groupGap` | `mulberry32` of the seed | `exact` |
 | `packed-grid` | `cols`, `rows`, `long`, `reach` | `mulberry32` of the seed | `exact` |
+| `frame-rows` | `cards`, `rows`, `links`, `inner`, `gap` | `mulberry32` of the seed | `exact` |
+| `pipeline` | `stages`, `perRow`, `skips`, `gap` | `mulberry32` of the seed | `exact` |
+| `fan-out` | `leaves`, `cross`, `gap` | `mulberry32` of the seed | `exact` |
+| `two-hubs` | `shared`, `own`, `span`, `gap` | `mulberry32` of the seed | `exact` |
+| `uneven-sizes` | `small`, `large`, `ratio`, `edgesPerNode`, `toLarge`, `gap` | `mulberry32` of the seed | `exact` |
+| `thin-bars` | `lanes`, `bars`, `links`, `thick`, `gap` | `mulberry32` of the seed | `exact` |
+| `sparse-long` | `nodes`, `edges`, `spacing`, `far` | `mulberry32` of the seed | `exact` |
+| `local-mesh` | `cols`, `rows`, `degree`, `gap`, `jitter` | `mulberry32` of the seed | `exact` |
+| `bipartite` | `left`, `right`, `noise`, `extra`, `layout`, `gap` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
 - The generator record has only the dimensions away from their defaults. `packed-grid` always has `cols`, `rows` and `long`, as the screen sets of today.
 - The 3 fixture families are separate families, not 1 family with explicit dimensions. Then the defaults of each family give the exact record of its screen boards.
 - A fixture family can choose the kind `clustered`, `hubs` or `collections`. These kinds use `Math.log`, `Math.cos` and `**`, so each fixture family is `libm-dependent`.
+- The last 9 families are `COVERAGE_FAMILIES` (CORPUS-FAMILIES) in `packages/core/src/families/coverage.ts`. Each one covers a region that the first 6 families do not cover:
+  - `frame-rows`: cards with full-width rows and a plug on each wall for each row. The dimension `inner` adds edges from a row to a card, which only `corners` routes. Its default is 0.
+  - `pipeline`: a long chain of stages in a snake, with some links that skip stages.
+  - `fan-out`: one hub with links to many leaves in the rings around it.
+  - `two-hubs`: two tall hubs with many shared targets between them.
+  - `uneven-sizes`: many small boxes and a few large boxes, in shelves.
+  - `thin-bars`: long thin bars in lanes, as the bars of a timeline or the rows of a table.
+  - `sparse-long`: few nodes far apart, and each edge goes to a far node.
+  - `local-mesh`: a grid of nodes with many short edges to the nodes near them.
+  - `bipartite`: a complete bipartite part with noise nodes. Its crossings stay in each plan. The `layout` is `rows` or `mixed`.
+- Each new family uses only integer steps of `mulberry32`, so each one is `exact`. Its boxes do not overlap, except a row in its card.
 - The rule of the members, `base + 1009 × k`, stays in `bench/screen/set.ts`. The hash of an input is the `documentHash` of the core, with no grid.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
@@ -505,6 +525,19 @@ The set `screen-v2` (CORPUS-SEEDS) has the 6 families of `screen-v1`, each with 
 
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f set=screen-v2 -f minutes=45
+```
+
+### The screen set `screen-v3`
+
+The set `screen-v3` (CORPUS-FAMILIES) has the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 seeds 0 to 9: 150 boards. Its files are in [`corpus/screen-v3`](../corpus/screen-v3). `SCREEN_V3` of `bench/screen/set.ts` makes them.
+
+- The first 6 families keep the seeds of `screen-v2`. Thus their 60 boards are the boards of `screen-v2`, under the ids of `screen-v3`.
+- The 9 new families get the base seeds 13, 17, 19, 23, 29, 31, 37, 41 and 43.
+- The split file [`corpus/splits/screen-v3.f9fc4d8823ded6e5.json`](../corpus/splits/screen-v3.f9fc4d8823ded6e5.json) holds out the seeds 7 to 9 of each family.
+- With 15 families, a two-sided sign test at the level 0.05 passes at 12 of 15. With 6 families, it passes only at 6 of 6. `signTestPower` gives this count, and `screen-verdict.ts` writes it.
+
+```sh
+gh workflow run screen.yml --ref main -f step=highway -f set=screen-v3 -f minutes=120
 ```
 
 ### The screen set `exact-v1`

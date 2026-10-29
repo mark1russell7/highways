@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { HIGHWAYS_FAMILIES, screenInputs, SCREEN_V2, type ParamValue } from "@mark1russell7/highways";
+import { HIGHWAYS_FAMILIES, screenInputs, SCREEN_V3, type ParamValue } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
 import { compareBoardOf, formatHash, GENERATED_BOARD, parseHash } from "./compare-data.ts";
 import {
@@ -41,10 +41,11 @@ describe("the generated boards of the site (CORPUS-GEN)", () => {
     for (const f of GEN_FAMILIES) for (const d of f.dimensions) expect(panel, d.name).not.toContain(`"${d.name}"`);
   });
 
-  it("gives the screen board of each family at its defaults: the member 0 of `screen-v2`", () => {
-    const inputs = screenInputs(SCREEN_V2);
+  it("gives the screen board of each family at its defaults: the member 0 of `screen-v3`", () => {
+    const inputs = screenInputs(SCREEN_V3);
+    expect(NAMED_GENS.slice(0, GEN_FAMILIES.length).map((n) => n.spec.family)).toEqual(GEN_FAMILIES.map((f) => f.name));
     for (const n of NAMED_GENS.slice(0, GEN_FAMILIES.length)) {
-      const member = inputs.find((i) => i.id === `screen-v2/${n.spec.family}/s0`)!;
+      const member = inputs.find((i) => i.id === `screen-v3/${n.spec.family}/s0`)!;
       const graph = genGraph(n.spec);
       expect(graph.nodes.map((x) => x.id), n.name).toEqual(member.boxes.map((b) => b.id));
       expect(graph.edges.length, n.name).toBe(member.edges.length);

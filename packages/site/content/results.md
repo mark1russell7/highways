@@ -10,6 +10,8 @@ Each cell is the verdict of one strategy against the default `shared` on one gua
 - The breadth tells how many families are against the side of the verdict, for example "worse on 2 of 6".
 - The small marks are the families: a plus is a win, a minus is a loss and a dot is a tie.
 
+The screen sets are `screen-v1`, `screen-v2` and `screen-v3`. `screen-v1` and `screen-v2` have 6 families. Thus a sign test passes only at 6 of 6. `screen-v3` has 15 families, and a sign test passes at 12 of 15 (CORPUS-FAMILIES).
+
 Select a cell to see its families. The snapshots are in [`docs/research/verdicts/`](https://github.com/mark1russell7/highways/tree/main/docs/research/verdicts).
 
 ## Where no single default wins
