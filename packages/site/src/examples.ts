@@ -1,4 +1,4 @@
-import { cornersRouter, runKey, sectionsRouter, segmentsOf, type Graph, type Point, type Result, type SegmentGraph } from "@mark1russell7/highways";
+import { cornersRouter, runKey, sectionsRouter, segmentsOf, type Graph, type InnerMode, type Point, type Result, type SegmentGraph } from "@mark1russell7/highways";
 import coursesText from "../content/examples/courses.md?raw";
 import deliveryText from "../content/examples/delivery.md?raw";
 import howtoText from "../content/examples/howto.md?raw";
@@ -28,15 +28,27 @@ const MARGIN = 20;
 /** The router of the boards. */
 const router = sectionsRouter({ name: "sections", margin: MARGIN, stretch: 3, cap: 6 });
 
-/** The router of the inner edges of a card with rows (INTERIOR-ROUTE). The router `sections` gives no route for an inner edge. */
-const inner = cornersRouter({ name: "corners", margin: 6 });
+/**
+ * The routers of the inner edges of a card with rows (INTERIOR-ROUTE), one for each mode of the option `inner`.
+ * The router `sections` gives no route for an inner edge.
+ */
+const inners: Readonly<Record<InnerMode, ReturnType<typeof cornersRouter>>> = {
+  corners: cornersRouter({ name: "corners", margin: 6 }),
+  gutter: cornersRouter({ name: "corners", margin: 6, inner: "gutter" }),
+};
 
-/** This function routes a board: the outer edges with `sections`, then the inner edges of each frame with `corners`. */
-function routeBoard(graph: Graph): Result {
+/** This function tells if a board has frames: nodes that hold other nodes. */
+const hasFrames = (graph: Graph): boolean => graph.nodes.some((n) => n.parent !== undefined);
+
+/** This function routes a board: the outer edges with `sections`, then the inner edges of each frame with `corners` in the mode `mode`. */
+function routeBoard(graph: Graph, mode: InnerMode): Result {
   const outer = router.route(graph);
-  if (!graph.nodes.some((n) => n.parent !== undefined)) return outer;
-  return { ...outer, routes: [...outer.routes, ...inner.route(graph).routes.filter((r) => r.frame !== undefined)] };
+  if (!hasFrames(graph)) return outer;
+  return { ...outer, routes: [...outer.routes, ...inners[mode].route(graph).routes.filter((r) => r.frame !== undefined)] };
 }
+
+/** The mode of the inner routes on the page. The buttons "Corners" and "Gutters" change it. */
+let innerMode: InnerMode = "corners";
 
 /** The id of the tab of the generated board (CORPUS-GEN). */
 const GENERATED = "generated";
@@ -66,15 +78,17 @@ function shownOf(board: Board, done: Shown["done"], ms: number): Shown {
   return { board, done, runs, ms, home: { minScale: 60 / (widths[widths.length >> 1] ?? 60), ...(focus && { focus }) } };
 }
 
-/** This function routes a board one time, and keeps the result. */
+/** This function routes a board one time for each mode of the inner routes, and keeps the result. */
 function routed(board: Board): Shown {
-  let s = shown.get(board.id);
+  const mode = hasFrames(board.graph) ? innerMode : "corners";
+  const key = `${board.id} ${mode}`;
+  let s = shown.get(key);
   if (!s) {
     const t0 = performance.now();
-    const result = routeBoard(board.graph);
+    const result = routeBoard(board.graph, mode);
     const segments = segmentsOf(result);
     s = shownOf(board, { result, segments }, performance.now() - t0);
-    shown.set(board.id, s);
+    shown.set(key, s);
   }
   return s;
 }
@@ -188,6 +202,14 @@ $("close-all").addEventListener("click", () => {
   state.open = new Set();
   render();
 });
+for (const b of document.querySelectorAll<HTMLButtonElement>("#inner-mode [data-inner]")) {
+  b.addEventListener("click", () => {
+    innerMode = b.dataset["inner"] as InnerMode;
+    for (const o of document.querySelectorAll<HTMLButtonElement>("#inner-mode [data-inner]")) o.setAttribute("aria-checked", String(o === b));
+    state.open = new Set();
+    render();
+  });
+}
 addEventListener("hashchange", () => {
   const next = fromHash();
   if (next.board !== state.board) pick(next.board, next.gen);
@@ -258,6 +280,7 @@ function boardText(): void {
   $("board-lede").innerHTML = html(lede);
   $("board-try").innerHTML = board ? `<h3>Try this</h3>${html(sectionOf(text, "Try this"))}` : "";
   $("board-try").hidden = gen;
+  $("inner-mode").hidden = !board || !hasFrames(board.graph);
   $("gen").hidden = !gen;
   $("map").setAttribute("aria-label", `The map of the ${name.toLowerCase()}`);
   document.title = `${name}: highways examples`;

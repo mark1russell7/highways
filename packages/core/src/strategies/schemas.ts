@@ -141,6 +141,20 @@ export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
     step: 1,
     describe: "The distance from the walls of a frame to the bounds of its inner routes. Without a value, the inset is the margin.",
   },
+  inner: {
+    type: "enum",
+    values: ["corners", "gutter"],
+    default: "corners",
+    describe: "The mode of the inner routes. With `gutter`, each inner route is orthogonal in the gaps between the nodes of the frame, with a lane in each shared gap.",
+  },
+  bendCost: {
+    type: "number",
+    min: 0,
+    max: 100,
+    step: 1,
+    default: 16,
+    describe: "The cost of one bend of an inner route of the mode `gutter`, in units of length. A larger cost gives fewer bends.",
+  },
 };
 
 /** The declarations of the options of the router `trunks`. */
