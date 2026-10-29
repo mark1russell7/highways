@@ -268,6 +268,7 @@ A zoom level shows a group as one item, and the edges between two items as one l
 - Z7 and Z8 compare two levels of one result. Z10 compares two results of two inputs. Both kinds are stability, and the bench has neither today.
 - Z8 uses the order and not the distance, because a reader keeps the order better ([Misue 1995][misue95]).
 - Z11 separates two parts of Z10. The move of one node has an expected local response: the edges of that node move by approximately one unit. `Z11.gain` above 1 tells that the response is larger than the move. `Z11.spill` tells that it reaches other routes.
+- On `screen-v3`, the median `Z11.gain` of `straight` is 0.96, and of `shared` 4.2. On the clustered families, the field bundlers spill most: `cubu` 0.44, `territories` 0.36 and `mlseb` 0.27.
 - Z12 reads only the option `seed` of the strategy. A strategy that keeps a seed inside, as the fit of `preferences`, has 0. A wrapper with its own fixed options hides the seed too.
 - The input change of Z10 and G9 is seeded: one node moves by `u`, one edge is added, or one edge is removed. The change is the same for each strategy.
 - For the step `highway`, the screen option `edits` gives Z10 over a sequence of seeded changes, with the plan before each change. It also gives the churn of the highways and the share of the highways that keep their id (BUILD-W2A).
