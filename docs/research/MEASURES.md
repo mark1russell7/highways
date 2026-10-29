@@ -169,6 +169,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 - R11 is the angular resolution of a box. On a box, the routes of one side leave along the same normal, so the angle between them is 0. The space between their plugs takes the place of the angle.
 - [Purchase 1997][purchase97] found no significant effect of the angular resolution or of the orthogonality. Thus R11 and R14 get low weights, but MEAS1 still reports them.
 - R14 is a style, not a quality. A host app with an orthogonal style sets a high weight. A host app with curves sets a weight of 0.
+- R12 counts the parallel ink that is too near. R16 counts uneven gaps, also when each gap is wide. On `screen-v3`, their Spearman correlation is 0.64, so they are not independent. `R16.low` against R12 is 0.22.
 
 ## Bundles
 
@@ -266,6 +267,8 @@ A zoom level shows a group as one item, and the edges between two items as one l
 
 - Z7 and Z8 compare two levels of one result. Z10 compares two results of two inputs. Both kinds are stability, and the bench has neither today.
 - Z8 uses the order and not the distance, because a reader keeps the order better ([Misue 1995][misue95]).
+- Z11 separates two parts of Z10. The move of one node has an expected local response: the edges of that node move by approximately one unit. `Z11.gain` above 1 tells that the response is larger than the move. `Z11.spill` tells that it reaches other routes.
+- Z12 reads only the option `seed` of the strategy. A strategy that keeps a seed inside, as the fit of `preferences`, has 0. A wrapper with its own fixed options hides the seed too.
 - The input change of Z10 and G9 is seeded: one node moves by `u`, one edge is added, or one edge is removed. The change is the same for each strategy.
 - For the step `highway`, the screen option `edits` gives Z10 over a sequence of seeded changes, with the plan before each change. It also gives the churn of the highways and the share of the highways that keep their id (BUILD-W2A).
 
