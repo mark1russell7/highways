@@ -44,6 +44,7 @@
     "profile": "node scripts/profile.ts",
     "levels": "node scripts/levels.ts",
     "screen": "node scripts/screen.ts",
+    "promotion": "node scripts/promotion.ts",
     "exact": "node scripts/exact.ts",
     "oracle": "node scripts/oracle.ts",
     "portfolio": "node scripts/portfolio.ts",
