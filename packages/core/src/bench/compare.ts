@@ -14,7 +14,7 @@ import { measureLevelFaults, sumFaults } from "./links.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
 import { roomOrderFaults } from "./measures/room.ts";
 import { boardUnit } from "./measures/routes.ts";
-import { changeGraph, routeStability } from "./measures/stability.ts";
+import { changeGraph, moveResponse, routeStability } from "./measures/stability.ts";
 import { farLinks, measureBoard } from "./room.ts";
 import { benchRun } from "./run.ts";
 import { curveRuns, fixtureGroupOptions, FRONT_OBJECTIVES, groupRun, routeMeasures } from "./suite.ts";
@@ -146,6 +146,7 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
   let rows: CompareRow[];
   if (step === "router") {
     const change = graph.nodes.length <= stabilityMax ? changeGraph(graph, seed) : undefined;
+    const move = graph.nodes.length <= stabilityMax ? changeGraph(graph, seed, { edges: false }) : undefined;
     rows = listStrategies(registry, "router").map((strategy): CompareRow => {
       if (graph.nodes.length > (strategy.maxNodes ?? Infinity)) return { step, strategy: strategy.name, violations: 0, ms: 0, values: {}, skipped: `over ${strategy.maxNodes} nodes` };
       const router = asRouter(strategy, own[strategy.name]);
@@ -156,6 +157,28 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
         values["Z10.mean"] = s.mean;
         values["Z10.max"] = s.max;
         values["Z10.moved"] = s.moved;
+      }
+      // Z11: the routes after a change that only moves one node by one unit.
+      if (move) {
+        const z = moveResponse(graph, move, result, router.route(move.graph), { seed });
+        if (z) {
+          values["Z11.gain"] = z.gain;
+          values["Z11.spill"] = z.spill;
+        }
+      }
+      // Z12: the routes with the next seed, for a strategy with the option `seed`. A strategy without a seed gives the same routes, so its values are 0.
+      if (change) {
+        const given = (own[strategy.name] ?? {}) as { seed?: unknown };
+        const base = typeof given.seed === "number" ? given.seed : (strategy.defaults as { seed?: unknown } | undefined)?.seed;
+        if (typeof base === "number") {
+          const next = asRouter(strategy, { ...own[strategy.name], seed: base + 1 } as object);
+          const s = routeStability(graph, result, next.route(graph), { seed });
+          values["Z12.mean"] = s.mean;
+          values["Z12.moved"] = s.moved;
+        } else {
+          values["Z12.mean"] = 0;
+          values["Z12.moved"] = 0;
+        }
       }
       return { step, strategy: strategy.name, violations: row.violations + (row.deterministic ? 0 : 1), ms: row.ms, values, result };
     });

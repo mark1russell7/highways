@@ -161,6 +161,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R13 | Outside | Routes in the bounding box of the board | `count(e : a point of r_e is more than 24 units outside the bounding box)` | count, `↓` | `linear` | fault | yes, `outside` | Own (QFIX, ER3c) |
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
+| R16 | Lane balance | Even gaps between parallel routes, also when each gap is wide | For each leg, the nearest leg of other edges at each side within 5° of parallel and 8 lane widths, with the overlap `w` and the gap `g`: `cv = sd_w(g) / mean_w(g)`, and `low` is the share of `w` with `g < median_w(g) / 2` | `cv` no unit and share 0..1, `↓` | `n log n` | score | yes, `R16.cv` and `R16.low` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
 
 ### Notes on the routes
 
@@ -258,6 +259,8 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | yes, `Z8.order` of the suite, sampled above 1500 items | [Misue 1995][misue95], [Kendall 1938][kendall38] |
 | Z9 | Link agreement | Level links that follow the routes of their edges | `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u` | no unit, `↓` | `quadratic` for each link, sampled | score | yes, `Z9.mean` of the screen | [Elmqvist 2010][elmqvist10], [Perlin 1993][perlin93] |
 | Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z10.mean`, `Z10.max` and `Z10.moved` of the suite, up to 1000 nodes | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
+| Z11 | Move response | Routes that answer a move of one node only near that node | One node moves by one unit `u` and the edges stay: `gain = Σ_e frechet / u / max(1, degree)`, and `spill` is the share of the other routes that move more than 1 unit | `gain` no unit, 1 is local, and share 0..1, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z11.gain` and `Z11.spill` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
+| Z12 | Seed stability | Routes that do not change with the seed of a strategy | A strategy with the option `seed` routes again with `seed + 1`: the mean Fréchet distance and the share of the routes that move. A strategy without a seed has 0 | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z12.mean` and `Z12.moved` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
 
 ### Notes on the zoom levels
 
