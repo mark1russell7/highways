@@ -82,6 +82,8 @@ export const MOVE_NAMES: Readonly<Record<string, string>> = Object.freeze({
   streets: "street",
   search: "searched",
   interchanges: "networkRoad",
+  knee: "tree",
+  bronchial: "tree",
 });
 
 /**

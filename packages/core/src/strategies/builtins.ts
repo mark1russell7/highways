@@ -46,6 +46,8 @@ import { P_HUB_DEFAULTS, pHubPlan, type PHubOptions } from "../highways/p-hub/in
 import { SCALE_SPACE_DEFAULTS, scaleSpacePlan, type ScaleSpaceOptions } from "../highways/scale-space/index.ts";
 import { GAP_DEFAULTS, gapPlan, type GapOptions } from "../highways/gaps/index.ts";
 import { INTERCHANGE_DEFAULTS, interchangePlan, type InterchangeOptions } from "../highways/interchanges/index.ts";
+import { KNEE_DEFAULTS, kneePlan, type KneeOptions } from "../highways/knee/index.ts";
+import { BRONCHIAL_DEFAULTS, bronchialPlan, type BronchialOptions } from "../highways/bronchial/index.ts";
 import { SEARCH_DEFAULTS, searchPlan, type SearchOptions } from "../highways/search/index.ts";
 import { STEINER_DEFAULTS, steinerPlan, type SteinerOptions } from "../highways/steiner/index.ts";
 import { STREET_DEFAULTS, streetPlan, type StreetOptions } from "../highways/streets/index.ts";
@@ -88,7 +90,7 @@ import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
 import { DEPTHS_SCHEMA, PIPELINE_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA } from "./schemas.ts";
+import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -472,6 +474,8 @@ export const highwayStrategies: {
   readonly streets: Strategy<"highway", StreetOptions>;
   readonly search: Strategy<"highway", SearchOptions>;
   readonly interchanges: Strategy<"highway", InterchangeOptions>;
+  readonly knee: Strategy<"highway", KneeOptions>;
+  readonly bronchial: Strategy<"highway", BronchialOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -946,6 +950,24 @@ export const highwayStrategies: {
     schema: INTERCHANGE_SCHEMA,
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<InterchangeOptions>) => interchangePlan(input, o),
+  }),
+  knee: defineStrategy({
+    step: "highway",
+    name: "knee",
+    describe: "The knee of the plant front (NAT-018). A sweep of the balancing factor of NAT-017 gives trees, and the tree at the knee of ink against path length wins.",
+    defaults: { ...KNEE_DEFAULTS } as KneeOptions,
+    schema: KNEE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<KneeOptions>) => kneePlan(input, o),
+  }),
+  bronchial: defineStrategy({
+    step: "highway",
+    name: "bronchial",
+    describe: "Bronchial splits that fill the space (NAT-019). The tree grows toward the center of its targets, then splits the targets in two halves, again and again.",
+    defaults: { ...BRONCHIAL_DEFAULTS } as BronchialOptions,
+    schema: BRONCHIAL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<BronchialOptions>) => bronchialPlan(input, o),
   }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),

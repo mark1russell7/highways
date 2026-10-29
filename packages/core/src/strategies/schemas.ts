@@ -41,6 +41,8 @@ import type { RoadClassOptions } from "../highways/road-classes/index.ts";
 import type { ScaleSpaceOptions } from "../highways/scale-space/index.ts";
 import type { GapOptions } from "../highways/gaps/index.ts";
 import type { InterchangeOptions } from "../highways/interchanges/index.ts";
+import type { KneeOptions } from "../highways/knee/index.ts";
+import type { BronchialOptions } from "../highways/bronchial/index.ts";
 import type { SearchOptions } from "../highways/search/index.ts";
 import type { SteinerOptions } from "../highways/steiner/index.ts";
 import type { StreetOptions } from "../highways/streets/index.ts";
@@ -993,4 +995,22 @@ export const INTERCHANGE_SCHEMA: OptionSchema<InterchangeOptions> = {
   radius: { type: "number", min: 0.5, max: 8, step: 0.5, marks: [1, 2, 4], default: 2, describe: "Two highways get an interchange where they come this near, in units of the board." },
   discount: { type: "number", min: 0.1, max: 1, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "The cost of a length on a highway against a length off the highways." },
   detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the network only when its way is this many times its first route or less." },
+};
+
+/** The declarations of the options of the highway strategy `knee` (NAT-018). */
+export const KNEE_SCHEMA: OptionSchema<KneeOptions> = {
+  sweep: { type: "integer", min: 5, max: 21, step: 1, marks: [5, 11, 21], default: 11, describe: "The number of points of the sweep of the balancing factor." },
+  rule: { type: "enum", values: ["chord", "weights"], default: "chord", describe: "The rule that picks one tree: the knee of the chord, or the least weighted sum." },
+  ink: { type: "number", min: 0, max: 1, step: 0.05, marks: [0.25, 0.5, 0.75], default: 0.5, describe: "The weight of the ink in the rule `weights`. The rest of the weight goes to the path length." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the tree only when its path in the tree is this many times its first route or less." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A stretch of a tree with fewer edges than this number is not a highway." },
+};
+
+/** The declarations of the options of the highway strategy `bronchial` (NAT-019). */
+export const BRONCHIAL_SCHEMA: OptionSchema<BronchialOptions> = {
+  split: { type: "enum", values: ["count", "weight", "gap"], default: "count", describe: "The rule that splits the targets of a tip in two: by count, by weight, or at the widest gap." },
+  share: { type: "number", min: 0.3, max: 0.7, step: 0.05, marks: [0.3, 0.5, 0.7], default: 0.5, describe: "The share of the distance to the center of the targets that a branch grows." },
+  smallest: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "A set with this number of targets or fewer stops the splits." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the tree only when its path in the tree is this many times its first route or less." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A stretch of a tree with fewer edges than this number is not a highway." },
 };

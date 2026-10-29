@@ -102,6 +102,8 @@ export { oneSteiner, spanningTree, STEINER_DEFAULTS, STEINER_GROUPS, STEINER_MET
 export { GAP_DEFAULTS, gapPlan, type GapOptions } from "./gaps/index.ts";
 export { STREET_DEFAULTS, streetPlan, type StreetOptions } from "./streets/index.ts";
 export { SEARCH_DEFAULTS, SEARCH_MOVES, searchPlan, searchScore, type SearchMove, type SearchOptions } from "./search/index.ts";
+export { KNEE_DEFAULTS, KNEE_RULES, kneeOf, kneePlan, type KneeOptions, type KneeRule, type KneeTree } from "./knee/index.ts";
+export { BRONCHIAL_DEFAULTS, BRONCHIAL_SPLITS, bronchialPlan, diamondAngle, splitTargets, type BronchialOptions, type BronchialSplit } from "./bronchial/index.ts";
 export { INTERCHANGE_BASES, INTERCHANGE_DEFAULTS, interchangeCandidates, interchangePlan, type Interchange, type InterchangeBase, type InterchangeOptions } from "./interchanges/index.ts";
 export { SCALE_SPACE_DEFAULTS, scaleClusters, scaleSpaceGroups, scaleSpacePlan, type ScaleCluster, type ScaleSpaceOptions } from "./scale-space/index.ts";
 export * from "./gates/index.ts";
