@@ -1465,7 +1465,7 @@ The module is `scripts/screens/physical.ts`. The highway strategies `fdeb` and `
 
 ### The two rounds
 
-Each round screens the step `router` on `screen-v3` with 5 sets of 10 members, from the members 0 to 9 to the members 40 to 49.
+Each round screens the step `router` on `screen-v3` with 5 sets of 10 members. The sets go from the members 0 to 9 to the members 40 to 49.
 Each value is the mean ± SD over the 5 sets of the median of the set.
 
 - Round 1 ([0–9](https://github.com/mark1russell7/highways/actions/runs/40920910957), [10–19](https://github.com/mark1russell7/highways/actions/runs/40920915842), [20–29](https://github.com/mark1russell7/highways/actions/runs/40920920277), [30–39](https://github.com/mark1russell7/highways/actions/runs/40920925176), [40–49](https://github.com/mark1russell7/highways/actions/runs/40920929706)) had the first `repel` and the first `nudge`.
