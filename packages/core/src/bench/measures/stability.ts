@@ -111,7 +111,7 @@ export interface MoveResponse {
    * The edges of the moved node move by approximately one unit, so 1 is a local response. A larger value tells that other routes also move.
    */
   readonly gain: number;
-  /** The share of the routes of the edges that do not touch the moved node and move more than 1 unit of length, as `moved` of Z10. */
+  /** The share of the other routes that move more than 1 unit of length, as `moved` of Z10. An other route has no end at the moved node. */
   readonly spill: number;
 }
 
