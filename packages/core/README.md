@@ -60,6 +60,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
 | `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
+| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
 - `spread` keeps the room of a wall free of the corner insets (`inset`) and of the fixed plugs on the wall.
@@ -71,6 +72,24 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
   - The ends of one port share one plug. The option `rounds` sorts each wall again by the new places of the far ends.
 - The option `plug` of `corners` takes a plug rule. The other routers place the plugs as `facing` does.
 
+A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT-RANGE). A free plug of the port goes in this interval.
+
+- A row of a card is an example. Its plug anchors the row only in the part of the wall where the row can sit.
+- Each rule keeps a plug of a port with a range in that range. The rule keeps its order and its gap.
+  - When the range is too short for the gap, the gap shrinks evenly. No plug drops.
+- A port without a range gives the same plugs as before.
+- `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
+
+`assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
+
+1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
+2. The plugs keep the order of the far ends, so they do not cross at the wall, when goal 1 lets them.
+3. The plugs move the least distance from the plugs of `facing`.
+
+- An end without a range has the room of the wall as its range.
+- An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
+- A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
+
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 
 - The rule is a plug strategy, or the name of one in `STRATEGIES` (or in the option `registry`). `plugOptions` gives its options.
@@ -78,6 +97,8 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 - An end without a port stays free. With `newPorts: true`, it gets a new fixed port with the id `<edge id>:source` or `<edge id>:target`.
 - The output is a new graph. The function does not change the input.
 - The routes of `corners` on the output are the routes of `corners` with the option `plug` on the input.
+- The option `ranges` tells what to do with a plug out of the range of its port. With `keep`, the plug moves into its range.
+  - With `rule`, the plug stays where the rule puts it. The default is `keep`, but `rule` for `assign`.
 
 ```ts
 import { fixPorts, sectionsRouter } from "@mark1russell7/highways";
@@ -445,7 +466,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
-| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |

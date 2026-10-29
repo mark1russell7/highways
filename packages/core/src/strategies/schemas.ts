@@ -9,6 +9,7 @@ import type { CutOptions } from "../groups/cut/index.ts";
 import type { JustifyOptions } from "../plugs/justify.ts";
 import type { SidePlugOptions } from "../plugs/side.ts";
 import type { SpreadOptions } from "../plugs/spread/index.ts";
+import type { AssignOptions } from "../plugs/assign/index.ts";
 import type { LeaderOptions } from "../plugs/leaders/index.ts";
 import type { BalanceOptions } from "../highways/balance/index.ts";
 import type { ManifoldOptions } from "../highways/manifolds/index.ts";
@@ -975,6 +976,12 @@ export const SPREAD_SCHEMA: OptionSchema<SpreadOptions> = {
   plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
   inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
   rounds: { type: "integer", min: 0, max: 8, step: 1, default: 2, describe: "The passes that sort each wall again by the new places of the far ends." },
+};
+
+/** The declarations of the options of the plug strategy `assign` (PLUG-ASSIGN). */
+export const ASSIGN_SCHEMA: OptionSchema<AssignOptions> = {
+  plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
+  inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
 };
 
 /** The declarations of the options of the whole strategy `pipeline`. */
