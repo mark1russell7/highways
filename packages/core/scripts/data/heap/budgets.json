@@ -1,0 +1,23 @@
+{
+  "run": "none yet: the first CI run of HEAP-GATE measures each router",
+  "margin": 1.5,
+  "floorMb": 512,
+  "measureCapMb": 12288,
+  "routers": {
+    "straight": null,
+    "plugs": null,
+    "corners": null,
+    "corners-smooth": null,
+    "trunks": null,
+    "sections": null,
+    "sections-tree": null,
+    "shared": null,
+    "shared-all": null,
+    "steiner": null,
+    "gaps": null,
+    "streets": null,
+    "search": null,
+    "interchanges": null,
+    "portfolio": null
+  }
+}
