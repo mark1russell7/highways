@@ -167,7 +167,8 @@ export function venationLinks(items: readonly LevelItem[], direct: readonly Leve
         // The way goes around the item between the end of the hop before and the start of this hop.
         const item = items[index.get(h.forward ? routed[h.link]!.source : routed[h.link]!.target)!]!;
         const around = aroundBox(item.box, margin, points[points.length - 1]!, seq[0]!);
-        points.pop();
+        // The first point stays: it is on the box of the source. A link between two items that touch has no length, so its two points are one point.
+        if (points.length > 1) points.pop();
         points.push(...around);
         seq.shift();
       }

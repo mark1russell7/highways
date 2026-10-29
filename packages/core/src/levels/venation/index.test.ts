@@ -54,6 +54,17 @@ describe("the level strategy venation (NAT-016)", () => {
     expect(changed).toBeGreaterThan(0);
   }, 60_000);
 
+  // The items of `packed-grid` touch, so some backbone links have no length. Each level link still starts on the box of its source.
+  it("gives links that start and end on their items when the items touch", () => {
+    for (const input of screenInputs().filter((i) => i.id.includes("packed-grid")).slice(0, 2)) {
+      const graph = inputGraph(input);
+      for (const backbone of ["rng", "gabriel"] as const) {
+        const vein = asRouter(sections, { level: levelStrategies.venation, levelOptions: { ...VENATION_DEFAULTS, backbone } }).route(graph);
+        expect(checkLevels(graph, vein.levels ?? [], 1_000_000), `${input.id} ${backbone}`).toEqual([]);
+      }
+    }
+  }, 60_000);
+
   it("declares each option in its schema", () => {
     expect(checkOptions(levelStrategies.venation, VENATION_DEFAULTS)).toEqual([]);
   });
