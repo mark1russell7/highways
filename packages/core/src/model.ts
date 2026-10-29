@@ -169,7 +169,7 @@ export function portOffset(box: Box, port: Port): Point | undefined {
 
 /**
  * This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`.
- * It also throws a `RangeError` when the `range` of a plug is bad: not two finite numbers, outside 0 to 1, or with a start after its end.
+ * It also throws a `RangeError` for a bad `range` of a plug. A bad range has a value that is not finite or is outside 0 to 1, or a start after its end.
  */
 export function checkPort(node: Node, port: Port): void {
   const at = `The plug "${port.id}" of the node "${node.id}"`;

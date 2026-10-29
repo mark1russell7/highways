@@ -36,7 +36,7 @@ function sideOf(plug: Plug, node: Node): Side {
 }
 
 /**
- * This function moves the new fixed ports of each side of a node into their ranges (PORT-RANGE), when one of them is out of its range.
+ * This function moves the new fixed ports of a side of a node into their ranges (PORT-RANGE). It does this when one port is out of its range.
  * The ports of the side keep their order, and two of them keep at least `gap` (`placeInIntervals`). A side with each port in its range does not change.
  */
 function keepInRanges(node: Node, ports: Map<string, Port>, gap: number, inset: number): void {

@@ -62,10 +62,10 @@ export interface TallCardsOptions {
 }
 
 /**
- * This function gives a board of 6 cards with tall rows (PORT-RANGE, PLUG-ASSIGN), in 3 columns and 2 lines. The links are the links of `rowCardsBoard`.
- * The box of the rows of a card is smaller than the card: the card has a header and a footer, and the box shows only some rows.
- * The port `o<row>` is on the east side, and the port `i<row>` is on the west side. The range of a port is the reach of its row:
- * from the top of the box of the rows plus half a row, to its bottom minus half a row.
+ * This function gives a board of 6 cards with tall rows (PORT-RANGE, PLUG-ASSIGN), in 3 columns and 2 lines. It has the links of `rowCardsBoard`.
+ * The box of the rows of a card is smaller than the card, because the card has a header and a footer. The box shows only some rows.
+ * The port `o<row>` is on the east side, and the port `i<row>` is on the west side.
+ * The range of a port is the reach of its row. It goes from the top of the box of the rows plus half a row to its bottom minus half a row.
  */
 export function tallCardsBoard(options: TallCardsOptions = {}): Graph {
   const rows = options.rows ?? 20;

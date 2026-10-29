@@ -155,7 +155,7 @@ function keyOrderPlan(order: readonly number[], win: readonly ([number, number] 
 }
 
 /**
- * This function gives the most ends of a wall that can have their plug in their interval, in any order, and one plan with that count.
+ * This function gives the most ends of a wall that can have their plug in their interval, in any order. It also gives one plan with that count.
  * Each end without its plug in its interval still gets a plug in the room of the wall: a free plug.
  *
  * The plan comes from two facts. First, a plan can move each plug down until it touches its interval, the room, a fixed zone or the plug before it.
@@ -280,7 +280,7 @@ function bestPlan(order: readonly number[], win: readonly ([number, number] | un
   for (const f of fixed) items.push({ end: -1, anchored: true, at: f });
   return items.sort((a, b) => a.at - b.at || (a.end < 0 ? -1 : b.end < 0 ? 1 : order.indexOf(a.end) - order.indexOf(b.end)));
 
-  /** This function gives each end of `list` one of the sorted places `free`, in order, with the least sum of the squares of the moves from the ideal places. */
+  /** This function gives each end of `list` one of the sorted places `free`, in order. The sum of the squares of the moves from the ideal places is the least. */
   function assignInOrder(list: readonly number[], places: readonly number[]): number[] {
     const a = list.length;
     const b = places.length;
@@ -302,8 +302,8 @@ function bestPlan(order: readonly number[], win: readonly ([number, number] | un
 /**
  * This function gives the plan of one wall (PLUG-ASSIGN). Each end has an interval on the axis along the wall. The plugs keep at least `gap` between two of them,
  * and between a plug and a fixed plug at a place of `fixed`. When the room is too short for all the plugs, the gap shrinks evenly. The plan has three goals, in this order:
- * 1. the most ends with their plug in their interval (exact);
- * 2. no crossing at the wall: the order of the keys, when that order lets the count of goal 1;
+ * 1. the most ends with their plug in their interval (exact).
+ * 2. no crossing at the wall: the order of the keys, when that order lets the count of goal 1.
  * 3. the least sum of the squares of the moves from the ideal places, for the order and the ends of goals 1 and 2.
  *
  * An end that cannot get a plug in its interval still gets a plug in the room. When the order of the keys loses ends, the plugs swap their places
