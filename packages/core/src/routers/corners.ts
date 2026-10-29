@@ -1,7 +1,7 @@
-import { center, type Point } from "../geom.ts";
-import { nodeIndex, fixedPortPoint, resolvePorts, splitFrames, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
+import { center } from "../geom.ts";
+import { nodeIndex, resolvePorts, splitFrames, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
-import { justifyPlugs } from "../plugs/justify.ts";
+import { spacePlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
 import type { PlugPair, Strategy } from "../strategies/model.ts";
 import { WayFinder } from "../ways.ts";
@@ -97,40 +97,4 @@ function plugsByEdge(list: readonly PlugPair[]): Map<string, PlugPair[]> {
     else out.set(p.edge, [p]);
   }
   return out;
-}
-
-/**
- * This function moves the free plugs of each side of each node, so that two of them are at least `gap` apart (`justifyPlugs`).
- * The plugs keep their order on the side. Two plugs at one place take the order of their other ends. A fixed plug does not move.
- */
-function spacePlugs(ends: [Edge, Node, Node, Plug, Plug][], gap: number): void {
-  const inset = 6;
-  // The free plugs of each side: the index of the edge, the end (3 for the source, 4 for the target) and the point of the other end.
-  const sides = new Map<string, { node: Node; normal: Point; items: [number, 3 | 4, Point][] }>();
-  ends.forEach(([e, s, t, ps, pt], i) => {
-    for (const [end, node, plug, other, k] of [
-      [e.source, s, ps, pt, 3],
-      [e.target, t, pt, ps, 4],
-    ] as const) {
-      if (fixedPortPoint(node, end) !== undefined) continue;
-      const key = JSON.stringify([node.id, plug.normal.x, plug.normal.y]);
-      let side = sides.get(key);
-      if (!side) sides.set(key, (side = { node, normal: plug.normal, items: [] }));
-      side.items.push([i, k, other.point]);
-    }
-  });
-  for (const { node, normal, items } of sides.values()) {
-    if (items.length < 2) continue;
-    const along = normal.x !== 0 ? "y" : "x";
-    const b = node.box;
-    const start = along === "y" ? b.y : b.x;
-    const len = along === "y" ? b.h : b.w;
-    const m = Math.min(inset, len / 4);
-    const ideal = items.map(([i, k]) => ends[i]![k].point[along]);
-    const placed = justifyPlugs(ideal, start + m, start + len - m, gap, (j) => items[j]![2][along]);
-    items.forEach(([i, k], j) => {
-      const old = ends[i]![k];
-      ends[i]![k] = { point: along === "y" ? { x: old.point.x, y: placed[j]! } : { x: placed[j]!, y: old.point.y }, normal: old.normal };
-    });
-  }
 }
