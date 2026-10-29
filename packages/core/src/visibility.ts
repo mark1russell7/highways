@@ -290,6 +290,7 @@ export class CornerGraph {
           if (before && bj >= pj0 && bj <= pj1) continue;
           const list = this.#buckets.get(bucketKey(bi, bj));
           if (list === undefined) continue;
+          WORK.sight += list.length;
           for (const j of list) {
             if (j === self) continue;
             const d = dist(p, points[j]!);

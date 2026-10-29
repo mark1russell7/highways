@@ -1,4 +1,5 @@
 import type { Box, Point } from "./geom.ts";
+import { WORK } from "./work.ts";
 
 /**
  * A uniform grid of buckets over the plane. A box item goes into each bucket that the box touches.
@@ -82,6 +83,7 @@ export class Grid<T> {
     const c = this.#cell;
     const items = this.#items;
     const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (c / 2)));
+    WORK.sight += n;
     let px = a.x;
     let py = a.y;
     // The bucket range of the step before. The first step has none.
