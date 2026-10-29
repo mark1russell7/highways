@@ -19,8 +19,11 @@ export interface WorkCounts {
 /** The counters. Each loop adds its count when it ends, so the cost of a count is small. */
 export const WORK: WorkCounts = { lane: 0, corner: 0, sight: 0, score: 0, route: 0 };
 
-/** The weight of each counter in a unit of work. The fit of `scripts/search-work.ts` gives them. */
-export const WORK_WEIGHTS: Readonly<WorkCounts> = Object.freeze({ lane: 1, corner: 1, sight: 1, score: 1, route: 1 });
+/**
+ * The weight of each counter in a unit of work, in lane steps. The fit of `scripts/search-work.ts` gives them (run 40960950349).
+ * The fit gives `sight` no weight, because the `route` counter holds that cost. One million units take about 2.7 ms on a CI runner.
+ */
+export const WORK_WEIGHTS: Readonly<WorkCounts> = Object.freeze({ lane: 1, corner: 11, sight: 0, score: 13, route: 24_000 });
 
 /** This function gives a copy of the counters. */
 export function workCounts(): WorkCounts {
