@@ -19,6 +19,10 @@ export { REROUTE_DEFAULTS, REROUTE_SCHEMA, rerouteRouter, rerouteStrategy, rerou
 export { TIGHT_DEFAULTS, TIGHT_FIRSTS, TIGHT_SCHEMA, TIGHT_TIES, tightRouter, tightStrategy, waySlacks, type TightFirst, type TightOptions, type TightTies } from "./tight/index.ts";
 export { ATTRACTION_DEFAULTS, ATTRACTION_SCHEMA, attractionRouter, attractionStrategy, type AttractionOptions } from "./attraction/index.ts";
 export { sectionsRouter, type SectionsOptions } from "./sections.ts";
+export { boxField, keepRules, passesThrough, relaxRoutes, resample as resampleRoute, simplify, type BoxField, type RelaxOptions } from "./physics.ts";
+export { REPEL_DEFAULTS, REPEL_SCHEMA, repelRouter, repelStrategy, type RepelOptions } from "./repel/index.ts";
+export { SPRINGS_DEFAULTS, SPRINGS_SCHEMA, springsRouter, springsStrategy, type SpringsOptions } from "./springs/index.ts";
+export { NUDGE_DEFAULTS, NUDGE_SCHEMA, nudgeRoutes, nudgeRouter, nudgeStrategy, spread, type NudgeOptions } from "./nudge/index.ts";
 export { byCollection, groupEdges, laneOrder, splitPoint, trunksRouter, type TrunkFan, type TrunkSplit, type TrunksOptions } from "./trunks.ts";
 
 /** The built-in routers. The registry `STRATEGIES` holds the same routers as strategies, and the benchmark races the routers of the registry. */
