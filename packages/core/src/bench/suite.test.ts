@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { createRegistry, listStrategies, routersOf, STEPS } from "../strategies/model.ts";
+import { createRegistry, listStrategies, routersOf, STEPS, type AnyStrategy } from "../strategies/model.ts";
 import { benchOne, benchRun } from "./run.ts";
 import { familySeed, formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, joinReports, PROPOSED_RULES, runSuite } from "./suite.ts";
 
@@ -65,8 +65,8 @@ describe("runSuite in parts (BENCH-CI)", () => {
   const family = { name: "packed-small", cols: 4, rows: 3, long: 3 };
   // The test checks the join, not the strategies. Thus each step has its first 2 strategies, and the router `corners` for the curves (TEST-NO-LIMIT).
   const registry = createRegistry(
-    STEPS.flatMap((step) => {
-      const all = listStrategies(STRATEGIES, step);
+    STEPS.flatMap((step): AnyStrategy[] => {
+      const all = listStrategies(STRATEGIES, step) as readonly AnyStrategy[];
       return [...all.slice(0, 2), ...(step === "router" ? all.filter((s, i) => i >= 2 && s.name === "corners") : [])];
     }),
   );

@@ -74,12 +74,12 @@ function one(name: string, fixture: string, out: string): void {
   appendFileSync(out, JSON.stringify(row) + "\n");
 }
 
-/** This function gives the RSS budget of a router: the larger of its measured peak RSS times `margin` and its measured peak RSS plus `slackMb`, in MB. */
+/** This function gives the RSS budget of a router in MB. The budget is the larger of the measured peak RSS times `margin` and the peak plus `slackMb`. */
 function rssBudget(budgets: Pick<Budgets, "margin" | "slackMb">, rssMb: number): number {
   return Math.max(Math.ceil(rssMb * budgets.margin), rssMb + budgets.slackMb);
 }
 
-/** This function runs each router of the budget file in its own process, and gives the rows of the summary and the count of the breaks. */
+/** This function runs each router of the budget file in its own process. It gives the rows of the summary and the count of the breaks. */
 function gate(budgets: Budgets, fixture: string, out: string): number {
   const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
   let breaks = 0;
