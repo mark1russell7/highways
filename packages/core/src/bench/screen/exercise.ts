@@ -91,7 +91,7 @@ export const MOVE_NAMES: Readonly<Record<string, string>> = Object.freeze({
  * The highway strategies that change the plan of another strategy (`from`). Their own move is a change of that plan, so they count no move.
  * The output against the plan `from` tells if they ran.
  */
-export const PLAN_CHANGERS: readonly string[] = Object.freeze(["balance", "crossbars", "divided", "lanes", "level-links", "meet", "stubs", "weiszfeld", "zipper"]);
+export const PLAN_CHANGERS: readonly string[] = Object.freeze(["balance", "crossbars", "divided", "lanes", "level-links", "meet", "slots", "stubs", "weiszfeld", "zipper"]);
 
 const FINDERS: readonly string[] = [...new Set([...Object.keys(highwayStrategies).filter((n) => !n.includes("+")), "shared-ways-all"])].sort((a, b) => b.length - a.length);
 

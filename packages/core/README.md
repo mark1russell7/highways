@@ -447,11 +447,11 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
-| `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum` |
+| `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum`, `preferences`, `fireflies`, `tracing` |
 
 `STEPS` gives the steps in the order of the pipeline: `group`, `plugs`, `router`, `highway`, `levels`, `curve`, `room`, `whole`.
 
@@ -492,6 +492,15 @@ Each of these steps has one default strategy. The default gives the output of th
   The pool `CURRICULUM_POOL` holds the routes of `corners`, `shared` and `trunks`. The first answer is the routes of `corners`.
   In each stage, an edge takes a route of the pool that improves the new rule with no loss on the earlier rules.
   The output has the routes alone, with no runs or bundles.
+- `preferences` (the step `whole`, RULE-038) fits the weights of five rules to made-up pairs of routes, with a Bradley-Terry model.
+  A made-up panel labels the pairs (`PREFERENCE_PANEL`). The pairs do not come from the screen or from a board.
+  `fitPreferences()` gives the weights and the agreement with 50 held-out pairs. Each edge takes the route of `CURRICULUM_POOL` with the least weighted cost.
+- `fireflies` (the step `whole`, NAT-047) searches the options `discount` and `margin` of `shared` on the board, with a seeded swarm.
+  The option `search` is `firefly` or `bees`. The option `budget` (4 to 40) is the largest number of different settings that the search routes.
+  The first setting is the default of `shared`. The attraction of a firefly is rational, so it uses no `Math.exp`.
+- `tracing` (the step `whole`, WILD-057) runs the settings of `BOARD_PORTFOLIO_SETTINGS` and keeps the one with the least tracing load.
+  The load of an edge is `crossing × crossings + merge × merges and splits + bend × bends`. A merge counts only where the edge is not an outer lane.
+  `tracingLoads(result, weights)` gives the load of each edge, as the measure W4. The pick reads the quantile 0.95 of the loads by default.
 - `strategyKey(router, step)` gives the option of a router that takes a strategy of the step. `pipeline` uses it for the steps `group`, `plugs` and `levels`.
 - `stepRouterStrategy(strategy)` runs a strategy of a step of `RoutedStep` as a router. `stepRouters(registry, step)` gives one router for each strategy of the step.
 
@@ -574,9 +583,10 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `bronchial` | The bronchial tree of NAT-019. The tree grows toward the center of its targets, then splits them in two sectors, again and again. |
 | `balance` | The stretch balance of EDA-017. A price for each edge grows while its stretch is above `tau`, and the price moves the exit of its ride forward. |
 | `manifolds` | The manifolds of WILD-036. A fan from one node to a row of nodes gets a straight header in the gap before the row, with taps at right angles. |
+| `slots` | The lane slots of RULE-047. An edge whose first route runs near a trunk joins it on a new outer lane, when the pull is larger than its detour. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
-The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided` and `crossbars` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided`, `crossbars` and `slots` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
@@ -649,9 +659,9 @@ The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default out
 - A capacity term raises the cost of a link when its users are more than its width holds.
 - With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
 
-### The routers `tight`, `annealing` and `reroute`
+### The routers `tight`, `annealing`, `reroute`, `canals` and `adam`
 
-The routers `tight`, `annealing` and `reroute` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Both put a hook on the router `shared`.
+The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Each one starts from the router `shared`.
 
 - `tightRouter(options)` gives the order of WILD-023: the edges whose second way costs much more than their first way go first.
   Its options are `penalty` (2 to 10), `first` (`tight` or `loose`) and `ties` (`id` or `length`). `tightStrategy` is its router strategy.
@@ -662,6 +672,11 @@ The routers `tight`, `annealing` and `reroute` are opt-in. They are not in `STRA
 - `rerouteRouter(options)` gives the rule prices and the rip-up of RULE-044. A link costs more in a narrow channel and with edges of other keys.
   A link with an edge of the same key costs less. Each round routes again the share `q` of the edges with the largest prices.
   Its options are `alpha`, `beta`, `gamma` and `tau` (0 to 2), `rounds` (1 to 5), `q` (0.05 to 0.3) and `clearance`. `rerouteStrategy` is its router strategy.
+- `canalRouter(options)` gives the feeder trees of NAT-004. The edges of one key at a hub are sources of flux, and a link with more flux gets cheaper.
+  Its options are `mu` (1 to 3), `steps` (30 to 150), `decay` (0.5 to 2) and `minMembers` (2 to 8). `canalStrategy` is its router strategy.
+- `adamRouter(options)` gives the steps of Adam of RULE-020. The free legs of the routes move away from near legs and boxes, along their normals.
+  No point of a run, of a trunk or of two routes moves. A route goes back when it gets more crossings or a break of a hard rule.
+  Its options are `eta` (0.01 to 1), `samples` (4 to 32), `steps` (100 to 2000, the budget), `seed` and `clearance`. The same seed gives the same routes. `adamStrategy` is its router strategy.
 
 ### The portfolio router
 

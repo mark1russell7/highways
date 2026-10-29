@@ -104,6 +104,7 @@ export { STREET_DEFAULTS, streetPlan, type StreetOptions } from "./streets/index
 export { SEARCH_DEFAULTS, SEARCH_MOVES, searchPlan, searchScore, type SearchMove, type SearchOptions } from "./search/index.ts";
 export { KNEE_DEFAULTS, KNEE_RULES, kneeOf, kneePlan, type KneeOptions, type KneeRule, type KneeTree } from "./knee/index.ts";
 export { BALANCE_DEFAULTS, BALANCE_ENDS, balanceOf, balancePlan, type BalanceEnd, type BalanceOptions } from "./balance/index.ts";
+export { SLOT_DEFAULTS, SLOT_KEYS, slotJoin, slotPlan, slotsOf, type SlotJoin, type SlotKeys, type SlotOptions } from "./slots/index.ts";
 export { MANIFOLD_DEFAULTS, MANIFOLD_SIDES, manifoldPlan, type ManifoldOptions, type ManifoldSide } from "./manifolds/index.ts";
 export { BRONCHIAL_DEFAULTS, BRONCHIAL_SPLITS, bronchialPlan, diamondAngle, splitTargets, type BronchialOptions, type BronchialSplit } from "./bronchial/index.ts";
 export { INTERCHANGE_BASES, INTERCHANGE_DEFAULTS, interchangeCandidates, interchangePlan, type Interchange, type InterchangeBase, type InterchangeOptions } from "./interchanges/index.ts";
