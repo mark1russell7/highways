@@ -699,6 +699,21 @@ The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. The
   No point of a run, of a trunk or of two routes moves. A route goes back when it gets more crossings or a break of a hard rule.
   Its options are `eta` (0.01 to 1), `samples` (4 to 32), `steps` (100 to 2000, the budget), `seed` and `clearance`. The same seed gives the same routes. `adamStrategy` is its router strategy.
 
+### The physical routers `repel`, `springs` and `nudge`
+
+The routers `repel`, `springs` and `nudge` of PHYSICAL are opt-in. They are not in `STRATEGIES`, so the default outputs do not change.
+They move the points of the routes with no grid and no search. So a small move of a node gives a small move of the routes.
+
+- `relaxRoutes(graph, routes, options)` gives the forces of PHYSICAL. Each route first gets `legs` legs of equal length, and its two ends stay.
+  The boxes push the points (`boxPush`, `clearance`). The points of other routes push the points (`edgePush`, `gap`). A spring pulls each point to the middle of its neighbors (`spring`).
+  All the points move together in each step, so the order of the edges does not change the result.
+- `keepRules(graph, routes, backup)` keeps the rule `no-pass-through`. A route through a box gets its route of `backup`, and then the route of `corners`.
+- `repelRouter(options)` starts from the straight lines of `straight`, and the forces of `relaxRoutes` move them. `repelStrategy` is its router strategy.
+- `springsRouter(options)` smooths the routes of `shared` with springs, and the boxes push the points. The corners become curves. `springsStrategy` is its router strategy.
+- `nudgeRouter(options)` moves the parallel legs of the routes of `shared` to even gaps, after the nudging of Wybrow, Marriott and Stuckey (2009).
+  A track is the legs of one axis on one line, so each lane of `shared` stays one lane. A track at an end of a route stays.
+  Its options are `reach` (4 to 96), `lane` (0 to 16) and `spacing` (0 to 32). `nudgeStrategy` is its router strategy.
+
 ### The portfolio router
 
 The router `portfolio` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change. [`PORTFOLIO.md`](../../docs/research/PORTFOLIO.md#the-portfolio-router-portfolio-api) gives its tables.
