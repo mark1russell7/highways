@@ -108,6 +108,8 @@ export interface SharedSearch {
    * The function `cost` can change the cost of the link from corner `i` to corner `j`, of length `d`. It must give at least `floor` × `d`.
    */
   find(w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number): { seq: Point[]; ids: number[] } | undefined;
+  /** This function gives the free space across the link from corner `i` to corner `j` (`channelWidth`). The router keeps each width that it finds. */
+  width(i: number, j: number): number;
 }
 
 /**
@@ -212,6 +214,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
           const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
           return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
         },
+        width: (i, j) => widthOf(i, j),
       };
       const sorted = orderWays(all, options.order ?? "span", graph);
       const order = hooks?.order ? hooks.order(sorted, search) : sorted;

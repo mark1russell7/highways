@@ -9,6 +9,11 @@ import type { CutOptions } from "../groups/cut/index.ts";
 import type { JustifyOptions } from "../plugs/justify.ts";
 import type { SidePlugOptions } from "../plugs/side.ts";
 import type { SpreadOptions } from "../plugs/spread/index.ts";
+import type { LeaderOptions } from "../plugs/leaders/index.ts";
+import type { BalanceOptions } from "../highways/balance/index.ts";
+import type { ManifoldOptions } from "../highways/manifolds/index.ts";
+import type { DetailOptions } from "../levels/detail/index.ts";
+import type { CurriculumOptions } from "../whole/curriculum/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
@@ -1069,4 +1074,46 @@ export const BOARD_PORTFOLIO_SCHEMA: OptionSchema<BoardPortfolioOptions> = {
   detour: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the median detour (R5) in the score." },
   ink: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the ink saved (B1) in the score." },
   budget: { type: "number", min: 0, max: 10, step: 0.1, marks: [0, 1, 10], default: 0, describe: "The time budget in seconds. The value 0 sets no budget." },
+};
+
+/** The declarations of the options of the highway strategy `balance` (EDA-017). */
+export const BALANCE_SCHEMA: OptionSchema<BalanceOptions> = {
+  tau: { type: "number", min: 1.1, max: 2, step: 0.05, marks: [1.1, 1.2, 1.5, 2], default: 1.2, describe: "The target of the stretch of an edge: its route on the plan over its route alone." },
+  iterations: { type: "integer", min: 5, max: 30, step: 1, marks: [5, 10, 30], default: 5, describe: "The number of updates of the prices." },
+  end: { type: "enum", values: ["exit", "entry", "both"], default: "exit", describe: "The end of a ride that the price moves: the exit, the entry, or both by half." },
+  from: { ...HIGHWAY_BASE, default: "shared-ways" },
+};
+
+/** The declarations of the options of the highway strategy `manifolds` (WILD-036). */
+export const MANIFOLD_SCHEMA: OptionSchema<ManifoldOptions> = {
+  kMin: { type: "integer", min: 3, max: 8, step: 1, marks: [3, 4, 6, 8], default: 3, describe: "A manifold has this number of taps or more." },
+  band: { type: "number", min: 0.5, max: 2, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The nodes of one row have centers in a band of this many median box heights." },
+  side: { type: "enum", values: ["near", "far"], default: "near", describe: "The place of the header in the gap before the row: near the row, or near the feed node." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "A tap stays on the manifold only when its way is this many times the direct line or less." },
+  from: { ...HIGHWAY_BASE, default: "shared-ways" },
+};
+
+/** The declarations of the options of the plug strategy `leaders` (EDA-041). */
+export const LEADER_SCHEMA: OptionSchema<LeaderOptions> = {
+  leader: { type: "enum", values: ["s", "po", "opo"], default: "po", describe: "The type of leader: the order of the angles, the order along the wall, or even places." },
+  slotSpacing: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 8, describe: "The least gap between two plugs of one wall." },
+  inset: SPREAD_SCHEMA.inset,
+  rounds: { type: "integer", min: 0, max: 4, step: 1, default: 2, describe: "The passes that sort each wall again by the new places of the far ends." },
+};
+
+/** The declarations of the options of the level strategy `detail` (WILD-016 with EDA-038): the options of `depths`, and the limits of the collapse. */
+export const DETAIL_SCHEMA: OptionSchema<DetailOptions> = {
+  ...DEPTHS_SCHEMA,
+  pxMin: { type: "number", min: 0.5, max: 4, step: 0.5, marks: [1, 2, 3, 4], default: 3, describe: "Two parallel legs closer than this number of pixels on the screen become one stroke." },
+  minCount: { type: "integer", min: 2, max: 5, step: 1, default: 2, describe: "A stroke holds this number of edges or more." },
+  w0: { type: "number", min: 1, max: 4, step: 0.5, default: 1.5, describe: "The width of a stroke of one edge, in pixels." },
+  widthScale: { type: "enum", values: ["linear", "sqrt", "log"], default: "log", describe: "The growth of the width of a stroke with its count." },
+};
+
+/** The declarations of the options of the whole strategy `curriculum` (RULE-048). */
+export const CURRICULUM_SCHEMA: OptionSchema<CurriculumOptions> = {
+  order: { type: "enum", values: ["R1-R12-R2", "R12-R1-R2", "R1-R2-R12"], default: "R1-R12-R2", describe: "The order in which the stages add the rules." },
+  passes: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "The number of passes over the edges in each stage." },
+  settings: { type: "integer", min: 2, max: 3, step: 1, default: 3, describe: "The number of settings in the pool of routes, from the start of its list." },
+  detour: { type: "number", min: 1.5, max: 4, step: 0.25, marks: [1.5, 2, 3], default: 2, describe: "A new route has a detour of at most this value, or of its old route." },
 };

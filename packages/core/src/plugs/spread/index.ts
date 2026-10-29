@@ -85,6 +85,20 @@ function keyOf(box: Box, side: Side, far: Point): number {
 }
 
 /**
+ * This function gives the sort key of a far point for a po-leader (EDA-041): its place on the axis along the wall.
+ * A far point behind the wall gets the key of `keyOf` with a large shift, so it goes to an end of the wall.
+ */
+function poKeyOf(box: Box, side: Side, far: Point): number {
+  const c = center(box);
+  const n = SIDE_NORMAL[side];
+  const out = (far.x - c.x) * n.x + (far.y - c.y) * n.y;
+  const along = alongOf(side) === "y" ? far.y : far.x;
+  if (out > 0) return along;
+  const k = keyOf(box, side, far);
+  return k >= 0 ? 1e12 + k : -1e12 + k;
+}
+
+/**
  * This function places `ideal.length` plugs in their given order on the segment from `lo` to `hi`. Two neighbours are at least `gap` apart.
  * The gap shrinks evenly when the segment is too short. The sum of the squares of the moves from the ideal places is the least.
  */
@@ -102,7 +116,7 @@ function placeInOrder(ideal: readonly number[], lo: number, hi: number, gap: num
  * Each slot goes into the part of its ideal place, and the parts keep the order of the slots. In each part, two plugs and a plug and a fixed plug are at least `gap` apart.
  * The gap of a part shrinks evenly when the part is too short.
  */
-function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number, hi: number, gap: number): void {
+function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number, hi: number, gap: number, idealOf: (s: Slot) => number = (s) => s.ideal): void {
   const cuts = [...new Set(fixed.filter((f) => f > lo - 1e-9 && f < hi + 1e-9))].sort((a, b) => a - b);
   // The part i is from cuts[i - 1] to cuts[i]. The first part starts at lo, and the last part ends at hi.
   const ends = [lo, ...cuts, hi];
@@ -110,7 +124,7 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
   let part = 0;
   for (const s of slots) {
     let p = 0;
-    while (p < cuts.length && s.ideal > cuts[p]!) p++;
+    while (p < cuts.length && idealOf(s) > cuts[p]!) p++;
     part = Math.max(part, p);
     parts[part]!.push(s);
   }
@@ -125,7 +139,7 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
     const lower = a + fa * s;
     const upper = Math.max(lower, b - fb * s);
     const at = placeInOrder(
-      list.map((x) => x.ideal),
+      list.map((x) => idealOf(x)),
       lower,
       upper,
       s,
@@ -144,6 +158,21 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
  * The output has one entry for each edge with two known nodes, in the order of the edges.
  */
 export function spreadEnds(input: PlugInput, options: SpreadOptions = {}): PlugPair[] {
+  return spreadWith(input, options);
+}
+
+/**
+ * The order and the places of the plugs of one wall in the strategy `leaders` (EDA-041).
+ * With `po`, the sort key of a far end in front of the wall is its place on the axis along the wall.
+ * With `opo`, the plugs of a wall go at even places in the order of the keys of `spread`.
+ */
+export type WallLeader = "po" | "opo";
+
+/**
+ * This function does the work of `spreadEnds`, and of the strategy `leaders` with the argument `leader`.
+ * Without `leader`, it gives the plugs of `spread`.
+ */
+export function spreadWith(input: PlugInput, options: SpreadOptions = {}, leader?: WallLeader): PlugPair[] {
   const { graph } = input;
   const gap = options.plugGap ?? SPREAD_DEFAULTS.plugGap;
   const inset = options.inset ?? SPREAD_DEFAULTS.inset;
@@ -206,11 +235,16 @@ export function spreadEnds(input: PlugInput, options: SpreadOptions = {}): PlugP
   for (let round = 0; round <= rounds; round++) {
     for (const wall of walls.values()) {
       const [lo, hi] = roomOf(wall.node.box, wall.side, inset);
-      const keys = new Map<Slot, number>(wall.slots.map((s) => [s, keyOf(wall.node.box, wall.side, resolve(s.far!).point)]));
+      const key = leader === "po" ? poKeyOf : keyOf;
+      const keys = new Map<Slot, number>(wall.slots.map((s) => [s, key(wall.node.box, wall.side, resolve(s.far!).point)]));
       const tie = (a: Slot, b: Slot): number => (round === 0 ? a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] : order.get(a)! - order.get(b)!);
       const sorted = [...wall.slots].sort((a, b) => keys.get(a)! - keys.get(b)! || tie(a, b));
       sorted.forEach((s, i) => order.set(s, i));
-      placeWall(sorted, wall.fixed, lo, hi, gap);
+      if (leader === "opo") {
+        // The even places: the plugs split the room into equal parts, so the plug spacing of the wall is the largest that it can be.
+        const even = new Map<Slot, number>(sorted.map((s, i) => [s, lo + ((i + 0.5) * (hi - lo)) / sorted.length]));
+        placeWall(sorted, wall.fixed, lo, hi, gap, (s) => even.get(s)!);
+      } else placeWall(sorted, wall.fixed, lo, hi, gap);
     }
   }
   return ends.map((x) => ({ edge: x.edge, source: resolve(x.source), target: resolve(x.target) }));
