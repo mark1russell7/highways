@@ -13,23 +13,16 @@ on:
       run:
         description: "The id of the layout-contract run with the artifact xplat-graphs."
         default: "40688908137"
-  # The job xplat of ci.yml calls this workflow on a pull request that changes the paths of its job changes (CI-OK).
-  # Thus the check "CI OK" of the ruleset needs the cells of the matrix.
-  workflow_call:
-    inputs:
-      all:
-        type: string
-        default: "true"
-      run:
-        type: string
-        default: "40688908137"
+  # Each pull request starts this workflow, so the check "Xplat OK" of the ruleset is always there (CI-OK).
+  # The job changes skips the cells when the pull request does not change the core or the trace.
+  # Xplat is not a job of ci.yml: release.yml gives ci.yml only "contents: read", and the job inputs needs "actions: read".
+  pull_request:
 
 permissions:
   contents: read
 
-# The group has the event, so a dispatch does not cancel the call of ci.yml.
 concurrency:
-  group: xplat-${{ github.ref }}-${{ github.event_name }}
+  group: xplat-${{ github.ref }}
   cancel-in-progress: true
 
 defaults:
@@ -37,7 +30,33 @@ defaults:
     shell: bash
 
 jobs:
+  # The paths that start the cells. A dispatch always starts them.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      xplat: ${{ steps.diff.outputs.xplat }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: github.event_name == 'pull_request'
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then echo "xplat=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          files="$(git diff --name-only "$BASE...$HEAD")"
+          if grep -qE '^(packages/core/src/|packages/core/scripts/data/xplat/|packages/core/scripts/xplat(-summary)?\.ts$|\.github/workflows/xplat\.yml$)' <<< "$files"; then echo "xplat=true" >> "$GITHUB_OUTPUT"; else echo "xplat=false" >> "$GITHUB_OUTPUT"; fi
+
   inputs:
+    needs: changes
+    if: needs.changes.outputs.xplat == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -110,8 +129,8 @@ jobs:
           if-no-files-found: warn
 
   locate:
-    needs: trace
-    if: ${{ always() }}
+    needs: [changes, trace]
+    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -173,8 +192,8 @@ jobs:
           if-no-files-found: warn
 
   summary:
-    needs: near
-    if: ${{ always() }}
+    needs: [changes, near]
+    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -202,3 +221,20 @@ jobs:
           path: |
             xplat.md
             xplat.json
+
+  # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
+  # A job that its own if skips does not fail it, so a pull request without changes to the core passes.
+  xplat-ok:
+    name: Xplat OK
+    if: always()
+    needs: [changes, inputs, trace, locate, near, summary]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Each job passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          case " $RESULTS " in *" failure "*|*" cancelled "*) exit 1 ;; esac
