@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { hubChainBoard, manyGroupsBoard, packedGridBoard } from "../cases.ts";
 import { FIXTURES, makeFixture, type FixtureSpec } from "../fixtures.ts";
 import { graphInput } from "../bench/screen/forms.ts";
-import { caseSeed, inputId, manifestHash, SCREEN_V1, SCREEN_V2, screenInputs, setManifest, type ScreenSet } from "../bench/screen/set.ts";
+import { caseSeed, inputId, manifestHash, SCREEN_V1, SCREEN_V2, SCREEN_V3, screenInputs, setManifest, type ScreenSet } from "../bench/screen/set.ts";
 import { wholeStrategies } from "../strategies/builtins.ts";
 import type { Graph } from "../model.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "./index.ts";
@@ -51,9 +51,10 @@ function expectRouted(graph: Graph, where: string): void {
 }
 
 describe("the corpus families of highways (CORPUS-GEN)", () => {
-  it("has the 6 families of the screen sets, in their order", () => {
-    expect(HIGHWAYS_FAMILIES.map((f) => f.name)).toEqual(SCREEN_V2.families.map((f) => f.name));
-    expect(reg.families().map((f) => f.name)).toEqual(SCREEN_V2.families.map((f) => f.name));
+  it("has the 15 families of screen-v3, in their order, and the 6 families of screen-v2 come first", () => {
+    expect(HIGHWAYS_FAMILIES.map((f) => f.name)).toEqual(SCREEN_V3.families.map((f) => f.name));
+    expect(reg.families().map((f) => f.name)).toEqual(SCREEN_V3.families.map((f) => f.name));
+    expect(HIGHWAYS_FAMILIES.slice(0, 6).map((f) => f.name)).toEqual(SCREEN_V2.families.map((f) => f.name));
   });
 
   it("gives the 74 screen boards of the direct calls through the registry, and the manifest hashes do not change", () => {

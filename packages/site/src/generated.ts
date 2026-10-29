@@ -152,8 +152,8 @@ export interface NamedGen {
 }
 
 /**
- * The named examples of the generator: the board of each family in the benchmark, then some boards away from the defaults.
- * The base seeds are the seeds of the screen sets, so the first boards are the screen boards of the member 0.
+ * The named examples of the generator: the board of each family at its defaults, then some boards away from the defaults.
+ * The base seeds are the seeds of the screen sets, so the first 15 boards are the screen boards of the member 0 of `screen-v3`.
  */
 export const NAMED_GENS: readonly NamedGen[] = [
   { id: "tiny", name: "Tiny board", spec: { family: "tiny-uniform", seed: 1, dims: {} } },
@@ -162,6 +162,15 @@ export const NAMED_GENS: readonly NamedGen[] = [
   { id: "hubs", name: "A chain of hubs", spec: { family: "hub-chain", seed: 3, dims: {} } },
   { id: "groups", name: "Many groups", spec: { family: "many-groups", seed: 7, dims: {} } },
   { id: "packed", name: "A packed grid", spec: { family: "packed-grid", seed: 11, dims: {} } },
+  { id: "frames", name: "Cards with rows", spec: { family: "frame-rows", seed: 13, dims: {} } },
+  { id: "pipeline", name: "A long pipeline", spec: { family: "pipeline", seed: 17, dims: {} } },
+  { id: "fan-out", name: "A wide fan-out", spec: { family: "fan-out", seed: 19, dims: {} } },
+  { id: "two-hubs", name: "Two hubs with shared targets", spec: { family: "two-hubs", seed: 23, dims: {} } },
+  { id: "uneven", name: "Very uneven sizes", spec: { family: "uneven-sizes", seed: 29, dims: {} } },
+  { id: "bars", name: "Thin bars of a timeline", spec: { family: "thin-bars", seed: 31, dims: {} } },
+  { id: "sparse", name: "A sparse board with long edges", spec: { family: "sparse-long", seed: 37, dims: {} } },
+  { id: "mesh", name: "Many short edges", spec: { family: "local-mesh", seed: 41, dims: {} } },
+  { id: "bipartite", name: "Crossings that no plan removes", spec: { family: "bipartite", seed: 43, dims: {} } },
   { id: "large-grid", name: "A large grid of nodes", spec: { family: "tiny-uniform", seed: 5, dims: { layout: "grid", nodes: 200, edgesPerNode: 2 } } },
   { id: "hub-nodes", name: "Hub nodes with many edges", spec: { family: "small-clustered", seed: 9, dims: { layout: "hubs", nodes: 120, fixedPorts: 0 } } },
   { id: "far-links", name: "Long links between far rows", spec: { family: "hub-chain", seed: 12, dims: { rows: 6, cols: 24, long: 120 } } },

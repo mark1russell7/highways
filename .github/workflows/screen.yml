@@ -34,7 +34,7 @@ on:
         description: "The time limit of the job, in minutes. With exact: the time limit of each shard."
         default: "15"
       set:
-        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
+        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
         default: "screen-v1"
       activation:
         description: "The families of the decision inputs of the activation report (ACTIVATION), with commas, or all. Empty: no report."

@@ -805,6 +805,24 @@ const { rows, front } = compareStep("curve", graph, { options: { arc: { radius: 
 const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { width: 5, maxWidth: 30 }, options: { highway: { jog: "quintic" } } });
 ```
 
+## The corpus families
+
+`HIGHWAYS_FAMILIES` lists the 15 generators of the boards of the screen and the site. Each one is a family of `@mark1russell7/layout-contract`, with its dimensions as data. `highwaysRegistry()` makes a registry of them.
+
+- The first 6 families make the boards of `screen-v1` and `screen-v2`.
+- `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
+- The screen set `screen-v3` has the 15 families, each with 10 seeds.
+- `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.
+
+```ts
+import { highwaysRegistry, signTestPower } from "@mark1russell7/highways";
+
+const { graph } = highwaysRegistry().generate("fan-out", 4, { leaves: 40 });
+console.log(graph.nodes.length, signTestPower(15)); // 41 12
+```
+
+[The corpus families](https://github.com/mark1russell7/highways/blob/main/docs/LAYOUT-RECORDS.md#the-corpus-families-corpus-gen) give the dimensions of each family.
+
 ## The same routes on each platform
 
 A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can give a different last bit on another platform or node version. A decision of a router must not depend on that bit.
