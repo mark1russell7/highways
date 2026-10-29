@@ -51,9 +51,37 @@ export interface Highway {
   readonly members: readonly HighwayMember[];
 }
 
-/** The output of a highway strategy: the highways, as data. `follow` routes the edges along them. */
+/**
+ * The side of the edges of one direction in a run of two-way lanes (NAT-009). The y axis points down.
+ * With `right`, each edge keeps to the right of its own direction. With `left`, each edge keeps to the left.
+ * With `outer`, the edges that go along the spine take the two outer lanes, and the other edges take the middle lanes.
+ */
+export type TwoWaySide = "right" | "left" | "outer";
+
+/** The values of `TwoWaySide`. */
+export const TWO_WAY_SIDES: readonly TwoWaySide[] = Object.freeze(["right", "left", "outer"]);
+
+/**
+ * The lane rule of a plan (NAT-009, WILD-039). It tells `follow` the lane order of each shared run.
+ * With `plan`, each run takes the order of `lanes` of its highway. With `two-way`, each run takes the bundle order, with the edges of one direction side by side.
+ */
+export type LaneRule =
+  | { readonly order: "plan" }
+  | {
+      readonly order: "two-way";
+      readonly side: TwoWaySide;
+      /** The weight of the direction against the bundle order, from 0 to 1. The value 1 puts each direction on its side, and 0 keeps the bundle order. */
+      readonly weight: number;
+    };
+
+/**
+ * The output of a highway strategy: the highways, as data. `follow` routes the edges along them.
+ * A plan without `laneRule` gives each run the bundle order, or the order of the option `laneOrder` of `follow`.
+ */
 export interface HighwayPlan {
   readonly highways: readonly Highway[];
+  /** The lane rule of the shared runs. Most strategies give no rule. */
+  readonly laneRule?: LaneRule;
 }
 
 /** This function gives the point at a place on a polyline. A place outside the polyline gives its nearest end. */

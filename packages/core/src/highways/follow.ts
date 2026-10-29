@@ -3,7 +3,7 @@ import { fixedPortPoint, nodeIndex, outerGraph, type End, type Graph, type Node,
 import { placePlug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
-import { pointAt, type HighwayMember, type HighwayPlan } from "./model.ts";
+import { pointAt, type Highway, type HighwayMember, type HighwayPlan, type LaneRule } from "./model.ts";
 
 /** The options of `follow`. */
 export interface FollowOptions extends WayOptions {
@@ -55,6 +55,34 @@ function slice(stops: Stops, on: number, off: number): Point[] {
 }
 
 /**
+ * This function gives the lane order of one run with the lane rule of the plan (NAT-009, WILD-039). The list `bundle` is the bundle order of the run.
+ * With `plan`, the edges of the run take the order of `lanes` of the highway, and the other edges go last in the bundle order.
+ * With `two-way`, the key of an edge is `weight × n × class + its bundle rank`, and the least key takes lane 0. The run goes along the spine.
+ * With `right`, the edges that go backward have class 0 and the other edges class 1. With `left`, the classes change places.
+ * With `outer`, the first half of the forward edges has class 0, the backward edges class 1, and the other forward edges class 2.
+ */
+export function ruleLanes(rule: LaneRule, h: Highway, bundle: readonly string[]): string[] {
+  if (rule.order === "plan") {
+    const rank = new Map(h.lanes.map((e, i) => [e, i]));
+    const at = new Map(bundle.map((e, i) => [e, i]));
+    return [...bundle].sort((a, b) => (rank.get(a) ?? Infinity) - (rank.get(b) ?? Infinity) || at.get(a)! - at.get(b)!);
+  }
+  const forward = new Map(h.members.map((m) => [m.edge, m.on < m.off]));
+  const n = bundle.length;
+  const half = Math.ceil(bundle.filter((e) => forward.get(e) !== false).length / 2);
+  let seen = 0;
+  const cls = new Map<string, number>();
+  for (const e of bundle) {
+    const fwd = forward.get(e) !== false;
+    if (rule.side === "outer") cls.set(e, fwd ? (seen++ < half ? 0 : 2) : 1);
+    else cls.set(e, fwd === (rule.side === "right") ? 1 : 0);
+  }
+  const w = Math.max(0, Math.min(1, rule.weight));
+  const key = new Map(bundle.map((e, i) => [e, w * n * cls.get(e)! + i]));
+  return [...bundle].sort((a, b) => key.get(a)! - key.get(b)!);
+}
+
+/**
  * This function routes the edges along a highway plan.
  *
  * An edge of a highway goes from its source plug to its merge point. Then it goes along the spine to its split point, and to its target plug.
@@ -66,7 +94,7 @@ function slice(stops: Stops, on: number, off: number): Point[] {
  * An edge outside the plan keeps its route from `options.routes`, or goes as in the router `corners`.
  *
  * The result has a shared run for each stretch of a spine where the same two edges or more go. Each run holds the points of its routes in a row.
- * The same graph, plan and options give the same result.
+ * A plan with a lane rule gives each run the order of `ruleLanes`. The same graph, plan and options give the same result.
  */
 export function follow(input: Graph, plan: HighwayPlan, options: FollowOptions = {}): Result {
   const graph = outerGraph(input);
@@ -149,7 +177,8 @@ export function follow(input: Graph, plan: HighwayPlan, options: FollowOptions =
       if (users.length < 2 || points.length < 2) continue;
       const mine = users.map((id) => routeOf.get(id)!).filter((r) => holds(r.points, points));
       if (mine.length < 2) continue;
-      runs.push({ id: `r${runs.length}`, key: h.key, points, edges: orderLanes(points, mine, options.laneOrder ?? "bundle") });
+      const edges = orderLanes(points, mine, options.laneOrder ?? "bundle");
+      runs.push({ id: `r${runs.length}`, key: h.key, points, edges: plan.laneRule === undefined ? edges : ruleLanes(plan.laneRule, h, edges) });
     }
   });
   return runs.length > 0 ? { routes, runs } : { routes };

@@ -18,6 +18,12 @@ import type { SlotOptions } from "../highways/slots/index.ts";
 import type { PreferenceOptions } from "../whole/preferences/index.ts";
 import type { FireflyOptions } from "../whole/fireflies/index.ts";
 import type { TracingOptions } from "../whole/tracing/index.ts";
+import type { TwoWayOptions } from "../highways/two-way/index.ts";
+import type { GlobalOrderOptions } from "../highways/global-order/index.ts";
+import type { ApprovalOptions } from "../highways/approval/index.ts";
+import type { EscapeOptions } from "../plugs/escape/index.ts";
+import type { CropOptions } from "../whole/crops/index.ts";
+import type { ChoiceOptions } from "../whole/choice/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
@@ -1107,6 +1113,39 @@ export const SLOT_SCHEMA: OptionSchema<SlotOptions> = {
   from: { ...HIGHWAY_BASE, default: "shared-ways" },
 };
 
+/** The declarations of the options of the highway strategy `two-way` (NAT-009). */
+export const TWO_WAY_SCHEMA: OptionSchema<TwoWayOptions> = {
+  side: { type: "enum", values: ["right", "left", "outer"], default: "right", describe: "The side of each direction: keep right, keep left, or the outer lanes for the edges along the spine." },
+  weight: { type: "number", min: 0, max: 1, step: 0.05, marks: [0, 0.5, 1], default: 1, describe: "The weight of the direction against the bundle order. The value 0 keeps the bundle order." },
+  from: { ...HIGHWAY_BASE, default: "shared-ways" },
+};
+
+/** The declarations of the options of the highway strategy `global-order` (WILD-039). */
+export const GLOBAL_ORDER_SCHEMA: OptionSchema<GlobalOrderOptions> = {
+  key: { type: "enum", values: ["hilbert", "angle"], default: "hilbert", describe: "The first key of the global order: the Hilbert ranks of the ends, or the direction of the edge." },
+  passes: { type: "integer", min: 0, max: 3, step: 1, default: 2, describe: "The number of sifting passes. The value 0 keeps the order of the key." },
+  from: { ...HIGHWAY_BASE, default: "shared-ways" },
+};
+
+/** The declarations of the options of the highway strategy `approval` (WILD-031). */
+export const APPROVAL_SCHEMA: OptionSchema<ApprovalOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  eps: { type: "number", min: 0.05, max: 0.5, step: 0.05, marks: [0.05, 0.2, 0.5], default: 0.2, describe: "An edge approves the links of its ways within 1 + eps of its shortest way." },
+  discount: { type: "number", min: 0.3, max: 0.9, step: 0.1, marks: [0.3, 0.5, 0.9], default: 0.5, describe: "The second pass gives each corridor link this discount, as a share of its length." },
+  budget: { type: "number", min: 0.05, max: 0.5, step: 0.05, marks: [0.05, 0.2, 0.5], default: 0.2, describe: "The largest share of the approved links that become corridor links." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A corridor link has this number of approvals or more, and a highway this number of edges or more." },
+  pick: { type: "enum", values: ["score", "cover"], default: "score", describe: "The rule that picks the corridor links: the most approvals, or a greedy cover of the edges." },
+};
+
+/** The declarations of the options of the plug strategy `escape` (EDA-022). */
+export const ESCAPE_SCHEMA: OptionSchema<EscapeOptions> = {
+  method: { type: "enum", values: ["sort", "flow"], default: "sort", describe: "The method that places the plugs of a wall: the least moves, or even slots with an ordered assignment." },
+  slotSpacing: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 4, describe: "The least gap between two plugs of one wall, and the gap of the slots." },
+  cornerReserve: { type: "number", min: 0, max: 0.25, step: 0.05, marks: [0, 0.1, 0.25], default: 0.1, describe: "The share of the side that stays free at each corner." },
+  rounds: { type: "integer", min: 0, max: 3, step: 1, default: 1, describe: "The passes that route the ways again from the new plugs and sort each wall again." },
+};
+
 /** The declarations of the options of the plug strategy `leaders` (EDA-041). */
 export const LEADER_SCHEMA: OptionSchema<LeaderOptions> = {
   leader: { type: "enum", values: ["s", "po", "opo"], default: "po", describe: "The type of leader: the order of the angles, the order along the wall, or even places." },
@@ -1158,4 +1197,18 @@ export const TRACING_SCHEMA: OptionSchema<TracingOptions> = {
   bend: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 0.5, 1, 4], default: 0.5, describe: "The weight of a bend in the tracing load." },
   settings: { type: "integer", min: 1, max: 12, step: 1, marks: [1, 4, 8, 12], default: 4, describe: "The number of settings that the strategy tries, from the start of its list." },
   quantile: { type: "enum", values: ["q50", "q95", "mean"], default: "q95", describe: "The value of the loads of the edges that the pick reads." },
+};
+
+/** The declarations of the options of the whole strategy `crops` (WILD-048). */
+export const CROP_SCHEMA: OptionSchema<CropOptions> = {
+  windows: { type: "integer", min: 3, max: 10, step: 1, default: 3, describe: "The number of windows of the board that rank the settings." },
+  nodes: { type: "integer", min: 50, max: 300, step: 10, marks: [50, 100, 200, 300], default: 50, describe: "The number of nodes of each window. A smaller board is one window." },
+  settings: { type: "integer", min: 3, max: 12, step: 1, marks: [3, 4, 8, 12], default: 4, describe: "The number of settings that the windows rank, from the start of the list." },
+  seed: { type: "integer", min: 0, max: 1_000_000, step: 1, marks: [1, 2, 3], default: 1, describe: "The seed of the centers of the windows." },
+};
+
+/** The declarations of the options of the whole strategy `choice` (WILD-046). */
+export const CHOICE_SCHEMA: OptionSchema<ChoiceOptions> = {
+  k: { type: "integer", min: 1, max: 10, step: 1, marks: [1, 3, 5, 10], default: 3, describe: "The number of nearest boards of the table that vote." },
+  features: { type: "enum", values: ["all", "size", "shape"], default: "all", describe: "The features that the model reads: each feature, the size of the board, or its shape." },
 };

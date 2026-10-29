@@ -100,10 +100,16 @@ import { SLOT_DEFAULTS, slotPlan, type SlotOptions } from "../highways/slots/ind
 import { PREFERENCE_DEFAULTS, preferences, type PreferenceOptions } from "../whole/preferences/index.ts";
 import { FIREFLY_DEFAULTS, fireflies, type FireflyOptions } from "../whole/fireflies/index.ts";
 import { TRACING_DEFAULTS, tracing, type TracingOptions } from "../whole/tracing/index.ts";
+import { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "../highways/two-way/index.ts";
+import { GLOBAL_ORDER_DEFAULTS, globalOrderPlan, type GlobalOrderOptions } from "../highways/global-order/index.ts";
+import { APPROVAL_DEFAULTS, approvalPlan, type ApprovalOptions } from "../highways/approval/index.ts";
+import { ESCAPE_DEFAULTS, escapeEnds, type EscapeOptions } from "../plugs/escape/index.ts";
+import { CROP_DEFAULTS, crops, type CropOptions } from "../whole/crops/index.ts";
+import { CHOICE_DEFAULTS, choice, type ChoiceOptions } from "../whole/choice/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA } from "./schemas.ts";
+import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -492,6 +498,9 @@ export const highwayStrategies: {
   readonly balance: Strategy<"highway", BalanceOptions>;
   readonly manifolds: Strategy<"highway", ManifoldOptions>;
   readonly slots: Strategy<"highway", SlotOptions>;
+  readonly "two-way": Strategy<"highway", TwoWayOptions>;
+  readonly "global-order": Strategy<"highway", GlobalOrderOptions>;
+  readonly approval: Strategy<"highway", ApprovalOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -1012,6 +1021,33 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<SlotOptions>) => slotPlan(input, o),
   }),
+  "two-way": defineStrategy({
+    step: "highway",
+    name: "two-way",
+    describe: "Two-way lanes (NAT-009). Each run sorts its lanes by the direction of each edge, then by the bundle order, as ants and walkers do.",
+    defaults: { ...TWO_WAY_DEFAULTS } as TwoWayOptions,
+    schema: TWO_WAY_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<TwoWayOptions>) => twoWayPlan(input, o),
+  }),
+  "global-order": defineStrategy({
+    step: "highway",
+    name: "global-order",
+    describe: "One global lane order (WILD-039). A Hilbert key and sifting give one order of all the edges, and each run uses it.",
+    defaults: { ...GLOBAL_ORDER_DEFAULTS } as GlobalOrderOptions,
+    schema: GLOBAL_ORDER_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<GlobalOrderOptions>) => globalOrderPlan(input, o),
+  }),
+  approval: defineStrategy({
+    step: "highway",
+    name: "approval",
+    describe: "Approval corridors (WILD-031). Each edge approves the links of its near-shortest ways, and the links with the most approvals become corridors.",
+    defaults: { ...APPROVAL_DEFAULTS } as ApprovalOptions,
+    schema: APPROVAL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ApprovalOptions>) => approvalPlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -1026,6 +1062,7 @@ export const plugStrategies: {
   readonly justify: Strategy<"plugs", JustifyOptions>;
   readonly spread: Strategy<"plugs", SpreadOptions>;
   readonly leaders: Strategy<"plugs", LeaderOptions>;
+  readonly escape: Strategy<"plugs", EscapeOptions>;
 } = Object.freeze({
   facing: defineStrategy({
     step: "plugs",
@@ -1066,6 +1103,14 @@ export const plugStrategies: {
     defaults: { ...LEADER_DEFAULTS },
     schema: LEADER_SCHEMA,
     run: (input, o) => leaderEnds(input, o),
+  }),
+  escape: defineStrategy<"plugs", EscapeOptions>({
+    step: "plugs",
+    name: "escape",
+    describe: "Ordered escape of the plugs (EDA-022). The plugs of each wall take the order of the first legs of their ways, so the stubs do not cross.",
+    defaults: { ...ESCAPE_DEFAULTS },
+    schema: ESCAPE_SCHEMA,
+    run: (input, o) => escapeEnds(input, o),
   }),
 });
 
@@ -1134,6 +1179,8 @@ export const wholeStrategies: {
   readonly preferences: Strategy<"whole", PreferenceOptions>;
   readonly fireflies: Strategy<"whole", FireflyOptions>;
   readonly tracing: Strategy<"whole", TracingOptions>;
+  readonly crops: Strategy<"whole", CropOptions>;
+  readonly choice: Strategy<"whole", ChoiceOptions>;
 } = Object.freeze({
   pipeline: defineStrategy<"whole", PipelineOptions>({
     step: "whole",
@@ -1182,6 +1229,22 @@ export const wholeStrategies: {
     defaults: { ...TRACING_DEFAULTS },
     schema: TRACING_SCHEMA,
     run: (graph, o) => tracing(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
+  }),
+  crops: defineStrategy<"whole", CropOptions>({
+    step: "whole",
+    name: "crops",
+    describe: "Tune on crops of the board (WILD-048). A few seeded windows rank a fixed list of settings, and the whole board routes with the best one.",
+    defaults: { ...CROP_DEFAULTS },
+    schema: CROP_SCHEMA,
+    run: (graph, o) => crops(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
+  }),
+  choice: defineStrategy<"whole", ChoiceOptions>({
+    step: "whole",
+    name: "choice",
+    describe: "A learned choice of the setting (WILD-046). Features of the board pick one setting by the nearest made-up boards, so only one setting routes.",
+    defaults: { ...CHOICE_DEFAULTS },
+    schema: CHOICE_SCHEMA,
+    run: (graph, o) => choice(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
   }),
 });
 

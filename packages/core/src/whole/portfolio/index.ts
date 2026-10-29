@@ -84,7 +84,7 @@ export function boardPortfolio(graph: Graph, list: readonly PortfolioSetting[], 
     const output = runPipeline(graph, s.pipeline);
     fallback ??= { name: s.name, output };
     if (checkProperties(output.graph, output.result, 1).length > 0) continue;
-    entries.push({ name: s.name, output, ...measuresOf(output.graph, output.result) });
+    entries.push({ name: s.name, output, ...portfolioMeasures(output.graph, output.result) });
   }
   if (entries.length === 0) {
     const first = fallback ?? { name: list[0]!.name, output: runPipeline(graph, list[0]!.pipeline) };
@@ -103,6 +103,6 @@ export function boardPortfolio(graph: Graph, list: readonly PortfolioSetting[], 
 }
 
 /** This function gives the three measures of the score of one output: the crossings, the median detour and the ink saved. */
-function measuresOf(graph: Graph, result: Result): { crossings: number; detour: number; ink: number } {
+export function portfolioMeasures(graph: Graph, result: Result): { crossings: number; detour: number; ink: number } {
   return { crossings: measureQuality(graph, result).crossings, detour: detourSpread(result.routes).median, ink: inkSaved(result.routes) };
 }
