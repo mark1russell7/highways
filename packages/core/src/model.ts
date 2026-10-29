@@ -21,6 +21,13 @@ export interface Port {
    * A plug with `along` needs a `side` and has no `at`. `resolvePorts` throws a `RangeError` for a bad value.
    */
   readonly along?: number;
+  /**
+   * This interval of the side holds a free plug of the port (PORT-RANGE). Its values go from 0 to 1, as the values of `along`.
+   * Each plug rule and `fixPorts` keep the plug in this interval, and keep the order and the gap of the rule.
+   * When the interval is too short for the gap, the gap shrinks evenly. A fixed plug does not read the range.
+   * `resolvePorts` throws a `RangeError` for a bad range.
+   */
+  readonly range?: readonly [number, number];
 }
 
 /** A node: a box that routes must not go through. */
@@ -160,10 +167,21 @@ export function portOffset(box: Box, port: Port): Point | undefined {
   return portPoint(box, { id: port.id, side: CONTRACT_SIDE[port.side], along: port.along });
 }
 
-/** This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`. */
+/**
+ * This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`.
+ * It also throws a `RangeError` when the `range` of a plug is bad: not two finite numbers, outside 0 to 1, or with a start after its end.
+ */
 export function checkPort(node: Node, port: Port): void {
-  if (port.along === undefined) return;
   const at = `The plug "${port.id}" of the node "${node.id}"`;
+  if (port.range !== undefined) {
+    const r: unknown = port.range;
+    if (!Array.isArray(r) || r.length !== 2 || !r.every((v) => typeof v === "number" && Number.isFinite(v)))
+      throw new RangeError(`${at} has the range ${JSON.stringify(r)}. It must be two finite numbers.`);
+    const [lo, hi] = r as [number, number];
+    if (lo < 0 || hi > 1) throw new RangeError(`${at} has the range [${lo}, ${hi}]. It must be in the side, from 0 to 1.`);
+    if (lo > hi) throw new RangeError(`${at} has the range [${lo}, ${hi}]. Its start must not be after its end.`);
+  }
+  if (port.along === undefined) return;
   if (typeof port.along !== "number" || !Number.isFinite(port.along) || port.along < 0 || port.along > 1)
     throw new RangeError(`${at} has the along value ${String(port.along)}. It must be a finite number from 0 to 1.`);
   if (port.side === undefined) throw new RangeError(`${at} has an along value and no side. A plug with along needs a side.`);
@@ -173,7 +191,7 @@ export function checkPort(node: Node, port: Port): void {
 /**
  * This function checks the plugs of a graph, and gives each plug with `side` and `along` a fixed `at`. The plug keeps its `side`.
  * Each router calls it at the start of `route`, so all routers agree. A graph without `along` comes back as the same object.
- * It throws a `RangeError` for a bad `along` (`checkPort`).
+ * It throws a `RangeError` for a bad `along` or a bad `range` (`checkPort`).
  */
 export function resolvePorts(graph: Graph): Graph {
   let found = false;

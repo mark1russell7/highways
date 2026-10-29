@@ -3,10 +3,11 @@
  * They move the least distance from their ideal places.
  */
 
-import { center, type Point } from "../geom.ts";
-import { fixedPortPoint, nodeIndex, type Edge, type Node } from "../model.ts";
+import { center, type Box, type Point } from "../geom.ts";
+import { fixedPortPoint, nodeIndex, type Edge, type Node, type Port, type Side } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import type { PlugInput, PlugPair } from "../strategies/model.ts";
+import { alongAxis, placeInIntervals, portOfEnd, rangeInterval } from "./range.ts";
 
 /**
  * This function places `ideal.length` points on the segment from `lo` to `hi` of one side.
@@ -56,10 +57,11 @@ export function isotonic(v: readonly number[]): number[] {
  * This function moves the free plugs of each side of each node, so that two of them are at least `gap` apart (`justifyPlugs`).
  * The plugs keep their order on the side. Two plugs at one place take the order of their other ends. A fixed plug does not move.
  * A plug stays `inset` from the corners of its side, or a quarter of the side when the side is short.
+ * A plug of a port with a `range` stays in its range (PORT-RANGE), and the plugs keep their order and the gap (`placeInIntervals`).
  */
 export function spacePlugs(ends: [Edge, Node, Node, Plug, Plug][], gap: number, inset = 6): void {
-  // The free plugs of each side: the index of the edge, the end (3 for the source, 4 for the target) and the point of the other end.
-  const sides = new Map<string, { node: Node; normal: Point; items: [number, 3 | 4, Point][] }>();
+  // The free plugs of each side: the index of the edge, the end (3 for the source, 4 for the target), the point of the other end and the port.
+  const sides = new Map<string, { node: Node; normal: Point; items: [number, 3 | 4, Point, Port | undefined][] }>();
   ends.forEach(([e, s, t, ps, pt], i) => {
     for (const [end, node, plug, other, k] of [
       [e.source, s, ps, pt, 3],
@@ -69,23 +71,53 @@ export function spacePlugs(ends: [Edge, Node, Node, Plug, Plug][], gap: number, 
       const key = JSON.stringify([node.id, plug.normal.x, plug.normal.y]);
       let side = sides.get(key);
       if (!side) sides.set(key, (side = { node, normal: plug.normal, items: [] }));
-      side.items.push([i, k, other.point]);
+      side.items.push([i, k, other.point, portOfEnd(node, end)]);
     }
   });
   for (const { node, normal, items } of sides.values()) {
-    if (items.length < 2) continue;
+    const ranged = items.some((x) => x[3]?.range !== undefined);
+    if (items.length < 2 && !ranged) continue;
     const along = normal.x !== 0 ? "y" : "x";
     const b = node.box;
     const start = along === "y" ? b.y : b.x;
     const len = along === "y" ? b.h : b.w;
     const m = Math.min(inset, len / 4);
     const ideal = items.map(([i, k]) => ends[i]![k].point[along]);
-    const placed = justifyPlugs(ideal, start + m, start + len - m, gap, (j) => items[j]![2][along]);
+    const placed = ranged ? spaceInRanges(b, normal, items, ideal, start + m, start + len - m, gap, inset) : justifyPlugs(ideal, start + m, start + len - m, gap, (j) => items[j]![2][along]);
     items.forEach(([i, k], j) => {
       const old = ends[i]![k];
       ends[i]![k] = { point: along === "y" ? { x: old.point.x, y: placed[j]! } : { x: placed[j]!, y: old.point.y }, normal: old.normal };
     });
   }
+}
+
+/**
+ * This function places the free plugs of one side with ranges (PORT-RANGE). The order is the order of `justifyPlugs`.
+ * Each plug stays in the interval of its range, or in the room of the side without a range.
+ */
+function spaceInRanges(box: Box, normal: Point, items: readonly [number, 3 | 4, Point, Port | undefined][], ideal: readonly number[], lo: number, hi: number, gap: number, inset: number): number[] {
+  const side = sideOfNormal(normal);
+  const along = alongAxis(side);
+  const order = ideal.map((_, i) => i).sort((a, b) => ideal[a]! - ideal[b]! || items[a]![2][along] - items[b]![2][along] || a - b);
+  const span = order.map((j): [number, number] => rangeInterval(box, side, items[j]![3], inset) ?? [lo, hi]);
+  const at = placeInIntervals(
+    order.map((j) => ideal[j]!),
+    span.map((r) => r[0]),
+    span.map((r) => r[1]),
+    gap,
+  );
+  const out = new Array<number>(ideal.length);
+  order.forEach((j, i) => {
+    out[j] = at[i]!;
+  });
+  return out;
+}
+
+/** This function gives the side of an outward normal. */
+function sideOfNormal(n: Point): Side {
+  if (n.x > 0) return "east";
+  if (n.x < 0) return "west";
+  return n.y > 0 ? "south" : "north";
 }
 
 /** The options of the plug strategy `justify`. */
