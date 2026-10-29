@@ -939,7 +939,7 @@ export const P_HUB_SCHEMA: OptionSchema<PHubOptions> = {
 /** The declarations of the options of the highway strategy `scale-space` (HWY-053). */
 export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
   theta: { type: "number", min: 0.5, max: 6, step: 0.5, marks: [1.5, 3], default: 1.5, describe: "The first scale, in units of the board." },
-  ratio: { type: "number", min: 1.1, max: 3, step: 0.1, marks: [1.5, 2], default: Math.SQRT2, describe: "The scale of each next scale is this value times the scale before it." },
+  ratio: { type: "number", min: 1.1, max: 3, marks: [1.5, 2], default: Math.SQRT2, describe: "The scale of each next scale is this value times the scale before it." },
   scales: { type: "integer", min: 2, max: 16, step: 1, marks: [4, 8], default: 8, describe: "The number of scales." },
   level: { type: "integer", min: 0, max: 15, step: 1, marks: [2, 4, 6], default: 2, describe: "The scale of the plan, from 0 (the first scale)." },
   p0: { type: "number", min: 0, max: 3, step: 0.1, marks: [0.3, 0.6, 1.2], default: 0.6, describe: "A cluster gets highways only when its persistence (the log of the ratio of its last scale to its first scale) is this value or more." },
