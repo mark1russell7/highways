@@ -9,7 +9,7 @@
     "directory": "packages/core"
   },
   "homepage": "https://mark1russell7.github.io/highways/",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
