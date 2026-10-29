@@ -3,8 +3,9 @@
 // The routers are the 15 routers that the joint bench of layout-contract races. Its memory probe (L77) found that `streets` filled 4 to 5.7 GB there.
 //
 // Each process has the heap cap `--max-old-space-size` of its router, so a router that needs more heap stops with an error of memory.
-// The cap is the measured heap times `margin`, and at least `floorMb`. After the route, the process writes its peak RSS and its heap.
-// The gate fails when a process stops with an error, or when a peak RSS is more than the measured peak RSS times `margin`.
+// The cap is the measured peak RSS times `margin`, and at least `floorMb`. The peak heap is less than the peak RSS, so the cap does not stop a router that keeps its measure.
+// After the route, the process writes its peak RSS, its heap and its route hash.
+// The gate fails when a process stops with an error, or when a peak RSS is more than its budget: the measured peak RSS times `margin`, and at least `floorMb`.
 // A router with no measure in the budget file runs with the cap `measureCapMb` and does not fail the gate. Thus its first run gives the measure.
 //
 // One process: `node --max-old-space-size=<MB> scripts/heap.ts --router <name> [--fixture <file>] [--out <file>]` routes once and appends one row to `--out`.
@@ -26,7 +27,7 @@ interface Budgets {
   readonly margin: number;
   readonly floorMb: number;
   readonly measureCapMb: number;
-  /** The measures of each router: its peak RSS and its committed heap after the route, in MB. A router with `null` has no measure yet. */
+  /** The measures of each router: its peak RSS and its committed heap after the route, in MB. The heap is for information only. A router with `null` has no measure yet. */
   readonly routers: Readonly<Record<string, { readonly rssMb: number; readonly heapMb: number } | null>>;
 }
 
@@ -63,7 +64,7 @@ function one(name: string, fixture: string, out: string): void {
   const t0 = performance.now();
   const result = route(name, doc.graph);
   const ms = Math.round(performance.now() - t0);
-  // V8 keeps the heap that it committed for a time after a peak, so `total_heap_size` after the route is near the peak heap of the route.
+  // V8 can give back the heap of a peak before the route ends, so `total_heap_size` after the route can be much less than the peak. The gate reads the peak RSS.
   const heap = getHeapStatistics();
   const row: Row = { router: name, ms, rssMb: mb(process.resourceUsage().maxRSS * 1024), heapMb: mb(heap.total_heap_size), usedMb: mb(heap.used_heap_size), hash: routeHash(result) };
   appendFileSync(out, JSON.stringify(row) + "\n");
@@ -74,7 +75,7 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
   const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
   let breaks = 0;
   for (const [name, measure] of Object.entries(budgets.routers)) {
-    const cap = measure === null ? budgets.measureCapMb : Math.max(budgets.floorMb, Math.ceil(measure.heapMb * budgets.margin));
+    const cap = measure === null ? budgets.measureCapMb : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));
     const tmp = join(tmpdir(), `heap-${process.pid}-${name}.jsonl`);
     rmSync(tmp, { force: true });
     let error = "";
@@ -86,7 +87,7 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
     const row = existsSync(tmp) ? (JSON.parse(readFileSync(tmp, "utf8").trim()) as Row) : undefined;
     rmSync(tmp, { force: true });
     if (row !== undefined) appendFileSync(out, JSON.stringify({ ...row, cap }) + "\n");
-    const budgetRss = measure === null ? undefined : Math.ceil(measure.rssMb * budgets.margin);
+    const budgetRss = measure === null ? undefined : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));
     let result = "pass";
     if (measure === null) result = error === "" ? "measured" : `measure ${error}`;
     else if (error !== "" || row === undefined) result = `fail: ${error || "no row"}`;
