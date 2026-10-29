@@ -9,6 +9,7 @@ The joint bench of layout-contract routes 24 inputs on linux with node 26 and on
 - The trace `packages/core/scripts/xplat.ts` routes each input. It writes the route hash by the rule of the joint runner, and the exact routes with all the digits of each number.
 - With `XPLAT_CALLS=1`, the trace also logs each call of `Math.hypot`, `atan2`, `sin`, `cos`, `tan`, `acos`, `asin`, `atan`, `exp`, `log` and `pow`. It keeps a hash of each chunk of 1000 calls.
 - The workflow `Xplat` runs the trace on ubuntu and windows, with node 24 and node 26. Then it logs in full each chunk that differs, with the stack of each call.
+- Each pull request starts `Xplat`. Its job `changes` skips the cells when the pull request does not change the core or the trace. The check `Xplat OK` of the ruleset needs each job (CI-OK).
 - `packages/core/scripts/xplat-summary.ts` compares the cells. The inputs are the 24 inputs of the layout-contract run 40688908137. The folder `packages/core/scripts/data/xplat` keeps 3 of them.
 - The data comes from the CI run [40691194197](https://github.com/mark1russell7/highways/actions/runs/40691194197) of the workflow `Xplat`, at `highways` 0.7.0.
 

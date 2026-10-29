@@ -20,8 +20,24 @@ concurrency:
 
 jobs:
   security:
-    uses: mark1russell7/template/.github/workflows/reusable-security.yml@072c68a9d4b3fbaea886ad60ae54b6ebbef42bde # main
+    uses: mark1russell7/template/.github/workflows/reusable-security.yml@ca498a7280d76d9b8788f0850cbd151bd06230a0 # main
     permissions:
       contents: read
       security-events: write
       actions: read
+
+  # The check of the ruleset (CI.md, "The check of the ruleset"): the scans of this file passed.
+  security-ok:
+    name: Security OK
+    if: always()
+    needs: [security]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Each scan passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          case " $RESULTS " in *" failure "*|*" cancelled "*) exit 1 ;; esac
