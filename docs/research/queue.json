@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
   "date": "2026-10-29",
-  "commit": "5b7e14df9112432e1b31722293721ac745f7c9f5",
+  "commit": "7cd60ced2e8b3bc8a876ef568e08c7e6151cea65",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -70,8 +70,9 @@
     "blockedByStepAndMeasure": 0,
     "openTargets": 72,
     "byStatus": {
+      "building": 6,
       "built": 12,
-      "queued": 165
+      "queued": 159
     },
     "byStep": {
       "curve": 8,
@@ -96,12 +97,12 @@
 
   ],
   "rows": [
-    {"id":"RULE-047","name":"Pull toward the lane slots of the highway skeleton","step":"highway","kind":"ours","wins":["B2","B1","B9"],"gain":35.5,"uncertainty":1,"cost":1,"score":35.5,"rank":1,"slot":true,"canonical":"RULE-047","blockedBy":[],"status":"queued"},
-    {"id":"NAT-004","name":"Canalization feeder trees to hubs","step":"router","kind":"hybrid","wins":["B1","R1","B2"],"gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":2,"slot":true,"canonical":"NAT-004","blockedBy":[],"status":"queued"},
-    {"id":"RULE-038","name":"Rule weights from preferences","step":"whole","kind":"hybrid","wins":["R1","R2","B1"],"gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":3,"slot":true,"canonical":"RULE-038","blockedBy":[],"status":"queued"},
-    {"id":"NAT-047","name":"Firefly and bee searches","step":"whole","kind":"literature","wins":["B1","R5"],"gain":36,"uncertainty":0.84,"cost":1,"score":30.24,"rank":4,"slot":true,"canonical":"NAT-047","blockedBy":[],"status":"queued"},
-    {"id":"RULE-020","name":"Adam with a seeded sample of pairs","step":"router","kind":"hybrid","wins":["R1","R2","R8"],"gain":26.5,"uncertainty":1.02,"cost":1,"score":27.03,"rank":5,"slot":true,"canonical":"RULE-020","blockedBy":["idea:RULE-019"],"status":"queued"},
-    {"id":"WILD-057","name":"Tracing load","step":"whole","kind":"ours","wins":["R1","B4"],"gain":26,"uncertainty":1,"cost":1,"score":26,"rank":6,"slot":true,"canonical":"WILD-057","blockedBy":[],"status":"queued"},
+    {"id":"RULE-047","name":"Pull toward the lane slots of the highway skeleton","step":"highway","kind":"ours","wins":["B2","B1","B9"],"gain":35.5,"uncertainty":1,"cost":1,"score":35.5,"rank":1,"slot":true,"canonical":"RULE-047","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":35.5,"uncertainty":1,"cost":1,"score":35.5,"rank":1},"strategy":"slots"},
+    {"id":"NAT-004","name":"Canalization feeder trees to hubs","step":"router","kind":"hybrid","wins":["B1","R1","B2"],"gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":2,"slot":true,"canonical":"NAT-004","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":2},"strategy":"canals"},
+    {"id":"RULE-038","name":"Rule weights from preferences","step":"whole","kind":"hybrid","wins":["R1","R2","B1"],"gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":3,"slot":true,"canonical":"RULE-038","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":3},"strategy":"preferences"},
+    {"id":"NAT-047","name":"Firefly and bee searches","step":"whole","kind":"literature","wins":["B1","R5"],"gain":36,"uncertainty":0.84,"cost":1,"score":30.24,"rank":4,"slot":true,"canonical":"NAT-047","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":36,"uncertainty":0.84,"cost":1,"score":30.24,"rank":4},"strategy":"fireflies"},
+    {"id":"RULE-020","name":"Adam with a seeded sample of pairs","step":"router","kind":"hybrid","wins":["R1","R2","R8"],"gain":26.5,"uncertainty":1.02,"cost":1,"score":27.03,"rank":5,"slot":true,"canonical":"RULE-020","blockedBy":["idea:RULE-019"],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":26.5,"uncertainty":1.02,"cost":1,"score":27.03,"rank":5},"strategy":"adam"},
+    {"id":"WILD-057","name":"Tracing load","step":"whole","kind":"ours","wins":["R1","B4"],"gain":26,"uncertainty":1,"cost":1,"score":26,"rank":6,"slot":true,"canonical":"WILD-057","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":26,"uncertainty":1,"cost":1,"score":26,"rank":6},"strategy":"tracing"},
     {"id":"NAT-009","name":"Two-way lanes","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":26,"uncertainty":0.85,"cost":1,"score":22.1,"rank":7,"slot":true,"canonical":"NAT-009","blockedBy":[],"status":"queued"},
     {"id":"WILD-039","name":"One global lane order","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":26,"uncertainty":0.85,"cost":1,"score":22.1,"rank":8,"slot":true,"canonical":"WILD-039","blockedBy":[],"status":"queued"},
     {"id":"EDA-022","name":"Ordered escape for plugs","step":"plugs","kind":"literature","wins":["R1","R11","B5","R10"],"gain":31,"uncertainty":0.7,"cost":1,"score":21.7,"rank":9,"slot":true,"canonical":"EDA-022","blockedBy":[],"status":"queued"},
