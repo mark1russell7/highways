@@ -47,6 +47,24 @@ jobs:
           path: ${{ runner.temp }}/heap.jsonl
           if-no-files-found: warn
 
+  # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
+  # A job that its own if skips does not fail it. Add each new job of the gate to needs.
+  # The cells of Xplat have their own check "Xplat OK" in xplat.yml.
+  ci-ok:
+    name: CI OK
+    if: always()
+    needs: [ci, heap, presets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Each job passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          case " $RESULTS " in *" failure "*|*" cancelled "*) exit 1 ;; esac
+
   # Each preset of `pnpm package add` makes a package, and that package passes its typecheck and its tests.
   # The tests of the preset service hold its entry to describe() and lint() of @mark1russell7/service (OTH-5).
   # A test of the CLI compares this list with the presets of the CLI.

@@ -141,6 +141,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PHYSICAL | Three opt-in routers that move the routes with forces, with no grid and no search. `repel` makes rubber bands of the straight lines round the boxes. `springs` smooths `shared`, and `nudge` gives even gaps to its parallel legs. `repel` halves R16.low and lowers R12, but it does not lower Z11.gain, and it adds crossings. No default changes. [The results](research/CATALOG.md#the-physical-routers-physical). | 2026-10-29 | #190 |
 | TEST-NO-LIMIT | The unit test of the parts of the bench has no time limit. It checks the join with the first 2 strategies of each step, and the router `corners` for the curves. | 2026-10-29 | #196 |
 | HEAP-BUDGET | The RSS budget of each router of the heap gate is the larger of its peak times 1.5 and its peak plus 64 MB. The budget has no floor, so a small router keeps a tight budget. The heap cap keeps its floor of 1024 MB. | 2026-10-29 | #196 |
+| CI-OK | Each gate workflow has one check that needs each of its jobs: `CI OK` in `CI`, `Xplat OK` in `Xplat` and `Security OK` in `Security`. Thus a ruleset names 3 checks, and `--auto` waits for the whole gate. | 2026-10-29 | #197 |
 
 ## Calibration
 
