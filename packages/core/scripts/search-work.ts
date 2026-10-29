@@ -3,11 +3,16 @@
 // On each window it times `searchPlan` with 1 evaluation and with each count of `--evaluations`. One evaluation also makes the pool and the first routes.
 // The extra time is the time minus the time with 1 evaluation. The work is the edges times the evaluations after the first.
 // It fits the extra time against the work, and it writes the slope, the R² and each point. A budget in edge routes bounds the time only when the fit is near a line.
+// It also times each part of one evaluation on each window: `follow` of the start plan, and each term of `searchScore`.
 // The workflow `Search work` (.github/workflows/search-work.yml) starts it. Times run in CI only, not on a local machine.
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
+import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../src/bench/measures/bundles.ts";
+import { tidyPlan } from "../src/highways/base.ts";
+import { follow } from "../src/highways/follow.ts";
+import { candidatePlan } from "../src/highways/select/index.ts";
 import { SEARCH_DEFAULTS, searchPlan, type Graph } from "../src/index.ts";
 
 const opt = (name: string): string | undefined => {
@@ -39,12 +44,39 @@ function time(graph: Graph, evaluations: number): number {
   return times[times.length >> 1]!;
 }
 
+/** This function gives the median time in ms of a function. */
+function timeOf(f: () => unknown): number {
+  const times: number[] = [];
+  for (let i = 0; i < repeat; i++) {
+    const t0 = performance.now();
+    f();
+    times.push(performance.now() - t0);
+  }
+  times.sort((a, b) => a - b);
+  return times[times.length >> 1]!;
+}
+
 const bytes = readFileSync(fixture);
 const doc = JSON.parse((fixture.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8")) as { graph: Graph };
 if (out) writeFileSync(out, "");
+const parts: { nodes: number; edges: number; follow: number; ink: number; stretch: number; ambiguity: number; angle: number }[] = [];
 const points: { nodes: number; edges: number; evaluations: number; work: number; ms: number; extra: number }[] = [];
 for (const size of sizes) {
   const graph = window(doc.graph, size);
+  const plan = tidyPlan(candidatePlan({ graph }, SEARCH_DEFAULTS.from));
+  const routes = follow(graph, plan).routes;
+  const first = follow(graph, { highways: [] }).routes;
+  const part = {
+    nodes: graph.nodes.length,
+    edges: graph.edges.length,
+    follow: Math.round(timeOf(() => follow(graph, plan))),
+    ink: Math.round(timeOf(() => inkSaved(routes))),
+    stretch: Math.round(timeOf(() => bundleStretch(routes, first))),
+    ambiguity: Math.round(timeOf(() => ambiguity(graph, routes))),
+    angle: Math.round(timeOf(() => mergeAngle(routes))),
+  };
+  parts.push(part);
+  console.error(JSON.stringify(part));
   const base = time(graph, 1);
   for (const evaluations of counts) {
     const ms = time(graph, evaluations);
@@ -78,6 +110,12 @@ const lines = [
   "| Boxes | Edges | ms for each 1000 edge routes |",
   "|---:|---:|---:|",
   ...perWindow.map((w) => `| ${w.nodes} | ${w.edges} | ${w.msPerKiloWork.toFixed(1)} |`),
+  "",
+  "The ms of each part of one evaluation:",
+  "",
+  "| Boxes | Edges | follow | ink | stretch | ambiguity | angle |",
+  "|---:|---:|---:|---:|---:|---:|---:|",
+  ...parts.map((p) => `| ${p.nodes} | ${p.edges} | ${p.follow} | ${p.ink} | ${p.stretch} | ${p.ambiguity} | ${p.angle} |`),
   "",
   "| Boxes | Edges | Evaluations | Work | ms | Extra ms |",
   "|---:|---:|---:|---:|---:|---:|",
