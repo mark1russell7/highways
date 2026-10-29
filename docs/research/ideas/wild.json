@@ -1090,7 +1090,7 @@
     "placementDependent": false,
     "screen": "On shared-all over case-many-groups at 5 zoom scales: keep it when the lane legibility count of WILD-060 is 0 and the drawn ink drops.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-060",
       "WILD-014",
@@ -1103,7 +1103,119 @@
     "dependsOn": [
       "WILD-060"
     ],
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40804949288",
+      "records": [
+        "screen-v2/*/depths@2a5caed",
+        "screen-v2/*/detail@2a5caed",
+        "screen-v2/*/detail-min3@2a5caed",
+        "screen-v2/*/detail-px4@2a5caed",
+        "screen-v3/*/depths@2a5caed",
+        "screen-v3/*/detail@2a5caed",
+        "screen-v3/*/detail-min3@2a5caed",
+        "screen-v3/*/detail-px4@2a5caed",
+        "screen-v1/*/depths@2a5caed",
+        "screen-v1/*/detail@2a5caed",
+        "screen-v1/*/detail-min3@2a5caed",
+        "screen-v1/*/detail-px4@2a5caed"
+      ],
+      "measures": {
+        "B7 against depths": {
+          "base": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          },
+          "new": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          }
+        },
+        "B1 against depths": {
+          "base": {
+            "tiny-uniform": 0.204,
+            "small-clustered": 0.325,
+            "dense-groups": 0.364,
+            "hub-chain": 0.251,
+            "many-groups": 0.474,
+            "packed-grid": 0.07
+          },
+          "new": {
+            "tiny-uniform": 0.204,
+            "small-clustered": 0.325,
+            "dense-groups": 0.364,
+            "hub-chain": 0.251,
+            "many-groups": 0.474,
+            "packed-grid": 0.07
+          }
+        },
+        "R12 against depths": {
+          "base": {
+            "tiny-uniform": 0.15,
+            "small-clustered": 0.198,
+            "dense-groups": 0.202,
+            "hub-chain": 0.572,
+            "many-groups": 0.457,
+            "packed-grid": 0.158
+          },
+          "new": {
+            "tiny-uniform": 0.15,
+            "small-clustered": 0.198,
+            "dense-groups": 0.202,
+            "hub-chain": 0.572,
+            "many-groups": 0.457,
+            "packed-grid": 0.158
+          }
+        },
+        "Z4 against depths": {
+          "base": {
+            "tiny-uniform": 3.8,
+            "small-clustered": 4,
+            "dense-groups": 4,
+            "hub-chain": 4,
+            "many-groups": 4,
+            "packed-grid": 4
+          },
+          "new": {
+            "tiny-uniform": 3.8,
+            "small-clustered": 4,
+            "dense-groups": 4,
+            "hub-chain": 4,
+            "many-groups": 4,
+            "packed-grid": 4
+          }
+        },
+        "Z3 against depths": {
+          "base": {
+            "tiny-uniform": 619.216,
+            "small-clustered": 137576.505,
+            "dense-groups": 302144.483,
+            "hub-chain": 9069.8,
+            "many-groups": 34695.4,
+            "packed-grid": 63595.959
+          },
+          "new": {
+            "tiny-uniform": 619.216,
+            "small-clustered": 137606.494,
+            "dense-groups": 302181.294,
+            "hub-chain": 9069.8,
+            "many-groups": 34695.4,
+            "packed-grid": 63595.959
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40804949288, the screen-v3 run 40804951767 and the screen-v1 run 40805759096, at 2a5caed. The strategy detail keeps the levels and the routes of depths and changes only the level links. So B7, B1, R12 and Z4 are ties on each family. The screen has no measure of the strokes drawn at each level, so the named win of the record has no value. The level links change on 20 of 60 inputs of screen-v2 and on 66 of 150 of screen-v3. The link length is worse, with 0 families against and each family a tie. The time is 1.04 times depths on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-017",
@@ -2671,7 +2783,7 @@
     "placementDependent": true,
     "screen": "On mid-fanout (in CI) and a small case board with fans: keep it when B1 rises by 0.1 or more and the mean of R3 drops.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-005",
       "WILD-040",
@@ -2679,7 +2791,104 @@
       "EDA-035",
       "HWY-037"
     ],
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40802879108",
+      "records": [
+        "screen-v2/*/shared@2a5caed",
+        "screen-v2/*/manifolds@2a5caed",
+        "screen-v2/*/manifolds-far@2a5caed",
+        "screen-v2/*/manifolds-k5@2a5caed",
+        "screen-v2/*/manifolds-none@2a5caed",
+        "screen-v3/*/shared@2a5caed",
+        "screen-v3/*/manifolds@2a5caed",
+        "screen-v3/*/manifolds-far@2a5caed",
+        "screen-v3/*/manifolds-k5@2a5caed",
+        "screen-v3/*/manifolds-none@2a5caed",
+        "screen-v1/*/shared@2a5caed",
+        "screen-v1/*/manifolds@2a5caed",
+        "screen-v1/*/manifolds-far@2a5caed",
+        "screen-v1/*/manifolds-k5@2a5caed",
+        "screen-v1/*/manifolds-none@2a5caed"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.064,
+            "small-clustered": 0.247,
+            "dense-groups": 0.343,
+            "hub-chain": 0.071,
+            "many-groups": 0.085,
+            "packed-grid": 0.033
+          }
+        },
+        "R3 against shared": {
+          "base": {
+            "tiny-uniform": 2.493,
+            "small-clustered": 3.99,
+            "dense-groups": 4.737,
+            "hub-chain": 0.974,
+            "many-groups": 2.944,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 2.54,
+            "small-clustered": 4.036,
+            "dense-groups": 4.712,
+            "hub-chain": 0.943,
+            "many-groups": 2.938,
+            "packed-grid": 0.048
+          }
+        },
+        "R14 against shared": {
+          "base": {
+            "tiny-uniform": 0.142,
+            "small-clustered": 0.11,
+            "dense-groups": 0.114,
+            "hub-chain": 0.775,
+            "many-groups": 0.449,
+            "packed-grid": 0.166
+          },
+          "new": {
+            "tiny-uniform": 0.249,
+            "small-clustered": 0.14,
+            "dense-groups": 0.135,
+            "hub-chain": 0.797,
+            "many-groups": 0.454,
+            "packed-grid": 0.226
+          }
+        },
+        "B7 against shared": {
+          "base": {
+            "tiny-uniform": 0.981,
+            "small-clustered": 0.942,
+            "dense-groups": 0.927,
+            "hub-chain": 0.941,
+            "many-groups": 0.969,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 0.978,
+            "small-clustered": 0.941,
+            "dense-groups": 0.925,
+            "hub-chain": 0.941,
+            "many-groups": 0.969,
+            "packed-grid": 1.085
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40802879108 and the screen-v3 run 40802881978 at 2a5caed, and the screen-v1 run 40802798104 at 96ca96d. The strategy manifolds gets B1 and R14 better with 0 families against on each set. On screen-v3, 14 of 15 families are for B1, and 13 of 15 for R14. R3 has no verdict on screen-v2, with 3 of 6 against, and it is worse on screen-v3 with 5 of 15 against. B7 is worse on screen-v2 with 2 of 6 against. The risk R5 is worse on each set. The median time is 1.99 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-037",

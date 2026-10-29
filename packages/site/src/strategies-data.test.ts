@@ -35,7 +35,7 @@ describe("the strategy cards", () => {
 
   it("give the verdicts of the snapshots and the times of the routers", () => {
     const corridors = data.cards.find((c) => c.step === "highway" && c.name === "corridors")!;
-    expect(corridors.sets.map((s) => s.set)).toEqual(["screen-v1", "screen-v2"]);
+    expect(corridors.sets.map((s) => s.set)).toEqual(["screen-v1", "screen-v2", "screen-v3"]);
     expect(corridors.sets[0]!.verdicts.length).toBeGreaterThan(0);
     expect(corridors.ideas).toContain("HWY-031");
     const shared = data.cards.find((c) => c.step === "router" && c.name === "shared")!;

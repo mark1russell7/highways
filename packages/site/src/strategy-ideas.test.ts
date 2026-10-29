@@ -66,4 +66,14 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["levels/venation"]).toContain("NAT-016");
     expect(built.strategies["whole/board-portfolio"]).toContain("WILD-045");
   });
+
+  // The texts `describe` of the registered strategies of wave 4B (BUILD-W4B) cite their ideas.
+  it("gives the cards the ideas of the strategies of wave 4B", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/balance"]).toContain("EDA-017");
+    expect(built.strategies["highway/manifolds"]).toContain("WILD-036");
+    expect(built.strategies["plugs/leaders"]).toContain("EDA-041");
+    expect(built.strategies["levels/detail"]).toContain("WILD-016");
+    expect(built.strategies["whole/curriculum"]).toContain("RULE-048");
+  });
 });

@@ -1,0 +1,17 @@
+{
+  "set": "screen-v1",
+  "step": "router",
+  "base": "shared",
+  "level": 0.05,
+  "run": 40805756190,
+  "commit": "2a5caedfa78c7761bd88e43f5ee1e3dd8bdea1b2",
+  "date": "2026-10-29",
+  "core": "0.9.4",
+  "rows": [
+    {"strategy":"reroute","guard":"R1","measure":"route.crossings","label":"worse","old":"worse","stratified":-52.166666666666664,"pooled":-33.785714285714285,"p":0.0234375,"families":[{"family":"dense-groups","n":3,"mean":-28.666666666666668,"sign":-1},{"family":"hub-chain","n":1,"mean":-54,"sign":-1},{"family":"many-groups","n":1,"mean":-179,"sign":-1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-51.333333333333336,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":2}},
+    {"strategy":"reroute","guard":"R4","measure":"route.turn.mean","label":"worse","old":"worse","stratified":-0.028170187719446297,"pooled":-0.01950707919354927,"p":0.03125,"families":[{"family":"dense-groups","n":3,"mean":-0.03323197180591867,"sign":-1},{"family":"hub-chain","n":1,"mean":-0.0941525764535758,"sign":-1},{"family":"many-groups","n":1,"mean":-0.022829558666595973,"sign":-1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.018807019390587338,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":2}},
+    {"strategy":"reroute","guard":"R5 q0.95","measure":"route.detour.q95","label":"depends on the mix","old":"tie","stratified":-0.003356816824007606,"pooled":0.0002027334345871942,"p":0.84375,"families":[{"family":"dense-groups","n":3,"mean":0.0033037986015047593,"sign":1},{"family":"hub-chain","n":1,"mean":-0.031630485458178814,"sign":-1},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":0.008185785912628418,"sign":1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":2,"of":6,"ties":3}},
+    {"strategy":"reroute","guard":"R11 min","measure":"route.plug-spacing.min","label":"no verdict","old":"tie","stratified":0,"pooled":0,"p":1,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":0,"sign":0},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},
+    {"strategy":"reroute","guard":"B1","measure":"route.bundle.ink-saved","label":"worse","old":"worse","stratified":-0.028860343749781792,"pooled":-0.015701351114553435,"p":0.03125,"families":[{"family":"dense-groups","n":3,"mean":-0.006059668070740136,"sign":-1},{"family":"hub-chain","n":1,"mean":-0.07827735114042189,"sign":-1},{"family":"many-groups","n":1,"mean":-0.07155628480574017,"sign":-1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.01726875848178855,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":2}}
+  ]
+}

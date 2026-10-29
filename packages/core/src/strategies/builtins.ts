@@ -47,6 +47,8 @@ import { SCALE_SPACE_DEFAULTS, scaleSpacePlan, type ScaleSpaceOptions } from "..
 import { GAP_DEFAULTS, gapPlan, type GapOptions } from "../highways/gaps/index.ts";
 import { INTERCHANGE_DEFAULTS, interchangePlan, type InterchangeOptions } from "../highways/interchanges/index.ts";
 import { KNEE_DEFAULTS, kneePlan, type KneeOptions } from "../highways/knee/index.ts";
+import { BALANCE_DEFAULTS, balancePlan, type BalanceOptions } from "../highways/balance/index.ts";
+import { MANIFOLD_DEFAULTS, manifoldPlan, type ManifoldOptions } from "../highways/manifolds/index.ts";
 import { BRONCHIAL_DEFAULTS, bronchialPlan, type BronchialOptions } from "../highways/bronchial/index.ts";
 import { SEARCH_DEFAULTS, searchPlan, type SearchOptions } from "../highways/search/index.ts";
 import { STEINER_DEFAULTS, steinerPlan, type SteinerOptions } from "../highways/steiner/index.ts";
@@ -75,11 +77,13 @@ import { WSPD_DEFAULTS, wspdPlan, type WspdOptions } from "../highways/wspd/inde
 import { ZIPPER_DEFAULTS, zipperPlan, type ZipperOptions } from "../highways/zipper/index.ts";
 import { depthLevels, type DepthLevelOptions } from "../levels/depths/index.ts";
 import { VENATION_DEFAULTS, venationLevels, type VenationOptions } from "../levels/venation/index.ts";
+import { DETAIL_DEFAULTS, detailLevels, type DetailOptions } from "../levels/detail/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { facingEnds } from "../plugs/facing/index.ts";
 import { justifyEnds, type JustifyOptions } from "../plugs/justify.ts";
 import { sideEnds, type SidePlugOptions } from "../plugs/side.ts";
 import { SPREAD_DEFAULTS, spreadEnds, type SpreadOptions } from "../plugs/spread/index.ts";
+import { LEADER_DEFAULTS, leaderEnds, type LeaderOptions } from "../plugs/leaders/index.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
 import { levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
 import { cornersRouter, type CornersOptions } from "../routers/corners.ts";
@@ -91,10 +95,11 @@ import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunk
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { runPipeline, type PipelineOptions } from "../whole/pipeline/index.ts";
 import { BOARD_PORTFOLIO_DEFAULTS, boardPortfolio, type BoardPortfolioOptions, type PortfolioSetting } from "../whole/portfolio/index.ts";
+import { CURRICULUM_DEFAULTS, curriculum, type CurriculumOptions } from "../whole/curriculum/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA } from "./schemas.ts";
+import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -480,6 +485,8 @@ export const highwayStrategies: {
   readonly interchanges: Strategy<"highway", InterchangeOptions>;
   readonly knee: Strategy<"highway", KneeOptions>;
   readonly bronchial: Strategy<"highway", BronchialOptions>;
+  readonly balance: Strategy<"highway", BalanceOptions>;
+  readonly manifolds: Strategy<"highway", ManifoldOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -973,6 +980,24 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<BronchialOptions>) => bronchialPlan(input, o),
   }),
+  balance: defineStrategy({
+    step: "highway",
+    name: "balance",
+    describe: "Stretch balance in a bundle (EDA-017). A price for each edge grows while its stretch is above the target, and the price moves its exit forward.",
+    defaults: { ...BALANCE_DEFAULTS } as BalanceOptions,
+    schema: BALANCE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<BalanceOptions>) => balancePlan(input, o),
+  }),
+  manifolds: defineStrategy({
+    step: "highway",
+    name: "manifolds",
+    describe: "Manifolds for a fan to a row (WILD-036). A straight header in the gap before the row, with taps at right angles and one feed from the node.",
+    defaults: { ...MANIFOLD_DEFAULTS } as ManifoldOptions,
+    schema: MANIFOLD_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ManifoldOptions>) => manifoldPlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -986,6 +1011,7 @@ export const plugStrategies: {
   readonly side: Strategy<"plugs", SidePlugOptions>;
   readonly justify: Strategy<"plugs", JustifyOptions>;
   readonly spread: Strategy<"plugs", SpreadOptions>;
+  readonly leaders: Strategy<"plugs", LeaderOptions>;
 } = Object.freeze({
   facing: defineStrategy({
     step: "plugs",
@@ -1019,12 +1045,21 @@ export const plugStrategies: {
     schema: SPREAD_SCHEMA,
     run: (input, o) => spreadEnds(input, o),
   }),
+  leaders: defineStrategy<"plugs", LeaderOptions>({
+    step: "plugs",
+    name: "leaders",
+    describe: "Boundary leaders as plug stubs (EDA-041). The plugs of each wall take the order of po-leaders with no crossing, and keep a least gap.",
+    defaults: { ...LEADER_DEFAULTS },
+    schema: LEADER_SCHEMA,
+    run: (input, o) => leaderEnds(input, o),
+  }),
 });
 
 /** The built-in level rules: the strategies of the step `levels`. The router `sections` makes its zoom levels with its option `level`. */
 export const levelStrategies: {
   readonly depths: Strategy<"levels", DepthLevelOptions>;
   readonly venation: Strategy<"levels", VenationOptions>;
+  readonly detail: Strategy<"levels", DetailOptions>;
 } = Object.freeze({
   depths: defineStrategy<"levels", DepthLevelOptions>({
     step: "levels",
@@ -1041,6 +1076,14 @@ export const levelStrategies: {
     defaults: { ...VENATION_DEFAULTS },
     schema: VENATION_SCHEMA,
     run: (input, o) => venationLevels(input, o),
+  }),
+  detail: defineStrategy<"levels", DetailOptions>({
+    step: "levels",
+    name: "detail",
+    describe: "The level of detail of the bundles (WILD-016 with EDA-038). Legs of level links closer than a few pixels at the scale of their level become one stroke.",
+    defaults: { ...DETAIL_DEFAULTS },
+    schema: DETAIL_SCHEMA,
+    run: (input, o) => detailLevels(input, o),
   }),
 });
 
@@ -1059,12 +1102,21 @@ export const BOARD_PORTFOLIO_SETTINGS: readonly PortfolioSetting[] = Object.free
 );
 
 /**
+ * The pool of routes of the whole strategy `curriculum` (RULE-048), in order: the routers of the base of the screen. The first one gives the first answer.
+ * The option `settings` takes the first ones.
+ */
+export const CURRICULUM_POOL: readonly PortfolioSetting[] = Object.freeze(
+  (["corners", "shared", "trunks"] as const).map((name) => Object.freeze({ name, pipeline: { router: routerStrategies[name] as Strategy<"router"> } })),
+);
+
+/**
  * The built-in whole strategies: the strategies of the step `whole`. The strategy `pipeline` runs one strategy of each step, as the demo of the site does.
  * Without options, it routes the graph with the router `corners`.
  */
 export const wholeStrategies: {
   readonly pipeline: Strategy<"whole", PipelineOptions>;
   readonly "board-portfolio": Strategy<"whole", BoardPortfolioOptions>;
+  readonly curriculum: Strategy<"whole", CurriculumOptions>;
 } = Object.freeze({
   pipeline: defineStrategy<"whole", PipelineOptions>({
     step: "whole",
@@ -1081,6 +1133,14 @@ export const wholeStrategies: {
     defaults: { ...BOARD_PORTFOLIO_DEFAULTS },
     schema: BOARD_PORTFOLIO_SCHEMA,
     run: (graph, o) => boardPortfolio(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
+  }),
+  curriculum: defineStrategy<"whole", CurriculumOptions>({
+    step: "whole",
+    name: "curriculum",
+    describe: "A curriculum of rules (RULE-048). Each stage adds one rule, and each edge takes the route of a pool that improves it with no loss on the earlier rules.",
+    defaults: { ...CURRICULUM_DEFAULTS },
+    schema: CURRICULUM_SCHEMA,
+    run: (graph, o) => curriculum(graph, CURRICULUM_POOL, o),
   }),
 });
 

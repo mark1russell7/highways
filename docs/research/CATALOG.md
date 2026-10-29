@@ -1170,6 +1170,115 @@ The steps `levels` and `whole` get their first snapshots. For the other strategi
 - C3 has no value for the step `whole`, because it has no curves. Thus WILD-045 has no C3 verdict.
 - B3 q95 is the only B3 measure of the screen. The named win B3 of NAT-018 uses it.
 
+## Wave 4B (BUILD-W4B)
+
+Wave 4B builds the next six ideas of the queue. Each one is a strategy of its step:
+
+| Idea | Strategy | Step | Named wins | Baseline |
+|---|---|---|---|---|
+| RULE-048 | `curriculum` | `whole` | R1, R2, R12 | `pipeline` |
+| WILD-016 (with EDA-038) | `detail` | `levels` | B7, B1 (EDA-038: Z4, B7, R12) | `depths` |
+| EDA-017 | `balance` | `highway` | B3, R6, R5 | `shared` |
+| RULE-044 | `reroute` (opt-in) | `router` | R1, R3, R12, B2 | `shared` |
+| WILD-036 | `manifolds` | `highway` | B1, R3, R14, B7 | `shared` |
+| EDA-041 | `leaders` | `plugs` | R1, R11, R10 | `facing` |
+
+The screen examines each strategy alone and with two or three changes of its options. The modules are `scripts/screens/build-w4b*.ts`.
+The verdict is the verdict over families of `scripts/screen-verdict.ts` against the baseline of the step, on the named wins of the idea.
+The screen examines each step on `screen-v1`, `screen-v2` and `screen-v3`. The set `screen-v3` has 15 families, so its sign test passes at 12 of 15.
+
+### The design notes
+
+- `curriculum` has no energy solver, because RULE-019 is not built. A pool of the routes of `corners`, `shared` and `trunks` takes its place.
+  - The first answer is the routes of `corners`. Each stage adds one rule: R1, then R12, then R2.
+  - In a stage, an edge takes a route of the pool that lowers the new rule. The earlier rules do not get worse, and the detour stays under the cap `detour`.
+  - A route with a break of a hard rule is not in the pool.
+- `detail` keeps the levels and the routes of `depths`. It changes only the level links, so B7, B1, R12 and Z4 are ties by construction.
+  - At the scale where a level first shows, two parallel legs nearer than `pxMin` pixels move onto one stroke.
+  - `detailWidth` gives the width of a stroke from its count, for a renderer. The screen has no measure of the strokes of a level.
+- `balance` follows the plan of `shared-ways`. A price for each edge grows while its stretch is above `tau`, and the price cuts the ride at its exit.
+- `reroute` puts a refine hook on `shared`. The price of a link grows in a narrow channel and with edges of other keys. It falls with edges of the same key.
+  - Each round routes again the share `q` of the edges with the largest prices. A new way stays only when its price is lower.
+- `manifolds` finds the fans from one node to 3 or more nodes in a band on one axis. It puts the header in the gap before the row, at a third of the gap.
+- `leaders` uses the walls of `spread`. With `po`, the order of the plugs on a wall is the order of the far ends along the wall.
+  - With `s`, the plugs are the plugs of `spread`. With `opo`, the plugs go at even places on the wall.
+- `reroute` is opt-in. It gets rows in the workflow `Scale`, not in the registry.
+
+### The results
+
+The records are these runs, at `2a5caed`:
+
+- The step `highway`: [40802879108](https://github.com/mark1russell7/highways/actions/runs/40802879108) on `screen-v2` and [40802881978](https://github.com/mark1russell7/highways/actions/runs/40802881978) on `screen-v3`. The run [40802798104](https://github.com/mark1russell7/highways/actions/runs/40802798104) on `screen-v1` is at `96ca96d`, the merge commit of the PR.
+- The step `router`: [40804550492](https://github.com/mark1russell7/highways/actions/runs/40804550492) on `screen-v2`, [40804553123](https://github.com/mark1russell7/highways/actions/runs/40804553123) on `screen-v3` and [40805756190](https://github.com/mark1russell7/highways/actions/runs/40805756190) on `screen-v1`.
+- The step `whole`: [40804555768](https://github.com/mark1russell7/highways/actions/runs/40804555768) on `screen-v2`, [40804558369](https://github.com/mark1russell7/highways/actions/runs/40804558369) on `screen-v3` and [40805753373](https://github.com/mark1russell7/highways/actions/runs/40805753373) on `screen-v1`.
+- The step `levels`: [40804949288](https://github.com/mark1russell7/highways/actions/runs/40804949288) on `screen-v2`, [40804951767](https://github.com/mark1russell7/highways/actions/runs/40804951767) on `screen-v3` and [40805759096](https://github.com/mark1russell7/highways/actions/runs/40805759096) on `screen-v1`.
+- The step `plugs`: [40804954171](https://github.com/mark1russell7/highways/actions/runs/40804954171) on `screen-v2`, [40804956723](https://github.com/mark1russell7/highways/actions/runs/40804956723) on `screen-v3` and [40805761696](https://github.com/mark1russell7/highways/actions/runs/40805761696) on `screen-v1`.
+
+The rule of the stage is the rule of wave 3G. A cell gives the label and the breadth: the families against, of 6 or of 15, and the ties.
+The ratios are the paired ratios of the candidate over the baseline on `screen-v2`, as the median and the maximum. The time ratio is the median time over the median time of the baseline on `screen-v2`.
+
+| Idea | Named wins on `screen-v1` | Named wins on `screen-v2` | Named wins on `screen-v3` | B1 ratio | B3 q95 ratio | Time | New hard-rule breaks | Stage |
+|---|---|---|---|---:|---:|---:|---|---|
+| RULE-048 `curriculum` | R1 `better` 0 of 6 (2 ties), R2 `better` 0 of 6 (3 ties), R12 `better` 0 of 6 (3 ties) | R1 `better` 0 of 6 (2 ties), R2 `better` 0 of 6 (2 ties), R12 `better` 0 of 6 (3 ties) | R1 `better` 0 of 15 (8 ties), R2 `better` 0 of 15 (11 ties), R12 `better` 0 of 15 (11 ties) | 1.000 / 17.54 | 1.000 / 1.236 | 7.85 | 0 | `kept` |
+| WILD-016 `detail` | B7, B1, R12 and Z4 `no verdict` 0 of 6 (6 ties) | B7, B1, R12 and Z4 `no verdict` 0 of 6 (6 ties) | B7, B1, R12 and Z4 `no verdict` 0 of 15 (15 ties) | 1.000 / 1.000 | 1.000 / 1.000 | 1.04 | 0 | `screened` |
+| EDA-017 `balance` | B3 q95 `better` 1 of 6 (3 ties), R6 `no verdict` 0 of 6 (4 ties), R5 q95 `better` 0 of 6 (4 ties) | B3 q95 `better` 0 of 6 (4 ties), R6 `better` 0 of 6 (4 ties), R5 q95 `better` 0 of 6 (3 ties) | B3 q95 `better` 0 of 15 (13 ties), R6 `better` 0 of 15 (13 ties), R5 q95 `better` 0 of 15 (12 ties) | 1.000 / 3.201 | 1.000 / 1.011 | 1.66 | 0 | `kept` |
+| RULE-044 `reroute` | R1 `worse` 0 of 6 (2 ties), R3 `no verdict` 1 of 6 (2 ties), R12 `better` 0 of 6 (2 ties), B2 `no verdict` 0 of 6 (4 ties) | R1 `worse` 0 of 6 (2 ties), R3 `worse` 1 of 6 (3 ties), R12 `better` 0 of 6 (2 ties), B2 `worse` 0 of 6 (3 ties) | R1 `worse` 0 of 15 (4 ties), R3 `no verdict` 6 of 15 (5 ties), R12 `better` 2 of 15 (4 ties), B2 `worse` 0 of 15 (6 ties) | 0.933 / 1.050 | 1.000 / 1.150 | 2.13 | 0 | `screened` |
+| WILD-036 `manifolds` | B1 `better` 0 of 6, R3 `depends on the mix` 2 of 6 (1 tie), R14 `better` 0 of 6, B7 `no verdict` 4 of 6 | B1 `better` 0 of 6, R3 `no verdict` 3 of 6, R14 `better` 0 of 6, B7 `worse` 2 of 6 (3 ties) | B1 `better` 0 of 15 (1 tie), R3 `worse` 5 of 15 (1 tie), R14 `better` 0 of 15 (2 ties), B7 `better` 3 of 15 (5 ties) | 1.065 / 51.48 | 1.000 / 2.041 | 1.99 | 0 | `screened` |
+| EDA-041 `leaders` | R1 `worse` 0 of 6 (1 tie), R11 `better` 0 of 6, R10 `no verdict` 0 of 6 (5 ties) | R1 `worse` 0 of 6, R11 `better` 0 of 6, R10 `worse` 0 of 6 (5 ties) | R1 `worse` 1 of 15 (2 ties), R11 `better` 1 of 15 (1 tie), R10 `worse` 0 of 15 (14 ties) | 0.843 / 1.658 | 1.053 / 2.333 | 1.08 | 0 | `screened` |
+
+- `curriculum` and `balance` meet the rule of `kept`. Each named win with a value is `better` on `screen-v2` with 0 families against, and no named win is `worse` on `screen-v1`.
+- The risk R6 of `curriculum` is `worse` on `screen-v2` and `screen-v3`, with 0 families against. Its time is 7.85 times `pipeline`, because it routes each board three times.
+- The gains of `balance` come from 2 or 3 families. The other families have no ride with a stretch above `tau`, so they are ties.
+- `manifolds` gets B1 and R14 `better` on each set. On `screen-v3`, 14 of 15 families are for B1 and 13 of 15 for R14.
+  - The risk R5 is `worse` on each set, and B3 q95 is `worse` with 0 families against.
+  - R3 and B7 have families against them, so the idea stays `screened`.
+- `reroute` gets R12 `better`, but R1 and B2 are `worse`. The median B1 ratio is 0.933 on `screen-v2` and 0.887 on `screen-v3`.
+- `leaders` changes the plugs of 60 of 60 inputs of `screen-v2`. R11 is `better`, but R1 is `worse` with 0 families against on `screen-v1` and `screen-v2`.
+  - With `s`, the plugs are the plugs of `spread`, so each row of `leaders-s` is the same as `spread`.
+- `detail` changes the level links of 20 of 60 inputs of `screen-v2` and of 66 of 150 inputs of `screen-v3`. Each family is a tie on each named win.
+
+### The prediction of wave 4B
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. At most 1 of the 6 ideas gets B1 `better` against the default of its step on `screen-v2` with 0 families against it. | 0.65 | Not met: 2 of 6 (`manifolds`, and `curriculum` with 3 ties). |
+| 2. At least 1 idea gets `better` on one of its named wins on `screen-v3` with 12 or more of 15 families for it. | 0.35 | Met: `manifolds` gets B1 with 14 of 15 families for it, and R14 with 13 of 15. |
+| 3. EDA-041 changes the plugs on at least half of the inputs of `screen-v2` and adds 0 hard-rule breaks. | 0.5 | Met: 60 of 60 inputs, and 0 breaks. |
+| 4. The 6 strategies add 0 new hard-rule breaks on all sets. | medium | Met: 0 on `screen-v1`, `screen-v2` and `screen-v3`. |
+| 5. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #176. |
+
+### The queue after wave 4B
+
+The six ideas of the wave are built, so they leave the queue. The newest set of the snapshots is `screen-v3`, so the queue reads its verdicts. `pnpm queue` gives these counts after the wave:
+
+| Count | Before the wave | After the wave |
+|---|---:|---:|
+| rows | 186 | 186 |
+| ranked ideas | 171 | 165 |
+| duplicates | 9 | 9 |
+| blocked ideas | 16 | 14 |
+| open targets of the newest set | 46 (`screen-v2`) | 72 (`screen-v3`) |
+| ideas of the back test | 62 | 69 |
+
+- The new top 3 is `RULE-047`, `NAT-004` and `RULE-038`.
+- The rank correlation of the back test goes from 0.322 to 0.555.
+
+### The snapshots of the verdicts
+
+The snapshots hold the screens of this wave, with the registered strategies only. The variants are only in this section and in the idea records.
+The rows of the opt-in router `reroute` are in [`verdicts/opt-in/`](verdicts/README.md#the-opt-in-strategies), in a file for each set.
+The run [40806222637](https://github.com/mark1russell7/highways/actions/runs/40806222637) gives the rows of `annealing` and `tight` on `screen-v3`, for the measured gain of the queue.
+The step `plugs` gets its first snapshots, and `screen-v3` gets its first snapshots for each step. For the other strategies, each row is the same as before.
+
+- Over all the `better` verdicts of `screen-v2`, 46 of 118 have 1 or more families against them. Over all the `better` and `worse` verdicts, 106 of 255 have.
+- Over all the `better` verdicts of `screen-v3`, 72 of 118 have 1 or more families against them. Over all the `better` and `worse` verdicts, 141 of 251 have.
+
+### The measures with no value
+
+- The screen has no measure of the strokes drawn at each level. Thus the real win of WILD-016 and EDA-038 has no value.
+- The screen has no count of the crossings within 2 units of a box. The screen rule of EDA-041 reads that count, so R1 of all the routes takes its place.
+- B3 q95 is the only B3 measure of the screen. The named win B3 of EDA-017 uses it. R5 uses the detour q95, and R6 the largest detour.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
