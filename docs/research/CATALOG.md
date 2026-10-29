@@ -1059,7 +1059,7 @@ The six ideas of the wave are built, so they leave the queue. Their screens add 
 The snapshots of [`verdicts/`](verdicts/README.md) hold the screens of this wave, with the registered strategies only. The variants of the wave and the opt-in router `attraction` are only in this section and in the idea records.
 For the other strategies, each row is the same as in the snapshots of the BUILD-Q1 runs.
 
-- Over all the `better` verdicts of `screen-v2`, 46 of 103 have 1 or more families against them. Over all the `better` and `worse` verdicts, 102 of 220 have.
+- After wave 3G, 46 of 103 `better` verdicts of `screen-v2` had 1 or more families against them. Of the `better` and `worse` verdicts, 102 of 220 had.
 - The results page reads these counts. A new screen in a snapshot changes them.
 
 ### The measures with no value
@@ -1096,7 +1096,79 @@ The verdict is the verdict over families of `scripts/screen-verdict.ts` against 
 
 ### The results
 
-The screens are in progress. This section gets the results when the runs end.
+The records are these runs:
+
+- The step `highway`: [40793754164](https://github.com/mark1russell7/highways/actions/runs/40793754164) on `screen-v2` at `18906cd`, and [40795595664](https://github.com/mark1russell7/highways/actions/runs/40795595664) on `screen-v1` at `3a99fa5`.
+- The step `router`: [40795910435](https://github.com/mark1russell7/highways/actions/runs/40795910435) on `screen-v2` and [40795913236](https://github.com/mark1russell7/highways/actions/runs/40795913236) on `screen-v1`, at `3a99fa5`.
+- The step `whole`: [40796356615](https://github.com/mark1russell7/highways/actions/runs/40796356615) on `screen-v2` and [40796359270](https://github.com/mark1russell7/highways/actions/runs/40796359270) on `screen-v1`, at `3a99fa5`.
+- The step `levels`: [40797159867](https://github.com/mark1russell7/highways/actions/runs/40797159867) on `screen-v2` and [40797162693](https://github.com/mark1russell7/highways/actions/runs/40797162693) on `screen-v1`, at `577bb94`.
+
+The rule of the stage is the rule of wave 3G. A cell gives the label and the breadth: the families against, of 6, and the ties.
+The ratios are the paired ratios of the candidate over the baseline on `screen-v2`, as the median and the maximum. The time ratio is the median time over the median time of the baseline on `screen-v2`.
+
+| Idea | Named wins on `screen-v1` | Named wins on `screen-v2` | B1 ratio | B3 q95 ratio | Time | New hard-rule breaks | Stage |
+|---|---|---|---:|---:|---:|---|---|
+| NAT-016 `venation` | B1, R1 and B7 `no verdict` 0 of 6 (6 ties), Z3 length `no verdict` 0 of 6 (1 tie), Z3 through `worse` 0 of 6 (3 ties) | B1, R1 and B7 `no verdict` 0 of 6 (6 ties), Z3 length `worse` 0 of 6 (1 tie), Z3 through `worse` 0 of 6 (3 ties) | 1.000 / 1.000 | 1.000 / 1.000 | 1.13 | 0 (61 `link-ends` before `577bb94`) | `dropped` |
+| NAT-018 `knee` | B1 `no verdict` 3 of 6, B3 q95 `no verdict` 2 of 6, R5 q95 `no verdict` 1 of 6 | B1 `no verdict` 3 of 6 (1 tie), B3 q95 `no verdict` 2 of 6 (2 ties), R5 q95 `better` 1 of 6 (3 ties) | 1.000 / 12.75 | 1.000 / 1.467 | 3.44 | 0 | `screened` |
+| RULE-021 `annealing` | R1 `no verdict` 3 of 6, R12 `no verdict` 1 of 6, B1 `worse` 1 of 6, R5 q95 `better` 1 of 6 | R1 `worse` 3 of 6 (1 tie), R12 `worse` 1 of 6, B1 `worse` 0 of 6 (2 ties), R5 q95 `better` 1 of 6 (3 ties) | 0.754 / 2.752 | 1.000 / 1.101 | 3.77 | 0 | `screened` |
+| NAT-019 `bronchial` | B1 `no verdict` 3 of 6, B6 `worse` 0 of 6, B8 runs `no verdict` 3 of 6, R4 `worse` 0 of 6 | B1 `no verdict` 3 of 6 (1 tie), B6 `worse` 0 of 6 (1 tie), B8 runs `better` 3 of 6 (1 tie), R4 `worse` 0 of 6 (1 tie) | 1.048 / 12.70 | 1.006 / 1.562 | 2.41 | 0 | `screened` |
+| WILD-045 `board-portfolio` | R1 `better` 0 of 6, R5 median `worse` 0 of 6, R5 q95 `worse` 0 of 6, B1 `better` 0 of 6 | R1 `better` 0 of 6 (1 tie), R5 median `worse` 0 of 6 (2 ties), R5 q95 `worse` 0 of 6 (1 tie), B1 `better` 0 of 6 (1 tie) | 5.589 / 76.43 | 1.248 / 1.923 | 5.43 | 0 | `screened` |
+| WILD-023 `tight` | R5 q95 `no verdict` 0 of 6, R6 `no verdict` 0 of 6, R1 `no verdict` 2 of 6 | R5 q95 `better` 0 of 6 (4 ties), R6 `no verdict` 0 of 6 (3 ties), R1 `no verdict` 1 of 6 (3 ties) | 1.000 / 3.460 | 1.000 / 1.070 | 1.21 | 0 | `screened` |
+
+- The first screens of `venation` at `3a99fa5` added 46 `link-ends` breaks on 10 inputs of `screen-v2`, and 15 on 3 inputs of `screen-v1`. Each one is on `packed-grid`.
+- Items that touch give a backbone link with no length. That link then started inside its source box. The fix of `577bb94` keeps the first point, and a test pins it.
+- `venation` changes the links of 55 of 60 inputs of `screen-v2`. The median ratio of the link length over `depths` is 1.053.
+- With the Gabriel backbone, the ratio is 1.012, and Z3 length has no verdict with 2 of 6 families against. The links through items are `worse` for each variant.
+- Thus the move of `venation` gives no gain over `depths`, and NAT-016 is `dropped`.
+- With the rule `weights`, `knee` gets B1 `better` on `screen-v2`, with 2 of 6 families against.
+- On `screen-v2`, R1 is `worse` for `knee` with 3 of 6 families against, and for `bronchial` with 2 of 6.
+- The energy of `annealing` counts the crossings of the corner ways, but R1 of the routes does not go down. B1 goes down when a candidate leaves the links of other edges.
+- With the crossing weight 0, each named win of `annealing` is a tie. With the budget 200, the time is 5.36 times `shared` on `screen-v2`, and 5.86 times on `screen-v1`.
+- On `screen-v1`, the time of `annealing` is 3.41 times `shared`, and its median B1 ratio is 0.658.
+- `tight` with the order loose first is `worse` on R1, R12 and B1.
+- `board-portfolio` reads only the board. It runs the first `settings` (default 4) of the 12 settings of `BOARD_PORTFOLIO_SETTINGS`.
+- It skips a setting above its `maxNodes`, and a setting with a break of a hard rule. The least weighted sum of the rank shares of R1, the R5 median and B1 (inverted) wins.
+- A tie goes to the earlier setting. The option `settings` (1 to 12) sets the budget.
+- With all 12 settings, the median B1 ratio of `board-portfolio` is 6.591. The time is 26.6 times `pipeline` on `screen-v2`.
+
+### The prediction of wave 4A
+
+| Claim | Level | Result |
+|---|---|---|
+| 1. At most 1 of the 6 ideas gets B1 `better` against the default of its step on `screen-v2` with 0 families against it. | 0.6 | Met: 1 of 6 (`board-portfolio`). |
+| 2. RULE-021 takes 3 times or more the warm median time of `shared` on the router screen of `screen-v1`. | 0.5 | Met: 3.41 times. |
+| 3. WILD-045 gets `better` on R1 or B1 on `screen-v2` with 0 families against. | 0.35 | Met: R1 and B1 are `better` with 0 of 6 against. |
+| 4. NAT-016 changes Z3 by more than the tie on `screen-v2`. | 0.45 | Met: Z3 length is `worse`, with a median ratio of 1.053. The change is a loss. |
+| 5. The 6 strategies add 0 new hard-rule breaks on both sets. | medium | Partly met: `venation` added 61 `link-ends` breaks before the fix of `577bb94`. After the fix, each strategy adds 0. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #168. |
+
+### The queue after wave 4A
+
+The six ideas of the wave are built, so they leave the queue. `pnpm queue` gives these counts after the wave:
+
+| Count | Before the wave | After the wave |
+|---|---:|---:|
+| rows | 186 | 186 |
+| ranked ideas | 177 | 171 |
+| duplicates | 9 | 9 |
+| blocked ideas | 17 | 16 |
+| open targets of `screen-v2` | 46 | 46 |
+| ideas of the back test | 58 | 62 |
+
+- The new top 3 is `RULE-048`, `WILD-016` and `EDA-017`.
+- The rank correlation of the back test goes from 0.396 to 0.322.
+
+### The snapshots of the verdicts
+
+The snapshots hold the screens of this wave, with the registered strategies only. The variants are only in this section and in the idea records. The rows of the opt-in routers `annealing` and `tight` are in [`verdicts/opt-in/`](verdicts/README.md#the-opt-in-strategies), for the measured gain of the queue.
+The steps `levels` and `whole` get their first snapshots. For the other strategies, each row is the same as before.
+
+- Over all the `better` verdicts of `screen-v2`, 46 of 105 have 1 or more families against them. Over all the `better` and `worse` verdicts, 105 of 229 have.
+
+### The measures with no value
+
+- C3 has no value for the step `whole`, because it has no curves. Thus WILD-045 has no C3 verdict.
+- B3 q95 is the only B3 measure of the screen. The named win B3 of NAT-018 uses it.
 
 ## Gaps
 

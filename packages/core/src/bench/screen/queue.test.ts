@@ -130,6 +130,10 @@ describe("the idea queue (IDEA-QUEUE)", () => {
     // The strategy b is better on B1 (0.5) and closes the target of a on B1 (1). It is not better on B3.
     expect(measuredGain("b", ["B1", "B3"], [snap])).toBe(2.5);
     expect(measuredGain("c", ["B1"], [snap])).toBeUndefined();
+    // An opt-in strategy gets its rows from the opt-in snapshots of the newest set. Its targets do not count.
+    const optIn: QueueSnapshot = { ...snap, rows: [{ ...snap.rows[1]!, strategy: "c" }, { ...snap.rows[0]!, strategy: "d" }] };
+    expect(measuredGain("c", ["B1"], [snap], [optIn])).toBe(2.5);
+    expect(measuredGain("c", ["B1"], [snap], [{ ...optIn, set: "r" }])).toBeUndefined();
     const base = Object.fromEntries(Object.entries(ideas.find((r) => r.id === "HWY-001")!).filter(([k]) => !["same", "canonical", "dependsOn", "result"].includes(k))) as Idea;
     const q = buildQueue({
       ideas: [

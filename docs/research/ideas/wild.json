@@ -1498,14 +1498,86 @@
     "placementDependent": true,
     "screen": "The same test as WILD-022. Keep it when it beats the best order of WILD-022 on one measure with Â12 of 0.64 or more.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-022",
       "WILD-024",
       "EDA-010",
       "NAT-024"
     ],
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40795910435",
+      "records": [
+        "screen-v2/*/shared@3a99fa5",
+        "screen-v2/*/tight@3a99fa5",
+        "screen-v2/*/tight-loose@3a99fa5",
+        "screen-v2/*/tight-p6@3a99fa5",
+        "screen-v1/*/shared@3a99fa5",
+        "screen-v1/*/tight@3a99fa5",
+        "screen-v1/*/tight-loose@3a99fa5",
+        "screen-v1/*/tight-p6@3a99fa5"
+      ],
+      "measures": {
+        "R5 against shared": {
+          "base": {
+            "tiny-uniform": 1.182,
+            "small-clustered": 1.291,
+            "dense-groups": 1.313,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.181,
+            "small-clustered": 1.253,
+            "dense-groups": 1.273,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          }
+        },
+        "R6 against shared": {
+          "base": {
+            "tiny-uniform": 1.278,
+            "small-clustered": 1.623,
+            "dense-groups": 1.665,
+            "hub-chain": 1.032,
+            "many-groups": 1.392,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.274,
+            "small-clustered": 1.6,
+            "dense-groups": 1.619,
+            "hub-chain": 1.032,
+            "many-groups": 1.392,
+            "packed-grid": 1
+          }
+        },
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.6,
+            "small-clustered": 642.4,
+            "dense-groups": 1082.5,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40795910435 and the screen-v1 run 40795913236, at 3a99fa5. The strategy tight gets R5 q95 better with 0 of 6 families against on screen-v2, with 4 ties. R6 and R1 have no verdict. On screen-v1, each named win has no verdict. The order loose first is worse on R1, R12 and B1. The median time is 1.21 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-024",
@@ -1736,7 +1808,7 @@
     "placementDependent": true,
     "screen": "On the 3 case boards: keep it when R1 drops by 20% or more against corners, at a time below 10 T_c.",
     "prototype": "L",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-055",
       "WILD-024",
@@ -1746,7 +1818,99 @@
       "RULE-021"
     ],
     "canonical": "RULE-021",
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40795910435",
+      "records": [
+        "screen-v2/*/shared@3a99fa5",
+        "screen-v2/*/annealing@3a99fa5",
+        "screen-v2/*/annealing-s2@3a99fa5",
+        "screen-v2/*/annealing-x0@3a99fa5",
+        "screen-v2/*/annealing-b200@3a99fa5",
+        "screen-v1/*/shared@3a99fa5",
+        "screen-v1/*/annealing@3a99fa5",
+        "screen-v1/*/annealing-s2@3a99fa5",
+        "screen-v1/*/annealing-x0@3a99fa5",
+        "screen-v1/*/annealing-b200@3a99fa5"
+      ],
+      "measures": {
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.2,
+            "small-clustered": 765.6,
+            "dense-groups": 1415.6,
+            "hub-chain": 27.8,
+            "many-groups": 714.8,
+            "packed-grid": 269.3
+          }
+        },
+        "R12 against shared": {
+          "base": {
+            "tiny-uniform": 0.132,
+            "small-clustered": 0.151,
+            "dense-groups": 0.144,
+            "hub-chain": 0.627,
+            "many-groups": 0.505,
+            "packed-grid": 0.123
+          },
+          "new": {
+            "tiny-uniform": 0.12,
+            "small-clustered": 0.157,
+            "dense-groups": 0.165,
+            "hub-chain": 0.693,
+            "many-groups": 0.513,
+            "packed-grid": 0.123
+          }
+        },
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.016,
+            "small-clustered": 0.129,
+            "dense-groups": 0.201,
+            "hub-chain": 0.041,
+            "many-groups": 0.081,
+            "packed-grid": 0
+          }
+        },
+        "R5 against shared": {
+          "base": {
+            "tiny-uniform": 1.182,
+            "small-clustered": 1.291,
+            "dense-groups": 1.313,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.188,
+            "small-clustered": 1.229,
+            "dense-groups": 1.243,
+            "hub-chain": 1.025,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The screen of RULE-021. The records are the screen-v2 run 40795910435 and the screen-v1 run 40795913236, at 3a99fa5. The strategy annealing gets R5 q95 better with 1 of 6 families against on both sets. R1 is worse on screen-v2 with 3 of 6 against, R12 is worse with 1 of 6, and B1 is worse with 0 of 6. The median B1 ratio is 0.754. The median time is 3.77 times shared on screen-v2 and 3.41 times on screen-v1, and 5.36 times with the budget 200. With the crossing weight 0, each named win is a tie. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-029",
@@ -3139,14 +3303,86 @@
     "placementDependent": true,
     "screen": "On the boards of SCREEN: keep it when its score beats the best single setting on 60% of the boards.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-046",
       "WILD-047",
       "WILD-044",
       "NAT-045"
     ],
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40796356615",
+      "records": [
+        "screen-v2/*/pipeline@3a99fa5",
+        "screen-v2/*/board-portfolio@3a99fa5",
+        "screen-v2/*/board-portfolio-s12@3a99fa5",
+        "screen-v2/*/board-portfolio-ink@3a99fa5",
+        "screen-v1/*/pipeline@3a99fa5",
+        "screen-v1/*/board-portfolio@3a99fa5",
+        "screen-v1/*/board-portfolio-s12@3a99fa5",
+        "screen-v1/*/board-portfolio-ink@3a99fa5"
+      ],
+      "measures": {
+        "R1 against pipeline": {
+          "base": {
+            "tiny-uniform": 15.2,
+            "small-clustered": 1065,
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 9.7,
+            "small-clustered": 630.9,
+            "dense-groups": 1105.2,
+            "hub-chain": 42.8,
+            "many-groups": 503.3,
+            "packed-grid": 269.3
+          }
+        },
+        "R5 against pipeline": {
+          "base": {
+            "tiny-uniform": 1.176,
+            "small-clustered": 1.143,
+            "dense-groups": 1.102,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.678,
+            "small-clustered": 1.361,
+            "dense-groups": 1.365,
+            "hub-chain": 1.342,
+            "many-groups": 1.605,
+            "packed-grid": 1
+          }
+        },
+        "B1 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.007,
+            "small-clustered": 0.045,
+            "dense-groups": 0.066,
+            "hub-chain": 0.041,
+            "many-groups": 0.082,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.172,
+            "small-clustered": 0.24,
+            "dense-groups": 0.324,
+            "hub-chain": 0.251,
+            "many-groups": 0.349,
+            "packed-grid": 0
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40796356615 and the screen-v1 run 40796359270, at 3a99fa5. The strategy board-portfolio gets R1 and B1 better with 0 families against on both sets. The R5 median and q95 are worse with 0 of 6 against on both sets. The median B1 ratio over pipeline is 5.589. C3 has no value for the whole step. It reads no screen record. The median time is 5.43 times pipeline on screen-v2, and 26.6 times with 12 settings. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-046",

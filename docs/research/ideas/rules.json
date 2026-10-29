@@ -1225,7 +1225,7 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `mid-hubs`: keep it if R1 falls by 15% against the first choice, at the same R6.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "RULE-044",
       "RULE-025",
@@ -1239,7 +1239,99 @@
     "wave": 4,
     "rules": "Any rule, also discrete rules: crossing counts, highway membership, lane capacity.",
     "hardRules": "guard. Each candidate obeys the hard rules.",
-    "zoom": "hysteresis. The start state is the choice of the parent level, and a change costs."
+    "zoom": "hysteresis. The start state is the choice of the parent level, and a change costs.",
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40795910435",
+      "records": [
+        "screen-v2/*/shared@3a99fa5",
+        "screen-v2/*/annealing@3a99fa5",
+        "screen-v2/*/annealing-s2@3a99fa5",
+        "screen-v2/*/annealing-x0@3a99fa5",
+        "screen-v2/*/annealing-b200@3a99fa5",
+        "screen-v1/*/shared@3a99fa5",
+        "screen-v1/*/annealing@3a99fa5",
+        "screen-v1/*/annealing-s2@3a99fa5",
+        "screen-v1/*/annealing-x0@3a99fa5",
+        "screen-v1/*/annealing-b200@3a99fa5"
+      ],
+      "measures": {
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.2,
+            "small-clustered": 765.6,
+            "dense-groups": 1415.6,
+            "hub-chain": 27.8,
+            "many-groups": 714.8,
+            "packed-grid": 269.3
+          }
+        },
+        "R12 against shared": {
+          "base": {
+            "tiny-uniform": 0.132,
+            "small-clustered": 0.151,
+            "dense-groups": 0.144,
+            "hub-chain": 0.627,
+            "many-groups": 0.505,
+            "packed-grid": 0.123
+          },
+          "new": {
+            "tiny-uniform": 0.12,
+            "small-clustered": 0.157,
+            "dense-groups": 0.165,
+            "hub-chain": 0.693,
+            "many-groups": 0.513,
+            "packed-grid": 0.123
+          }
+        },
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.016,
+            "small-clustered": 0.129,
+            "dense-groups": 0.201,
+            "hub-chain": 0.041,
+            "many-groups": 0.081,
+            "packed-grid": 0
+          }
+        },
+        "R5 against shared": {
+          "base": {
+            "tiny-uniform": 1.182,
+            "small-clustered": 1.291,
+            "dense-groups": 1.313,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.188,
+            "small-clustered": 1.229,
+            "dense-groups": 1.243,
+            "hub-chain": 1.025,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40795910435 and the screen-v1 run 40795913236, at 3a99fa5. The strategy annealing gets R5 q95 better with 1 of 6 families against on both sets. R1 is worse on screen-v2 with 3 of 6 against, R12 is worse with 1 of 6, and B1 is worse with 0 of 6. The median B1 ratio is 0.754. The median time is 3.77 times shared on screen-v2 and 3.41 times on screen-v1, and 5.36 times with the budget 200. With the crossing weight 0, each named win is a tie. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-022",
