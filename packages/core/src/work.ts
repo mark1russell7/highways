@@ -21,7 +21,7 @@ export const WORK: WorkCounts = { lane: 0, corner: 0, sight: 0, score: 0, route:
 
 /**
  * The weight of each counter in a unit of work, in lane steps. The fit of `scripts/search-work.ts` gives them (run 40960950349).
- * The fit gives `sight` no weight, because the `route` counter holds that cost. One million units take approximately 2.7 ms on a CI runner.
+ * The fit gives `sight` no weight, because the `route` counter holds that cost. One million units take 1.5 ms to 2.7 ms on a CI runner (runs 40960950349 and 40964639537).
  */
 export const WORK_WEIGHTS: Readonly<WorkCounts> = Object.freeze({ lane: 1, corner: 11, sight: 0, score: 13, route: 24_000 });
 
