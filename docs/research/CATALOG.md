@@ -1439,6 +1439,91 @@ This prediction was written before the runs, on 2026-10-29.
 | 4. On the fresh set, the signs of `canals` on R1, B1 and B2 agree with the screens. | 0.7 | Met: R1, B1 and B2 are `better` on the two sets. |
 | 5. No default changes in this PR. | 0.95 | Met: the PR changes only scripts and docs. |
 
+## The physical routers (PHYSICAL)
+
+PHYSICAL builds three opt-in routers that move the points of the routes with forces. They use no grid and no search.
+
+| Strategy | Step | Start | Target | Baseline |
+|---|---|---|---|---|
+| `repel` | `router` | the lines of `straight` | Z11.gain near `straight`, with no loss on R12 and R1 | `shared`, `straight` |
+| `springs` | `router` | the routes of `shared` | R4.turn | `shared` |
+| `nudge` | `router` | the routes of `shared` | R16.low, R16.cv | `shared` |
+
+The module is `scripts/screens/physical.ts`. The highway strategies `fdeb` and `divided` were in the screens of BALANCE-STABILITY.
+
+### The design notes
+
+- `relaxRoutes` gives the forces. Each route gets legs of equal length, and its ends stay. All the points move together in each step.
+  - The boxes push the points near them. The points of other routes push the points. A spring pulls each point to the middle of its neighbors.
+  - After each step, a point in a box moves out of it with a space of 2.5 units. So each route acts as a rubber band round the boxes.
+- `repel` moves each point out through the side of its chord that is away from the center of the box. So all the points of one route go round a box on one side.
+  - That side changes only when the chord crosses the center of the box.
+- `keepRules` keeps the rule `no-pass-through`. A route through a box gets a backup route: `corners` for `repel`, and `shared` for `springs` and `nudge`.
+- `nudge` puts the legs of the routes into direction classes of near parallel legs. A track is the legs of one class on one line, so each lane of `shared` stays one lane.
+  - The tracks of a group of neighbors get even free gaps. A group whose new routes go through a box stays where it is.
+- The pseudo angle `dy / (|dx| + |dy|)` sorts the legs by direction, so `nudge` uses no `Math.atan2`.
+
+### The two rounds
+
+Each round screens the step `router` on `screen-v3` with 5 sets of 10 members, from the members 0 to 9 to the members 40 to 49.
+Each value is the mean ± SD over the 5 sets of the median of the set.
+
+- Round 1 ([0–9](https://github.com/mark1russell7/highways/actions/runs/40920910957), [10–19](https://github.com/mark1russell7/highways/actions/runs/40920915842), [20–29](https://github.com/mark1russell7/highways/actions/runs/40920920277), [30–39](https://github.com/mark1russell7/highways/actions/runs/40920925176), [40–49](https://github.com/mark1russell7/highways/actions/runs/40920929706)) had the first `repel` and the first `nudge`.
+  - The first `repel` had 16 legs for each route, and a projection only after the last step. On the members 0 of the 15 families, 836 of 1759 straight lines go through a box. The forces cleared only 230 of them. So 606 edges took the route of `corners`, and a change of the router is a jump.
+  - The first `nudge` moved only the legs parallel to an axis. Most of the legs of `shared` are not parallel to an axis, so it changed no measure.
+- Round 2 ([0–9](https://github.com/mark1russell7/highways/actions/runs/40923661182), [10–19](https://github.com/mark1russell7/highways/actions/runs/40923665787), [20–29](https://github.com/mark1russell7/highways/actions/runs/40923669648), [30–39](https://github.com/mark1russell7/highways/actions/runs/40923673609), [40–49](https://github.com/mark1russell7/highways/actions/runs/40923678426)) has the routers of this PR.
+  - The rubber band and the legs of 6 units or less bring the routes of `corners` from 606 to 175 on the members 0.
+  - All the 94 edges of `packed-grid` keep the route of `corners`. Its boxes touch, so no point fits between them.
+
+### The results
+
+The values are of round 2. A paired value is the median ratio to `shared` on the same input.
+
+| Router | Z11.gain | Z11.spill, clustered | R16.low | R16.cv | R12.share | Paired R1 | Paired R12 | Paired R4.turn | Time ratio |
+|---|---|---|---|---|---|---|---|---|---|
+| `straight` | 0.960 ± 0.001 | 0 | 0.236 ± 0.016 | 0.657 ± 0.021 | 0.286 ± 0.011 | 1.000 | 1.138 | 0 | 0.006 |
+| `shared` | 3.973 ± 0.257 | 0.045 ± 0.007 | 0.309 ± 0.018 | 1.012 ± 0.016 | 0.203 ± 0.008 | 1 | 1 | 1 | 1 |
+| `repel` | 6.880 ± 0.699 | 0.152 ± 0.012 | 0.149 ± 0.012 | 0.768 ± 0.010 | 0.112 ± 0.007 | 1.384 ± 0.034 | 0.613 ± 0.015 | 0.744 ± 0.021 | 52.1 ± 3.8 |
+| `springs` | 4.198 ± 0.426 | 0.059 ± 0.007 | 0.361 ± 0.008 | 1.417 ± 0.058 | 0.369 ± 0.004 | 1.804 ± 0.024 | 1.141 ± 0.007 | 0.451 ± 0.004 | 6.6 ± 0.3 |
+| `nudge` | 4.458 ± 0.581 | 0.120 ± 0.025 | 0.319 ± 0.010 | 0.954 ± 0.029 | 0.207 ± 0.010 | 1.127 ± 0.012 | 0.996 ± 0.004 | 1.011 ± 0.001 | 1.18 ± 0.00 |
+
+- No router breaks a hard rule on the 750 inputs of each round.
+- `repel` has the lowest R12.share and R16.low of the routers that go round the boxes. Its paired R12 is 0.61, and it halves R16.low.
+  - But it adds 38% of crossings, and it takes 52 times the time of `shared`.
+- `repel` does not bring Z11.gain down. Z11 adds the moves of all the routes. A rubber band round the moved box follows the box, so it adds to the gain and to the spill.
+  - The side flips of the chords and the routes of `corners` also add jumps.
+- `springs` removes 55% of the turn, but its curves cross 80% more, and R12 is worse.
+- `nudge` lowers R16.cv by 6%. Its R16.low does not change, and it adds 13% of crossings.
+- The second target of the strategist was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
+
+Thus no default changes, and no router goes to the promotion test. Each router fails the guard R1, and `repel` also fails the time test.
+
+### The ideas after PHYSICAL
+
+These ideas come from the results. Each one needs a screen before a verdict.
+
+- A crossing force for `repel`: two legs that cross push their points apart along the normal of the other leg.
+- A Z11 that does not count a route that follows its box. The strategist decides if the measure changes.
+- A border walk for boxes that touch: a route goes along the shared side, within the tolerance of the rule.
+- A faster `repel`: fewer steps on the long free legs, or a projection only near the boxes.
+- `nudge` with a test of the crossings: a group whose move adds a crossing stays where it is.
+
+### The prediction of PHYSICAL
+
+This prediction was written before the runs, on 2026-10-29. The results are of round 2.
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. `repel`: the mean median Z11.gain is 1.5 or less. | 0.55 | Not met: 6.88 ± 0.70. |
+| 2. `repel`: the paired median R1 against `shared` is 1.02 or less. | 0.35 | Not met: 1.384. |
+| 3. `repel`: the paired median R12.share is no worse than `shared`. | 0.4 | Met: 0.613. |
+| 4. `repel`: 0 breaks of a hard rule on all the inputs. | 0.85 | Met: 0 of 750. |
+| 5. `repel`: the median Z11.spill on the clustered families is 0.10 or less. | 0.5 | Not met: 0.152. |
+| 6. `nudge`: R16.low falls by 20% or more, with Z11.gain within 10% of `shared`. | 0.5 | Not met: R16.low 0.319 against 0.309, Z11.gain +12%. |
+| 7. `springs`: the median R4.turn falls by 10% or more. | 0.6 | Met: the paired R4.turn is 0.451. |
+| 8. `repel`: the time ratio against `shared` is 3 or less. | 0.4 | Not met: 52.1. |
+| 9. No default output changes. | 0.97 | Met: the routers are opt-in, and the hashes of `ROUTERS` stay. |
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
