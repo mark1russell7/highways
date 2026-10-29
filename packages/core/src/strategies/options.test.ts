@@ -92,7 +92,7 @@ describe("the declarations of the built-in strategies (OPTS)", () => {
     expect(roomStrategies.routes.defaults).toEqual({});
     expect(optionDefaults(routerStrategies["sections-tree"])).toMatchObject({ stretch: Infinity, hubSlack: 80, cap: 8, margin: 5 });
     expect(optionDefaults(routerStrategies["shared-all"])).not.toHaveProperty("rule");
-    expect(optionDefaults(routerStrategies["corners-smooth"])).toEqual({ margin: 5, k: 8, smooth: true, plugs: "facing", plugGap: 0, outside: "throw" });
+    expect(optionDefaults(routerStrategies["corners-smooth"])).toEqual({ margin: 5, k: 8, smooth: true, plugs: "facing", plugGap: 0, outside: "throw", inner: "corners", bendCost: 16 });
   });
 
   it("list the options in the order of the schema, with the effective defaults", () => {

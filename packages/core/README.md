@@ -99,6 +99,16 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - `throw` (the default) throws a `RangeError`.
   - `skip` gives no route to the edges of that node.
   - `clamp` cuts the box to the bounds of the frame.
+- The option `inner` sets the mode of the inner routes:
+  - `corners` (the default) finds each route in the corner graph, as above.
+  - `gutter` gives orthogonal routes in the gaps between the nodes and in the strips at the walls.
+- In the mode `gutter`, a route uses the whole box of the frame. The mode does not use `frameInset`.
+- A route of the mode `gutter` goes into its row at the port, or at the left or right end of the row.
+- The plug stub stays perpendicular to the wall. A plug that is level with its row gives only the stub.
+- The option `bendCost` is the cost of one bend in units of length. A larger cost gives fewer bends. The default is 16.
+- Each gap that two or more routes share gets one lane for each route. The lanes are evenly spaced, in an order with few crossings.
+- The space between two lanes is the margin of the router. In a narrow gap, the space becomes smaller.
+- An edge with no way through the free room gets no route, as with `skip`. Rows that touch each other with gap 0 can block a way.
 
 ```ts
 const nodes = [
@@ -107,6 +117,7 @@ const nodes = [
 ];
 const edges = [{ id: "inner", source: { node: "row" }, target: { node: "card", port: "in" } }];
 const inner = cornersRouter({ name: "corners" }).route({ nodes, edges }).routes; // inner[0].frame is "card"
+const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }).route({ nodes, edges }).routes; // only H and V legs
 ```
 
 ## Curve types
