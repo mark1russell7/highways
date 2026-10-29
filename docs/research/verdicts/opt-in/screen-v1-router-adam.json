@@ -1,0 +1,17 @@
+{
+  "set": "screen-v1",
+  "step": "router",
+  "base": "shared",
+  "level": 0.05,
+  "run": 40814235847,
+  "commit": "6605f5d5538cea46ebf0406d1b0dfb3b35c5abb1",
+  "date": "2026-10-29",
+  "core": "0.9.4",
+  "rows": [
+    {"strategy":"adam","guard":"R1","measure":"route.crossings","label":"no verdict","old":"tie","stratified":0,"pooled":0,"p":1,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":0,"sign":0},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},
+    {"strategy":"adam","guard":"R4","measure":"route.turn.mean","label":"no verdict","old":"worse","stratified":-0.007588396749818306,"pooled":-0.007303444820409959,"p":0.125,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":-0.01717145700549505,"sign":-1},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.02016741922486065,"sign":-1},{"family":"tiny-uniform","n":3,"mean":-0.00819150426855414,"sign":-1}],"breadth":{"against":0,"of":6,"ties":3}},
+    {"strategy":"adam","guard":"R5 q0.95","measure":"route.detour.q95","label":"no verdict","old":"tie","stratified":-0.000007044268075567178,"pooled":-0.0000090569160971578,"p":0.5,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.00003921335972423279,"sign":0},{"family":"tiny-uniform","n":3,"mean":-0.000003052248729170278,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},
+    {"strategy":"adam","guard":"R11 min","measure":"route.plug-spacing.min","label":"no verdict","old":"tie","stratified":0,"pooled":0,"p":1,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":0,"sign":0},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},
+    {"strategy":"adam","guard":"B1","measure":"route.bundle.ink-saved","label":"no verdict","old":"tie","stratified":-0.00008085436804755597,"pooled":-0.00010298222956635548,"p":0.0625,"families":[{"family":"dense-groups","n":3,"mean":0,"sign":0},{"family":"hub-chain","n":1,"mean":-0.0000068137054635153405,"sign":0},{"family":"many-groups","n":1,"mean":0,"sign":0},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-0.0004639367869302043,"sign":0},{"family":"tiny-uniform","n":3,"mean":-0.000014375715891616162,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}}
+  ]
+}

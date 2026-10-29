@@ -15,6 +15,10 @@ import type { BalanceOptions } from "../highways/balance/index.ts";
 import type { ManifoldOptions } from "../highways/manifolds/index.ts";
 import type { DetailOptions } from "../levels/detail/index.ts";
 import type { CurriculumOptions } from "../whole/curriculum/index.ts";
+import type { SlotOptions } from "../highways/slots/index.ts";
+import type { PreferenceOptions } from "../whole/preferences/index.ts";
+import type { FireflyOptions } from "../whole/fireflies/index.ts";
+import type { TracingOptions } from "../whole/tracing/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
@@ -1100,6 +1104,16 @@ export const MANIFOLD_SCHEMA: OptionSchema<ManifoldOptions> = {
   from: { ...HIGHWAY_BASE, default: "shared-ways" },
 };
 
+/** The declarations of the options of the highway strategy `slots` (RULE-047). */
+export const SLOT_SCHEMA: OptionSchema<SlotOptions> = {
+  pull: { type: "number", min: 0.25, max: 8, step: 0.25, marks: [0.5, 1, 2, 4, 8], default: 2, describe: "The weight of the pull toward the slot of a new lane." },
+  reach: { type: "number", min: 8, max: 64, step: 4, marks: [8, 16, 24, 48, 64], default: 24, describe: "A route point farther than this distance from a trunk gets no pull." },
+  laneSpacing: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 4, describe: "The distance between two lanes of a trunk." },
+  maxStretch: { type: "number", min: 1.05, max: 2, step: 0.05, marks: [1.1, 1.25, 1.5, 2], default: 1.25, describe: "The largest new length of a route over its first length after it joins a trunk." },
+  keys: { type: "enum", values: ["same", "any"], default: "same", describe: "The edges that can join a trunk: only the edges with the key of the trunk, or each edge." },
+  from: { ...HIGHWAY_BASE, default: "shared-ways" },
+};
+
 /** The declarations of the options of the plug strategy `leaders` (EDA-041). */
 export const LEADER_SCHEMA: OptionSchema<LeaderOptions> = {
   leader: { type: "enum", values: ["s", "po", "opo"], default: "po", describe: "The type of leader: the order of the angles, the order along the wall, or even places." },
@@ -1123,4 +1137,32 @@ export const CURRICULUM_SCHEMA: OptionSchema<CurriculumOptions> = {
   passes: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "The number of passes over the edges in each stage." },
   settings: { type: "integer", min: 2, max: 3, step: 1, default: 3, describe: "The number of settings in the pool of routes, from the start of its list." },
   detour: { type: "number", min: 1.5, max: 4, step: 0.25, marks: [1.5, 2, 3], default: 2, describe: "A new route has a detour of at most this value, or of its old route." },
+};
+
+/** The declarations of the options of the whole strategy `preferences` (RULE-038). */
+export const PREFERENCE_SCHEMA: OptionSchema<PreferenceOptions> = {
+  l2: { type: "number", min: 0, max: 1, step: 0.01, marks: [0, 0.01, 0.1, 1], default: 0.01, describe: "The weight of the L2 term of the fit of the weights to the made-up pairs." },
+  passes: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "The number of passes over the edges." },
+  settings: { type: "integer", min: 2, max: 3, step: 1, default: 3, describe: "The number of settings in the pool of routes, from the start of its list." },
+  detour: { type: "number", min: 1.5, max: 4, step: 0.25, marks: [1.5, 2, 3], default: 2, describe: "A new route has a detour of at most this value, or of its old route." },
+};
+
+/** The declarations of the options of the whole strategy `fireflies` (NAT-047). */
+export const FIREFLY_SCHEMA: OptionSchema<FireflyOptions> = {
+  search: { type: "enum", values: ["firefly", "bees"], default: "firefly", describe: "The search: the firefly algorithm, or the artificial bee colony." },
+  budget: { type: "integer", min: 4, max: 40, step: 1, marks: [4, 12, 20, 40], default: 12, describe: "The largest number of different settings that the search routes." },
+  colony: { type: "integer", min: 4, max: 20, step: 1, marks: [4, 6, 10, 20], default: 6, describe: "The number of fireflies or food sources." },
+  gamma: { type: "number", min: 0.01, max: 10, step: 0.01, scale: "log", marks: [0.01, 0.1, 1, 10], default: 1, describe: "The absorption of the light of a firefly." },
+  alpha: { type: "number", min: 0.01, max: 0.5, step: 0.01, marks: [0.01, 0.1, 0.2, 0.5], default: 0.2, describe: "The size of the random step of a firefly, as a share of the range." },
+  limit: { type: "integer", min: 10, max: 100, step: 10, marks: [10, 50, 100], default: 10, describe: "A scout bee leaves a food source after this number of tries with no gain." },
+  seed: { type: "integer", min: 0, max: 1_000_000, step: 1, marks: [1, 2, 3], default: 1, describe: "The seed of the search. The same seed gives the same routes." },
+};
+
+/** The declarations of the options of the whole strategy `tracing` (WILD-057). */
+export const TRACING_SCHEMA: OptionSchema<TracingOptions> = {
+  crossing: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2, 4], default: 1, describe: "The weight of a crossing in the tracing load." },
+  merge: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2, 4], default: 2, describe: "The weight of a merge or a split where the edge is not an outer lane." },
+  bend: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 0.5, 1, 4], default: 0.5, describe: "The weight of a bend in the tracing load." },
+  settings: { type: "integer", min: 1, max: 12, step: 1, marks: [1, 4, 8, 12], default: 4, describe: "The number of settings that the strategy tries, from the start of its list." },
+  quantile: { type: "enum", values: ["q50", "q95", "mean"], default: "q95", describe: "The value of the loads of the edges that the pick reads." },
 };
