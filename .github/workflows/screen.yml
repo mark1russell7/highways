@@ -36,6 +36,9 @@ on:
       set:
         description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
         default: "screen-v1"
+      members:
+        description: "The members of each family, as from-to, for example 10-23, in place of the members of the set (PROMO-CANALS). Empty: the members of the set."
+        default: ""
       activation:
         description: "The families of the decision inputs of the activation report (ACTIVATION), with commas, or all. Empty: no report."
         default: ""
@@ -56,7 +59,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
+  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.members }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
   cancel-in-progress: true
 
 jobs:
@@ -101,6 +104,7 @@ jobs:
       EDITS: ${{ inputs.edits || '0' }}
       SET: ${{ inputs.set || 'screen-v1' }}
       ACTIVATION: ${{ inputs.activation || '' }}
+      MEMBERS: ${{ inputs.members || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -123,6 +127,7 @@ jobs:
             args+=(--module "$modules")
           fi
           [ -n "$FAMILIES" ] && args+=(--families "$FAMILIES")
+          [ -n "$MEMBERS" ] && args+=(--members "$MEMBERS")
           [ -n "$WRAP" ] && args+=(--wrap "$WRAP")
           [ "$SHUFFLES" != "0" ] && args+=(--shuffles "$SHUFFLES")
           [ "$EDITS" != "0" ] && args+=(--edits "$EDITS")
