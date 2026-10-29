@@ -139,6 +139,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | BALANCE-STABILITY | Three new measures of each record of the screen. R16 is the spread of the gaps between parallel routes. Z11 is the response of the routes to a move of one node by one unit. Z12 is the move of the routes with the next seed of a strategy. On `screen-v3`, the grid routers move the edges of a moved node by approximately 4 units for each unit, and other routes move little. [The measures](research/MEASURES.md#routes). | 2026-10-29 | #184 |
 | SCHEMA-GRID | The option `ratio` of the highway strategy `scale-space` has the default √2, and no step. Its old step 0.1 did not hold the default, so a host that checks the step refused it. A test keeps each number default on its step. | 2026-10-29 | #187 |
 | PHYSICAL | Three opt-in routers that move the routes with forces, with no grid and no search. `repel` makes rubber bands of the straight lines round the boxes. `springs` smooths `shared`, and `nudge` gives even gaps to its parallel legs. `repel` halves R16.low and lowers R12, but it does not lower Z11.gain, and it adds crossings. No default changes. [The results](research/CATALOG.md#the-physical-routers-physical). | 2026-10-29 | #190 |
+| CI-OK | The job `CI OK` of the workflow `CI` needs each job of the gate: the shared checks, the heap gate and the cells of `Xplat`. `Xplat` is now a job of `CI`, so the ruleset can name one check. | 2026-10-29 | #197 |
 
 ## Calibration
 
