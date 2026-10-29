@@ -7,6 +7,13 @@ import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 
+/** This function gives the last count of split verdicts that CATALOG.md states for a set. The newest wave comes last. */
+function splitCount(set: string): RegExpMatchArray | undefined {
+  const catalog = readFileSync(join(root, "docs/research/CATALOG.md"), "utf8");
+  const re = new RegExp(`Over all the \`better\` verdicts of \`${set}\`, (\\d+) of (\\d+) have 1 or more families against them`, "g");
+  return [...catalog.matchAll(re)].at(-1);
+}
+
 const roadmap = ["# R", "", "## Shipped", "", "| Id | Item | Shipped | Link |", "|---|---|---|---|", "| A1 | The `x` router. | 2026-10-01 | `abcdef1` |", "| B2 | [The opt-in router](research/A.md#b) `y`. | 2026-10-02 | #12 |", "| REL1 | Version 1, opt-in. | 2026-10-03 | #13 |", "", "## Calibration", "| C | d | e | f |"].join("\n");
 
 describe("results data", () => {
@@ -57,9 +64,8 @@ describe("the committed files of the results page", () => {
   });
 
   it("gives the same count of split verdicts on screen-v2 as CATALOG.md", () => {
-    const catalog = readFileSync(join(root, "docs/research/CATALOG.md"), "utf8");
-    const m = /Over all the `better` verdicts of `screen-v2`, (\d+) of (\d+) have 1 or more families against them/.exec(catalog);
-    expect(m).not.toBeNull();
+    const m = splitCount("screen-v2");
+    expect(m).toBeDefined();
     const v2 = files.map((f) => parseSnapshot(f.text, f.name)).filter((s) => s.set === "screen-v2");
     const split = v2.flatMap(splitVerdicts);
     expect(split.length).toBe(Number(m![1]));
@@ -70,10 +76,10 @@ describe("the committed files of the results page", () => {
   it("builds the page data from the committed files", () => {
     const data = readResults(root);
     expect(data.tables).toHaveLength(files.length);
-    expect(data.splitSet).toBe("screen-v2");
-    const catalog = readFileSync(join(root, "docs/research/CATALOG.md"), "utf8");
-    const m = /Over all the `better` verdicts of `screen-v2`, (\d+) of (\d+) have 1 or more families against them/.exec(catalog);
+    expect(data.splitSet).toBe("screen-v3");
+    const m = splitCount("screen-v3");
     expect(data.split.length).toBe(Number(m?.[1]));
+    expect(data.betterCount).toBe(Number(m?.[2]));
     expect(data.ideas.total).toBe(ideaRecords(root).length);
     expect(data.ideas.stages.reduce((n, s) => n + s.count, 0)).toBe(data.ideas.total);
     expect(data.ideas.kept.length).toBeGreaterThan(0);

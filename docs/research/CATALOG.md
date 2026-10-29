@@ -1271,7 +1271,7 @@ The run [40806222637](https://github.com/mark1russell7/highways/actions/runs/408
 The step `plugs` gets its first snapshots, and `screen-v3` gets its first snapshots for each step. For the other strategies, each row is the same as before.
 
 - Over all the `better` verdicts of `screen-v2`, 46 of 118 have 1 or more families against them. Over all the `better` and `worse` verdicts, 106 of 255 have.
-- On `screen-v3`, 72 of 118 `better` verdicts have families against them, and 141 of 251 `better` and `worse` verdicts have.
+- Over all the `better` verdicts of `screen-v3`, 72 of 118 have 1 or more families against them. Over all the `better` and `worse` verdicts, 141 of 251 have.
 
 ### The measures with no value
 
