@@ -58,6 +58,8 @@ import type { WspdOptions } from "../highways/wspd/index.ts";
 import type { ZipperOptions } from "../highways/zipper/index.ts";
 import type { LaneStretchOptions } from "../lane-orders/stretch/index.ts";
 import type { DepthLevelOptions } from "../levels/depths/index.ts";
+import type { VenationOptions } from "../levels/venation/index.ts";
+import type { BoardPortfolioOptions } from "../whole/portfolio/index.ts";
 import type { CornersOptions } from "../routers/corners.ts";
 import type { SectionsOptions } from "../routers/sections.ts";
 import type { SharedOptions } from "../routers/shared.ts";
@@ -1013,4 +1015,22 @@ export const BRONCHIAL_SCHEMA: OptionSchema<BronchialOptions> = {
   smallest: { type: "integer", min: 1, max: 3, step: 1, default: 1, describe: "A set with this number of targets or fewer stops the splits." },
   detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "An edge rides the tree only when its path in the tree is this many times its first route or less." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A stretch of a tree with fewer edges than this number is not a highway." },
+};
+
+/** The declarations of the options of the level strategy `venation` (NAT-016): the options of `depths`, and the options of the backbone. */
+export const VENATION_SCHEMA: OptionSchema<VenationOptions> = {
+  ...DEPTHS_SCHEMA,
+  backbone: { type: "enum", values: ["rng", "gabriel"], default: "rng", describe: "The graph of the backbone: the relative neighbourhood graph, or the Gabriel graph." },
+  discount: { type: "number", min: 0, max: 0.8, step: 0.05, marks: [0, 0.4, 0.8], default: 0.4, describe: "The share of the cost of a backbone link that a later level link saves when an earlier link uses it." },
+  detour: { type: "number", min: 1, max: 3, step: 0.05, marks: [1.25, 1.5, 2], default: 1.5, describe: "A level link takes its way on the backbone only when that way is this many times its direct link or less." },
+  maxItems: { type: "integer", min: 10, max: 2000, step: 10, marks: [100, 400, 1000], default: 400, describe: "A level with more items than this number keeps the links of `depths`." },
+};
+
+/** The declarations of the options of the whole strategy `board-portfolio` (WILD-045). */
+export const BOARD_PORTFOLIO_SCHEMA: OptionSchema<BoardPortfolioOptions> = {
+  settings: { type: "integer", min: 3, max: 12, step: 1, marks: [3, 4, 8, 12], default: 4, describe: "The number of settings that the portfolio tries, from the start of its list." },
+  crossings: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the crossings (R1) in the score." },
+  detour: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the median detour (R5) in the score." },
+  ink: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2], default: 1, describe: "The weight of the ink saved (B1) in the score." },
+  budget: { type: "number", min: 0, max: 10, step: 0.1, marks: [0, 1, 10], default: 0, describe: "The time budget in seconds. The value 0 sets no budget." },
 };

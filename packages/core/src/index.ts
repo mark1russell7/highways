@@ -20,6 +20,8 @@ export * from "./room/levels/index.ts";
 export * from "./plugs/facing/index.ts";
 export * from "./levels/depths/index.ts";
 export * from "./whole/pipeline/index.ts";
+export * from "./levels/venation/index.ts";
+export * from "./whole/portfolio/index.ts";
 export * from "./bench/properties.ts";
 export * from "./bench/quality.ts";
 export * from "./bench/links.ts";
