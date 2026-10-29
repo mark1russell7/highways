@@ -92,6 +92,33 @@ export interface SharedNegotiation {
   readonly laneWidth: number;
 }
 
+/**
+ * The search of the corner graph of one route of `shared`, for the hooks of `SharedHooks`.
+ * An index below `corners` is a corner of the graph. Each end of a way gets an index from `corners`, one for each place.
+ */
+export interface SharedSearch {
+  /** The graph of the route, without the inner edges of a frame. */
+  readonly graph: Graph;
+  /** The number of corners of the corner graph. */
+  readonly corners: number;
+  /** This function gives the key of the link between the indices `i` and `j`, for each order of the two. */
+  link(i: number, j: number): number;
+  /**
+   * This function gives a shortest way of `w` through the corner graph, with its points and their indices, or `undefined`.
+   * The function `cost` can change the cost of the link from corner `i` to corner `j`, of length `d`. It must give at least `floor` × `d`.
+   */
+  find(w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number): { seq: Point[]; ids: number[] } | undefined;
+}
+
+/**
+ * The hooks of a router that `shared` runs (WILD-023, RULE-021). The router `shared` itself has no hooks.
+ * `order` gives the order of the ways before the first pass. `refine` changes the ways after the passes, before the runs.
+ */
+export interface SharedHooks {
+  readonly order?: (ways: readonly Way[], search: SharedSearch) => Way[];
+  readonly refine?: (ways: readonly Way[], search: SharedSearch) => void;
+}
+
 /** A way of one edge through the corner graph. */
 export interface Way {
   readonly edge: Edge;
@@ -129,7 +156,7 @@ function turn(from: Point, base: Point, to: Point): number {
  * Thus the edges of a key come together on common ways. Each stretch that several edges share has the same points in each route.
  * The result gives each stretch as a run, with the order of its lanes.
  */
-export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotiation): Router {
+export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotiation, hooks?: SharedHooks): Router {
   const discount = Math.min(1, Math.max(0.05, options.discount ?? 0.5));
   const flow = options.cost === "flow";
   const alpha = Math.min(1, Math.max(0.1, options.alpha ?? 0.6));
@@ -177,7 +204,17 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
 
       // The edges of one key go one after the other, by default the longest first, so that the short edges join the long ways.
       const discounted = new Map<string, Map<number, string[]>>();
-      const order = orderWays(all, options.order ?? "span", graph);
+      const search: SharedSearch = {
+        graph,
+        corners: corners.points.length,
+        link,
+        find: (w, cost, floor = 1) => {
+          const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
+          return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
+        },
+      };
+      const sorted = orderWays(all, options.order ?? "span", graph);
+      const order = hooks?.order ? hooks.order(sorted, search) : sorted;
       // The largest number of edges on one link of each key. The cost share of that number is the floor of the search.
       const top = new Map<string, number>();
       // The width of the channel of each link, for the option `capacity`. Each link gets its width at its first use.
@@ -308,6 +345,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
         }
       }
 
+      hooks?.refine?.(order, search);
       // With `merge: snell`, each route that joins or leaves a run moves its merge point along the run to the Snell angle.
       if (options.merge === "snell") {
         const pad = ways.margin / 2;
