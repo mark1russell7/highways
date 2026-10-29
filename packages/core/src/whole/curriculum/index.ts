@@ -56,6 +56,56 @@ function shapeOf(route: Route): Shape {
   return { route, x0, y0, x1, y1 };
 }
 
+/** The sine of 5 degrees, as a literal. A literal gives the same bits on each platform, so a decision does not depend on `Math.sin`. */
+const SIN_5 = 0.08715574274765817;
+
+/** The constants of the arc sine of fdlibm (`e_asin.c`). */
+const PIO2_HI = 1.5707963267948966;
+const PIO2_LO = 6.123233995736766e-17;
+const PIO4_HI = 0.7853981633974483;
+const PS = [1.66666666666666657415e-1, -3.25565818622400915405e-1, 2.01212532134862925881e-1, -4.00555345006794114027e-2, 7.91534994289814532176e-4, 3.47933107596021167570e-5] as const;
+const QS = [-2.40339491173441421878, 2.02094576023350569471, -6.88283971605453293030e-1, 7.70381505559019352791e-2] as const;
+const WORDS = new DataView(new ArrayBuffer(8));
+
+/** This function gives the rational part `p / q` of the arc sine of fdlibm at `t`. */
+function asinRatio(t: number): [number, number] {
+  const p = t * (PS[0] + t * (PS[1] + t * (PS[2] + t * (PS[3] + t * (PS[4] + t * PS[5])))));
+  const q = 1 + t * (QS[0] + t * (QS[1] + t * (QS[2] + t * QS[3])));
+  return [p, q];
+}
+
+/**
+ * This function gives the arc sine of `x` in radians, from -1 to 1. It is the algorithm of fdlibm, with only `+`, `*`, `/` and `Math.sqrt`.
+ * These operations are exact to the last bit on each platform, so the result does not depend on the engine.
+ */
+export function arcsin(x: number): number {
+  const ax = Math.abs(x);
+  if (Number.isNaN(x) || ax > 1) return Number.NaN;
+  if (ax === 1) return x * PIO2_HI + x * PIO2_LO;
+  if (ax < 0.5) {
+    if (ax < 2 ** -27) return x;
+    const [p, q] = asinRatio(x * x);
+    return x + x * (p / q);
+  }
+  const t = (1 - ax) * 0.5;
+  const [p, q] = asinRatio(t);
+  const s = Math.sqrt(t);
+  let r: number;
+  WORDS.setFloat64(0, ax);
+  if (WORDS.getUint32(0) >= 0x3fef3333) {
+    r = PIO2_HI - (2 * (s + s * (p / q)) - PIO2_LO);
+  } else {
+    WORDS.setFloat64(0, s);
+    WORDS.setUint32(4, 0);
+    const w = WORDS.getFloat64(0);
+    const c = (t - w * w) / (s + w);
+    const pp = 2 * s * (p / q) - (PIO2_LO - 2 * c);
+    const qq = PIO4_HI - 2 * w;
+    r = PIO4_HI - (pp - qq);
+  }
+  return x > 0 ? r : -r;
+}
+
 /** This function gives the distance between the segments `ab` and `cd`, when they do not cross. */
 function segmentGap(a: Point, b: Point, c: Point, d: Point): number {
   const at = (p: Point, u: Point, v: Point): number => {
@@ -63,7 +113,9 @@ function segmentGap(a: Point, b: Point, c: Point, d: Point): number {
     const dy = v.y - u.y;
     const l2 = dx * dx + dy * dy;
     const t = l2 > 0 ? Math.max(0, Math.min(1, ((p.x - u.x) * dx + (p.y - u.y) * dy) / l2)) : 0;
-    return Math.hypot(p.x - u.x - t * dx, p.y - u.y - t * dy);
+    const ex = p.x - u.x - t * dx;
+    const ey = p.y - u.y - t * dy;
+    return Math.sqrt(ex * ex + ey * ey);
   };
   return Math.min(at(a, c, d), at(b, c, d), at(c, a, b), at(d, a, b));
 }
@@ -77,28 +129,27 @@ export function pairCosts(a: readonly Point[], b: readonly Point[]): Record<Curr
   let r1 = 0;
   let r2 = 0;
   let r12 = 0;
-  const sin5 = Math.sin((5 * Math.PI) / 180);
   for (let i = 1; i < a.length; i++) {
     const p = a[i - 1]!;
     const q = a[i]!;
     const ux = q.x - p.x;
     const uy = q.y - p.y;
-    const lu = Math.hypot(ux, uy);
+    const lu = Math.sqrt(ux * ux + uy * uy);
     if (lu <= 1e-9) continue;
     for (let j = 1; j < b.length; j++) {
       const r = b[j - 1]!;
       const s = b[j]!;
       const vx = s.x - r.x;
       const vy = s.y - r.y;
-      const lv = Math.hypot(vx, vy);
+      const lv = Math.sqrt(vx * vx + vy * vy);
       if (lv <= 1e-9) continue;
       if (segmentsCross(p, q, r, s)) {
         r1++;
-        const angle = (Math.asin(Math.min(1, Math.abs(ux * vy - uy * vx) / (lu * lv))) * 180) / Math.PI;
+        const angle = (arcsin(Math.min(1, Math.abs(ux * vy - uy * vx) / (lu * lv))) * 180) / Math.PI;
         r2 += 1 - angle / 90;
         continue;
       }
-      if (Math.abs(ux * vy - uy * vx) > sin5 * lu * lv) continue;
+      if (Math.abs(ux * vy - uy * vx) > SIN_5 * lu * lv) continue;
       const t0 = ((r.x - p.x) * ux + (r.y - p.y) * uy) / lu;
       const t1 = ((s.x - p.x) * ux + (s.y - p.y) * uy) / lu;
       const overlap = Math.min(lu, Math.max(t0, t1)) - Math.max(0, Math.min(t0, t1));

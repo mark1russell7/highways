@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { checkProperties } from "../../bench/properties.ts";
 import { clustered, hub } from "../../highways/fixtures.test-util.ts";
 import { checkOptions, CURRICULUM_POOL, wholeStrategies } from "../../strategies/index.ts";
-import { CURRICULUM_DEFAULTS, curriculum, pairCosts } from "./index.ts";
+import { arcsin, CURRICULUM_DEFAULTS, curriculum, pairCosts } from "./index.ts";
 
 /** This function gives the sum of the costs of one rule over each pair of routes. */
 function total(routes: readonly { points: readonly { x: number; y: number }[] }[], rule: "R1" | "R12" | "R2"): number {
@@ -12,6 +12,13 @@ function total(routes: readonly { points: readonly { x: number; y: number }[] }[
 }
 
 describe("the whole strategy curriculum (RULE-048)", () => {
+  it("gives the arc sine of fdlibm to the last bit, with no transcendental Math call", () => {
+    const xs = [0, 1, -1, 0.5, -0.5, 0.975, 0.9749999940395355, 0.97499999, 2 ** -27, 2 ** -28, 1e-300, Number.MIN_VALUE, 1 - 2 ** -53];
+    for (let i = 0; i <= 20000; i++) xs.push(i / 20000, -i / 20000, Math.sqrt(i / 20000), (i * 0.618033988749895) % 1);
+    for (const x of xs) expect(Object.is(arcsin(x), Math.asin(x)), `arcsin(${x})`).toBe(true);
+    expect(arcsin(1.5)).toBeNaN();
+  });
+
   it("gives the costs of the rules between two routes", () => {
     const h = [
       { x: 0, y: 0 },

@@ -5,6 +5,9 @@ import type { OptionSchema } from "../../strategies/options.ts";
 import { sharedRouter, type SharedSearch, type Way } from "../shared.ts";
 import { byCollection } from "../trunks.ts";
 
+/** The sine of 1 degree, as a literal. A literal gives the same bits on each platform, so a decision does not depend on `Math.sin`. */
+const SIN_1 = 0.01745240643728351;
+
 /** The options of the router `reroute` (RULE-044: a corner graph with the prices of the rules, and rounds of rip-up and reroute). */
 export interface RerouteOptions {
   /** The price of a link in a narrow channel, from 0 to 2. The default is 1. */
@@ -48,10 +51,10 @@ export function turnsOf(seq: readonly Point[]): number {
     const uy = b.y - a.y;
     const vx = c.x - b.x;
     const vy = c.y - b.y;
-    const lu = Math.hypot(ux, uy);
-    const lv = Math.hypot(vx, vy);
+    const lu = Math.sqrt(ux * ux + uy * uy);
+    const lv = Math.sqrt(vx * vx + vy * vy);
     if (lu <= 1e-9 || lv <= 1e-9) continue;
-    if (Math.abs(ux * vy - uy * vx) > Math.sin(Math.PI / 180) * lu * lv || ux * vx + uy * vy < 0) turns++;
+    if (Math.abs(ux * vy - uy * vx) > SIN_1 * lu * lv || ux * vx + uy * vy < 0) turns++;
   }
   return turns;
 }
