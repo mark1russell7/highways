@@ -4223,12 +4223,73 @@
     "placementDependent": true,
     "screen": "Rank the 9 routers on 3 boards: keep the measure when its ranks differ from the ranks of R1, with a Kendall tau below 0.8.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "WILD-058",
       "HWY-049"
     ],
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40812975829",
+      "records": [
+        "screen-v2/*/pipeline@6605f5d",
+        "screen-v2/*/tracing@6605f5d",
+        "screen-v2/*/tracing-m0.5@6605f5d",
+        "screen-v2/*/tracing-q50@6605f5d",
+        "screen-v2/*/tracing-s12@6605f5d",
+        "screen-v3/*/pipeline@6605f5d",
+        "screen-v3/*/tracing@6605f5d",
+        "screen-v3/*/tracing-m0.5@6605f5d",
+        "screen-v3/*/tracing-q50@6605f5d",
+        "screen-v3/*/tracing-s12@6605f5d",
+        "screen-v1/*/pipeline@6605f5d",
+        "screen-v1/*/tracing@6605f5d",
+        "screen-v1/*/tracing-m0.5@6605f5d",
+        "screen-v1/*/tracing-q50@6605f5d",
+        "screen-v1/*/tracing-s12@6605f5d"
+      ],
+      "measures": {
+        "R1 against pipeline": {
+          "base": {
+            "tiny-uniform": 15.2,
+            "small-clustered": 1065,
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14,
+            "small-clustered": 936.2,
+            "dense-groups": 2171.8,
+            "hub-chain": 54.3,
+            "many-groups": 528.6,
+            "packed-grid": 269.3
+          }
+        },
+        "B4 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.036,
+            "small-clustered": 0.338,
+            "dense-groups": 0.382,
+            "hub-chain": 0.029,
+            "many-groups": 0.333,
+            "packed-grid": 0.011
+          },
+          "new": {
+            "tiny-uniform": 0.066,
+            "small-clustered": 0.439,
+            "dense-groups": 0.386,
+            "hub-chain": 0.098,
+            "many-groups": 0.588,
+            "packed-grid": 0.011
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40812975829, the screen-v3 run 40812981446 and the screen-v1 run 40814238249, at 6605f5d. The screen has no measure of the tracing load W4, so the named win W4 has no value. The pick uses the load, and the screen reads R1 and B4. R1 is better on screen-v2 with 1 family against, and B4 is worse. On screen-v1, each named win has no verdict. With the default weights, the pick bundles less than board-portfolio. Its median B1 ratio over board-portfolio is 0.279 on screen-v2. The median time is 4.61 times pipeline on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "WILD-058",

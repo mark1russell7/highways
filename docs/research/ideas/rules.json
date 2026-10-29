@@ -1176,7 +1176,7 @@
     "placementDependent": true,
     "screen": "Against RULE-019 at the same time: keep it if it reaches the energy of RULE-019 in a third of the time or less at 1000 nodes.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "RULE-019"
     ],
@@ -1186,7 +1186,86 @@
     "wave": 7,
     "rules": "The same rules as RULE-019.",
     "hardRules": "The same as RULE-019.",
-    "zoom": "anchor."
+    "zoom": "anchor.",
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40812972853",
+      "records": [
+        "screen-v2/*/shared@6605f5d",
+        "screen-v2/*/adam@6605f5d",
+        "screen-v2/*/adam-seed2@6605f5d",
+        "screen-v2/*/adam-eta0.5@6605f5d",
+        "screen-v2/*/adam-steps2000@6605f5d",
+        "screen-v3/*/shared@6605f5d",
+        "screen-v3/*/adam@6605f5d",
+        "screen-v3/*/adam-seed2@6605f5d",
+        "screen-v3/*/adam-eta0.5@6605f5d",
+        "screen-v3/*/adam-steps2000@6605f5d",
+        "screen-v1/*/shared@6605f5d",
+        "screen-v1/*/adam@6605f5d",
+        "screen-v1/*/adam-seed2@6605f5d",
+        "screen-v1/*/adam-eta0.5@6605f5d",
+        "screen-v1/*/adam-steps2000@6605f5d"
+      ],
+      "measures": {
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 638.5,
+            "dense-groups": 1069.1,
+            "hub-chain": 58.6,
+            "many-groups": 828.2,
+            "packed-grid": 269.3
+          }
+        },
+        "R2 against shared": {
+          "base": {
+            "tiny-uniform": 0.673,
+            "small-clustered": 0.65,
+            "dense-groups": 0.652,
+            "hub-chain": 0.373,
+            "many-groups": 0.558,
+            "packed-grid": 0.553
+          },
+          "new": {
+            "tiny-uniform": 0.672,
+            "small-clustered": 0.65,
+            "dense-groups": 0.652,
+            "hub-chain": 0.374,
+            "many-groups": 0.56,
+            "packed-grid": 0.553
+          }
+        },
+        "R8 against shared": {
+          "base": {
+            "tiny-uniform": 20.497,
+            "small-clustered": 15.036,
+            "dense-groups": 13.592,
+            "hub-chain": 32.346,
+            "many-groups": 13.237,
+            "packed-grid": 7.752
+          },
+          "new": {
+            "tiny-uniform": 20.558,
+            "small-clustered": 15.063,
+            "dense-groups": 13.597,
+            "hub-chain": 32.337,
+            "many-groups": 13.218,
+            "packed-grid": 7.752
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40812972853, the screen-v3 run 40812979037 and the screen-v1 run 40814235847, at 6605f5d. The opt-in router adam gets R1 better with 0 families against on screen-v2 and screen-v3. R1 is a tie on each family of screen-v1. R2 has no verdict on screen-v2 and is better on screen-v3. R8 mean has no verdict on screen-v2, and R8 tight is worse. The risks Z10 and R6 are worse with 0 families against. Each seed gives the same routes again. The median time is 7.17 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-021",
@@ -2316,7 +2395,7 @@
     "placementDependent": false,
     "screen": "200 pairs from a panel on made-up boards: keep it if it agrees with 75% or more of the held-out pairs.",
     "prototype": "M",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "RULE-017",
       "RULE-039"
@@ -2324,7 +2403,86 @@
     "wave": 7,
     "rules": "The weights of any rule set.",
     "hardRules": "No change. The solver keeps them.",
-    "zoom": "One weight vector for each level, from views of that level."
+    "zoom": "One weight vector for each level, from views of that level.",
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40812975829",
+      "records": [
+        "screen-v2/*/pipeline@6605f5d",
+        "screen-v2/*/preferences@6605f5d",
+        "screen-v2/*/preferences-l2@6605f5d",
+        "screen-v2/*/preferences-p2@6605f5d",
+        "screen-v2/*/preferences-s2@6605f5d",
+        "screen-v3/*/pipeline@6605f5d",
+        "screen-v3/*/preferences@6605f5d",
+        "screen-v3/*/preferences-l2@6605f5d",
+        "screen-v3/*/preferences-p2@6605f5d",
+        "screen-v3/*/preferences-s2@6605f5d",
+        "screen-v1/*/pipeline@6605f5d",
+        "screen-v1/*/preferences@6605f5d",
+        "screen-v1/*/preferences-l2@6605f5d",
+        "screen-v1/*/preferences-p2@6605f5d",
+        "screen-v1/*/preferences-s2@6605f5d"
+      ],
+      "measures": {
+        "R1 against pipeline": {
+          "base": {
+            "tiny-uniform": 15.2,
+            "small-clustered": 1065,
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.3,
+            "small-clustered": 837.5,
+            "dense-groups": 1681.9,
+            "hub-chain": 58.6,
+            "many-groups": 822.5,
+            "packed-grid": 269.3
+          }
+        },
+        "R2 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.679,
+            "small-clustered": 0.635,
+            "dense-groups": 0.637,
+            "hub-chain": 0.373,
+            "many-groups": 0.556,
+            "packed-grid": 0.553
+          },
+          "new": {
+            "tiny-uniform": 0.691,
+            "small-clustered": 0.649,
+            "dense-groups": 0.648,
+            "hub-chain": 0.373,
+            "many-groups": 0.557,
+            "packed-grid": 0.553
+          }
+        },
+        "B1 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.007,
+            "small-clustered": 0.045,
+            "dense-groups": 0.066,
+            "hub-chain": 0.041,
+            "many-groups": 0.082,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.015,
+            "small-clustered": 0.104,
+            "dense-groups": 0.141,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The records are the screen-v2 run 40812975829, the screen-v3 run 40812981446 and the screen-v1 run 40814238249, at 6605f5d. The strategy preferences gets R1, R2 and B1 better with 0 families against on screen-v1 and screen-v2. On screen-v3, B1 has 1 family against. The fit uses made-up pairs from a panel of weights, not the inputs of the screen. It agrees with 0.90 of the held-out pairs. The risk R6 is worse on screen-v2 and screen-v3 with 0 families against. The median time is 3.63 times pipeline and 0.63 times curriculum on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-039",
@@ -2956,7 +3114,7 @@
     "placementDependent": true,
     "screen": "With the trunks of HWY-001 on `mid-clustered`: keep it if B2 rises by 15% with B3 up by 5% or less.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "HWY-001",
       "HWY-009",
@@ -2966,7 +3124,80 @@
     "wave": 7,
     "rules": "Bundles with a lane order.",
     "hardRules": "project, then RULE-046.",
-    "zoom": "One skeleton for each level. The skeletons nest."
+    "zoom": "One skeleton for each level. The skeletons nest.",
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40814231102",
+      "records": [
+        "screen-v2/*/shared@6605f5d",
+        "screen-v2/*/slots@6605f5d",
+        "screen-v2/*/slots-any@6605f5d",
+        "screen-v2/*/slots-pull4@6605f5d",
+        "screen-v2/*/slots-corridors@6605f5d",
+        "screen-v3/*/shared@6605f5d",
+        "screen-v3/*/slots@6605f5d",
+        "screen-v3/*/slots-any@6605f5d",
+        "screen-v3/*/slots-pull4@6605f5d",
+        "screen-v3/*/slots-corridors@6605f5d",
+        "screen-v1/*/shared@02cf22c",
+        "screen-v1/*/slots@02cf22c",
+        "screen-v1/*/slots-any@02cf22c",
+        "screen-v1/*/slots-pull4@02cf22c",
+        "screen-v1/*/slots-corridors@02cf22c"
+      ],
+      "measures": {
+        "B2 against shared": {
+          "base": {
+            "tiny-uniform": 0.18,
+            "small-clustered": 0.542,
+            "dense-groups": 0.504,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006
+          },
+          "new": {
+            "tiny-uniform": 0.187,
+            "small-clustered": 0.55,
+            "dense-groups": 0.503,
+            "hub-chain": 0.039,
+            "many-groups": 0.337,
+            "packed-grid": 0.006
+          }
+        },
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.021,
+            "small-clustered": 0.248,
+            "dense-groups": 0.348,
+            "hub-chain": 0.041,
+            "many-groups": 0.082,
+            "packed-grid": 0
+          }
+        },
+        "B9 against shared": {
+          "base": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 0.539,
+            "dense-groups": 0.594
+          },
+          "new": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 0.54,
+            "dense-groups": 0.602
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40814231102 and the screen-v3 run 40814233479 at 6605f5d, and the screen-v1 run 40812954341 at 02cf22c. The strategy slots gets B1 better with 0 families against on screen-v1 and screen-v2. On screen-v3, 4 of 15 families are for B1 and 1 is against. B2 has no verdict on screen-v1 and screen-v2. B9 has records on 3 families only, and it has no verdict. The risk B3 q95 is better, and R6 is better on screen-v2 and screen-v3. The median time is 2.65 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-048",
