@@ -1,7 +1,7 @@
 {
-  "run": "40930460078 (main 8c2702b + the gate); streets: none yet, the fix of streetPlan changes it",
+  "run": "40930460078 (main 8c2702b + the gate) for 14 routers; 40933904789 (the fix of streetPlan) for streets",
   "margin": 1.5,
-  "floorMb": 512,
+  "floorMb": 1024,
   "measureCapMb": 12288,
   "routers": {
     "straight": {
@@ -48,7 +48,10 @@
       "rssMb": 220,
       "heapMb": 122
     },
-    "streets": null,
+    "streets": {
+      "rssMb": 276,
+      "heapMb": 118
+    },
     "search": {
       "rssMb": 1268,
       "heapMb": 482

@@ -3,7 +3,8 @@
 // The routers are the 15 routers that the joint bench of layout-contract races. Its memory probe (L77) found that `streets` filled 4 to 5.7 GB there.
 //
 // Each process has the heap cap `--max-old-space-size` of its router, so a router that needs more heap stops with an error of memory.
-// The cap is the measured peak RSS times `margin`, and at least `floorMb`. The peak heap is less than the peak RSS, so the cap does not stop a router that keeps its measure.
+// The cap is the measured peak RSS times `margin`, and at least `floorMb`.
+// The peak RSS does not include the heap that V8 reserved but did not use. Thus a router can need a cap above its peak RSS: `shared`, `shared-all` and `gaps` stopped at 512 MB with a peak RSS of 220 to 345 MB. The floor is for these routers.
 // After the route, the process writes its peak RSS, its heap and its route hash.
 // The gate fails when a process stops with an error, or when a peak RSS is more than its budget: the measured peak RSS times `margin`, and at least `floorMb`.
 // A router with no measure in the budget file runs with the cap `measureCapMb` and does not fail the gate. Thus its first run gives the measure.
