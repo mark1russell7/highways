@@ -2603,7 +2603,7 @@
     "placementDependent": true,
     "screen": "On `mid-clustered` and `case-dense-groups`, against `corner`: keep it if R1 and R3 fall by 10% with R6 up by 5% or less and 0 hard faults.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "RULE-025",
       "RULE-021",
@@ -2615,7 +2615,104 @@
     "wave": 7,
     "rules": "Bends, clearance, crowding, highway preference, each rule on an arc.",
     "hardRules": "guard. Only free arcs exist. The plugs are fixed.",
-    "zoom": "A discount on the arcs of the routes of the parent level."
+    "zoom": "A discount on the arcs of the routes of the parent level.",
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40804550492",
+      "records": [
+        "screen-v2/*/shared@2a5caed",
+        "screen-v2/*/reroute@2a5caed",
+        "screen-v2/*/reroute-a0@2a5caed",
+        "screen-v2/*/reroute-b1@2a5caed",
+        "screen-v2/*/reroute-r4@2a5caed",
+        "screen-v3/*/shared@2a5caed",
+        "screen-v3/*/reroute@2a5caed",
+        "screen-v3/*/reroute-a0@2a5caed",
+        "screen-v3/*/reroute-b1@2a5caed",
+        "screen-v3/*/reroute-r4@2a5caed",
+        "screen-v1/*/shared@2a5caed",
+        "screen-v1/*/reroute@2a5caed",
+        "screen-v1/*/reroute-a0@2a5caed",
+        "screen-v1/*/reroute-b1@2a5caed",
+        "screen-v1/*/reroute-r4@2a5caed"
+      ],
+      "measures": {
+        "R1 against shared": {
+          "base": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 639.1,
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.7,
+            "small-clustered": 684.3,
+            "dense-groups": 1144.4,
+            "hub-chain": 107.3,
+            "many-groups": 940.8,
+            "packed-grid": 269.3
+          }
+        },
+        "R3 against shared": {
+          "base": {
+            "tiny-uniform": 2.493,
+            "small-clustered": 3.99,
+            "dense-groups": 4.737,
+            "hub-chain": 0.974,
+            "many-groups": 2.944,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 2.493,
+            "small-clustered": 3.99,
+            "dense-groups": 4.773,
+            "hub-chain": 1.12,
+            "many-groups": 2.886,
+            "packed-grid": 0
+          }
+        },
+        "R12 against shared": {
+          "base": {
+            "tiny-uniform": 0.132,
+            "small-clustered": 0.151,
+            "dense-groups": 0.144,
+            "hub-chain": 0.627,
+            "many-groups": 0.505,
+            "packed-grid": 0.123
+          },
+          "new": {
+            "tiny-uniform": 0.132,
+            "small-clustered": 0.137,
+            "dense-groups": 0.126,
+            "hub-chain": 0.382,
+            "many-groups": 0.477,
+            "packed-grid": 0.123
+          }
+        },
+        "B2 against shared": {
+          "base": {
+            "tiny-uniform": 0.18,
+            "small-clustered": 0.542,
+            "dense-groups": 0.504,
+            "hub-chain": 0.039,
+            "many-groups": 0.336,
+            "packed-grid": 0.006
+          },
+          "new": {
+            "tiny-uniform": 0.18,
+            "small-clustered": 0.542,
+            "dense-groups": 0.499,
+            "hub-chain": 0.003,
+            "many-groups": 0.256,
+            "packed-grid": 0.006
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40804550492, the screen-v3 run 40804553123 and the screen-v1 run 40805756190, at 2a5caed. The opt-in router reroute gets R12 better with 0 families against on screen-v2 and screen-v1. On screen-v2, R1 and B2 are worse with 0 against, and R3 is worse with 1 of 6. On screen-v3, R12 is better with 2 of 15 against. The median B1 ratio over shared is 0.933. The median time is 2.13 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-045",
@@ -2903,7 +3000,7 @@
     "placementDependent": false,
     "screen": "On `mid-clustered` with 5 seeds: keep it if the final energy falls by 5% against the full energy at once, at the same number of steps.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "RULE-019",
       "RULE-017"
@@ -2914,7 +3011,86 @@
     "wave": 7,
     "rules": "Any rule.",
     "hardRules": "The same as the solver.",
-    "zoom": "The stages can follow the levels."
+    "zoom": "The stages can follow the levels.",
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40804555768",
+      "records": [
+        "screen-v2/*/pipeline@2a5caed",
+        "screen-v2/*/curriculum@2a5caed",
+        "screen-v2/*/curriculum-p2@2a5caed",
+        "screen-v2/*/curriculum-r12@2a5caed",
+        "screen-v2/*/curriculum-s2@2a5caed",
+        "screen-v3/*/pipeline@2a5caed",
+        "screen-v3/*/curriculum@2a5caed",
+        "screen-v3/*/curriculum-p2@2a5caed",
+        "screen-v3/*/curriculum-r12@2a5caed",
+        "screen-v3/*/curriculum-s2@2a5caed",
+        "screen-v1/*/pipeline@2a5caed",
+        "screen-v1/*/curriculum@2a5caed",
+        "screen-v1/*/curriculum-p2@2a5caed",
+        "screen-v1/*/curriculum-r12@2a5caed",
+        "screen-v1/*/curriculum-s2@2a5caed"
+      ],
+      "measures": {
+        "R1 against pipeline": {
+          "base": {
+            "tiny-uniform": 15.2,
+            "small-clustered": 1065,
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 14.3,
+            "small-clustered": 820.5,
+            "dense-groups": 1627.4,
+            "hub-chain": 58.6,
+            "many-groups": 823.2,
+            "packed-grid": 269.3
+          }
+        },
+        "R2 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.679,
+            "small-clustered": 0.635,
+            "dense-groups": 0.637,
+            "hub-chain": 0.373,
+            "many-groups": 0.556,
+            "packed-grid": 0.553
+          },
+          "new": {
+            "tiny-uniform": 0.693,
+            "small-clustered": 0.651,
+            "dense-groups": 0.649,
+            "hub-chain": 0.373,
+            "many-groups": 0.558,
+            "packed-grid": 0.553
+          }
+        },
+        "R12 against pipeline": {
+          "base": {
+            "tiny-uniform": 0.135,
+            "small-clustered": 0.197,
+            "dense-groups": 0.215,
+            "hub-chain": 0.627,
+            "many-groups": 0.506,
+            "packed-grid": 0.123
+          },
+          "new": {
+            "tiny-uniform": 0.122,
+            "small-clustered": 0.154,
+            "dense-groups": 0.179,
+            "hub-chain": 0.627,
+            "many-groups": 0.505,
+            "packed-grid": 0.123
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The records are the screen-v2 run 40804555768, the screen-v3 run 40804558369 and the screen-v1 run 40805753373, at 2a5caed. The strategy curriculum gets R1, R2 and R12 better with 0 families against on each set. On screen-v3, 7 of 15 families are for R1, and the others are ties. The record has no energy solver (RULE-019), so a pool of the routes of corners, shared and trunks takes its place. The risk R6 is worse on screen-v2 and screen-v3 with 0 families against. With R12 first, R1 is worse. The median time is 7.85 times pipeline on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "RULE-049",

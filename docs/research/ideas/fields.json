@@ -882,13 +882,92 @@
     "placementDependent": true,
     "screen": "trunks on mid-fanout. Keep if the B3 q95 falls >= 10% at a B1 loss <= 3%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "kept",
     "related": [
       "EDA-012",
       "EDA-030",
       "HWY-048"
     ],
-    "wave": 5
+    "wave": 5,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40802879108",
+      "records": [
+        "screen-v2/*/shared@2a5caed",
+        "screen-v2/*/balance@2a5caed",
+        "screen-v2/*/balance-both@2a5caed",
+        "screen-v2/*/balance-corridors@2a5caed",
+        "screen-v2/*/balance-t1.1@2a5caed",
+        "screen-v3/*/shared@2a5caed",
+        "screen-v3/*/balance@2a5caed",
+        "screen-v3/*/balance-both@2a5caed",
+        "screen-v3/*/balance-corridors@2a5caed",
+        "screen-v3/*/balance-t1.1@2a5caed",
+        "screen-v1/*/shared@2a5caed",
+        "screen-v1/*/balance@2a5caed",
+        "screen-v1/*/balance-both@2a5caed",
+        "screen-v1/*/balance-corridors@2a5caed",
+        "screen-v1/*/balance-t1.1@2a5caed"
+      ],
+      "measures": {
+        "B3 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.006,
+            "small-clustered": 1.169,
+            "dense-groups": 1.207,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          }
+        },
+        "R6 against shared": {
+          "base": {
+            "tiny-uniform": 1.278,
+            "small-clustered": 1.623,
+            "dense-groups": 1.665,
+            "hub-chain": 1.032,
+            "many-groups": 1.392,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.278,
+            "small-clustered": 1.548,
+            "dense-groups": 1.502,
+            "hub-chain": 1.032,
+            "many-groups": 1.392,
+            "packed-grid": 1
+          }
+        },
+        "R5 against shared": {
+          "base": {
+            "tiny-uniform": 1.182,
+            "small-clustered": 1.291,
+            "dense-groups": 1.313,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.177,
+            "small-clustered": 1.234,
+            "dense-groups": 1.233,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "kept",
+      "note": "The records are the screen-v2 run 40802879108 and the screen-v3 run 40802881978 at 2a5caed, and the screen-v1 run 40802798104 at 96ca96d. The strategy balance gets B3 q95, R6 and R5 q95 better with 0 families against on screen-v2 and screen-v3. Only 2 or 3 families change, and the others are ties. On screen-v1, B3 q95 is better with 1 of 6 against, and R6 has no verdict. The risk B1 has no verdict, with 2 of 6 families against. The median time is 1.66 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "EDA-018",
@@ -2608,7 +2687,7 @@
     "placementDependent": false,
     "screen": "The count of drawn elements at each level against the budget. Keep if Z4 falls >= 30% at the far levels.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "EDA-014",
       "EDA-036",
@@ -2619,7 +2698,83 @@
       "WILD-016"
     ],
     "canonical": "WILD-016",
-    "wave": 4
+    "wave": 4,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40804949288",
+      "records": [
+        "screen-v2/*/depths@2a5caed",
+        "screen-v2/*/detail@2a5caed",
+        "screen-v2/*/detail-min3@2a5caed",
+        "screen-v2/*/detail-px4@2a5caed",
+        "screen-v3/*/depths@2a5caed",
+        "screen-v3/*/detail@2a5caed",
+        "screen-v3/*/detail-min3@2a5caed",
+        "screen-v3/*/detail-px4@2a5caed",
+        "screen-v1/*/depths@2a5caed",
+        "screen-v1/*/detail@2a5caed",
+        "screen-v1/*/detail-min3@2a5caed",
+        "screen-v1/*/detail-px4@2a5caed"
+      ],
+      "measures": {
+        "B7 against depths": {
+          "base": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          },
+          "new": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          }
+        },
+        "R12 against depths": {
+          "base": {
+            "tiny-uniform": 0.15,
+            "small-clustered": 0.198,
+            "dense-groups": 0.202,
+            "hub-chain": 0.572,
+            "many-groups": 0.457,
+            "packed-grid": 0.158
+          },
+          "new": {
+            "tiny-uniform": 0.15,
+            "small-clustered": 0.198,
+            "dense-groups": 0.202,
+            "hub-chain": 0.572,
+            "many-groups": 0.457,
+            "packed-grid": 0.158
+          }
+        },
+        "Z4 against depths": {
+          "base": {
+            "tiny-uniform": 3.8,
+            "small-clustered": 4,
+            "dense-groups": 4,
+            "hub-chain": 4,
+            "many-groups": 4,
+            "packed-grid": 4
+          },
+          "new": {
+            "tiny-uniform": 3.8,
+            "small-clustered": 4,
+            "dense-groups": 4,
+            "hub-chain": 4,
+            "many-groups": 4,
+            "packed-grid": 4
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "EDA-038 is the rider of WILD-016, in the strategy detail. The records and the result are the result of WILD-016. Z4, B7 and R12 are ties on each family, because the items and the routes of the levels do not change. The screen has no measure of the strokes drawn at each level."
+    }
   },
   {
     "id": "EDA-039",
@@ -2744,11 +2899,90 @@
     "placementDependent": true,
     "screen": "As EDA-022. Keep if the crossings within 2 u of a box fall >= 30%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "EDA-022"
     ],
-    "wave": 5
+    "wave": 5,
+    "result": {
+      "date": "2026-10-29",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40804954171",
+      "records": [
+        "screen-v2/*/facing@2a5caed",
+        "screen-v2/*/leaders@2a5caed",
+        "screen-v2/*/leaders-gap2@2a5caed",
+        "screen-v2/*/leaders-opo@2a5caed",
+        "screen-v2/*/leaders-s@2a5caed",
+        "screen-v3/*/facing@2a5caed",
+        "screen-v3/*/leaders@2a5caed",
+        "screen-v3/*/leaders-gap2@2a5caed",
+        "screen-v3/*/leaders-opo@2a5caed",
+        "screen-v3/*/leaders-s@2a5caed",
+        "screen-v1/*/facing@2a5caed",
+        "screen-v1/*/leaders@2a5caed",
+        "screen-v1/*/leaders-gap2@2a5caed",
+        "screen-v1/*/leaders-opo@2a5caed",
+        "screen-v1/*/leaders-s@2a5caed"
+      ],
+      "measures": {
+        "R1 against facing": {
+          "base": {
+            "tiny-uniform": 15.2,
+            "small-clustered": 1065,
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3
+          },
+          "new": {
+            "tiny-uniform": 15.9,
+            "small-clustered": 1094.1,
+            "dense-groups": 2258.2,
+            "hub-chain": 74.6,
+            "many-groups": 866.2,
+            "packed-grid": 284
+          }
+        },
+        "R11 against facing": {
+          "base": {
+            "tiny-uniform": 0.117,
+            "small-clustered": 0.052,
+            "dense-groups": 0.041,
+            "hub-chain": 0.095,
+            "many-groups": 0.093,
+            "packed-grid": 0.113
+          },
+          "new": {
+            "tiny-uniform": 0.515,
+            "small-clustered": 0.27,
+            "dense-groups": 0.41,
+            "hub-chain": 0.667,
+            "many-groups": 0.405,
+            "packed-grid": 0.181
+          }
+        },
+        "R10 against facing": {
+          "base": {
+            "tiny-uniform": 0,
+            "small-clustered": 0,
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 29.264
+          },
+          "new": {
+            "tiny-uniform": 0,
+            "small-clustered": 0,
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 33.058
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40804954171, the screen-v3 run 40804956723 and the screen-v1 run 40805761696, at 2a5caed. The strategy leaders changes the plugs of 60 of 60 inputs of screen-v2. R11 is better with 0 families against on screen-v2 and screen-v1. R1 is worse with 0 families against on screen-v2 and screen-v1, and R10 is worse on screen-v2, only on packed-grid. The screen has no count of the crossings within 2 units of a box. The median B1 ratio over facing is 0.843. The time is 1.08 times facing on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "EDA-042",
