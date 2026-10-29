@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
   "date": "2026-10-29",
-  "commit": "6605f5d5538cea46ebf0406d1b0dfb3b35c5abb1",
+  "commit": "37ac52af97915374de6825a35d5dd11aeb9d3468",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -76,8 +76,9 @@
     "blockedByStepAndMeasure": 0,
     "openTargets": 78,
     "byStatus": {
+      "building": 6,
       "built": 18,
-      "queued": 159
+      "queued": 153
     },
     "byStep": {
       "curve": 8,
@@ -102,12 +103,12 @@
 
   ],
   "rows": [
-    {"id":"NAT-009","name":"Two-way lanes","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":1,"slot":true,"canonical":"NAT-009","blockedBy":[],"status":"queued"},
-    {"id":"WILD-039","name":"One global lane order","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":2,"slot":true,"canonical":"WILD-039","blockedBy":[],"status":"queued"},
-    {"id":"EDA-022","name":"Ordered escape for plugs","step":"plugs","kind":"literature","wins":["R1","R11","B5","R10"],"gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":3,"slot":true,"canonical":"EDA-022","blockedBy":[],"status":"queued"},
-    {"id":"WILD-048","name":"Tune on crops of the board","step":"whole","kind":"ours","wins":["R5","B1"],"gain":39,"uncertainty":1.2,"cost":2,"score":23.4,"rank":4,"slot":true,"canonical":"WILD-048","blockedBy":["idea:WILD-047"],"status":"queued"},
-    {"id":"WILD-046","name":"Learned choice of the strategy","step":"whole","kind":"literature","wins":["R1","R5","B1"],"gain":66.5,"uncertainty":0.7,"cost":2,"score":23.275,"rank":5,"slot":true,"canonical":"WILD-046","blockedBy":[],"status":"queued"},
-    {"id":"WILD-031","name":"Approval corridors","step":"highway","kind":"ours","wins":["B1","B2","B3"],"gain":43.5,"uncertainty":1,"cost":2,"score":21.75,"rank":6,"slot":true,"canonical":"WILD-031","blockedBy":[],"status":"queued"},
+    {"id":"NAT-009","name":"Two-way lanes","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":1,"slot":true,"canonical":"NAT-009","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":1},"strategy":"two-way"},
+    {"id":"WILD-039","name":"One global lane order","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":2,"slot":true,"canonical":"WILD-039","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":2},"strategy":"global-order"},
+    {"id":"EDA-022","name":"Ordered escape for plugs","step":"plugs","kind":"literature","wins":["R1","R11","B5","R10"],"gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":3,"slot":true,"canonical":"EDA-022","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":3},"strategy":"escape"},
+    {"id":"WILD-048","name":"Tune on crops of the board","step":"whole","kind":"ours","wins":["R5","B1"],"gain":39,"uncertainty":1.2,"cost":2,"score":23.4,"rank":4,"slot":true,"canonical":"WILD-048","blockedBy":["idea:WILD-047"],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":39,"uncertainty":1.2,"cost":2,"score":23.4,"rank":4},"strategy":"crops"},
+    {"id":"WILD-046","name":"Learned choice of the strategy","step":"whole","kind":"literature","wins":["R1","R5","B1"],"gain":66.5,"uncertainty":0.7,"cost":2,"score":23.275,"rank":5,"slot":true,"canonical":"WILD-046","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":66.5,"uncertainty":0.7,"cost":2,"score":23.275,"rank":5},"strategy":"choice"},
+    {"id":"WILD-031","name":"Approval corridors","step":"highway","kind":"ours","wins":["B1","B2","B3"],"gain":43.5,"uncertainty":1,"cost":2,"score":21.75,"rank":6,"slot":true,"canonical":"WILD-031","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":43.5,"uncertainty":1,"cost":2,"score":21.75,"rank":6},"strategy":"approval"},
     {"id":"EDA-010","name":"Rip-up and reroute","step":"router","kind":"literature","wins":["R7","R6","R1","B5"],"gain":30,"uncertainty":0.7,"cost":1,"score":21,"rank":7,"slot":true,"canonical":"EDA-010","blockedBy":[],"status":"queued"},
     {"id":"WILD-035","name":"Streets along the cuts","step":"highway","kind":"ours","wins":["B1","B2","B7","R14"],"gain":39,"uncertainty":1,"cost":2,"score":19.5,"rank":8,"slot":true,"canonical":"WILD-035","blockedBy":[],"status":"queued"},
     {"id":"EDA-032","name":"Concave then convex link cost","step":"highway","kind":"ours","wins":["B1","M4","R12"],"gain":38.5,"uncertainty":1,"cost":2,"score":19.25,"rank":9,"slot":true,"canonical":"EDA-032","blockedBy":["idea:EDA-009"],"status":"queued"},
