@@ -1,5 +1,33 @@
 [
   {
+    "id": "EDA-017",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "balance",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 16.5,
+      "uncertainty": 0.85,
+      "cost": 1,
+      "score": 14.025,
+      "rank": 3
+    }
+  },
+  {
+    "id": "EDA-041",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "leaders",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 13.5,
+      "uncertainty": 1.02,
+      "cost": 1,
+      "score": 13.77,
+      "rank": 6
+    }
+  },
+  {
     "id": "NAT-016",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4A",
@@ -56,6 +84,48 @@
     }
   },
   {
+    "id": "RULE-044",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "reroute",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 14,
+      "uncertainty": 1,
+      "cost": 1,
+      "score": 14,
+      "rank": 4
+    }
+  },
+  {
+    "id": "RULE-048",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "curriculum",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 13.5,
+      "uncertainty": 1.2,
+      "cost": 1,
+      "score": 16.2,
+      "rank": 1
+    }
+  },
+  {
+    "id": "WILD-016",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "detail",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 13,
+      "uncertainty": 1.2,
+      "cost": 1,
+      "score": 15.6,
+      "rank": 2
+    }
+  },
+  {
     "id": "WILD-023",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4A",
@@ -67,6 +137,20 @@
       "cost": 1,
       "score": 14.5,
       "rank": 8
+    }
+  },
+  {
+    "id": "WILD-036",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4B",
+    "strategy": "manifolds",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 14,
+      "uncertainty": 1,
+      "cost": 1,
+      "score": 14,
+      "rank": 5
     }
   },
   {

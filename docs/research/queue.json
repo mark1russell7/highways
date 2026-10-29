@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
   "date": "2026-10-29",
-  "commit": "577bb94ff3a3b328061a129320c2336814267609",
+  "commit": "23084b20c150ab39baf50cdd158745c658ccaa45",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -54,8 +54,9 @@
     "blockedByStepAndMeasure": 0,
     "openTargets": 46,
     "byStatus": {
+      "building": 6,
       "built": 6,
-      "queued": 171
+      "queued": 165
     },
     "byStep": {
       "curve": 8,
@@ -80,12 +81,12 @@
 
   ],
   "rows": [
-    {"id":"RULE-048","name":"A curriculum that adds the rules one at a time","step":"whole","kind":"ours","wins":["R1","R2","R12"],"gain":13.5,"uncertainty":1.2,"cost":1,"score":16.2,"rank":1,"slot":true,"canonical":"RULE-048","blockedBy":["idea:RULE-019"],"status":"queued"},
-    {"id":"WILD-016","name":"Bundle level of detail","step":"levels","kind":"ours","wins":["B7","B1"],"gain":13,"uncertainty":1.2,"cost":1,"score":15.6,"rank":2,"slot":true,"canonical":"WILD-016","blockedBy":["idea:WILD-060"],"status":"queued"},
-    {"id":"EDA-017","name":"Stretch balance in a bundle (inverse length matching)","step":"highway","kind":"hybrid","wins":["B3","R6","R5"],"gain":16.5,"uncertainty":0.85,"cost":1,"score":14.025,"rank":3,"slot":true,"canonical":"EDA-017","blockedBy":[],"status":"queued"},
-    {"id":"RULE-044","name":"Corner graph with rule prices, then rip-up and reroute","step":"router","kind":"ours","wins":["R1","R3","R12","B2"],"gain":14,"uncertainty":1,"cost":1,"score":14,"rank":4,"slot":true,"canonical":"RULE-044","blockedBy":[],"status":"queued"},
-    {"id":"WILD-036","name":"Manifolds for a fan to a row","step":"highway","kind":"ours","wins":["B1","R3","R14","B7"],"gain":14,"uncertainty":1,"cost":1,"score":14,"rank":5,"slot":true,"canonical":"WILD-036","blockedBy":[],"status":"queued"},
-    {"id":"EDA-041","name":"Boundary leaders as plug stubs","step":"plugs","kind":"hybrid","wins":["R1","R11","R10"],"gain":13.5,"uncertainty":1.02,"cost":1,"score":13.77,"rank":6,"slot":true,"canonical":"EDA-041","blockedBy":[],"status":"queued"},
+    {"id":"RULE-048","name":"A curriculum that adds the rules one at a time","step":"whole","kind":"ours","wins":["R1","R2","R12"],"gain":13.5,"uncertainty":1.2,"cost":1,"score":16.2,"rank":1,"slot":true,"canonical":"RULE-048","blockedBy":["idea:RULE-019"],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13.5,"uncertainty":1.2,"cost":1,"score":16.2,"rank":1},"strategy":"curriculum"},
+    {"id":"WILD-016","name":"Bundle level of detail","step":"levels","kind":"ours","wins":["B7","B1"],"gain":13,"uncertainty":1.2,"cost":1,"score":15.6,"rank":2,"slot":true,"canonical":"WILD-016","blockedBy":["idea:WILD-060"],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13,"uncertainty":1.2,"cost":1,"score":15.6,"rank":2},"strategy":"detail"},
+    {"id":"EDA-017","name":"Stretch balance in a bundle (inverse length matching)","step":"highway","kind":"hybrid","wins":["B3","R6","R5"],"gain":16.5,"uncertainty":0.85,"cost":1,"score":14.025,"rank":3,"slot":true,"canonical":"EDA-017","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":16.5,"uncertainty":0.85,"cost":1,"score":14.025,"rank":3},"strategy":"balance"},
+    {"id":"RULE-044","name":"Corner graph with rule prices, then rip-up and reroute","step":"router","kind":"ours","wins":["R1","R3","R12","B2"],"gain":14,"uncertainty":1,"cost":1,"score":14,"rank":4,"slot":true,"canonical":"RULE-044","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":14,"uncertainty":1,"cost":1,"score":14,"rank":4},"strategy":"reroute"},
+    {"id":"WILD-036","name":"Manifolds for a fan to a row","step":"highway","kind":"ours","wins":["B1","R3","R14","B7"],"gain":14,"uncertainty":1,"cost":1,"score":14,"rank":5,"slot":true,"canonical":"WILD-036","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":14,"uncertainty":1,"cost":1,"score":14,"rank":5},"strategy":"manifolds"},
+    {"id":"EDA-041","name":"Boundary leaders as plug stubs","step":"plugs","kind":"hybrid","wins":["R1","R11","R10"],"gain":13.5,"uncertainty":1.02,"cost":1,"score":13.77,"rank":6,"slot":true,"canonical":"EDA-041","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13.5,"uncertainty":1.02,"cost":1,"score":13.77,"rank":6},"strategy":"leaders"},
     {"id":"RULE-020","name":"Adam with a seeded sample of pairs","step":"router","kind":"hybrid","wins":["R1","R2","R8"],"gain":13.5,"uncertainty":1.02,"cost":1,"score":13.77,"rank":7,"slot":true,"canonical":"RULE-020","blockedBy":["idea:RULE-019"],"status":"queued"},
     {"id":"RULE-047","name":"Pull toward the lane slots of the highway skeleton","step":"highway","kind":"ours","wins":["B2","B1","B9"],"gain":13.5,"uncertainty":1,"cost":1,"score":13.5,"rank":8,"slot":true,"canonical":"RULE-047","blockedBy":[],"status":"queued"},
     {"id":"WILD-031","name":"Approval corridors","step":"highway","kind":"ours","wins":["B1","B2","B3"],"gain":26.5,"uncertainty":1,"cost":2,"score":13.25,"rank":9,"slot":true,"canonical":"WILD-031","blockedBy":[],"status":"queued"},
@@ -252,7 +253,7 @@
     {"id":"RULE-041","name":"A neural time field (NTFields)","step":"router","kind":"literature","wins":["R8","C7"],"gain":2,"uncertainty":0.84,"cost":4,"score":0.42,"rank":170,"slot":true,"canonical":"RULE-041","blockedBy":[],"status":"queued"},
     {"id":"EDA-011","name":"Multicommodity flow with randomized rounding","step":"router","kind":"literature","wins":["M4","R12"],"gain":2,"uncertainty":0.84,"cost":8,"score":0.21,"rank":171,"slot":true,"canonical":"EDA-011","blockedBy":["idea:EDA-009"],"status":"queued"},
     {"id":"EDA-001","name":"Grid maze router (Lee, Hadlock, A*)","step":"router","kind":"literature","wins":["R14","R3","R8","R9"],"gain":3,"uncertainty":0.84,"cost":4,"score":0.63,"rank":null,"slot":true,"canonical":"RULE-032","blockedBy":[],"status":"queued"},
-    {"id":"EDA-038","name":"Lane collapse for each zoom","step":"levels","kind":"hybrid","wins":["Z4","B7","R12"],"gain":2.5,"uncertainty":0.85,"cost":1,"score":2.125,"rank":null,"slot":true,"canonical":"WILD-016","blockedBy":[],"status":"queued"},
+    {"id":"EDA-038","name":"Lane collapse for each zoom","step":"levels","kind":"hybrid","wins":["Z4","B7","R12"],"gain":2.5,"uncertainty":0.85,"cost":1,"score":2.125,"rank":null,"slot":true,"canonical":"WILD-016","blockedBy":[],"status":"building","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13,"uncertainty":1.2,"cost":1,"score":15.6,"rank":2},"strategy":"detail"},
     {"id":"NAT-016","name":"Closed venation backbone for levels","step":"levels","kind":"hybrid","wins":["B1","R1","Z3","B7"],"gain":25,"uncertainty":1.02,"cost":1,"score":25.5,"rank":null,"slot":true,"canonical":"NAT-016","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":25,"uncertainty":1.02,"cost":1,"score":25.5,"rank":1},"strategy":"venation","measured":1},
     {"id":"NAT-018","name":"Knee of the plant Pareto front","step":"highway","kind":"hybrid","wins":["B1","B3","R5"],"gain":27.5,"uncertainty":0.85,"cost":1,"score":23.375,"rank":null,"slot":true,"canonical":"NAT-018","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":27.5,"uncertainty":0.85,"cost":1,"score":23.375,"rank":2},"strategy":"knee","measured":2},
     {"id":"NAT-019","name":"Bronchial space-filling splits","step":"highway","kind":"hybrid","wins":["B1","B6","B8","R4"],"gain":24,"uncertainty":0.85,"cost":1,"score":20.4,"rank":null,"slot":true,"canonical":"NAT-019","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":24,"uncertainty":0.85,"cost":1,"score":20.4,"rank":4},"strategy":"bronchial","measured":2},
