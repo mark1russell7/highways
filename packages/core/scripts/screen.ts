@@ -1,5 +1,5 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
-// [--options <file.json>] [--families <a,b>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
+// [--options <file.json>] [--families <a,b>] [--members <from-to>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
 // [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--out screen.jsonl] [--summary screen.md]`.
 // `--moves` counts the own move of each highway strategy of the step `highway`. A module can also export `moves`, a `MoveCounter` by the names of the records.
 // `--activation` adds the activation report (ACTIVATION) to the summary. The inputs of these families are the decision inputs. The value `all` takes each family.
@@ -9,6 +9,8 @@
 // or only the exports of `--export`. An export can also be a list of strategies. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
 // `--set exact-v1` screens the small boards with a known optimum (MEAS2). With that set, the screen reads the optima of `src/bench/exact/optima-exact-v1.json`,
 // or of `--optima <file>`, and gives the gap closed of each strategy. `--optima none` gives no optima.
+// `--members 10-23` screens the members 10 to 23 of each family of the set, in place of its members (PROMO-CANALS). These fresh seeds are in no screen set.
+// The set of these inputs has the id `<set>-m<from>`, and its member `k` is the member `from + k` of the family.
 // The workflow `Screen` starts it in CI. Locally, start it only on one or two small families, for example `--families tiny-uniform`.
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
@@ -29,6 +31,8 @@ import {
   type ExactOptimaFile,
   type LayoutInput,
   type LayoutPrediction,
+  type ScreenFamily,
+  type ScreenSet,
   type ScreenStep,
   type ScreenWrap,
 } from "../src/bench/screen/index.ts";
@@ -87,8 +91,26 @@ const files = (dir: string): string[] =>
 const inputs = inputsDir ? files(inputsDir).map((f) => JSON.parse(readFileSync(f, "utf8")) as LayoutInput) : undefined;
 
 const setId = opt("--set") ?? "screen-v1";
-const set = SCREEN_SETS[setId];
-if (!set) throw new Error(`There is no screen set "${setId}". The sets are ${Object.keys(SCREEN_SETS).join(", ")}.`);
+const named = SCREEN_SETS[setId];
+if (!named) throw new Error(`There is no screen set "${setId}". The sets are ${Object.keys(SCREEN_SETS).join(", ")}.`);
+const members = opt("--members");
+const set: ScreenSet = (() => {
+  if (members === undefined) return named;
+  const m = /^(\d+)-(\d+)$/.exec(members);
+  const from = m ? Number(m[1]) : NaN;
+  const to = m ? Number(m[2]) : NaN;
+  if (!m || to < from) throw new Error(`The value of --members is not "<from>-<to>" with from <= to.`);
+  const count = to - from + 1;
+  const families = named.families.map((f): ScreenFamily => ({ ...f, seeds: count, make: (k) => f.make(from + k), generator: (k) => f.generator(from + k) }));
+  const declared = named.claims?.declared;
+  return {
+    ...named,
+    id: `${named.id}-m${from}`,
+    families,
+    heldOut: [],
+    ...(declared ? { claims: { ...named.claims, declared: { ...declared, minCount: count, counts: Object.fromEntries(families.map((f) => [f.name, count])) } } } : {}),
+  };
+})();
 // The optima of the set: the file of `--optima`, or the file `optima-<set>.json` of `src/bench/exact` when it exists.
 const optimaPath = opt("--optima") ?? join(dirname(fileURLToPath(import.meta.url)), `../src/bench/exact/optima-${set.id}.json`);
 const optima = optimaPath !== "none" && existsSync(optimaPath) ? (JSON.parse(readFileSync(optimaPath, "utf8")) as ExactOptimaFile).optima : undefined;
