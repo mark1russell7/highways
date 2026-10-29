@@ -68,7 +68,7 @@ function unitOf(graph: Graph): number {
 
 /**
  * This function anneals the choice of one candidate way for each edge (RULE-021, after Davidson and Harel, 1996).
- * The candidates of an edge are its way in `shared`, its shortest way, and the shortest ways when the links of the earlier candidates cost 3 times more.
+ * The candidates of an edge are its way in `shared` and its shortest way. Other candidates are the shortest ways when the links of earlier candidates cost 3 times more.
  * The energy is `(1 - 0.5) ink + 0.5 Σ L + crossing u X`: the cost of `shared` plus a cost for each crossing `X` between the ways of two edges.
  * A change takes one edge to another candidate. A worse change stays with the rational chance `1 / (1 + y + y^2 / 2)`, with `y = ΔE / T`.
  * The temperature falls by `cooling` after each sweep. The ways at the end are the ways of the lowest energy of the run.

@@ -14,7 +14,7 @@ export const VENATION_BACKBONES: readonly VenationBackbone[] = Object.freeze(["r
 export interface VenationOptions extends DepthLevelOptions {
   /** The graph of the backbone. The relative neighbourhood graph has fewer links than the Gabriel graph. The default is `rng`. */
   readonly backbone: VenationBackbone;
-  /** The share of the cost of a backbone link that a later level link saves when an earlier level link uses it, from 0 to 0.8. The default is 0.4. */
+  /** A later level link saves this share of the cost of a backbone link that an earlier level link uses, from 0 to 0.8. The default is 0.4. */
   readonly discount: number;
   /** A level link takes its way on the backbone only when that way is this many times its direct link or less. The default is 1.5. */
   readonly detour: number;

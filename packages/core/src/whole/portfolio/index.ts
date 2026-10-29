@@ -44,7 +44,7 @@ export interface PortfolioEntry {
   readonly ink: number;
 }
 
-/** The result of `boardPortfolio`: the output of the pick, the name of the pick, and the measures of each setting that ran with no break of a hard rule. */
+/** The result of `boardPortfolio`: the output and the name of the pick. It also holds the measures of each setting with no break of a hard rule. */
 export interface BoardPortfolioRun {
   readonly output: WholeOutput;
   readonly pick: string;

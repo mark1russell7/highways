@@ -1068,6 +1068,36 @@ For the other strategies, each row is the same as in the snapshots of the BUILD-
 - Z2 is 0 on each record.
 - B8 runs is 0 for `shared` on `hub-chain` and `many-groups` (MEAS-FLAT). Thus each strategy that makes a run there is `worse` on B8 runs.
 
+## Wave 4A (BUILD-W4A)
+
+Wave 4A builds the six ideas at the top of the queue. Each one is a strategy of its step:
+
+| Idea | Strategy | Step | Named wins | Baseline |
+|---|---|---|---|---|
+| NAT-016 | `venation` | `levels` | B1, R1, Z3, B7 | `depths` |
+| NAT-018 | `knee` | `highway` | B1, B3, R5 | `shared` |
+| RULE-021 (with WILD-028) | `annealing` (opt-in) | `router` | R1, R12, B1, R5 | `shared` |
+| NAT-019 | `bronchial` | `highway` | B1, B6, B8, R4 | `shared` |
+| WILD-045 | `board-portfolio` | `whole` | R1, R5, B1, C3 | `pipeline` |
+| WILD-023 | `tight` (opt-in) | `router` | R5, R6, R1 | `shared` |
+
+Each strategy is screened alone and with one or two changes of its options. The modules are `scripts/screens/build-w4a*.ts`.
+The verdict is the verdict over families of `scripts/screen-verdict.ts` against the baseline of the step, on the named wins of the idea.
+
+### The design notes
+
+- `venation` keeps the levels of `depths` and changes only their links. So B1, R1 and B7 are ties by construction, and Z3 is its only real win.
+- `venation` has no Delaunay backbone. The Gabriel graph is a subgraph of the Delaunay graph, and the option `backbone` gives it.
+- `bronchial` has no angles of Murray. Its splits cut the targets in two sectors by count, by weight or at the widest gap.
+- `board-portfolio` reads no screen record and has no fit. It runs the first `settings` settings of `BOARD_PORTFOLIO_SETTINGS` on the board.
+  A setting with a break of a hard rule does not count. The least sum of the rank shares of R1, R5 and B1 (inverted) wins.
+- The whole step has no curves, so C3 has no value for `board-portfolio`.
+- `annealing` and `tight` are opt-in, as `attraction` is. They get rows in the workflow `Scale`, not in the registry.
+
+### The results
+
+The screens are in progress. This section gets the results when the runs end.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

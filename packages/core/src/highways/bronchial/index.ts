@@ -78,8 +78,9 @@ export function splitTargets(tip: Point, targets: readonly Point[], ids: readonl
 }
 
 /**
- * This function gives the highways of the bronchial trees (NAT-019, after Kitaoka and others, 1999). The edges from one source node get one tree. Its root is the out point of the plug nearest the center of the targets.
- * From the tip, the tree grows a share of the way to the center of its targets, then splits the targets in two and grows a branch for each half.
+ * This function gives the highways of the bronchial trees (NAT-019, after Kitaoka and others, 1999). The edges from one source node get one tree.
+ * The root of a tree is the out point of the plug nearest the center of the targets.
+ * From the tip, the tree grows a share of the way to the center of its targets. Then it splits the targets in two and grows a branch for each half.
  * A branch that hits a box grows half as far, or not at all. A small set of targets gets its own ways from the tip, through the corner graph.
  * Each edge takes its path in the tree when that path is short enough, and the stretches that two edges or more share become highways.
  */
