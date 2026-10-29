@@ -128,6 +128,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PLUG-REGISTER | [Plug rules](../packages/core/README.md#plug-rules-and-fixed-ports): the step `plugs` lists `facing`, `side` (WILD-001), `justify` (WILD-002) and `spread`, each with a schema. `side` and `justify` give the plugs of the options `plugs: side` and `plugGap` of `corners`. The output of `corners` does not change. | 2026-10-28 | #169 |
 | PLUG-SPREAD | The plug strategy `spread` spreads the free plugs of each wall over its room with the gap `plugGap`, in the order of the far ends. On a short wall the gap shrinks evenly, and no plug drops. 14 ends on a wall of 100 px get 14 plugs with equal gaps. | 2026-10-28 | #169 |
 | FIX-PORTS | The export `fixPorts(graph, rule, options?)` gives each free port a fixed `at` from a plug rule. On a made-up board of 6 cards with 20 rows, `sections` then anchors 120 of 120 routes at their plugs, with 0.55% more length than `facing`. | 2026-10-28 | #169 |
+| CORPUS-FAMILIES | [The corpus families](LAYOUT-RECORDS.md#the-corpus-families-corpus-gen): 9 new families of `HIGHWAYS_FAMILIES`, for a total of 15. They add cards with rows, a pipeline, a fan-out, two hubs, uneven sizes, thin bars, long edges, a local mesh and a bipartite part. [`screen-v3`](LAYOUT-RECORDS.md#the-screen-set-screen-v3) has 150 boards. A sign test over 15 families passes at 12 of 15, not only at 6 of 6. | 2026-10-28 | #174 |
 
 ## Calibration
 
@@ -170,7 +171,6 @@ The rule for the next predictions:
 | BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
 | INTERIOR-ROUTE | Slice 2: inner box to inner box. Each edge between two nodes of one frame routes inside their nearest common frame, around the other nodes. Slice 1 (the plugs of the walls) shipped. | `later` | INTERIOR-ROUTE slice 1 | P1 |
 | PASS-GRID | On `screen-v2`, each highway strategy has too many pass-throughs on some `packed-grid` seed, so the front of the highway screen is empty. Find the cause on the worst seeds: the plan, `follow`, or the floor. | `later` | CORPUS-SEEDS | P1 |
-| CORPUS-FAMILIES | 12 or more input families from the dimensions of the generator, so a verdict over families has power. Today `screen-v2` has 6, and a sign test passes only at 6 of 6. | `later` | CORPUS-GEN | P1 |
 | FAMILIES-WEEKLY | New input families each week, with no ceiling: dumps of made-up data, adversarial and worst cases, scaling ladders and benchmarks from the literature. The sliders of the site get each one at once. | `later` | CORPUS-FAMILIES | P1 |
 | SPACE-COVERAGE | One number on the site, with a weekly trend: the share of strategies, options and input dimensions where each measure has a fitted model, a held-out error and Sobol indices. | `later` | STAGE-DATA, PASS-GRID | P1 |
 | SOLVED-ATLAS | The atlas shows each solved region. A region is solved when its leader is within a measured bound of a proven lower bound, or when one leader holds for 4 weeks. | `later` | SPACE-COVERAGE | P1 |
