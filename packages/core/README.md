@@ -49,6 +49,40 @@ const node = { id: "a", box: { x: 0, y: 0, w: 80, h: 40 }, ports: [{ id: "out", 
 // The plug "out" is at (80, 10). With h = 120, it is at (80, 30).
 ```
 
+### Plug rules and fixed ports
+
+A plug rule is a strategy of the step `plugs`. It places the free plugs of each edge. A fixed plug stays at its point.
+
+| Rule | The place of each free plug |
+|---|---|
+| `facing` | The plug faces the other end of its edge. It is the default of the router `corners`. |
+| `side` | The search of the route starts from the whole free side. The plug goes where the way leaves the side (WILD-001). |
+| `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
+| `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
+
+- `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
+- `spread` keeps the room of a wall free of the corner insets (`inset`) and of the fixed plugs on the wall.
+  - When the room is too small for the gap, the gap shrinks evenly. No plug drops.
+  - The order on the wall keeps the order of the far ends, so the straight lines of two plugs do not cross at the wall.
+  - The ends of one port share one plug. The option `rounds` sorts each wall again by the new places of the far ends.
+- The option `plug` of `corners` takes a plug rule. The other routers place the plugs as `facing` does.
+
+`fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
+
+- The rule is a plug strategy, or the name of one in `STRATEGIES` (or in the option `registry`). `plugOptions` gives its options.
+- A fixed port keeps its values, and a port of no edge stays free. A port of several ends takes the plug of its first end.
+- An end without a port stays free. With `newPorts: true`, it gets a new fixed port with the id `<edge id>:source` or `<edge id>:target`.
+- The output is a new graph. The function does not change the input.
+- The routes of `corners` on the output are the routes of `corners` with the option `plug` on the input.
+
+```ts
+import { fixPorts, sectionsRouter } from "@mark1russell7/highways";
+
+// The rows of each card get plugs on the walls with at least 8 px between two plugs. Then `sections` routes between them.
+const fixed = fixPorts(graph, "spread", { plugOptions: { plugGap: 8 } });
+const result = sectionsRouter({ name: "sections" }).route(fixed);
+```
+
 ### Frames
 
 A node can name a frame node in `parent`. A frame is a node that holds other nodes, for example a card that holds rows.
@@ -396,7 +430,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
-| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths` |

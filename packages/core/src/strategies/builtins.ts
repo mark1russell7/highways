@@ -77,6 +77,9 @@ import { depthLevels, type DepthLevelOptions } from "../levels/depths/index.ts";
 import { VENATION_DEFAULTS, venationLevels, type VenationOptions } from "../levels/venation/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { facingEnds } from "../plugs/facing/index.ts";
+import { justifyEnds, type JustifyOptions } from "../plugs/justify.ts";
+import { sideEnds, type SidePlugOptions } from "../plugs/side.ts";
+import { SPREAD_DEFAULTS, spreadEnds, type SpreadOptions } from "../plugs/spread/index.ts";
 import { roomDemand, type RoomMethod, type RoomOptions } from "../room/index.ts";
 import { levelRoom, type LevelRoomOptions } from "../room/levels/index.ts";
 import { cornersRouter, type CornersOptions } from "../routers/corners.ts";
@@ -91,8 +94,7 @@ import { BOARD_PORTFOLIO_DEFAULTS, boardPortfolio, type BoardPortfolioOptions, t
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { BOARD_PORTFOLIO_SCHEMA, DEPTHS_SCHEMA, PIPELINE_SCHEMA, VENATION_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA } from "./schemas.ts";
+import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -981,6 +983,9 @@ export const highwayStrategies: {
 /** The built-in plug rules: the strategies of the step `plugs`. The router `corners` routes between their plugs with its option `plug`. */
 export const plugStrategies: {
   readonly facing: Strategy<"plugs", object>;
+  readonly side: Strategy<"plugs", SidePlugOptions>;
+  readonly justify: Strategy<"plugs", JustifyOptions>;
+  readonly spread: Strategy<"plugs", SpreadOptions>;
 } = Object.freeze({
   facing: defineStrategy({
     step: "plugs",
@@ -989,6 +994,30 @@ export const plugStrategies: {
     defaults: {},
     schema: {},
     run: (input) => facingEnds(input),
+  }),
+  side: defineStrategy<"plugs", SidePlugOptions>({
+    step: "plugs",
+    name: "side",
+    describe: "WILD-001. The search of a route starts from the whole free side, and the plug goes where the way leaves the side. It is `corners` with `plugs: side`.",
+    defaults: { bend: 1, inset: 6, most: 16 },
+    schema: SIDE_PLUG_SCHEMA,
+    run: (input, o) => sideEnds(input, o),
+  }),
+  justify: defineStrategy<"plugs", JustifyOptions>({
+    step: "plugs",
+    name: "justify",
+    describe: "WILD-002. The plugs of `facing`, then the free plugs of each side keep their order and a minimum gap. They move the least distance.",
+    defaults: { plugGap: 8 },
+    schema: JUSTIFY_SCHEMA,
+    run: (input, o) => justifyEnds(input, o),
+  }),
+  spread: defineStrategy<"plugs", SpreadOptions>({
+    step: "plugs",
+    name: "spread",
+    describe: "PLUG-SPREAD. The free plugs of each wall share its room with a minimum gap, in the order of their far ends. On a short wall the gap shrinks, and no plug drops.",
+    defaults: { ...SPREAD_DEFAULTS },
+    schema: SPREAD_SCHEMA,
+    run: (input, o) => spreadEnds(input, o),
   }),
 });
 

@@ -6,6 +6,9 @@ import type { MlsebOptions } from "../highways/mlseb/index.ts";
 import type { PowerOptions } from "../highways/power/index.ts";
 import type { SbebOptions } from "../highways/sbeb/index.ts";
 import type { CutOptions } from "../groups/cut/index.ts";
+import type { JustifyOptions } from "../plugs/justify.ts";
+import type { SidePlugOptions } from "../plugs/side.ts";
+import type { SpreadOptions } from "../plugs/spread/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
@@ -930,6 +933,25 @@ export const DEPTHS_SCHEMA: OptionSchema<DepthLevelOptions> = {
   plugInset: SECTIONS_SCHEMA.plugInset,
   throughCost: SECTIONS_SCHEMA.throughCost,
   levels: SECTIONS_SCHEMA.levels,
+};
+
+/** The declarations of the options of the plug strategy `side` (WILD-001). The defaults are the plugs of `corners` with `plugs: "side"`. */
+export const SIDE_PLUG_SCHEMA: OptionSchema<SidePlugOptions> = {
+  bend: { type: "number", min: 0, max: 4, step: 0.25, default: 1, describe: "The cost of a slant first leg: its length grows by this value times its angle to the normal." },
+  inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its side." },
+  most: { type: "integer", min: 1, max: 64, step: 1, default: 16, describe: "The largest number of places that the search tries on each side." },
+};
+
+/** The declarations of the options of the plug strategy `justify` (WILD-002). */
+export const JUSTIFY_SCHEMA: OptionSchema<JustifyOptions> = {
+  plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The free plugs of a side keep their order and at least this gap. 0 keeps each plug where it faces." },
+};
+
+/** The declarations of the options of the plug strategy `spread` (PLUG-SPREAD). */
+export const SPREAD_SCHEMA: OptionSchema<SpreadOptions> = {
+  plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
+  inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
+  rounds: { type: "integer", min: 0, max: 8, step: 1, default: 2, describe: "The passes that sort each wall again by the new places of the far ends." },
 };
 
 /** The declarations of the options of the whole strategy `pipeline`. */

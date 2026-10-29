@@ -18,6 +18,8 @@ export * from "./room/index.ts";
 export * from "./room/lanes.ts";
 export * from "./room/levels/index.ts";
 export * from "./plugs/facing/index.ts";
+export * from "./plugs/spread/index.ts";
+export * from "./plugs/fix.ts";
 export * from "./levels/depths/index.ts";
 export * from "./whole/pipeline/index.ts";
 export * from "./levels/venation/index.ts";

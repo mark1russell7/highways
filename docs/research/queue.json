@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
   "date": "2026-10-29",
-  "commit": "a545854f48f90b5015ff8b889d29c7f45e6672bc",
+  "commit": "ba770520c55c0b8cd06232d00b2aceb8d5d51f87",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -54,10 +54,10 @@
     }
   },
   "backtest": {
-    "ideas": 59,
-    "rho": 0.446,
-    "low": 0.211,
-    "high": 0.657,
+    "ideas": 57,
+    "rho": 0.45,
+    "low": 0.196,
+    "high": 0.665,
     "resamples": 2000,
     "seed": 1
   },
