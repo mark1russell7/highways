@@ -818,11 +818,17 @@ h1.tagline {
   margin: 0.3rem 0 0;
 }
 
-.try h3 {
+.try h3,
+.inner-mode h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 900;
   color: var(--sign);
+}
+
+/* The mode of the routes inside a card (INTERIOR-GUTTER): corners or gutters. */
+.inner-mode h3 {
+  margin-bottom: 6px;
 }
 
 .try ul {

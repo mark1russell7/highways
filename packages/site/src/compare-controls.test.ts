@@ -26,6 +26,10 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "corners-smooth.outside": "The boards of the compare page have no frames (INTERIOR-ROUTE), so no box is outside its frame.",
   "corners.frameInset": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
   "corners-smooth.frameInset": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners.inner": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners-smooth.inner": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners-smooth.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */
