@@ -1,7 +1,8 @@
 {
-  "run": "40930460078 (main 8c2702b + the gate) for 14 routers; 40933904789 (the fix of streetPlan) for streets",
+  "run": "40937118877 (f90297f, the fix of streetPlan) for the 15 routers",
   "margin": 1.5,
   "floorMb": 1024,
+  "slackMb": 64,
   "measureCapMb": 12288,
   "routers": {
     "straight": {
@@ -9,60 +10,60 @@
       "heapMb": 28
     },
     "plugs": {
-      "rssMb": 123,
+      "rssMb": 122,
       "heapMb": 41
     },
     "corners": {
-      "rssMb": 153,
-      "heapMb": 65
+      "rssMb": 147,
+      "heapMb": 60
     },
     "corners-smooth": {
       "rssMb": 218,
-      "heapMb": 127
+      "heapMb": 126
     },
     "trunks": {
-      "rssMb": 153,
-      "heapMb": 61
+      "rssMb": 156,
+      "heapMb": 62
     },
     "sections": {
-      "rssMb": 215,
-      "heapMb": 119
+      "rssMb": 209,
+      "heapMb": 113
     },
     "sections-tree": {
-      "rssMb": 215,
-      "heapMb": 118
+      "rssMb": 208,
+      "heapMb": 112
     },
     "shared": {
-      "rssMb": 306,
-      "heapMb": 193
+      "rssMb": 283,
+      "heapMb": 167
     },
     "shared-all": {
-      "rssMb": 345,
-      "heapMb": 225
+      "rssMb": 393,
+      "heapMb": 258
     },
     "steiner": {
-      "rssMb": 236,
-      "heapMb": 138
+      "rssMb": 233,
+      "heapMb": 137
     },
     "gaps": {
-      "rssMb": 220,
-      "heapMb": 122
+      "rssMb": 216,
+      "heapMb": 123
     },
     "streets": {
-      "rssMb": 276,
-      "heapMb": 118
+      "rssMb": 261,
+      "heapMb": 119
     },
     "search": {
-      "rssMb": 1268,
-      "heapMb": 482
+      "rssMb": 863,
+      "heapMb": 338
     },
     "interchanges": {
-      "rssMb": 725,
-      "heapMb": 623
+      "rssMb": 639,
+      "heapMb": 538
     },
     "portfolio": {
-      "rssMb": 290,
-      "heapMb": 176
+      "rssMb": 281,
+      "heapMb": 169
     }
   }
 }
