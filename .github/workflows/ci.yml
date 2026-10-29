@@ -24,7 +24,7 @@ jobs:
   # with a heap cap from its measure in packages/core/scripts/data/heap/budgets.json. A memory regression of a router fails here.
   heap:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
