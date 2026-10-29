@@ -4,7 +4,7 @@ import { commonTests, flows, hub } from "../fixtures.test-util.ts";
 import { checkPlan } from "../model.ts";
 import { tidyPlan } from "../base.ts";
 import { candidatePlan } from "../select/index.ts";
-import { SEARCH_DEFAULTS, searchEvaluations, searchPlan, searchScore } from "./index.ts";
+import { SEARCH_DEFAULTS, SEARCH_WORK_UNIT, searchPlan, searchRun, searchScore } from "./index.ts";
 
 describe("the highway strategy search (HWY-059)", () => {
   it("gives the start plan with no evaluations", () => {
@@ -28,21 +28,25 @@ describe("the highway strategy search (HWY-059)", () => {
     expect(searchScore(hub, follow(hub, start).routes, first, o)).toBeGreaterThan(searchScore(hub, first, first, o));
   });
 
-  it("limits the measured plans to the work budget divided by the edges (SEARCH-BUDGET)", () => {
-    expect(searchEvaluations({ evaluations: 16, work: 0 }, 4000)).toBe(16);
-    expect(searchEvaluations({ evaluations: 16 }, 4000)).toBe(16);
-    expect(searchEvaluations({ evaluations: 16, work: 32_000 }, 4000)).toBe(8);
-    expect(searchEvaluations({ evaluations: 16, work: 32_000 }, 100)).toBe(16);
-    expect(searchEvaluations({ evaluations: 16, work: 3999 }, 4000)).toBe(0);
-    expect(searchEvaluations({ evaluations: 16, work: 10 }, 0)).toBe(10);
-  });
+  it("counts the same work on each run, and keeps the default plan with no work budget (SEARCH-BUDGET)", () => {
+    const a = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6 });
+    const b = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6, work: 0 });
+    expect(a.evaluations).toBe(6);
+    expect(a.work).toBeGreaterThan(0);
+    expect(b).toEqual(a);
+    expect(a.plan).toEqual(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6 }));
+  }, 30_000);
 
-  it("keeps the default plan with no work budget, and gives the start plan with too little work", () => {
-    const edges = hub.edges.length;
-    expect(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6, work: 0 })).toEqual(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6 }));
-    expect(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6, work: 6 * edges })).toEqual(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6 }));
-    expect(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6, work: 3 * edges })).toEqual(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 3 }));
-    expect(searchPlan({ graph: hub }, { ...SEARCH_DEFAULTS, work: edges - 1 })).toEqual(tidyPlan(candidatePlan({ graph: hub }, "corridors")));
+  it("measures no new plan after the work budget, and gives the start plan with too little work (SEARCH-BUDGET)", () => {
+    const three = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 3 });
+    const two = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 2 });
+    // A budget between the work of 2 plans and the work of 3 plans stops after the third plan.
+    const budget = (two.work + three.work) / 2 / SEARCH_WORK_UNIT;
+    const cut = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 6, work: budget });
+    expect(cut).toEqual(three);
+    const least = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, work: 1 / SEARCH_WORK_UNIT });
+    expect(least.evaluations).toBe(1);
+    expect(least.plan).toEqual(tidyPlan(candidatePlan({ graph: hub }, "corridors")));
   }, 30_000);
 
   commonTests("search", { ...SEARCH_DEFAULTS, evaluations: 4 }, searchPlan, [flows]);

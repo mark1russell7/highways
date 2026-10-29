@@ -2,6 +2,7 @@ import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/meas
 import type { Point } from "../../geom.ts";
 import type { Graph, Route } from "../../model.ts";
 import { WayFinder } from "../../ways.ts";
+import { workCounts, workSince } from "../../work.ts";
 import { nearestPlace, orderAlongRoutes, tidyPlan, firstRoutes } from "../base.ts";
 import { follow } from "../follow.ts";
 import { memberAt, type Highway, type HighwayInput, type HighwayPlan } from "../model.ts";
@@ -29,8 +30,8 @@ export interface SearchOptions {
   /** The seed of the moves. The default is 1. */
   readonly seed: number;
   /**
-   * The work budget (SEARCH-BUDGET): the most edge routes that the search measures. Each measured plan costs the number of the edges of the graph.
-   * Thus the search measures at most `floor(work / edges)` plans, and the work of a large board stays bounded. The value 0 is no limit. The default is 0.
+   * The work budget (SEARCH-BUDGET), in millions of the units of `workUnits`. The search measures no new plan after the plans that it measured took this work.
+   * The units count the steps of the hot loops, so the same budget stops at the same plan on each machine. The value 0 is no limit. The default is 0.
    */
   readonly work?: number;
 }
@@ -91,14 +92,17 @@ function acceptance(y: number): number {
   return 1 / (1 + y + (y * y) / 2);
 }
 
-/**
- * This function gives the number of the plans that `searchPlan` measures on a graph with `edges` edges (SEARCH-BUDGET).
- * It is `evaluations`, and the work budget `work` limits it to `floor(work / edges)` when `work` is more than 0.
- */
-export function searchEvaluations(o: Readonly<Pick<SearchOptions, "evaluations" | "work">>, edges: number): number {
-  const evaluations = Math.max(0, Math.floor(o.evaluations));
-  const work = Math.max(0, Math.floor(o.work ?? 0));
-  return work > 0 ? Math.min(evaluations, Math.floor(work / Math.max(1, edges))) : evaluations;
+/** The number of the units of `workUnits` in one unit of the option `work`. */
+export const SEARCH_WORK_UNIT = 1_000_000;
+
+/** The result of `searchRun` (SEARCH-BUDGET). */
+export interface SearchRun {
+  /** The best plan that the search measured. */
+  readonly plan: HighwayPlan;
+  /** The number of the plans that the search measured. */
+  readonly evaluations: number;
+  /** The units of `workUnits` that the measures of the plans took. */
+  readonly work: number;
 }
 
 /**
@@ -109,10 +113,19 @@ export function searchEvaluations(o: Readonly<Pick<SearchOptions, "evaluations" 
  * The score reads only this graph and its routes. Thus the search does not fit to the inputs of a screen.
  */
 export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): HighwayPlan {
+  return searchRun(input, o).plan;
+}
+
+/**
+ * This function is `searchPlan`, and it also gives the number of the plans that it measured and their work (SEARCH-BUDGET).
+ * With `work` more than 0, the search measures no new plan after the work of its measures is `work` × `SEARCH_WORK_UNIT` units or more.
+ */
+export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>): SearchRun {
   const graph = input.graph;
   const start = tidyPlan(candidatePlan(input, o.from));
-  const budget = searchEvaluations(o, graph.edges.length);
-  if (budget === 0 || graph.edges.length === 0) return start;
+  const budget = Math.max(0, Math.floor(o.evaluations));
+  const limit = Math.max(0, o.work ?? 0) * SEARCH_WORK_UNIT;
+  if (budget === 0 || graph.edges.length === 0) return { plan: start, evaluations: 0, work: 0 };
   const pool: Highway[] = [];
   for (const source of o.pool) if (source !== o.from) pool.push(...candidatePlan(input, source).highways);
   const finder = new WayFinder(graph.nodes);
@@ -120,7 +133,13 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
   const plugs = new Map(edgePlugs(graph).map((p) => [p.edge.id, p] as const));
   const routes = firstRoutes(input);
   const first = follow(graph, { highways: [] }).routes;
-  const scoreOf = (plan: HighwayPlan): number => searchScore(graph, follow(graph, plan).routes, first, o);
+  let work = 0;
+  const scoreOf = (plan: HighwayPlan): number => {
+    const from = workCounts();
+    const score = searchScore(graph, follow(graph, plan).routes, first, o);
+    work += workSince(from);
+    return score;
+  };
   const next = random(o.seed);
   const pick = <T>(list: readonly T[]): T => list[Math.floor(next() * list.length) % list.length]!;
   const tidy = (highways: Highway[]): HighwayPlan => tidyPlan(orderAlongRoutes({ highways }, routes));
@@ -172,7 +191,8 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
   let best = start;
   let bestScore = currentScore;
   let temperature = Math.max(0, o.temperature);
-  for (let n = 1, tries = 0; n < budget && tries < 4 * budget; tries++) {
+  let n = 1;
+  for (let tries = 0; n < budget && tries < 4 * budget && (limit === 0 || work < limit); tries++) {
     const plan = moved(current, pick(SEARCH_MOVES));
     if (!plan) continue;
     n++;
@@ -182,5 +202,5 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
     if (score > bestScore + 1e-12) [best, bestScore] = [plan, score];
     if (n % SWEEP === 0) temperature *= 0.95;
   }
-  return best;
+  return { plan: best, evaluations: n, work };
 }

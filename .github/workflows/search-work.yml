@@ -1,5 +1,6 @@
-# The unit of the work budget of the highway strategy search (SEARCH-BUDGET). It times searchPlan on windows of the dense board
-# at several counts of evaluations, and it fits the extra time against the work (edges × evaluations). Times run here, not on a local machine.
+# The unit of the work budget of the highway strategy search (SEARCH-BUDGET). The job work times searchRun on windows of the dense board
+# at several counts of evaluations, and it fits the extra time against the counted work (src/work.ts). Gate (a) is in its summary.
+# The jobs stops write the stop of each budget on Linux and on Windows, and the job same compares them (gate (b)). Times run here, not on a local machine.
 name: Search work
 
 on:
@@ -7,6 +8,10 @@ on:
   pull_request:
     paths:
       - "packages/core/src/highways/search/**"
+      - "packages/core/src/work.ts"
+      - "packages/core/src/lane-order.ts"
+      - "packages/core/src/visibility.ts"
+      - "packages/core/src/bench/measures/bundles.ts"
       - "packages/core/scripts/search-work.ts"
       - ".github/workflows/search-work.yml"
   workflow_dispatch:
@@ -17,9 +22,12 @@ on:
       evaluations:
         description: "The counts of evaluations, separated by commas"
         default: "2,4,8"
-      repeat:
-        description: "The runs of each point (the time is the median)"
-        default: "1"
+      min-ms:
+        description: "The least time in ms of the runs of each point, up to 9 runs (the time is the median)"
+        default: "2000"
+      budgets:
+        description: "The budgets of the stop records, in millions of units, separated by commas"
+        default: "1,10,100,1000"
 
 permissions:
   contents: read
@@ -31,7 +39,7 @@ jobs:
     env:
       SIZES: ${{ inputs.sizes || '60,125,250,500,1000' }}
       EVALUATIONS: ${{ inputs.evaluations || '2,4,8' }}
-      REPEAT: ${{ inputs.repeat || '1' }}
+      MIN_MS: ${{ inputs.min-ms || '2000' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -46,7 +54,7 @@ jobs:
         working-directory: packages/core
         run: |
           set -o pipefail
-          node scripts/search-work.ts --sizes "$SIZES" --evaluations "$EVALUATIONS" --repeat "$REPEAT" --out "$RUNNER_TEMP/search-work.jsonl" | tee table.md
+          node scripts/search-work.ts --sizes "$SIZES" --evaluations "$EVALUATIONS" --min-ms "$MIN_MS" --out "$RUNNER_TEMP/search-work.jsonl" | tee table.md
           cat table.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
@@ -54,3 +62,52 @@ jobs:
           name: search-work-${{ github.sha }}
           path: ${{ runner.temp }}/search-work.jsonl
           if-no-files-found: warn
+
+  stops:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Write the stop of each budget
+        working-directory: packages/core
+        shell: bash
+        run: node scripts/search-work.ts --stops "$RUNNER_TEMP/stops.jsonl" --budgets "$BUDGETS"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: search-stops-${{ matrix.os }}-${{ github.sha }}
+          path: ${{ runner.temp }}/stops.jsonl
+
+  same:
+    needs: stops
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: search-stops-*-${{ github.sha }}
+          path: stops
+      - name: Compare the stops of Linux and Windows
+        run: |
+          ls -R stops
+          {
+            echo "## The stops of each budget (gate (b))"
+            echo
+            echo '```'
+            cat stops/search-stops-ubuntu-latest-*/stops.jsonl
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cmp stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
+          echo "Gate (b): the stops of Linux and Windows are byte-equal." >> "$GITHUB_STEP_SUMMARY"
