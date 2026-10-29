@@ -3,10 +3,10 @@
   "step": "router",
   "base": "shared",
   "level": 0.05,
-  "run": 40767715430,
-  "commit": "a32522f25d1bbe0e59c212493e5be708c3d4ad58",
+  "run": 40795910435,
+  "commit": "3a99fa5f2ba479e971896fb883db7a362bd150a0",
   "date": "2026-10-28",
-  "core": "0.8.1",
+  "core": "0.9.2",
   "rows": [
     {"strategy":"straight","guard":"R1","measure":"route.crossings","label":"worse","old":"worse","stratified":-284.3666666666667,"pooled":-284.3666666666667,"p":0.00004999750012499375,"families":[{"family":"dense-groups","n":10,"mean":-1240.6,"sign":-1},{"family":"hub-chain","n":10,"mean":-34.7,"sign":-1},{"family":"many-groups","n":10,"mean":-69.2,"sign":-1},{"family":"packed-grid","n":10,"mean":9.2,"sign":1},{"family":"small-clustered","n":10,"mean":-374.5,"sign":-1},{"family":"tiny-uniform","n":10,"mean":3.6,"sign":1}],"breadth":{"against":2,"of":6,"ties":0}},
     {"strategy":"straight","guard":"R4","measure":"route.turn.mean","label":"better","old":"better","stratified":0.5484427310029921,"pooled":0.5484427310029922,"p":0.00004999750012499375,"families":[{"family":"dense-groups","n":10,"mean":0.9148537251966898,"sign":1},{"family":"hub-chain","n":10,"mean":0.14858711892628126,"sign":1},{"family":"many-groups","n":10,"mean":0.9109176949645164,"sign":1},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"small-clustered","n":10,"mean":0.8207326603981204,"sign":1},{"family":"tiny-uniform","n":10,"mean":0.495565186532345,"sign":1}],"breadth":{"against":0,"of":6,"ties":1}},

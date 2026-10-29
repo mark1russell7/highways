@@ -46,6 +46,8 @@ import { P_HUB_DEFAULTS, pHubPlan, type PHubOptions } from "../highways/p-hub/in
 import { SCALE_SPACE_DEFAULTS, scaleSpacePlan, type ScaleSpaceOptions } from "../highways/scale-space/index.ts";
 import { GAP_DEFAULTS, gapPlan, type GapOptions } from "../highways/gaps/index.ts";
 import { INTERCHANGE_DEFAULTS, interchangePlan, type InterchangeOptions } from "../highways/interchanges/index.ts";
+import { KNEE_DEFAULTS, kneePlan, type KneeOptions } from "../highways/knee/index.ts";
+import { BRONCHIAL_DEFAULTS, bronchialPlan, type BronchialOptions } from "../highways/bronchial/index.ts";
 import { SEARCH_DEFAULTS, searchPlan, type SearchOptions } from "../highways/search/index.ts";
 import { STEINER_DEFAULTS, steinerPlan, type SteinerOptions } from "../highways/steiner/index.ts";
 import { STREET_DEFAULTS, streetPlan, type StreetOptions } from "../highways/streets/index.ts";
@@ -72,6 +74,7 @@ import { WEISZFELD_DEFAULTS, weiszfeldPlan, type WeiszfeldOptions } from "../hig
 import { WSPD_DEFAULTS, wspdPlan, type WspdOptions } from "../highways/wspd/index.ts";
 import { ZIPPER_DEFAULTS, zipperPlan, type ZipperOptions } from "../highways/zipper/index.ts";
 import { depthLevels, type DepthLevelOptions } from "../levels/depths/index.ts";
+import { VENATION_DEFAULTS, venationLevels, type VenationOptions } from "../levels/venation/index.ts";
 import type { Graph, Result, Router } from "../model.ts";
 import { facingEnds } from "../plugs/facing/index.ts";
 import { justifyEnds, type JustifyOptions } from "../plugs/justify.ts";
@@ -87,11 +90,11 @@ import { straightRouter } from "../routers/straight.ts";
 import { byCollection, trunksRouter, type TrunksOptions } from "../routers/trunks.ts";
 import { buildSections, SECTION_DEFAULTS, type SectionOptions } from "../sections.ts";
 import { runPipeline, type PipelineOptions } from "../whole/pipeline/index.ts";
+import { BOARD_PORTFOLIO_DEFAULTS, boardPortfolio, type BoardPortfolioOptions, type PortfolioSetting } from "../whole/portfolio/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA } from "./schemas.ts";
-import { CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA } from "./schemas.ts";
+import { DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -475,6 +478,8 @@ export const highwayStrategies: {
   readonly streets: Strategy<"highway", StreetOptions>;
   readonly search: Strategy<"highway", SearchOptions>;
   readonly interchanges: Strategy<"highway", InterchangeOptions>;
+  readonly knee: Strategy<"highway", KneeOptions>;
+  readonly bronchial: Strategy<"highway", BronchialOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -950,6 +955,24 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<InterchangeOptions>) => interchangePlan(input, o),
   }),
+  knee: defineStrategy({
+    step: "highway",
+    name: "knee",
+    describe: "The knee of the plant front (NAT-018). A sweep of the balancing factor of NAT-017 gives trees, and the tree at the knee of ink against path length wins.",
+    defaults: { ...KNEE_DEFAULTS } as KneeOptions,
+    schema: KNEE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<KneeOptions>) => kneePlan(input, o),
+  }),
+  bronchial: defineStrategy({
+    step: "highway",
+    name: "bronchial",
+    describe: "Bronchial splits that fill the space (NAT-019). The tree grows toward the center of its targets, then splits the targets in two halves, again and again.",
+    defaults: { ...BRONCHIAL_DEFAULTS } as BronchialOptions,
+    schema: BRONCHIAL_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<BronchialOptions>) => bronchialPlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -1001,6 +1024,7 @@ export const plugStrategies: {
 /** The built-in level rules: the strategies of the step `levels`. The router `sections` makes its zoom levels with its option `level`. */
 export const levelStrategies: {
   readonly depths: Strategy<"levels", DepthLevelOptions>;
+  readonly venation: Strategy<"levels", VenationOptions>;
 } = Object.freeze({
   depths: defineStrategy<"levels", DepthLevelOptions>({
     step: "levels",
@@ -1010,7 +1034,29 @@ export const levelStrategies: {
     schema: DEPTHS_SCHEMA,
     run: (input, o) => depthLevels(input, o),
   }),
+  venation: defineStrategy<"levels", VenationOptions>({
+    step: "levels",
+    name: "venation",
+    describe: "A closed venation backbone (NAT-016). The links of each level with groups take their ways along the relative neighbourhood graph of the items.",
+    defaults: { ...VENATION_DEFAULTS },
+    schema: VENATION_SCHEMA,
+    run: (input, o) => venationLevels(input, o),
+  }),
 });
+
+/**
+ * The fixed list of settings of the whole strategy `board-portfolio` (WILD-045), in order. The option `settings` takes the first ones.
+ * The list holds routers and highway strategies with their defaults. It comes from the catalog of the strategies, not from a fit to the screen.
+ */
+export const BOARD_PORTFOLIO_SETTINGS: readonly PortfolioSetting[] = Object.freeze(
+  [
+    ...(["shared", "corners", "trunks", "sections", "sections-tree", "corners-smooth"] as const).map((name) => ({ name, pipeline: { router: routerStrategies[name] as Strategy<"router"> } })),
+    ...(["corridors", "shared-ways", "road-classes", "steiner", "knee", "bronchial"] as const).map((name) => ({
+      name: `highway:${name}`,
+      pipeline: { router: routerStrategies.corners as Strategy<"router">, highway: highwayStrategies[name] as Strategy<"highway"> },
+    })),
+  ].map((s) => Object.freeze(s)),
+);
 
 /**
  * The built-in whole strategies: the strategies of the step `whole`. The strategy `pipeline` runs one strategy of each step, as the demo of the site does.
@@ -1018,6 +1064,7 @@ export const levelStrategies: {
  */
 export const wholeStrategies: {
   readonly pipeline: Strategy<"whole", PipelineOptions>;
+  readonly "board-portfolio": Strategy<"whole", BoardPortfolioOptions>;
 } = Object.freeze({
   pipeline: defineStrategy<"whole", PipelineOptions>({
     step: "whole",
@@ -1026,6 +1073,14 @@ export const wholeStrategies: {
     defaults: { router: routerStrategies.corners as Strategy<"router"> },
     schema: PIPELINE_SCHEMA,
     run: (graph, o) => runPipeline(graph, o),
+  }),
+  "board-portfolio": defineStrategy<"whole", BoardPortfolioOptions>({
+    step: "whole",
+    name: "board-portfolio",
+    describe: "A portfolio for each board (WILD-045). The pipeline tries a fixed list of settings, and the least weighted rank of crossings, detour and ink wins.",
+    defaults: { ...BOARD_PORTFOLIO_DEFAULTS },
+    schema: BOARD_PORTFOLIO_SCHEMA,
+    run: (graph, o) => boardPortfolio(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
   }),
 });
 

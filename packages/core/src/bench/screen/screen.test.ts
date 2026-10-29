@@ -376,6 +376,8 @@ describe("screen", () => {
       ["highway", "streets"],
       ["highway", "search"],
       ["highway", "interchanges"],
+      ["highway", "knee"],
+      ["highway", "bronchial"],
       ["highway", "corridors+breakeven"],
       ["highway", "corridors+stretch"],
       ["highway", "corridors+ambiguity"],

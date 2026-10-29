@@ -7,7 +7,7 @@
 // The queue also scores the enablers: each one removes a block of ideas. The header has the back test with its bootstrap interval.
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { STEPS } from "../src/strategies/model.ts";
@@ -24,6 +24,8 @@ export const QUEUE_URL = new URL("queue.json", RESEARCH);
 export const TAKEN_URL = new URL("queue-taken.json", RESEARCH);
 /** The folder of the verdict snapshots. */
 export const VERDICTS_DIR = new URL("verdicts/", RESEARCH);
+/** The folder of the verdict snapshots of the opt-in strategies. Only the measured gain reads them. */
+export const OPT_IN_DIR = new URL("opt-in/", VERDICTS_DIR);
 
 /** The uncertainty of each kind of idea. */
 export const UNCERTAINTY: Readonly<Record<string, number>> = { ours: 1.0, hybrid: 0.85, literature: 0.7 };
@@ -179,6 +181,15 @@ export function loadSnapshots(): { readonly name: string; readonly snapshot: Que
     .map((name) => ({ name, snapshot: JSON.parse(readFileSync(new URL(name, VERDICTS_DIR), "utf8")) as QueueSnapshot }));
 }
 
+/** This function reads the verdict snapshots of the opt-in strategies, sorted by name. A missing folder gives no snapshot. */
+export function loadOptIn(): { readonly name: string; readonly snapshot: QueueSnapshot }[] {
+  if (!existsSync(OPT_IN_DIR)) return [];
+  return readdirSync(OPT_IN_DIR)
+    .filter((f) => f.endsWith(".json"))
+    .sort()
+    .map((name) => ({ name, snapshot: JSON.parse(readFileSync(new URL(name, OPT_IN_DIR), "utf8")) as QueueSnapshot }));
+}
+
 /** This function reads the list of the taken ideas. */
 export function loadTaken(): Taken[] {
   return JSON.parse(readFileSync(TAKEN_URL, "utf8")) as Taken[];
@@ -208,11 +219,13 @@ export function gainOf(wins: readonly string[], targets: readonly Target[]): num
  * This function gives the measured gain of a built strategy on the scale of the gain.
  * The value is 1, plus for each named win: 0.5 when a guard of the win is `better`, and the count of the open targets that the strategy closes.
  * The strategy closes a target of another strategy when, on the guard of the target, it wins on each family against the target.
+ * The rows of the strategy come from `snapshots` and from `optIn`, the snapshots of the opt-in strategies. The open targets come only from `snapshots`.
  * It gives `undefined` when the newest set has no row of the strategy.
  */
-export function measuredGain(strategy: string, wins: readonly string[], snapshots: readonly QueueSnapshot[]): number | undefined {
+export function measuredGain(strategy: string, wins: readonly string[], snapshots: readonly QueueSnapshot[], optIn: readonly QueueSnapshot[] = []): number | undefined {
   const newest = newestSet(snapshots);
-  const own = newest.flatMap((s) => s.rows.filter((r) => r.strategy === strategy).map((r) => ({ ...r, step: s.step })));
+  const set = newest[0]?.set;
+  const own = [...newest, ...optIn.filter((s) => s.set === set)].flatMap((s) => s.rows.filter((r) => r.strategy === strategy).map((r) => ({ ...r, step: s.step })));
   if (own.length === 0) return undefined;
   const targets = openTargets(snapshots).filter((t) => t.strategy !== strategy);
   let gain = 1;
@@ -230,6 +243,8 @@ export function measuredGain(strategy: string, wins: readonly string[], snapshot
 export interface QueueInput {
   readonly ideas: readonly Idea[];
   readonly snapshots: readonly QueueSnapshot[];
+  /** The snapshots of the opt-in strategies, for the measured gain only. */
+  readonly optIn?: readonly QueueSnapshot[];
   readonly taken: readonly Taken[];
   /** The map from each registered strategy to the ideas that it builds. */
   readonly strategies: readonly StrategyIdeas[];
@@ -275,7 +290,7 @@ export function buildQueue(input: QueueInput): Queue {
     // An idea that a registered strategy builds is built, also when its stage is old.
     const strategy = taken?.strategy ?? builtBy.get(canonical);
     const status: QueueStatus = builtBy.has(canonical) || (taken !== undefined && !open) ? "built" : taken === undefined ? "queued" : "building";
-    const measured = status === "built" && strategy !== undefined ? measuredGain(strategy, r.wins, input.snapshots) : undefined;
+    const measured = status === "built" && strategy !== undefined ? measuredGain(strategy, r.wins, input.snapshots, input.optIn) : undefined;
     return {
       id: r.id,
       name: r.name,
@@ -382,11 +397,12 @@ export function queueText(q: Queue): string {
 }
 
 /** The files that the queue reads, relative to the root of the repository. */
-export function inputNames(snapshotNames: readonly string[]): string[] {
+export function inputNames(snapshotNames: readonly string[], optInNames: readonly string[] = []): string[] {
   return [
     ...FAMILIES.map((f) => `docs/research/ideas/${f}.json`),
     "docs/research/ideas/meas3.json",
     ...snapshotNames.map((n) => `docs/research/verdicts/${n}`),
+    ...optInNames.map((n) => `docs/research/verdicts/opt-in/${n}`),
     "docs/research/queue-taken.json",
     "packages/core/src/strategies/model.ts (STEPS)",
     "packages/core/scripts/strategy-ideas.ts (the strategies and their ideas)",
@@ -397,9 +413,11 @@ export function inputNames(snapshotNames: readonly string[]): string[] {
 /** This function makes the queue from the files of the repository, with the date and the commit that it gets. */
 export function readQueue(date: string, commit: string): Queue {
   const snaps = loadSnapshots();
+  const optIn = loadOptIn();
   return buildQueue({
     ideas: loadIdeas(),
     snapshots: snaps.map((s) => s.snapshot),
+    optIn: optIn.map((s) => s.snapshot),
     taken: loadTaken(),
     strategies: strategyIdeas(),
     measures: knownMeasures(loadMeas3()).screen,
@@ -407,7 +425,7 @@ export function readQueue(date: string, commit: string): Queue {
     enablers: ENABLERS,
     date,
     commit,
-    inputs: inputNames(snaps.map((s) => s.name)),
+    inputs: inputNames(snaps.map((s) => s.name), optIn.map((s) => s.name)),
   });
 }
 

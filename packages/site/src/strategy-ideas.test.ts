@@ -57,4 +57,13 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["highway/search"]).toContain("HWY-059");
     expect(built.strategies["highway/interchanges"]).toContain("HWY-060");
   });
+
+  // The texts `describe` of the registered strategies of wave 4A (BUILD-W4A) cite their ideas.
+  it("gives the cards the ideas of the strategies of wave 4A", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/knee"]).toContain("NAT-018");
+    expect(built.strategies["highway/bronchial"]).toContain("NAT-019");
+    expect(built.strategies["levels/venation"]).toContain("NAT-016");
+    expect(built.strategies["whole/board-portfolio"]).toContain("WILD-045");
+  });
 });

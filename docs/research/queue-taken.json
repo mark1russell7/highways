@@ -1,1 +1,86 @@
-[]
+[
+  {
+    "id": "NAT-016",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "venation",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 25,
+      "uncertainty": 1.02,
+      "cost": 1,
+      "score": 25.5,
+      "rank": 1
+    }
+  },
+  {
+    "id": "NAT-018",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "knee",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 27.5,
+      "uncertainty": 0.85,
+      "cost": 1,
+      "score": 23.375,
+      "rank": 2
+    }
+  },
+  {
+    "id": "NAT-019",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "bronchial",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 24,
+      "uncertainty": 0.85,
+      "cost": 1,
+      "score": 20.4,
+      "rank": 4
+    }
+  },
+  {
+    "id": "RULE-021",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "annealing",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 26,
+      "uncertainty": 0.85,
+      "cost": 1,
+      "score": 22.1,
+      "rank": 3
+    }
+  },
+  {
+    "id": "WILD-023",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "tight",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 14.5,
+      "uncertainty": 1,
+      "cost": 1,
+      "score": 14.5,
+      "rank": 8
+    }
+  },
+  {
+    "id": "WILD-045",
+    "takenAt": "2026-10-29",
+    "by": "BUILD-W4A",
+    "strategy": "board-portfolio",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 26,
+      "uncertainty": 1.2,
+      "cost": 2,
+      "score": 15.6,
+      "rank": 7
+    }
+  }
+]

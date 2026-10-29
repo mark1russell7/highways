@@ -474,6 +474,13 @@ Each of these steps has one default strategy. The default gives the output of th
   The option `level` of `sections` takes a level strategy, and `levelOptions` gives its options. The strategy also gets the level options of the router.
 - `pipeline` (the step `whole`) runs a room strategy, then a router or a highway plan, with the rules that the router reads (`runPipeline`).
   Without options, it routes with `corners`. The demo of the site runs it. It does not draw the curves.
+- `venation` (the step `levels`, NAT-016) keeps the levels of `depths`. Its level links take their ways on a closed backbone of the items.
+  The backbone is the relative neighbourhood graph (`rng`) or the Gabriel graph. A backbone link that a level link uses costs less for the next level links.
+  The routes do not change, so only the level links (Z3) change.
+- `board-portfolio` (the step `whole`, WILD-045) runs a short list of settings on the board and keeps the best one.
+  The list `BOARD_PORTFOLIO_SETTINGS` holds 12 routers and highway plans. The option `settings` sets how many of them run.
+  A setting with a break of a hard rule does not count. The score adds the rank shares of the crossings, the median detour and the ink saved.
+  It reads no screen record and has no fit. With `budget: 0`, the default, the pick does not depend on the speed of the machine.
 - `strategyKey(router, step)` gives the option of a router that takes a strategy of the step. `pipeline` uses it for the steps `group`, `plugs` and `levels`.
 - `stepRouterStrategy(strategy)` runs a strategy of a step of `RoutedStep` as a router. `stepRouters(registry, step)` gives one router for each strategy of the step.
 
@@ -552,6 +559,8 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `streets` | The orthogonal streets of HWY-058. A greedy set cover picks the free horizontal and vertical lines that carry the most edge length. |
 | `search` | The local search of HWY-059. It adds, drops and changes the highways of a start plan, and it keeps the plan with the best score. |
 | `interchanges` | The interchanges of HWY-060. An edge can change from one highway to another at an interchange, where two spines come near. |
+| `knee` | The knee tree of NAT-018. A sweep of the balancing factor gives trees from the least ink to the most direct paths, and the knee of that front is the pick. |
+| `bronchial` | The bronchial tree of NAT-019. The tree grows toward the center of its targets, then splits them in two sectors, again and again. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided` and `crossbars` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
@@ -626,6 +635,17 @@ The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default out
 - The options are `passes` (1 to 10), `attraction` (0 to 1), `capacityWeight` (0 to 10) and `laneWidth` (1 to 12).
 - A capacity term raises the cost of a link when its users are more than its width holds.
 - With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
+
+### The routers `tight` and `annealing`
+
+The routers `tight` and `annealing` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Both put a hook on the router `shared`.
+
+- `tightRouter(options)` gives the order of WILD-023: the edges whose second way costs much more than their first way go first.
+  Its options are `penalty` (2 to 10), `first` (`tight` or `loose`) and `ties` (`id` or `length`). `tightStrategy` is its router strategy.
+- `annealingRouter(options)` gives the simulated annealing of RULE-021, with the candidate routes of WILD-028. Each edge picks one of a few ways.
+  The energy adds the ink, the path length and the crossings. The chance to keep a worse state is rational, so it uses no `Math.exp`.
+  Its options are `candidates` (3 to 8), `crossing` (0 to 20), `temperature` (0.1 to 10), `cooling` (0.9 to 0.99), `budget` (20 to 200) and `seed`.
+  The same seed gives the same routes. `annealingStrategy` is its router strategy.
 
 ### The portfolio router
 

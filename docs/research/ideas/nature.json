@@ -1005,13 +1005,103 @@
     "placementDependent": true,
     "screen": "Level links of case-dense-groups and case-many-groups. Keep if the level faults (Z3) are not worse and the ink of the level drops by 10%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "dropped",
     "related": [
       "NAT-020",
       "NAT-003",
       "NAT-049"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40797159867",
+      "records": [
+        "screen-v2/*/depths@577bb94",
+        "screen-v2/*/venation@577bb94",
+        "screen-v2/*/venation-gabriel@577bb94",
+        "screen-v2/*/venation-d0.8@577bb94",
+        "screen-v1/*/depths@577bb94",
+        "screen-v1/*/venation@577bb94",
+        "screen-v1/*/venation-gabriel@577bb94",
+        "screen-v1/*/venation-d0.8@577bb94"
+      ],
+      "measures": {
+        "B1 against depths": {
+          "base": {
+            "tiny-uniform": 0.204,
+            "small-clustered": 0.325,
+            "dense-groups": 0.364,
+            "hub-chain": 0.251,
+            "many-groups": 0.474,
+            "packed-grid": 0.07
+          },
+          "new": {
+            "tiny-uniform": 0.204,
+            "small-clustered": 0.325,
+            "dense-groups": 0.364,
+            "hub-chain": 0.251,
+            "many-groups": 0.474,
+            "packed-grid": 0.07
+          }
+        },
+        "R1 against depths": {
+          "base": {
+            "tiny-uniform": 11.3,
+            "small-clustered": 714.1,
+            "dense-groups": 1334.9,
+            "hub-chain": 42.8,
+            "many-groups": 350,
+            "packed-grid": 239.9
+          },
+          "new": {
+            "tiny-uniform": 11.3,
+            "small-clustered": 714.1,
+            "dense-groups": 1334.9,
+            "hub-chain": 42.8,
+            "many-groups": 350,
+            "packed-grid": 239.9
+          }
+        },
+        "Z3 against depths": {
+          "base": {
+            "tiny-uniform": 619.2,
+            "small-clustered": 137576.5,
+            "dense-groups": 302144.5,
+            "hub-chain": 9069.8,
+            "many-groups": 34695.4,
+            "packed-grid": 63596
+          },
+          "new": {
+            "tiny-uniform": 637,
+            "small-clustered": 139664,
+            "dense-groups": 310424.3,
+            "hub-chain": 10200.4,
+            "many-groups": 38655.8,
+            "packed-grid": 64053.5
+          }
+        },
+        "B7 against depths": {
+          "base": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          },
+          "new": {
+            "tiny-uniform": 0.969,
+            "small-clustered": 0.912,
+            "dense-groups": 0.93,
+            "hub-chain": 1.029,
+            "many-groups": 0.859,
+            "packed-grid": 1.284
+          }
+        }
+      },
+      "verdict": "dropped",
+      "note": "The records are the screen-v2 run 40797159867 and the screen-v1 run 40797162693, at 577bb94. The strategy venation keeps the levels of depths and changes only their links. So B1, R1 and B7 are ties on each family. Z3 is worse: the link length is worse with 0 families against on screen-v2 (median ratio 1.053), and the links through items are worse on both sets. The Gabriel backbone gives no verdict, with 2 of 6 families against. Thus the move gives no gain over depths. The time is 1.13 times depths on screen-v2. After the fix of 577bb94, it adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-017",
@@ -1226,7 +1316,7 @@
     "placementDependent": true,
     "screen": "Against NAT-017 with its best fixed bf: keep if the hypervolume of (B1, B3) is higher on 2 of 3 boards.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-017",
       "NAT-044"
@@ -1234,7 +1324,79 @@
     "dependsOn": [
       "NAT-017"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40793754164",
+      "records": [
+        "screen-v2/*/shared@18906cd",
+        "screen-v2/*/knee@18906cd",
+        "screen-v2/*/knee+stretch@18906cd",
+        "screen-v2/*/knee-weights@18906cd",
+        "screen-v1/*/shared@3a99fa5",
+        "screen-v1/*/knee@3a99fa5",
+        "screen-v1/*/knee+stretch@3a99fa5",
+        "screen-v1/*/knee-weights@3a99fa5"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.084,
+            "small-clustered": 0.138,
+            "dense-groups": 0.158,
+            "hub-chain": 0.063,
+            "many-groups": 0.151,
+            "packed-grid": 0
+          }
+        },
+        "B3 against shared": {
+          "base": {
+            "tiny-uniform": 1.007,
+            "small-clustered": 1.199,
+            "dense-groups": 1.258,
+            "hub-chain": 1,
+            "many-groups": 1,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.12,
+            "small-clustered": 1.119,
+            "dense-groups": 1.121,
+            "hub-chain": 1,
+            "many-groups": 1.014,
+            "packed-grid": 1
+          }
+        },
+        "R5 against shared": {
+          "base": {
+            "tiny-uniform": 1.182,
+            "small-clustered": 1.291,
+            "dense-groups": 1.313,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          },
+          "new": {
+            "tiny-uniform": 1.254,
+            "small-clustered": 1.212,
+            "dense-groups": 1.169,
+            "hub-chain": 1.024,
+            "many-groups": 1.27,
+            "packed-grid": 1
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40793754164 at 18906cd and the screen-v1 run 40795595664 at 3a99fa5. The strategy knee gets B1 no verdict with 3 of 6 families against on both sets, and B3 q95 no verdict with 2 of 6. R5 q95 is better on screen-v2 with 1 of 6 against. The rule weights gets B1 better with 2 of 6 against. R1 is worse with 3 of 6 against. The median time is 3.44 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-019",
@@ -1277,14 +1439,108 @@
     "placementDependent": true,
     "screen": "Same boards as NAT-017. Keep if not dominated by the best bf of NAT-017 on (B1, B3 q95) and B6 is lower.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-017",
       "NAT-012",
       "NAT-013",
       "NAT-015"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-10-28",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/40793754164",
+      "records": [
+        "screen-v2/*/shared@18906cd",
+        "screen-v2/*/bronchial@18906cd",
+        "screen-v2/*/bronchial+stretch@18906cd",
+        "screen-v2/*/bronchial-gap@18906cd",
+        "screen-v2/*/bronchial-weight@18906cd",
+        "screen-v2/*/bronchial-s0.7@18906cd",
+        "screen-v1/*/shared@3a99fa5",
+        "screen-v1/*/bronchial@3a99fa5",
+        "screen-v1/*/bronchial+stretch@3a99fa5",
+        "screen-v1/*/bronchial-gap@3a99fa5",
+        "screen-v1/*/bronchial-weight@3a99fa5",
+        "screen-v1/*/bronchial-s0.7@3a99fa5"
+      ],
+      "measures": {
+        "B1 against shared": {
+          "base": {
+            "tiny-uniform": 0.018,
+            "small-clustered": 0.225,
+            "dense-groups": 0.323,
+            "hub-chain": 0.041,
+            "many-groups": 0.083,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.119,
+            "small-clustered": 0.135,
+            "dense-groups": 0.141,
+            "hub-chain": 0.061,
+            "many-groups": 0.097,
+            "packed-grid": 0
+          }
+        },
+        "B6 against shared": {
+          "base": {
+            "tiny-uniform": 36.4,
+            "small-clustered": 135.3,
+            "dense-groups": 152.7,
+            "hub-chain": 41.5,
+            "many-groups": 89,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 99.9,
+            "small-clustered": 163,
+            "dense-groups": 159.4,
+            "hub-chain": 75.5,
+            "many-groups": 125.5,
+            "packed-grid": 0
+          }
+        },
+        "B8 against shared": {
+          "base": {
+            "tiny-uniform": 0.5,
+            "small-clustered": 66.2,
+            "dense-groups": 137.2,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 3.9,
+            "small-clustered": 57.4,
+            "dense-groups": 72.5,
+            "hub-chain": 5.8,
+            "many-groups": 13.3,
+            "packed-grid": 0
+          }
+        },
+        "R4 against shared": {
+          "base": {
+            "tiny-uniform": 0.496,
+            "small-clustered": 0.821,
+            "dense-groups": 0.915,
+            "hub-chain": 0.149,
+            "many-groups": 0.911,
+            "packed-grid": 0
+          },
+          "new": {
+            "tiny-uniform": 0.961,
+            "small-clustered": 1.087,
+            "dense-groups": 1.077,
+            "hub-chain": 0.254,
+            "many-groups": 0.991,
+            "packed-grid": 0
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 40793754164 at 18906cd and the screen-v1 run 40795595664 at 3a99fa5. The strategy bronchial gets B1 no verdict with 3 of 6 families against on both sets, with a median B1 ratio of 1.048 on screen-v2. B8 runs is better on screen-v2 with 3 of 6 against. B6 and R4 are worse with 0 of 6 against on both sets. The median time is 2.41 times shared on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-020",

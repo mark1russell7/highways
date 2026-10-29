@@ -25,6 +25,13 @@ Each item that changes a strategy, a measure, a verdict or a corpus commits its 
 
 An item that screens an idea also starts `pnpm queue` and commits `docs/research/queue.json` in the same pull request.
 
+## The opt-in strategies
+
+The folder [`opt-in/`](opt-in/) holds the verdicts of the opt-in routers that a build took from the queue. Each file has the form of a snapshot, with the rows of those routers only.
+
+- Only the measured gain of `pnpm queue` reads these files. The results page does not read them.
+- Make the file with `--snapshot`, then keep only the rows of the opt-in routers.
+
 ## The benchmark snapshot
 
 The folder [`../bench/`](../bench/) holds `bench.json` and `bench-meta.json` of one run of the workflow `Bench`. The Pages build copies them into the site and does not start the benchmark. To make a new snapshot, download the artifact `bench-<sha>` of a finished run on `main`. Then write its rows into `bench.json`, one row on each line, and its run, commit and date into `bench-meta.json`.
