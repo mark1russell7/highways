@@ -1524,6 +1524,59 @@ This prediction was written before the runs, on 2026-10-29. The results are of r
 | 8. `repel`: the time ratio against `shared` is 3 or less. | 0.4 | Not met: 52.1. |
 | 9. No default output changes. | 0.97 | Met: the routers are opt-in, and the hashes of `ROUTERS` stay. |
 
+## The work budget of search (SEARCH-BUDGET)
+
+The option `work` of `search` stops the search after a counted work, not after a time. Thus a budget gives the same plan on each machine.
+
+### The unit
+
+- The first unit was the edges times the evaluations. Its fit failed: R² 0.878, and the ms of 1000 edge routes went from 157 to 7285 over the windows.
+- The split fit (run 40950938005) found the cause. `follow` takes 27.3 s of the 31.5 s of one evaluation on 1000 boxes.
+- The lane order of `follow` is a pair loop. On 1000 boxes, `partAfter` and `partBefore` walk 3.1 billion steps over 9.3 million pairs.
+- The new unit is the weighted sum of 5 counters in `src/work.ts`: `lane`, `corner`, `sight`, `score` and `route`.
+- Each hot loop adds its count when it ends. The counts are deterministic.
+- A fit of the relative error gives the weights: `lane` 1, `corner` 11, `sight` 0, `score` 13 and `route` 24000.
+
+### The gates
+
+| Run | Weights | R² | The worst window | Gate (a) | Gate (b) |
+|---|---|---:|---:|---|---|
+| 40956237301 | All 1, 4 counters | 0.9997 | +1085% | Fail | Pass |
+| 40960950349 | Fitted, 5 counters | 0.9999 | -5.4% | Pass | Pass |
+| 40964639537 | Fixed, on new times | 0.9889 | +14.2% | Pass | Pass |
+
+- Gate (a) needs R² of 0.95 or more, and the slope of each window within 20% of the global slope.
+- Gate (b) needs a byte-equal stop for each budget on Linux and on Windows.
+- One million units take 1.5 ms to 2.7 ms on a CI runner. The speed of the runner changes this value, but not the stop.
+
+### The size of the pair loop
+
+These counts of one evaluation are the baseline of INCREMENTAL-SEARCH.
+
+| Boxes | Edges | `lane` | `score` | `route` |
+|---:|---:|---:|---:|---:|
+| 60 | 77 | 14292 | 17530 | 137 |
+| 125 | 236 | 955149 | 467043 | 361 |
+| 250 | 620 | 17709410 | 5453792 | 870 |
+| 500 | 1588 | 216559482 | 50890960 | 2088 |
+| 1000 | 4000 | 3094883932 | 535904365 | 5000 |
+
+The screen of the first unit found that `search` with 0 evaluations is nearly as good as the default. SEARCH-OBJECTIVE examines this result.
+
+### The prediction of SEARCH-BUDGET
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. The default output does not change. | 0.95 | Met. |
+| 2. On the dense board, 8 evaluations take 50% or less of the time of the default. | 0.6 | Not met: approximately 61%. |
+| 3. On `screen-v3`, the paired median B1 with a small budget is within 5% of the default. | 0.5 | Met. |
+| 4. On `screen-v3`, 0 evaluations is within 5% of the default on the median B1. | 0.45 | Met. |
+| 6. The fixed weights pass gate (a) on new times. | 0.8 | Met. |
+| 7. Each window of that run is within 10%. | 0.55 | Not met: +14.2%. |
+| 8. Gate (b) passes with the new weights. | 0.9 | Met. |
+
+Claim 5 was not tested. The mean Brier score of the 7 claims is 0.181.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

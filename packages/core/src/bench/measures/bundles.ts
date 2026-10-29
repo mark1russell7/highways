@@ -1,6 +1,7 @@
 import { dist, polylineLength, type Point } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import type { Graph, Result, Route } from "../../model.ts";
+import { WORK } from "../../work.ts";
 import { drawnSegments, segmentKey } from "./routes.ts";
 import { quantile } from "./stats.ts";
 
@@ -10,7 +11,10 @@ import { quantile } from "./stats.ts";
  */
 export function inkSaved(routes: readonly Route[]): number {
   let total = 0;
-  for (const r of routes) total += polylineLength(r.points);
+  for (const r of routes) {
+    total += polylineLength(r.points);
+    WORK.score += r.points.length;
+  }
   if (total <= 0) return 0;
   let ink = 0;
   for (const [a, b] of drawnSegments(routes)) ink += dist(a, b);
@@ -56,6 +60,7 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
   for (const r of routes) {
     const end = ends.get(r.edge);
     if (!end) continue;
+    WORK.score += r.points.length;
     const own: number[] = [];
     for (let i = 1; i < r.points.length; i++) {
       const k = segmentKey(r.points[i - 1]!, r.points[i]!);
@@ -101,6 +106,7 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
   const linkStamp = new Int32Array(n).fill(-1);
   let all = 0;
   let wrong = 0;
+  let visits = 0;
   pick.forEach((v, step) => {
     for (const w of adjacent[v]!) linkStamp[w] = step;
     nearStamp[v] = step;
@@ -108,6 +114,7 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
       for (const k of keysOf.get(e) ?? []) {
         if (keyStamp[k] === step) continue;
         keyStamp[k] = step;
+        visits += nodesOf[k]!.length;
         for (const w of nodesOf[k]!) {
           if (nearStamp[w] === step) continue;
           nearStamp[w] = step;
@@ -116,6 +123,7 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
         }
       }
   });
+  WORK.score += visits;
   return { value: all ? wrong / all : 0, estimated: !exact };
 }
 
@@ -124,6 +132,7 @@ function routeKeys(routes: readonly Route[]): { readonly keys: Map<string, strin
   const keys = new Map<string, string[]>();
   const users = new Map<string, Set<string>>();
   for (const r of routes) {
+    WORK.score += r.points.length;
     const own: string[] = [];
     for (let i = 1; i < r.points.length; i++) {
       const k = segmentKey(r.points[i - 1]!, r.points[i]!);
@@ -176,6 +185,7 @@ export function bundleStretch(routes: readonly Route[], base: readonly Route[]):
   for (const r of base) baseLength.set(r.edge, polylineLength(r.points));
   const st: number[] = [];
   for (const r of routes) {
+    WORK.score += r.points.length;
     const b = baseLength.get(r.edge);
     if (b === undefined || b <= 1 || r.points.length < 2) continue;
     st.push(polylineLength(r.points) / b);
@@ -193,9 +203,13 @@ export function bundleStretch(routes: readonly Route[], base: readonly Route[]):
 export function mergeAngle(routes: readonly Route[]): number {
   const { users } = routeKeys(routes);
   const sig = new Map<string, string>();
-  for (const [k, set] of users) sig.set(k, [...set].sort().join("\u0000"));
+  for (const [k, set] of users) {
+    sig.set(k, [...set].sort().join("\u0000"));
+    WORK.score += set.size;
+  }
   let max = 0;
   for (const r of routes) {
+    WORK.score += r.points.length;
     // The vertices of the route, with each segment that has no key dropped.
     let prev: { readonly k: string; readonly a: Point; readonly b: Point } | undefined;
     for (let i = 1; i < r.points.length; i++) {

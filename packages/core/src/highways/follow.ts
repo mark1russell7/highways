@@ -3,6 +3,7 @@ import { fixedPortPoint, nodeIndex, outerGraph, type End, type Graph, type Node,
 import { placePlug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
+import { WORK } from "../work.ts";
 import { pointAt, type HighwayMember, type HighwayPlan } from "./model.ts";
 
 /** The options of `follow`. */
@@ -70,6 +71,7 @@ function slice(stops: Stops, on: number, off: number): Point[] {
  */
 export function follow(input: Graph, plan: HighwayPlan, options: FollowOptions = {}): Result {
   const graph = outerGraph(input);
+  WORK.route += graph.nodes.length + graph.edges.length;
   const byId = nodeIndex(graph);
   const ways = new WayFinder(graph.nodes, options);
   const base = new Map((options.routes?.routes ?? []).map((r) => [r.edge, r.points]));

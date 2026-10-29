@@ -101,7 +101,7 @@ export { freeLines, STREET_SOURCES, streetEdges, streetPoint, streetRide, type F
 export { oneSteiner, spanningTree, STEINER_DEFAULTS, STEINER_GROUPS, STEINER_METHODS, STEINER_METRICS, steinerPlan, type SteinerGroup, type SteinerMethod, type SteinerMetric, type SteinerOptions } from "./steiner/index.ts";
 export { GAP_DEFAULTS, gapPlan, type GapOptions } from "./gaps/index.ts";
 export { STREET_DEFAULTS, streetPlan, type StreetOptions } from "./streets/index.ts";
-export { SEARCH_DEFAULTS, SEARCH_MOVES, searchPlan, searchScore, type SearchMove, type SearchOptions } from "./search/index.ts";
+export { SEARCH_DEFAULTS, SEARCH_MOVES, SEARCH_WORK_UNIT, searchPlan, searchRun, searchScore, type SearchMove, type SearchOptions, type SearchRun } from "./search/index.ts";
 export { KNEE_DEFAULTS, KNEE_RULES, kneeOf, kneePlan, type KneeOptions, type KneeRule, type KneeTree } from "./knee/index.ts";
 export { BALANCE_DEFAULTS, BALANCE_ENDS, balanceOf, balancePlan, type BalanceEnd, type BalanceOptions } from "./balance/index.ts";
 export { SLOT_DEFAULTS, SLOT_KEYS, slotJoin, slotPlan, slotsOf, type SlotJoin, type SlotKeys, type SlotOptions } from "./slots/index.ts";
