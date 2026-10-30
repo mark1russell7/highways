@@ -1577,6 +1577,65 @@ The screen of the first unit found that `search` with 0 evaluations is nearly as
 
 Claim 5 was not tested. The mean Brier score of the 7 claims is 0.181.
 
+## The objective of search (SEARCH-OBJECTIVE)
+
+This item examines if the score of `search` follows the bench measures. The script `scripts/search-objective.ts` runs in the workflow `Search objective`.
+It runs `search` with 5 seeds on the 150 inputs of `screen-v3` and on the dense windows of 60, 125 and 250 boxes.
+
+### Part 1: the score against the measures
+
+For each input, the Spearman correlation of the score delta of each move with the change of ink, R1 and R4. A positive value means that a higher score gives a better measure.
+
+| Variant | ink | R1 | R4 |
+|---|---:|---:|---:|
+| The default | 0.182 | 0.084 | 0.526 |
+| Only ink (no penalties) | 0.500 | 0.421 | -0.743 |
+| Half penalties | 0.467 | 0.292 | 0.316 |
+| `crossingWeight` 0.1 | 0.386 | 0.354 | 0.401 |
+| `crossingWeight` 0.3 | 0.562 | 0.593 | 0.277 |
+| `crossingWeight` 0.3, half penalties | 0.763 | 0.763 | 0.114 |
+
+- The score of the default follows R4, but not ink or R1.
+- The term B1 follows ink (0.70) and R1 (0.60), and it goes against R4 (-0.71).
+- The penalties B3, B4 and B6 go against ink and R1, and they follow R4. Thus the penalties hold the search back from the ink.
+- The families `packed-grid` and `local-mesh` give no spread: no move changes their measures.
+
+### Part 2: each variant against the default
+
+A gain is a mean over the seeds that is better than the mean of the default by more than 2 sd. Holm runs over the 18 tests.
+
+| Against the default | ink gains, drops | R1 gains, drops | R4 gains, drops | Holm p of ink, R1, R4 |
+|---|---|---|---|---|
+| 0 evaluations | 5, 7 | 4, 5 | 4, 6 | 1, 1, 1 |
+| Only ink | 8, 1 | 5, 0 | 0, 28 | 0.41, 0.56, below 0.0001 |
+| `crossingWeight` 0.3 | 9, 0 | 14, 0 | 0, 6 | 0.055, 0.002, 0.41 |
+| `crossingWeight` 0.3, half penalties | 14, 0 | 20, 0 | 0, 6 | 0.002, below 0.0001, 0.41 |
+
+- 0 evaluations is within the floor of the default on 92% of the inputs. Thus the annealing of the default changes little.
+- `crossingWeight` 0.3 with half penalties gains on ink and R1 with no drop. Its R4 has 6 drops, but Holm does not find them significant.
+- The effect of the best variant is small: the median ratio of R1 is 0.962, and p10 is 0.863. It takes 1.18 times the time of the default.
+- The work counters do not count the crossing term yet. A change of the default needs that counter.
+
+The default does not change with this screen. The item SEARCH-CROSS tests the change of the default on new seeds.
+
+### The prediction of SEARCH-OBJECTIVE
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. The median ρ of the score against ink is 0.3 or more. | 0.45 | Not met: 0.182. |
+| 2. The median ρ against R1 is 0.1 or less. | 0.7 | Met: 0.084. |
+| 3. The median ρ against R4 is 0.1 or less. | 0.6 | Not met: 0.526. |
+| 4. At least one term has a negative median ρ against ink. | 0.5 | Met: B3, B4 and B6. |
+| 5. The start plan gains on R1 with Holm p below 0.05. | 0.5 | Not met: Holm p 1. |
+| 6. The observer does not change the output. | 0.97 | Met. |
+| 7. The screen job ends within 30 minutes. | 0.6 | Met: 4.5 minutes. |
+| 8. `crossingWeight` 0.3 has a median ρ against R1 of 0.3 or more. | 0.5 | Met: 0.593. |
+| 9. That variant gains on R1 with Holm p below 0.05. | 0.35 | Met: 0.002. |
+| 10. Only ink has a median ρ of 0.5 or more against ink, and below 0 against R4. | 0.55 | Met: 0.500 and -0.743. |
+| 11. No variant passes Holm on the three measures. | 0.75 | Met. |
+
+The mean Brier score of the 11 claims is 0.205.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
