@@ -1,6 +1,6 @@
 # The objective of the highway strategy search (SEARCH-OBJECTIVE). The job objective runs search with the default options and 5 seeds
 # on each input of screen-v3 and on windows of the dense board. It correlates the score delta of each move with the change of ink, R1 and R4.
-# It also compares the start plan with the default, with a noise floor over the seeds and Holm. The runs go here, not on a local machine.
+# It also compares the start plan and each variant of the score with the default, with a noise floor over the seeds and Holm. The runs go here, not on a local machine.
 name: Search objective
 
 on:
@@ -21,6 +21,9 @@ on:
       dense:
         description: "The sizes of the windows of the dense board, in boxes, separated by commas (empty for none)"
         default: "60,125,250"
+      variants:
+        description: "The variants of the score (name:key=value,key=value;...). Empty gives the variants of the script"
+        default: ""
 
 permissions:
   contents: read
@@ -33,6 +36,7 @@ jobs:
       SET: ${{ inputs.set || 'screen-v3' }}
       SEEDS: ${{ inputs.seeds || '5' }}
       DENSE: ${{ inputs.dense == null && '60,125,250' || inputs.dense }}
+      VARIANTS: ${{ inputs.variants || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -47,7 +51,7 @@ jobs:
         working-directory: packages/core
         run: |
           set -o pipefail
-          node scripts/search-objective.ts --set "$SET" --seeds "$SEEDS" --dense "$DENSE" --out "$RUNNER_TEMP/search-objective.jsonl" | tee table.md
+          node scripts/search-objective.ts --set "$SET" --seeds "$SEEDS" --dense "$DENSE" ${VARIANTS:+--variants "$VARIANTS"} --out "$RUNNER_TEMP/search-objective.jsonl" | tee table.md
           cat table.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}

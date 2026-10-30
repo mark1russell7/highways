@@ -1,4 +1,5 @@
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/measures/bundles.ts";
+import { measureQuality } from "../../bench/quality.ts";
 import type { Point } from "../../geom.ts";
 import type { Graph, Result, Route } from "../../model.ts";
 import { WayFinder } from "../../ways.ts";
@@ -27,6 +28,11 @@ export interface SearchOptions {
   readonly ambiguityWeight: number;
   /** The weight of the largest merge angle (B6), divided by 180 degrees. The default is 0.25. */
   readonly angleWeight: number;
+  /**
+   * The weight of the crossings of the routes (R1), divided by the number of routes (SEARCH-OBJECTIVE). The default is 0.
+   * The counters of the work budget do not count this term.
+   */
+  readonly crossingWeight?: number;
   /** The seed of the moves. The default is 1. */
   readonly seed: number;
   /**
@@ -46,6 +52,7 @@ export const SEARCH_DEFAULTS: Readonly<SearchOptions> = Object.freeze({
   stretchWeight: 0.5,
   ambiguityWeight: 0.5,
   angleWeight: 0.25,
+  crossingWeight: 0,
   seed: 1,
   work: 0,
 });
@@ -72,7 +79,7 @@ function random(seed: number): () => number {
 }
 
 /**
- * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180`. Higher is better.
+ * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180 - wx R1 / m`. Higher is better.
  * B3 is the 0.95 quantile of the stretch against the first routes. The score reads only the graph and the routes of the plan.
  */
 export function searchScore(graph: Graph, routes: readonly Route[], first: readonly Route[], o: Readonly<SearchOptions>): number {
@@ -80,7 +87,8 @@ export function searchScore(graph: Graph, routes: readonly Route[], first: reado
   const stretch = bundleStretch(routes, first).q95;
   const amb = o.ambiguityWeight > 0 ? ambiguity(graph, routes).value : 0;
   const angle = o.angleWeight > 0 ? mergeAngle(routes) / 180 : 0;
-  return o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle;
+  const cross = (o.crossingWeight ?? 0) > 0 ? measureQuality(graph, { routes }).crossings / Math.max(1, routes.length) : 0;
+  return o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle - (o.crossingWeight ?? 0) * cross;
 }
 
 /**

@@ -1037,6 +1037,7 @@ export const SEARCH_SCHEMA: OptionSchema<SearchOptions> = {
   stretchWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the 0.95 quantile of the stretch (B3)." },
   ambiguityWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the ambiguity (B4)." },
   angleWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.25], default: 0.25, describe: "The weight of the largest merge angle (B6), divided by 180 degrees." },
+  crossingWeight: { type: "number", min: 0, max: 4, step: 0.05, marks: [0, 0.3], default: 0, describe: "The weight of the crossings of the routes (R1), divided by the number of routes. The value 0 is no crossing term." },
   seed: { type: "integer", min: 0, max: 1000, step: 1, default: 1, describe: "The seed of the moves." },
   work: { type: "integer", min: 0, max: 100_000, step: 100, marks: [0, 1000, 10_000, 50_000], default: 0, describe: "The most work of the measures of the plans, in millions of counted steps. The value 0 is no limit." },
 };
