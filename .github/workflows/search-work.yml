@@ -32,6 +32,11 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # One run for each ref (RUNNER-SLOTS). A new head of a pull request cancels the old run. A dispatch waits for the run before it.
+  group: search-work-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   work:
     runs-on: ubuntu-latest

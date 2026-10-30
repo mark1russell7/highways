@@ -98,8 +98,8 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 20 jobs at one time across all repositories, so a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [24, 26]
@@ -160,8 +160,8 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 20 jobs at one time across all repositories, so a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [24, 26]

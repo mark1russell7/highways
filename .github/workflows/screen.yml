@@ -89,8 +89,8 @@ jobs:
     timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 20 jobs at one time across all repositories, so a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         # A pull request screens both steps. A dispatch screens its own step.
         step: ${{ fromJSON(github.event_name == 'pull_request' && '["router","highway"]' || format('["{0}"]', inputs.step || 'router')) }}
