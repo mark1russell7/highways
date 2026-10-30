@@ -145,7 +145,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SEARCH-BUDGET | The option `work` of `search` stops the search after a counted work, not a time. Five counters in the hot loops count it, with fitted weights. Gate (a): R² 0.9889, each window within 14.2%. Gate (b): the stops are byte-equal on Linux and Windows. The default does not change. | 2026-10-29 | #195 |
 | SEARCH-OBJECTIVE | The score of `search` follows R4 (median ρ 0.53), but not ink (0.18) or R1 (0.08), and its annealing changes little. The opt-in `crossingWeight` 0.3 with half penalties follows ink and R1 (0.76). It gains on both against the default with Holm. | 2026-10-30 | #200 |
 | FAIL-CLOSED | Each gate fails when an input of its plan is missing, and it names that input. The gates read the parts, the shards, the cells and the strategy × input grid of their plans. `scripts/gates/inputs.ts` holds the shared check, and each gate has a test with an empty input and with one input missing. | 2026-10-30 | #205 |
-| SCREEN-NO-RUN | The screen summary said "yes" in the column "same twice" for a strategy that did not run. Now that cell says "no run", and the summary counts those strategies. The type `ScreenStrategySummary` gives `null` for them. | 2026-10-30 | #210 |
+| SCREEN-NO-RUN | The screen summary said "yes" in the column "same twice" for a strategy that did not run. With this item, that cell says "no run", and the summary counts those strategies. The type `ScreenStrategySummary` gives `null` for them. | 2026-10-30 | #210 |
 
 ## Calibration
 
