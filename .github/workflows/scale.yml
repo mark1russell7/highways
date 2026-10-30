@@ -100,7 +100,7 @@ jobs:
           if-no-files-found: warn
 
   summary:
-    needs: time
+    needs: [routers, time]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -114,6 +114,15 @@ jobs:
         with:
           pattern: scale-*
           path: cells
+      # FAIL-CLOSED: each router of the matrix gives its rows.
+      - name: Check the inputs of the summary
+        env:
+          ROUTERS: ${{ needs.routers.outputs.list }}
+        run: |
+          got=$(find cells -name rows.jsonl | sed -E 's#^cells/scale-([^/]+)/rows\.jsonl$#\1#' | paste -sd, -)
+          # With one cell, the action puts the files of the artifact in cells/ itself, with no folder of the artifact (FIT-COST).
+          if [ "$got" = "cells/rows.jsonl" ] && [ "$(jq length <<< "$ROUTERS")" = 1 ]; then got=$(jq -r '.[0]' <<< "$ROUTERS"); fi
+          node packages/core/scripts/gates/inputs.ts "scale cells" --expect "$(jq -r 'join(",")' <<< "$ROUTERS")" --got "$got"
       - name: Write the summary
         run: |
           find cells -name rows.jsonl | sort | xargs cat > rows.jsonl

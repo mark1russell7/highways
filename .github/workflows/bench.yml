@@ -171,7 +171,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p parts
-          node packages/core/scripts/bench-join.ts --parts parts --json "$GITHUB_WORKSPACE/bench.json" --report "$GITHUB_WORKSPACE/report.json" | tee table.txt
+          node packages/core/scripts/bench-join.ts --parts parts --expect "$(jq -r '[.[].name] | join(",")' <<< "$PARTS")" --json "$GITHUB_WORKSPACE/bench.json" --report "$GITHUB_WORKSPACE/report.json" | tee table.txt
           {
             echo "## Bench (max $MAX nodes, $REPEAT runs up to 10 000 nodes, 2 runs at 100 000 nodes, $SEEDS seeds up to 1 000 nodes, 1 seed above)"
             echo

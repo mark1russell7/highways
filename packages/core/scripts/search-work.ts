@@ -124,7 +124,8 @@ function gate(weights: Readonly<WorkCounts>): { slope: number; r2: number; windo
     const w = xx > 0 ? xy / xx : 0;
     return { nodes: n, edges: own[0]!.p.edges, slope: w, off: slope > 0 ? w / slope - 1 : 0 };
   });
-  return { slope, r2, windows, pass: r2 >= 0.95 && windows.every((w) => Math.abs(w.off) <= 0.2) };
+  // FAIL-CLOSED: with no point, R² is 1 and there is no window, so the fit must have points to pass.
+  return { slope, r2, windows, pass: points.length > 0 && r2 >= 0.95 && windows.every((w) => Math.abs(w.off) <= 0.2) };
 }
 
 /**

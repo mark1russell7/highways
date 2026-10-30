@@ -49,7 +49,12 @@ const GUARDS: Readonly<Record<string, readonly string[]>> = {
   highway: ["R1.crossings", "B1.inkSaved", "B3.q95", "B6.max", "Z10.mean"],
   whole: [...ROUTER_GUARDS, "B3.q95", "B6.max", "C3.median", "C5.peak", "C8.max"],
 };
-const guards = (GUARDS[step] ?? ROUTER_GUARDS).map((k) => MEASURES.find((m) => m.key === k)).filter((m): m is MeasureInfo => m !== undefined);
+// FAIL-CLOSED: each guard key is a measure of the catalog. A key that is not there gives no test, and a test that does not run must not pass.
+const guards = (GUARDS[step] ?? ROUTER_GUARDS).map((k) => {
+  const m = MEASURES.find((x) => x.key === k);
+  if (m === undefined) throw new Error(`The guard ${k} of the step ${step} is not a measure of MEASURES.`);
+  return m;
+});
 
 const load = (list: string | undefined): Rec[] =>
   (list ?? "")
@@ -187,7 +192,7 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
     const rs = ratios(m, ps);
     const med = median(rs);
     const tail = rs.length === 0 ? 0 : rs.filter((r) => r > 1 + P.tailWorse).length / rs.length;
-    return { key: m.key, n: rs.length, median: med, tail, pass: rs.length === 0 || (med <= 1 + P.medianWorse && tail <= P.tailShare) };
+    return { key: m.key, n: rs.length, median: med, tail, pass: rs.length > 0 && med <= 1 + P.medianWorse && tail <= P.tailShare };
   });
   // The gain: each measure with a median ratio of 1 - gainMin or better is a gain candidate. The sign tests of all the measures get the Holm correction.
   const raw = MEASURES.map((m) => {
@@ -218,7 +223,7 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
   const times = ps.filter((p) => p.c.ms !== undefined && p.b.ms !== undefined).map((p) => p.c.ms! / Math.max(p.b.ms!, P.timeFloorMs / P.timeRatio));
   const tMed = median(times);
   const tTail = quantile(times, P.timeTailQ);
-  const time = { median: tMed, tail: tTail, pass: times.length === 0 || (tMed <= P.timeRatio && tTail <= P.timeTail) };
+  const time = { median: tMed, tail: tTail, pass: times.length > 0 && tMed <= P.timeRatio && tTail <= P.timeTail };
   const hardPass = worse.length === 0;
   return {
     reading,
@@ -289,11 +294,13 @@ function verdictText(rows: readonly VerdictRow[]): string {
   return lines.join("\n");
 }
 
+// FAIL-CLOSED: each set that an option names must give records. Before, an empty file left out its set with no sign.
 const sets = [
-  { name: "The promotion corpus", records: load(opt("--corpus")) },
-  { name: "The fresh seeds", records: load(opt("--fresh")) },
-].filter((s) => s.records.length > 0);
-if (sets.length === 0) throw new Error("The options --corpus and --fresh give no records.");
+  { name: "The promotion corpus", option: "--corpus", records: load(opt("--corpus")) },
+  { name: "The fresh seeds", option: "--fresh", records: load(opt("--fresh")) },
+].filter((s) => opt(s.option) !== undefined);
+if (sets.length === 0) throw new Error("The test needs --corpus or --fresh.");
+for (const s of sets) if (s.records.length === 0) throw new Error(`The files of ${s.option} (${opt(s.option)}) give no records.`);
 
 const out: string[] = [`# The promotion test of \`${candidate}\` against \`${baseline}\` (step \`${step}\`)`, ""];
 const json: Record<string, unknown> = { candidate, baseline, step, sets: [] };

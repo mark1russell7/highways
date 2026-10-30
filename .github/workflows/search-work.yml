@@ -72,6 +72,8 @@ jobs:
     timeout-minutes: 60
     env:
       BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
+      # The sizes of gate (b). The job same expects one stop for each size and each budget.
+      SIZES: "60,125,250,500"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -85,7 +87,7 @@ jobs:
       - name: Write the stop of each budget
         working-directory: packages/core
         shell: bash
-        run: node scripts/search-work.ts --stops "$RUNNER_TEMP/stops.jsonl" --budgets "$BUDGETS"
+        run: node scripts/search-work.ts --stops "$RUNNER_TEMP/stops.jsonl" --sizes "$SIZES" --budgets "$BUDGETS"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: search-stops-${{ matrix.os }}-${{ github.sha }}
@@ -94,14 +96,33 @@ jobs:
   same:
     needs: stops
     runs-on: ubuntu-latest
+    env:
+      BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
+      # The sizes of gate (b). The job same expects one stop for each size and each budget.
+      SIZES: "60,125,250,500"
     steps:
+      # The check of the inputs (scripts/gates/inputs.ts) needs only node and the script, not the packages.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: packages/core/scripts/gates
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: search-stops-*-${{ github.sha }}
           path: stops
-      - name: Compare the stops of Linux and Windows
+      # FAIL-CLOSED: each system of the matrix gives its stops, and each file has one stop for each size and budget. Two empty files are byte-equal too.
+      - name: Check the inputs of the gate
         run: |
           ls -R stops
+          node packages/core/scripts/gates/inputs.ts "search stops" --expect "ubuntu-latest windows-latest" --got "$(ls stops | sed -E 's/^search-stops-(.+)-[0-9a-f]{40}$/\1/')"
+          budgets=$(tr ',' '\n' <<< "$BUDGETS" | grep -c .)
+          sizes=$(tr ',' '\n' <<< "$SIZES" | grep -c .)
+          for f in stops/*/stops.jsonl; do node packages/core/scripts/gates/inputs.ts "stops of $f" --expect-count "$((sizes * budgets))" --got-count "$(grep -c . "$f")"; done
+      - name: Compare the stops of Linux and Windows
+        run: |
           {
             echo "## The stops of each budget (gate (b))"
             echo
