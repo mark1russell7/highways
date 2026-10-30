@@ -14,7 +14,8 @@
   },
   "include": [
     "src/**/*",
-    "scripts/**/*"
+    "scripts/**/*",
+    "*.config.ts"
   ],
   "exclude": []
 }

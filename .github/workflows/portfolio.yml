@@ -109,10 +109,21 @@ jobs:
           if-no-files-found: warn
 
   merge:
-    needs: time
+    needs: [plan, time]
     if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
     runs-on: ubuntu-latest
+    env:
+      # The join expects the file of each shard of the plan (FAIL-CLOSED).
+      SHARDS: ${{ needs.plan.outputs.count }}
     steps:
+      # The check of the inputs (scripts/gates/inputs.ts) needs only node and the script, not the packages.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: packages/core/scripts/gates
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: time-shard-*
@@ -120,7 +131,9 @@ jobs:
       - name: Join the shards
         run: |
           # With one shard, the action puts the file of the shard in shards/ itself, with no folder of the artifact (FIT-COST).
+          node packages/core/scripts/gates/inputs.ts "portfolio time shards" --expect "$(seq -s, 0 $((SHARDS - 1)))" --got "$(find shards -name 'time-*.jsonl' | sed -E 's/.*time-([0-9]+)\.jsonl$/\1/')"
           find shards -name '*.jsonl' -exec cat {} + > time.jsonl
+          if [ ! -s time.jsonl ]; then echo "::error::the $SHARDS shards hold no timed run"; exit 1; fi
           echo "The job joined $(wc -l < time.jsonl) timed runs." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

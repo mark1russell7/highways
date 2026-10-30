@@ -86,11 +86,11 @@ Each option changes the lane order of some runs on node 24, on node 26 or on the
 
 ### The ratchet of the Math calls
 
-The script `scripts/check-math.mjs` counts the calls of the transcendental Math functions in `packages/*/src`. `pnpm test` starts it as `test:math`.
+The script `scripts/check-math.ts` counts the calls of the transcendental Math functions in `packages/*/src`. `pnpm test` starts it as `test:math`.
 
 - The baseline `docs/math-baseline.json` has 187 calls in 53 files.
 - The check fails when the count of a file goes up, or when a new file has a call.
-- When a count goes down, the check asks for a lower baseline with `node scripts/check-math.mjs --write`.
+- When a count goes down, the check asks for a lower baseline with `node scripts/check-math.ts --write`.
 - This item found no Math function that gives a different result. But the result of such a function can change on another platform. A decision of the router must not depend on its last bit.
 
 ## The lane order (LANE-ORDER)

@@ -29,6 +29,10 @@ defaults:
   run:
     shell: bash
 
+env:
+  # The cells of the matrices of trace and near: process.platform and the major node version (FAIL-CLOSED). Change it with the matrices.
+  CELLS: linux-node24,linux-node26,win32-node24,win32-node26
+
 jobs:
   # The paths that start the cells. A dispatch always starts them.
   changes:
@@ -144,7 +148,7 @@ jobs:
           pattern: xplat-trace-*
           path: cells
       - name: Find the first chunk of calls that differs
-        run: node packages/core/scripts/xplat-summary.ts --cells cells --targets targets.json
+        run: node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --targets targets.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: xplat-targets
@@ -213,7 +217,7 @@ jobs:
       - name: Write the summary
         run: |
           mkdir -p near
-          node packages/core/scripts/xplat-summary.ts --cells cells --near near --out xplat.md --json xplat.json
+          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --near near --out xplat.md --json xplat.json
           cat xplat.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -223,7 +227,7 @@ jobs:
             xplat.json
 
   # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
-  # A job that its own if skips does not fail it, so a pull request without changes to the core passes.
+  # A skipped job fails it (template #85), except the jobs of the cells on a pull request without changes to the core.
   xplat-ok:
     name: Xplat OK
     if: always()
@@ -234,7 +238,19 @@ jobs:
     steps:
       - name: Each job passed
         env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
+          NEEDS: ${{ toJSON(needs) }}
+          # The jobs that their own if may skip, separated by spaces. Each other job must pass.
+          ALLOW_SKIP: ${{ needs.changes.outputs.xplat != 'true' && 'inputs trace locate near summary' || '' }}
         run: |
-          echo "results: $RESULTS"
-          case " $RESULTS " in *" failure "*|*" cancelled "*) exit 1 ;; esac
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) \(.value.result)"' > results
+          cat results
+          if [ ! -s results ]; then echo "::error::no job in needs"; exit 1; fi
+          bad=0
+          while read -r job result; do
+            case "$result" in
+              success) ;;
+              skipped) case " $ALLOW_SKIP " in *" $job "*) ;; *) echo "::error::$job was skipped, and ALLOW_SKIP does not name it"; bad=1 ;; esac ;;
+              *) echo "::error::$job: $result"; bad=1 ;;
+            esac
+          done < results
+          exit $bad

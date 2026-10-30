@@ -300,9 +300,15 @@ async function main(): Promise<void> {
   console.log(`xplat: ${meta.os} ${meta.arch} node ${meta.node} V8 ${meta.v8}, highways ${meta.highways}.`);
 
   const files = inputFiles(inputs);
+  // FAIL-CLOSED: a file with no graph is not an input, and the log names it. A run with no input fails.
+  let routed = 0;
   for (const [name, path] of files) {
     const input = readInput(name, path);
-    if (input === undefined) continue;
+    if (input === undefined) {
+      console.error(`xplat: the file ${path} has no graph, so it is not an input.`);
+      continue;
+    }
+    routed++;
     const routers = [...new Set([...(routersArg ?? [...input.routes.map((r) => r.router), "corners"]), ...extra])];
     for (const router of routers) {
       const key = `${name}/${router}`;
@@ -381,6 +387,7 @@ async function main(): Promise<void> {
       console.log(`xplat: ${key}: ${hash}${same}, exact ${exactHash}, ${row.ms} ms, ${row.calls ?? 0} calls.`);
     }
   }
+  if (routed === 0) throw new Error(`xplat: the folders ${inputs.join(", ")} hold no input with a graph (${files.size} files).`);
 }
 
 if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

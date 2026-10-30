@@ -80,11 +80,13 @@ jobs:
           if-no-files-found: warn
 
   merge:
-    needs: solve
+    needs: [plan, solve]
     if: always()
     runs-on: ubuntu-latest
     env:
       ARGS: ${{ inputs.args }}
+      # The join expects the file of each shard of the plan (FAIL-CLOSED).
+      SHARDS: ${{ needs.plan.outputs.count }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -103,7 +105,7 @@ jobs:
         run: |
           set -o pipefail
           read -ra args <<< "$ARGS"
-          pnpm --filter @mark1russell7/highways exact "${args[@]}" --merge "$GITHUB_WORKSPACE/shards" --out "$GITHUB_WORKSPACE/optima.json" --summary "$GITHUB_WORKSPACE/exact.md"
+          pnpm --filter @mark1russell7/highways exact --shards "$SHARDS" "${args[@]}" --merge "$GITHUB_WORKSPACE/shards" --out "$GITHUB_WORKSPACE/optima.json" --summary "$GITHUB_WORKSPACE/exact.md"
           cat exact.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

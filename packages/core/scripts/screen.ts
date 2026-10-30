@@ -38,6 +38,7 @@ import {
 } from "../src/bench/screen/index.ts";
 import { highwayStrategies } from "../src/strategies/builtins.ts";
 import type { Strategy } from "../src/strategies/model.ts";
+import { requireGrid } from "./gates/inputs.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -152,6 +153,8 @@ const report = screen(step, strategies, {
 const seconds = (performance.now() - start) / 1000;
 const out = opt("--out") ?? "screen.jsonl";
 writeFileSync(out, recordLines(report.records));
+// FAIL-CLOSED: the screen writes its records first, so a failed check still leaves them to read.
+requireGrid(`screen ${setId}`, report.records);
 const activation = list("--activation");
 const candidates = new Set(report.summary.strategies.filter((s) => s.candidate).map((s) => s.strategy));
 const decision = activation?.includes("all") ? {} : { families: activation ?? [] };

@@ -12,22 +12,36 @@
     "template": "template repo",
     "test": "pnpm -r run test && pnpm run test:ai-review && pnpm run test:shared && pnpm run test:math",
     "test:shared": "node scripts/check-shared.mjs",
-    "test:math": "node scripts/check-math.mjs",
-    "test:ai-review": "node --test \"scripts/ai-review/*.test.mjs\"",
-    "typecheck": "pnpm -r run typecheck",
+    "test:math": "node scripts/check-math.ts",
+    "test:ai-review": "node --test \"scripts/ai-review/*.test.ts\"",
+    "typecheck": "pnpm -r run typecheck && pnpm run typecheck:scripts",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json",
     "lint:ste": "ste-lint",
     "ideas": "pnpm --filter @mark1russell7/highways ideas",
-    "queue": "pnpm --filter @mark1russell7/highways queue"
+    "queue": "pnpm --filter @mark1russell7/highways queue",
+    "check:conventions": "conventions check"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@arethetypeswrong/core": "^0.18.5",
-    "@mark1russell7/cue": "github:mark1russell7/cue",
-    "@mark1russell7/ste-lint": "github:mark1russell7/ste-lint",
+    "@mark1russell7/conventions": "^0.5.0",
+    "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
+    "@mark1russell7/ste-lint": "github:mark1russell7/ste-lint#3428ebde9116812a52540cf8b0b978caa98e02db",
     "@mark1russell7/template-cli": "^0.1.0",
+    "@types/node": "^26.6.4",
     "publint": "^0.3.25",
     "tsdown": "^0.23.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
+  },
+  "conventions": {
+    "rules": {
+      "typed-scripts": {
+        "ignore": [
+          "scripts/check-shared.mjs"
+        ],
+        "reason": "layout-contract and packing keep the same file byte for byte (docs/PROMOTION.md). It changes to TypeScript in the three repositories together."
+      }
+    }
   }
 }
