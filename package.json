@@ -24,7 +24,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@arethetypeswrong/core": "^0.18.5",
-    "@mark1russell7/conventions": "^0.6.0",
+    "@mark1russell7/conventions": "^0.7.0",
     "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
     "@mark1russell7/ste-lint": "github:mark1russell7/ste-lint#3428ebde9116812a52540cf8b0b978caa98e02db",
     "@mark1russell7/template-cli": "^0.1.0",
