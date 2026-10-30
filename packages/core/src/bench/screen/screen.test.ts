@@ -210,6 +210,20 @@ describe("screen", () => {
     expect(again.records.map(strip)).toEqual(one.records.map(strip));
   });
 
+  it("gives `null`, not `true`, as `deterministic` of a strategy with no run, and counts it (SCREEN-NO-RUN)", () => {
+    const corners = getStrategy(STRATEGIES, "router", "corners");
+    const small = defineStrategy({ step: "router", name: "proto-small", describe: "corners, for boards of 1 node at most.", defaults: {}, maxNodes: 1, run: (graph) => corners.run(graph) });
+    const report = screen("router", ["corners", small], { inputs: [tiny], baseline: false });
+    const row = report.summary.strategies.find((s) => s.strategy === "proto-small")!;
+    expect(row).toMatchObject({ runs: 0, skipped: 1, deterministic: null });
+    expect(report.summary.strategies.find((s) => s.strategy === "corners")!.deterministic).toBe(true);
+    expect(report.summary.noRun).toBe(1);
+    expect(report.summary.excluded).toContain("proto-small");
+    const text = formatScreen(report.summary);
+    expect(text).toContain("| no run |");
+    expect(text).toContain("Strategies with no run on any input: 1.");
+  });
+
   it("writes the bundle measures B2, B3 and B6 for each router record", () => {
     const m = one.records[0]!.measures;
     for (const name of ["route.bundle.share", "route.bundle.stretch.median", "route.bundle.stretch.q95", "route.bundle.merge-angle.max"]) expect(m[name]).toBeTypeOf("number");

@@ -131,8 +131,8 @@ export interface ScreenStrategySummary {
   readonly runs: number;
   /** The number of inputs that the strategy skipped. */
   readonly skipped: number;
-  /** This value is `true` when each run gave the same output two times. */
-  readonly deterministic: boolean;
+  /** This value is `true` when each run gave the same output two times. It is `null` when the strategy has no run, because no run makes no claim (SCREEN-NO-RUN). */
+  readonly deterministic: boolean | null;
   /** The sum of the breaks of each hard rule over the runs. */
   readonly hard: Readonly<Record<string, number>>;
   /** The sum of `hard`. */
@@ -173,6 +173,8 @@ export interface ScreenSummary {
   readonly front: readonly string[];
   /** The strategies with a break over the floor, without a run or with two different outputs of one input. They do not enter the front. */
   readonly excluded: readonly string[];
+  /** The number of strategies with no run on any input. Their `deterministic` is `null`. */
+  readonly noRun: number;
   readonly predictions: readonly PredictionCheck[];
   /** The gap closed of each strategy and rule, when the screen has optima. */
   readonly gap?: readonly GapSummary[];
@@ -527,7 +529,7 @@ function summarizeScreen(
       candidate: at.candidates.has(strategy),
       runs: ran.length,
       skipped: all.length - ran.length,
-      deterministic: ran.every((r) => r.deterministic),
+      deterministic: ran.length === 0 ? null : ran.every((r) => r.deterministic),
       hard,
       hardTotal: Object.values(hard).reduce((s, v) => s + v, 0),
       hardOverFloor: ran.reduce((n, r) => n + overFloor(r), 0),
@@ -536,7 +538,7 @@ function summarizeScreen(
       onFront: comparisons.filter((c) => c.front.includes(strategy)).length,
     };
   });
-  const fair = strategies.filter((s) => s.runs > 0 && s.hardOverFloor === 0 && s.deterministic);
+  const fair = strategies.filter((s) => s.runs > 0 && s.hardOverFloor === 0 && s.deterministic === true);
   const front = paretoFront(fair, (s) => Object.fromEntries(objectives.map((o) => [o.key, s.medians[o.key] ?? Number.NaN])), objectives).map((s) => s.strategy);
   const predictions = (at.predictions ?? []).map((p): PredictionCheck => {
     const op = p.op ?? (measureByName(p.measure)?.better === "higher" ? ">=" : "<=");
@@ -553,6 +555,7 @@ function summarizeScreen(
     strategies,
     front,
     excluded: strategies.filter((s) => !fair.includes(s)).map((s) => s.strategy),
+    noRun: strategies.filter((s) => s.runs === 0).length,
     predictions,
   };
 }
@@ -572,11 +575,12 @@ export function formatScreen(summary: ScreenSummary): string {
     `|---|---|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
     ...summary.strategies.map(
       (s) =>
-        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
+        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic === null ? "no run" : s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
     ),
     "",
     `Pareto front over the medians: ${summary.front.join(", ") || "-"}.`,
     `Not on the front because of a break over the floor, no run or two different outputs: ${summary.excluded.join(", ") || "-"}.`,
+    `Strategies with no run on any input: ${summary.noRun}.`,
   ];
   if (summary.predictions.length > 0) {
     lines.push("", "| prediction | strategy | input | measure | expected | measured | met | reason |", "|---|---|---|---|---:|---:|---|---|");
