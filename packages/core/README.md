@@ -613,6 +613,8 @@ The routers `trunks` and `shared` keep their own code. A test pins their output,
 The option `work` of `search` is a work budget, in millions of counted steps. The search measures no new plan after its plans took that work.
 Counters in the hot loops count the steps, so a budget stops at the same plan on each machine. The value 0 is no limit, and it is the default.
 `searchRun` gives the plan, the number of the measured plans and their work. One million steps take 1.5 ms to 2.7 ms on a CI runner.
+The third argument of `searchRun` is an observer. It gets each measured plan with its routes and its score, and it does not change the search.
+The option `crossingWeight` of `search` adds the crossings of the routes (R1) to the score, divided by the number of routes. The default is 0.
 
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
 The new strategy has the options of both. The keys of the options of a gate are not keys of the strategy before it. Gates can follow gates.
