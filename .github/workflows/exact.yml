@@ -27,6 +27,11 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # One run for each ref (RUNNER-SLOTS). A dispatch waits for the run before it.
+  group: exact-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   plan:
     runs-on: ubuntu-latest
@@ -49,8 +54,8 @@ jobs:
     timeout-minutes: ${{ fromJSON(inputs.minutes || '120') }}
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 20 jobs at one time across all repositories, so a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     env:
