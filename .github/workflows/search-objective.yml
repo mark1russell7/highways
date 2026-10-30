@@ -1,0 +1,57 @@
+# The objective of the highway strategy search (SEARCH-OBJECTIVE). The job objective runs search with the default options and 5 seeds
+# on each input of screen-v3 and on windows of the dense board. It correlates the score delta of each move with the change of ink, R1 and R4.
+# It also compares the start plan with the default, with a noise floor over the seeds and Holm. The runs go here, not on a local machine.
+name: Search objective
+
+on:
+  # A pull request that changes search or this script gets the screen with the default inputs.
+  pull_request:
+    paths:
+      - "packages/core/src/highways/search/**"
+      - "packages/core/scripts/search-objective.ts"
+      - ".github/workflows/search-objective.yml"
+  workflow_dispatch:
+    inputs:
+      set:
+        description: "The screen set"
+        default: "screen-v3"
+      seeds:
+        description: "The number of seeds of each input"
+        default: "5"
+      dense:
+        description: "The sizes of the windows of the dense board, in boxes, separated by commas (empty for none)"
+        default: "60,125,250"
+
+permissions:
+  contents: read
+
+jobs:
+  objective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      SET: ${{ inputs.set || 'screen-v3' }}
+      SEEDS: ${{ inputs.seeds || '5' }}
+      DENSE: ${{ inputs.dense == null && '60,125,250' || inputs.dense }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Correlate the score of search with the bench measures
+        working-directory: packages/core
+        run: |
+          set -o pipefail
+          node scripts/search-objective.ts --set "$SET" --seeds "$SEEDS" --dense "$DENSE" --out "$RUNNER_TEMP/search-objective.jsonl" | tee table.md
+          cat table.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: search-objective-${{ github.sha }}
+          path: ${{ runner.temp }}/search-objective.jsonl
+          if-no-files-found: warn

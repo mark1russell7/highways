@@ -1,6 +1,6 @@
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/measures/bundles.ts";
 import type { Point } from "../../geom.ts";
-import type { Graph, Route } from "../../model.ts";
+import type { Graph, Result, Route } from "../../model.ts";
 import { WayFinder } from "../../ways.ts";
 import { workCounts, workSince } from "../../work.ts";
 import { nearestPlace, orderAlongRoutes, tidyPlan, firstRoutes } from "../base.ts";
@@ -105,6 +105,20 @@ export interface SearchRun {
   readonly work: number;
 }
 
+/** One plan that `searchRun` measured, for the observer of `searchRun` (SEARCH-OBJECTIVE). */
+export interface SearchStep {
+  /** The number of the plan. The start plan has the number 1. */
+  readonly n: number;
+  /** The number of the current plan that the move changed. The start plan has 0. */
+  readonly from: number;
+  readonly plan: HighwayPlan;
+  /** The routes of the plan: the result of `follow`, as the bench measures it. */
+  readonly result: Result;
+  readonly score: number;
+  /** This value is true when the annealing keeps the plan as its current plan. The start plan has true. */
+  readonly accepted: boolean;
+}
+
 /**
  * This function gives the highways of a local search over the set of highways (HWY-059). The search starts at the plan of `from`.
  * Each move adds a highway of the pool, drops a highway, moves one edge to another highway, or moves one point of a spine.
@@ -119,8 +133,9 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
 /**
  * This function is `searchPlan`, and it also gives the number of the plans that it measured and their work (SEARCH-BUDGET).
  * With `work` more than 0, the search measures no new plan after the work of its measures is `work` × `SEARCH_WORK_UNIT` units or more.
+ * The function `observe` gets each measured plan. It does not change the search, and the work does not count its time.
  */
-export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>): SearchRun {
+export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>, observe?: (step: SearchStep) => void): SearchRun {
   const graph = input.graph;
   const start = tidyPlan(candidatePlan(input, o.from));
   const budget = Math.max(0, Math.floor(o.evaluations));
@@ -134,9 +149,11 @@ export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>): Sear
   const routes = firstRoutes(input);
   const first = follow(graph, { highways: [] }).routes;
   let work = 0;
+  let last: Result | undefined;
   const scoreOf = (plan: HighwayPlan): number => {
     const from = workCounts();
-    const score = searchScore(graph, follow(graph, plan).routes, first, o);
+    last = follow(graph, plan);
+    const score = searchScore(graph, last.routes, first, o);
     work += workSince(from);
     return score;
   };
@@ -188,6 +205,8 @@ export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>): Sear
 
   let current = start;
   let currentScore = scoreOf(start);
+  let currentN = 1;
+  observe?.({ n: 1, from: 0, plan: start, result: last!, score: currentScore, accepted: true });
   let best = start;
   let bestScore = currentScore;
   let temperature = Math.max(0, o.temperature);
@@ -198,7 +217,10 @@ export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>): Sear
     n++;
     const score = scoreOf(plan);
     const delta = score - currentScore;
-    if (delta >= 0 || (temperature > 0 && next() < acceptance(-delta / temperature))) [current, currentScore] = [plan, score];
+    const from = currentN;
+    const accepted = delta >= 0 || (temperature > 0 && next() < acceptance(-delta / temperature));
+    if (accepted) [current, currentScore, currentN] = [plan, score, n];
+    observe?.({ n, from, plan, result: last!, score, accepted });
     if (score > bestScore + 1e-12) [best, bestScore] = [plan, score];
     if (n % SWEEP === 0) temperature *= 0.95;
   }

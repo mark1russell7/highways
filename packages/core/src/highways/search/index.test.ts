@@ -4,7 +4,7 @@ import { commonTests, flows, hub } from "../fixtures.test-util.ts";
 import { checkPlan } from "../model.ts";
 import { tidyPlan } from "../base.ts";
 import { candidatePlan } from "../select/index.ts";
-import { SEARCH_DEFAULTS, SEARCH_WORK_UNIT, searchPlan, searchRun, searchScore } from "./index.ts";
+import { SEARCH_DEFAULTS, SEARCH_WORK_UNIT, searchPlan, searchRun, searchScore, type SearchStep } from "./index.ts";
 
 describe("the highway strategy search (HWY-059)", () => {
   it("gives the start plan with no evaluations", () => {
@@ -47,6 +47,21 @@ describe("the highway strategy search (HWY-059)", () => {
     const least = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, work: 1 / SEARCH_WORK_UNIT });
     expect(least.evaluations).toBe(1);
     expect(least.plan).toEqual(tidyPlan(candidatePlan({ graph: hub }, "corridors")));
+  }, 30_000);
+
+  it("gives each measured plan to the observer, and the observer does not change the search (SEARCH-OBJECTIVE)", () => {
+    const o = { ...SEARCH_DEFAULTS, evaluations: 6 };
+    const plain = searchRun({ graph: hub }, o);
+    const steps: SearchStep[] = [];
+    const seen = searchRun({ graph: hub }, o, (s) => steps.push(s));
+    expect(seen).toEqual(plain);
+    expect(steps.map((s) => s.n)).toEqual(Array.from({ length: plain.evaluations }, (_, i) => i + 1));
+    expect(steps[0]!.from).toBe(0);
+    const first = follow(hub, { highways: [] }).routes;
+    for (const s of steps) {
+      expect(s.from).toBeLessThan(s.n);
+      expect(s.score).toBe(searchScore(hub, s.result.routes, first, o));
+    }
   }, 30_000);
 
   commonTests("search", { ...SEARCH_DEFAULTS, evaluations: 4 }, searchPlan, [flows]);
