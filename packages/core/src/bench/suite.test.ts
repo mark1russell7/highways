@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
+import type { Router } from "../model.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { createRegistry, listStrategies, routersOf, STEPS, type AnyStrategy } from "../strategies/model.ts";
 import { benchOne, benchRun } from "./run.ts";
@@ -164,5 +165,19 @@ describe("runSuite in shards, with caps and the paired arm (BENCH-GREEN)", () =>
     const { ms: _b, paired, ...restB } = b.row;
     expect(restB).toEqual(restA);
     expect(paired?.base).toBe("shared");
+  });
+
+  it("routes one warm-up of each paired arm before the timed routes, and no warm-up without a pair", () => {
+    const graph = makeFixture(tiny);
+    const corners = routersOf(STRATEGIES).find((r) => r.name === "corners")!;
+    const shared = routersOf(STRATEGIES).find((r) => r.name === "shared")!;
+    const log: string[] = [];
+    const counted = (router: Router, tag: string): Router => ({ name: router.name, route: (g) => (log.push(tag), router.route(g)) });
+    benchRun(counted(corners, "A"), tiny.name, graph, 3, Infinity, counted(shared, "B"));
+    // The warm-up (B, A), then the timed routes with the order swapped at each route.
+    expect(log).toEqual(["B", "A", "B", "A", "A", "B", "B", "A"]);
+    log.length = 0;
+    benchRun(counted(corners, "A"), tiny.name, graph, 3);
+    expect(log).toEqual(["A", "A", "A"]);
   });
 });

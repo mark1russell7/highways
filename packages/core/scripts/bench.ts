@@ -25,6 +25,7 @@ import { portfolioStrategy } from "../src/portfolio/router.ts";
 import { STRATEGIES as BUILT_IN } from "../src/strategies/builtins.ts";
 import { listStrategies, register, routersOf, STEPS, type AnyStrategy, type Step } from "../src/strategies/model.ts";
 import { formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
+import { envOf } from "./gates/paired.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -89,6 +90,8 @@ const suite = runSuite({
   ...(pair ? { pair, pairMax: number("--pair-max", 1000) } : {}),
   log: (line) => process.stderr.write(line + "\n"),
 });
+// Each timing record names the computer and the mode (MEASURE-ISOLATE). The benchmark times each route in this process.
+const env = envOf("process");
 const rows = suite.bench;
 // The case boards are small, so each run races them. Each case shows one known defect.
 if (!rowsOnly)
@@ -103,7 +106,7 @@ console.log(formatFaults(rows));
 console.log();
 console.log(formatLevels(rows.filter((r) => r.levelFaults.length > 0)));
 const json = opt("--json");
-if (json) writeFileSync(json, JSON.stringify(rows, null, 2) + "\n");
+if (json) writeFileSync(json, JSON.stringify(rows.map((r) => ({ ...r, env })), null, 2) + "\n");
 if (rows.some((r) => !r.deterministic)) process.exitCode = 1;
 // The side tables come after the tables of the rows. `--side-tables` also writes them to a file, for the join of the parts.
 const side: string[] = [];
@@ -141,7 +144,7 @@ if (report.rows.some((r) => r.paired)) {
   console.log(formatPaired(report.rows));
 }
 const out = opt("--report");
-if (out) writeFileSync(out, JSON.stringify(report) + "\n");
+if (out) writeFileSync(out, JSON.stringify({ ...report, rows: report.rows.map((r) => ({ ...r, env })) }) + "\n");
 
 /** This function prints the side tables: the curves, the highways, the room, the sweeps of the levels and the cost of a link through a box. */
 function sideTables(): void {

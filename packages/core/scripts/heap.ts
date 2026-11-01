@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import { getHeapStatistics } from "node:v8";
 import { gunzipSync } from "node:zlib";
 import { asRouter, getStrategy, highwayRouterStrategy, routePortfolio, routerStrategies, STRATEGIES, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { envOf, type RecordEnv } from "./gates/paired.ts";
 import { routeHash } from "./xplat.ts";
 
 /** The budget file: the measures of a CI run, and the rules of the caps. */
@@ -44,6 +45,8 @@ interface Row {
   readonly usedMb: number;
   /** The route hash of `scripts/xplat.ts`. Two equal hashes before and after a change show that the change keeps the output. */
   readonly hash: string;
+  /** The computer and the mode (MEASURE-ISOLATE). Each router routes in a fresh process, so the mode is `fresh`. The context has the heap cap of the process. */
+  readonly env?: RecordEnv;
 }
 
 const mb = (bytes: number): number => Math.round(bytes / 2 ** 20);
@@ -70,7 +73,7 @@ function one(name: string, fixture: string, out: string): void {
   const ms = Math.round(performance.now() - t0);
   // V8 can give back the heap of a peak before the route ends, so `total_heap_size` after the route can be much less than the peak. The gate reads the peak RSS.
   const heap = getHeapStatistics();
-  const row: Row = { router: name, ms, rssMb: mb(process.resourceUsage().maxRSS * 1024), heapMb: mb(heap.total_heap_size), usedMb: mb(heap.used_heap_size), hash: routeHash(result) };
+  const row: Row = { router: name, ms, rssMb: mb(process.resourceUsage().maxRSS * 1024), heapMb: mb(heap.total_heap_size), usedMb: mb(heap.used_heap_size), hash: routeHash(result), env: envOf("fresh") };
   appendFileSync(out, JSON.stringify(row) + "\n");
 }
 
@@ -81,7 +84,7 @@ function rssBudget(budgets: Pick<Budgets, "margin" | "slackMb">, rssMb: number):
 
 /** This function runs each router of the budget file in its own process. It gives the rows of the summary and the count of the breaks. */
 function gate(budgets: Budgets, fixture: string, out: string): number {
-  const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
+  const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "The budgets do not come from 5 runs yet (GATE-LIMITS).", "","| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
   let breaks = 0;
   for (const [name, measure] of Object.entries(budgets.routers)) {
     const cap = measure === null ? budgets.measureCapMb : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));

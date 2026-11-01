@@ -39,6 +39,7 @@ import {
 import { highwayStrategies } from "../src/strategies/builtins.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 import { requireGrid } from "./gates/inputs.ts";
+import { envOf } from "./gates/paired.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -149,6 +150,8 @@ const report = screen(step, strategies, {
   ...(edits > 0 ? { edits } : {}),
   ...(moves ? { moves } : {}),
   log: (line) => process.stderr.write(line + "\n"),
+  // The screen times each run in this process (MEASURE-ISOLATE). The summary names the computer and the mode.
+  env: envOf("process"),
 });
 const seconds = (performance.now() - start) / 1000;
 const out = opt("--out") ?? "screen.jsonl";
