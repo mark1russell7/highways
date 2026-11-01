@@ -82,7 +82,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(inputs.minutes || '60') }}
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at one time across all repositories, so a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
       max-parallel: 3
       matrix:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
