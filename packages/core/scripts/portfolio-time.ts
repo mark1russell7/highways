@@ -40,6 +40,7 @@ import type { Graph, Result } from "../src/model.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { asRouter, getStrategy, listStrategies, type Strategy } from "../src/strategies/model.ts";
 import { strategies as gapStrategies } from "./screens/meas2.ts";
+import { envOf, type RecordEnv } from "./gates/paired.ts";
 
 /** One timed run of a strategy on a board. */
 export interface TimeRecord {
@@ -61,6 +62,8 @@ export interface TimeRecord {
   /** With `--members`: the time of the hash of the output, in ms. It is not a part of `keyMs`. The router hashes the base and the winner of a pick that moves. */
   readonly hashMs?: number;
   readonly skipped?: string;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). The script times each run in this process. */
+  readonly env?: RecordEnv;
 }
 
 /** The name of the lines of the setup of the key: the network of the stretch, and the facts of the output of `shared`. */
@@ -132,6 +135,8 @@ export interface BreakdownRecord {
   readonly baseMs?: number;
   readonly membersMs?: number;
   readonly members?: number;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). */
+  readonly env?: RecordEnv;
 }
 
 /**
@@ -277,6 +282,8 @@ export interface CostRecord {
   readonly picked?: boolean;
   /** For `router`: `true` for the last member that ran in the pick. */
   readonly last?: boolean;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). */
+  readonly env?: RecordEnv;
 }
 
 /**
@@ -612,6 +619,8 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const members = args.includes("--members");
   const [shard, shards] = (opt("--shard") ?? "0/1").split("/").map(Number) as [number, number];
   const out = opt("--out") ?? "time.jsonl";
+  // Each timing line names the computer and the mode (MEASURE-ISOLATE). The script times each run in this process.
+  const env = envOf("process");
   if (args.includes("--breakdown")) {
     const boards = sizes.flatMap((n) => EXACT_CLASSES.flatMap((cls: ExactClass) => seeds.map((k) => ({ cls, n, k }))));
     const mine = boards.filter((_, i) => i % shards === shard);
@@ -621,7 +630,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept. So the first timed board is warm.
     const first = mine[0];
     if (first !== undefined) breakdownLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow, forms);
-    const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow, forms).map((l) => JSON.stringify(l)));
+    const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow, forms).map((l) => JSON.stringify({ ...l, env })));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
@@ -632,7 +641,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept.
     const first = mine[0];
     if (first !== undefined) costLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow);
-    const lines = mine.flatMap((b) => costLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
+    const lines = mine.flatMap((b) => costLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify({ ...l, env })));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
@@ -685,7 +694,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
         const f = portfolioFacts(b.graph);
         f(out0);
         const ms = performance.now() - t;
-        if (shard === 0) lines.push(JSON.stringify({ strategy: KEY_SETUP, cls: b.cls, seed: b.k, nodes: b.graph.nodes.length, edges: b.graph.edges.length, rep, ms, scoreMs: 0 } satisfies TimeRecord));
+        if (shard === 0) lines.push(JSON.stringify({ strategy: KEY_SETUP, cls: b.cls, seed: b.k, nodes: b.graph.nodes.length, edges: b.graph.edges.length, rep, ms, scoreMs: 0, env } satisfies TimeRecord));
       }
       keys.set(b, keyTimer(b.graph, out0));
     }
@@ -718,7 +727,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
         const scoreMs = performance.now() - t;
         const key = members ? keys.get(b)!(result, s.name === PORTFOLIO_BASE_MEMBER) : undefined;
         times.push(ms + (key?.keyMs ?? 0));
-        lines.push(JSON.stringify({ ...head, rep, ms, scoreMs, ...(key ?? {}) } satisfies TimeRecord));
+        lines.push(JSON.stringify({ ...head, rep, ms, scoreMs, ...(key ?? {}), env } satisfies TimeRecord));
       }
       times.sort((x, y) => x - y);
       if (times[Math.floor(times.length / 2)]! > stop) slowAt.add(b.graph.nodes.length);

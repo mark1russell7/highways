@@ -29,6 +29,23 @@ export interface BenchRow {
   readonly overLimit?: OverLimit;
   /** The time of the paired baseline arm (BENCH-GREEN). Only a cell with a baseline router has it. */
   readonly paired?: Paired;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). The script of the benchmark sets it. */
+  readonly env?: TimingEnv;
+}
+
+/**
+ * The computer and the mode of a timing record (MEASURE-ISOLATE). The `cpu` is the model of the first CPU.
+ * The `mode` is `process` for a time in one process, and `fresh` for a time in a fresh process for each arm.
+ * The `context` is `ci` or `local`, then the flags of Node.js.
+ */
+export interface TimingEnv {
+  readonly cpu: string;
+  readonly cores: number;
+  readonly os: string;
+  readonly arch: string;
+  readonly node: string;
+  readonly mode: string;
+  readonly context?: string;
 }
 
 /**
@@ -118,6 +135,7 @@ export interface BenchRun {
  * This function does the work of `benchOne` and also gives the result, so more measures can read it without a second route.
  * With a baseline router `pair`, the baseline routes the graph one time for each route of the router, in turn: first before, then after.
  * The row then gets `paired`. The baseline routes do not count for the cell limit, and their results do not change the row.
+ * Before the timed routes, each of the two arms routes the graph one time as a warm-up (MEASURE-ISOLATE). The warm-up routes do not count.
  */
 export function benchRun(router: Router, fixture: string, graph: Graph, repeat = 3, cellLimit: number = Infinity, pair?: Router): BenchRun {
   const times: number[] = [];
@@ -131,6 +149,11 @@ export function benchRun(router: Router, fixture: string, graph: Graph, repeat =
   let first: Result | undefined;
   let deterministic = true;
   let spent = 0;
+  // The warm-up of the paired arms: the first route of each arm is not timed, so a cold start does not change the ratio.
+  if (pair) {
+    pair.route(graph);
+    router.route(graph);
+  }
   for (let i = 0; i < Math.max(2, repeat); i++) {
     // The order of the two arms changes at each route, so a warm cache helps each arm equally.
     if (i % 2 === 0) timeBase();

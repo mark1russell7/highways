@@ -20,12 +20,12 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { Session } from "node:inspector/promises";
-import { arch, cpus, platform } from "node:os";
 import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { adamStrategy, annealingStrategy, canalStrategy, nudgeStrategy, repelStrategy, springsStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { envOf } from "./gates/paired.ts";
 import { exactLines, routeHash } from "./xplat.ts";
 
 interface ProfileNode {
@@ -114,7 +114,8 @@ async function main(): Promise<void> {
   const graph = doc.graph;
   const route = routerOf(name);
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
-  const env = { os: platform(), arch: arch(), cpu: (cpus()[0]?.model ?? "").trim(), node: process.version, highways: pkg.version };
+  // The computer, the mode and the context of the times (MEASURE-ISOLATE). Each route is timed in this process.
+  const env = { ...envOf("process"), highways: pkg.version };
   console.log(`scale: ${name} on ${doc.manifestId ?? file} (${graph.nodes.length} nodes, ${graph.edges.length} edges), ${env.os} ${env.arch} node ${env.node}, ${env.cpu}.`);
 
   // With `--profile`, a CPU profile covers the first route, and a second profile covers the steps.

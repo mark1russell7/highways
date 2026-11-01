@@ -18,7 +18,7 @@ import { routeSymmetry } from "../measures/symmetry.ts";
 import { quantile } from "../measures/stats.ts";
 import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
-import { sameData } from "../run.ts";
+import { sameData, type TimingEnv } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
 import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
 import { curvesHash, resultHash, type MoveCounter } from "./exercise.ts";
@@ -120,6 +120,8 @@ export interface ScreenOptions {
   readonly moves?: MoveCounter;
   /** This function gets one line of progress for each input. */
   readonly log?: (line: string) => void;
+  /** The computer and the mode of the times (MEASURE-ISOLATE). The summary keeps it. The records do not get it. */
+  readonly env?: TimingEnv;
 }
 
 /** The summary of one strategy over the inputs of a screen. */
@@ -178,6 +180,8 @@ export interface ScreenSummary {
   readonly predictions: readonly PredictionCheck[];
   /** The gap closed of each strategy and rule, when the screen has optima. */
   readonly gap?: readonly GapSummary[];
+  /** The computer and the mode of the times of the records (MEASURE-ISOLATE), from `ScreenOptions.env`. */
+  readonly env?: TimingEnv;
 }
 
 /** The result of `screen`: one record for each strategy and input, and the summary. */
@@ -496,7 +500,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   }
 
   const summary = summarizeScreen(records, comparisons, { set: set.id, step, candidates, ...(options.predictions ? { predictions: options.predictions } : {}) });
-  return { records, summary: optima ? { ...summary, gap: summarizeGap(records) } : summary };
+  const timed = options.env ? { ...summary, env: options.env } : summary;
+  return { records, summary: optima ? { ...timed, gap: summarizeGap(records) } : timed };
 }
 
 /** This function gives the summary of the records of a screen. */
@@ -570,6 +575,7 @@ export function formatScreen(summary: ScreenSummary): string {
     "",
     `${summary.inputs} inputs, ${summary.strategies.length} strategies. Each cell of a measure is the median over the inputs.`,
     "The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input.",
+    ...(summary.env ? [`The times come from ${summary.env.cores} x ${summary.env.cpu} (${summary.env.os} ${summary.env.arch}, Node.js ${summary.env.node}), mode \`${summary.env.mode}\`${summary.env.context ? `, context \`${summary.env.context}\`` : ""}.`] : []),
     "",
     `| strategy | new | runs | skipped | hard | over the floor | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
     `|---|---|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
