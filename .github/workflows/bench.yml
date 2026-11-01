@@ -15,7 +15,7 @@ on:
     branches: [main]
     paths: ["packages/core/**", ".github/workflows/bench.yml"]
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "53 3 * * *"
   workflow_dispatch:
     inputs:
       max:
