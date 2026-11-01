@@ -147,6 +147,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | FAIL-CLOSED | Each gate fails when an input of its plan is missing, and it names that input. The gates read the parts, the shards, the cells and the strategy × input grid of their plans. `scripts/gates/inputs.ts` holds the shared check, and each gate has a test with an empty input and with one input missing. | 2026-10-30 | #205 |
 | SCREEN-NO-RUN | The screen summary said "yes" in the column "same twice" for a strategy that did not run. With this item, that cell says "no run", and the summary counts those strategies. The type `ScreenStrategySummary` gives `null` for them. | 2026-10-30 | #210 |
 | RUNNER-SLOTS | Each heavy matrix runs 3 cells at most, and each heavy workflow has one concurrency group for each ref. The account runs at most 40 jobs at one time, and heavy work keeps 28 of them at most. | 2026-10-30 | #207 |
+| BENCH-JOIN-INSTALL | The join job of `Bench` installs the packages. The source of the core imports `@mark1russell7/layout-contract`, and the scheduled runs of 10-29 to 11-01 failed without it. | 2026-11-01 | #218 |
 
 ## Calibration
 
