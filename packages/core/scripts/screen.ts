@@ -1,6 +1,10 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
 // [--options <file.json>] [--families <a,b>] [--members <from-to>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
-// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--out screen.jsonl] [--summary screen.md]`.
+// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--paired <file> --paired-base <name> [--paired-arms <name,...>] [--paired-repeats <n>]]
+// [--out screen.jsonl] [--summary screen.md]`.
+// `--paired` times the arms of a comparison in this process with `measureIsolated` (MEASURE-ISOLATE), after the screen, and writes the report `paired-time/1` to the file.
+// The base is `--paired-base`. The other arms are `--paired-arms`, else the strategies of the call. Each arm routes each input where no arm skipped it.
+// The mode is `process`, with the A/A arm and 1 warm-up run. `--paired-repeats` gives the timed rounds, and the default is 3. Only a step that gives routes has paired times.
 // `--moves` counts the own move of each highway strategy of the step `highway`. A module can also export `moves`, a `MoveCounter` by the names of the records.
 // `--activation` adds the activation report (ACTIVATION) to the summary. The inputs of these families are the decision inputs. The value `all` takes each family.
 // `--edits` runs each highway strategy over this number of seeded edits, with its plan before each edit (BUILD-W2A).
@@ -36,10 +40,14 @@ import {
   type ScreenStep,
   type ScreenWrap,
 } from "../src/bench/screen/index.ts";
-import { highwayStrategies } from "../src/strategies/builtins.ts";
-import type { Strategy } from "../src/strategies/model.ts";
+import { isRoutedStep, stepRouterStrategy, type RoutedStep } from "../src/bench/compare.ts";
+import { HIGHWAY_BASE_ROUTERS, inputGraph, screenInputs } from "../src/bench/screen/index.ts";
+import type { Graph, Router } from "../src/model.ts";
+import { highwayStrategies, STRATEGIES } from "../src/strategies/builtins.ts";
+import { asRouter, getStrategy, type Strategy } from "../src/strategies/model.ts";
 import { requireGrid } from "./gates/inputs.ts";
-import { envOf } from "./gates/paired.ts";
+import { envOf, measureIsolated } from "./gates/paired.ts";
+import { pairedTable } from "./gates/time-gate.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -165,6 +173,42 @@ const activationText = activation ? "\n" + formatActivation(activationReport(rep
 // A record that is not skipped and has no output hash has no output, or a number in its output that is not finite.
 const unhashed = report.records.filter((r) => r.skipped === undefined && r.outputHash === undefined).map((r) => `${r.strategy} on ${r.input}`);
 const unhashedText = unhashed.length > 0 ? `\n${unhashed.length} records have no output hash: ${unhashed.slice(0, 20).join(", ")}.\n` : "";
-const text = formatScreen(report.summary) + activationText + unhashedText + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
+
+// The paired time (MEASURE-ISOLATE): the arms of the comparison run in turn on each input in this process, with the A/A arm.
+const pairedOut = opt("--paired");
+let pairedText = "";
+if (pairedOut !== undefined) {
+  if (step !== "router" && !isRoutedStep(step)) throw new Error(`The step "${step}" gives no routes, so it has no paired time.`);
+  const base = opt("--paired-base");
+  if (base === undefined) throw new Error("The option --paired needs --paired-base <name>.");
+  const repeats = Number(opt("--paired-repeats") ?? "3");
+  const others = list("--paired-arms") ?? report.summary.strategies.filter((s) => s.candidate).map((s) => s.strategy);
+  const names = [base, ...others.filter((n, i) => n !== base && others.indexOf(n) === i)];
+  if (names.length < 2) throw new Error("The paired time needs an arm other than the base: give --paired-arms or a strategy of the call.");
+  const mine = (name: string): Strategy<ScreenStep> | undefined => strategies.find((s): s is Strategy<ScreenStep> => typeof s !== "string" && s.name === name);
+  // Each arm is the router of the screen: a router, a base router of the step `highway`, or the router of a strategy of a step of `RoutedStep`.
+  const routerOf = (name: string): Router => {
+    const own = options?.[name];
+    const found = mine(name);
+    if (step === "router") return asRouter((found ?? getStrategy(STRATEGIES, "router", name)) as Strategy<"router", object>, own);
+    if (step === "highway" && found === undefined && HIGHWAY_BASE_ROUTERS.includes(name)) return asRouter(getStrategy(STRATEGIES, "router", name) as Strategy<"router", object>, own);
+    return asRouter(stepRouterStrategy((found ?? getStrategy(STRATEGIES, step as RoutedStep, name)) as Strategy<RoutedStep>) as Strategy<"router", object>, own);
+  };
+  const skipped = new Set(report.records.filter((r) => r.skipped !== undefined).map((r) => `${r.strategy}|${r.input}`));
+  const screened = new Set(report.records.map((r) => r.input));
+  const families = list("--families");
+  const pairedInputs = (inputs ?? screenInputs(set))
+    .filter((i) => (families?.includes(i.family) ?? true) && screened.has(i.id) && names.every((n) => !skipped.has(`${n}|${i.id}`)))
+    .map((i) => ({ id: i.id, group: i.family, value: inputGraph(i) }));
+  if (pairedInputs.length === 0) throw new Error("The paired time has no input where each arm runs.");
+  const arms = names.map((id) => {
+    const router = routerOf(id);
+    return { id, run: (graph: Graph) => router.route(graph) };
+  });
+  const paired = measureIsolated({ arms, inputs: pairedInputs, repeats, warmup: 1, mode: "process" });
+  writeFileSync(pairedOut, JSON.stringify(paired) + "\n");
+  pairedText = `\n## The paired time\n\n${pairedTable(paired).join("\n")}\n`;
+}
+const text = formatScreen(report.summary) + activationText + unhashedText + pairedText + `\n${report.records.length} records in ${seconds.toFixed(1)} s.\n`;
 writeFileSync(opt("--summary") ?? "screen.md", text);
 console.log(text);

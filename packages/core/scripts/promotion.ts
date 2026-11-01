@@ -1,14 +1,19 @@
 // The promotion test of `docs/PROMOTION.md` over the records of screens (PROMO-CANALS).
-// Start: `pnpm promotion --candidate canals --baseline shared --step router --corpus a.jsonl,b.jsonl --fresh c.jsonl,d.jsonl [--out promotion.md] [--json promotion.json]`.
+// Start: `pnpm promotion --candidate canals --baseline shared --step router --corpus a.jsonl,b.jsonl --fresh c.jsonl,d.jsonl --time e.json,f.json [--out promotion.md] [--json promotion.json]`.
 // `--corpus` gives the records of the promotion corpus, and `--fresh` the records of the confirmation run. Each file is the `screen.jsonl` of a screen.
 // The script applies the win test to each set of records, and the verdict over families to each measure.
 // The verdict uses the families of the input ids, and the Holm correction over the measures.
 // The literal reading uses all the inputs. The exercised reading uses only the inputs where the candidate changes the output.
+// `--time` gives the paired time reports (`paired-time/1`) of the screens with `--paired`. The time test reads its ratios from them (MEASURE-ISOLATE).
+// Without them, the time test has no result, so it fails: the times of the records do not come from one paired run.
+// Each file is the report of one job. The policy is 5 jobs (`timeJobs`). With fewer jobs, the time test cannot decide, so it does not promote.
+// A check that the A/A arm of the jobs cannot resolve gives "cannot decide (noise)", and it does not promote.
 // The script reads files and does no layout, so it is a quick local check.
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
 import { compareSpec, MEASURES, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
+import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
 
 /** The fields of a screen record that the test reads. */
 interface Rec {
@@ -39,7 +44,7 @@ const baseline = need("--baseline");
 const step = opt("--step") ?? "router";
 
 // The parameters of `docs/PROMOTION.md`.
-const P = { medianWorse: 0.02, tailWorse: 0.1, tailShare: 0.1, gainMin: 0.05, signP: 0.05, bootstrapRuns: 10000, bootstrapLevel: 0.95, timeRatio: 1.5, timeTailQ: 0.95, timeTail: 2.0, timeFloorMs: 5, level: 0.05 };
+const P = { medianWorse: 0.02, tailWorse: 0.1, tailShare: 0.1, gainMin: 0.05, signP: 0.05, bootstrapRuns: 10000, bootstrapLevel: 0.95, timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2.0, timeFloorMs: 5, level: 0.05 };
 // The floors of `docs/PROMOTION.md`: the record name, the floor and the tolerance.
 const FLOORS: Readonly<Record<string, { floor: number; tol: number }>> = { "route.crossings": { floor: 0, tol: 0 }, "route.bundle.merge-angle.max": { floor: 0, tol: 60 } };
 // The guard measures of each step, by the keys of `MEASURES`. The step `whole` has no row, so it takes the guards of each routing step. `Z10.mean` is the stability guard.
@@ -176,7 +181,7 @@ interface WinTest {
   readonly hard: { readonly pass: boolean; readonly worse: readonly string[] };
   readonly guards: readonly GuardRow[];
   readonly gain: readonly GainRow[];
-  readonly time: { readonly median: number; readonly tail: number; readonly pass: boolean };
+  readonly time: TimeTest;
   readonly pass: boolean;
 }
 
@@ -219,11 +224,8 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
       return { key: x.m.key, n: x.rs.length, median: med, wins: x.wins, losses: x.losses, p: x.p, pHolm: adjusted[i]!, lo, hi, pass: adjusted[i]! < P.signP && hi < 1 };
     })
     .filter((g): g is GainRow => g !== undefined);
-  // The time: t / max(b, timeFloorMs / timeRatio).
-  const times = ps.filter((p) => p.c.ms !== undefined && p.b.ms !== undefined).map((p) => p.c.ms! / Math.max(p.b.ms!, P.timeFloorMs / P.timeRatio));
-  const tMed = median(times);
-  const tTail = quantile(times, P.timeTailQ);
-  const time = { median: tMed, tail: tTail, pass: times.length > 0 && tMed <= P.timeRatio && tTail <= P.timeTail };
+  // The time: the worst median and the worst tail over the paired time reports of the jobs, with the resolution of the A/A arm (MEASURE-ISOLATE).
+  const time = pairedTimeTest(timeReports, baseline, candidate, new Set(ps.map((p) => p.c.input)), P);
   const hardPass = worse.length === 0;
   return {
     reading,
@@ -265,7 +267,7 @@ const yes = (b: boolean): string => (b ? "pass" : "fail");
 function winText(name: string, t: WinTest, all: number): string {
   const lines = [`#### ${name}: ${t.reading} reading, ${t.n} of ${all} inputs: ${yes(t.pass)}`, ""];
   lines.push(`- Hard rules: ${yes(t.hard.pass)}${t.hard.worse.length > 0 ? ` (${t.hard.worse.length} worse, for example ${t.hard.worse.slice(0, 3).join(", ")})` : ""}.`);
-  lines.push(`- Time: median ${fmt(t.time.median, 2)}, q0.95 ${fmt(t.time.tail, 2)}: ${yes(t.time.pass)}.`);
+  lines.push(`- ${timeText(t.time, P.timeTailQ)}`);
   lines.push("", "| Guard | Inputs | Median ratio | Tail share | Result |", "|---|---|---|---|---|");
   // A guard with no value in the records, for example a curve measure of a step without curves, has no row.
   for (const g of t.guards.filter((x) => x.n > 0)) lines.push(`| \`${g.key}\` | ${g.n} | ${fmt(g.median)} | ${fmt(g.tail, 2)} | ${yes(g.pass)} |`);
@@ -301,6 +303,13 @@ const sets = [
 ].filter((s) => opt(s.option) !== undefined);
 if (sets.length === 0) throw new Error("The test needs --corpus or --fresh.");
 for (const s of sets) if (s.records.length === 0) throw new Error(`The files of ${s.option} (${opt(s.option)}) give no records.`);
+
+// The paired time reports of `--time` (MEASURE-ISOLATE). An option that names files with no report is an error (FAIL-CLOSED).
+const timeReports = (opt("--time") ?? "")
+  .split(",")
+  .filter((f) => f.length > 0)
+  .flatMap((f) => parseReports(readFileSync(f, "utf8")));
+if (opt("--time") !== undefined && timeReports.length === 0) throw new Error(`The files of --time (${opt("--time")}) give no paired time report.`);
 
 const out: string[] = [`# The promotion test of \`${candidate}\` against \`${baseline}\` (step \`${step}\`)`, ""];
 const json: Record<string, unknown> = { candidate, baseline, step, sets: [] };

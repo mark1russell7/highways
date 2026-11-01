@@ -54,6 +54,9 @@ on:
       node:
         description: "The major version of Node.js of the screen."
         default: "26"
+      paired:
+        description: "The base of the paired time (MEASURE-ISOLATE), for example shared. The job times the base and the strategies of the call in turn, with an A/A arm. Empty: no paired time."
+        default: ""
 
 permissions:
   contents: read
@@ -105,6 +108,7 @@ jobs:
       SET: ${{ inputs.set || 'screen-v1' }}
       ACTIVATION: ${{ inputs.activation || '' }}
       MEMBERS: ${{ inputs.members || '' }}
+      PAIRED: ${{ inputs.paired || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -132,6 +136,8 @@ jobs:
           [ "$SHUFFLES" != "0" ] && args+=(--shuffles "$SHUFFLES")
           [ "$EDITS" != "0" ] && args+=(--edits "$EDITS")
           [ -n "$ACTIVATION" ] && args+=(--activation "$ACTIVATION")
+          # The paired time runs the arms of the comparison in this job, in turn on each input (MEASURE-ISOLATE).
+          [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired.json" --paired-base "$PAIRED")
           start=$SECONDS
           pnpm --filter @mark1russell7/highways screen "${args[@]}"
           {
@@ -146,4 +152,5 @@ jobs:
           path: |
             screen.jsonl
             screen.md
+            paired.json
           if-no-files-found: warn
