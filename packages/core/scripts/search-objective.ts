@@ -1,10 +1,14 @@
-// The objective of `search` (SEARCH-OBJECTIVE): `node scripts/search-objective.ts [--set screen-v3] [--seeds 5] [--dense 60,125,250] [--variants <list>] [--fixture <file>] [--out <file>]`.
+// The objective of `search` (SEARCH-OBJECTIVE): `node scripts/search-objective.ts [--set screen-v3] [--seeds 5] [--dense 60,125,250] [--variants <list>] [--fixture <file>] [--out <file>]
+// [--time-repeats <n>] [--paired <file>]`.
 // It runs `searchRun` with the default options and each seed on each input of the set, and on windows of the dense board.
 // For each measured plan it keeps the score, the four terms of the score and the bench measures ink, R1 and R4 of its routes.
 // Part 1: for each input, the Spearman correlation of the score delta of each move with the change of each measure, over the moves of all the seeds.
 // The sign of a measure is turned, so a positive correlation means that a higher score gives a better measure.
 // It also gives the correlation of each term of the score, so that a term that does not follow the measures is visible.
 // Part 2: the start plan (0 evaluations) and each variant of `--variants` against the default, with the noise floor of 2 sd over the seeds, the effect and Holm.
+// Part 3, the time (MEASURE-ISOLATE): `measureIsolated` times the variants in turn on each input in this process, with the A/A arm of the default and 1 warm-up run.
+// Each timed run is `searchRun` with the seed 1 and no measure of the plans. `--time-repeats` gives the timed rounds (default 1, and 0 gives no time).
+// `--paired` writes the report `paired-time/1`. Each record gets `env`, the computer and the mode of its time.
 // The workflow `Search objective` (.github/workflows/search-objective.yml) starts it. The runs go in CI, not on a local machine.
 import { readFileSync, writeFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
@@ -17,6 +21,8 @@ import { inputGraph, SCREEN_SETS, screenInputs } from "../src/bench/screen/index
 import { follow } from "../src/highways/follow.ts";
 import { SEARCH_DEFAULTS, searchRun, type SearchOptions, type SearchStep } from "../src/highways/search/index.ts";
 import type { Graph, Route } from "../src/model.ts";
+import { envOf, measureIsolated } from "./gates/paired.ts";
+import { pairedTable } from "./gates/time-gate.ts";
 
 const opt = (name: string): string | undefined => {
   const i = process.argv.indexOf(name);
@@ -27,6 +33,10 @@ const seeds = Math.max(1, Number(opt("--seeds") ?? 5));
 const dense = (opt("--dense") ?? "60,125,250").split(",").filter((x) => x.trim() !== "").map(Number);
 const fixture = opt("--fixture") ?? fileURLToPath(new URL("./data/scale/route-scale-fixture.json.gz", import.meta.url));
 const out = opt("--out");
+const timeRepeats = Math.max(0, Math.floor(Number(opt("--time-repeats") ?? 1)));
+const pairedOut = opt("--paired");
+// The time of a record comes from this process, with the measures of the plans in the timed run. Part 3 gives the paired times.
+const env = envOf("process");
 /** The variants of the score that the screen compares with the default. The term `X` is the crossing term of `crossingWeight`. */
 const DEFAULT_VARIANTS = "ink-only:stretchWeight=0,ambiguityWeight=0,angleWeight=0;half-penalties:stretchWeight=0.25,ambiguityWeight=0.25,angleWeight=0.125;cross-0.1:crossingWeight=0.1;cross-0.3:crossingWeight=0.3;cross-0.3-half:crossingWeight=0.3,stretchWeight=0.25,ambiguityWeight=0.25,angleWeight=0.125";
 const MEASURES = ["ink", "R1", "R4"] as const;
@@ -153,6 +163,8 @@ interface InputRecord {
   readonly nodes: number;
   readonly edges: number;
   readonly runs: { readonly seed: number; readonly ms: number; readonly best: number; readonly points: Point[] }[];
+  /** The computer and the mode of the times (MEASURE-ISOLATE). */
+  readonly env?: ReturnType<typeof envOf>;
 }
 
 const inputs: { id: string; family: string; graph: Graph }[] = [];
@@ -185,7 +197,7 @@ for (const { id, family, graph } of inputs) {
       for (const p of points) if (p.score > bestScore + 1e-12) [best, bestScore] = [p.n, p.score];
       runs.push({ seed, ms, best, points });
     }
-    const record: InputRecord = { id, family, variant: v.name, nodes: graph.nodes.length, edges: graph.edges.length, runs };
+    const record: InputRecord = { id, family, variant: v.name, nodes: graph.nodes.length, edges: graph.edges.length, runs, env };
     byVariant.get(v.name)!.push(record);
     lines.push(JSON.stringify(record));
   }
@@ -278,10 +290,17 @@ report.push("", "### Part 2: each variant against the default", "");
 report.push("A gain is a mean over the seeds lower than the mean of the default by more than 2 sd (the larger sd). The effect is the ratio of the means, lower is better.", "");
 report.push("| Against the default | Measure | Gains | Drops | Within the floor | Effect median | p10 | p90 | Sign p | Holm p |", "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|");
 tests.forEach((t, i) => report.push(`| ${t.label} | ${t.m} | ${t.gains} | ${t.drops} | ${t.within} | ${f(quantile(t.effects, 0.5))} | ${f(quantile(t.effects, 0.1))} | ${f(quantile(t.effects, 0.9))} | ${f(t.p, 4)} | ${f(adjusted[i]!, 4)} |`));
-report.push("", "### The time of one run, with the bench measures of each plan", "", "| Variant | Median ms | Ratio to the default |", "|---|---:|---:|");
-const baseMs = quantile(base.flatMap((r) => r.runs.map((x) => x.ms)), 0.5);
+report.push("", "### The time of one run, with the bench measures of each plan", "", "These times hold the measures of the plans, so they are not a comparison. Part 3 compares the times.", "", "| Variant | Median ms |", "|---|---:|");
 for (const v of VARIANTS) {
   const ms = quantile(byVariant.get(v.name)!.flatMap((r) => r.runs.map((x) => x.ms)), 0.5);
-  report.push(`| ${v.name} | ${f(ms, 1)} | ${f(ms / baseMs, 2)} |`);
+  report.push(`| ${v.name} | ${f(ms, 1)} |`);
+}
+// Part 3: the variants in turn on each input, in this process, with the A/A arm of the default (MEASURE-ISOLATE).
+if (timeRepeats > 0 && VARIANTS.length > 1) {
+  const timed = inputs.filter((i) => i.graph.edges.length > 0).map((i) => ({ id: i.id, group: i.family, value: i.graph }));
+  const arms = VARIANTS.map((v) => ({ id: v.name, run: (graph: Graph) => searchRun({ graph }, { ...v.options, seed: 1 }) }));
+  const paired = measureIsolated({ arms, inputs: timed, repeats: timeRepeats, warmup: 1, mode: "process" });
+  if (pairedOut) writeFileSync(pairedOut, JSON.stringify(paired) + "\n");
+  report.push("", "### Part 3: the time of each variant against the default", "", "Each timed run is `searchRun` with the seed 1 and no measure of the plans.", "", ...pairedTable(paired));
 }
 console.log(report.join("\n"));

@@ -1,6 +1,7 @@
 # The objective of the highway strategy search (SEARCH-OBJECTIVE). The job objective runs search with the default options and 5 seeds
 # on each input of screen-v3 and on windows of the dense board. It correlates the score delta of each move with the change of ink, R1 and R4.
 # It also compares the start plan and each variant of the score with the default, with a noise floor over the seeds and Holm. The runs go here, not on a local machine.
+# The time of each variant against the default runs in this job, in turn on each input, with an A/A arm (MEASURE-ISOLATE).
 name: Search objective
 
 on:
@@ -56,11 +57,13 @@ jobs:
         working-directory: packages/core
         run: |
           set -o pipefail
-          node scripts/search-objective.ts --set "$SET" --seeds "$SEEDS" --dense "$DENSE" ${VARIANTS:+--variants "$VARIANTS"} --out "$RUNNER_TEMP/search-objective.jsonl" | tee table.md
+          node scripts/search-objective.ts --set "$SET" --seeds "$SEEDS" --dense "$DENSE" ${VARIANTS:+--variants "$VARIANTS"} --out "$RUNNER_TEMP/search-objective.jsonl" --paired "$RUNNER_TEMP/search-objective-time.json" | tee table.md
           cat table.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: search-objective-${{ github.sha }}
-          path: ${{ runner.temp }}/search-objective.jsonl
+          path: |
+            ${{ runner.temp }}/search-objective.jsonl
+            ${{ runner.temp }}/search-objective-time.json
           if-no-files-found: warn

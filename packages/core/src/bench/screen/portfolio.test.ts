@@ -12,6 +12,8 @@ import {
   greedySet,
   MODEL_STRETCH,
   obeys,
+  pairedRatios,
+  pairedShared,
   paretoCurve,
   passes,
   portfolioReport,
@@ -32,7 +34,8 @@ import {
   singleBest,
   strategyTimes,
 } from "../../../scripts/portfolio.ts";
-import type { TimeRecord } from "../../../scripts/portfolio-time.ts";
+import { measureIsolated } from "../../../scripts/gates/paired.ts";
+import { boardId, isPairedLine, isTimeRecord, type PairedLine, type TimeRecord } from "../../../scripts/portfolio-time.ts";
 import { GAP_CAPS, GAP_RULES, gapCap, type ExactOptimum, type GapRule } from "./gap.ts";
 
 /** This function makes a record of the strategy `strategy` on the input `input`, with the measures `measures`. */
@@ -143,6 +146,39 @@ describe("the portfolio (PORTFOLIO)", () => {
     expect(st!.parallel.median).toBeCloseTo(15);
     expect(st!.shared).toBeCloseTo(2.5);
     expect(strategyTimes(times).get("a")?.get(10)?.median).toBe(15);
+  });
+
+  it("gives the ratios over `shared` from the paired lines of one job, with the A/A floor (MEASURE-ISOLATE)", () => {
+    const t = (strategy: string, seed: number, ms: number): TimeRecord => ({ strategy, cls: "uniform", seed, nodes: 10, edges: 15, rep: 0, ms, scoreMs: 0 });
+    const times = [t("corners", 0, 1), t("shared", 0, 2), t("a", 0, 10), t("b", 0, 5), t("corners", 1, 1), t("shared", 1, 2), t("a", 1, 20), t("b", 1, 5)];
+    // A fake clock: each run moves the time by the cost of the strategy on the board. No test reads the real time.
+    const cost: Record<string, readonly [number, number]> = { shared: [2, 2], corners: [1, 1], a: [10, 20], b: [5, 5] };
+    let now = 0;
+    const paired = measureIsolated({
+      arms: ["shared", "corners", "a", "b"].map((id) => ({ id, run: (seed: number) => (now += cost[id]![seed]!) })),
+      inputs: [0, 1].map((seed) => ({ id: boardId("uniform", 10, seed), group: "uniform", value: seed })),
+      repeats: 1,
+      warmup: 0,
+      mode: "process",
+      clock: () => now,
+      env: { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" },
+    });
+    const line: PairedLine = { paired, nodes: 10 };
+    expect(isPairedLine(line)).toBe(true);
+    expect(isTimeRecord(line)).toBe(false);
+    expect(isTimeRecord(times[0])).toBe(true);
+    const ratios = pairedRatios([line]);
+    expect(ratios.aa.get(10)).toEqual([1, 1]);
+    expect(pairedShared(ratios, "a", 10)).toBeCloseTo(7.5);
+    expect(pairedShared(ratios, "shared", 10)).toBe(1);
+    expect(pairedShared(ratios, "a", 24)).toBeNaN();
+    // Board 0: 1 + 0.5 + 5 + 2.5 = 9, the longest 5. Board 1: 1 + 0.5 + 10 + 2.5 = 14, the longest 10.
+    const [st] = setTimes(times, ["a", "b"], ratios);
+    expect(st!.paired).toEqual({ serial: 11.5, parallel: 7.5, boards: 2 });
+    expect(setTimes(times, ["a", "b"])[0]!.paired).toBeUndefined();
+    const report = portfolioReport([], [], times, [], [line]);
+    expect(report.markdown).toContain("The noise floor of the A/A arm of `shared` (p10 to p90) is 10 nodes: 1.000 to 1.000.");
+    expect(portfolioReport([], [], times).markdown).toContain("The times have no paired lines");
   });
 
   it("writes the report of both corpora and of the times", () => {

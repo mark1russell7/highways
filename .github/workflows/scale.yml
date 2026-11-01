@@ -2,6 +2,7 @@
 # and writes the wall time of the route and of each step after it, with `scripts/scale.ts`. With "profile", the cell also keeps a CPU profile
 # of one more route and of its steps as an artifact. The job summary joins the rows of the cells.
 # The job screen runs the router screen of the base commit and of this commit in turn on one runner, and compares the records and the times.
+# Each round of the job screen also runs the base a second time as the A/A arm, so the times have a noise floor (MEASURE-ISOLATE).
 # The note `docs/research/SCALE.md` gives the result.
 name: Scale
 
@@ -161,11 +162,17 @@ jobs:
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/base/node_modules"
           ln -s "$GITHUB_WORKSPACE/packages/core/node_modules" "$RUNNER_TEMP/base/packages/core/node_modules"
           mkdir -p out
+          # Each round runs three arms, each in its own process: the base, the head and the A/A arm (the base again).
+          # The order of the arms turns by one in each round, so no arm is always first (MEASURE-ISOLATE).
+          arm() {
+            if [ "$1" = head ]; then dir=packages/core; else dir="$RUNNER_TEMP/base/packages/core"; fi
+            (cd "$dir" && node scripts/screen.ts --step router --out "$GITHUB_WORKSPACE/out/$1-$2.jsonl" --summary "$GITHUB_WORKSPACE/out/$1-$2.md")
+          }
+          arms=(base head aa)
           for i in $(seq 1 "$ROUNDS"); do
-            (cd "$RUNNER_TEMP/base/packages/core" && node scripts/screen.ts --step router --out "$GITHUB_WORKSPACE/out/base-$i.jsonl" --summary "$GITHUB_WORKSPACE/out/base-$i.md")
-            (cd packages/core && node scripts/screen.ts --step router --out "$GITHUB_WORKSPACE/out/head-$i.jsonl" --summary "$GITHUB_WORKSPACE/out/head-$i.md")
+            for j in 0 1 2; do arm "${arms[$(( (i - 1 + j) % 3 ))]}" "$i"; done
           done
-          node packages/core/scripts/scale-screen.ts out/base-*.jsonl -- out/head-*.jsonl | tee out/screen.md
+          node packages/core/scripts/scale-screen.ts out/base-*.jsonl -- out/head-*.jsonl -- out/aa-*.jsonl --json out/screen-paired.json | tee out/screen.md
           { echo "Base: $(git rev-parse --short "$BASE"). Head: $(git rev-parse --short HEAD)."; echo; cat out/screen.md; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

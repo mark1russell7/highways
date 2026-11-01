@@ -7,6 +7,7 @@
 // It fits the extra time against the units of `workUnits`, and it writes the R² and the slope of each window. Gate (a) needs R² ≥ 0.95 and each slope within ±20%.
 // It also fits the weights of the counters with no negative weight, and it writes the gate with those weights.
 // The lane steps of one evaluation are the size of the pair loop of the lane order. INCREMENTAL-SEARCH takes them as its baseline.
+// Each point gets `env`, the computer and the mode of its time (MEASURE-ISOLATE). The fit uses the times of one arm only, so it is not a paired comparison.
 // The workflow `Search work` (.github/workflows/search-work.yml) starts it. Times run in CI only, not on a local machine.
 import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
@@ -15,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { SEARCH_DEFAULTS, searchRun, type Graph } from "../src/index.ts";
 import { WORK_WEIGHTS, workCounts, workUnits, type WorkCounts } from "../src/work.ts";
+import { envOf, type RecordEnv } from "./gates/paired.ts";
 
 const opt = (name: string): string | undefined => {
   const i = process.argv.indexOf(name);
@@ -84,7 +86,10 @@ interface Point {
   counts: WorkCounts;
   ms: number;
   extra: number;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). */
+  env?: RecordEnv;
 }
+const env = envOf("process");
 const points: Point[] = [];
 const loop: { nodes: number; edges: number; lane: number; corner: number; sight: number; score: number; route: number }[] = [];
 for (const size of sizes) {
@@ -96,7 +101,7 @@ for (const size of sizes) {
   const scale = Math.max(1, Math.floor(scaleEdges / Math.max(1, graph.edges.length)));
   for (const evaluations of counts.map((c) => c * scale)) {
     const r = run(graph, evaluations);
-    const point: Point = { nodes: graph.nodes.length, edges: graph.edges.length, evaluations, counts: minus(r.counts, base.counts), ms: Math.round(r.ms), extra: r.ms - base.ms };
+    const point: Point = { nodes: graph.nodes.length, edges: graph.edges.length, evaluations, counts: minus(r.counts, base.counts), ms: Math.round(r.ms), extra: r.ms - base.ms, env };
     points.push(point);
     if (out) appendFileSync(out, JSON.stringify(point) + "\n");
     console.error(JSON.stringify(point));
