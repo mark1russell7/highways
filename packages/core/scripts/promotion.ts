@@ -6,7 +6,8 @@
 // The literal reading uses all the inputs. The exercised reading uses only the inputs where the candidate changes the output.
 // `--time` gives the paired time reports (`paired-time/1`) of the screens with `--paired`. The time test reads its ratios from them (MEASURE-ISOLATE).
 // Without them, the time test has no result, so it fails: the times of the records do not come from one paired run.
-// Each file is the report of one job. The policy is 5 jobs. A check that the A/A arm of the jobs cannot resolve gives "cannot decide (noise)", and it does not promote.
+// Each file is the report of one job. The policy is 5 jobs (`timeJobs`). With fewer jobs, the time test cannot decide, so it does not promote.
+// A check that the A/A arm of the jobs cannot resolve gives "cannot decide (noise)", and it does not promote.
 // The script reads files and does no layout, so it is a quick local check.
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
@@ -43,7 +44,7 @@ const baseline = need("--baseline");
 const step = opt("--step") ?? "router";
 
 // The parameters of `docs/PROMOTION.md`.
-const P = { medianWorse: 0.02, tailWorse: 0.1, tailShare: 0.1, gainMin: 0.05, signP: 0.05, bootstrapRuns: 10000, bootstrapLevel: 0.95, timeRatio: 1.5, timeTailQ: 0.95, timeTail: 2.0, timeFloorMs: 5, level: 0.05 };
+const P = { medianWorse: 0.02, tailWorse: 0.1, tailShare: 0.1, gainMin: 0.05, signP: 0.05, bootstrapRuns: 10000, bootstrapLevel: 0.95, timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2.0, timeFloorMs: 5, level: 0.05 };
 // The floors of `docs/PROMOTION.md`: the record name, the floor and the tolerance.
 const FLOORS: Readonly<Record<string, { floor: number; tol: number }>> = { "route.crossings": { floor: 0, tol: 0 }, "route.bundle.merge-angle.max": { floor: 0, tol: 60 } };
 // The guard measures of each step, by the keys of `MEASURES`. The step `whole` has no row, so it takes the guards of each routing step. `Z10.mean` is the stability guard.

@@ -17,6 +17,8 @@ export const insideFloor = (ratio: number, band: NoiseBand): boolean => ratio >=
 export interface TimeLimits {
   /** The limit of the worst median ratio over the reports. */
   readonly timeRatio: number;
+  /** The count of the reports (one for each job) of the policy. With fewer reports, each check cannot decide, and the test does not pass. */
+  readonly timeJobs: number;
   /** The quantile of the tail. */
   readonly timeTailQ: number;
   /** The limit of the worst tail ratio over the reports. */
@@ -29,9 +31,6 @@ export interface TimeLimits {
 export const RESOLUTION_MARGIN = 1.1;
 /** The largest spread of the tails of the reports for a valid tail check. The spread is the largest tail over the smallest tail, minus 1. */
 export const TAIL_SPREAD = 0.1;
-/** The count of the reports (one for each job) of the policy of the promotion time test. */
-export const POLICY_JOBS = 5;
-
 /** The status of a time test: `noise` tells that a check cannot decide, and `void` tells that the test has no paired time report. Only `pass` passes. */
 export type TimeStatus = "pass" | "fail" | "noise" | "void";
 
@@ -67,6 +66,8 @@ export interface TimeTest {
   readonly status: TimeStatus;
   /** The count of the reports, one for each job. */
   readonly jobs: number;
+  /** The count of the jobs of the policy, `timeJobs`. */
+  readonly policy: number;
   /** The median ratio of each job, in the order of the reports. */
   readonly medians: readonly number[];
   /** The tail ratio of each job, in the order of the reports. A job with an empty tail set gives `null`. */
@@ -99,12 +100,13 @@ export interface TimeTest {
  * - The A/A tail uses the A/A ratios of the same tail set. An empty tail set in only some reports makes the tail check not valid.
  * - An empty tail set in each report gives the line `TAIL_NOT_MEASURED` in the record. This tail is not a pass, and it does not stop a promotion.
  * - A failed valid check fails the test. Else a check that cannot decide gives `noise`, and the test does not pass.
+ * - With fewer reports than `timeJobs`, each check gives "cannot decide (1 job of 5)" with the real counts. The test does not pass (FAIL-CLOSED).
  * - With no report or no input, the status is `void` and the test fails (FAIL-CLOSED).
  */
 export function pairedTimeTest(reports: readonly PairedReport[], baseline: string, candidate: string, keys: ReadonlySet<string> | undefined, limits: TimeLimits): TimeTest {
   const aa = aaId(baseline);
   const mine = reports.filter((r) => r.mode === "process" && r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
-  const empty = { median: Number.NaN, tail: Number.NaN, pass: false, status: "void" as const, jobs: mine.length, medians: [], tails: [], cpus: mine.map((r) => r.env.cpu), inputs: 0, checks: [], faster: false };
+  const empty = { median: Number.NaN, tail: Number.NaN, pass: false, status: "void" as const, jobs: mine.length, policy: limits.timeJobs, medians: [], tails: [], cpus: mine.map((r) => r.env.cpu), inputs: 0, checks: [], faster: false };
   if (mine.length === 0) return { ...empty, reason: `no paired time report of mode process has the base ${baseline}, the arm ${candidate} and the A/A arm` };
   const at = { env: mine[0]!.env, mode: mine[0]!.mode };
   // The values of each report: the median ratio, the tail ratio, the A/A tail and the noise floor.
@@ -145,11 +147,13 @@ export function pairedTimeTest(reports: readonly PairedReport[], baseline: strin
       : real.length < tails.length
         ? { check: "tail", worst: max(real), limit: limits.timeTail, aa: aaTail, valid: false, why: some, verdict: "noise" }
         : check("tail", max(real), limits.timeTail, aaTail, max(real) / min(real) - 1);
-  const checks = [medianCheck, tailCheck];
+  // Too few jobs: each check cannot decide, whatever its value (FAIL-CLOSED).
+  const few = mine.length < limits.timeJobs ? jobsOf(mine.length, limits.timeJobs) : undefined;
+  const checks = few === undefined ? [medianCheck, tailCheck] : [medianCheck, tailCheck].map((c): TimeCheck => ({ ...c, valid: false, why: few, verdict: "noise" }));
   const status: TimeStatus = checks.some((c) => c.verdict === "fail") ? "fail" : checks.some((c) => c.verdict === "noise") ? "noise" : "pass";
   const p10 = min(per.map((x) => x.floor?.p10 ?? Number.NaN));
   const faster = status === "pass" && worstMedian < 1 && worstMedian < p10;
-  const record = { jobs: mine.length, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
+  const record = { jobs: mine.length, policy: limits.timeJobs, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
   return { median: worstMedian, tail: tailCheck.worst, pass: status === "pass", status, ...record, inputs: per[0]!.all.length, checks, faster, ...at };
 }
 
@@ -169,11 +173,15 @@ function check(name: "median" | "tail", worst: number, limit: number, aa: number
 
 const fmt = (x: number, d = 2): string => (Number.isFinite(x) ? x.toFixed(d) : String(x));
 
+/** This function gives the count of the jobs against the policy, for example "1 job of 5". */
+const jobsOf = (jobs: number, policy: number): string => `${jobs} ${jobs === 1 ? "job" : "jobs"} of ${policy}`;
+
 /** This function gives the line of a time test for a summary. The quantile `q` names the tail. */
 export function timeText(t: TimeTest, q: number): string {
   if (t.status === "void") return `Time: no result (${t.reason ?? "no paired time report"}), so the time test fails.`;
-  const jobs = `${t.jobs} ${t.jobs === 1 ? "job" : "jobs"} (the policy is ${POLICY_JOBS})`;
+  const jobs = jobsOf(t.jobs, t.policy);
   const head = `Time: the worst median ${fmt(t.median)} and the worst q${q} ${fmt(t.tail)} over ${jobs} and ${t.inputs} inputs`;
+  if (t.jobs < t.policy) return `${head}: cannot decide (${jobs}). This is not a pass, and it does not promote.`;
   const undecided = t.checks.filter((c) => c.verdict === "noise");
   if (t.status === "noise") return `${head}: cannot decide (noise). ${undecided.map((c) => `The ${c.check} check cannot decide: ${c.why}.`).join(" ")} This is not a pass.`;
   const failed = t.checks.filter((c) => c.verdict === "fail");

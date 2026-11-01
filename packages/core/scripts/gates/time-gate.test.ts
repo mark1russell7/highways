@@ -3,7 +3,9 @@ import { measureIsolated, type PairedReport } from "./paired.ts";
 import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, timeText, type TimeLimits } from "./time-gate.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
-const LIMITS: TimeLimits = { timeRatio: 1.5, timeTailQ: 0.95, timeTail: 2, timeFloorMs: 5 };
+const LIMITS: TimeLimits = { timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2, timeFloorMs: 5 };
+/** This function gives the 5 reports of the policy: the same job 5 times. */
+const five = (r: () => PairedReport): PairedReport[] => Array.from({ length: 5 }, r);
 // The A/A factor of each input: the second run of the base on the input takes this factor of the first run.
 // The noise floor p10 to p90 is from 0.918 to 1.082, and the A/A q0.95 is 1.091. So both checks are valid.
 const AA = [0.9, 0.94, 0.98, 1.02, 1.06, 1.1, 0.96, 1.04, 0.92, 1.08];
@@ -44,7 +46,7 @@ const report = (factor: number, aa: readonly number[] = AA, baseMs = 10): Paired
 
 describe("pairedTimeTest", () => {
   it("passes a ratio inside the noise floor, and does not count it as a speed gain", () => {
-    const t = pairedTimeTest([report(1.03)], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => report(1.03)), "base", "cand", undefined, LIMITS);
     expect(t.median).toBeCloseTo(1.03);
     expect(t.checks.map((c) => [c.check, c.valid, c.verdict])).toEqual([
       ["median", true, "pass"],
@@ -58,7 +60,7 @@ describe("pairedTimeTest", () => {
   });
 
   it("cannot decide when the A/A p90 times 1.1 is not below the limit, and then it does not pass", () => {
-    const t = pairedTimeTest([report(1.03, NOISY)], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => report(1.03, NOISY)), "base", "cand", undefined, LIMITS);
     const median = t.checks[0]!;
     expect(median.valid).toBe(false);
     expect(median.aa).toBeCloseTo(1.51);
@@ -70,7 +72,7 @@ describe("pairedTimeTest", () => {
   });
 
   it("fails a ratio above the limit and outside the noise floor", () => {
-    const t = pairedTimeTest([report(1.8)], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => report(1.8)), "base", "cand", undefined, LIMITS);
     expect(t.median).toBeCloseTo(1.8);
     expect(t.checks[0]!.verdict).toBe("fail");
     expect(t.status).toBe("fail");
@@ -79,7 +81,7 @@ describe("pairedTimeTest", () => {
   });
 
   it("gives a pass and a speed gain for a ratio below 1 and below the noise floor", () => {
-    const t = pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => report(0.5)), "base", "cand", undefined, LIMITS);
     expect(t.median).toBeCloseTo(0.5);
     expect(t.status).toBe("pass");
     expect(t.pass).toBe(true);
@@ -100,7 +102,7 @@ describe("pairedTimeTest", () => {
     // The spread is the largest tail over the smallest tail, minus 1: 0.54 / 0.5 - 1 = 0.08.
     expect(steady.checks[1]!.spread).toBeCloseTo(0.08);
     expect(steady.status).toBe("pass");
-    expect(timeText(steady, 0.95)).toContain("5 jobs (the policy is 5)");
+    expect(timeText(steady, 0.95)).toContain("over 5 jobs of 5 and 10 inputs");
     const spread = pairedTimeTest([0.5, 0.5, 0.5, 0.5, 0.7].map((f) => report(f)), "base", "cand", undefined, LIMITS);
     expect(spread.checks[1]!.spread).toBeCloseTo(0.4);
     expect(spread.checks[1]!.valid).toBe(false);
@@ -110,7 +112,7 @@ describe("pairedTimeTest", () => {
 
   it("fails a tail above its limit when the median passes", () => {
     // The candidate takes 50 ms on the input in9 only, so its ratio is 5. The q0.95 of the ratios is 2.975, above 2.
-    const t = pairedTimeTest([job((arm, i) => (arm === "cand" ? (i === 9 ? 50 : 5) : 10))], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => job((arm, i) => (arm === "cand" ? (i === 9 ? 50 : 5) : 10))), "base", "cand", undefined, LIMITS);
     expect(t.checks.map((c) => c.verdict)).toEqual(["pass", "fail"]);
     expect(t.tail).toBeCloseTo(2.975);
     expect(t.status).toBe("fail");
@@ -118,30 +120,53 @@ describe("pairedTimeTest", () => {
 
   it("keeps an input with both medians below the time floor in the median, and not in the tail", () => {
     // On in0, the base takes 1 ms and the candidate 4 ms: the ratio is 4, with both medians below 5 ms. Each other input has the ratio 1.
-    const t = pairedTimeTest([job((arm, i) => (i === 0 ? (arm === "cand" ? 4 : 1) : 10))], "base", "cand", undefined, LIMITS);
+    const t = pairedTimeTest(five(() => job((arm, i) => (i === 0 ? (arm === "cand" ? 4 : 1) : 10))), "base", "cand", undefined, LIMITS);
     expect(t.inputs).toBe(10);
     expect(t.median).toBeCloseTo(1);
     // With in0 in the tail set, the q0.95 is 2.65. Without it, the tail is 1.
     expect(t.tail).toBeCloseTo(1);
     expect(t.status).toBe("pass");
     // An input below the floor is in the median.
-    expect(pairedTimeTest([job((arm) => (arm === "cand" ? 4 : 1))], "base", "cand", undefined, LIMITS).checks.map((c) => c.verdict)).toEqual(["fail", "not measured"]);
+    expect(pairedTimeTest(five(() => job((arm) => (arm === "cand" ? 4 : 1))), "base", "cand", undefined, LIMITS).checks.map((c) => c.verdict)).toEqual(["fail", "not measured"]);
   });
 
   it("does not measure the tail with an empty tail set in each job, and cannot decide with an empty tail set in only some jobs", () => {
     const small = job((arm) => (arm === "cand" ? 1.2 : 1));
-    const none = pairedTimeTest([small, small], "base", "cand", undefined, LIMITS);
-    expect(none.tails).toEqual([null, null]);
+    const none = pairedTimeTest(five(() => small), "base", "cand", undefined, LIMITS);
+    expect(none.tails).toEqual(Array(5).fill(null));
     // This tail is not a pass, but it does not stop a promotion.
     expect(none.checks[1]!.verdict).toBe("not measured");
     expect(none.note).toBe(TAIL_NOT_MEASURED);
     expect(TAIL_NOT_MEASURED).toBe("tail: not measured, no input above timeFloorMs");
     expect(none.pass).toBe(true);
     expect(timeText(none, 0.95)).toContain("`tail: not measured, no input above timeFloorMs`");
-    const some = pairedTimeTest([small, report(1.2)], "base", "cand", undefined, LIMITS);
+    const some = pairedTimeTest([small, small, small, small, report(1.2)], "base", "cand", undefined, LIMITS);
     expect(some.checks[1]!.valid).toBe(false);
-    expect(some.checks[1]!.why).toBe("1 of 2 jobs have an empty tail set");
+    expect(some.checks[1]!.why).toBe("4 of 5 jobs have an empty tail set");
     expect(some.status).toBe("noise");
+  });
+
+  it("cannot decide with fewer jobs than the policy, and decides with 5 jobs", () => {
+    // 1 job of a candidate that is faster: each check cannot decide, so the test does not pass.
+    const one = pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS);
+    expect(one.jobs).toBe(1);
+    expect(one.policy).toBe(5);
+    expect(one.checks.map((c) => [c.check, c.valid, c.why, c.verdict])).toEqual([
+      ["median", false, "1 job of 5", "noise"],
+      ["tail", false, "1 job of 5", "noise"],
+    ]);
+    expect(one.status).toBe("noise");
+    expect(one.pass).toBe(false);
+    expect(one.faster).toBe(false);
+    expect(timeText(one, 0.95)).toContain(": cannot decide (1 job of 5). This is not a pass, and it does not promote.");
+    // 1 job of a slow candidate also cannot decide: too few jobs do not give a fail.
+    expect(pairedTimeTest([report(1.8)], "base", "cand", undefined, LIMITS).status).toBe("noise");
+    expect(timeText(pairedTimeTest([report(0.5), report(0.5)], "base", "cand", undefined, LIMITS), 0.95)).toContain("cannot decide (2 jobs of 5)");
+    // 5 jobs decide.
+    const all = pairedTimeTest(five(() => report(0.5)), "base", "cand", undefined, LIMITS);
+    expect(all.jobs).toBe(5);
+    expect(all.checks.map((c) => c.verdict)).toEqual(["pass", "pass"]);
+    expect(all.pass).toBe(true);
   });
 
   it("reads only the inputs of the keys", () => {
