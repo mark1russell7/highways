@@ -31,7 +31,9 @@ concurrency:
 jobs:
   profile:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # With "compare", `levels.ts` starts a fresh process for each commit, each round and each report (BENCH-FRESH-CASES).
+    # One commit to compare and 5 rounds give 30 children and 105 routes. At 60 s for each route, that is 105 min, plus the profile and the setup.
+    timeout-minutes: 180
     env:
       ROUTER: ${{ inputs.router }}
       FIXTURE: ${{ inputs.fixture }}
