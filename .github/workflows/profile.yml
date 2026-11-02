@@ -62,6 +62,8 @@ jobs:
           for ref in $COMPARE; do
             n=$((n + 1))
             git worktree add --detach "$RUNNER_TEMP/at-$n" "$ref"
+            # The core of a commit after #161 imports its dependencies, so the worktree installs them with its own lock file.
+            (cd "$RUNNER_TEMP/at-$n" && pnpm install --frozen-lockfile --prefer-offline --ignore-scripts --filter ./packages/core)
             srcs+=(--src "$ref=$RUNNER_TEMP/at-$n/packages/core/src")
           done
           srcs+=(--src "this commit=$GITHUB_WORKSPACE/packages/core/src")
