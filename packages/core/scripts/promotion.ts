@@ -268,6 +268,8 @@ function winText(name: string, t: WinTest, all: number): string {
   const lines = [`#### ${name}: ${t.reading} reading, ${t.n} of ${all} inputs: ${yes(t.pass)}`, ""];
   lines.push(`- Hard rules: ${yes(t.hard.pass)}${t.hard.worse.length > 0 ? ` (${t.hard.worse.length} worse, for example ${t.hard.worse.slice(0, 3).join(", ")})` : ""}.`);
   lines.push(`- ${timeText(t.time, P.timeTailQ)}`);
+  // The record keeps the CPU model of each job of the time test (MEASURE-ISOLATE).
+  if (t.time.cpus.length > 0) lines.push(`- The CPU model of each job of the time test: ${t.time.cpus.map((cpu, i) => `job ${i + 1}: ${cpu}`).join(", ")}.`);
   lines.push("", "| Guard | Inputs | Median ratio | Tail share | Result |", "|---|---|---|---|---|");
   // A guard with no value in the records, for example a curve measure of a step without curves, has no row.
   for (const g of t.guards.filter((x) => x.n > 0)) lines.push(`| \`${g.key}\` | ${g.n} | ${fmt(g.median)} | ${fmt(g.tail, 2)} | ${yes(g.pass)} |`);

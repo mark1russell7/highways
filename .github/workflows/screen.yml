@@ -55,7 +55,7 @@ on:
         description: "The major version of Node.js of the screen."
         default: "26"
       paired:
-        description: "The base of the paired time (MEASURE-ISOLATE), for example shared. The job times the base and the strategies of the call in turn, with an A/A arm. Empty: no paired time."
+        description: "The base of the paired time (MEASURE-ISOLATE), for example shared. 5 jobs time the base and the strategies of the call in turn, with an A/A arm. Then the promotion test reads the 5 reports. Empty: no paired time."
         default: ""
 
 permissions:
@@ -97,6 +97,8 @@ jobs:
       matrix:
         # A pull request screens both steps. A dispatch screens its own step.
         step: ${{ fromJSON(github.event_name == 'pull_request' && '["router","highway"]' || format('["{0}"]', inputs.step || 'router')) }}
+        # A paired screen runs 5 jobs, because the promotion time test reads 5 reports (MEASURE-ISOLATE). Each job is a full screen with its own report.
+        job: ${{ fromJSON(inputs.paired && '[1,2,3,4,5]' || '[1]') }}
     env:
       STEP: ${{ matrix.step }}
       STRATEGY: ${{ inputs.strategy || '' }}
@@ -109,6 +111,7 @@ jobs:
       ACTIVATION: ${{ inputs.activation || '' }}
       MEMBERS: ${{ inputs.members || '' }}
       PAIRED: ${{ inputs.paired || '' }}
+      JOB: ${{ matrix.job }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -137,7 +140,8 @@ jobs:
           [ "$EDITS" != "0" ] && args+=(--edits "$EDITS")
           [ -n "$ACTIVATION" ] && args+=(--activation "$ACTIVATION")
           # The paired time runs the arms of the comparison in this job, in turn on each input (MEASURE-ISOLATE).
-          [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired.json" --paired-base "$PAIRED")
+          # Each job of a paired screen writes its own report, in mode process with the A/A arm.
+          [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired-job$JOB.json" --paired-base "$PAIRED")
           start=$SECONDS
           pnpm --filter @mark1russell7/highways screen "${args[@]}"
           {
@@ -148,9 +152,60 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: screen-${{ inputs.set || 'screen-v1' }}-${{ matrix.step }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}
+          name: screen-${{ inputs.set || 'screen-v1' }}-${{ matrix.step }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}${{ inputs.paired && format('-job{0}', matrix.job) || '' }}
           path: |
             screen.jsonl
             screen.md
-            paired.json
+            paired-job*.json
+          if-no-files-found: warn
+
+  # The promotion time test of a paired screen (MEASURE-ISOLATE). It reads the reports of the 5 jobs, and it runs only when each job gave its report.
+  # A missing report fails this job (FAIL-CLOSED). The records of the job 1 are the corpus of the win test.
+  promotion:
+    needs: screen
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.paired != '' && inputs.strategy != '' && !inputs.exact && !inputs.time && !inputs.report }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      STEP: ${{ inputs.step || 'router' }}
+      STRATEGY: ${{ inputs.strategy }}
+      PAIRED: ${{ inputs.paired }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ inputs.node || '26' }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: screen-${{ inputs.set || 'screen-v1' }}-${{ inputs.step || 'router' }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}-job*
+          path: jobs
+      - name: Check the 5 paired reports
+        run: |
+          got=$(find jobs -name 'paired-job*.json' -printf '%f\n' | sed -E 's/^paired-(job[0-9]+)\.json$/\1/' | paste -sd, -)
+          node packages/core/scripts/gates/inputs.ts "paired time reports" --expect job1,job2,job3,job4,job5 --got "$got"
+      - name: Run the promotion test of each strategy of the call
+        run: |
+          set -o pipefail
+          reports=$(find "$GITHUB_WORKSPACE/jobs" -name 'paired-job*.json' | sort | paste -sd, -)
+          corpus=$(find "$GITHUB_WORKSPACE/jobs" -path '*-job1/screen.jsonl')
+          [ -n "$corpus" ] || { echo "::error::The job 1 gave no screen records."; exit 1; }
+          mkdir -p out
+          IFS=',' read -ra list <<< "$STRATEGY"
+          for s in "${list[@]}"; do
+            s="${s// /}"
+            # The base of the paired time is not a candidate.
+            if [ -z "$s" ] || [ "$s" = "$PAIRED" ]; then continue; fi
+            pnpm --filter @mark1russell7/highways promotion --candidate "$s" --baseline "$PAIRED" --step "$STEP" --corpus "$corpus" --time "$reports" --out "$GITHUB_WORKSPACE/out/promotion-$s.md" --json "$GITHUB_WORKSPACE/out/promotion-$s.json" > /dev/null
+            cat "out/promotion-$s.md" >> "$GITHUB_STEP_SUMMARY"
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: promotion-${{ inputs.set || 'screen-v1' }}-${{ inputs.step || 'router' }}-${{ github.sha }}
+          path: out/
           if-no-files-found: warn
