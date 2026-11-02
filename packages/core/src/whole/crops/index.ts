@@ -63,7 +63,8 @@ function exitPoint(box: Box, from: Point, to: Point): Point {
 }
 
 /**
- * This function cuts one window of a board (WILD-048): the `size` nodes nearest to the center `at`, by the larger of the distances on the two axes. Thus the window is a square.
+ * This function cuts one window of a board (WILD-048). The window has the `size` nodes nearest to the center `at`.
+ * The distance is the larger of the distances on the two axes. Thus the window is a square.
  * An edge with both ends in the window stays. An edge with one end in the window goes to a small stub node at its border, `BORDER` from the boxes.
  * A node whose parent is not in the window loses its parent.
  */
@@ -105,7 +106,7 @@ export function cropWindow(graph: Graph, at: Point, size: number): Graph {
   return { nodes: [...nodes, ...stubs.values()], edges };
 }
 
-/** The result of `crops`: the output, the name of the pick, and the summed score of each setting on the windows, in the order of the list. */
+/** The result of `crops`. It has the output, the name of the pick, and the summed score of each setting in the order of the list. */
 export interface CropRun {
   readonly output: WholeOutput;
   readonly pick: string;
@@ -113,8 +114,9 @@ export interface CropRun {
 }
 
 /**
- * This function runs the whole strategy `crops` (WILD-048). It cuts `windows` seeded windows of `nodes` nodes, and runs the first `settings` settings of `list` on each one.
- * On each window, the score of a setting is the sum of its rank shares of the crossings (R1), the median detour (R5) and the ink saved (B1), as in `board-portfolio`.
+ * This function runs the whole strategy `crops` (WILD-048). It cuts `windows` seeded windows of `nodes` nodes.
+ * It runs the first `settings` settings of `list` on each window.
+ * On each window, the score of a setting is the sum of its rank shares of R1, R5 and B1, as in `board-portfolio`.
  * A setting with a break of a hard rule on a window gets the worst score there. The least sum wins, a tie goes to the earlier setting, and the whole board routes with it.
  * When the pick breaks a hard rule on the whole board, the next setting by score routes. A board of `nodes` nodes or fewer runs `board-portfolio` itself.
  */

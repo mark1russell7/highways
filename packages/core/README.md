@@ -621,7 +621,8 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `approval` | The approval corridors of WILD-031. Each edge approves the links of its ways within `1 + eps` of its shortest way. The links with the most approvals become corridors. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
-The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided`, `crossbars`, `slots`, `two-way` and `global-order` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
+The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided`, `crossbars`, `slots`, `two-way` and `global-order` change the plan of the option `from`.
+The value of `from` is `shared-ways` (the default), `corridors` or `none`.
 The strategies `two-way` and `global-order` do not change the highways. They give the plan a lane rule (`HighwayPlan.laneRule`), and `follow` then gives each run its lane order.
 A plan with no lane rule gives the runs of the bundle order, as before. `ruleLanes(rule, highway, bundle)` gives the lane order of one run.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.

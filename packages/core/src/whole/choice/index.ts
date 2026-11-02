@@ -43,9 +43,10 @@ export interface ChoiceOptions {
 export const CHOICE_DEFAULTS: Readonly<ChoiceOptions> = Object.freeze({ k: 3, features: "all" });
 
 /**
- * This function gives the features of a board (WILD-046). They are the counts of the nodes and the edges, the edges for each node,
- * the skew of the degrees (the largest over the mean), the spread of the box areas (the interquartile range over the median),
- * the nearest-neighbour ratio of the centers (Clark and Evans), the share of the edges with a key, the largest fan-out, and the mean span of the edges over the mean box size.
+ * This function gives the 9 features of a board (WILD-046). The first three are the counts of the nodes and the edges, and the edges for each node.
+ * The next two are the skew of the degrees (the largest over the mean) and the spread of the box areas (the interquartile range over the median).
+ * The next two are the nearest-neighbour ratio of the centers (Clark and Evans) and the share of the edges with a key.
+ * The last two are the largest fan-out and the mean span of the edges over the mean box size.
  */
 export function boardFeatures(graph: Graph): number[] {
   const n = graph.nodes.length;

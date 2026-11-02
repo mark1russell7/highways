@@ -97,7 +97,7 @@ function alongRun(route: readonly Point[], run: readonly Point[]): boolean {
   return a < 0 || b < 0 || a <= b;
 }
 
-/** The weights of the pairs: `W(a, b)` is the number of runs where `a` goes before `b`, in the frame of the direction of most edges of the run. */
+/** The weights of the pairs. `W(a, b)` is the number of runs where `a` goes before `b`, in the frame of the main direction of the run. */
 export type PairWeights = Map<string, Map<string, number>>;
 
 /** This function adds the pairs of one order to the weights. */
@@ -112,7 +112,7 @@ export function addPairs(w: PairWeights, order: readonly string[]): void {
 /** This function gives `W(a, b)`. */
 const weight = (w: PairWeights, a: string, b: string): number => w.get(a)?.get(b) ?? 0;
 
-/** This function gives the number of pairs of the weights that an order puts the other way: the Kendall disagreement of the order with the runs. */
+/** This function gives the number of pairs of the weights that an order puts the other way. It is the Kendall disagreement with the runs. */
 export function disagreement(w: PairWeights, order: readonly string[]): number {
   let n = 0;
   for (let i = 0; i < order.length; i++) for (let j = i + 1; j < order.length; j++) n += weight(w, order[j]!, order[i]!);

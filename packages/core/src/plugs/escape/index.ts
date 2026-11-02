@@ -10,7 +10,7 @@ import { WayFinder } from "../../ways.ts";
 import { placeInIntervals, rangeInterval } from "../range.ts";
 import { alongOf, keyOf, pointAt, roomOf } from "../walls.ts";
 
-/** The method that places the plugs of a wall in their order: the least moves from the facing places, or even slots with an ordered assignment. */
+/** The method that places the plugs of a wall in their order. It is the least moves from the facing places, or even slots in order. */
 export type EscapeMethod = "sort" | "flow";
 
 /** The values of `EscapeMethod`. */

@@ -102,7 +102,8 @@ export function approvedLinks(corners: CornerGraph, a: Point, b: Point, eps: num
 
 /**
  * This function picks the corridor links from the approvals of each edge. A link needs `minSize` approvals or more.
- * With `score`, the links with the most approvals win. With `cover`, a greedy cover takes the link with the most approvals of edges that no picked link serves yet, and stops when each edge has one.
+ * With `score`, the links with the most approvals win. With `cover`, a greedy cover takes the link with the most approvals of edges with no picked link.
+ * The cover stops when each edge has a picked link.
  * The pick holds at most `budget` of the approved links. A tie goes to the least key.
  */
 export function pickLinks(approvals: readonly ReadonlySet<number>[], o: Readonly<Pick<ApprovalOptions, "budget" | "minSize" | "pick">>): Set<number> {
