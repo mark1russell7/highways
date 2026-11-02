@@ -1,7 +1,9 @@
 // The time gates of the comparisons of highways over paired time reports (MEASURE-ISOLATE).
 // Each comparison times its arms in one job with `measureIsolated`. These functions read its report: the ratios, the A/A noise floor and the verdicts.
 // - The verdict of an arm in a table: a median ratio inside the noise floor (p10 to p90 of the A/A ratios) is not a gain and not a loss.
+// - The verdict of an arm on one input in `roundsTable`: the band is 1 ± the A/A spread of the rounds of the input (the confirm rule), so one input has a band too.
 // - The promotion time test reads the reports of several jobs. A check that the A/A arm cannot resolve gives "cannot decide (noise)", and it does not pass.
+import { armRows } from "./pair-confirm.ts";
 import { aaId, pairedReport, quantileOf, type Arm, type Input, type Mode, type PairedEnv, type PairedRatio, type PairedReport, type RawTimes } from "./paired.ts";
 
 /** The band of the A/A ratios: p10 to p90. */
@@ -246,6 +248,31 @@ export function pairedTable(report: PairedReport): string[] {
     const r = report.ratios[arm]!;
     const moved = r.moved === null ? "-" : `${Math.round(100 * r.moved)}%`;
     lines.push(`| \`${arm}\` | ${r.inputs} | ${fmt(r.median, 3)} | ${fmt(r.p10, 3)} | ${fmt(r.p90, 3)} | ${moved} | ${armVerdict(r, report.noiseFloor)} |`);
+  }
+  return lines;
+}
+
+/**
+ * This function gives the Markdown table of a paired time report with the band of the rounds: one row for each arm and input.
+ *
+ * - The arms are the arms that are not the base or the A/A arm. The ratio of a row is the median of the arm over the median of the base.
+ * - The band of a row is 1 ± the A/A spread of its input: p90 of |r - 1| over the A/A ratios of the rounds (the confirm rule).
+ * - The verdict of a row compares its ratio with that band. So a report with one input has a verdict that the noise of its rounds decides.
+ */
+export function roundsTable(report: PairedReport): string[] {
+  const aa = aaId(report.base);
+  const lines = [
+    reportText(report),
+    "",
+    "The band of a row is 1 ± the A/A spread of its input: p90 of |r - 1| over the A/A ratios of its rounds. A ratio outside the band is slower or faster.",
+    "",
+    `| arm | input | ratio over \`${report.base}\` | A/A rounds | A/A band of the rounds | verdict |`,
+    "|---|---|---:|---:|---|---|",
+  ];
+  for (const arm of report.arms) {
+    if (arm === report.base || arm === aa) continue;
+    for (const r of armRows(report, arm))
+      lines.push(`| \`${arm}\` | ${r.input} | ${r.ratio === null ? "-" : fmt(r.ratio, 3)} | ${r.aa.length} | ${r.band === null ? "-" : `${fmt(r.band.lo, 3)} to ${fmt(r.band.hi, 3)}`} | ${r.verdict} |`);
   }
   return lines;
 }

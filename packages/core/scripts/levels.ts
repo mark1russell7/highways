@@ -2,7 +2,8 @@
 // It routes each fixture with the router of the example boards of the site. It times the route, and the level links alone.
 // Each `--src [<label>=]<dir>` is the `src` folder of a core, for example the core of an earlier commit. The first source is the base.
 // `measureIsolated` times the sources on each fixture, with the A/A arm of the base and 1 warm-up run (MEASURE-ISOLATE).
-// `--repeat` gives the timed rounds. `--paired` writes the two reports `paired-time/1`, the route and the level links, as one JSON list.
+// `--repeat` gives the timed rounds. The verdict of a source on a fixture uses the band of the A/A rounds of that fixture (GATE-LIMITS), so one fixture has a band too.
+// `--paired` writes the two reports `paired-time/1`, the route and the level links, as one JSON list.
 //
 // The mode is `fresh` by default (BENCH-FRESH-CASES): a fresh process for each source, each fixture, each round and each report, one at a time.
 // - A child of the route makes the graph of its fixture, routes it 1 time untimed, and times 1 route.
@@ -18,7 +19,7 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { measureIsolated, runChild, type Arm, type Mode, type PairedReport } from "./gates/paired.ts";
-import { pairedTable } from "./gates/time-gate.ts";
+import { roundsTable } from "./gates/time-gate.ts";
 
 interface Core {
   readonly label: string;
@@ -132,9 +133,9 @@ async function runLevels(): Promise<void> {
   console.log(`The router of the example boards on ${sizes.join(", ")}, ${repeat} timed rounds. Each cell is the median over the fixtures of the median of the rounds:\n`);
   console.log("| source | route ms | level links ms |\n|---|---:|---:|");
   for (const core of cores) console.log(`| ${core.label} | ${medianOf(route, core.label)} | ${medianOf(links, core.label)} |`);
-  if (fixtures.length === 1) console.log("\nWith one fixture, the noise floor is one ratio. Give more fixtures to get a band.");
-  if (cores.length > 1) console.log(`\n### The route\n\n${pairedTable(route).join("\n")}`);
-  if (links && withLevels.length > 1) console.log(`\n### The level links\n\n${pairedTable(links).join("\n")}`);
+  // The band of a verdict comes from the A/A ratios of the rounds of each fixture. A band from the median ratios of the fixtures is one ratio with one fixture.
+  if (cores.length > 1) console.log(`\n### The route\n\n${roundsTable(route).join("\n")}`);
+  if (links && withLevels.length > 1) console.log(`\n### The level links\n\n${roundsTable(links).join("\n")}`);
   const pairedOut = opt("--paired");
   if (pairedOut) writeFileSync(pairedOut, JSON.stringify(links ? [route, links] : [route]) + "\n");
 }

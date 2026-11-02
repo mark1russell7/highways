@@ -4,6 +4,7 @@
 //
 // - `confirmPair` times the arms `parent` and `commit` and the A/A arm `parent~aa` on each input, and gives the report.
 // - `pairVerdicts` reads such a report. For each input, it gives the ratio of the commit over the parent, the A/A band and the verdict.
+// - `armRows` reads a paired report. For each input, it gives the ratio of one arm over the base and the band of the A/A rounds.
 import { aaId, measureIsolated, quantileOf, type ChildResult, type PairedEnv, type PairedReport } from "./paired.ts";
 
 /** The id of the arm of the parent. It is the base of the report: the denominator of each ratio. */
@@ -17,6 +18,8 @@ export interface PairOptions {
   readonly parent: readonly string[];
   /** The argv of a child of the commit. */
   readonly commit: readonly string[];
+  /** More arms after the commit, for example a fixed base. Each id is unique. The default is no other arm. */
+  readonly others?: readonly { readonly id: string; readonly command: readonly string[] }[];
   /** The ids of the inputs. Each id is its own group. */
   readonly inputs: readonly string[];
   /** The timed rounds of each arm on each input. */
@@ -34,7 +37,7 @@ export interface PairOptions {
 /**
  * This function times a commit against its parent in fresh processes, and gives the report of schema `paired-time/1`.
  *
- * - The arms are `parent`, `commit` and the A/A arm `parent~aa`. In each round, the order of the arms rotates.
+ * - The arms are `parent`, `commit`, the arms of `others` and the A/A arm `parent~aa`. In each round, the order of the arms rotates.
  * - Each route has its own fresh process, and the children run one at a time.
  * - A bad option makes the promise reject with a `RangeError`.
  */
@@ -43,6 +46,7 @@ export function confirmPair(o: PairOptions): Promise<PairedReport> {
     arms: [
       { id: PARENT_ARM, command: o.parent },
       { id: COMMIT_ARM, command: o.commit },
+      ...(o.others ?? []).map((a) => ({ id: a.id, command: a.command })),
     ],
     inputs: o.inputs.map((id) => ({ id, group: id })),
     repeats: o.rounds,
@@ -82,6 +86,47 @@ export function verdictOf(ratio: number | null, spread: number): PairVerdict {
   return "inside";
 }
 
+/** The result of one arm against the base of a report on one input. The band comes from the A/A ratios of the rounds of the input. */
+export interface ArmRow {
+  readonly input: string;
+  /** The median time of the arm over the median time of the base. */
+  readonly ratio: number | null;
+  /** The median times of the base and of the arm, in ms. */
+  readonly baseMs: number | null;
+  readonly armMs: number | null;
+  /** The A/A ratios of the rounds. */
+  readonly aa: readonly number[];
+  /** The A/A spread: p90 of |r - 1| over `aa`. */
+  readonly spread: number;
+  /** The band of the base: 1 - spread to 1 + spread. It is `null` without A/A ratios. */
+  readonly band: { readonly lo: number; readonly hi: number } | null;
+  readonly verdict: PairVerdict;
+}
+
+/**
+ * This function gives the result of one arm against the base on each input of a report, in the order of the inputs (the confirm rule).
+ *
+ * - The band of an input is 1 ± the A/A spread of its rounds, so one input has a band too.
+ * - A report with no A/A arm, or an arm that the report does not have, gives the verdict `not measured`.
+ */
+export function armRows(report: PairedReport, arm: string): ArmRow[] {
+  return report.inputs.map((row): ArmRow => {
+    const aa = aaRatios(report, row.id);
+    const spread = spreadOf(aa);
+    const ratio = row.ratio[arm] ?? null;
+    return {
+      input: row.id,
+      ratio,
+      baseMs: row.median[report.base] ?? null,
+      armMs: row.median[arm] ?? null,
+      aa,
+      spread,
+      band: Number.isFinite(spread) ? { lo: 1 - spread, hi: 1 + spread } : null,
+      verdict: verdictOf(ratio, spread),
+    };
+  });
+}
+
 /** The result of the commit against the parent on one input. */
 export interface PairRow {
   readonly input: string;
@@ -108,19 +153,5 @@ export interface PairRow {
 export function pairVerdicts(report: PairedReport): PairRow[] {
   if (report.base !== PARENT_ARM || !report.arms.includes(COMMIT_ARM) || !report.arms.includes(aaId(PARENT_ARM)))
     throw new RangeError(`A confirm report has the base ${PARENT_ARM}, the arm ${COMMIT_ARM} and the A/A arm ${aaId(PARENT_ARM)}.`);
-  return report.inputs.map((row): PairRow => {
-    const aa = aaRatios(report, row.id);
-    const spread = spreadOf(aa);
-    const ratio = row.ratio[COMMIT_ARM] ?? null;
-    return {
-      input: row.id,
-      ratio,
-      parentMs: row.median[PARENT_ARM] ?? null,
-      commitMs: row.median[COMMIT_ARM] ?? null,
-      aa,
-      spread,
-      band: Number.isFinite(spread) ? { lo: 1 - spread, hi: 1 + spread } : null,
-      verdict: verdictOf(ratio, spread),
-    };
-  });
+  return armRows(report, COMMIT_ARM).map(({ baseMs, armMs, ...row }): PairRow => ({ ...row, parentMs: baseMs, commitMs: armMs }));
 }
