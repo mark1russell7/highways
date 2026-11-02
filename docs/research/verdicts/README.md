@@ -36,7 +36,7 @@ The folder [`opt-in/`](opt-in/) holds the verdicts of the opt-in routers that a 
 
 The folder [`remeasure/`](remeasure/) holds the record `remeasure.json` of each run of the workflow `Remeasure`. Each record has the 5 jobs, their A/A floors and their CPU models.
 
-- `h3.json` is run 41369331158. `portfolio-speed.json` is run 41381593646. `route-scale.json` is run 41382862417.
+- `h3.json` is run 41369331158. `portfolio-speed.json` is run 41455276356, in mode `fresh`. `route-scale.json` is run 41382862417.
 - The results page does not read these files. The [roadmap](../../ROADMAP.md) gives the verdicts.
 
 ## The benchmark snapshot
