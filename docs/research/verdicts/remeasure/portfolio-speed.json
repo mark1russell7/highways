@@ -1,0 +1,380 @@
+{
+  "schema": "remeasure/1",
+  "claim": "portfolio-speed",
+  "plan": {
+    "claim": "portfolio-speed",
+    "rows": [
+      "PORTFOLIO-SPEED"
+    ],
+    "old": "npm `@mark1russell7/highways@0.5.1`",
+    "board": "the exact boards of 0.5.1 with 41, 52, 64, 100 nodes, each class, the seeds 0, 1, 2",
+    "mode": "process",
+    "rounds": 10,
+    "warmup": 1,
+    "targets": [
+      {
+        "id": "setup n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the setup at 41 to 64 nodes"
+      },
+      {
+        "id": "setup n100",
+        "claim": 0.14534883720930233,
+        "source": "PORTFOLIO-SPEED: the setup at 100 nodes goes from 172 to 25 ms"
+      },
+      {
+        "id": "router n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the fit runs one member at the cap 1.5, at 39 to 46 ms (a time, not a ratio)"
+      },
+      {
+        "id": "router n100",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the router at 100 nodes"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "job": "job1",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "process",
+      "floor": {
+        "p10": 0.9812932333974973,
+        "p90": 1.0207251760082188
+      }
+    },
+    {
+      "job": "job2",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "process",
+      "floor": {
+        "p10": 0.9836214085605047,
+        "p90": 1.0294477748232937
+      }
+    },
+    {
+      "job": "job3",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "process",
+      "floor": {
+        "p10": 0.9811533240784466,
+        "p90": 1.0222315863814626
+      }
+    },
+    {
+      "job": "job4",
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "cores": 4,
+      "mode": "process",
+      "floor": {
+        "p10": 0.9866633427770244,
+        "p90": 1.0176149317544778
+      }
+    },
+    {
+      "job": "job5",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "process",
+      "floor": {
+        "p10": 0.97891254670693,
+        "p90": 1.0172153672252293
+      }
+    }
+  ],
+  "targets": [
+    {
+      "target": {
+        "id": "setup n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the setup at 41 to 64 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.30688772455157337,
+          "floor": {
+            "p10": 0.9812932333974973,
+            "p90": 1.0207251760082188
+          },
+          "inside": false,
+          "oldMs": 39.62557874999766,
+          "newMs": 11.898474249999708
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.33243123523357754,
+          "floor": {
+            "p10": 0.9836214085605047,
+            "p90": 1.0294477748232937
+          },
+          "inside": false,
+          "oldMs": 24.55208224999842,
+          "newMs": 8.270238250000602
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.3413271103761796,
+          "floor": {
+            "p10": 0.9811533240784466,
+            "p90": 1.0222315863814626
+          },
+          "inside": false,
+          "oldMs": 24.536993000001985,
+          "newMs": 8.353931749998537
+        },
+        {
+          "job": "job4",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.32179319973272447,
+          "floor": {
+            "p10": 0.9866633427770244,
+            "p90": 1.0176149317544778
+          },
+          "inside": false,
+          "oldMs": 40.08027299999594,
+          "newMs": 12.725812500004395
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.30326042116851815,
+          "floor": {
+            "p10": 0.97891254670693,
+            "p90": 1.0172153672252293
+          },
+          "inside": false,
+          "oldMs": 39.55434999999852,
+          "newMs": 11.939497749996008
+        }
+      ],
+      "worst": 0.3413271103761796,
+      "slower": 0,
+      "verdict": "outside the noise floor, no claimed ratio"
+    },
+    {
+      "target": {
+        "id": "setup n100",
+        "claim": 0.14534883720930233,
+        "source": "PORTFOLIO-SPEED: the setup at 100 nodes goes from 172 to 25 ms"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.13076177134679637,
+          "floor": {
+            "p10": 0.9812932333974973,
+            "p90": 1.0207251760082188
+          },
+          "inside": false,
+          "oldMs": 188.5973097499998,
+          "newMs": 25.67179324999961
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.16050546422822043,
+          "floor": {
+            "p10": 0.9836214085605047,
+            "p90": 1.0294477748232937
+          },
+          "inside": false,
+          "oldMs": 105.4940985000012,
+          "newMs": 17.768928999998025
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.1611103338281102,
+          "floor": {
+            "p10": 0.9811533240784466,
+            "p90": 1.0222315863814626
+          },
+          "inside": false,
+          "oldMs": 105.39291324999908,
+          "newMs": 17.71087025000338
+        },
+        {
+          "job": "job4",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.14024500875790952,
+          "floor": {
+            "p10": 0.9866633427770244,
+            "p90": 1.0176149317544778
+          },
+          "inside": false,
+          "oldMs": 183.57554574999926,
+          "newMs": 26.86252925000008
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.1289894164852703,
+          "floor": {
+            "p10": 0.97891254670693,
+            "p90": 1.0172153672252293
+          },
+          "inside": false,
+          "oldMs": 188.62906449999173,
+          "newMs": 25.2596220000014
+        }
+      ],
+      "worst": 0.1611103338281102,
+      "slower": 0,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "router n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the fit runs one member at the cap 1.5, at 39 to 46 ms (a time, not a ratio)"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 3.9534644383798687,
+          "floor": {
+            "p10": 0.9812932333974973,
+            "p90": 1.0207251760082188
+          },
+          "inside": false,
+          "oldMs": 8.213483000006818,
+          "newMs": 31.260733499995695
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 3.9920846069586093,
+          "floor": {
+            "p10": 0.9836214085605047,
+            "p90": 1.0294477748232937
+          },
+          "inside": false,
+          "oldMs": 5.604837750001479,
+          "newMs": 21.367024000001493
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 4.006952527289281,
+          "floor": {
+            "p10": 0.9811533240784466,
+            "p90": 1.0222315863814626
+          },
+          "inside": false,
+          "oldMs": 5.585430999997698,
+          "newMs": 21.350480999999945
+        },
+        {
+          "job": "job4",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 3.928172597948233,
+          "floor": {
+            "p10": 0.9866633427770244,
+            "p90": 1.0176149317544778
+          },
+          "inside": false,
+          "oldMs": 8.72990224998648,
+          "newMs": 33.31106825000211
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 3.864745844799618,
+          "floor": {
+            "p10": 0.97891254670693,
+            "p90": 1.0172153672252293
+          },
+          "inside": false,
+          "oldMs": 8.403752000000168,
+          "newMs": 31.184095000006664
+        }
+      ],
+      "worst": 4.006952527289281,
+      "slower": 5,
+      "verdict": "outside the noise floor, no claimed ratio"
+    },
+    {
+      "target": {
+        "id": "router n100",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the router at 100 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.8802280887179942,
+          "floor": {
+            "p10": 0.9812932333974973,
+            "p90": 1.0207251760082188
+          },
+          "inside": false,
+          "oldMs": 18.841116750003494,
+          "newMs": 16.72838249999586
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.8771171663498056,
+          "floor": {
+            "p10": 0.9836214085605047,
+            "p90": 1.0294477748232937
+          },
+          "inside": false,
+          "oldMs": 12.685852999999042,
+          "newMs": 11.0456945000019
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.858633657527286,
+          "floor": {
+            "p10": 0.9811533240784466,
+            "p90": 1.0222315863814626
+          },
+          "inside": false,
+          "oldMs": 12.762475750001613,
+          "newMs": 10.938002750001488
+        },
+        {
+          "job": "job4",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.8712151104145325,
+          "floor": {
+            "p10": 0.9866633427770244,
+            "p90": 1.0176149317544778
+          },
+          "inside": false,
+          "oldMs": 19.344759250003335,
+          "newMs": 16.929601250005362
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.8754239780092343,
+          "floor": {
+            "p10": 0.97891254670693,
+            "p90": 1.0172153672252293
+          },
+          "inside": false,
+          "oldMs": 18.71764925000025,
+          "newMs": 16.630910749998293
+        }
+      ],
+      "worst": 0.8802280887179942,
+      "slower": 0,
+      "verdict": "outside the noise floor, no claimed ratio"
+    }
+  ],
+  "verdict": "smaller"
+}

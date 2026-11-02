@@ -670,6 +670,28 @@ This part is a design. The contract does not change in this item.
 - The iterative members can stop early. They are `hw:growth`, `hw:diffusion`, the families `mlseb` and `kdeeb`, and `shared-p2` and `shared-p3`.
 - A member with one pass, as `corners-side`, cannot stop early. The router keeps the check before each member for these.
 
+### The remeasure (MEASURE-ISOLATE)
+
+The times of this item are from separate jobs, so their speed claim was void. The workflow `Remeasure` (run 41381593646) timed 0.5.1 and the workspace in one job, with an A/A arm.
+Each of the 5 jobs runs the arms in turn in one process. The [record](verdicts/remeasure/portfolio-speed.json) keeps each job.
+
+The ratio is the time of the workspace over the time of 0.5.1. The columns give each CPU model.
+
+| Measure | Interval | EPYC 7763, 2 jobs | Xeon 8370C, 1 job | EPYC 9V45, 2 jobs | 0.5.1 | Workspace |
+|---|---|---|---:|---|---:|---:|
+| The setup at 100 nodes | 0.129 to 0.161 | 0.129 to 0.131 | 0.140 | 0.161 | 183.6 ms | 25.3 ms |
+| The setup at 41 to 64 nodes | 0.303 to 0.341 | 0.303 to 0.307 | 0.322 | 0.332 to 0.341 | 39.6 ms | 11.9 ms |
+| The router at 100 nodes | 0.859 to 0.880 | 0.875 to 0.880 | 0.871 | 0.859 to 0.877 | 18.7 ms | 16.6 ms |
+| The router at 41 to 64 nodes | 3.865 to 4.007 | 3.865 to 3.953 | 3.928 | 3.992 to 4.007 | 8.2 ms | 31.2 ms |
+
+- The claim of the setup at 100 nodes is the interval 0.129 to 0.161, not the single value 0.145.
+- The spread is between the CPU models, not inside a job. Each model gives one value in its jobs.
+- The CPU models of the users are not known. A future limit on these measures has one value for each CPU model.
+- At 41 to 64 nodes the router is 4 times slower than 0.5.1. 0.5.1 used `shared` alone above 40 nodes, and the new bands run the fit there. This time agrees with the 39 to 46 ms of this item.
+- The A/A band of each job contains 1, so each job counts.
+- Each case of this run came after the other cases in one process. The heap of earlier cases can change the time of a later case, and an A/A arm does not show it.
+- So each value of this table, and the 4 times of the router at 41 to 64 nodes, waits for a run in fresh processes. The item BENCH-FRESH-CASES gives that run.
+
 ### The predictions of PORTFOLIO-SPEED
 
 | Prediction | Result |
