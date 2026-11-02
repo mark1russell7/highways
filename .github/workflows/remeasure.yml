@@ -3,7 +3,8 @@
 # Each claim runs 5 jobs. Each job writes one `paired-time/1` report. The job `join` reads the 5 reports and gives the verdict of each target.
 # The old arms:
 # - h3: the core of `fa1dd82~1` in a git worktree, because no npm version is older than the claim. The mode is `fresh`.
-# - portfolio-speed: npm `@mark1russell7/highways@0.5.1`, the dev dependency `highways-0-5-1`. The mode is `process`.
+# - portfolio-speed: npm `@mark1russell7/highways@0.5.1`, the dev dependency `highways-0-5-1`. The mode is `fresh` (BENCH-FRESH-CASES).
+#   A job starts 96 inputs x 3 arms x 10 rounds = 2880 processes, one at a time. The estimate is 19 to 58 min for each job.
 # - route-scale: npm `@mark1russell7/highways@0.8.0`, the dev dependency `highways-0-8-0`. The mode is `fresh`, with 3 rounds.
 name: Remeasure
 

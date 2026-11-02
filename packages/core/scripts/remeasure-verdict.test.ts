@@ -74,7 +74,7 @@ describe("parseClaim", () => {
   it("has a plan for each claim, with the modes and the claimed ratios of the rows", () => {
     expect(Object.keys(CLAIM_PLANS).sort()).toEqual([...CLAIMS].sort());
     expect(CLAIM_PLANS.h3.mode).toBe("fresh");
-    expect(CLAIM_PLANS["portfolio-speed"].mode).toBe("process");
+    expect(CLAIM_PLANS["portfolio-speed"].mode).toBe("fresh");
     expect(CLAIM_PLANS["route-scale"]).toMatchObject({ mode: "fresh", rounds: 3 });
     expect(CLAIM_PLANS.h3.targets.every((t) => t.claim === 0.5)).toBe(true);
     expect(CLAIM_PLANS["portfolio-speed"].targets.find((t) => t.id === "setup n100")!.claim).toBeCloseTo(25 / 172);

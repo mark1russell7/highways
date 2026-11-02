@@ -14,7 +14,7 @@ on:
         default: ""
       minutes:
         type: string
-        default: "60"
+        default: "150"
       sets:
         type: string
         default: ""
@@ -36,8 +36,8 @@ on:
         description: "The ids of CI runs, with commas: --exact <id> --screen <id,...> --time <id>, and --bounds <id,...> for pnpm bounds. The job then writes the reports from their artifacts, and times nothing."
         default: ""
       minutes:
-        description: "The time limit of each shard, in minutes."
-        default: "60"
+        description: "The time limit of each shard, in minutes. The paired times start fresh processes, so the default is 150."
+        default: "150"
       sets:
         description: "PORTFOLIO-FIT: the id of a run of the times with --members. The job writes the sets, the fit and the summary of the times with pnpm portfolio:sets, and times nothing."
         default: ""
@@ -79,7 +79,9 @@ jobs:
   time:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ fromJSON(inputs.minutes || '60') }}
+    # The paired times start a fresh process for each arm, each board and each round (BENCH-FRESH-CASES).
+    # With 16 shards, a shard starts 3780 processes at most, 32 to 95 min. So the default is 150 minutes.
+    timeout-minutes: ${{ fromJSON(inputs.minutes || '150') }}
     strategy:
       fail-fast: false
       # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).

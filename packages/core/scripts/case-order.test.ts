@@ -69,6 +69,8 @@ describe("casePlan", () => {
     expect(speed.alone("setup:hubs-41-s0", "/w").slice(-2)).toEqual(["--only", "setup:hubs-41-s0"]);
     expect(speed.inOrder("/w")).not.toContain("--only");
     expect(speed.reportOf("/w")).toBe("/w/paired-job1.json");
+    // Each process of the two arms times its cases in turn in one process. The two scripts run mode fresh by default (BENCH-FRESH-CASES).
+    for (const argv of [alone, levels.inOrder("/w"), speed.alone("setup:hubs-41-s0", "/w"), speed.inOrder("/w")]) expect(argv[argv.indexOf("--paired-mode") + 1]).toBe("process");
   });
 });
 
