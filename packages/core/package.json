@@ -53,6 +53,7 @@
     "portfolio:api": "node scripts/portfolio-api-report.ts",
     "bounds": "node scripts/bounds.ts",
     "screen:inputs": "node scripts/screen-inputs.ts",
+    "predicate:dump": "node scripts/predicate-dump.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
   },

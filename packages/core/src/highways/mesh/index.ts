@@ -1,4 +1,5 @@
 import { dist, type Point } from "../../geom.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import type { Graph } from "../../model.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
@@ -39,6 +40,13 @@ export function boxUnit(graph: Graph): number {
 
 /** This function gives the shares `t` of the segment `a b` and `u` of the segment `c d` at their crossing. Segments that do not cross give `undefined`. */
 function crossing(a: Point, b: Point, c: Point, d: Point): { t: number; u: number } | undefined {
+  const answer = crossingOf(a, b, c, d);
+  if (predicateSink !== null) predicateSink.cross("mesh.crossing", a, b, c, d, answer !== undefined);
+  return answer;
+}
+
+/** This function is the test of `crossing`, without the hook of the predicate sink. */
+function crossingOf(a: Point, b: Point, c: Point, d: Point): { t: number; u: number } | undefined {
   const rx = b.x - a.x;
   const ry = b.y - a.y;
   const sx = d.x - c.x;

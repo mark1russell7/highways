@@ -1,5 +1,6 @@
 import { rng } from "../../fixtures.ts";
 import { dist, type Point } from "../../geom.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import type { Graph, GroupRule, Result, Router } from "../../model.ts";
 import { defineStrategy, type Strategy } from "../../strategies/model.ts";
 import type { OptionSchema } from "../../strategies/options.ts";
@@ -56,7 +57,9 @@ function properCross(a: Point, b: Point, c: Point, d: Point): boolean {
   const d2 = o(c, d, b);
   const d3 = o(a, b, c);
   const d4 = o(a, b, d);
-  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+  const answer = ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+  if (predicateSink !== null) predicateSink.cross("annealing.properCross", a, b, c, d, answer);
+  return answer;
 }
 
 /** This function gives the median of the smaller side of the boxes, the unit of the costs. */

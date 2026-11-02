@@ -3,6 +3,7 @@ import { center, dist, polylineLength, type Box, type Point } from "./geom.ts";
 import type { LevelItem, LevelLink, Node, Side } from "./model.ts";
 import { pointOnSide, SIDE_NORMAL, sideToward, type Plug } from "./plugs.ts";
 import { CornerGraph, Obstacles, SoftGraph } from "./visibility.ts";
+import { predicateSink } from "./predicate-sink.ts";
 import type { WayFinder, WayOptions } from "./ways.ts";
 
 /** Two items of a level that a link joins, and the count of the edges between them. */
@@ -82,6 +83,7 @@ function tidyPoints(p: readonly Point[]): Point[] {
       const a = out[out.length - 2]!;
       const b = out[out.length - 1]!;
       const cross = (b.x - a.x) * (q.y - b.y) - (b.y - a.y) * (q.x - b.x);
+      if (predicateSink !== null) predicateSink.side("levels.tidyPoints", b, a, q, !(Math.abs(cross) > EPS * (1 + dist(a, b) * dist(b, q))));
       if (Math.abs(cross) > EPS * (1 + dist(a, b) * dist(b, q))) break;
       // The point b is on the line through a and q: in the middle of a straight run, or at the tip of a turn back.
       out.pop();

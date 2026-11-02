@@ -6,6 +6,7 @@ import { segmentHitsBox, type Point } from "../../geom.ts";
 import type { Level, LevelItem, LevelLink } from "../../model.ts";
 import { itemSizes, PICK } from "../../pick.ts";
 import type { LevelInput } from "../../strategies/model.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import { depthLevels, type DepthLevelOptions } from "../depths/index.ts";
 
 /** The growth of the width of a stroke with the number of its edges. */
@@ -78,6 +79,7 @@ function tidy(p: readonly Point[]): Point[] {
       const b = out[out.length - 1]!;
       const cross = (b.x - a.x) * (q.y - b.y) - (b.y - a.y) * (q.x - b.x);
       const dot = (b.x - a.x) * (q.x - b.x) + (b.y - a.y) * (q.y - b.y);
+      if (predicateSink !== null) predicateSink.side("detail.tidy", b, a, q, Math.abs(cross) <= 1e-9);
       if (Math.abs(cross) <= 1e-9 && dot > 0) out.pop();
     }
     out.push(q);

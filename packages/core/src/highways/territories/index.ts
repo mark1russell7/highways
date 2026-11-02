@@ -1,5 +1,6 @@
 import { boardUnit } from "../../bench/measures/routes.ts";
 import { dist, polylineLength, type Point } from "../../geom.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import { firstRoutes } from "../base.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
 import { snapPlan, type SnapLine, type SnapMember } from "../snap.ts";
@@ -65,6 +66,7 @@ export function nearestCentre(centres: readonly Point[], p: Point): number {
     const d = dist(p, c);
     if (d < bestD) [best, bestD] = [i, d];
   });
+  if (predicateSink !== null) predicateSink.nearest("territories.nearestCentre", p, centres, best);
   return best;
 }
 
