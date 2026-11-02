@@ -22,8 +22,7 @@
 // Then it compares the stretch of each edge of `exactStretches` with the stretch of `exactStretchesReference` (`stretchCheck`). The summary counts each difference above `RECORD_EPS`.
 // With `--guard-records`, the script times nothing. It routes the boards of `exact-v1` at the sizes `--sizes` with each member of the portfolio router (`guardRecord`).
 // Each line is a record with the values of the guard: B1, the stretch of the model, the flag of mixed collections and the hard breaks. The sizes above 40 nodes have no optima.
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
@@ -710,7 +709,7 @@ const opt = (name: string): string | undefined => {
 };
 const nums = (name: string, fallback: string): number[] => (opt(name) ?? fallback).split(",").map(Number);
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const summary = opt("--summary");
   if (summary !== undefined) {
     const all = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as unknown));

@@ -9,8 +9,8 @@
 // The times of two shards come from two jobs, so without paired lines these columns are empty.
 // The script reads only records, so it runs locally in a few seconds. The screens and the times run in CI.
 // The test `src/bench/screen/portfolio.test.ts` examines the functions of this file on a small set of records.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_CAPS, GAP_RULES, gapCap, gapClosed, optimumKey, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
@@ -940,7 +940,7 @@ function readTimes(paths: readonly string[]): { times: TimeRecord[]; paired: Pai
   return { times: all.filter((l) => !isPaired(l)) as TimeRecord[], paired: all.filter(isPaired) };
 }
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);
