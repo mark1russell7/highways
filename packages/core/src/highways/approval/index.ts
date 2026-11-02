@@ -3,7 +3,7 @@
  * Each edge approves each link of the corner graph that lies on a way within `1 + eps` of its shortest way. The links with the most approvals become corridors.
  */
 import { dist, type Point } from "../../geom.ts";
-import type { CornerGraph } from "../../visibility.ts";
+import { MinHeap, type CornerGraph } from "../../visibility.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
 import { edgePlugs, sharedStretches, type KeyedWay } from "../stretches.ts";
@@ -34,61 +34,6 @@ export const APPROVAL_DEFAULTS: Readonly<Required<Omit<ApprovalOptions, "margin"
 /** The number of corners near an end that a search starts from or ends at. */
 const ENDS = 8;
 
-/** A small binary min-heap of (key, value) pairs. Equal keys come out by value, so the order is deterministic. */
-class Heap {
-  readonly #k: number[] = [];
-  readonly #v: number[] = [];
-
-  get size(): number {
-    return this.#k.length;
-  }
-
-  get topKey(): number {
-    return this.#k[0]!;
-  }
-
-  #less(a: number, b: number): boolean {
-    return this.#k[a]! < this.#k[b]! || (this.#k[a] === this.#k[b] && this.#v[a]! < this.#v[b]!);
-  }
-
-  #swap(a: number, b: number): void {
-    [this.#k[a], this.#k[b]] = [this.#k[b]!, this.#k[a]!];
-    [this.#v[a], this.#v[b]] = [this.#v[b]!, this.#v[a]!];
-  }
-
-  push(key: number, value: number): void {
-    this.#k.push(key);
-    this.#v.push(value);
-    let i = this.#k.length - 1;
-    while (i > 0) {
-      const p = (i - 1) >> 1;
-      if (!this.#less(i, p)) break;
-      this.#swap(i, p);
-      i = p;
-    }
-  }
-
-  pop(): number {
-    const top = this.#v[0]!;
-    const last = this.#k.length - 1;
-    this.#swap(0, last);
-    this.#k.pop();
-    this.#v.pop();
-    let i = 0;
-    for (;;) {
-      const l = 2 * i + 1;
-      const r = l + 1;
-      let m = i;
-      if (l < this.#k.length && this.#less(l, m)) m = l;
-      if (r < this.#k.length && this.#less(r, m)) m = r;
-      if (m === i) break;
-      this.#swap(i, m);
-      i = m;
-    }
-    return top;
-  }
-}
-
 /**
  * This function gives the distance from the point `p` to each corner of the corner graph, up to `bound` (Dijkstra).
  * The search starts at the corners that `p` sees. A corner farther than `bound` is not in the map.
@@ -96,7 +41,7 @@ class Heap {
 export function distancesFrom(corners: CornerGraph, p: Point, bound: number): Map<number, number> {
   const d = new Map<number, number>();
   const done = new Set<number>();
-  const heap = new Heap();
+  const heap = new MinHeap();
   for (const j of corners.nearestVisible(p, ENDS)) {
     const g = dist(p, corners.points[j]!);
     if (g <= bound && g < (d.get(j) ?? Infinity)) {
@@ -126,11 +71,17 @@ export function distancesFrom(corners: CornerGraph, p: Point, bound: number): Ma
 /**
  * This function gives the links that the way from `a` to `b` approves (WILD-031), as keys `i × M + j` with `i < j`.
  * The way approves the link `(i, j)` when `d_a(i) + w(i, j) + d_b(j) ≤ (1 + eps) × d*`, in one direction or the other. The value `d*` is the length of its shortest way.
+ * The searches stop at `(1 + eps)` times the length of the way of `CornerGraph.path`, so a far corner costs nothing.
  */
 export function approvedLinks(corners: CornerGraph, a: Point, b: Point, eps: number): Set<number> {
   const M = corners.points.length;
   const out = new Set<number>();
-  const fromA = distancesFrom(corners, a, Infinity);
+  // The shortest way of the corner graph bounds the first search, so the search does not visit the whole graph.
+  const way = corners.path(a, b);
+  if (way === undefined) return out;
+  let first = 0;
+  for (let i = 1; i < way.length; i++) first += dist(way[i - 1]!, way[i]!);
+  const fromA = distancesFrom(corners, a, (1 + eps) * first);
   let best = Infinity;
   for (const j of corners.nearestVisible(b, ENDS)) {
     const g = fromA.get(j);
@@ -168,16 +119,18 @@ export function pickLinks(approvals: readonly ReadonlySet<number>[], o: Readonly
   if (o.pick === "score") return new Set(able.slice(0, cap).map(([l]) => l));
   const picked = new Set<number>();
   const served = new Set<number>();
-  const heap = new Heap();
-  // The heap holds the minus of the gain of each link, as it was when the link went in. A gain does not grow, so a fresh top is the best.
-  for (const [l, v] of able) heap.push(-v.length, l);
+  const heap = new MinHeap();
+  // The heap holds the minus of the gain of each link, as it was when the link went in, and the index of the link in `able`.
+  // A gain does not grow, so a fresh top is the best. The index keeps the order of a tie, and it fits in the heap for each size of the corner graph.
+  able.forEach(([, v], i) => heap.push(-v.length, i));
   while (heap.size > 0 && picked.size < cap) {
     const stale = -heap.topKey;
-    const l = heap.pop();
+    const i = heap.pop();
+    const l = able[i]![0];
     const gain = voters.get(l)!.filter((e) => !served.has(e)).length;
     if (gain === 0) continue;
     if (gain < stale && heap.size > 0 && gain < -heap.topKey) {
-      heap.push(-gain, l);
+      heap.push(-gain, i);
       continue;
     }
     picked.add(l);

@@ -1,4 +1,4 @@
-// This file is made by `node scripts/choice-train.ts --seeds 2`. Do not edit it by hand.
+// The script `node scripts/choice-train.ts --seeds 2` writes this file. The table is empty until a run of the script fills it.
 import type { ChoiceRow } from "./index.ts";
 
 /**

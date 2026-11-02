@@ -3,6 +3,7 @@
  * Features of the board pick one setting of the portfolio by the k nearest boards of a table, so only one setting routes.
  */
 import { checkProperties } from "../../bench/properties.ts";
+import { summarize } from "../../bench/measures/stats.ts";
 import { center, dist } from "../../geom.ts";
 import type { Graph } from "../../model.ts";
 import type { WholeOutput } from "../../strategies/model.ts";
@@ -43,7 +44,7 @@ export const CHOICE_DEFAULTS: Readonly<ChoiceOptions> = Object.freeze({ k: 3, fe
 
 /**
  * This function gives the features of a board (WILD-046). They are the counts of the nodes and the edges, the edges for each node,
- * the skew of the degrees (the largest over the mean), the spread of the box areas (the standard deviation over the mean),
+ * the skew of the degrees (the largest over the mean), the spread of the box areas (the interquartile range over the median),
  * the nearest-neighbour ratio of the centers (Clark and Evans), the share of the edges with a key, the largest fan-out, and the mean span of the edges over the mean box size.
  */
 export function boardFeatures(graph: Graph): number[] {
@@ -68,9 +69,7 @@ export function boardFeatures(graph: Graph): number[] {
     spans++;
   }
   const meanDegree = n > 0 ? degree.reduce((a, b) => a + b, 0) / n : 0;
-  const areas = graph.nodes.map((v) => v.box.w * v.box.h);
-  const meanArea = n > 0 ? areas.reduce((a, b) => a + b, 0) / n : 0;
-  const varArea = n > 0 ? areas.reduce((a, b) => a + (b - meanArea) ** 2, 0) / n : 0;
+  const areas = summarize(graph.nodes.map((v) => v.box.w * v.box.h));
   const size = n > 0 ? graph.nodes.reduce((a, v) => a + Math.sqrt(v.box.w * v.box.h), 0) / n : 1;
   let x0 = Infinity;
   let y0 = Infinity;
@@ -95,7 +94,7 @@ export function boardFeatures(graph: Graph): number[] {
     m,
     n > 0 ? m / n : 0,
     meanDegree > 0 ? Math.max(...degree) / meanDegree : 0,
-    meanArea > 0 ? Math.sqrt(varArea) / meanArea : 0,
+    areas.median > 0 ? areas.iqr / areas.median : 0,
     n > 1 ? nearest / n / expected : 0,
     m > 0 ? keyed / m : 0,
     n > 0 ? Math.max(...out) : 0,
@@ -103,14 +102,10 @@ export function boardFeatures(graph: Graph): number[] {
   ];
 }
 
-/** The mean and the standard deviation of each feature over the table, for the scale of the distance. A feature with no spread gets the scale 1. */
-function scales(table: readonly ChoiceRow[]): { mean: number[]; sd: number[] } {
-  const d = CHOICE_FEATURES.length;
-  const mean = new Array<number>(d).fill(0);
-  const sd = new Array<number>(d).fill(0);
-  for (const r of table) r.features.forEach((v, i) => (mean[i]! += v / table.length));
-  for (const r of table) r.features.forEach((v, i) => (sd[i]! += (v - mean[i]!) ** 2 / table.length));
-  return { mean, sd: sd.map((v) => (v > 0 ? Math.sqrt(v) : 1)) };
+/** The median and the interquartile range of each feature over the table, for the scale of the distance. A feature with no spread gets the scale 1. */
+function scales(table: readonly ChoiceRow[]): { mid: number[]; spread: number[] } {
+  const columns = CHOICE_FEATURES.map((_, i) => summarize(table.map((r) => r.features[i]!)));
+  return { mid: columns.map((c) => c.median), spread: columns.map((c) => (c.iqr > 0 ? c.iqr : 1)) };
 }
 
 /**
@@ -120,9 +115,9 @@ function scales(table: readonly ChoiceRow[]): { mean: number[]; sd: number[] } {
  */
 export function rankSettings(features: readonly number[], table: readonly ChoiceRow[], o: Readonly<ChoiceOptions>): string[] {
   if (table.length === 0) return [];
-  const { mean, sd } = scales(table);
+  const { mid, spread } = scales(table);
   const use = SETS[o.features];
-  const z = (v: readonly number[], i: number): number => (v[i]! - mean[i]!) / sd[i]!;
+  const z = (v: readonly number[], i: number): number => (v[i]! - mid[i]!) / spread[i]!;
   const near = table
     .map((r, row) => {
       let d = 0;

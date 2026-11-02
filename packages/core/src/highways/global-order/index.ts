@@ -179,8 +179,7 @@ export function globalOrderPlan(input: HighwayInput, o: Readonly<GlobalOrderOpti
     const at = new Map(h.lanes.map((e, i) => [e, i]));
     const big = order.length;
     const lanes = [...h.lanes].sort((a, b) => sign * ((rank.get(a) ?? big) - (rank.get(b) ?? big)) || at.get(a)! - at.get(b)!);
-    const byEdge = new Map(h.members.map((m) => [m.edge, m]));
-    return { ...h, lanes, members: lanes.map((e) => byEdge.get(e)!) };
+    return { ...h, lanes };
   });
   return { highways, laneRule: { order: "plan" } };
 }

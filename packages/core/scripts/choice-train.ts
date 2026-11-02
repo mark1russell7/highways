@@ -9,7 +9,7 @@ import { BOARD_PORTFOLIO_SETTINGS } from "../src/strategies/builtins.ts";
 import { boardFeatures, type ChoiceRow } from "../src/whole/choice/index.ts";
 import { BOARD_PORTFOLIO_DEFAULTS, boardPortfolio } from "../src/whole/portfolio/index.ts";
 
-/** The first seed of the training boards. The seeds of the screen sets are below 10 000. */
+/** The first seed of the training boards. A screen set gives the member `k` the seed `base + 1009 * k`, far below 100 000. */
 export const TRAIN_SEED = 100_000;
 
 const args = process.argv.slice(2);
@@ -36,7 +36,7 @@ for (const family of HIGHWAYS_FAMILIES) {
 const body = rows.map((r) => `  { board: ${JSON.stringify(r.board)}, features: ${JSON.stringify(r.features)}, winner: ${JSON.stringify(r.winner)} },`).join("\n");
 writeFileSync(
   out,
-  `// This file is made by \`node scripts/choice-train.ts --seeds ${seeds}\`. Do not edit it by hand.
+  `// The script \`node scripts/choice-train.ts --seeds ${seeds}\` writes this file. Do not edit it by hand.
 import type { ChoiceRow } from "./index.ts";
 
 /**

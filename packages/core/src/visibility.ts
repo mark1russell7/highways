@@ -709,7 +709,7 @@ const bucketKey = (i: number, j: number): number => (i + 1_048_576) * 2_097_152 
  * A binary min-heap of (key, value) pairs in typed arrays. The pairs come out by key, and equal keys by value, so the order is deterministic.
  * The method `push` adds a pair to the heap. The method `add` only appends a pair, and the method `build` then makes the heap of all the pairs.
  */
-class MinHeap {
+export class MinHeap {
   #d = new Float64Array(64);
   #j = new Int32Array(64);
   size = 0;

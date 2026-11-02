@@ -1636,6 +1636,46 @@ The default does not change with this screen. The item SEARCH-CROSS tests the ch
 
 The mean Brier score of the 11 claims is 0.205.
 
+## Wave 4D (BUILD-W4D)
+
+Wave 4D builds the next six ideas of the queue. Each one is a strategy of its step:
+
+| Idea | Strategy | Step | Baseline |
+|---|---|---|---|
+| NAT-009 | `two-way` | `highway` | `shared` |
+| WILD-039 | `global-order` | `highway` | `shared` |
+| WILD-031 | `approval` | `highway` | `shared` |
+| EDA-022 | `escape` | `plugs` | `facing` |
+| WILD-048 | `crops` | `whole` | `pipeline` |
+| WILD-046 | `choice` | `whole` | `pipeline` |
+
+The screen examines each strategy alone and with three changes of its options. The modules are `scripts/screens/build-w4d*.ts`.
+The verdict is the verdict over families of `scripts/screen-verdict.ts` against the baseline of the step, on the named wins of the idea.
+
+### The design notes
+
+- `two-way` and `global-order` keep the highways of their plan `from`. They add a lane rule to the plan, so only the lane order of each run changes.
+  - `HighwayPlan.laneRule` is a new optional field. A plan with no lane rule gives the same runs as before, so the routes of each other strategy do not change.
+- `two-way` puts the edges of one direction of a run side by side. With `right`, the edges against the spine go first. With `outer`, the edges along the spine take the two outer sides.
+  - The option `weight` mixes the direction key with the bundle order. The value 0 gives the bundle order.
+- `global-order` gives the edges one order for all the runs. The key is the Hilbert rank of the source and the target, or the pseudo-angle of the edge.
+  - Sifting then moves each edge to the place with the fewest pairs that the runs put the other way. Sifting stops after 2000 edges.
+- `approval` routes each edge on the corner graph. Each link of a way within `1 + eps` of the shortest way gets the approval of the edge.
+  - The search of each edge stops at `1 + eps` times its first length. The pick `score` keeps the links with the most approvals, and `cover` keeps a greedy cover.
+  - The kept links go to `sharedStretches`, so the corridors are the stretches that 2 or more edges share.
+- `escape` routes the way of each edge between the facing plugs. The first leg after the stub gives the order of the plugs on each wall.
+  - It uses the walls of `spread` and the ranges of PORT-RANGE. A fixed plug does not move, and a plug of a port with a range stays in its range.
+- `crops` ranks the settings of `board-portfolio` on seeded windows of the board. Only the whole board with the pick routes in full.
+  - A board with `nodes` nodes or fewer runs `board-portfolio` with the same number of settings.
+- `choice` reads 9 features of the board and picks a setting by the vote of the nearest rows of `CHOICE_TABLE`.
+  - The table holds made-up boards of the families only, with seeds from 100 000, outside the screen sets.
+  - With an empty table, `choice` routes the first setting of the list, `shared`.
+- The new strategies use the helpers of the package: `MinHeap` of `visibility.ts`, `rng` of `fixtures.ts`, `summarize` of the bench measures and the walls of the plugs.
+
+### The results
+
+The screens of this wave are not in this section yet. The runs and the verdicts come with the next commit of the records.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

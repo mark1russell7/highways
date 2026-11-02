@@ -3,6 +3,7 @@
  * The idea WILD-047 (successive halving) is not built, so the fixed list of settings of `board-portfolio` is the tuner.
  */
 import { checkProperties } from "../../bench/properties.ts";
+import { rng } from "../../fixtures.ts";
 import { center, type Box, type Point } from "../../geom.ts";
 import type { Edge, Graph, Node } from "../../model.ts";
 import type { WholeOutput } from "../../strategies/model.ts";
@@ -32,18 +33,6 @@ const SNAP = 8;
 
 /** The size of the stub node of a cut edge. */
 const STUB = 4;
-
-/** This function gives a seeded generator of numbers from 0 to 1 (mulberry32). */
-function random(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 /** This function gives the bounds of the boxes of a list of nodes. */
 function boundsOf(nodes: readonly Node[]): Box {
@@ -142,7 +131,7 @@ export function crops(graph: Graph, list: readonly PortfolioSetting[], options: 
     return limit === undefined || graph.nodes.length <= limit;
   });
   if (settings.length === 0) return { output: runPipeline(graph, list[0]!.pipeline), pick: list[0]!.name, scores: [] };
-  const next = random(o.seed);
+  const next = rng(Math.max(0, Math.floor(o.seed)));
   const total = new Array<number>(settings.length).fill(0);
   for (let w = 0; w < Math.max(1, Math.floor(o.windows)); w++) {
     const pick = graph.nodes[Math.min(graph.nodes.length - 1, Math.floor(next() * graph.nodes.length))]!;

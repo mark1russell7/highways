@@ -2,12 +2,13 @@
  * The plug strategy `escape` (EDA-022): ordered escape of the plugs, after the ordered escape routing of the boards of printed circuits.
  * The free plugs of one wall go in the order of the direction of the first leg of their ways. Thus the stubs leave the box with no crossing.
  */
-import { center, type Box, type Point } from "../../geom.ts";
+import { center, type Point } from "../../geom.ts";
 import { nodeIndex, portOffset, type End, type Node, type Side } from "../../model.ts";
 import { nearestSide, placePlug, SIDE_NORMAL, sideToward, type Plug } from "../../plugs.ts";
 import type { PlugInput, PlugPair } from "../../strategies/model.ts";
 import { WayFinder } from "../../ways.ts";
-import { isotonic } from "../justify.ts";
+import { placeInIntervals, rangeInterval } from "../range.ts";
+import { alongOf, keyOf, pointAt, roomOf } from "../walls.ts";
 
 /** The method that places the plugs of a wall in their order: the least moves from the facing places, or even slots with an ordered assignment. */
 export type EscapeMethod = "sort" | "flow";
@@ -40,71 +41,27 @@ interface Slot {
   readonly rank: number;
   /** The first end of the slot: its edge, and `true` for the source end. */
   readonly first: { readonly edge: number; readonly source: boolean };
+  /** The interval of the range of the port on the axis along the wall (PORT-RANGE), or `undefined` for a plug with no range. */
+  readonly range: readonly [number, number] | undefined;
   /** The place of the plug on the axis along the wall. */
   at: number;
 }
 
-/** This function gives the axis along a side. */
-const alongOf = (side: Side): "x" | "y" => (side === "east" || side === "west" ? "y" : "x");
-
-/** This function gives the room of a wall: the segment of the axis along the side, without the reserve at each corner. */
-function roomOf(box: Box, side: Side, reserve: number): [number, number] {
-  const along = alongOf(side);
-  const start = along === "y" ? box.y : box.x;
-  const len = along === "y" ? box.h : box.w;
-  const m = Math.min(len / 4, Math.max(reserve * len, Math.min(2, len / 4)));
-  return [start + m, start + len - m];
-}
-
-/** This function gives the point of a side at `v` on the axis along the side. */
-function wallPoint(box: Box, side: Side, v: number): Point {
-  if (side === "east") return { x: box.x + box.w, y: v };
-  if (side === "west") return { x: box.x, y: v };
-  if (side === "south") return { x: v, y: box.y + box.h };
-  return { x: v, y: box.y };
-}
-
-/**
- * This function gives the sort key of the first leg of a way on a wall: a pseudo-angle of the direction from the center of the box to the end of the leg.
- * The key grows in the direction of the axis along the wall, from -2 to 2, with no transcendental call. Thus the plugs in the order of the keys give stubs that do not cross.
- */
-export function legKey(box: Box, side: Side, leg: Point): number {
-  const c = center(box);
-  const n = SIDE_NORMAL[side];
-  const dx = leg.x - c.x;
-  const dy = leg.y - c.y;
-  const out = dx * n.x + dy * n.y;
-  const along = alongOf(side) === "y" ? dy : dx;
-  const size = Math.abs(out) + Math.abs(along);
-  if (size === 0) return 0;
-  const p = along / size;
-  if (out >= 0) return p;
-  return along >= 0 ? 2 - p : -2 - p;
-}
-
-/**
- * This function places `ideal.length` plugs in their order on the segment from `lo` to `hi`, with `gap` or more between two neighbours.
- * The gap shrinks evenly when the segment is too short. The sum of the squares of the moves from the ideal places is the least.
- */
-export function placeSorted(ideal: readonly number[], lo: number, hi: number, gap: number): number[] {
-  const k = ideal.length;
-  if (k === 0) return [];
-  const s = k > 1 ? Math.max(0, Math.min(gap, (hi - lo) / (k - 1))) : 0;
-  const y = isotonic(ideal.map((v, i) => v - i * s));
-  const top = Math.max(lo, hi - (k - 1) * s);
-  return y.map((v, i) => Math.max(lo, Math.min(top, v)) + i * s);
+/** This function gives the corner inset of a side for the share `reserve`: the share of the length, and 2 or more. `roomOf` keeps it to a quarter of the side. */
+function insetOf(len: number, reserve: number): number {
+  return Math.max(reserve * len, 2);
 }
 
 /**
  * This function places `ideal.length` plugs in their order on slots `gap` apart from `lo` to `hi` (the `flow` method of EDA-022).
  * An ordered assignment (dynamic programming) gives the least sum of the moves from the ideal places. On a line it is the min-cost flow that keeps the order.
- * When the slots are fewer than the plugs, it places them as `placeSorted` does.
+ * When the slots are fewer than the plugs, the plugs keep their order with the least sum of the squares of the moves (`placeInIntervals`).
  */
 export function placeSlots(ideal: readonly number[], lo: number, hi: number, gap: number): number[] {
   const k = ideal.length;
   if (k === 0) return [];
   const count = gap > 0 ? Math.floor((hi - lo) / gap + 1e-9) + 1 : 1;
-  if (count < k) return placeSorted(ideal, lo, hi, gap);
+  if (count < k) return placeInIntervals(ideal, ideal.map(() => lo), ideal.map(() => hi), gap);
   const slot = (j: number): number => lo + j * gap;
   // cost[i][j]: the least cost of the plugs 0 to i, with the plug i on the slot j.
   const cost: Float64Array[] = [];
@@ -136,6 +93,7 @@ export function placeSlots(ideal: readonly number[], lo: number, hi: number, gap
 /**
  * This function places the slots of one wall in their order. The fixed plugs cut the room into parts.
  * Each slot goes into the part of its ideal place, and the parts keep the order of the slots. A plug and a fixed plug are `gap` or more apart.
+ * A plug of a port with a range stays in its range (PORT-RANGE). The method `flow` applies only to a part with no range and room for the gap.
  */
 function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number, hi: number, gap: number, method: EscapeMethod): void {
   const cuts = [...new Set(fixed.filter((f) => f > lo - 1e-9 && f < hi + 1e-9))].sort((a, b) => a - b);
@@ -157,7 +115,22 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
     const lower = ends[p]! + fa * s;
     const upper = Math.max(lower, ends[p + 1]! - fb * s);
     const ideal = list.map((x) => x.ideal);
-    const at = method === "flow" && s >= gap ? placeSlots(ideal, lower, upper, gap) : placeSorted(ideal, lower, upper, s);
+    const bounds = list.map((x): [number, number] => {
+      if (x.range === undefined) return [lower, upper];
+      const a = Math.max(lower, x.range[0]);
+      const b = Math.min(upper, x.range[1]);
+      return a <= b ? [a, b] : [x.range[0], x.range[1]];
+    });
+    const free = list.every((x) => x.range === undefined);
+    const at =
+      method === "flow" && free && s >= gap
+        ? placeSlots(ideal, lower, upper, gap)
+        : placeInIntervals(
+            ideal,
+            bounds.map((b) => b[0]),
+            bounds.map((b) => b[1]),
+            s,
+          );
     list.forEach((x, i) => {
       x.at = at[i]!;
     });
@@ -202,7 +175,9 @@ export function escapeEnds(input: PlugInput, options: Partial<EscapeOptions> = {
     if (slots.has(key)) return key;
     const side = port?.side ?? sideToward(node.box, toward);
     const ideal = placePlug(node, end, toward).point[alongOf(side)];
-    const slot: Slot = { node, side, ideal, rank: slots.size, first: { edge, source }, at: ideal };
+    const len = alongOf(side) === "y" ? node.box.h : node.box.w;
+    const range = rangeInterval(node.box, side, port, insetOf(len, o.cornerReserve));
+    const slot: Slot = { node, side, ideal, rank: slots.size, first: { edge, source }, range, at: ideal };
     slots.set(key, slot);
     wallOf(node, side).slots.push(slot);
     return key;
@@ -217,7 +192,7 @@ export function escapeEnds(input: PlugInput, options: Partial<EscapeOptions> = {
   const resolve = (p: Plug | string): Plug => {
     if (typeof p !== "string") return p;
     const s = slots.get(p)!;
-    return { point: wallPoint(s.node.box, s.side, s.at), normal: SIDE_NORMAL[s.side] };
+    return { point: pointAt(s.node.box, s.side, s.at), normal: SIDE_NORMAL[s.side] };
   };
   const rounds = Math.max(0, Math.min(3, Math.floor(o.rounds)));
   for (let round = 0; round <= rounds; round++) {
@@ -230,8 +205,9 @@ export function escapeEnds(input: PlugInput, options: Partial<EscapeOptions> = {
       return { source: way.length > 3 ? at(2) : pt.point, target: way.length > 3 ? at(way.length - 3) : ps.point };
     });
     for (const wall of walls.values()) {
-      const [lo, hi] = roomOf(wall.node.box, wall.side, o.cornerReserve);
-      const key = new Map(wall.slots.map((s) => [s, legKey(wall.node.box, wall.side, s.first.source ? legs[s.first.edge]!.source : legs[s.first.edge]!.target)]));
+      const box = wall.node.box;
+      const [lo, hi] = roomOf(box, wall.side, insetOf(alongOf(wall.side) === "y" ? box.h : box.w, o.cornerReserve));
+      const key = new Map(wall.slots.map((s) => [s, keyOf(wall.node.box, wall.side, s.first.source ? legs[s.first.edge]!.source : legs[s.first.edge]!.target)]));
       const sorted = [...wall.slots].sort((a, b) => key.get(a)! - key.get(b)! || a.ideal - b.ideal || a.rank - b.rank);
       placeWall(sorted, wall.fixed, lo, hi, o.slotSpacing, o.method);
     }
