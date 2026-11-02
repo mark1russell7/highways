@@ -6,11 +6,9 @@ name: Search objective
 
 on:
   # A pull request that changes search or this script gets the screen with the default inputs.
+  # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
+  # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
-    paths:
-      - "packages/core/src/highways/search/**"
-      - "packages/core/scripts/search-objective.ts"
-      - ".github/workflows/search-objective.yml"
   workflow_dispatch:
     inputs:
       set:
@@ -35,7 +33,26 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          paths: |
+            packages/core/src/highways/search/**
+            packages/core/scripts/search-objective.ts
+            .github/workflows/search-objective.yml
+
   objective:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -67,3 +84,15 @@ jobs:
             ${{ runner.temp }}/search-objective.jsonl
             ${{ runner.temp }}/search-objective-time.json
           if-no-files-found: warn
+
+  search-objective-ok:
+    name: Search objective OK
+    if: always()
+    needs: [changes, objective]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          needs: ${{ toJSON(needs) }}

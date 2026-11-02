@@ -5,15 +5,9 @@ name: Search work
 
 on:
   # A pull request that changes search or this script gets the fit with the default inputs.
+  # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
+  # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
-    paths:
-      - "packages/core/src/highways/search/**"
-      - "packages/core/src/work.ts"
-      - "packages/core/src/lane-order.ts"
-      - "packages/core/src/visibility.ts"
-      - "packages/core/src/bench/measures/bundles.ts"
-      - "packages/core/scripts/search-work.ts"
-      - ".github/workflows/search-work.yml"
   workflow_dispatch:
     inputs:
       sizes:
@@ -38,7 +32,30 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          paths: |
+            packages/core/src/highways/search/**
+            packages/core/src/work.ts
+            packages/core/src/lane-order.ts
+            packages/core/src/visibility.ts
+            packages/core/src/bench/measures/bundles.ts
+            packages/core/scripts/search-work.ts
+            .github/workflows/search-work.yml
+
   work:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
@@ -69,6 +86,8 @@ jobs:
           if-no-files-found: warn
 
   stops:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     strategy:
       max-parallel: 3
       fail-fast: false
@@ -100,7 +119,8 @@ jobs:
           path: ${{ runner.temp }}/stops.jsonl
 
   same:
-    needs: stops
+    if: needs.changes.outputs.match == 'true'
+    needs: [changes, stops]
     runs-on: ubuntu-latest
     env:
       BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
@@ -138,3 +158,15 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           cmp stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
           echo "Gate (b): the stops of Linux and Windows are byte-equal." >> "$GITHUB_STEP_SUMMARY"
+
+  search-work-ok:
+    name: Search work OK
+    if: always()
+    needs: [changes, work, stops, same]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          needs: ${{ toJSON(needs) }}
