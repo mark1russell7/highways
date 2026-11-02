@@ -1,7 +1,8 @@
 # The objective of the highway strategy search (SEARCH-OBJECTIVE). The job objective runs search with the default options and 5 seeds
 # on each input of screen-v3 and on windows of the dense board. It correlates the score delta of each move with the change of ink, R1 and R4.
 # It also compares the start plan and each variant of the score with the default, with a noise floor over the seeds and Holm. The runs go here, not on a local machine.
-# The time of each variant against the default runs in this job, in turn on each input, with an A/A arm (MEASURE-ISOLATE).
+# The time of each variant against the default runs in this job, with an A/A arm (MEASURE-ISOLATE).
+# Each variant, each input and each round gets its own fresh process (BENCH-FRESH-CASES): 1071 processes, 5 to 18 min more.
 name: Search objective
 
 on:

@@ -78,7 +78,8 @@ export const CLAIM_PLANS: Readonly<Record<Claim, ClaimPlan>> = {
     rows: ["PORTFOLIO-SPEED"],
     old: "npm `@mark1russell7/highways@0.5.1`",
     board: `the exact boards of 0.5.1 with ${PORTFOLIO_SPEED_NODES.join(", ")} nodes, each class, the seeds ${PORTFOLIO_SPEED_SEEDS.join(", ")}`,
-    mode: "process",
+    // Each input gets its own fresh processes (BENCH-FRESH-CASES). The record of the run 41381593646 has the mode process.
+    mode: "fresh",
     rounds: 10,
     warmup: 1,
     targets: [

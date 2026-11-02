@@ -6,22 +6,28 @@
 // The sign of a measure is turned, so a positive correlation means that a higher score gives a better measure.
 // It also gives the correlation of each term of the score, so that a term that does not follow the measures is visible.
 // Part 2: the start plan (0 evaluations) and each variant of `--variants` against the default, with the noise floor of 2 sd over the seeds, the effect and Holm.
-// Part 3, the time (MEASURE-ISOLATE): `measureIsolated` times the variants in turn on each input in this process, with the A/A arm of the default and 1 warm-up run.
+// Part 3, the time (MEASURE-ISOLATE): `measureIsolated` times the variants on each input, with the A/A arm of the default and 1 warm-up run.
 // Each timed run is `searchRun` with the seed 1 and no measure of the plans. `--time-repeats` gives the timed rounds (default 1, and 0 gives no time).
 // `--paired` writes the report `paired-time/1`. Each record gets `env`, the computer and the mode of its time.
+// The mode of Part 3 is `fresh` (BENCH-FRESH-CASES): a fresh process for each variant, each input and each round, one at a time.
+// Each child makes only the graph of its input, runs `searchRun` 1 time untimed, and times 1 run.
+// A child: `node scripts/search-objective.ts <the options> --time-child <variant> --input <id> --warmup 1`.
+// The cost of mode `fresh`: 153 inputs x 7 arms (6 variants and the A/A arm) x 1 round gives 1071 children.
+// Each child runs `searchRun` 2 times, as mode process does for each arm and input. So the run time does not change.
+// The starts add 0.3 to 1 s for each child on a CI runner, thus 5 to 18 min. Parts 1 and 2 take 35 min, and the job time limit is 120 min.
 // The workflow `Search objective` (.github/workflows/search-objective.yml) starts it. The runs go in CI, not on a local machine.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, writeSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../src/bench/measures/bundles.ts";
 import { totalTurn } from "../src/bench/measures/routes.ts";
 import { measureQuality } from "../src/bench/quality.ts";
-import { inputGraph, SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
+import { graphInput, inputGraph, inputId, SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
 import { follow } from "../src/highways/follow.ts";
 import { SEARCH_DEFAULTS, searchRun, type SearchOptions, type SearchStep } from "../src/highways/search/index.ts";
 import type { Graph, Route } from "../src/model.ts";
-import { envOf, measureIsolated } from "./gates/paired.ts";
+import { envOf, measureIsolated, runChild } from "./gates/paired.ts";
 import { pairedTable } from "./gates/time-gate.ts";
 
 const opt = (name: string): string | undefined => {
@@ -167,17 +173,40 @@ interface InputRecord {
   readonly env?: ReturnType<typeof envOf>;
 }
 
-const inputs: { id: string; family: string; graph: Graph }[] = [];
 const set = SCREEN_SETS[setId];
 if (!set) throw new Error(`There is no screen set "${setId}".`);
-for (const input of screenInputs(set)) inputs.push({ id: input.id, family: input.family, graph: inputGraph(input) });
-if (dense.length > 0) {
+/** This function reads the dense board of `--fixture`. */
+function denseBoard(): Graph {
   const bytes = readFileSync(fixture);
-  const doc = JSON.parse((fixture.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8")) as { graph: Graph };
-  for (const size of dense) inputs.push({ id: `dense/${size}`, family: "dense", graph: window(doc.graph, size) });
+  return (JSON.parse((fixture.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8")) as { graph: Graph }).graph;
+}
+const VARIANTS = variants(opt("--variants") ?? DEFAULT_VARIANTS);
+
+/** This function gives the graph of one input by its id. It makes only that graph, with the same steps as `screenInputs` and the windows of the dense board. */
+function inputOf(id: string): Graph {
+  if (id.startsWith("dense/")) return window(denseBoard(), Number(id.slice("dense/".length)));
+  for (const f of set!.families)
+    for (let k = 0; k < f.seeds; k++)
+      if (inputId(set!.id, f.name, k) === id) return inputGraph(graphInput(f.make(k), { id, set: set!.id, family: f.name, seed: k, generator: f.generator(k), cell: f.cell }));
+  throw new Error(`The set ${setId} has no input "${id}".`);
 }
 
-const VARIANTS = variants(opt("--variants") ?? DEFAULT_VARIANTS);
+// A child of Part 3 in mode fresh (BENCH-FRESH-CASES). It times one variant on one input, and then it stops. The write to the file descriptor 1 ends before the exit.
+const timeChild = opt("--time-child");
+if (timeChild !== undefined) {
+  const variant = VARIANTS.find((v) => v.name === timeChild);
+  if (variant === undefined) throw new Error(`There is no variant "${timeChild}".`);
+  runChild(inputOf, (graph) => searchRun({ graph }, { ...variant.options, seed: 1 }), { write: (line) => writeSync(1, line + "\n") });
+  process.exit(0);
+}
+
+const inputs: { id: string; family: string; graph: Graph }[] = [];
+for (const input of screenInputs(set)) inputs.push({ id: input.id, family: input.family, graph: inputGraph(input) });
+if (dense.length > 0) {
+  const board = denseBoard();
+  for (const size of dense) inputs.push({ id: `dense/${size}`, family: "dense", graph: window(board, size) });
+}
+
 const byVariant = new Map<string, InputRecord[]>(VARIANTS.map((v) => [v.name, []]));
 const lines: string[] = [];
 for (const { id, family, graph } of inputs) {
@@ -295,12 +324,15 @@ for (const v of VARIANTS) {
   const ms = quantile(byVariant.get(v.name)!.flatMap((r) => r.runs.map((x) => x.ms)), 0.5);
   report.push(`| ${v.name} | ${f(ms, 1)} |`);
 }
-// Part 3: the variants in turn on each input, in this process, with the A/A arm of the default (MEASURE-ISOLATE).
+// Part 3: the variants on each input, with the A/A arm of the default (MEASURE-ISOLATE). Each variant, each input and each round gets its own fresh process.
 if (timeRepeats > 0 && VARIANTS.length > 1) {
-  const timed = inputs.filter((i) => i.graph.edges.length > 0).map((i) => ({ id: i.id, group: i.family, value: i.graph }));
-  const arms = VARIANTS.map((v) => ({ id: v.name, run: (graph: Graph) => searchRun({ graph }, { ...v.options, seed: 1 }) }));
-  const paired = measureIsolated({ arms, inputs: timed, repeats: timeRepeats, warmup: 1, mode: "process" });
+  // Each child gets the options of this run, so it makes the same graph and the same variant. The A/A arm copies the command of the default.
+  const timed = inputs.filter((i) => i.graph.edges.length > 0).map((i) => ({ id: i.id, group: i.family }));
+  const script = fileURLToPath(import.meta.url);
+  const arms = VARIANTS.map((v) => ({ id: v.name, command: [process.execPath, ...process.execArgv, script, ...process.argv.slice(2), "--time-child", v.name] }));
+  const paired = await measureIsolated({ arms, inputs: timed, repeats: timeRepeats, warmup: 1, mode: "fresh" });
   if (pairedOut) writeFileSync(pairedOut, JSON.stringify(paired) + "\n");
-  report.push("", "### Part 3: the time of each variant against the default", "", "Each timed run is `searchRun` with the seed 1 and no measure of the plans.", "", ...pairedTable(paired));
+  const how = "Each variant, each input and each round has its own fresh process.";
+  report.push("", "### Part 3: the time of each variant against the default", "", `Each timed run is \`searchRun\` with the seed 1 and no measure of the plans. ${how}`, "", ...pairedTable(paired));
 }
 console.log(report.join("\n"));
