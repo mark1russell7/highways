@@ -9,7 +9,7 @@ const five = (r: () => PairedReport): PairedReport[] => Array.from({ length: 5 }
 // The A/A factor of each input: the second run of the base on the input takes this factor of the first run.
 // The noise floor p10 to p90 is from 0.918 to 1.082, and the A/A q0.95 is 1.091. So both checks are valid.
 const AA = [0.9, 0.94, 0.98, 1.02, 1.06, 1.1, 0.96, 1.04, 0.92, 1.08];
-// Noisy A/A factors: the p90 is 1.51, and 1.51 times 1.1 is above the limit 1.5. So the median check cannot decide.
+// Noisy A/A factors: the p90 is 1.51, above the limit 1.5. So the median check cannot decide.
 const NOISY = [0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 0.7, 0.9, 1.3, 1.5];
 const IDS = AA.map((_, i) => `in${i}`);
 
@@ -54,12 +54,14 @@ describe("pairedTimeTest", () => {
     ]);
     expect(t.checks[0]!.aa).toBeCloseTo(1.082);
     expect(t.checks[1]!.aa).toBeCloseTo(1.091);
+    // The 5 jobs have the same A/A values, so the spread of the A/A values is 0.
+    expect(t.checks[0]!.aaSpread).toBeCloseTo(0);
     expect(t.status).toBe("pass");
     expect(t.faster).toBe(false);
     expect(timeText(t, 0.95)).toMatch(/: pass\.$/);
   });
 
-  it("cannot decide when the A/A p90 times 1.1 is not below the limit, and then it does not pass", () => {
+  it("cannot decide when the A/A p90 plus its spread is not below the limit, and then it does not pass", () => {
     const t = pairedTimeTest(five(() => report(1.03, NOISY)), "base", "cand", undefined, LIMITS);
     const median = t.checks[0]!;
     expect(median.valid).toBe(false);
@@ -91,7 +93,7 @@ describe("pairedTimeTest", () => {
     expect(timeText(t, 0.95)).toContain("pass, and faster than the baseline");
   });
 
-  it("takes the worst median and the worst tail over the jobs, and cannot decide on a spread of the tails above 0.1", () => {
+  it("takes the worst median and the worst tail over the jobs, so each job must pass", () => {
     const steady = pairedTimeTest([0.5, 0.52, 0.53, 0.5, 0.54].map((f) => report(f)), "base", "cand", undefined, LIMITS);
     expect(steady.jobs).toBe(5);
     expect(steady.median).toBeCloseTo(0.54);
@@ -99,15 +101,39 @@ describe("pairedTimeTest", () => {
     expect(steady.medians.map((m) => Number(m.toFixed(2)))).toEqual([0.5, 0.52, 0.53, 0.5, 0.54]);
     expect(steady.tails.map((m) => Number(m!.toFixed(2)))).toEqual([0.5, 0.52, 0.53, 0.5, 0.54]);
     expect(steady.cpus).toEqual(Array(5).fill("Test CPU"));
-    // The spread is the largest tail over the smallest tail, minus 1: 0.54 / 0.5 - 1 = 0.08.
-    expect(steady.checks[1]!.spread).toBeCloseTo(0.08);
     expect(steady.status).toBe("pass");
     expect(timeText(steady, 0.95)).toContain("over 5 jobs of 5 and 10 inputs");
-    const spread = pairedTimeTest([0.5, 0.5, 0.5, 0.5, 0.7].map((f) => report(f)), "base", "cand", undefined, LIMITS);
-    expect(spread.checks[1]!.spread).toBeCloseTo(0.4);
-    expect(spread.checks[1]!.valid).toBe(false);
-    expect(spread.checks[1]!.why).toContain("spread");
-    expect(spread.status).toBe("noise");
+    // A candidate that passes in 4 jobs and not in the fifth fails. No tolerance on the spread of the jobs is necessary.
+    const one = pairedTimeTest([0.5, 0.5, 0.5, 0.5, 1.8].map((f) => report(f)), "base", "cand", undefined, LIMITS);
+    expect(one.median).toBeCloseTo(1.8);
+    expect(one.checks[0]!.verdict).toBe("fail");
+    expect(one.status).toBe("fail");
+  });
+
+  it("does not count a job whose A/A band does not contain 1, so the test cannot decide with 4 jobs of 5", () => {
+    // In the fifth job the second run of the base is faster on each input: the A/A band is 0.66 to 0.79, so that job measured the runner.
+    const slow = AA.map((x) => x * 0.73);
+    const t = pairedTimeTest([AA, AA, AA, AA, slow].map((aa) => report(1.03, aa)), "base", "cand", undefined, LIMITS);
+    expect(t.jobs).toBe(4);
+    expect(t.outside).toBe(1);
+    expect(t.checks[0]!.why).toBe("4 jobs of 5, 1 with an A/A band that does not contain 1");
+    expect(t.status).toBe("noise");
+    const none = pairedTimeTest(five(() => report(1.03, slow)), "base", "cand", undefined, LIMITS);
+    expect(none.status).toBe("void");
+    expect(none.reason).toContain("does not contain 1");
+  });
+
+  it("adds the spread of the A/A values of the jobs to the worst A/A value, with no margin factor", () => {
+    // 4 jobs have the A/A band 0.918 to 1.082. One job has a band 3.7 times as wide around 1, from 0.697 to 1.303. It contains 1, so the job counts.
+    // The worst A/A p90 1.303 is below the limit 1.5, but 1.303 plus the spread 0.221 is above it. So the median check cannot decide.
+    const wide = AA.map((x) => 1 + (x - 1) * 3.7);
+    const t = pairedTimeTest([AA, AA, AA, AA, wide].map((aa) => report(1.03, aa)), "base", "cand", undefined, LIMITS);
+    const median = t.checks[0]!;
+    expect(median.aa).toBeCloseTo(1.303);
+    expect(median.aaSpread).toBeCloseTo(0.221);
+    expect(median.valid).toBe(false);
+    expect(median.why).toContain("plus its spread 0.221");
+    expect(t.status).toBe("noise");
   });
 
   it("fails a tail above its limit when the median passes", () => {

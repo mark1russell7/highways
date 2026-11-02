@@ -270,6 +270,7 @@ function winText(name: string, t: WinTest, all: number): string {
   lines.push(`- ${timeText(t.time, P.timeTailQ)}`);
   // The record keeps the CPU model of each job of the time test (MEASURE-ISOLATE).
   if (t.time.cpus.length > 0) lines.push(`- The CPU model of each job of the time test: ${t.time.cpus.map((cpu, i) => `job ${i + 1}: ${cpu}`).join(", ")}.`);
+  if (timeRun !== undefined) lines.push(`- The run of the jobs of the time test: ${timeRun}.`);
   lines.push("", "| Guard | Inputs | Median ratio | Tail share | Result |", "|---|---|---|---|---|");
   // A guard with no value in the records, for example a curve measure of a step without curves, has no row.
   for (const g of t.guards.filter((x) => x.n > 0)) lines.push(`| \`${g.key}\` | ${g.n} | ${fmt(g.median)} | ${fmt(g.tail, 2)} | ${yes(g.pass)} |`);
@@ -314,7 +315,9 @@ const timeReports = (opt("--time") ?? "")
 if (opt("--time") !== undefined && timeReports.length === 0) throw new Error(`The files of --time (${opt("--time")}) give no paired time report.`);
 
 const out: string[] = [`# The promotion test of \`${candidate}\` against \`${baseline}\` (step \`${step}\`)`, ""];
-const json: Record<string, unknown> = { candidate, baseline, step, sets: [] };
+// The record names the CI run of the jobs of the time test, so each limit has its runs next to it (STRATEGY.md 2026-11-02).
+const timeRun = process.env["GITHUB_RUN_ID"] === undefined ? undefined : `${process.env["GITHUB_SERVER_URL"] ?? "https://github.com"}/${process.env["GITHUB_REPOSITORY"] ?? ""}/actions/runs/${process.env["GITHUB_RUN_ID"]}`;
+const json: Record<string, unknown> = { candidate, baseline, step, ...(timeRun === undefined ? {} : { timeRun }), sets: [] };
 for (const s of sets) {
   const ps = pairs(s.records);
   const ex = ps.filter((p) => p.exercised);
