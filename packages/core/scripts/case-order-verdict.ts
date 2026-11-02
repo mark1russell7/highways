@@ -112,7 +112,8 @@ export function casePlan(target: CaseTarget, paths: PlanPaths): CasePlan {
     };
   }
   if (target === "levels") {
-    const run = (fixtures: string, dir: string): string[] => [...node, script("levels.ts"), "--fixture", fixtures, "--repeat", "3", "--paired", at(dir, "paired.json")];
+    // The script `levels.ts` uses mode fresh by default (BENCH-FRESH-CASES). This run needs mode process: its cases come in turn in one process.
+    const run = (fixtures: string, dir: string): string[] => [...node, script("levels.ts"), "--fixture", fixtures, "--repeat", "3", "--paired", at(dir, "paired.json"), "--paired-mode", "process"];
     return {
       target,
       inOrder: (dir) => run(LEVELS_FIXTURES.join(","), dir),
@@ -123,7 +124,8 @@ export function casePlan(target: CaseTarget, paths: PlanPaths): CasePlan {
       describe: `\`scripts/levels.ts\` on the fixtures \`${LEVELS_FIXTURES.join(",")}\`, 3 rounds. The route of each fixture comes first, then the level links of each fixture`,
     };
   }
-  const run = (dir: string): string[] => [...node, script("remeasure.ts"), "--claim", "portfolio-speed", "--job", "1", "--out", dir];
+  // The remeasure uses mode fresh by default (BENCH-FRESH-CASES). This run needs mode process: its cases come in turn in one process.
+  const run = (dir: string): string[] => [...node, script("remeasure.ts"), "--claim", "portfolio-speed", "--job", "1", "--out", dir, "--paired-mode", "process"];
   return {
     target,
     inOrder: (dir) => run(dir),
