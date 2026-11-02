@@ -51,7 +51,7 @@ The CPU of the runner is not the same in each cell, so compare the large changes
 | `sections` | `418dc3a` | 2 550 | 2 328 | 116 | 680 | 8 487 | Xeon 8573C |
 
 - The rows come from the CI runs 40716219239 (`main`), 40716722637, 40717696580 and 40728475746 of the workflow `Scale`.
-- The cells of `portfolio` ran on the same CPU. A route falls from 299.9 s to 27.7 s, 10.8 times faster.
+- The cells of `portfolio` ran on the same CPU. A route falls from 299.9 s to 27.7 s, 10.8 times faster. The remeasure below gives 0.091 to 0.092 on that CPU model.
 - On this board, `portfolio` runs only its base member `shared`. The key of the pick takes approximately 340 ms.
 - On `main`, the joint bench needed 27 min for the cell of `shared-all`. On the head, one route takes 36 s.
 
@@ -73,15 +73,18 @@ The profile of a route of `shared`, by self time:
 The times above are from separate jobs, so their speed claim was void. The workflow `Remeasure` (run 41382862417) timed 0.8.0 and the workspace in one job, with an A/A arm.
 Each of the 5 jobs runs each arm in a fresh process in each round. The [record](verdicts/remeasure/route-scale.json) keeps each job.
 
-| Router | Claim | Ratio in the 5 jobs | 0.8.0 | Workspace | Verdict |
-|---|---:|---|---:|---:|---|
-| `shared` | 0.070 | 0.083 to 0.105 | 297.1 s | 26.5 s | The gain is smaller than the claim. |
-| `shared-all` | 0.100 | 0.029 to 0.037 | 1443.2 s | 50.4 s | The claim holds. |
-| `portfolio` | 0.093 | 0.084 to 0.108 | 297.3 s | 27.1 s | The gain is smaller than the claim. |
+The ratio is the time of the workspace over the time of 0.8.0. The interval is over the 4 jobs that count, and the columns give each CPU model.
 
-- The ratio follows the CPU model. The 3 jobs on EPYC 7763 give 0.089 to 0.092 for `shared` and `portfolio`. The job on EPYC 9V74 gives 0.105 and 0.108.
-- The A/A band of job 4 is 1.001 to 1.009. It does not contain 1, so job 4 does not count. Without job 4, no verdict changes.
-- The claim of `shared-all` holds in the 4 jobs that count. A fifth job that counts is not run yet.
+| Router | Old claim | Interval | EPYC 7763, 3 jobs | EPYC 9V74, 1 job | 0.8.0 | Workspace | Verdict |
+|---|---:|---|---|---:|---:|---:|---|
+| `shared` | 0.070 | 0.089 to 0.105 | 0.089 to 0.090 | 0.105 | 297.1 s | 26.5 s | The gain is smaller than the old claim. |
+| `shared-all` | 0.100 | 0.035 to 0.037 | 0.035 to 0.036 | 0.037 | 1443.2 s | 50.4 s | The claim holds. |
+| `portfolio` | 0.093 | 0.091 to 0.108 | 0.091 to 0.092 | 0.108 | 297.3 s | 27.1 s | The gain is smaller than the old claim. |
+
+- The interval is the claim. The spread of a ratio is between the CPU models, not inside a job.
+- The A/A band of job 4 (EPYC 9V45) is 1.001 to 1.009. It does not contain 1, so job 4 does not count. Its ratios are 0.083, 0.029 and 0.084.
+- The claim of `shared-all` holds in the 4 jobs that count. A fifth job does not change it: its worst job, 0.037, is far below the limit 0.067 of 15 times.
+- The CPU models of the users are not known. A future limit on these measures has one value for each CPU model.
 
 ### The output does not change
 
@@ -118,3 +121,25 @@ These hot spots stay. Each fix is larger than this item, and each fix must keep 
 | `indexOf` of `segments.ts` | approximately 5% | `orderLanes` looks for the run in each route with a scan, and again in the reverse. | Give `orderLanes` the place of the run in each route, from the walk of `shared`. |
 | `distancesTo` of `bench/exact/index.ts` | approximately 25% of the self time of the steps of `shared`, before the guide cache | Each end point gets one search to all its partners. The guide goes to the nearest partner, so the search opens most of the network. | Use a guide with landmarks (ALT) for a tighter bound. Two paths of the same length can give other last digits, so compare the bits of each distance. |
 | `measureQuality` | approximately 3 s on `shared` | The grid query of each segment walks many cells on a dense board. | Measure the profile of the grid query first. |
+
+## The tree of sections at 10 000 nodes (H3)
+
+H3 made each router faster at 10 000 nodes with a profile fix. Its old claim, 2 to 2.5 times faster, came from separate jobs.
+The workflow `Remeasure` (run 41369331158) timed the core before `fa1dd82` and the workspace in one job, with an A/A arm. Each of the 5 jobs runs each arm in a fresh process in each round.
+The board is the fixture `large-clustered` of 10 000 nodes. The [record](verdicts/remeasure/h3.json) keeps each job. The A/A band of each job contains 1, so each job counts.
+
+The ratio is the time of the workspace over the old time. The columns give each CPU model.
+
+| Router | Interval | Xeon 6973P-C, 2 jobs | Xeon 8573C, 1 job | EPYC 9V45, 2 jobs | Verdict |
+|---|---|---|---:|---|---|
+| `corners` | 0.339 to 0.471 | 0.380 to 0.390 | 0.460 | 0.339 to 0.471 | The claim holds. |
+| `corners-smooth` | 0.370 to 0.502 | 0.389 to 0.475 | 0.468 | 0.370 to 0.502 | The gain is smaller than the claim. |
+| `trunks` | 0.382 to 0.506 | 0.382 to 0.423 | 0.449 | 0.400 to 0.506 | The gain is smaller than the claim. |
+| `shared` | 0.335 to 0.435 | 0.359 to 0.361 | 0.381 | 0.335 to 0.435 | The claim holds. |
+| `shared-all` | 0.170 to 0.231 | 0.188 | 0.200 | 0.170 to 0.231 | The claim holds. |
+| `sections` | 1.147 to 1.332 | 1.173 to 1.243 | 1.290 | 1.147 to 1.332 | The workspace is slower. |
+| `sections-tree` | 2.667 to 3.211 | 2.671 to 2.744 | 2.667 | 2.828 to 3.211 | The workspace is slower. |
+
+- The old arm is the core before `fa1dd82`. So the ratio also contains each change after `fa1dd82`.
+- On this board, the 2 jobs on EPYC 9V45 differ more than the CPU models. So the CPU model does not explain all of the spread here.
+- The open item SECTIONS-SLOW finds the change that makes `sections` and `sections-tree` slower.
