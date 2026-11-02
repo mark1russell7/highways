@@ -300,6 +300,24 @@ This file does not copy the floors of the other projects:
 - The floor and the tolerance of each `pack.*` measure are in `MEASURE_SPECS` of `@mark1russell7/packing`, from version 0.1.7. Their reasons are in the section "The floors of the guards" of `docs/MEASURES.md` of `packing`.
 - The floor and the tolerance of each `joint.*` measure are in `JOINT_MEASURES` of `@mark1russell7/layout-contract`. Its table is in `docs/JOINT-MEASURES.md`.
 
+## The sections time gate
+
+The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pull request when `sections-tree` gets slower at 10 000 nodes (GATE-LIMITS slice 1). It starts on each pull request that changes `packages/core/src`.
+
+- One job times four arms in turn: the parent of the pull request, the head, the A/A copy of the parent and the fixed base. Each route has its own fresh process.
+- Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`. Each arm has 10 rounds.
+- The A/A spread of the job is p90 of |r - 1| over the A/A ratios of its rounds. A ratio is a median time over the median time of the parent.
+
+| Check | Fails when | Value | Reason |
+|---|---|---|---|
+| Against the parent | the ratio head/parent is above 1 + max(0.05, the A/A spread) | 0.05 | A step of 5 % or more is a real cost at 10 000 nodes. A step that the A/A spread of the job covers is noise, so the band of the job replaces 0.05 when it is wider. |
+| Against the fixed base | the ratio head/fixed base is above 1.10 | 1.10 | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
+
+- The strategist gave these first values on 2026-11-02. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
+- The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`, with its date and its reason. The first fixed base is the head of `main` when the gate merges.
+- Move the fixed base only in a commit that tells the reason. An example is a feature that costs time on purpose.
+- A check with no time does not pass, so the gate fails (FAIL-CLOSED).
+
 <!-- shared:order-of-promotions -->
 ## The order of promotions
 

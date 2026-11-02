@@ -1,0 +1,6 @@
+{
+  "schema": "sections-gate-base/1",
+  "commit": "bce22a5590ec8dd49d92b84f1e056cc1ca02b800",
+  "date": "2026-11-02",
+  "reason": "The first fixed base: the head of main when the gate merges (GATE-LIMITS slice 1). The sections routers have the SECTIONS-SLOW drift at this commit, and the gate keeps them from a larger one."
+}
