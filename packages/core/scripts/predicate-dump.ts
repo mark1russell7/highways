@@ -13,11 +13,15 @@
 //   Its line: `{"case","fn","via","a","b","box":{x,y,w,h},"eps","floatAnswer","n"}`. The function `geom.segmentHitsRect` gives `"rect":[x0,y0,x1,y1]` in place of `box`.
 // - A test of the nearest centre is near when the two nearest centres have distances within 1e-9 * scale of each other.
 //   Its line: `{"case","fn","via","p","c1","c2","i1","i2","floatAnswer","n"}`.
-// - The total line: `{"case","totalSegmentPairs","totalBoxTests","totalNearestTests","nearSegmentPairs","nearSharedEnd",`
-//   `"nearBoxTests","nearNearestTests","lines","tests","near"}`. A board with a step that threw also gets `errors`.
+// - A side test of the point `p` against the line through `a` and `b` is near when |orient(a, b, p)| <= 1e-9 * scale^2.
+//   The scale is the largest |coordinate| of the 3 points. Its line: `{"case","fn","via","p","a","b","floatAnswer","n"}`.
+//   The answer is the sign or the boolean that the code uses. A test with a second condition, for a dot product, gives only the side part.
+// - The total line: `{"case","totalSegmentPairs","totalBoxTests","totalNearestTests","totalPointSideTests","nearSegmentPairs","nearSharedEnd",`
+//   `"nearBoxTests","nearNearestTests","nearPointSideTests","lines","tests","near"}`. A board with a step that threw also gets `errors`.
 //   The field `tests` gives the count of each `fn`, and `near` gives the near count of each `fn`.
 // The script writes each near input one time for each board. The field `n` counts the repeats of the line on the board.
 // The field `via` is the file and the line of the caller of the predicate, at the first test of the line.
+// A side test in the body of a function gives the caller of that function as `via`.
 // A board with more than `--max-lines` lines (default 200 000) gets no more new lines. Its counts continue, and its total line gets `"truncated": true`.
 import { closeSync, mkdirSync, openSync, readFileSync, realpathSync, writeFileSync, writeSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -67,6 +71,12 @@ export function crossIsNear(a: Point, b: Point, c: Point, d: Point): boolean {
   const s = Math.max(Math.abs(a.x), Math.abs(a.y), Math.abs(b.x), Math.abs(b.y), Math.abs(c.x), Math.abs(c.y), Math.abs(d.x), Math.abs(d.y));
   const tol = ORIENT_NEAR * s * s;
   return Math.abs(orient(c, d, a)) <= tol || Math.abs(orient(c, d, b)) <= tol || Math.abs(orient(a, b, c)) <= tol || Math.abs(orient(a, b, d)) <= tol;
+}
+
+/** This function tells if a side test of the point `p` against the line through `a` and `b` is near: its orientation is near 0. */
+export function sideIsNear(p: Point, a: Point, b: Point): boolean {
+  const s = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(a.x), Math.abs(a.y), Math.abs(b.x), Math.abs(b.y));
+  return Math.abs(orient(a, b, p)) <= ORIENT_NEAR * s * s;
 }
 
 /**
@@ -179,6 +189,8 @@ interface BoardCounts {
   nearShared: number;
   nearBoxes: number;
   nearNearest: number;
+  sides: number;
+  nearSides: number;
   readonly tests: Map<string, number>;
   readonly near: Map<string, number>;
 }
@@ -205,7 +217,7 @@ export class PredicateRecorder implements PredicateSink {
   }
 
   private static empty(): BoardCounts {
-    return { pairs: 0, boxes: 0, nearest: 0, nearPairs: 0, nearShared: 0, nearBoxes: 0, nearNearest: 0, tests: new Map(), near: new Map() };
+    return { pairs: 0, boxes: 0, nearest: 0, nearPairs: 0, nearShared: 0, nearBoxes: 0, nearNearest: 0, sides: 0, nearSides: 0, tests: new Map(), near: new Map() };
   }
 
   /** This function starts the board `name`. It clears the counts and the lines of the board before it. */
@@ -275,6 +287,16 @@ export class PredicateRecorder implements PredicateSink {
     this.keep(`${fn}|${p.x},${p.y},${c1.x},${c1.y},${c2.x},${c2.y}|${two.i1},${two.i2}|${answer}`, () => ({ fn, p: xy(p), c1: xy(c1), c2: xy(c2), i1: two.i1, i2: two.i2, floatAnswer: answer }));
   }
 
+  /** This function records one side test of a point against a line. */
+  side(fn: string, p: Point, a: Point, b: Point, answer: boolean | number): void {
+    this.counts.sides++;
+    add(this.counts.tests, fn);
+    if (!sideIsNear(p, a, b)) return;
+    this.counts.nearSides++;
+    add(this.counts.near, fn);
+    this.keep(`${fn}|${p.x},${p.y},${a.x},${a.y},${b.x},${b.y}|${answer}`, () => ({ fn, p: xy(p), a: xy(a), b: xy(b), floatAnswer: answer }));
+  }
+
   /** This function gives the near lines of the board, then its total line, as JSON objects. */
   end(): Record<string, unknown>[] {
     const c = this.counts;
@@ -283,10 +305,12 @@ export class PredicateRecorder implements PredicateSink {
       totalSegmentPairs: c.pairs,
       totalBoxTests: c.boxes,
       totalNearestTests: c.nearest,
+      totalPointSideTests: c.sides,
       nearSegmentPairs: c.nearPairs,
       nearSharedEnd: c.nearShared,
       nearBoxTests: c.nearBoxes,
       nearNearestTests: c.nearNearest,
+      nearPointSideTests: c.nearSides,
       lines: this.lines.size,
       tests: Object.fromEntries([...c.tests].sort(([x], [y]) => x.localeCompare(y))),
       near: Object.fromEntries([...c.near].sort(([x], [y]) => x.localeCompare(y))),
@@ -424,6 +448,7 @@ export function summaryText(set: string, totals: readonly Record<string, unknown
     `| segment pairs | ${sum("totalSegmentPairs")} | ${sum("nearSegmentPairs")} | ${sum("nearSharedEnd")} |`,
     `| box tests | ${sum("totalBoxTests")} | ${sum("nearBoxTests")} | |`,
     `| nearest centre | ${sum("totalNearestTests")} | ${sum("nearNearestTests")} | |`,
+    `| point-side tests | ${sum("totalPointSideTests")} | ${sum("nearPointSideTests")} | |`,
     `| lines | | ${sum("lines")} | |`,
     "",
     "| fn | tests | near |",

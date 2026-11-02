@@ -1,5 +1,6 @@
 import { center, dist, type Point } from "../../geom.ts";
 import type { Graph, Route } from "../../model.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import { boardUnit } from "./routes.ts";
 
 const EPS = 1e-9;
@@ -19,6 +20,7 @@ function cornersOf(points: readonly Point[]): Point[] {
       const c = q[i + 1]!;
       const cr = (v.x - a.x) * (c.y - v.y) - (v.y - a.y) * (c.x - v.x);
       const dt = (v.x - a.x) * (c.x - v.x) + (v.y - a.y) * (c.y - v.y);
+      if (predicateSink !== null) predicateSink.side("symmetry.cornersOf", v, a, c, Math.abs(cr) <= EPS * Math.max(1, dist(a, v) * dist(v, c)));
       if (Math.abs(cr) <= EPS * Math.max(1, dist(a, v) * dist(v, c)) && dt > 0) continue;
     }
     out.push(v);

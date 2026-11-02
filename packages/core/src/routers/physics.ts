@@ -1,6 +1,7 @@
 import { inflate, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import { nodeIndex, type Graph, type Node, type Result, type Route } from "../model.ts";
+import { predicateSink } from "../predicate-sink.ts";
 import { cornersRouter } from "./corners.ts";
 
 /** The options of the relaxation of the routes (PHYSICAL): the forces on the points of each route. */
@@ -91,6 +92,8 @@ function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number
   let q = p;
   const dx = a && b ? b.x - a.x : 0;
   const dy = a && b ? b.y - a.y : 0;
+  // The end of the chord for the predicate sink. The loop below has its own name `b`.
+  const end = b;
   const len = Math.sqrt(sq(dx, dy));
   for (let pass = 0; pass < 4; pass++) {
     let hit: Box | undefined;
@@ -104,6 +107,7 @@ function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number
       // The center of the box is at the left of the chord when the cross product is positive. Then the point goes to the right.
       const cross = dx * (b.y + b.h / 2 - a.y) - dy * (b.x + b.w / 2 - a.x);
       const k = cross > 0 ? 1 : -1;
+      if (predicateSink !== null && end) predicateSink.side("physics.outOf", { x: b.x + b.w / 2, y: b.y + b.h / 2 }, a, end, k);
       const mx = (k * dy) / len;
       const my = (-k * dx) / len;
       const tx = mx > 1e-12 ? (b.x + b.w + pad - q.x) / mx : mx < -1e-12 ? (b.x - pad - q.x) / mx : Infinity;

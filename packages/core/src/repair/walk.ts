@@ -3,6 +3,7 @@ import { dist, inflate, segmentHitsBox, type Box, type Point } from "../geom.ts"
 import type { Grid } from "../grid.ts";
 import type { Node } from "../model.ts";
 import { nearestSide } from "../plugs.ts";
+import { predicateSink } from "../predicate-sink.ts";
 
 /** The sides of a box, as the indexes of two corners: north, east, south and west. */
 const SIDES: readonly (readonly [number, number])[] = [
@@ -42,6 +43,7 @@ function straighten(p: readonly Point[]): Point[] {
       const b = out[out.length - 1]!;
       const cross = (b.x - a.x) * (v.y - b.y) - (b.y - a.y) * (v.x - b.x);
       const dot = (b.x - a.x) * (v.x - b.x) + (b.y - a.y) * (v.y - b.y);
+      if (predicateSink !== null) predicateSink.side("walk.straighten", b, a, v, !(Math.abs(cross) > EPS));
       if (Math.abs(cross) > EPS || dot < 0) break;
       out.pop();
     }

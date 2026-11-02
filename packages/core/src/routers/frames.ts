@@ -1,6 +1,7 @@
 import { center, dist, type Box, type Point } from "../geom.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type InnerEdge, type Node, type Route } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
+import { predicateSink } from "../predicate-sink.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { gutterRoutes, type GutterEdge } from "./gutter.ts";
 
@@ -128,6 +129,7 @@ function gutterFrameRoutes(inner: readonly InnerEdge[], options: FrameOptions, b
 function stub(plug: Point, way: Point[]): Point[] {
   const [a, b] = way;
   if (!a || dist(a, plug) === 0) return way;
+  if (b && predicateSink !== null) predicateSink.side("frames.stub", a, plug, b, Math.abs((a.x - plug.x) * (b.y - plug.y) - (a.y - plug.y) * (b.x - plug.x)) < 1e-9);
   if (b && Math.abs((a.x - plug.x) * (b.y - plug.y) - (a.y - plug.y) * (b.x - plug.x)) < 1e-9 && (a.x - plug.x) * (b.x - a.x) + (a.y - plug.y) * (b.y - a.y) > 0)
     return [plug, ...way.slice(1)];
   return [plug, ...way];

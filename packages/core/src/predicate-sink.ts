@@ -15,6 +15,11 @@ export interface PredicateSink {
   box(fn: string, a: Point, b: Point, x0: number, y0: number, x1: number, y1: number, eps: number, answer: boolean, box?: { readonly x: number; readonly y: number; readonly w: number; readonly h: number }): void;
   /** This function gets one test of the nearest centre of `p`, and the index `answer` that the predicate `fn` gives. */
   nearest(fn: string, p: Point, centres: readonly Point[], answer: number): void;
+  /**
+   * This function gets one side test of the point `p` against the line through `a` and `b`.
+   * The answer is the value that the code of `fn` uses: a sign, or a boolean.
+   */
+  side(fn: string, p: Point, a: Point, b: Point, answer: boolean | number): void;
 }
 
 /** The sink of the predicates. The value `null` turns the hooks off. Only `setPredicateSink` changes it. */

@@ -4,7 +4,7 @@ import { nearestCentre } from "../src/highways/territories/index.ts";
 import type { Graph } from "../src/model.ts";
 import { predicateSink } from "../src/predicate-sink.ts";
 import { graphInput, type LayoutInput } from "../src/bench/screen/index.ts";
-import { boxIsNear, clipLength, crossIsNear, dumpBoards, PredicateRecorder, screenBoard, segmentDepth, summaryText } from "./predicate-dump.ts";
+import { boxIsNear, clipLength, crossIsNear, dumpBoards, PredicateRecorder, screenBoard, segmentDepth, sideIsNear, summaryText } from "./predicate-dump.ts";
 
 // Made-up tiny boards only. The predicates of the tests take made-up points.
 const P = (x: number, y: number): { x: number; y: number } => ({ x, y });
@@ -83,10 +83,12 @@ describe("predicate dump", () => {
         totalSegmentPairs: 1,
         totalBoxTests: 0,
         totalNearestTests: 0,
+        totalPointSideTests: 0,
         nearSegmentPairs: 0,
         nearSharedEnd: 0,
         nearBoxTests: 0,
         nearNearestTests: 0,
+        nearPointSideTests: 0,
         lines: 0,
         tests: { "geom.segmentsCross": 1 },
         near: {},
@@ -126,6 +128,32 @@ describe("predicate dump", () => {
     expect(lines[1]).toMatchObject({ totalNearestTests: 2, nearNearestTests: 1 });
   });
 
+  it("writes a point exactly on a line as a near side line", () => {
+    const lines = dumpOne(() => predicateSink!.side("test.side", P(1, 1), P(0, 0), P(2, 2), true));
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatchObject({ case: "test/board", fn: "test.side", p: [1, 1], a: [0, 0], b: [2, 2], floatAnswer: true, n: 1 });
+    expect(String(lines[0]!["via"])).toMatch(/predicate-dump\.test\.ts:\d+$/);
+    expect(lines[1]).toMatchObject({ totalPointSideTests: 1, nearPointSideTests: 1, totalSegmentPairs: 0, lines: 1, tests: { "test.side": 1 } });
+  });
+
+  it("finds a point near a line at a large scale, with a sign as the answer", () => {
+    const s = 1e8;
+    // The point p is 1e-7 off the line of a b, far below 1e-9 * scale^2.
+    expect(sideIsNear(P(s + 1, s + 1 + 1e-7), P(s, s), P(s + 2, s + 2))).toBe(true);
+    expect(sideIsNear(P(1, 1.5), P(0, 0), P(2, 2))).toBe(false);
+    const lines = dumpOne(() => {
+      for (let i = 0; i < 2; i++) predicateSink!.side("test.side", P(s + 1, s + 1 + 1e-7), P(s, s), P(s + 2, s + 2), -1);
+    });
+    expect(lines[0]).toMatchObject({ fn: "test.side", p: [s + 1, s + 1 + 1e-7], floatAnswer: -1, n: 2 });
+    expect(lines[1]).toMatchObject({ totalPointSideTests: 2, nearPointSideTests: 2, lines: 1 });
+  });
+
+  it("counts a far point and writes only the total line", () => {
+    const lines = dumpOne(() => predicateSink!.side("test.side", P(1, 5), P(0, 0), P(10, 0), 1));
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ totalPointSideTests: 1, nearPointSideTests: 0, lines: 0, tests: { "test.side": 1 }, near: {} });
+  });
+
   it("starts no more boards after stop gives true", () => {
     const boards = ["test/one", "test/two", "test/three"].map((id) => ({ id, set: "test", family: "board", seed: 0 }) as LayoutInput);
     const out: Record<string, unknown>[] = [];
@@ -141,6 +169,7 @@ describe("predicate dump", () => {
     expect(text).toContain("2 of 3 boards");
     expect(text).toContain("| segment pairs | 2 | 1 | 0 |");
     expect(text).toContain("| geom.segmentsCross | 2 | 1 |");
+    expect(text).toContain("| point-side tests | 0 | 0 | |");
     expect(text).toContain("Boards with truncated lines: test/board.");
   });
 
@@ -180,5 +209,29 @@ describe("predicate dump", () => {
     // The opt-in router `annealing` has its own copy of the crossing test.
     expect(Object.keys(total["tests"] as object)).toContain("annealing.properCross");
     expect(predicateSink).toBe(null);
+  }, 60_000);
+
+  it("counts the side tests of the step levels on the made-up board of 4 boxes", () => {
+    const graph: Graph = {
+      nodes: [
+        { id: "a", box: { x: 0, y: 0, w: 40, h: 20 } },
+        { id: "b", box: { x: 200, y: 0, w: 40, h: 20 } },
+        { id: "c", box: { x: 0, y: 200, w: 40, h: 20 } },
+        { id: "d", box: { x: 200, y: 200, w: 40, h: 20 } },
+      ],
+      edges: [
+        { id: "ad", source: { node: "a" }, target: { node: "d" } },
+        { id: "bc", source: { node: "b" }, target: { node: "c" } },
+        { id: "ab", source: { node: "a" }, target: { node: "b" } },
+      ],
+    };
+    const input = graphInput(graph, { id: "test/levels", set: "test", family: "levels", seed: 0, generator: null });
+    const out: Record<string, unknown>[] = [];
+    dumpBoards([input], (i) => screenBoard(i, ["levels"]), (lines) => out.push(...lines));
+    const total = out[out.length - 1]!;
+    expect(total["errors"]).toBeUndefined();
+    expect(Number(total["totalPointSideTests"])).toBeGreaterThan(0);
+    // The measure of the symmetry finds the corners of each route with a side test.
+    expect(Object.keys(total["tests"] as object)).toContain("symmetry.cornersOf");
   }, 60_000);
 });
