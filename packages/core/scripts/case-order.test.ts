@@ -51,6 +51,8 @@ describe("casePlan", () => {
     expect(io.slice(0, 2)).toEqual(["node", "/repo/packages/core/scripts/screen.ts"]);
     expect(io).toContain("--paired");
     expect(io[io.indexOf("--paired-base") + 1]).toBe("shared");
+    // The in-order arm keeps the old mode of the paired screen: each input after the other inputs in one process.
+    expect(io[io.indexOf("--paired-mode") + 1]).toBe("process");
     const alone = plan.alone("screen-v3/pipeline/s5", "/w/b");
     expect(alone.slice(0, 4)).toEqual(["node", "/repo/packages/core/scripts/case-order.ts", "--child", "screen"]);
     expect(alone[alone.indexOf("--input") + 1]).toBe("screen-v3/pipeline/s5");

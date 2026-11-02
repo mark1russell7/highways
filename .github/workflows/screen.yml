@@ -32,7 +32,7 @@ on:
         description: "The number of seeded edits of each highway strategy, for the stability of its highways. 0: no edits."
         default: "0"
       minutes:
-        description: "The time limit of the job, in minutes. With exact: the time limit of each shard."
+        description: "The time limit of the job, in minutes. With exact: the time limit of each shard. With paired: 60 or more."
         default: "15"
       set:
         description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
@@ -111,7 +111,8 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.match == 'true' && (!inputs.exact && !inputs.time && !inputs.report) }}
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
+    # A paired job starts a fresh process for each arm, each input and each round (BENCH-FRESH-CASES), so it gets 60 minutes or more.
+    timeout-minutes: ${{ fromJSON(inputs.paired && fromJSON(inputs.minutes || '15') < 60 && '60' || inputs.minutes || '15') }}
     strategy:
       fail-fast: false
       # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
@@ -161,8 +162,8 @@ jobs:
           [ "$SHUFFLES" != "0" ] && args+=(--shuffles "$SHUFFLES")
           [ "$EDITS" != "0" ] && args+=(--edits "$EDITS")
           [ -n "$ACTIVATION" ] && args+=(--activation "$ACTIVATION")
-          # The paired time runs the arms of the comparison in this job, in turn on each input (MEASURE-ISOLATE).
-          # Each job of a paired screen writes its own report, in mode process with the A/A arm.
+          # The paired time runs the arms of the comparison in this job (MEASURE-ISOLATE), one fresh process at a time.
+          # Each job of a paired screen writes its own report, in mode fresh with the A/A arm (BENCH-FRESH-CASES).
           [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired-job$JOB.json" --paired-base "$PAIRED")
           start=$SECONDS
           pnpm --filter @mark1russell7/highways screen "${args[@]}"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { measureIsolated, type PairedReport } from "./paired.ts";
+import { aaId, pairedReport, type Mode, type PairedReport, type RawTimes } from "./paired.ts";
 import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, timeText, type TimeLimits } from "./time-gate.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
@@ -14,35 +14,21 @@ const NOISY = [0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 0.7, 0.9, 1.3, 1.5];
 const IDS = AA.map((_, i) => `in${i}`);
 
 /**
- * This function gives the paired report of one job from a fake clock. No test reads the real time.
- * The cost gives the ms of the base, of the candidate and of the A/A arm on each input. The first run of the base on an input is the base arm, and the second run is the A/A arm.
+ * This function gives the paired report of one job from made-up times, with 1 round. No test reads the real time.
+ * The cost gives the ms of the base, of the candidate and of the A/A arm on each input. The mode is `fresh`, the mode of the time test (BENCH-FRESH-CASES).
  */
-function job(cost: (arm: "base" | "cand" | "aa", i: number) => number): PairedReport {
-  let t = 0;
-  const calls = new Map<number, number>();
-  return measureIsolated({
-    arms: [
-      {
-        id: "base",
-        run: (i: number) => {
-          const k = calls.get(i) ?? 0;
-          calls.set(i, k + 1);
-          t += cost(k === 0 ? "base" : "aa", i);
-        },
-      },
-      { id: "cand", run: (i: number) => (t += cost("cand", i)) },
-    ],
-    inputs: IDS.map((id, i) => ({ id, group: i < 5 ? "a" : "b", value: i })),
-    repeats: 1,
-    warmup: 0,
-    mode: "process",
-    clock: () => t,
-    env,
-  });
+function job(cost: (arm: "base" | "cand" | "aa", i: number) => number, mode: Mode = "fresh"): PairedReport {
+  const arms = [{ id: "base" }, { id: "cand" }, { id: aaId("base") }];
+  const raw: RawTimes = {
+    ms: new Map(IDS.map((id, i) => [id, new Map([["base", [cost("base", i)]], ["cand", [cost("cand", i)]], [aaId("base"), [cost("aa", i)]]])])),
+    peak: new Map(IDS.map((id) => [id, new Map<string, number>()])),
+  };
+  return pairedReport(mode, env, undefined, arms, IDS.map((id, i) => ({ id, group: i < 5 ? "a" : "b" })), raw);
 }
 
 /** This function gives a job where the candidate takes `factor` times the base on each input, with the A/A factors `aa`. */
-const report = (factor: number, aa: readonly number[] = AA, baseMs = 10): PairedReport => job((arm, i) => (arm === "base" ? baseMs : arm === "aa" ? baseMs * aa[i]! : baseMs * factor));
+const report = (factor: number, aa: readonly number[] = AA, baseMs = 10, mode: Mode = "fresh"): PairedReport =>
+  job((arm, i) => (arm === "base" ? baseMs : arm === "aa" ? baseMs * aa[i]! : baseMs * factor), mode);
 
 describe("pairedTimeTest", () => {
   it("passes a ratio inside the noise floor, and does not count it as a speed gain", () => {
@@ -89,7 +75,7 @@ describe("pairedTimeTest", () => {
     expect(t.pass).toBe(true);
     expect(t.faster).toBe(true);
     expect(t.env).toEqual(env);
-    expect(t.mode).toBe("process");
+    expect(t.mode).toBe("fresh");
     expect(timeText(t, 0.95)).toContain("pass, and faster than the baseline");
   });
 
@@ -199,15 +185,32 @@ describe("pairedTimeTest", () => {
     expect(pairedTimeTest([report(0.5)], "base", "cand", new Set(["in0", "in1", "nothere"]), LIMITS).inputs).toBe(2);
   });
 
-  it("gives void and fails with no report of mode process of the pair", () => {
+  it("gives void and fails with no report of mode fresh of the pair", () => {
     const none = pairedTimeTest([], "base", "cand", undefined, LIMITS);
     expect(none.status).toBe("void");
     expect(none.pass).toBe(false);
+    expect(none.reason).toContain("no paired time report of mode fresh");
     expect(timeText(none, 0.95)).toContain("so the time test fails");
     expect(pairedTimeTest([report(0.5)], "base", "other", undefined, LIMITS).status).toBe("void");
     expect(pairedTimeTest([report(0.5)], "base", "cand", new Set(["nothere"]), LIMITS).status).toBe("void");
-    const fresh = { ...report(0.5), mode: "fresh" as const };
-    expect(pairedTimeTest([fresh], "base", "cand", undefined, LIMITS).status).toBe("void");
+  });
+
+  it("does not count a report of mode process, because its cases ran after other cases in one process (BENCH-FRESH-CASES)", () => {
+    // 5 reports of mode process of a fast candidate: the test cannot decide, and it does not pass.
+    const old = pairedTimeTest(five(() => report(0.5, AA, 10, "process")), "base", "cand", undefined, LIMITS);
+    expect(old.status).toBe("void");
+    expect(old.pass).toBe(false);
+    expect(old.inProcess).toBe(5);
+    expect(old.jobs).toBe(0);
+    expect(old.reason).toContain("cannot decide: the 5 paired time reports of the pair have the mode process");
+    expect(timeText(old, 0.95)).toContain("so the time test fails");
+    // 4 reports of mode fresh and 1 of mode process: 4 jobs of 5 count, so each check cannot decide.
+    const mixed = pairedTimeTest([report(0.5), report(0.5), report(0.5), report(0.5), report(0.5, AA, 10, "process")], "base", "cand", undefined, LIMITS);
+    expect(mixed.jobs).toBe(4);
+    expect(mixed.inProcess).toBe(1);
+    expect(mixed.checks[0]!.why).toBe("4 jobs of 5, 1 of mode process");
+    expect(mixed.status).toBe("noise");
+    expect(mixed.pass).toBe(false);
   });
 });
 
