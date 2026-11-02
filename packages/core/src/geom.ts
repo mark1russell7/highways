@@ -1,3 +1,5 @@
+import { predicateSink } from "./predicate-sink.ts";
+
 /** A point in the plane. */
 export interface Point {
   readonly x: number;
@@ -47,7 +49,9 @@ export function segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
   const d2 = orient(c, d, b);
   const d3 = orient(a, b, c);
   const d4 = orient(a, b, d);
-  return d1 * d2 < 0 && d3 * d4 < 0;
+  const answer = d1 * d2 < 0 && d3 * d4 < 0;
+  if (predicateSink !== null) predicateSink.cross("geom.segmentsCross", a, b, c, d, answer);
+  return answer;
 }
 
 /**
@@ -55,11 +59,22 @@ export function segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
  * The function clips the segment to the box (Liang-Barsky) and asks for a part longer than `eps`.
  */
 export function segmentHitsBox(a: Point, b: Point, box: Box, eps = 1e-6): boolean {
-  return segmentHitsRect(a, b, box.x, box.y, box.x + box.w, box.y + box.h, eps);
+  const x1 = box.x + box.w;
+  const y1 = box.y + box.h;
+  const answer = hitsRect(a, b, box.x, box.y, x1, y1, eps);
+  if (predicateSink !== null) predicateSink.box("geom.segmentHitsBox", a, b, box.x, box.y, x1, y1, eps, answer, box);
+  return answer;
 }
 
 /** This function tells if the segment `ab` goes through the inside of the box from (`x0`, `y0`) to (`x1`, `y1`). */
 export function segmentHitsRect(a: Point, b: Point, x0: number, y0: number, x1: number, y1: number, eps = 1e-6): boolean {
+  const answer = hitsRect(a, b, x0, y0, x1, y1, eps);
+  if (predicateSink !== null) predicateSink.box("geom.segmentHitsRect", a, b, x0, y0, x1, y1, eps, answer);
+  return answer;
+}
+
+/** This function is the clip test of `segmentHitsRect`, without the hook of the predicate sink. */
+function hitsRect(a: Point, b: Point, x0: number, y0: number, x1: number, y1: number, eps: number): boolean {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   let t0 = 0;

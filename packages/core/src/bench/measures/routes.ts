@@ -1,6 +1,7 @@
 import { dist, polylineLength, turns, type Point } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import { Grid } from "../../grid.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import { nodeIndex, type Graph, type Route } from "../../model.ts";
 import { nearestSide } from "../../plugs.ts";
 import { TOLERANCE } from "../properties.ts";
@@ -117,7 +118,9 @@ const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.
 
 /** This test is the test of `segmentsCross`, so the count of `crossingAngles` is the count of `countCrossings`. */
 function segmentsCrossInside(a: Point, b: Point, c: Point, d: Point): boolean {
-  return orient(c, d, a) * orient(c, d, b) < 0 && orient(a, b, c) * orient(a, b, d) < 0;
+  const answer = orient(c, d, a) * orient(c, d, b) < 0 && orient(a, b, c) * orient(a, b, d) < 0;
+  if (predicateSink !== null) predicateSink.cross("routes.segmentsCrossInside", a, b, c, d, answer);
+  return answer;
 }
 
 /** The total turn of the routes (R4 of MEAS0). */

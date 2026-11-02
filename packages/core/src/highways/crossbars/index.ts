@@ -1,5 +1,6 @@
 import { boardUnit } from "../../bench/measures/routes.ts";
 import { dist, type Point } from "../../geom.ts";
+import { predicateSink } from "../../predicate-sink.ts";
 import type { WayOptions } from "../../ways.ts";
 import { arcPlace, basePlan, planRoutes, routeIndex, tidyPlan, type HighwayBase } from "../base.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
@@ -43,6 +44,13 @@ const unit = (a: Point, b: Point): Point => {
 
 /** This function gives the point where the segments `a b` and `c d` cross inside both, or `undefined`. Segments that only touch at an end do not cross. */
 function crossPoint(a: Point, b: Point, c: Point, d: Point): Point | undefined {
+  const answer = crossPointOf(a, b, c, d);
+  if (predicateSink !== null) predicateSink.cross("crossbars.crossPoint", a, b, c, d, answer !== undefined);
+  return answer;
+}
+
+/** This function is the test of `crossPoint`, without the hook of the predicate sink. */
+function crossPointOf(a: Point, b: Point, c: Point, d: Point): Point | undefined {
   const rx = b.x - a.x;
   const ry = b.y - a.y;
   const sx = d.x - c.x;
