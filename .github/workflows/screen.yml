@@ -5,8 +5,9 @@
 name: Screen
 
 on:
+  # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
+  # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
-    paths: ["packages/core/src/**", "packages/core/scripts/screen.ts", "corpus/**", ".github/workflows/screen.yml"]
   workflow_dispatch:
     inputs:
       step:
@@ -67,8 +68,27 @@ concurrency:
 
 jobs:
   # The exact solves of MEAS2 run in the workflow `Exact`, in shards.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          paths: |
+            packages/core/src/**
+            packages/core/scripts/screen.ts
+            corpus/**
+            .github/workflows/screen.yml
+
   exact:
-    if: ${{ inputs.exact }}
+    needs: changes
+    if: ${{ needs.changes.outputs.match == 'true' && (inputs.exact) }}
     uses: ./.github/workflows/exact.yml
     with:
       args: ${{ inputs.exact }}
@@ -76,7 +96,8 @@ jobs:
 
   # The times of the portfolio run in the workflow `Portfolio`, in shards.
   time:
-    if: ${{ inputs.time || inputs.report }}
+    needs: changes
+    if: ${{ needs.changes.outputs.match == 'true' && (inputs.time || inputs.report) }}
     uses: ./.github/workflows/portfolio.yml
     permissions:
       contents: read
@@ -87,7 +108,8 @@ jobs:
       minutes: ${{ inputs.minutes || '60' }}
 
   screen:
-    if: ${{ !inputs.exact && !inputs.time && !inputs.report }}
+    needs: changes
+    if: ${{ needs.changes.outputs.match == 'true' && (!inputs.exact && !inputs.time && !inputs.report) }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(inputs.minutes || '15') }}
     strategy:
@@ -162,8 +184,8 @@ jobs:
   # The promotion time test of a paired screen (MEASURE-ISOLATE). It reads the reports of the 5 jobs, and it runs only when each job gave its report.
   # A missing report fails this job (FAIL-CLOSED). The records of the job 1 are the corpus of the win test.
   promotion:
-    needs: screen
-    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.paired != '' && inputs.strategy != '' && !inputs.exact && !inputs.time && !inputs.report }}
+    needs: [changes, screen]
+    if: ${{ needs.changes.outputs.match == 'true' && (always() && github.event_name == 'workflow_dispatch' && inputs.paired != '' && inputs.strategy != '' && !inputs.exact && !inputs.time && !inputs.report) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -209,3 +231,16 @@ jobs:
           name: promotion-${{ inputs.set || 'screen-v1' }}-${{ inputs.step || 'router' }}-${{ github.sha }}
           path: out/
           if-no-files-found: warn
+
+  screen-ok:
+    name: Screen OK
+    if: always()
+    needs: [changes, exact, time, screen, promotion]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          needs: ${{ toJSON(needs) }}
+          allow-skip: exact time screen promotion

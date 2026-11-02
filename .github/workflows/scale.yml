@@ -25,13 +25,9 @@ on:
       rounds:
         description: "The number of rounds of the router screen of each commit in the job screen."
         default: "5"
+  # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
+  # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
-    paths:
-      - .github/workflows/scale.yml
-      - packages/core/scripts/scale.ts
-      - packages/core/scripts/scale-summary.ts
-      - packages/core/scripts/scale-screen.ts
-      - packages/core/scripts/data/scale/**
 
 permissions:
   contents: read
@@ -46,7 +42,28 @@ defaults:
     shell: bash
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          paths: |
+            .github/workflows/scale.yml
+            packages/core/scripts/scale.ts
+            packages/core/scripts/scale-summary.ts
+            packages/core/scripts/scale-screen.ts
+            packages/core/scripts/data/scale/**
+
   routers:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
     outputs:
       list: ${{ steps.list.outputs.list }}
@@ -57,7 +74,8 @@ jobs:
         run: echo "list=$(echo "$ROUTERS" | jq -Rc 'split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))')" >> "$GITHUB_OUTPUT"
 
   time:
-    needs: routers
+    if: needs.changes.outputs.match == 'true'
+    needs: [changes, routers]
     runs-on: ubuntu-latest
     # The router shared-all took 27 min for two routes of this board on highways 0.7.0. The cell routes it up to four times.
     timeout-minutes: 150
@@ -102,8 +120,8 @@ jobs:
           if-no-files-found: warn
 
   summary:
-    needs: [routers, time]
-    if: ${{ always() }}
+    needs: [changes, routers, time]
+    if: ${{ needs.changes.outputs.match == 'true' && (always()) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -138,6 +156,8 @@ jobs:
             rows.jsonl
 
   screen:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -180,3 +200,16 @@ jobs:
           name: scale-screen
           path: out/
           if-no-files-found: warn
+
+  scale-ok:
+    name: Scale OK
+    if: always()
+    needs: [changes, routers, time, summary, screen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@f05c6eeb35e33a040bdfdcd7d07a1d2c00640f8d # main
+        with:
+          needs: ${{ toJSON(needs) }}
+          allow-skip: summary
