@@ -15,7 +15,12 @@
 //   It makes a git worktree of the base, the commit and the parent. `confirmPair` times the commit, the parent and the A/A arm of the parent on the board of the base.
 //   It writes `<dir>/confirm-pair<n>.json` and prints the table of the pair.
 // - The join of the confirm mode: `node scripts/sections-bisect.ts --confirm-join <dir> --pairs <pairs> [--summary <file>] [--json <file>]`.
+// - The sections time gate (GATE-LIMITS): `node scripts/sections-bisect.ts --gate --parent <ref> --trees <dir> --out <dir> [--rounds <n>]`.
+//   It makes a git worktree of the base, the parent, the checkout and the fixed base of `data/sections-gate/fixed-base.json`.
+//   `confirmPair` times the parent, the checkout, the fixed base and the A/A arm of the parent on `sections-tree`, on the board of the base.
+//   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`, and exits with the code 1 when a check of the gate does not pass.
 // `scripts/sections-bisect-verdict.ts` has the plan and the verdict. `scripts/sections-confirm-verdict.ts` has them for the confirm mode.
+// `scripts/sections-gate-verdict.ts` has the checks of the gate.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -55,6 +60,7 @@ import {
   type PairRecord,
   type Side,
 } from "./sections-confirm-verdict.ts";
+import { BASE_FILE, FIXED_ARM, GATE_ROUNDS, GATE_ROUTER, GATE_SCHEMA, gateText, parseFixedBase, recordVerdict, type GateRecord } from "./sections-gate-verdict.ts";
 
 /** The parts of a version of the core that the arms call. Each candidate has the list `ROUTERS`, and the base has the fixtures. */
 interface Core {
@@ -175,28 +181,38 @@ async function runShard(shard: number, treesDir: string, out: string, routers: r
   return { schema: SHARD_SCHEMA, shard, shards: BISECT_SHARDS, head, base, fixture: BISECT_FIXTURE, routers, rounds, order, commits, skipped, env: envOf("fresh"), report };
 }
 
+/** This function gives one side of a comparison: the ref, its full hash and its subject. The ref `HEAD` is the checkout. */
+function sideOf(root: string, head: string, ref: string): Side {
+  const sha = ref === HEAD_REF ? head : git(root, "rev-parse", "--verify", `${ref}^{commit}`).trim();
+  return { ref, sha, subject: git(root, "log", "-1", "--format=%s", sha).trim() };
+}
+
+/** This function makes a git worktree of each commit that has none, and gives the folder of a commit. */
+function worktrees(root: string, treesDir: string, shas: Iterable<string>): (sha: string) => string {
+  mkdirSync(treesDir, { recursive: true });
+  const treeOf = (sha: string): string => join(treesDir, sha.slice(0, 12));
+  for (const sha of new Set(shas)) if (!existsSync(treeOf(sha))) git(root, "worktree", "add", "--detach", treeOf(sha), sha);
+  return treeOf;
+}
+
+/** This function installs and checks the core of each side, one time for each commit. It gives the reason of the first failure, else `null`. */
+function prepare(sides: readonly Side[], treeOf: (sha: string) => string, routers: readonly string[]): string | null {
+  for (const s of sides.filter((x, i) => sides.findIndex((y) => y.sha === x.sha) === i)) {
+    const reason = (needsInstall(treeOf(s.sha)) ? install(treeOf(s.sha)) : undefined) ?? check(treeOf(s.sha), routers);
+    if (reason !== undefined) return `${s.ref}: ${reason}`;
+  }
+  return null;
+}
+
 /** This function times one pair of the confirm mode: the commit, the parent and the A/A arm of the parent, in fresh processes, on the board of the base. */
 async function runPair(pair: number, commitRef: string, parentRef: string, treesDir: string, out: string, routers: readonly string[], rounds: number): Promise<PairRecord> {
   const { root, base, head } = refsOfRun();
-  const side = (ref: string): Side => {
-    const sha = ref === HEAD_REF ? head : git(root, "rev-parse", "--verify", `${ref}^{commit}`).trim();
-    return { ref, sha, subject: git(root, "log", "-1", "--format=%s", sha).trim() };
-  };
-  const commit = side(commitRef);
-  const parent = side(parentRef);
+  const commit = sideOf(root, head, commitRef);
+  const parent = sideOf(root, head, parentRef);
   if (commit.sha === parent.sha) throw new Error(`The pair ${pair}: ${commitRef} and ${parentRef} are the same commit ${commit.sha}.`);
   console.error(`Sections confirm: the pair ${pair}, ${commit.sha.slice(0, 7)} against ${parent.sha.slice(0, 7)}.`);
-  mkdirSync(treesDir, { recursive: true });
-  const treeOf = (sha: string): string => join(treesDir, sha.slice(0, 12));
-  for (const sha of new Set([base, parent.sha, commit.sha])) if (!existsSync(treeOf(sha))) git(root, "worktree", "add", "--detach", treeOf(sha), sha);
-  let skipped: string | null = null;
-  for (const s of [parent, commit]) {
-    const reason = (needsInstall(treeOf(s.sha)) ? install(treeOf(s.sha)) : undefined) ?? check(treeOf(s.sha), routers);
-    if (reason !== undefined) {
-      skipped = `${s.ref}: ${reason}`;
-      break;
-    }
-  }
+  const treeOf = worktrees(root, treesDir, [base, parent.sha, commit.sha]);
+  const skipped = prepare([parent, commit], treeOf, routers);
   let report: PairedReport | null = null;
   if (skipped === null) {
     // Each arm routes the same board: the fixture of the base, as in the bisect.
@@ -205,6 +221,32 @@ async function runPair(pair: number, commitRef: string, parentRef: string, trees
     report = await confirmPair({ parent: child(parent.sha), commit: child(commit.sha), inputs: routers, rounds });
   }
   return { schema: PAIR_SCHEMA, pair, head, base, fixture: BISECT_FIXTURE, routers, rounds, commit, parent, skipped, env: envOf("fresh"), report };
+}
+
+/**
+ * This function runs the sections time gate: the parent, the checkout, the fixed base and the A/A arm of the parent, in fresh processes, on the board of the base.
+ * The fixed base comes from the file `BASE_FILE` of the checkout.
+ */
+async function runGate(parentRef: string, treesDir: string, out: string, rounds: number): Promise<GateRecord> {
+  const { root, base, head } = refsOfRun();
+  const fixedBase = parseFixedBase(readFileSync(join(HERE, "..", BASE_FILE), "utf8"));
+  const headSide = sideOf(root, head, HEAD_REF);
+  const parent = sideOf(root, head, parentRef);
+  const fixed = sideOf(root, head, fixedBase.commit);
+  const board = sideOf(root, head, base);
+  if (headSide.sha === parent.sha) throw new Error(`The gate: the parent ${parentRef} is the checkout ${head}.`);
+  console.error(`Sections gate: ${head.slice(0, 7)} against the parent ${parent.sha.slice(0, 7)} and the fixed base ${fixed.sha.slice(0, 7)}.`);
+  const routers = [GATE_ROUTER];
+  const treeOf = worktrees(root, treesDir, [base, parent.sha, head, fixed.sha]);
+  const skipped = prepare([parent, headSide, fixed], treeOf, routers);
+  let report: PairedReport | null = null;
+  if (skipped === null) {
+    // Each arm routes the same board: the fixture of the base of the bisect. So the fixed base and the head route the same input.
+    const file = await writeBoard(treeOf(base), out);
+    const child = (sha: string): string[] => [...NODE, SCRIPT, "--child", "--tree", treeOf(sha), "--board", file];
+    report = await confirmPair({ parent: child(parent.sha), commit: child(head), others: [{ id: FIXED_ARM, command: child(fixed.sha) }], inputs: routers, rounds });
+  }
+  return { schema: GATE_SCHEMA, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh"), report };
 }
 
 if (args.includes("--child")) {
@@ -221,6 +263,16 @@ if (args.includes("--child")) {
   // The plan job checks the rounds too, so a bad input fails before the matrix starts.
   if (opt("--rounds") !== undefined) parseRounds(opt("--rounds"));
   console.log(JSON.stringify(parsePairs(opt("--plan"))));
+} else if (args.includes("--gate")) {
+  const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));
+  const out = resolve(need("--out"));
+  mkdirSync(out, { recursive: true });
+  const record = await runGate(need("--parent"), resolve(need("--trees")), out, rounds);
+  writeFileSync(join(out, "sections-gate.json"), JSON.stringify(record, null, 2) + "\n");
+  const text = gateText(record).join("\n") + "\n";
+  writeFileSync(join(out, "sections-gate.md"), text);
+  console.log(text);
+  if (!recordVerdict(record).pass) process.exitCode = 1;
 } else if (args.includes("--confirm")) {
   const pair = Number(need("--pair"));
   const [own] = parsePairs(`${need("--commit")}:${opt("--parent") ?? ""}`);

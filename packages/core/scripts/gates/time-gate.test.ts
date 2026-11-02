@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aaId, pairedReport, type Mode, type PairedReport, type RawTimes } from "./paired.ts";
-import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, timeText, type TimeLimits } from "./time-gate.ts";
+import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, roundsTable, timeText, type TimeLimits } from "./time-gate.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
 const LIMITS: TimeLimits = { timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2, timeFloorMs: 5 };
@@ -225,6 +225,25 @@ describe("the tables and the files of the reports", () => {
     expect(table[0]).toContain("2 x Test CPU");
     expect(table.filter((l) => l.startsWith("| `"))).toEqual([expect.stringContaining("| `cand` | 10 |")]);
     expect(table.at(-1)).toContain("| faster |");
+  });
+
+  it("gives the verdict of one fixture from the band of its A/A rounds, not from one median ratio", () => {
+    // One fixture and 5 rounds, as the Profile run 41505173044: the A/A median ratio is 0.81, and the arm "new" takes 1.167 times the base.
+    // The A/A ratios of the rounds are 0.7, 0.8, 0.81, 0.85, 1.2. Their spread is p90 of |r - 1|: 0.26. So the band is 0.74 to 1.26.
+    const arms = [{ id: "base" }, { id: "new" }, { id: "slow" }, { id: aaId("base") }];
+    const raw: RawTimes = {
+      ms: new Map([["large", new Map([["base", [100, 100, 100, 100, 100]], ["new", [116.7, 116.7, 116.7, 116.7, 116.7]], ["slow", [140, 140, 140, 140, 140]], [aaId("base"), [70, 80, 81, 85, 120]]])]]),
+      peak: new Map([["large", new Map<string, number>()]]),
+    };
+    const one = pairedReport("fresh", env, undefined, arms, [{ id: "large" }], raw);
+    // The band of the median ratios is one ratio: 0.81 to 0.81. So the old table reads 1.167 as slower.
+    expect(armVerdict(one.ratios["new"]!, one.noiseFloor)).toBe("slower");
+    const table = roundsTable(one);
+    const rows = table.filter((l) => l.startsWith("| `"));
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toBe("| `new` | large | 1.167 | 5 | 0.740 to 1.260 | inside |");
+    expect(rows[1]).toBe("| `slow` | large | 1.400 | 5 | 0.740 to 1.260 | slower |");
+    expect(table[0]).toContain("2 x Test CPU");
   });
 
   it("reads one report, a list of reports, or one report on each line", () => {
