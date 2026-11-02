@@ -1,7 +1,7 @@
 import { inflate, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import { nodeIndex, type Graph, type Node, type Result, type Route } from "../model.ts";
-import { predicateSink } from "../predicate-sink.ts";
+import { CALL_SITE_RULES, predicateSink } from "../predicate-sink.ts";
 import { cornersRouter } from "./corners.ts";
 
 /** The options of the relaxation of the routes (PHYSICAL): the forces on the points of each route. */
@@ -84,6 +84,9 @@ function pushOfBox(p: Point, b: Box, r: number): Point {
   return { x: m * (p.x - qx), y: m * (p.y - qy) };
 }
 
+/** The side of a box centre on the chord in `outOf`: the rule `physics.outOf` of `CALL_SITE_RULES`. */
+const OUT_OF_ZERO = CALL_SITE_RULES["physics.outOf"].zero;
+
 /**
  * This function moves the point `p` out of each box of `boxes` with the space `pad`. It takes at most 4 passes.
  * With a chord `a` to `b`, the point moves along the normal of the chord, away from the center of the box (`RelaxSide`). Without a chord, it moves through the nearest side.
@@ -105,8 +108,9 @@ function outOf(boxes: Grid<Node>, skip: ReadonlySet<Node>, p: Point, pad: number
     const b = hit;
     if (a && len > 1e-9) {
       // The center of the box is at the left of the chord when the cross product is positive. Then the point goes to the right.
+      // A center on the chord gives the value `zero` of the rule `physics.outOf` (PREDICATE-RULES).
       const cross = dx * (b.y + b.h / 2 - a.y) - dy * (b.x + b.w / 2 - a.x);
-      const k = cross > 0 ? 1 : -1;
+      const k = cross > 0 ? 1 : cross < 0 ? -1 : OUT_OF_ZERO;
       if (predicateSink !== null && end) predicateSink.side("physics.outOf", { x: b.x + b.w / 2, y: b.y + b.h / 2 }, a, end, k);
       const mx = (k * dy) / len;
       const my = (-k * dx) / len;
