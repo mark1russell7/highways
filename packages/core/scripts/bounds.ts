@@ -4,7 +4,7 @@
 // The script reads only records, so it runs locally in a few seconds. The screens and the solves run in CI.
 // The test `src/bench/screen/bounds.test.ts` examines the functions of this file and of `src/bench/screen/bounds.ts`.
 import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { boundsCells, topOf, type BoundsCell, type BoundsRun } from "../src/bench/screen/bounds.ts";
@@ -181,7 +181,7 @@ export function boundsReport(records: readonly OracleRecord[], optima: readonly 
   return { markdown: lines.join("\n"), data: { cells: cells.map((c) => ({ ...c, rows: c.rows.filter((r) => r.values > 0) })), claims, agreement: check } };
 }
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (import.meta.main) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);

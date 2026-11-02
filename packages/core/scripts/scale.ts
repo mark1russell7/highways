@@ -186,4 +186,4 @@ async function main(): Promise<void> {
   console.log(`scale: ${name}: hash ${hash}, exact ${exact}${row.same ? "" : " (the runs differ)"}.`);
 }
 
-if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (import.meta.main) await main();

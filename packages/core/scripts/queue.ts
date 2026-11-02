@@ -8,7 +8,6 @@
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { STEPS } from "../src/strategies/model.ts";
 import { FAMILIES, knownMeasures, loadIdeas, loadMeas3, measureIdsIn, type Idea } from "./ideas.ts";
@@ -548,7 +547,7 @@ const argOf = (name: string): string | undefined => {
   return i < 0 ? undefined : process.argv[i + 1];
 };
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (import.meta.main) {
   const old = committedQueue();
   if (process.argv.includes("--check")) {
     const text = queueText(readQueue(old?.queue.date ?? "", old?.queue.commit ?? ""));

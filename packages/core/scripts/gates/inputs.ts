@@ -3,7 +3,6 @@
 // This module imports only node modules and knows no type of highways, so a job with no installed packages can start it.
 // Usage as a command: node scripts/gates/inputs.ts <name> --expect <list> --got <list>, or <name> --expect-count <n> --got-count <n>
 //   A list has commas or spaces between its items. The command exits 1 when the inputs differ.
-import { fileURLToPath } from "node:url";
 
 /** The difference between the inputs that a gate expects and the inputs that it got. */
 export interface InputDiff {
@@ -69,7 +68,7 @@ export function parseList(text: string): string[] {
   return text.split(/[\s,]+/).filter((x) => x.length > 0);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (import.meta.main) {
   const args = process.argv.slice(2);
   const opt = (key: string): string | undefined => {
     const i = args.indexOf(key);

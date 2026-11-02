@@ -390,4 +390,4 @@ async function main(): Promise<void> {
   if (routed === 0) throw new Error(`xplat: the folders ${inputs.join(", ")} hold no input with a graph (${files.size} files).`);
 }
 
-if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (import.meta.main) await main();

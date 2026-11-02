@@ -23,8 +23,6 @@
 // With `--guard-records`, the script times nothing. It routes the boards of `exact-v1` at the sizes `--sizes` with each member of the portfolio router (`guardRecord`).
 // Each line is a record with the values of the guard: B1, the stretch of the model, the flag of mixed collections and the hard breaks. The sizes above 40 nodes have no optima.
 import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
 import { B1, MIXED, type OracleRecord } from "./oracle.ts";
@@ -710,7 +708,7 @@ const opt = (name: string): string | undefined => {
 };
 const nums = (name: string, fallback: string): number[] => (opt(name) ?? fallback).split(",").map(Number);
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (import.meta.main) {
   const summary = opt("--summary");
   if (summary !== undefined) {
     const all = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as unknown));

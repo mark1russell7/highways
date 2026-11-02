@@ -3,7 +3,6 @@
 // With `--check`, the script writes nothing. It stops with an error when a record is not correct or when the index is old.
 // The test `src/bench/screen/ideas.test.ts` uses the same functions.
 import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MEASURES } from "../src/bench/screen/measures.ts";
 
@@ -254,7 +253,7 @@ export const indexText = (index: IdeaIndex): string => `${JSON.stringify(index, 
 /** The URL of `index.json`. */
 export const INDEX_URL = new URL("index.json", IDEAS_DIR);
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (import.meta.main) {
   const ideas = loadIdeas();
   const meas3 = loadMeas3();
   const faults = checkIdeas(ideas, loadSchema(), meas3);
