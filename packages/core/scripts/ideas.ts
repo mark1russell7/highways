@@ -2,7 +2,7 @@
 // The script reads the five family files of `docs/research/ideas/`, checks them and writes `docs/research/ideas/index.json`.
 // With `--check`, the script writes nothing. It stops with an error when a record is not correct or when the index is old.
 // The test `src/bench/screen/ideas.test.ts` uses the same functions.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { MEASURES } from "../src/bench/screen/measures.ts";
 
@@ -253,7 +253,7 @@ export const indexText = (index: IdeaIndex): string => `${JSON.stringify(index, 
 /** The URL of `index.json`. */
 export const INDEX_URL = new URL("index.json", IDEAS_DIR);
 
-if (import.meta.main) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const ideas = loadIdeas();
   const meas3 = loadMeas3();
   const faults = checkIdeas(ideas, loadSchema(), meas3);

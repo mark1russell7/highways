@@ -9,7 +9,7 @@
 // There the value of a run is its B1 under the guard, and the oracle is the best member of the pool (`LARGE_SET`).
 // With `--setup-time <path,...> --setup-source <id>`, it keeps the times of the members, and takes the times of the setup of the key from other lines (`withSetup`).
 // Each band splits its seeds: the seeds 0 to 4 choose the set, and the seeds 5 to 9 test it. The script reads only records, so it runs locally in a few seconds.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -506,7 +506,7 @@ export function readOptima(paths: readonly string[] = OPTIMA_PATHS): ExactOptimu
   return paths.flatMap((f) => (JSON.parse(readFileSync(f, "utf8")) as ExactOptimaFile).optima);
 }
 
-if (import.meta.main) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);

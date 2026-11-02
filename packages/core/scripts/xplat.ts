@@ -28,7 +28,7 @@
 //   that differs between two cells, for each input and router. The script routes only those pairs, and writes each call of those chunks in full:
 //   the function, the arguments and the result as hex bits and as numbers, and the frames of the stack in `src/`.
 import { createHash } from "node:crypto";
-import { appendFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { arch, platform } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -390,4 +390,4 @@ async function main(): Promise<void> {
   if (routed === 0) throw new Error(`xplat: the folders ${inputs.join(", ")} hold no input with a graph (${files.size} files).`);
 }
 
-if (import.meta.main) await main();
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) await main();

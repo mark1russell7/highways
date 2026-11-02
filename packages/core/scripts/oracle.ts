@@ -3,8 +3,9 @@
 // The oracle of an input is the best strategy of the whole portfolio on that input. The script compares it with the best single strategy.
 // The script reads only records, so it runs locally in a few seconds. The screens themselves run in CI.
 // The test `src/bench/screen/oracle.test.ts` examines the functions of this file on a small set of records.
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_BOOTSTRAP, type BootstrapMedian } from "../src/bench/screen/gap.ts";
 import { mulberry32, RECORD_EPS } from "../src/bench/screen/hash.ts";
@@ -623,7 +624,7 @@ export function oracleReport(exact: readonly OracleRecord[], screen: readonly Or
   return { markdown: lines.join("\n"), data };
 }
 
-if (import.meta.main) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);
