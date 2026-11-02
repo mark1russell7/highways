@@ -32,7 +32,7 @@ on:
         description: "The number of seeded edits of each highway strategy, for the stability of its highways. 0: no edits."
         default: "0"
       minutes:
-        description: "The time limit of the job, in minutes. With exact: the time limit of each shard. With paired: 60 or more."
+        description: "The time limit of the job, in minutes. With exact: the time limit of each shard. With paired: 60 or more. With time: 150 or more."
         default: "15"
       set:
         description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
@@ -105,7 +105,8 @@ jobs:
     with:
       args: ${{ inputs.time }}
       report: ${{ inputs.report }}
-      minutes: ${{ inputs.minutes || '60' }}
+      # Each shard of the times starts fresh processes (BENCH-FRESH-CASES), so it gets 150 minutes or more.
+      minutes: ${{ fromJSON(inputs.minutes || '15') < 150 && '150' || inputs.minutes }}
 
   screen:
     needs: changes
