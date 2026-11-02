@@ -18,7 +18,7 @@
 // With `--profile <file>`, the script keeps a CPU profile of the first route in `<file>` and a CPU profile of the steps in a file with the suffix `.steps.cpuprofile`.
 // For each profile, it prints the 25 functions with the most self time.
 import { createHash } from "node:crypto";
-import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { Session } from "node:inspector/promises";
 import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -186,4 +186,4 @@ async function main(): Promise<void> {
   console.log(`scale: ${name}: hash ${hash}, exact ${exact}${row.same ? "" : " (the runs differ)"}.`);
 }
 
-if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) await main();
