@@ -9,7 +9,7 @@
 // The times of two shards come from two jobs, so without paired lines these columns are empty.
 // The script reads only records, so it runs locally in a few seconds. The screens and the times run in CI.
 // The test `src/bench/screen/portfolio.test.ts` examines the functions of this file on a small set of records.
-import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";

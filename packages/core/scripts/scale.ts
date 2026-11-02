@@ -18,7 +18,7 @@
 // With `--profile <file>`, the script keeps a CPU profile of the first route in `<file>` and a CPU profile of the steps in a file with the suffix `.steps.cpuprofile`.
 // For each profile, it prints the 25 functions with the most self time.
 import { createHash } from "node:crypto";
-import { appendFileSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { appendFileSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { Session } from "node:inspector/promises";
 import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";

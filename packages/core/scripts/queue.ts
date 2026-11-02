@@ -7,7 +7,7 @@
 // The queue also scores the enablers: each one removes a block of ideas. The header has the back test with its bootstrap interval.
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { STEPS } from "../src/strategies/model.ts";
 import { FAMILIES, knownMeasures, loadIdeas, loadMeas3, measureIdsIn, type Idea } from "./ideas.ts";

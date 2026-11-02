@@ -2,7 +2,7 @@
 // The script reads the five family files of `docs/research/ideas/`, checks them and writes `docs/research/ideas/index.json`.
 // With `--check`, the script writes nothing. It stops with an error when a record is not correct or when the index is old.
 // The test `src/bench/screen/ideas.test.ts` uses the same functions.
-import { readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { MEASURES } from "../src/bench/screen/measures.ts";
 

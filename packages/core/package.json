@@ -63,6 +63,8 @@
     "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
     "@types/node": "^26.6.4",
     "highs": "^1.15.4",
+    "highways-0-5-1": "npm:@mark1russell7/highways@0.5.1",
+    "highways-0-8-0": "npm:@mark1russell7/highways@0.8.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"
   }

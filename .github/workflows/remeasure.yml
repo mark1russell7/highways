@@ -1,0 +1,110 @@
+# The remeasure of a void speed claim (MEASURE-ISOLATE). The two arms of each claim were in two jobs, so the claims are void.
+# This workflow races the old version against the workspace in one job, with `scripts/remeasure.ts`, `measureIsolated` and the A/A arm.
+# Each claim runs 5 jobs. Each job writes one `paired-time/1` report. The job `join` reads the 5 reports and gives the verdict of each target.
+# The old arms:
+# - h3: the core of `fa1dd82~1` in a git worktree, because no npm version is older than the claim. The mode is `fresh`.
+# - portfolio-speed: npm `@mark1russell7/highways@0.5.1`, the dev dependency `highways-0-5-1`. The mode is `process`.
+# - route-scale: npm `@mark1russell7/highways@0.8.0`, the dev dependency `highways-0-8-0`. The mode is `fresh`, with 3 rounds.
+name: Remeasure
+
+on:
+  workflow_dispatch:
+    inputs:
+      claim:
+        description: "The claim to measure again: h3, portfolio-speed or route-scale."
+        type: choice
+        options: [h3, portfolio-speed, route-scale]
+        default: h3
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run for each workflow and ref (RUNNER-SLOTS). A new dispatch waits for the run before it.
+  group: remeasure-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    # One old route of shared-all on the dense board takes more than 13 min. Each round routes it two times: the old arm and the A/A arm.
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
+      matrix:
+        job: [1, 2, 3, 4, 5]
+    env:
+      CLAIM: ${{ inputs.claim }}
+      JOB: ${{ matrix.job }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The claim h3 needs the history for the worktree of fa1dd82~1.
+          fetch-depth: ${{ inputs.claim == 'h3' && '0' || '1' }}
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Make the worktree of the old arm of H3
+        if: ${{ inputs.claim == 'h3' }}
+        run: |
+          # The fix of H3 is fa1dd82. It has one parent, and that parent is the old arm.
+          [ "$(git rev-list --parents -n 1 fa1dd82 | wc -w)" = 2 ] || { echo "::error::The commit fa1dd82 does not have exactly one parent."; exit 1; }
+          git worktree add --detach "$RUNNER_TEMP/h3-old" fa1dd82~1
+          echo "The old arm of H3 is $(git -C "$RUNNER_TEMP/h3-old" rev-parse --short HEAD)." >> "$GITHUB_STEP_SUMMARY"
+      - name: Time the old arm and the workspace in this job
+        run: |
+          set -o pipefail
+          args=(--claim "$CLAIM" --job "$JOB" --out "$GITHUB_WORKSPACE/out")
+          [ "$CLAIM" = h3 ] && args+=(--old-tree "$RUNNER_TEMP/h3-old")
+          node packages/core/scripts/remeasure.ts "${args[@]}" | tee "$GITHUB_WORKSPACE/out.md"
+          cat "$GITHUB_WORKSPACE/out.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: remeasure-${{ inputs.claim }}-job${{ matrix.job }}
+          path: out/paired-job*.json
+          if-no-files-found: warn
+
+  join:
+    needs: measure
+    # The join also runs when a job fails, and then it fails: each job of the 5 jobs must give its report (FAIL-CLOSED).
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLAIM: ${{ inputs.claim }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: remeasure-${{ inputs.claim }}-job*
+          path: jobs
+      # The join reads only node modules, so this job installs no packages.
+      - name: Join the 5 reports
+        run: |
+          set -o pipefail
+          node packages/core/scripts/remeasure.ts --join jobs --claim "$CLAIM" --summary remeasure.md --json remeasure.json
+          cat remeasure.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: remeasure-${{ inputs.claim }}-${{ github.sha }}
+          path: |
+            remeasure.md
+            remeasure.json
+          if-no-files-found: warn

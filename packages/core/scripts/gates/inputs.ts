@@ -3,8 +3,8 @@
 // This module imports only node modules and knows no type of highways, so a job with no installed packages can start it.
 // Usage as a command: node scripts/gates/inputs.ts <name> --expect <list> --got <list>, or <name> --expect-count <n> --got-count <n>
 //   A list has commas or spaces between its items. The command exits 1 when the inputs differ.
-import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
 
 /** The difference between the inputs that a gate expects and the inputs that it got. */
 export interface InputDiff {

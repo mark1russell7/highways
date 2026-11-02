@@ -28,7 +28,7 @@
 //   that differs between two cells, for each input and router. The script routes only those pairs, and writes each call of those chunks in full:
 //   the function, the arguments and the result as hex bits and as numbers, and the frames of the stack in `src/`.
 import { createHash } from "node:crypto";
-import { appendFileSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync, realpathSync } from "node:fs";
 import { arch, platform } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { performance } from "node:perf_hooks";

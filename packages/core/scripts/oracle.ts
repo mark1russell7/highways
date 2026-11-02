@@ -3,7 +3,7 @@
 // The oracle of an input is the best strategy of the whole portfolio on that input. The script compares it with the best single strategy.
 // The script reads only records, so it runs locally in a few seconds. The screens themselves run in CI.
 // The test `src/bench/screen/oracle.test.ts` examines the functions of this file on a small set of records.
-import { readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, writeFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";

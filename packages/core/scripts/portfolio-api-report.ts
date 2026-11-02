@@ -4,7 +4,7 @@
 // On the exact sets, the report compares the gap closed of each form with the offline choice of `portfolio-sets.ts`, the best single strategy and the oracle.
 // On `screen-v1`, `--pool` gives the records of all strategies, and the report compares the guarded B1. Each report also gives the times.
 // The column `differ` counts the inputs (train and test) where the winner of the router is not the offline choice. It must be 0.
-import { realpathSync, writeFileSync } from "node:fs";
+import { writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_CAPS, GAP_RULES, type GapRule } from "../src/bench/screen/gap.ts";

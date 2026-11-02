@@ -22,9 +22,9 @@
 // Then it compares the stretch of each edge of `exactStretches` with the stretch of `exactStretchesReference` (`stretchCheck`). The summary counts each difference above `RECORD_EPS`.
 // With `--guard-records`, the script times nothing. It routes the boards of `exact-v1` at the sizes `--sizes` with each member of the portfolio router (`guardRecord`).
 // Each line is a record with the values of the guard: B1, the stretch of the model, the flag of mixed collections and the hard breaks. The sizes above 40 nodes have no optima.
-import { readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { performance } from "node:perf_hooks";
+import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
 import { B1, MIXED, type OracleRecord } from "./oracle.ts";
 import { MODEL_STRETCH } from "./portfolio.ts";
