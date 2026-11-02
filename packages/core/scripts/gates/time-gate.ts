@@ -66,6 +66,8 @@ export interface TimeTest {
   readonly policy: number;
   /** The count of the reports that do not count, because their A/A band does not contain 1. A new job replaces each of them. */
   readonly outside: number;
+  /** The count of the reports of the pair in mode `process`. They do not count, because they timed each case after other cases in one process (BENCH-FRESH-CASES). */
+  readonly inProcess: number;
   /** The median ratio of each job, in the order of the reports. */
   readonly medians: readonly number[];
   /** The tail ratio of each job, in the order of the reports. A job with an empty tail set gives `null`. */
@@ -89,7 +91,9 @@ export interface TimeTest {
 /**
  * This function gives the time test of a candidate against a baseline over paired time reports (MEASURE-ISOLATE). Each report comes from one job.
  *
- * - The reports must have the mode `process`, the base `baseline`, the arm `candidate` and the A/A arm. With `keys`, only those input ids count.
+ * - The reports must have the mode `fresh`, the base `baseline`, the arm `candidate` and the A/A arm. With `keys`, only those input ids count.
+ * - Each case of a time gate runs in its own fresh processes (BENCH-FRESH-CASES). A report of mode `process` timed each case after other cases in one process.
+ * - A report of mode `process` does not count. With only such reports, the status is `void` with the reason, and the test does not pass.
  * - The ratio of an input is the ratio of the report: the median of the arm over the median of the base.
  * - The median check: the worst median ratio over the reports is at `timeRatio` or below. It is valid only when `timeRatio` is above the worst A/A p90 plus the spread of the A/A p90 values.
  * - The tail check uses the tail set. An input with the base median and the arm median both below `timeFloorMs` is not in it.
@@ -105,12 +109,32 @@ export interface TimeTest {
  */
 export function pairedTimeTest(reports: readonly PairedReport[], baseline: string, candidate: string, keys: ReadonlySet<string> | undefined, limits: TimeLimits): TimeTest {
   const aa = aaId(baseline);
-  const matched = reports.filter((r) => r.mode === "process" && r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
+  const pair = reports.filter((r) => r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
+  // Each case runs in its own fresh processes (BENCH-FRESH-CASES, STRATEGY.md 2026-11-02). A report of mode process does not count.
+  const matched = pair.filter((r) => r.mode === "fresh");
+  const inProcess = pair.length - matched.length;
   // A job counts only when its A/A band contains 1. A job with a band that does not contain 1 measured the runner (STRATEGY.md 2026-11-02).
   const mine = matched.filter((r) => r.noiseFloor === null || (r.noiseFloor.p10 <= 1 && r.noiseFloor.p90 >= 1));
   const outside = matched.length - mine.length;
-  const empty = { median: Number.NaN, tail: Number.NaN, pass: false, status: "void" as const, jobs: mine.length, policy: limits.timeJobs, outside, medians: [], tails: [], cpus: mine.map((r) => r.env.cpu), inputs: 0, checks: [], faster: false };
-  if (matched.length === 0) return { ...empty, reason: `no paired time report of mode process has the base ${baseline}, the arm ${candidate} and the A/A arm` };
+  const empty = {
+    median: Number.NaN,
+    tail: Number.NaN,
+    pass: false,
+    status: "void" as const,
+    jobs: mine.length,
+    policy: limits.timeJobs,
+    outside,
+    inProcess,
+    medians: [],
+    tails: [],
+    cpus: mine.map((r) => r.env.cpu),
+    inputs: 0,
+    checks: [],
+    faster: false,
+  };
+  if (matched.length === 0 && inProcess > 0)
+    return { ...empty, reason: `cannot decide: the ${inProcess} paired time reports of the pair have the mode process, and each case of the time test runs in its own fresh processes` };
+  if (matched.length === 0) return { ...empty, reason: `no paired time report of mode fresh has the base ${baseline}, the arm ${candidate} and the A/A arm` };
   if (mine.length === 0) return { ...empty, reason: `the A/A band of each of the ${outside} paired time reports does not contain 1` };
   const at = { env: mine[0]!.env, mode: mine[0]!.mode };
   // The values of each report: the median ratio, the tail ratio, the A/A tail and the noise floor.
@@ -152,12 +176,13 @@ export function pairedTimeTest(reports: readonly PairedReport[], baseline: strin
         ? { check: "tail", worst: max(real), limit: limits.timeTail, aa: max(aaTails), aaSpread: max(aaTails) - min(aaTails), valid: false, why: some, verdict: "noise" }
         : check("tail", max(real), limits.timeTail, aaTails);
   // Too few jobs: each check cannot decide, whatever its value (FAIL-CLOSED).
-  const few = mine.length < limits.timeJobs ? `${jobsOf(mine.length, limits.timeJobs)}${outside > 0 ? `, ${outside} with an A/A band that does not contain 1` : ""}` : undefined;
+  const notCounted = [...(outside > 0 ? [`${outside} with an A/A band that does not contain 1`] : []), ...(inProcess > 0 ? [`${inProcess} of mode process`] : [])];
+  const few = mine.length < limits.timeJobs ? [jobsOf(mine.length, limits.timeJobs), ...notCounted].join(", ") : undefined;
   const checks = few === undefined ? [medianCheck, tailCheck] : [medianCheck, tailCheck].map((c): TimeCheck => ({ ...c, valid: false, why: few, verdict: "noise" }));
   const status: TimeStatus = checks.some((c) => c.verdict === "fail") ? "fail" : checks.some((c) => c.verdict === "noise") ? "noise" : "pass";
   const p10 = min(per.map((x) => x.floor?.p10 ?? Number.NaN));
   const faster = status === "pass" && worstMedian < 1 && worstMedian < p10;
-  const record = { jobs: mine.length, policy: limits.timeJobs, outside, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
+  const record = { jobs: mine.length, policy: limits.timeJobs, outside, inProcess, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
   return { median: worstMedian, tail: tailCheck.worst, pass: status === "pass", status, ...record, inputs: per[0]!.all.length, checks, faster, ...at };
 }
 

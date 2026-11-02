@@ -99,7 +99,8 @@ export function casePlan(target: CaseTarget, paths: PlanPaths): CasePlan {
         ...node,
         script("screen.ts"),
         ...["--step", "router", "--set", set, "--strategy", arms.join(",")],
-        ...["--paired", at(dir, "paired.json"), ...paired],
+        // The in-order arm keeps each input after the other inputs in one process. The paired screen runs mode fresh by default (BENCH-FRESH-CASES).
+        ...["--paired", at(dir, "paired.json"), ...paired, "--paired-mode", "process"],
         ...["--out", at(dir, "screen.jsonl"), "--summary", at(dir, "screen.md")],
       ],
       alone: (input, dir) => [...node, script("case-order.ts"), "--child", "screen", "--input", input, "--set", set, ...paired, "--paired", at(dir, "paired.json")],
