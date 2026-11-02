@@ -6,7 +6,7 @@ import { asRouter, createRegistry, getStrategy, listStrategies, register, STEPS,
 import { compareStep, highwayRouters, isRoutedStep, stepRouters, wholeBoard, type CompareRow, type CompareStep, type RoutedStep, type StepComparison } from "../compare.ts";
 import { bundledShare, bundleStretch, mergeAngle } from "../measures/bundles.ts";
 import { highwayEdits } from "../measures/highways.ts";
-import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "../measures/lanes.ts";
+import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeBalance, routeSeparation, runProfile } from "../measures/lanes.ts";
 import { farLevel, groupFill, itemOverlaps, silhouette } from "../measures/groups.ts";
 import { levelRatio, linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
@@ -18,7 +18,7 @@ import { routeSymmetry } from "../measures/symmetry.ts";
 import { quantile } from "../measures/stats.ts";
 import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
-import { sameData } from "../run.ts";
+import { sameData, type TimingEnv } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
 import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
 import { curvesHash, resultHash, type MoveCounter } from "./exercise.ts";
@@ -120,6 +120,8 @@ export interface ScreenOptions {
   readonly moves?: MoveCounter;
   /** This function gets one line of progress for each input. */
   readonly log?: (line: string) => void;
+  /** The computer and the mode of the times (MEASURE-ISOLATE). The summary keeps it. The records do not get it. */
+  readonly env?: TimingEnv;
 }
 
 /** The summary of one strategy over the inputs of a screen. */
@@ -131,8 +133,8 @@ export interface ScreenStrategySummary {
   readonly runs: number;
   /** The number of inputs that the strategy skipped. */
   readonly skipped: number;
-  /** This value is `true` when each run gave the same output two times. */
-  readonly deterministic: boolean;
+  /** This value is `true` when each run gave the same output two times. It is `null` when the strategy has no run, because no run makes no claim (SCREEN-NO-RUN). */
+  readonly deterministic: boolean | null;
   /** The sum of the breaks of each hard rule over the runs. */
   readonly hard: Readonly<Record<string, number>>;
   /** The sum of `hard`. */
@@ -173,9 +175,13 @@ export interface ScreenSummary {
   readonly front: readonly string[];
   /** The strategies with a break over the floor, without a run or with two different outputs of one input. They do not enter the front. */
   readonly excluded: readonly string[];
+  /** The number of strategies with no run on any input. Their `deterministic` is `null`. */
+  readonly noRun: number;
   readonly predictions: readonly PredictionCheck[];
   /** The gap closed of each strategy and rule, when the screen has optima. */
   readonly gap?: readonly GapSummary[];
+  /** The computer and the mode of the times of the records (MEASURE-ISOLATE), from `ScreenOptions.env`. */
+  readonly env?: TimingEnv;
 }
 
 /** The result of `screen`: one record for each strategy and input, and the summary. */
@@ -274,6 +280,9 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     const open = openLanes(row.result);
     values["R12.share"] = routeSeparation(routes);
     values["R14.share"] = orthogonality(routes);
+    const balance = routeBalance(routes);
+    values["R16.cv"] = balance.cv;
+    values["R16.low"] = balance.low;
     values["B5.crossings"] = laneCrossings(open.graph);
     values["B7.ratio"] = occupiedArea(routes, boardUnit(graph));
     const runs = runProfile(open.graph);
@@ -491,7 +500,8 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
   }
 
   const summary = summarizeScreen(records, comparisons, { set: set.id, step, candidates, ...(options.predictions ? { predictions: options.predictions } : {}) });
-  return { records, summary: optima ? { ...summary, gap: summarizeGap(records) } : summary };
+  const timed = options.env ? { ...summary, env: options.env } : summary;
+  return { records, summary: optima ? { ...timed, gap: summarizeGap(records) } : timed };
 }
 
 /** This function gives the summary of the records of a screen. */
@@ -524,7 +534,7 @@ function summarizeScreen(
       candidate: at.candidates.has(strategy),
       runs: ran.length,
       skipped: all.length - ran.length,
-      deterministic: ran.every((r) => r.deterministic),
+      deterministic: ran.length === 0 ? null : ran.every((r) => r.deterministic),
       hard,
       hardTotal: Object.values(hard).reduce((s, v) => s + v, 0),
       hardOverFloor: ran.reduce((n, r) => n + overFloor(r), 0),
@@ -533,7 +543,7 @@ function summarizeScreen(
       onFront: comparisons.filter((c) => c.front.includes(strategy)).length,
     };
   });
-  const fair = strategies.filter((s) => s.runs > 0 && s.hardOverFloor === 0 && s.deterministic);
+  const fair = strategies.filter((s) => s.runs > 0 && s.hardOverFloor === 0 && s.deterministic === true);
   const front = paretoFront(fair, (s) => Object.fromEntries(objectives.map((o) => [o.key, s.medians[o.key] ?? Number.NaN])), objectives).map((s) => s.strategy);
   const predictions = (at.predictions ?? []).map((p): PredictionCheck => {
     const op = p.op ?? (measureByName(p.measure)?.better === "higher" ? ">=" : "<=");
@@ -550,6 +560,7 @@ function summarizeScreen(
     strategies,
     front,
     excluded: strategies.filter((s) => !fair.includes(s)).map((s) => s.strategy),
+    noRun: strategies.filter((s) => s.runs === 0).length,
     predictions,
   };
 }
@@ -564,16 +575,18 @@ export function formatScreen(summary: ScreenSummary): string {
     "",
     `${summary.inputs} inputs, ${summary.strategies.length} strategies. Each cell of a measure is the median over the inputs.`,
     "The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input.",
+    ...(summary.env ? [`The times come from ${summary.env.cores} x ${summary.env.cpu} (${summary.env.os} ${summary.env.arch}, Node.js ${summary.env.node}), mode \`${summary.env.mode}\`${summary.env.context ? `, context \`${summary.env.context}\`` : ""}.`] : []),
     "",
     `| strategy | new | runs | skipped | hard | over the floor | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
     `|---|---|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
     ...summary.strategies.map(
       (s) =>
-        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
+        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic === null ? "no run" : s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
     ),
     "",
     `Pareto front over the medians: ${summary.front.join(", ") || "-"}.`,
     `Not on the front because of a break over the floor, no run or two different outputs: ${summary.excluded.join(", ") || "-"}.`,
+    `Strategies with no run on any input: ${summary.noRun}.`,
   ];
   if (summary.predictions.length > 0) {
     lines.push("", "| prediction | strategy | input | measure | expected | measured | met | reason |", "|---|---|---|---|---:|---:|---|---|");

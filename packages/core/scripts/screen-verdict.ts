@@ -14,6 +14,7 @@ import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabe
 import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
+import { requireGrid } from "./gates/inputs.ts";
 
 /** The significance level of each verdict. */
 const LEVEL = 0.05;
@@ -168,6 +169,8 @@ function main(): void {
   }
   const base = opt("--default") ?? "shared";
   const records = parseLines<LayoutRecord>(readFileSync(file, "utf8"));
+  // FAIL-CLOSED: a verdict needs records, and each strategy needs a record on each input. A file of a failed run holds fewer.
+  requireGrid(`screen-verdict ${file}`, records);
   const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
   const rows = screenVerdicts(records, base, measures);
   const step = stepOf(records);

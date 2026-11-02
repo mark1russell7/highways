@@ -161,6 +161,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R13 | Outside | Routes in the bounding box of the board | `count(e : a point of r_e is more than 24 units outside the bounding box)` | count, `↓` | `linear` | fault | yes, `outside` | Own (QFIX, ER3c) |
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
+| R16 | Lane balance | Even gaps between parallel routes, also when each gap is wide | For each leg, the nearest leg of other edges at each side within 5° of parallel and 8 lane widths, with the overlap `w` and the gap `g`: `cv = sd_w(g) / mean_w(g)`, and `low` is the share of `w` with `g < median_w(g) / 2` | `cv` no unit and share 0..1, `↓` | `n log n` | score | yes, `R16.cv` and `R16.low` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
 
 ### Notes on the routes
 
@@ -168,6 +169,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 - R11 is the angular resolution of a box. On a box, the routes of one side leave along the same normal, so the angle between them is 0. The space between their plugs takes the place of the angle.
 - [Purchase 1997][purchase97] found no significant effect of the angular resolution or of the orthogonality. Thus R11 and R14 get low weights, but MEAS1 still reports them.
 - R14 is a style, not a quality. A host app with an orthogonal style sets a high weight. A host app with curves sets a weight of 0.
+- R12 counts the parallel ink that is too near. R16 counts uneven gaps, also when each gap is wide. On `screen-v3`, their Spearman correlation is 0.64, so they are not independent. `R16.low` against R12 is 0.22.
 
 ## Bundles
 
@@ -258,11 +260,16 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Z8 | Order stability | The same order on each axis at each level | `τ_x` and `τ_y`: the Kendall tau between the order of the item centers and the order of the centroids of their nodes | -1..1, `↑` | `n log n` | score | yes, `Z8.order` of the suite, sampled above 1500 items | [Misue 1995][misue95], [Kendall 1938][kendall38] |
 | Z9 | Link agreement | Level links that follow the routes of their edges | `la = mean over links of hausdorff(link, routes of its edges outside the two items) / u` | no unit, `↓` | `quadratic` for each link, sampled | score | yes, `Z9.mean` of the screen | [Elmqvist 2010][elmqvist10], [Perlin 1993][perlin93] |
 | Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z10.mean`, `Z10.max` and `Z10.moved` of the suite, up to 1000 nodes | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
+| Z11 | Move response | Routes that answer a move of one node only near that node | One node moves by one unit `u` and the edges stay: `gain = Σ_e frechet / u / max(1, degree)`, and `spill` is the share of the other routes that move more than 1 unit | `gain` no unit, 1 is local, and share 0..1, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z11.gain` and `Z11.spill` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
+| Z12 | Seed stability | Routes that do not change with the seed of a strategy | A strategy with the option `seed` routes again with `seed + 1`: the mean Fréchet distance and the share of the routes that move. A strategy without a seed has 0 | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z12.mean` and `Z12.moved` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
 
 ### Notes on the zoom levels
 
 - Z7 and Z8 compare two levels of one result. Z10 compares two results of two inputs. Both kinds are stability, and the bench has neither today.
 - Z8 uses the order and not the distance, because a reader keeps the order better ([Misue 1995][misue95]).
+- Z11 separates two parts of Z10. The move of one node has an expected local response: the edges of that node move by approximately one unit. `Z11.gain` above 1 tells that the response is larger than the move. `Z11.spill` tells that it reaches other routes.
+- On `screen-v3`, the median `Z11.gain` of `straight` is 0.96, and of `shared` 4.2. On the clustered families, the field bundlers spill most: `cubu` 0.44, `territories` 0.36 and `mlseb` 0.27.
+- Z12 reads only the option `seed` of the strategy. A strategy that keeps a seed inside, as the fit of `preferences`, has 0. A wrapper with its own fixed options hides the seed too.
 - The input change of Z10 and G9 is seeded: one node moves by `u`, one edge is added, or one edge is removed. The change is the same for each strategy.
 - For the step `highway`, the screen option `edits` gives Z10 over a sequence of seeded changes, with the plan before each change. It also gives the churn of the highways and the share of the highways that keep their id (BUILD-W2A).
 

@@ -1,14 +1,16 @@
-// The summary of XPLAT-HASH: `node scripts/xplat-summary.ts --cells <dir> [--near <dir>] [--targets <file>] [--out <md>] [--json <file>]`.
+// The summary of XPLAT-HASH: `node scripts/xplat-summary.ts --cells <dir> --expect <cell ids> [--near <dir>] [--targets <file>] [--out <md>] [--json <file>]`.
 // Each folder under `--cells` with a `meta.json` file is the output of `scripts/xplat.ts` on one cell of the matrix (a system and a node version).
 // The script compares each cell with the reference cell: linux with node 26, the cell of the joint bench of layout-contract.
 // - The table of the route hashes, with a letter for each group of cells that agree.
 // - For each route that differs, the first key and the first value that differ, and whether the difference changes a decision or only moves a point.
 // - With the call logs, the first chunk of 1000 Math calls that differs. With `--targets <file>`, the script writes only those chunks, for `XPLAT_NEAR`.
 // - With `--near <dir>` (the outputs of `XPLAT_NEAR`), the first call that differs: the function, the arguments, the two results and the frames in `src/`.
-// The script needs only node. It imports no package.
+// `--expect` names the cells of the matrix, for example `linux-node26,win32-node26`. The script fails when a cell is missing, or when a cell lacks a route of the reference cell (FAIL-CLOSED).
+// The script needs only node. It imports no package, only the check of the inputs in `scripts/gates/inputs.ts`.
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { gunzipSync } from "node:zlib";
+import { parseList, requireInputs } from "./gates/inputs.ts";
 
 /** The facts of a cell. */
 interface Meta {
@@ -343,7 +345,14 @@ function main(): void {
     console.error("xplat-summary: there is no cell with a routes.jsonl file.");
     process.exit(2);
   }
+  const expected = opt("--expect");
+  if (expected === undefined) {
+    console.error("xplat-summary: --expect <cell ids> names the cells of the matrix.");
+    process.exit(2);
+  }
+  requireInputs("xplat cells", parseList(expected), cells.map((c) => c.id));
   const ref = cells.find((c) => c.id === "linux-node26") ?? cells[0]!;
+  for (const c of cells) requireInputs(`xplat routes of the cell ${c.id}`, [...ref.rows.keys()], [...c.rows.keys()]);
   const keys = [...new Set(cells.flatMap((c) => [...c.rows.keys()]))].sort();
 
   // The targets of the near pass: for each input and router, the first chunk of each cell that differs from the reference.

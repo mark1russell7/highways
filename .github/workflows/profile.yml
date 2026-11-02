@@ -24,10 +24,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   profile:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # With "compare", `levels.ts` starts a fresh process for each commit, each round and each report (BENCH-FRESH-CASES).
+    # One commit to compare and 5 rounds give 30 children and 105 routes. At 60 s for each route, that is 105 min, plus the profile and the setup.
+    timeout-minutes: 180
     env:
       ROUTER: ${{ inputs.router }}
       FIXTURE: ${{ inputs.fixture }}
@@ -58,6 +64,8 @@ jobs:
           for ref in $COMPARE; do
             n=$((n + 1))
             git worktree add --detach "$RUNNER_TEMP/at-$n" "$ref"
+            # The core of a commit after #161 imports its dependencies, so the worktree installs them with its own lock file.
+            (cd "$RUNNER_TEMP/at-$n" && pnpm install --frozen-lockfile --prefer-offline --ignore-scripts --filter ./packages/core)
             srcs+=(--src "$ref=$RUNNER_TEMP/at-$n/packages/core/src")
           done
           srcs+=(--src "this commit=$GITHUB_WORKSPACE/packages/core/src")

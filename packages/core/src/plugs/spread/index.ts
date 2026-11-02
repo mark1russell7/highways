@@ -7,6 +7,8 @@ import { nodeIndex, portOffset, type End, type Node, type Side } from "../../mod
 import { nearestSide, placePlug, SIDE_NORMAL, sideToward, type Plug } from "../../plugs.ts";
 import type { PlugInput, PlugPair } from "../../strategies/model.ts";
 import { isotonic } from "../justify.ts";
+import { placeInIntervals, rangeInterval } from "../range.ts";
+import { alongOf, keyOf, pointAt, roomOf } from "../walls.ts";
 
 /** The options of the plug strategy `spread`. */
 export interface SpreadOptions {
@@ -29,6 +31,8 @@ interface Slot {
   readonly ideal: number;
   /** The index of the port in the ports of its node, then the index of the slot. Thus the rows of a card keep their order in a tie. */
   readonly rank: readonly [number, number];
+  /** The interval of the range of the port on the axis along the wall (PORT-RANGE), or `undefined` for a port without a range. */
+  readonly range?: readonly [number, number];
   /** The far end of the first end of the slot: a fixed plug, or the key of its slot. */
   far?: Plug | string;
   /** The place of the plug on the axis along the wall. */
@@ -41,47 +45,6 @@ interface Wall {
   readonly side: Side;
   readonly slots: Slot[];
   readonly fixed: number[];
-}
-
-/** This function gives the axis along a side. */
-function alongOf(side: Side): "x" | "y" {
-  return side === "east" || side === "west" ? "y" : "x";
-}
-
-/** This function gives the room of a wall: the segment of the axis along the side, without the corner insets. */
-function roomOf(box: Box, side: Side, inset: number): [number, number] {
-  const along = alongOf(side);
-  const start = along === "y" ? box.y : box.x;
-  const len = along === "y" ? box.h : box.w;
-  const m = Math.min(inset, len / 4);
-  return [start + m, start + len - m];
-}
-
-/** This function gives the point of a side at `v` on the axis along the side. */
-function pointAt(box: Box, side: Side, v: number): Point {
-  if (side === "east") return { x: box.x + box.w, y: v };
-  if (side === "west") return { x: box.x, y: v };
-  if (side === "south") return { x: v, y: box.y + box.h };
-  return { x: v, y: box.y };
-}
-
-/**
- * This function gives the sort key of a far point on a wall. The key has the order of the angle from the normal of the wall, from the center of the box.
- * The key grows in the direction of the axis along the wall. Thus the plugs in the order of the keys do not cross at the wall.
- */
-function keyOf(box: Box, side: Side, far: Point): number {
-  const c = center(box);
-  const n = SIDE_NORMAL[side];
-  const dx = far.x - c.x;
-  const dy = far.y - c.y;
-  const out = dx * n.x + dy * n.y;
-  const along = alongOf(side) === "y" ? dy : dx;
-  // A pseudo-angle with the order of the angle: a sum and one division, with no transcendental call. It goes from -2 to 2.
-  const size = Math.abs(out) + Math.abs(along);
-  if (size === 0) return 0;
-  const p = along / size;
-  if (out >= 0) return p;
-  return along >= 0 ? 2 - p : -2 - p;
 }
 
 /**
@@ -128,6 +91,7 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
     part = Math.max(part, p);
     parts[part]!.push(s);
   }
+  const ranged = slots.some((s) => s.range !== undefined);
   parts.forEach((list, p) => {
     if (list.length === 0) return;
     const a = ends[p]!;
@@ -138,6 +102,27 @@ function placeWall(slots: readonly Slot[], fixed: readonly number[], lo: number,
     const s = steps > 0 ? Math.max(0, Math.min(gap, (b - a) / steps)) : gap;
     const lower = a + fa * s;
     const upper = Math.max(lower, b - fb * s);
+    if (ranged) {
+      // Each plug with a range stays in the part of its range (PORT-RANGE). A range out of the part gives the nearest place of the part.
+      const span = list.map((x): [number, number] => {
+        if (!x.range) return [lower, upper];
+        const lo = Math.max(lower, x.range[0]);
+        const hi = Math.min(upper, x.range[1]);
+        if (lo <= hi) return [lo, hi];
+        const v = x.range[1] < lower ? lower : upper;
+        return [v, v];
+      });
+      const at = placeInIntervals(
+        list.map((x) => idealOf(x)),
+        span.map((r) => r[0]),
+        span.map((r) => r[1]),
+        s,
+      );
+      list.forEach((x, i) => {
+        x.at = at[i]!;
+      });
+      return;
+    }
     const at = placeInOrder(
       list.map((x) => idealOf(x)),
       lower,
@@ -205,7 +190,8 @@ export function spreadWith(input: PlugInput, options: SpreadOptions = {}, leader
     if (slots.has(key)) return key;
     const side = port?.side ?? sideToward(node.box, toward);
     const ideal = placePlug(node, end, toward).point[alongOf(side)];
-    const slot: Slot = { node, side, ideal, rank: [port ? node.ports!.indexOf(port) : -1, slots.size], at: ideal };
+    const range = rangeInterval(node.box, side, port, inset);
+    const slot: Slot = { node, side, ideal, rank: [port ? node.ports!.indexOf(port) : -1, slots.size], at: ideal, ...(range ? { range } : {}) };
     slots.set(key, slot);
     wallOf(node, side).slots.push(slot);
     return key;

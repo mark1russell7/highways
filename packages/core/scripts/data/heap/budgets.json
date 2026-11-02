@@ -1,0 +1,69 @@
+{
+  "run": "40937118877 (f90297f, the fix of streetPlan) for the 15 routers",
+  "margin": 1.5,
+  "floorMb": 1024,
+  "slackMb": 64,
+  "measureCapMb": 12288,
+  "routers": {
+    "straight": {
+      "rssMb": 110,
+      "heapMb": 28
+    },
+    "plugs": {
+      "rssMb": 122,
+      "heapMb": 41
+    },
+    "corners": {
+      "rssMb": 147,
+      "heapMb": 60
+    },
+    "corners-smooth": {
+      "rssMb": 218,
+      "heapMb": 126
+    },
+    "trunks": {
+      "rssMb": 156,
+      "heapMb": 62
+    },
+    "sections": {
+      "rssMb": 209,
+      "heapMb": 113
+    },
+    "sections-tree": {
+      "rssMb": 208,
+      "heapMb": 112
+    },
+    "shared": {
+      "rssMb": 283,
+      "heapMb": 167
+    },
+    "shared-all": {
+      "rssMb": 393,
+      "heapMb": 258
+    },
+    "steiner": {
+      "rssMb": 233,
+      "heapMb": 137
+    },
+    "gaps": {
+      "rssMb": 216,
+      "heapMb": 123
+    },
+    "streets": {
+      "rssMb": 261,
+      "heapMb": 119
+    },
+    "search": {
+      "rssMb": 863,
+      "heapMb": 338
+    },
+    "interchanges": {
+      "rssMb": 639,
+      "heapMb": 538
+    },
+    "portfolio": {
+      "rssMb": 281,
+      "heapMb": 169
+    }
+  }
+}

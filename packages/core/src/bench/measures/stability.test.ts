@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { makeFixture } from "../../fixtures.ts";
 import { straightRouter } from "../../routers/index.ts";
 import { roomOrderFaults } from "./room.ts";
-import { changeGraph, routeStability } from "./stability.ts";
+import { changeGraph, moveResponse, routeStability } from "./stability.ts";
 
 describe("changeGraph and routeStability (Z10)", () => {
   const graph = makeFixture({ name: "t", kind: "uniform", nodes: 40, edgesPerNode: 2, seed: 5 });
@@ -39,5 +39,35 @@ describe("roomOrderFaults (M2, room-order)", () => {
     expect(roomOrderFaults(before, [box("a", 0), box("b", 30), box("c", 15)])).toBe(1);
     // A box that moves down out of its row changes its relation with each other box on y.
     expect(roomOrderFaults(before, [box("a", 0), box("b", 10, 30), box("c", 20)])).toBe(2);
+  });
+});
+
+describe("changeGraph with edges: false and moveResponse (Z11)", () => {
+  const graph = makeFixture({ name: "t", kind: "uniform", nodes: 40, edgesPerNode: 2, seed: 5 });
+
+  it("moves the node of the full change, and keeps the edges", () => {
+    const full = changeGraph(graph, 3);
+    const move = changeGraph(graph, 3, { edges: false });
+    expect(move.moved).toBe(full.moved);
+    expect(move.graph.edges).toEqual(graph.edges);
+    expect(move.added).toBeUndefined();
+    expect(move.removed).toBeUndefined();
+  });
+
+  it("gives a local response for straight routes: only the edges of the moved node move", () => {
+    const move = changeGraph(graph, 3, { edges: false });
+    const router = straightRouter;
+    const z = moveResponse(graph, move, router.route(graph), router.route(move.graph));
+    expect(z).toBeDefined();
+    expect(z!.spill).toBe(0);
+    // An end of each edge of the moved node moves by one unit, so the gain is at most 1.
+    expect(z!.gain).toBeGreaterThan(0);
+    expect(z!.gain).toBeLessThanOrEqual(1 + 1e-9);
+  });
+
+  it("gives undefined when no node moved", () => {
+    const router = straightRouter;
+    const r = router.route(graph);
+    expect(moveResponse(graph, { graph }, r, r)).toBeUndefined();
   });
 });

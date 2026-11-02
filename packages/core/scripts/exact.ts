@@ -2,7 +2,8 @@
 // `pnpm exact --ladder --sizes 10,14,18 [--classes uniform,hubs] [--seeds 0,1,2] [--caps 1.5] [--rules collection,all] [--seconds 300] [--shard 0/8] --out ladder.jsonl`
 // solves boards of each size, to find the largest size with a proven optimum within the time limit.
 // `pnpm exact --set exact-v1 [--caps 1.1,1.25,1.5] [--rules collection,all] [--seconds 300] [--shard 0/8] --out optima.jsonl` solves each input of the set.
-// `pnpm exact --merge <dir> --set exact-v1 --out optima-exact-v1.json` joins the lines of each shard into the file of the optima. `--shards` is for the workflow.
+// `pnpm exact --merge <dir> --shards <n> --set exact-v1 --out optima-exact-v1.json` joins the lines of each shard into the file of the optima.
+// The join fails when a shard of the plan has no file `exact-<i>.jsonl`, or when the shards hold no solve (FAIL-CLOSED).
 // Each line has the input, its hash, the rule, the cap, the status, the proof, the objective, the bound, the MIP gap, the time, and B1 and the largest B3 of the plan.
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -13,6 +14,7 @@ import { EXACT_CLASSES, exactBoard, exactGenerator, type ExactClass } from "../s
 import { graphInput, inputGraph, type LayoutInput } from "../src/bench/screen/forms.ts";
 import { SCREEN_SETS, screenInputs } from "../src/bench/screen/set.ts";
 import { optimaFile, type ExactOptimum } from "../src/bench/screen/gap.ts";
+import { requireInputs } from "./gates/inputs.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -39,12 +41,18 @@ if (mergeDir !== undefined) {
     readdirSync(dir)
       .sort()
       .flatMap((n) => (statSync(join(dir, n)).isDirectory() ? files(join(dir, n)) : n.endsWith(".jsonl") ? [join(dir, n)] : []));
+  // FAIL-CLOSED: the join needs the file `exact-<i>.jsonl` of each shard of the plan, and at least one solve.
+  const shardCount = Number(opt("--shards"));
+  if (!Number.isInteger(shardCount) || shardCount < 1) throw new Error("exact --merge needs --shards <n>: the number of shards of the plan.");
+  const shardNames = files(mergeDir).flatMap((f) => /(?:^|[\\/])exact-(\d+)\.jsonl$/.exec(f)?.[1] ?? []);
+  requireInputs("exact shards", Array.from({ length: shardCount }, (_, i) => String(i)), shardNames);
   const rows = files(mergeDir).flatMap((f) =>
     readFileSync(f, "utf8")
       .split("\n")
       .filter((l) => l.trim().length > 0)
       .map((l) => JSON.parse(l) as ExactOptimum),
   );
+  if (rows.length === 0) throw new Error(`exact --merge: the ${shardCount} shards in ${mergeDir} hold no solve.`);
   const seconds = Number(opt("--seconds") ?? 300);
   const file = optimaFile(setId, rows, { seconds, ...(commit ? { commit } : {}), ...(run ? { run } : {}) });
   writeFileSync(out, JSON.stringify(file, null, 1) + "\n");

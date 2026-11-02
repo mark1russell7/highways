@@ -1,0 +1,172 @@
+# The unit of the work budget of the highway strategy search (SEARCH-BUDGET). The job work times searchRun on windows of the dense board
+# at several counts of evaluations, and it fits the extra time against the counted work (src/work.ts). Gate (a) is in its summary.
+# The jobs stops write the stop of each budget on Linux and on Windows, and the job same compares them (gate (b)). Times run here, not on a local machine.
+name: Search work
+
+on:
+  # A pull request that changes search or this script gets the fit with the default inputs.
+  # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
+  # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      sizes:
+        description: "The sizes of the windows of the dense board, in boxes, separated by commas"
+        default: "60,125,250,500,1000"
+      evaluations:
+        description: "The counts of evaluations, separated by commas"
+        default: "2,4,8"
+      min-ms:
+        description: "The least time in ms of the runs of each point, up to 9 runs (the time is the median)"
+        default: "2000"
+      budgets:
+        description: "The budgets of the stop records, in millions of units, separated by commas"
+        default: "1,10,100,1000"
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run for each ref (RUNNER-SLOTS). A new head of a pull request cancels the old run. A dispatch waits for the run before it.
+  group: search-work-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+        with:
+          paths: |
+            packages/core/src/highways/search/**
+            packages/core/src/work.ts
+            packages/core/src/lane-order.ts
+            packages/core/src/visibility.ts
+            packages/core/src/bench/measures/bundles.ts
+            packages/core/scripts/search-work.ts
+            .github/workflows/search-work.yml
+
+  work:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SIZES: ${{ inputs.sizes || '60,125,250,500,1000' }}
+      EVALUATIONS: ${{ inputs.evaluations || '2,4,8' }}
+      MIN_MS: ${{ inputs.min-ms || '2000' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time search against the work
+        working-directory: packages/core
+        run: |
+          set -o pipefail
+          node scripts/search-work.ts --sizes "$SIZES" --evaluations "$EVALUATIONS" --min-ms "$MIN_MS" --out "$RUNNER_TEMP/search-work.jsonl" | tee table.md
+          cat table.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: search-work-${{ github.sha }}
+          path: ${{ runner.temp }}/search-work.jsonl
+          if-no-files-found: warn
+
+  stops:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
+    strategy:
+      max-parallel: 3
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
+      # The sizes of gate (b). The job same expects one stop for each size and each budget.
+      SIZES: "60,125,250,500"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Write the stop of each budget
+        working-directory: packages/core
+        shell: bash
+        run: node scripts/search-work.ts --stops "$RUNNER_TEMP/stops.jsonl" --sizes "$SIZES" --budgets "$BUDGETS"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: search-stops-${{ matrix.os }}-${{ github.sha }}
+          path: ${{ runner.temp }}/stops.jsonl
+
+  same:
+    if: needs.changes.outputs.match == 'true'
+    needs: [changes, stops]
+    runs-on: ubuntu-latest
+    env:
+      BUDGETS: ${{ inputs.budgets || '1,10,100,1000' }}
+      # The sizes of gate (b). The job same expects one stop for each size and each budget.
+      SIZES: "60,125,250,500"
+    steps:
+      # The check of the inputs (scripts/gates/inputs.ts) needs only node and the script, not the packages.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: packages/core/scripts/gates
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: search-stops-*-${{ github.sha }}
+          path: stops
+      # FAIL-CLOSED: each system of the matrix gives its stops, and each file has one stop for each size and budget. Two empty files are byte-equal too.
+      - name: Check the inputs of the gate
+        run: |
+          ls -R stops
+          node packages/core/scripts/gates/inputs.ts "search stops" --expect "ubuntu-latest windows-latest" --got "$(ls stops | sed -E 's/^search-stops-(.+)-[0-9a-f]{40}$/\1/')"
+          budgets=$(tr ',' '\n' <<< "$BUDGETS" | grep -c .)
+          sizes=$(tr ',' '\n' <<< "$SIZES" | grep -c .)
+          for f in stops/*/stops.jsonl; do node packages/core/scripts/gates/inputs.ts "stops of $f" --expect-count "$((sizes * budgets))" --got-count "$(grep -c . "$f")"; done
+      - name: Compare the stops of Linux and Windows
+        run: |
+          {
+            echo "## The stops of each budget (gate (b))"
+            echo
+            echo '```'
+            cat stops/search-stops-ubuntu-latest-*/stops.jsonl
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cmp stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
+          echo "Gate (b): the stops of Linux and Windows are byte-equal." >> "$GITHUB_STEP_SUMMARY"
+
+  search-work-ok:
+    name: Search work OK
+    if: always()
+    needs: [changes, work, stops, same]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+        with:
+          needs: ${{ toJSON(needs) }}

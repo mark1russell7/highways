@@ -9,7 +9,7 @@ on:
     branches: [main]
   # A weekly scan finds the new advisories for the dependencies that do not change
   schedule:
-    - cron: "23 5 * * 1"
+    - cron: "6 5 * * 1"
   workflow_dispatch:
 
 permissions: {}
@@ -20,8 +20,36 @@ concurrency:
 
 jobs:
   security:
-    uses: mark1russell7/template/.github/workflows/reusable-security.yml@072c68a9d4b3fbaea886ad60ae54b6ebbef42bde # main
+    uses: mark1russell7/template/.github/workflows/reusable-security.yml@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
     permissions:
       contents: read
       security-events: write
       actions: read
+
+  # The check of the ruleset (CI.md, "The check of the ruleset"): the scans of this file passed.
+  security-ok:
+    name: Security OK
+    if: always()
+    needs: [security]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Each scan passed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          # The jobs that their own if may skip, separated by spaces. Each other job must pass.
+          ALLOW_SKIP: ""
+        run: |
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) \(.value.result)"' > results
+          cat results
+          if [ ! -s results ]; then echo "::error::no job in needs"; exit 1; fi
+          bad=0
+          while read -r job result; do
+            case "$result" in
+              success) ;;
+              skipped) case " $ALLOW_SKIP " in *" $job "*) ;; *) echo "::error::$job was skipped, and ALLOW_SKIP does not name it"; bad=1 ;; esac ;;
+              *) echo "::error::$job: $result"; bad=1 ;;
+            esac
+          done < results
+          exit $bad

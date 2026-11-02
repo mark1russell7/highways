@@ -9,15 +9,15 @@
 // There the value of a run is its B1 under the guard, and the oracle is the best member of the pool (`LARGE_SET`).
 // With `--setup-time <path,...> --setup-source <id>`, it keeps the times of the members, and takes the times of the setup of the key from other lines (`withSetup`).
 // Each band splits its seeds: the seeds 0 to 4 choose the set, and the seeds 5 to 9 test it. The script reads only records, so it runs locally in a few seconds.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { gunzipSync, gzipSync } from "node:zlib";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { gapInterval, optimumInterval } from "../src/bench/screen/bounds.ts";
 import { GAP_BASELINES, GAP_CAPS, GAP_RULES, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
 import { PORTFOLIO_BANDS, PORTFOLIO_KS_API, portfolioBand, type PortfolioBand } from "../src/portfolio/bands.ts";
-import { KEY_SETUP, type TimeRecord } from "./portfolio-time.ts";
+import { isTimeRecord, KEY_SETUP, type TimeRecord } from "./portfolio-time.ts";
 import { B1, MIXED, readRecords, type OracleRecord } from "./oracle.ts";
 import { capTable, choose, fallbackValue, greedySet, MODEL_STRETCH, oracleValue, PORTFOLIO_BASE, portfolioValues, ruleTable, shareOf, singleBest, type Run, type RunTable, type ValueOf } from "./portfolio.ts";
 
@@ -506,7 +506,7 @@ export function readOptima(paths: readonly string[] = OPTIMA_PATHS): ExactOptimu
   return paths.flatMap((f) => (JSON.parse(readFileSync(f, "utf8")) as ExactOptimaFile).optima);
 }
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);
@@ -531,13 +531,13 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const timePaths = paths("--time");
   let times: MemberTimes;
   if (timePaths.length > 0) {
-    const lines = timePaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as TimeRecord));
+    const lines = timePaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as unknown).filter(isTimeRecord));
     times = memberTimes(lines, opt("--time-source") ?? "local");
     writeFileSync(TIMES_PATH, JSON.stringify(times, null, 1) + "\n");
   } else times = readTimes();
   const setupPaths = paths("--setup-time");
   if (setupPaths.length > 0) {
-    const lines = setupPaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as TimeRecord));
+    const lines = setupPaths.flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as unknown).filter(isTimeRecord));
     times = withSetup(times, memberTimes(lines, opt("--setup-source") ?? "local"));
     writeFileSync(TIMES_PATH, JSON.stringify(times, null, 1) + "\n");
   }

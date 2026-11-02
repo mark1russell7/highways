@@ -98,6 +98,9 @@ const ROWS: readonly Row[] = [
   // MEAS3A, for the steps `router` and `highway`. R12 is the share of the ink near a parallel leg of other edges. A narrow channel between boxes moves it.
   ["R12.share", "R12", "route.lane.separation", "0 to 1", "lower", true],
   ["R14.share", "R14", "route.orthogonality", "0 to 1", "higher", false],
+  // BALANCE-STABILITY. R16 is the spread of the gaps between neighbor parallel legs of two edges, also when each gap is wide.
+  ["R16.cv", "R16", "route.balance.cv", "no unit", "lower", true, "The spread of the gaps between parallel routes: the standard deviation of the gaps over their mean. A value of 0 is even."],
+  ["R16.low", "R16", "route.balance.low", "0 to 1", "lower", true, "The share of the parallel overlap with a gap less than half of the median gap."],
   ["ink", "R1", "route.ink", "units", "lower", true],
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
@@ -154,6 +157,11 @@ const ROWS: readonly Row[] = [
   ["Z10.edits.moved", "Z10", "route.stability.edits.moved", "0 to 1", "lower", false],
   ["Z10.churn", "Z10", "route.stability.highway-churn", "0 to 1", "lower", false],
   ["Z10.ids", "Z10", "route.stability.highway-ids", "0 to 1", "higher", false],
+  // BALANCE-STABILITY. Z11 is the response to a move of one node by one unit. Z12 is the change of the routes with the next seed of a strategy.
+  ["Z11.gain", "Z11", "route.stability.move.gain", "no unit", "lower", false, "The movement of all the routes after one node moves by one unit, for each edge of that node. A value of 1 is a local response."],
+  ["Z11.spill", "Z11", "route.stability.move.spill", "0 to 1", "lower", false, "The share of the routes of other nodes that move after one node moves by one unit. A value of 0 is a local response."],
+  ["Z12.mean", "Z12", "route.stability.seed.mean", "units of the board", "lower", false, "The mean movement of the routes with the next seed of the strategy. A strategy without a seed has 0."],
+  ["Z12.moved", "Z12", "route.stability.seed.moved", "0 to 1", "lower", false, "The share of the routes that move with the next seed of the strategy. A strategy without a seed has 0."],
   // The zoom levels and the groups. The default grouping rule reads the positions, so most of these measures depend on the placement.
   ["level-nesting", "Z6", "route.level.nesting", "count", "lower", false],
   // MEAS3A, for the steps `router`, `highway` and `group`. Z2 is the count of the hard rule `link-ends`. Z9 needs a result with zoom levels.

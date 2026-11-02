@@ -1395,6 +1395,247 @@ The steps `highway` and `whole` get new snapshots. For the other strategies, eac
 - The screen has no measure of the tracing load W4. Thus the real win of WILD-057 has no value, and R1 and B4 take its place.
 - B9 has records on 3 families only, on `screen-v2` and on `screen-v3`.
 
+## The promotion test of canals and preferences
+
+PROMO-CANALS applies [the promotion rule](../PROMOTION.md) to the two candidates of wave 4C with the most support. `pnpm promotion` of `packages/core` reads the records of the screens and gives the tests.
+
+- `canals` is the candidate of the step `router`. Its baseline is the router default `shared`.
+- `preferences` is the candidate of the step `whole`. Its baseline is the step default `pipeline`.
+- The promotion corpus is `screen-v3`: 150 inputs in 15 families. It holds the boards of `screen-v1` and `screen-v2`.
+- The fresh set is the members 10 to 23 of each family: 210 inputs (`pnpm screen --members 10-23`). No screen used these seeds before.
+- The guards are the guards of the step in the promotion rule. `whole` has no row, so it takes the guards of `router` and `highway`. `Z10.mean` is the stability guard.
+- The gain test takes each measure. The sign tests get the Holm correction over the measures. The verdict over families also gets the Holm correction.
+- The literal reading takes all the inputs. The exercised reading takes only the inputs where the output of the candidate is different.
+
+The runs are [router on `screen-v3`](https://github.com/mark1russell7/highways/actions/runs/40882200381), [router on the fresh set](https://github.com/mark1russell7/highways/actions/runs/40882204699), [`whole` on `screen-v3`](https://github.com/mark1russell7/highways/actions/runs/40882209077) and [`whole` on the fresh set](https://github.com/mark1russell7/highways/actions/runs/40882213011).
+
+### The results
+
+| Candidate | Set | Changed inputs | Literal reading | Exercised reading |
+|---|---|---|---|---|
+| `canals` | `screen-v3` | 21 of 150 | Fail: no gain | Fail: `R4.turn` 1.046, `Z10.mean` tail 0.43, time 1.69 |
+| `canals` | fresh | 28 of 210 | Fail: no gain | Fail: `R4.turn` 1.039, `Z10.mean` tail 0.39, time 1.64 |
+| `preferences` | `screen-v3` | 53 of 150 | Fail: no gain, time 3.47, 3 tails | Fail: no gain, time 4.25, 4 tails |
+| `preferences` | fresh | 70 of 210 | Fail: no gain, time 3.42, 4 tails | Fail: time 4.44, 4 tails |
+
+- The hard rules pass for the two candidates on each set.
+- `canals` changes only the families `dense-groups` and `small-clustered`. There it removes 6% of the crossings, and it saves more ink. The two gains pass the sign test and the bootstrap.
+- But on these inputs, `canals` adds 4% of turn, and its routes move more on a change. As a rule of the selector for clustered inputs, it also fails the guard `R4.turn`.
+- `preferences` changes a third of the inputs. It removes 2% to 3% of the crossings, but the median time ratio is 3.4 against the limit of 1.5.
+- The tails of `preferences` fail on `R4.turn`, `Z10.mean`, `B3.q95` and `B6.max`. Its `Z10.mean` verdict is `worse` on 6 families with 0 for it.
+- The verdicts agree in sign between `screen-v3` and the fresh set on each measure with a verdict on the two sets.
+
+Thus no default changes, and each candidate stays opt-in. A next version of `canals` needs fewer turns. A next version of `preferences` needs less time.
+
+### The prediction of PROMO-CANALS
+
+This prediction was written before the runs, on 2026-10-29.
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. `canals` passes the promotion rule. | 0.55 | Not met: it fails the gain test on all the inputs. |
+| 2. `canals` is `worse` with significance on 1 or more measures that the screens did not name. | 0.45 | Met: 11 measures on `screen-v3` and 12 on the fresh set, for example `R4.turn` and `Z10.moved`. |
+| 3. `preferences` passes the promotion rule. | 0.35 | Not met: it fails the time test and 4 tails. |
+| 4. On the fresh set, the signs of `canals` on R1, B1 and B2 agree with the screens. | 0.7 | Met: R1, B1 and B2 are `better` on the two sets. |
+| 5. No default changes in this PR. | 0.95 | Met: the PR changes only scripts and docs. |
+
+## The physical routers (PHYSICAL)
+
+PHYSICAL builds three opt-in routers that move the points of the routes with forces. They use no grid and no search.
+
+| Strategy | Step | Start | Target | Baseline |
+|---|---|---|---|---|
+| `repel` | `router` | the lines of `straight` | Z11.gain near `straight`, with no loss on R12 and R1 | `shared`, `straight` |
+| `springs` | `router` | the routes of `shared` | R4.turn | `shared` |
+| `nudge` | `router` | the routes of `shared` | R16.low, R16.cv | `shared` |
+
+The module is `scripts/screens/physical.ts`. The highway strategies `fdeb` and `divided` were in the screens of BALANCE-STABILITY.
+
+### The design notes
+
+- `relaxRoutes` gives the forces. Each route gets legs of equal length, and its ends stay. All the points move together in each step.
+  - The boxes push the points near them. The points of other routes push the points. A spring pulls each point to the middle of its neighbors.
+  - After each step, a point in a box moves out of it with a space of 2.5 units. So each route acts as a rubber band round the boxes.
+- `repel` moves each point out through the side of its chord that is away from the center of the box. So all the points of one route go round a box on one side.
+  - That side changes only when the chord crosses the center of the box.
+- `keepRules` keeps the rule `no-pass-through`. A route through a box gets a backup route: `corners` for `repel`, and `shared` for `springs` and `nudge`.
+- `nudge` puts the legs of the routes into direction classes of near parallel legs. A track is the legs of one class on one line, so each lane of `shared` stays one lane.
+  - The tracks of a group of neighbors get even free gaps. A group whose new routes go through a box stays where it is.
+- The pseudo angle `dy / (|dx| + |dy|)` sorts the legs by direction, so `nudge` uses no `Math.atan2`.
+
+### The two rounds
+
+Each round screens the step `router` on `screen-v3` with 5 sets of 10 members. The sets go from the members 0 to 9 to the members 40 to 49.
+Each value is the mean ± SD over the 5 sets of the median of the set.
+
+- Round 1 ([0–9](https://github.com/mark1russell7/highways/actions/runs/40920910957), [10–19](https://github.com/mark1russell7/highways/actions/runs/40920915842), [20–29](https://github.com/mark1russell7/highways/actions/runs/40920920277), [30–39](https://github.com/mark1russell7/highways/actions/runs/40920925176), [40–49](https://github.com/mark1russell7/highways/actions/runs/40920929706)) had the first `repel` and the first `nudge`.
+  - The first `repel` had 16 legs for each route, and a projection only after the last step. On the members 0 of the 15 families, 836 of 1759 straight lines go through a box. The forces cleared only 230 of them. So 606 edges took the route of `corners`, and a change of the router is a jump.
+  - The first `nudge` moved only the legs parallel to an axis. Most of the legs of `shared` are not parallel to an axis, so it changed no measure.
+- Round 2 ([0–9](https://github.com/mark1russell7/highways/actions/runs/40923661182), [10–19](https://github.com/mark1russell7/highways/actions/runs/40923665787), [20–29](https://github.com/mark1russell7/highways/actions/runs/40923669648), [30–39](https://github.com/mark1russell7/highways/actions/runs/40923673609), [40–49](https://github.com/mark1russell7/highways/actions/runs/40923678426)) has the routers of this PR.
+  - The rubber band and the legs of 6 units or less bring the routes of `corners` from 606 to 175 on the members 0.
+  - All the 94 edges of `packed-grid` keep the route of `corners`. Its boxes touch, so no point fits between them.
+
+### The results
+
+The values are of round 2. A paired value is the median ratio to `shared` on the same input.
+
+| Router | Z11.gain | Z11.spill, clustered | R16.low | R16.cv | R12.share | Paired R1 | Paired R12 | Paired R4.turn | Time ratio |
+|---|---|---|---|---|---|---|---|---|---|
+| `straight` | 0.960 ± 0.001 | 0 | 0.236 ± 0.016 | 0.657 ± 0.021 | 0.286 ± 0.011 | 1.000 | 1.138 | 0 | 0.006 |
+| `shared` | 3.973 ± 0.257 | 0.045 ± 0.007 | 0.309 ± 0.018 | 1.012 ± 0.016 | 0.203 ± 0.008 | 1 | 1 | 1 | 1 |
+| `repel` | 6.880 ± 0.699 | 0.152 ± 0.012 | 0.149 ± 0.012 | 0.768 ± 0.010 | 0.112 ± 0.007 | 1.384 ± 0.034 | 0.613 ± 0.015 | 0.744 ± 0.021 | 52.1 ± 3.8 |
+| `springs` | 4.198 ± 0.426 | 0.059 ± 0.007 | 0.361 ± 0.008 | 1.417 ± 0.058 | 0.369 ± 0.004 | 1.804 ± 0.024 | 1.141 ± 0.007 | 0.451 ± 0.004 | 6.6 ± 0.3 |
+| `nudge` | 4.458 ± 0.581 | 0.120 ± 0.025 | 0.319 ± 0.010 | 0.954 ± 0.029 | 0.207 ± 0.010 | 1.127 ± 0.012 | 0.996 ± 0.004 | 1.011 ± 0.001 | 1.18 ± 0.00 |
+
+- No router breaks a hard rule on the 750 inputs of each round.
+- `repel` has the lowest R12.share and R16.low of the routers that go round the boxes. Its paired R12 is 0.61, and it halves R16.low.
+  - But it adds 38% of crossings, and it takes 52 times the time of `shared`.
+- `repel` does not bring Z11.gain down. Z11 adds the moves of all the routes. A rubber band round the moved box follows the box, so it adds to the gain and to the spill.
+  - The side flips of the chords and the routes of `corners` also add jumps.
+- `springs` removes 55% of the turn, but its curves cross 80% more, and R12 is worse.
+- `nudge` lowers R16.cv by 6%. Its R16.low does not change, and it adds 13% of crossings.
+- The second target of the strategist was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
+
+Thus no default changes, and no router goes to the promotion test. Each router fails the guard R1, and `repel` also fails the time test.
+
+### The ideas after PHYSICAL
+
+These ideas come from the results. Each one needs a screen before a verdict.
+
+- A crossing force for `repel`: two legs that cross push their points apart along the normal of the other leg.
+- A Z11 that does not count a route that follows its box. The strategist decides if the measure changes.
+- A border walk for boxes that touch: a route goes along the shared side, within the tolerance of the rule.
+- A faster `repel`: fewer steps on the long free legs, or a projection only near the boxes.
+- `nudge` with a test of the crossings: a group whose move adds a crossing stays where it is.
+
+### The prediction of PHYSICAL
+
+This prediction was written before the runs, on 2026-10-29. The results are of round 2.
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. `repel`: the mean median Z11.gain is 1.5 or less. | 0.55 | Not met: 6.88 ± 0.70. |
+| 2. `repel`: the paired median R1 against `shared` is 1.02 or less. | 0.35 | Not met: 1.384. |
+| 3. `repel`: the paired median R12.share is no worse than `shared`. | 0.4 | Met: 0.613. |
+| 4. `repel`: 0 breaks of a hard rule on all the inputs. | 0.85 | Met: 0 of 750. |
+| 5. `repel`: the median Z11.spill on the clustered families is 0.10 or less. | 0.5 | Not met: 0.152. |
+| 6. `nudge`: R16.low falls by 20% or more, with Z11.gain within 10% of `shared`. | 0.5 | Not met: R16.low 0.319 against 0.309, Z11.gain +12%. |
+| 7. `springs`: the median R4.turn falls by 10% or more. | 0.6 | Met: the paired R4.turn is 0.451. |
+| 8. `repel`: the time ratio against `shared` is 3 or less. | 0.4 | Not met: 52.1. |
+| 9. No default output changes. | 0.97 | Met: the routers are opt-in, and the hashes of `ROUTERS` stay. |
+
+## The work budget of search (SEARCH-BUDGET)
+
+The option `work` of `search` stops the search after a counted work, not after a time. Thus a budget gives the same plan on each machine.
+
+### The unit
+
+- The first unit was the edges times the evaluations. Its fit failed: R² 0.878, and the ms of 1000 edge routes went from 157 to 7285 over the windows.
+- The split fit (run 40950938005) found the cause. `follow` takes 27.3 s of the 31.5 s of one evaluation on 1000 boxes.
+- The lane order of `follow` is a pair loop. On 1000 boxes, `partAfter` and `partBefore` walk 3.1 billion steps over 9.3 million pairs.
+- The new unit is the weighted sum of 5 counters in `src/work.ts`: `lane`, `corner`, `sight`, `score` and `route`.
+- Each hot loop adds its count when it ends. The counts are deterministic.
+- A fit of the relative error gives the weights: `lane` 1, `corner` 11, `sight` 0, `score` 13 and `route` 24000.
+
+### The gates
+
+| Run | Weights | R² | The worst window | Gate (a) | Gate (b) |
+|---|---|---:|---:|---|---|
+| 40956237301 | All 1, 4 counters | 0.9997 | +1085% | Fail | Pass |
+| 40960950349 | Fitted, 5 counters | 0.9999 | -5.4% | Pass | Pass |
+| 40964639537 | Fixed, on new times | 0.9889 | +14.2% | Pass | Pass |
+
+- Gate (a) needs R² of 0.95 or more, and the slope of each window within 20% of the global slope.
+- Gate (b) needs a byte-equal stop for each budget on Linux and on Windows.
+- One million units take 1.5 ms to 2.7 ms on a CI runner. The speed of the runner changes this value, but not the stop.
+
+### The size of the pair loop
+
+These counts of one evaluation are the baseline of INCREMENTAL-SEARCH.
+
+| Boxes | Edges | `lane` | `score` | `route` |
+|---:|---:|---:|---:|---:|
+| 60 | 77 | 14292 | 17530 | 137 |
+| 125 | 236 | 955149 | 467043 | 361 |
+| 250 | 620 | 17709410 | 5453792 | 870 |
+| 500 | 1588 | 216559482 | 50890960 | 2088 |
+| 1000 | 4000 | 3094883932 | 535904365 | 5000 |
+
+The screen of the first unit found that `search` with 0 evaluations is nearly as good as the default. SEARCH-OBJECTIVE examines this result.
+
+### The prediction of SEARCH-BUDGET
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. The default output does not change. | 0.95 | Met. |
+| 2. On the dense board, 8 evaluations take 50% or less of the time of the default. | 0.6 | Not met: approximately 61%. |
+| 3. On `screen-v3`, the paired median B1 with a small budget is within 5% of the default. | 0.5 | Met. |
+| 4. On `screen-v3`, 0 evaluations is within 5% of the default on the median B1. | 0.45 | Met. |
+| 6. The fixed weights pass gate (a) on new times. | 0.8 | Met. |
+| 7. Each window of that run is within 10%. | 0.55 | Not met: +14.2%. |
+| 8. Gate (b) passes with the new weights. | 0.9 | Met. |
+
+Claim 5 was not tested. The mean Brier score of the 7 claims is 0.181.
+
+## The objective of search (SEARCH-OBJECTIVE)
+
+This item examines if the score of `search` follows the bench measures. The script `scripts/search-objective.ts` runs in the workflow `Search objective`.
+It runs `search` with 5 seeds on the 150 inputs of `screen-v3` and on the dense windows of 60, 125 and 250 boxes.
+
+### Part 1: the score against the measures
+
+For each input, the Spearman correlation of the score delta of each move with the change of ink, R1 and R4. A positive value means that a higher score gives a better measure.
+
+| Variant | ink | R1 | R4 |
+|---|---:|---:|---:|
+| The default | 0.182 | 0.084 | 0.526 |
+| Only ink (no penalties) | 0.500 | 0.421 | -0.743 |
+| Half penalties | 0.467 | 0.292 | 0.316 |
+| `crossingWeight` 0.1 | 0.386 | 0.354 | 0.401 |
+| `crossingWeight` 0.3 | 0.562 | 0.593 | 0.277 |
+| `crossingWeight` 0.3, half penalties | 0.763 | 0.763 | 0.114 |
+
+- The score of the default follows R4, but not ink or R1.
+- The term B1 follows ink (0.70) and R1 (0.60), and it goes against R4 (-0.71).
+- The penalties B3, B4 and B6 go against ink and R1, and they follow R4. Thus the penalties hold the search back from the ink.
+- The families `packed-grid` and `local-mesh` give no spread: no move changes their measures.
+
+### Part 2: each variant against the default
+
+A gain is a mean over the seeds that is better than the mean of the default by more than 2 sd. Holm runs over the 18 tests.
+
+| Against the default | ink gains, drops | R1 gains, drops | R4 gains, drops | Holm p of ink, R1, R4 |
+|---|---|---|---|---|
+| 0 evaluations | 5, 7 | 4, 5 | 4, 6 | 1, 1, 1 |
+| Only ink | 8, 1 | 5, 0 | 0, 28 | 0.41, 0.56, below 0.0001 |
+| `crossingWeight` 0.3 | 9, 0 | 14, 0 | 0, 6 | 0.055, 0.002, 0.41 |
+| `crossingWeight` 0.3, half penalties | 14, 0 | 20, 0 | 0, 6 | 0.002, below 0.0001, 0.41 |
+
+- 0 evaluations is within the floor of the default on 92% of the inputs. Thus the annealing of the default changes little.
+- `crossingWeight` 0.3 with half penalties gains on ink and R1 with no drop. Its R4 has 6 drops, but Holm does not find them significant.
+- The effect of the best variant is small: the median ratio of R1 is 0.962, and p10 is 0.863. It takes 1.18 times the time of the default.
+- The work counters do not count the crossing term yet. A change of the default needs that counter.
+
+The default does not change with this screen. The item SEARCH-CROSS tests the change of the default on new seeds.
+
+### The prediction of SEARCH-OBJECTIVE
+
+| Claim | Confidence | Result |
+|---|---|---|
+| 1. The median ρ of the score against ink is 0.3 or more. | 0.45 | Not met: 0.182. |
+| 2. The median ρ against R1 is 0.1 or less. | 0.7 | Met: 0.084. |
+| 3. The median ρ against R4 is 0.1 or less. | 0.6 | Not met: 0.526. |
+| 4. At least one term has a negative median ρ against ink. | 0.5 | Met: B3, B4 and B6. |
+| 5. The start plan gains on R1 with Holm p below 0.05. | 0.5 | Not met: Holm p 1. |
+| 6. The observer does not change the output. | 0.97 | Met. |
+| 7. The screen job ends within 30 minutes. | 0.6 | Met: 4.5 minutes. |
+| 8. `crossingWeight` 0.3 has a median ρ against R1 of 0.3 or more. | 0.5 | Met: 0.593. |
+| 9. That variant gains on R1 with Holm p below 0.05. | 0.35 | Met: 0.002. |
+| 10. Only ink has a median ρ of 0.5 or more against ink, and below 0 against R4. | 0.55 | Met: 0.500 and -0.743. |
+| 11. No variant passes Holm on the three measures. | 0.75 | Met. |
+
+The mean Brier score of the 11 claims is 0.205.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

@@ -66,6 +66,16 @@ function runOn(s: AnyStrategy, options?: object): unknown[] {
 }
 
 describe("the declarations of the built-in strategies (OPTS)", () => {
+  it("give each number default on the step of its declaration, so a host that checks the step accepts it", () => {
+    for (const s of BUILT_IN_STRATEGIES) {
+      for (const [key, d] of Object.entries((s.schema ?? {}) as Record<string, { type?: string; min?: number; step?: number; default?: unknown }>)) {
+        if ((d.type !== "number" && d.type !== "integer") || d.step === undefined || typeof d.default !== "number" || !Number.isFinite(d.default)) continue;
+        const n = (d.default - d.min!) / d.step;
+        expect(Math.abs(n - Math.round(n)), `${s.step} ${s.name} ${key}`).toBeLessThan(1e-9);
+      }
+    }
+  });
+
   it("declare each option of the defaults, with a good range, and a test fails for an option without a declaration", () => {
     for (const s of BUILT_IN_STRATEGIES) {
       expect(s.schema, s.name).toBeDefined();

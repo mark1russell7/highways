@@ -1,0 +1,380 @@
+{
+  "schema": "remeasure/1",
+  "claim": "portfolio-speed",
+  "plan": {
+    "claim": "portfolio-speed",
+    "rows": [
+      "PORTFOLIO-SPEED"
+    ],
+    "old": "npm `@mark1russell7/highways@0.5.1`",
+    "board": "the exact boards of 0.5.1 with 41, 52, 64, 100 nodes, each class, the seeds 0, 1, 2",
+    "mode": "fresh",
+    "rounds": 10,
+    "warmup": 1,
+    "targets": [
+      {
+        "id": "setup n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the setup at 41 to 64 nodes"
+      },
+      {
+        "id": "setup n100",
+        "claim": 0.14534883720930233,
+        "source": "PORTFOLIO-SPEED: the setup at 100 nodes goes from 172 to 25 ms"
+      },
+      {
+        "id": "router n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the fit runs one member at the cap 1.5, at 39 to 46 ms (a time, not a ratio)"
+      },
+      {
+        "id": "router n100",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the router at 100 nodes"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "job": "job1",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9663993750460513,
+        "p90": 1.0342419975203376
+      }
+    },
+    {
+      "job": "job2",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.967649040984434,
+        "p90": 1.0327154403576997
+      }
+    },
+    {
+      "job": "job3",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9710761656368647,
+        "p90": 1.0304562933423012
+      }
+    },
+    {
+      "job": "job4",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9753464266200056,
+        "p90": 1.0290601209509245
+      }
+    },
+    {
+      "job": "job5",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9524812649245625,
+        "p90": 1.0252374161960314
+      }
+    }
+  ],
+  "targets": [
+    {
+      "target": {
+        "id": "setup n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the setup at 41 to 64 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.45567199173246603,
+          "floor": {
+            "p10": 0.9663993750460513,
+            "p90": 1.0342419975203376
+          },
+          "inside": false,
+          "oldMs": 48.966437249999984,
+          "newMs": 22.158621749999995
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.4531994644846952,
+          "floor": {
+            "p10": 0.967649040984434,
+            "p90": 1.0327154403576997
+          },
+          "inside": false,
+          "oldMs": 30.983908749999998,
+          "newMs": 13.995698249999975
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.440931679830349,
+          "floor": {
+            "p10": 0.9710761656368647,
+            "p90": 1.0304562933423012
+          },
+          "inside": false,
+          "oldMs": 47.4091675,
+          "newMs": 21.05131375000002
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.454996960073287,
+          "floor": {
+            "p10": 0.9753464266200056,
+            "p90": 1.0290601209509245
+          },
+          "inside": false,
+          "oldMs": 38.33963075000001,
+          "newMs": 17.77675575000002
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.44188593571729073,
+          "floor": {
+            "p10": 0.9524812649245625,
+            "p90": 1.0252374161960314
+          },
+          "inside": false,
+          "oldMs": 48.37826150000001,
+          "newMs": 22.113591999999997
+        }
+      ],
+      "worst": 0.45567199173246603,
+      "slower": 0,
+      "verdict": "outside the noise floor, no claimed ratio"
+    },
+    {
+      "target": {
+        "id": "setup n100",
+        "claim": 0.14534883720930233,
+        "source": "PORTFOLIO-SPEED: the setup at 100 nodes goes from 172 to 25 ms"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.23189253675871654,
+          "floor": {
+            "p10": 0.9663993750460513,
+            "p90": 1.0342419975203376
+          },
+          "inside": false,
+          "oldMs": 211.70591625,
+          "newMs": 48.94494750000001
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.2567539195276015,
+          "floor": {
+            "p10": 0.967649040984434,
+            "p90": 1.0327154403576997
+          },
+          "inside": false,
+          "oldMs": 121.50473925,
+          "newMs": 31.723391750000005
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.2255418537120566,
+          "floor": {
+            "p10": 0.9710761656368647,
+            "p90": 1.0304562933423012
+          },
+          "inside": false,
+          "oldMs": 212.69470149999998,
+          "newMs": 47.831172499999994
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.24288800963431273,
+          "floor": {
+            "p10": 0.9753464266200056,
+            "p90": 1.0290601209509245
+          },
+          "inside": false,
+          "oldMs": 162.17214575,
+          "newMs": 39.50379725000002
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.22593971617151248,
+          "floor": {
+            "p10": 0.9524812649245625,
+            "p90": 1.0252374161960314
+          },
+          "inside": false,
+          "oldMs": 211.95370575,
+          "newMs": 48.17122674999999
+        }
+      ],
+      "worst": 0.2567539195276015,
+      "slower": 0,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "router n41-64",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the fit runs one member at the cap 1.5, at 39 to 46 ms (a time, not a ratio)"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 2.1578343123890216,
+          "floor": {
+            "p10": 0.9663993750460513,
+            "p90": 1.0342419975203376
+          },
+          "inside": false,
+          "oldMs": 23.814086499999988,
+          "newMs": 50.50312150000002
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 2.2148582252972266,
+          "floor": {
+            "p10": 0.967649040984434,
+            "p90": 1.0327154403576997
+          },
+          "inside": false,
+          "oldMs": 14.546263249999996,
+          "newMs": 32.259043750000004
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 2.1174760637680015,
+          "floor": {
+            "p10": 0.9710761656368647,
+            "p90": 1.0304562933423012
+          },
+          "inside": false,
+          "oldMs": 23.209003750000008,
+          "newMs": 48.26084874999998
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 2.25209580302141,
+          "floor": {
+            "p10": 0.9753464266200056,
+            "p90": 1.0290601209509245
+          },
+          "inside": false,
+          "oldMs": 18.04061425,
+          "newMs": 40.07162199999999
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 2.093434579513037,
+          "floor": {
+            "p10": 0.9524812649245625,
+            "p90": 1.0252374161960314
+          },
+          "inside": false,
+          "oldMs": 23.876936750000006,
+          "newMs": 48.952092500000006
+        }
+      ],
+      "worst": 2.25209580302141,
+      "slower": 5,
+      "verdict": "outside the noise floor, no claimed ratio"
+    },
+    {
+      "target": {
+        "id": "router n100",
+        "claim": null,
+        "source": "PORTFOLIO-SPEED: the row gives no ratio for the router at 100 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.7009593831769693,
+          "floor": {
+            "p10": 0.9663993750460513,
+            "p90": 1.0342419975203376
+          },
+          "inside": false,
+          "oldMs": 38.06902425,
+          "newMs": 27.752517749999996
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.7142758907570663,
+          "floor": {
+            "p10": 0.967649040984434,
+            "p90": 1.0327154403576997
+          },
+          "inside": false,
+          "oldMs": 23.841881500000007,
+          "newMs": 17.20637099999999
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.6923248978112682,
+          "floor": {
+            "p10": 0.9710761656368647,
+            "p90": 1.0304562933423012
+          },
+          "inside": false,
+          "oldMs": 36.221486250000005,
+          "newMs": 26.52298175
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.722795472283893,
+          "floor": {
+            "p10": 0.9753464266200056,
+            "p90": 1.0290601209509245
+          },
+          "inside": false,
+          "oldMs": 29.14719375,
+          "newMs": 21.565747
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.7146864904477166,
+          "floor": {
+            "p10": 0.9524812649245625,
+            "p90": 1.0252374161960314
+          },
+          "inside": false,
+          "oldMs": 39.65656525000001,
+          "newMs": 28.635113750000002
+        }
+      ],
+      "worst": 0.722795472283893,
+      "slower": 0,
+      "verdict": "outside the noise floor, no claimed ratio"
+    }
+  ],
+  "verdict": "smaller"
+}

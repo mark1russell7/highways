@@ -14,7 +14,7 @@ on:
         default: ""
       minutes:
         type: string
-        default: "60"
+        default: "150"
       sets:
         type: string
         default: ""
@@ -36,8 +36,8 @@ on:
         description: "The ids of CI runs, with commas: --exact <id> --screen <id,...> --time <id>, and --bounds <id,...> for pnpm bounds. The job then writes the reports from their artifacts, and times nothing."
         default: ""
       minutes:
-        description: "The time limit of each shard, in minutes."
-        default: "60"
+        description: "The time limit of each shard, in minutes. The paired times start fresh processes, so the default is 150."
+        default: "150"
       sets:
         description: "PORTFOLIO-FIT: the id of a run of the times with --members. The job writes the sets, the fit and the summary of the times with pnpm portfolio:sets, and times nothing."
         default: ""
@@ -53,6 +53,11 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  # One run for each ref (RUNNER-SLOTS). A dispatch waits for the run before it.
+  group: portfolio-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   plan:
@@ -74,11 +79,13 @@ jobs:
   time:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ fromJSON(inputs.minutes || '60') }}
+    # The paired times start a fresh process for each arm, each board and each round (BENCH-FRESH-CASES).
+    # With 16 shards, a shard starts 3780 processes at most, 32 to 95 min. So the default is 150 minutes.
+    timeout-minutes: ${{ fromJSON(inputs.minutes || '150') }}
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     env:
@@ -109,10 +116,21 @@ jobs:
           if-no-files-found: warn
 
   merge:
-    needs: time
+    needs: [plan, time]
     if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
     runs-on: ubuntu-latest
+    env:
+      # The join expects the file of each shard of the plan (FAIL-CLOSED).
+      SHARDS: ${{ needs.plan.outputs.count }}
     steps:
+      # The check of the inputs (scripts/gates/inputs.ts) needs only node and the script, not the packages.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: packages/core/scripts/gates
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: time-shard-*
@@ -120,7 +138,9 @@ jobs:
       - name: Join the shards
         run: |
           # With one shard, the action puts the file of the shard in shards/ itself, with no folder of the artifact (FIT-COST).
+          node packages/core/scripts/gates/inputs.ts "portfolio time shards" --expect "$(seq -s, 0 $((SHARDS - 1)))" --got "$(find shards -name 'time-*.jsonl' | sed -E 's/.*time-([0-9]+)\.jsonl$/\1/')"
           find shards -name '*.jsonl' -exec cat {} + > time.jsonl
+          if [ ! -s time.jsonl ]; then echo "::error::the $SHARDS shards hold no timed run"; exit 1; fi
           echo "The job joined $(wc -l < time.jsonl) timed runs." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

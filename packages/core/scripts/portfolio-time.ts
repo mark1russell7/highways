@@ -1,4 +1,4 @@
-// The time of each strategy of the portfolio (PORTFOLIO): `pnpm portfolio:time [--sizes 10,24,40] [--seeds 0,1,2] [--repeats 5] [--slow 2000] [--members] [--stop 250] [--shard 0/8] --out time.jsonl`.
+// The time of each strategy of the portfolio (PORTFOLIO): `pnpm portfolio:time [--sizes 10,24,40] [--seeds 0,1,2] [--repeats 5] [--slow 2000] [--members] [--stop 250] [--shard 0/8] [--no-paired] --out time.jsonl`.
 // The script routes the small boards of `exact-v1` at each size with each strategy of the gap screen (`scripts/screens/meas2.ts`) and each built-in router.
 // It writes one line for each timed run: the strategy, the board, the time of the route and the time of the score of the portfolio (B1, B3 q95 and the hard rules).
 // A run slower than `--slow` ms gets no more repeats. Start it only in CI, with the workflow `Portfolio`, because the times of a busy machine are not true.
@@ -8,17 +8,32 @@
 // Each shard runs its first board once and keeps no line of it (HASH-LAZY). So the first timed board is warm, and each time is a warm median.
 // Then each board also gets one line of the strategy `@key-setup`: the time to build the network of the stretch and to read the facts of the output of `shared`.
 // After a size where the median time of a strategy is above `--stop` ms, the strategy skips the larger sizes.
+// Then, at each size, `measureIsolated` times `shared` and each strategy of the shard that ran each board with all its repeats (MEASURE-ISOLATE).
+// The mode is `fresh` (BENCH-FRESH-CASES): a fresh process for each arm, each board and each round, with the A/A arm of `shared` and 1 warm-up run.
+// One line `{"paired": report, "nodes": n}` keeps the report.
+// So the ratio of a strategy over `shared` comes from one job. `--no-paired` gives no such line.
 // With `--breakdown` (PORTFOLIO-SPEED), the script times the parts of the setup of the key and the router on each board instead (`breakdownLines`).
 // Then `--shard` splits the boards, not the strategies. `pnpm portfolio:time --summary <path,...>` writes the table of such lines, and times nothing.
 // With `--breakdown`, `--forms fit` or `--forms k3` keeps only the forms of the router with that end of the id.
 // With `--member-cost` (FIT-COST), the script times each member in the router (`costLines`): its run and the key of its output, with k = 8 at each rule and cap.
 // On the same board, it also times each member alone and the key of its output alone. `--summary` writes the ratios of such lines (`costSummary`).
+// The runs alone and the picks run in turn in each repeat, and the order swaps in each odd repeat (MEASURE-ISOLATE).
+// Then `measureIsolated` times each pick against the model of the fit on the boards of the shard, with the A/A arm (`costPaired`), in mode `fresh`.
+// One line `{"paired": report, "form": id}` keeps each report.
+// A child of a paired time: `node scripts/portfolio-time.ts <the options> --paired-child <shared|cost> --arm <name> [--form <id>] --input <board> --warmup 1`.
+// The shards stay. Each board of a shard gets its own fresh processes. The other lines of a shard come from this process, with the mode `process` in `env`.
+// The cost of mode `fresh`: boards x (arms + 1) x repeats children for each report. Each child starts Node.js and imports the pool, 0.5 to 1.5 s on a CI runner.
+// - The main mode, 16 shards: the pool has 307 strategies, so a shard has 19 or 20. With `shared` and the A/A arm, that is 21 arms at most.
+//   3 sizes x 12 boards x 21 arms x 5 repeats gives 3780 children of each shard at most, thus 32 to 95 min. 32 shards halve it.
+// - `--members`, 16 shards: 75 members give 7 arms at most, thus 1260 children of each shard, 11 to 32 min.
+// - `--member-cost` on 9 sizes and 16 shards: 6 forms x 7 boards x 3 arms x 5 repeats, thus 630 children of each shard at most, 5 to 16 min.
+// Each child of the main mode routes 2 times, as one round of mode process does. Each child of `--member-cost` also runs 1 untimed pick.
+// The workflow `Portfolio` gives each shard 150 minutes by default.
 // With `--check-stretch`, the script times nothing. It routes each input of `exact-v1`, `exact-v1-bounds` and `screen-v1` with each strategy of the pool.
 // Then it compares the stretch of each edge of `exactStretches` with the stretch of `exactStretchesReference` (`stretchCheck`). The summary counts each difference above `RECORD_EPS`.
 // With `--guard-records`, the script times nothing. It routes the boards of `exact-v1` at the sizes `--sizes` with each member of the portfolio router (`guardRecord`).
 // Each line is a record with the values of the guard: B1, the stretch of the model, the flag of mixed collections and the hard breaks. The sizes above 40 nodes have no optima.
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, writeFileSync, writeSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { bundleStretch, inkSaved } from "../src/bench/measures/bundles.ts";
@@ -40,6 +55,8 @@ import type { Graph, Result } from "../src/model.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { asRouter, getStrategy, listStrategies, type Strategy } from "../src/strategies/model.ts";
 import { strategies as gapStrategies } from "./screens/meas2.ts";
+import { envOf, measureIsolated, runChild, type ChildResult, type PairedReport, type RecordEnv } from "./gates/paired.ts";
+import { pairedTable } from "./gates/time-gate.ts";
 
 /** One timed run of a strategy on a board. */
 export interface TimeRecord {
@@ -61,6 +78,71 @@ export interface TimeRecord {
   /** With `--members`: the time of the hash of the output, in ms. It is not a part of `keyMs`. The router hashes the base and the winner of a pick that moves. */
   readonly hashMs?: number;
   readonly skipped?: string;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). The script times each run in this process. */
+  readonly env?: RecordEnv;
+}
+
+/** One line of a paired time report in the output of `portfolio:time` (MEASURE-ISOLATE). */
+export interface PairedLine {
+  readonly paired: PairedReport;
+  /** In the main mode: the node count of the boards of the report. */
+  readonly nodes?: number;
+  /** With `--member-cost`: the id of the form of the router. */
+  readonly form?: string;
+}
+
+/** This function tells if a line of `portfolio:time` is a paired line. */
+export const isPairedLine = (line: unknown): line is PairedLine => (line as { paired?: { schema?: unknown } } | null)?.paired?.schema === "paired-time/1";
+
+/** This function tells if a line of `portfolio:time` is a timed run of a strategy. A paired line is not. */
+export const isTimeRecord = (line: unknown): line is TimeRecord => typeof (line as { strategy?: unknown } | null)?.strategy === "string" && !isPairedLine(line);
+
+/** The id of a board in a paired report: `<class>/n<nodes>/s<seed>`. */
+export const boardId = (cls: string, nodes: number, seed: number): string => `${cls}/n${nodes}/s${seed}`;
+
+/**
+ * This function gives the exact board of an id of `boardId`. The node count of the id is the node count of the graph.
+ * It tries the node count of the id, then each size of `sizes`. An id with no board throws an error.
+ */
+export function exactBoardOf(id: string, sizes: readonly number[]): Graph {
+  const match = /^([a-z]+)\/n(\d+)\/s(\d+)$/.exec(id);
+  if (match === null || !(EXACT_CLASSES as readonly string[]).includes(match[1]!)) throw new RangeError(`The input "${id}" is not <class>/n<nodes>/s<seed>.`);
+  const cls = match[1] as ExactClass;
+  const seed = Number(match[3]);
+  for (const n of [Number(match[2]), ...sizes]) {
+    const graph = exactBoard(cls, n, seed);
+    if (boardId(cls, graph.nodes.length, seed) === id) return graph;
+  }
+  throw new RangeError(`No size gives the board "${id}".`);
+}
+
+/** The start of the children of mode `fresh`: Node.js, its flags, this script and the options of this run. A test gives its own `startChild`. */
+export interface ChildRun {
+  readonly command: readonly string[];
+  readonly startChild?: (command: readonly string[], input: string, warmup: number) => Promise<ChildResult>;
+}
+
+/**
+ * This function times the route of `shared` and of each strategy on the boards, with `measureIsolated` (MEASURE-ISOLATE).
+ * The mode is `fresh` (BENCH-FRESH-CASES): a fresh process for each arm, each board and each round, one at a time.
+ * The A/A arm is a second copy of `shared`. Each child makes only its own board, routes it 1 time untimed, and times 1 route. A strategy with the name `shared` is the base, so it is not a second arm.
+ * A child: `<command> --paired-child shared --arm <name> --input <board> --warmup 1`.
+ */
+export function sharedPaired(
+  boards: readonly { readonly cls: string; readonly seed: number; readonly graph: Graph }[],
+  strategies: readonly Strategy<"router", object>[],
+  repeats: number,
+  child: ChildRun,
+): Promise<PairedReport> {
+  const names = [PORTFOLIO_BASE_MEMBER, ...strategies.filter((s) => s.name !== PORTFOLIO_BASE_MEMBER).map((s) => s.name)];
+  return measureIsolated({
+    arms: names.map((id) => ({ id, command: [...child.command, "--paired-child", "shared", "--arm", id] })),
+    inputs: boards.map((b) => ({ id: boardId(b.cls, b.graph.nodes.length, b.seed), group: b.cls })),
+    repeats,
+    warmup: 1,
+    mode: "fresh",
+    ...(child.startChild ? { startChild: child.startChild } : {}),
+  });
 }
 
 /** The name of the lines of the setup of the key: the network of the stretch, and the facts of the output of `shared`. */
@@ -132,6 +214,8 @@ export interface BreakdownRecord {
   readonly baseMs?: number;
   readonly membersMs?: number;
   readonly members?: number;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). */
+  readonly env?: RecordEnv;
 }
 
 /**
@@ -277,6 +361,8 @@ export interface CostRecord {
   readonly picked?: boolean;
   /** For `router`: `true` for the last member that ran in the pick. */
   readonly last?: boolean;
+  /** The computer and the mode of the time (MEASURE-ISOLATE). */
+  readonly env?: RecordEnv;
 }
 
 /**
@@ -299,18 +385,24 @@ export function costLines(head: { readonly cls: string; readonly seed: number; r
   // The first pick of each form warms the code of each member, and gives the names of the members.
   const forms = COST_FORMS.map((form) => ({ form, names: routePortfolio(graph, form.options).members }));
   const timer = keyTimer(graph, base);
-  for (const name of [...new Set(forms.flatMap((f) => f.names))]) {
-    const router = asRouter(portfolioMember(name)!);
-    for (let rep = 0; rep < repeats; rep++) {
+  const names = [...new Set(forms.flatMap((f) => f.names))];
+  // A run or a pick slower than `slow` gets no more repeats.
+  const slowAlone = new Set<string>();
+  const slowPick = new Set<string>();
+  const alone = (rep: number): void => {
+    for (const name of names) {
+      if (slowAlone.has(name)) continue;
+      const router = asRouter(portfolioMember(name)!);
       const t = performance.now();
       const result = router.route(graph);
       const runMs = performance.now() - t;
       out.push({ kind: "alone", strategy: name, ...at, rep, runMs, ...timer(result, name === PORTFOLIO_BASE_MEMBER) });
-      if (runMs > slow) break;
+      if (runMs > slow) slowAlone.add(name);
     }
-  }
-  for (const { form } of forms) {
-    for (let rep = 0; rep < repeats; rep++) {
+  };
+  const picks = (rep: number): void => {
+    for (const { form } of forms) {
+      if (slowPick.has(form.id)) continue;
       const reads: number[] = [];
       const now = (): number => {
         const x = performance.now();
@@ -333,10 +425,122 @@ export function costLines(head: { readonly cls: string; readonly seed: number; r
         j += 2;
         if (m.status === "ran") out.push({ kind: "router", strategy: m.id, form: form.id, index, ...at, rep, runMs, keyMs, ...(index === lastIndex ? { last: true } : {}) });
       });
-      if (ms > slow) break;
+      if (ms > slow) slowPick.add(form.id);
+    }
+  };
+  // The runs alone and the picks run in turn in each repeat. The order swaps in each odd repeat (MEASURE-ISOLATE).
+  for (let rep = 0; rep < repeats; rep++) {
+    if (rep % 2 === 0) {
+      alone(rep);
+      picks(rep);
+    } else {
+      picks(rep);
+      alone(rep);
     }
   }
   return out;
+}
+
+/** The id of the model arm of `costPaired`. The pick arm has the id `pick`. */
+export const MODEL_ARM = "model";
+
+/** The id of the pick arm of `costPaired`. */
+export const PICK_ARM = "pick";
+
+/** One board of an arm of `costPaired`: the graph, and the routers of the members of the pick. */
+interface CostBoard {
+  readonly graph: Graph;
+  readonly routers: readonly ReturnType<typeof asRouter>[];
+}
+
+/** This function gives the form of `COST_FORMS` with the id `id`, or throws an error. */
+function costForm(id: string): (typeof COST_FORMS)[number] {
+  const form = COST_FORMS.find((f) => f.id === id);
+  if (form === undefined) throw new RangeError(`There is no cost form "${id}". The forms are ${COST_FORMS.map((f) => f.id).join(", ")}.`);
+  return form;
+}
+
+/** This function gives the board of an arm of `costPaired`. The members of the pick come from one untimed pick. */
+function costBoard(form: (typeof COST_FORMS)[number], graph: Graph): CostBoard {
+  const names = routePortfolio(graph, form.options).trace.members.filter((m) => m.status === "ran").map((m) => m.id);
+  return { graph, routers: names.map((n) => asRouter(portfolioMember(n)!)) };
+}
+
+/**
+ * This function gives the timed run of an arm of `costPaired`.
+ * - The arm `model` runs the members of the pick alone, in its order, with the key of the router on each output. The key builds its setup at the first member after the base.
+ * - The arm `pick` runs the pick of the router.
+ */
+function costRun(form: (typeof COST_FORMS)[number], arm: string): (v: CostBoard) => unknown {
+  if (arm === PICK_ARM) return (v) => routePortfolio(v.graph, form.options);
+  if (arm !== MODEL_ARM) throw new RangeError(`There is no cost arm "${arm}". The arms are ${MODEL_ARM} and ${PICK_ARM}.`);
+  return (v) => {
+    let base: Result | undefined;
+    const key = portfolioKey(v.graph, form.options.rule ?? "collection", form.options.cap ?? 1.5, () => base);
+    v.routers.forEach((router, i) => {
+      const result = router.route(v.graph);
+      if (i === 0) {
+        base = result;
+        return;
+      }
+      key.hard(v.graph, result);
+      for (const level of key.levels) level.value(v.graph, result);
+    });
+  };
+}
+
+/**
+ * This function times each pick of the router against the model of the fit on the boards, with `measureIsolated` (MEASURE-ISOLATE).
+ * The mode is `fresh` (BENCH-FRESH-CASES): a fresh process for each arm, each board and each round, one at a time.
+ * The A/A arm is a second copy of the model. Each child makes only its own board, and the members of its pick come from one untimed pick.
+ * Then it does 1 untimed run, and times 1 run.
+ * A child: `<command> --paired-child cost --form <id> --arm <model|pick> --input <board> --warmup 1`.
+ * The result has one line for each form of `COST_FORMS`, in their order.
+ */
+export async function costPaired(boards: readonly { readonly cls: string; readonly seed: number; readonly graph: Graph }[], repeats: number, child: ChildRun): Promise<PairedLine[]> {
+  const lines: PairedLine[] = [];
+  for (const form of COST_FORMS) {
+    const paired = await measureIsolated({
+      arms: [MODEL_ARM, PICK_ARM].map((id) => ({ id, command: [...child.command, "--paired-child", "cost", "--form", form.id, "--arm", id] })),
+      inputs: boards.map((b) => ({ id: boardId(b.cls, b.graph.nodes.length, b.seed), group: b.cls })),
+      repeats,
+      warmup: 1,
+      mode: "fresh",
+      ...(child.startChild ? { startChild: child.startChild } : {}),
+    });
+    lines.push({ paired, form: form.id });
+  }
+  return lines;
+}
+
+/**
+ * This function is one child of the paired times in mode `fresh`. The kind is `shared` (`sharedPaired`) or `cost` (`costPaired`).
+ * The imports, the board and the router are not timed. `runChild` runs the warm-up, times 1 run, and writes the line with `write`.
+ */
+export function pairedChild(kind: string, argv: readonly string[], write: (line: string) => void): ChildResult {
+  const opt = (key: string): string | undefined => {
+    const i = argv.indexOf(key);
+    return i >= 0 ? argv[i + 1] : undefined;
+  };
+  const arm = opt("--arm");
+  if (arm === undefined) throw new RangeError("The child needs --arm <name>.");
+  const sizes = (opt("--sizes") ?? "10,24,40").split(",").map(Number);
+  if (kind === "cost") {
+    const form = costForm(opt("--form") ?? "");
+    return runChild((id) => costBoard(form, exactBoardOf(id, sizes)), costRun(form, arm), { argv, write });
+  }
+  if (kind !== "shared") throw new RangeError(`There is no paired child "${kind}". The children are shared and cost.`);
+  const strategy = arm === PORTFOLIO_BASE_MEMBER ? portfolioMember(PORTFOLIO_BASE_MEMBER) : (argv.includes("--members") ? memberStrategies() : poolStrategies()).find((s) => s.name === arm);
+  if (strategy === undefined) throw new RangeError(`The pool has no strategy "${arm}".`);
+  const router = asRouter(strategy);
+  return runChild((id) => exactBoardOf(id, sizes), (graph) => router.route(graph), { argv, write });
+}
+
+/** This function writes the tables of the paired lines as Markdown: one table for each form or each node count. */
+export function pairedSummary(lines: readonly PairedLine[]): string {
+  const out = ["## The paired times (MEASURE-ISOLATE)", ""];
+  for (const l of lines) out.push(`### ${l.form !== undefined ? `The pick of \`${l.form}\` against the model of the fit` : `The route of each strategy against \`shared\` at ${l.nodes} nodes`}`, "", ...pairedTable(l.paired), "");
+  return out.join("\n");
 }
 
 /** One row of `costRows`: the medians of one member at one node count, in ms. */
@@ -588,10 +792,21 @@ const opt = (name: string): string | undefined => {
 };
 const nums = (name: string, fallback: string): number[] => (opt(name) ?? fallback).split(",").map(Number);
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+const SCRIPT = fileURLToPath(import.meta.url);
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(SCRIPT)) {
+  const childKind = opt("--paired-child");
+  if (childKind !== undefined) {
+    // A child of a paired time (BENCH-FRESH-CASES). The write to the file descriptor 1 ends before the exit.
+    pairedChild(childKind, args, (line) => writeSync(1, line + "\n"));
+    process.exit(0);
+  }
+  // The children of the paired times get the options of this run, so they make the same boards and the same strategies.
+  const child = { command: [process.execPath, ...process.execArgv, SCRIPT, ...args] };
   const summary = opt("--summary");
   if (summary !== undefined) {
-    const lines = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as BreakdownRecord));
+    const all = summary.split(",").flatMap((f) => readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim().length > 0).map((l) => JSON.parse(l) as unknown));
+    const paired = all.filter(isPairedLine);
+    const lines = all.filter((l) => !isPairedLine(l)) as BreakdownRecord[];
     const checks = lines.filter((l) => (l as unknown as { check?: string }).check === "stretch") as unknown as StretchCheck[];
     const costs = lines.filter((l) => (l as unknown as { kind?: string }).kind !== undefined) as unknown as CostRecord[];
     const parts = lines.filter((l) => l.part !== undefined);
@@ -599,6 +814,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
       ...(parts.length > 0 ? [breakdownSummary(parts)] : []),
       ...(checks.length > 0 ? [stretchCheckSummary(checks)] : []),
       ...(costs.length > 0 ? [costSummary(costs)] : []),
+      ...(paired.length > 0 ? [pairedSummary(paired)] : []),
     ].join("\n");
     if (opt("--out") !== undefined) writeFileSync(opt("--out")!, md);
     console.log(md);
@@ -612,6 +828,8 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const members = args.includes("--members");
   const [shard, shards] = (opt("--shard") ?? "0/1").split("/").map(Number) as [number, number];
   const out = opt("--out") ?? "time.jsonl";
+  // Each timing line names the computer and the mode (MEASURE-ISOLATE). The script times each run in this process.
+  const env = envOf("process");
   if (args.includes("--breakdown")) {
     const boards = sizes.flatMap((n) => EXACT_CLASSES.flatMap((cls: ExactClass) => seeds.map((k) => ({ cls, n, k }))));
     const mine = boards.filter((_, i) => i % shards === shard);
@@ -621,7 +839,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept. So the first timed board is warm.
     const first = mine[0];
     if (first !== undefined) breakdownLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow, forms);
-    const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow, forms).map((l) => JSON.stringify(l)));
+    const lines = mine.flatMap((b) => breakdownLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow, forms).map((l) => JSON.stringify({ ...l, env })));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
@@ -632,7 +850,10 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
     // The warm-up (HASH-LAZY): the first board runs one time, and its lines are not kept.
     const first = mine[0];
     if (first !== undefined) costLines({ cls: first.cls, seed: first.k, graph: exactBoard(first.cls, first.n, first.k) }, 1, slow);
-    const lines = mine.flatMap((b) => costLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify(l)));
+    const lines = mine.flatMap((b) => costLines({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) }, repeats, slow).map((l) => JSON.stringify({ ...l, env })));
+    // The picks against the model of the fit, in turn on each board of the shard, with the A/A arm (MEASURE-ISOLATE).
+    if (!args.includes("--no-paired") && mine.length > 0)
+      for (const l of await costPaired(mine.map((b) => ({ cls: b.cls, seed: b.k, graph: exactBoard(b.cls, b.n, b.k) })), repeats, child)) lines.push(JSON.stringify(l));
     writeFileSync(out, lines.join("\n") + "\n");
     process.exit(0);
   }
@@ -685,10 +906,12 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
         const f = portfolioFacts(b.graph);
         f(out0);
         const ms = performance.now() - t;
-        if (shard === 0) lines.push(JSON.stringify({ strategy: KEY_SETUP, cls: b.cls, seed: b.k, nodes: b.graph.nodes.length, edges: b.graph.edges.length, rep, ms, scoreMs: 0 } satisfies TimeRecord));
+        if (shard === 0) lines.push(JSON.stringify({ strategy: KEY_SETUP, cls: b.cls, seed: b.k, nodes: b.graph.nodes.length, edges: b.graph.edges.length, rep, ms, scoreMs: 0, env } satisfies TimeRecord));
       }
       keys.set(b, keyTimer(b.graph, out0));
     }
+  // The strategies that ran a board with all their repeats, by the board. Only they enter the paired time of the size of the board.
+  const full = new Map<(typeof boards)[number], Set<string>>(boards.map((b) => [b, new Set<string>()]));
   for (const s of mine) {
     const router = asRouter(s);
     const slowAt = new Set<number>();
@@ -707,6 +930,7 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
       router.route(b.graph);
       const first = performance.now() - t;
       const times: number[] = [];
+      if (first <= slow) full.get(b)!.add(s.name);
       for (let rep = 0; rep < (first > slow ? 1 : repeats); rep++) {
         t = performance.now();
         const result = router.route(b.graph);
@@ -718,12 +942,21 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
         const scoreMs = performance.now() - t;
         const key = members ? keys.get(b)!(result, s.name === PORTFOLIO_BASE_MEMBER) : undefined;
         times.push(ms + (key?.keyMs ?? 0));
-        lines.push(JSON.stringify({ ...head, rep, ms, scoreMs, ...(key ?? {}) } satisfies TimeRecord));
+        lines.push(JSON.stringify({ ...head, rep, ms, scoreMs, ...(key ?? {}), env } satisfies TimeRecord));
       }
       times.sort((x, y) => x - y);
       if (times[Math.floor(times.length / 2)]! > stop) slowAt.add(b.graph.nodes.length);
     }
     process.stderr.write(`${s.name}: done\n`);
   }
+  // The paired time of each size (MEASURE-ISOLATE): `shared` and each strategy that ran each board of the size with all its repeats.
+  if (!args.includes("--no-paired"))
+    for (const n of [...new Set(boards.map((b) => b.graph.nodes.length))]) {
+      const at = boards.filter((b) => b.graph.nodes.length === n);
+      const arms = mine.filter((s) => s.name !== PORTFOLIO_BASE_MEMBER && at.every((b) => full.get(b)!.has(s.name)));
+      if (arms.length === 0) continue;
+      lines.push(JSON.stringify({ paired: await sharedPaired(at.map((b) => ({ cls: b.cls, seed: b.k, graph: b.graph })), arms, repeats, child), nodes: n } satisfies PairedLine));
+      process.stderr.write(`The paired time at ${n} nodes: done\n`);
+    }
   writeFileSync(out, lines.join("\n") + "\n");
 }

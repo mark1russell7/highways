@@ -9,6 +9,7 @@ import type { CutOptions } from "../groups/cut/index.ts";
 import type { JustifyOptions } from "../plugs/justify.ts";
 import type { SidePlugOptions } from "../plugs/side.ts";
 import type { SpreadOptions } from "../plugs/spread/index.ts";
+import type { AssignOptions } from "../plugs/assign/index.ts";
 import type { LeaderOptions } from "../plugs/leaders/index.ts";
 import type { BalanceOptions } from "../highways/balance/index.ts";
 import type { ManifoldOptions } from "../highways/manifolds/index.ts";
@@ -944,7 +945,7 @@ export const P_HUB_SCHEMA: OptionSchema<PHubOptions> = {
 /** The declarations of the options of the highway strategy `scale-space` (HWY-053). */
 export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
   theta: { type: "number", min: 0.5, max: 6, step: 0.5, marks: [1.5, 3], default: 1.5, describe: "The first scale, in units of the board." },
-  ratio: { type: "number", min: 1.1, max: 3, step: 0.1, marks: [1.5, 2], default: Math.SQRT2, describe: "The scale of each next scale is this value times the scale before it." },
+  ratio: { type: "number", min: 1.1, max: 3, marks: [1.5, 2], default: Math.SQRT2, describe: "The scale of each next scale is this value times the scale before it." },
   scales: { type: "integer", min: 2, max: 16, step: 1, marks: [4, 8], default: 8, describe: "The number of scales." },
   level: { type: "integer", min: 0, max: 15, step: 1, marks: [2, 4, 6], default: 2, describe: "The scale of the plan, from 0 (the first scale)." },
   p0: { type: "number", min: 0, max: 3, step: 0.1, marks: [0.3, 0.6, 1.2], default: 0.6, describe: "A cluster gets highways only when its persistence (the log of the ratio of its last scale to its first scale) is this value or more." },
@@ -981,6 +982,12 @@ export const SPREAD_SCHEMA: OptionSchema<SpreadOptions> = {
   plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
   inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
   rounds: { type: "integer", min: 0, max: 8, step: 1, default: 2, describe: "The passes that sort each wall again by the new places of the far ends." },
+};
+
+/** The declarations of the options of the plug strategy `assign` (PLUG-ASSIGN). */
+export const ASSIGN_SCHEMA: OptionSchema<AssignOptions> = {
+  plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
+  inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
 };
 
 /** The declarations of the options of the whole strategy `pipeline`. */
@@ -1036,7 +1043,9 @@ export const SEARCH_SCHEMA: OptionSchema<SearchOptions> = {
   stretchWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the 0.95 quantile of the stretch (B3)." },
   ambiguityWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5], default: 0.5, describe: "The weight of the ambiguity (B4)." },
   angleWeight: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.25], default: 0.25, describe: "The weight of the largest merge angle (B6), divided by 180 degrees." },
+  crossingWeight: { type: "number", min: 0, max: 4, step: 0.05, marks: [0, 0.3], default: 0, describe: "The weight of the crossings of the routes (R1), divided by the number of routes. The value 0 is no crossing term." },
   seed: { type: "integer", min: 0, max: 1000, step: 1, default: 1, describe: "The seed of the moves." },
+  work: { type: "integer", min: 0, max: 100_000, step: 100, marks: [0, 1000, 10_000, 50_000], default: 0, describe: "The most work of the measures of the plans, in millions of counted steps. The value 0 is no limit." },
 };
 
 /** The declarations of the options of the highway strategy `interchanges` (HWY-060). */

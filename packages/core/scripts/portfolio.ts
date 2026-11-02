@@ -5,10 +5,12 @@
 // PORTFOLIO-RULE adds the forms with the rule of the caller: the portfolio chooses only among the runs that obey the rule, and measures against the oracle of that rule.
 // The optima of `--optima` (default `src/bench/exact/optima-exact-v1.json`) give the gap closed at one cap for each run.
 // EXACT-BOUNDS adds a form for each cap of the gap closed (1.1, 1.25 and 1.5), and the greedy sets of each rule and cap on all inputs.
+// The columns `× shared` read the paired lines of the times (MEASURE-ISOLATE): each ratio comes from one job, with the A/A noise floor of `shared`.
+// The times of two shards come from two jobs, so without paired lines these columns are empty.
 // The script reads only records, so it runs locally in a few seconds. The screens and the times run in CI.
 // The test `src/bench/screen/portfolio.test.ts` examines the functions of this file on a small set of records.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_CAPS, GAP_RULES, gapCap, gapClosed, optimumKey, type ExactOptimaFile, type ExactOptimum, type GapRule } from "../src/bench/screen/gap.ts";
@@ -16,7 +18,8 @@ import { RECORD_EPS } from "../src/bench/screen/hash.ts";
 import { selectBest, type SelectCandidate, type SelectLevel } from "../src/bench/screen/portfolio-pick.ts";
 import { PORTFOLIO_B1, portfolioB1Spec } from "../src/portfolio/key.ts";
 import { B1, B10, B3_Q95, DECISION_BOARDS, familyOf, halfFolds, MIXED, pairedBootstrap, readRecords, type OracleRecord } from "./oracle.ts";
-import type { TimeRecord } from "./portfolio-time.ts";
+import { aaId, quantileOf } from "./gates/paired.ts";
+import type { PairedLine, TimeRecord } from "./portfolio-time.ts";
 
 /** The name of the largest stretch of the routes, in the units of the exact model, in a record of `exact-v1`. */
 export const MODEL_STRETCH = "route.bundle.stretch.model.max";
@@ -420,13 +423,51 @@ export interface SetTime {
   readonly parallel: { readonly median: number; readonly q95: number };
   /** The median time of `shared` alone on the same boards, with its score. */
   readonly shared: number;
+  /**
+   * With paired lines (MEASURE-ISOLATE): the median over the boards of the routes of the set over the route of `shared`, one after the other and in parallel.
+   * The ratios come from one job each and have no score. A board where a strategy of the set ran with no paired ratio does not count.
+   */
+  readonly paired?: { readonly serial: number; readonly parallel: number; readonly boards: number };
+}
+
+/** The paired ratios over `shared` (MEASURE-ISOLATE): by the node count, the board and the strategy. The A/A ratios of each node count are apart. */
+export interface PairedRatios {
+  readonly ratio: ReadonlyMap<number, ReadonlyMap<string, ReadonlyMap<string, number>>>;
+  readonly aa: ReadonlyMap<number, readonly number[]>;
+}
+
+/** This function gives the paired ratios of the paired lines of the main mode of `portfolio:time`. A line of another base or with no node count does not count. */
+export function pairedRatios(lines: readonly PairedLine[]): PairedRatios {
+  const ratio = new Map<number, Map<string, Map<string, number>>>();
+  const aa = new Map<number, number[]>();
+  for (const l of lines) {
+    if (l.nodes === undefined || l.paired.base !== PORTFOLIO_BASE) continue;
+    const a = aaId(PORTFOLIO_BASE);
+    if (!ratio.has(l.nodes)) ratio.set(l.nodes, new Map());
+    const at = ratio.get(l.nodes)!;
+    for (const input of l.paired.inputs) {
+      if (!at.has(input.id)) at.set(input.id, new Map());
+      for (const [arm, r] of Object.entries(input.ratio)) {
+        if (arm === a) aa.set(l.nodes, [...(aa.get(l.nodes) ?? []), r]);
+        else at.get(input.id)!.set(arm, r);
+      }
+    }
+  }
+  return { ratio, aa };
+}
+
+/** This function gives the median paired ratio of a strategy over `shared` at a node count, over the boards. The base `shared` gives 1. No ratio gives NaN. */
+export function pairedShared(p: PairedRatios, strategy: string, nodes: number): number {
+  if (strategy === PORTFOLIO_BASE) return p.ratio.has(nodes) ? 1 : Number.NaN;
+  const xs = [...(p.ratio.get(nodes)?.values() ?? [])].flatMap((m) => (m.has(strategy) ? [m.get(strategy)!] : []));
+  return quantileOf(xs, 0.5);
 }
 
 /**
  * This function gives the time of the portfolio `set` at each size. The portfolio runs `corners` (the base of B3), `shared` and each strategy of `set`, and scores each output.
  * For each board, a strategy takes the median of its repeats. One after the other is the sum of the runs. In parallel is the longest run.
  */
-export function setTimes(times: readonly TimeRecord[], set: readonly string[]): SetTime[] {
+export function setTimes(times: readonly TimeRecord[], set: readonly string[], paired?: PairedRatios): SetTime[] {
   const cell = new Map<string, number[]>();
   for (const t of times) {
     if (t.skipped !== undefined) continue;
@@ -448,7 +489,20 @@ export function setTimes(times: readonly TimeRecord[], set: readonly string[]): 
     const serial: number[] = [];
     const parallel: number[] = [];
     const shared: number[] = [];
+    const pSerial: number[] = [];
+    const pParallel: number[] = [];
     for (const b of boards) {
+      // The paired ratios of the board (MEASURE-ISOLATE): each strategy that ran there, with `corners`, over `shared`. The board id is `<class>/n<nodes>/s<seed>`.
+      const [cls, seed] = b.split("|") as [string, string];
+      const own = paired?.ratio.get(nodes)?.get(`${cls}/n${nodes}/s${seed}`);
+      if (own !== undefined) {
+        const ran = ["corners", ...members.slice(1)].filter((s) => cell.has(`${s}|${nodes}|${b}`));
+        if (ran.every((s) => own.has(s))) {
+          const rs = ran.map((s) => own.get(s)!);
+          pSerial.push(1 + rs.reduce((x, y) => x + y, 0));
+          pParallel.push(Math.max(1, ...rs));
+        }
+      }
       const one = members.map((s) => cell.get(`${s}|${nodes}|${b}`));
       // A strategy without a time on the board (a skip) does not run there.
       const runs = one.filter((x): x is number[] => x !== undefined).map((x) => quantile(x, 0.5));
@@ -460,7 +514,8 @@ export function setTimes(times: readonly TimeRecord[], set: readonly string[]): 
       shared.push(runs[0]!);
     }
     const q = (xs: number[]): { median: number; q95: number } => ({ median: quantile(xs, 0.5), q95: quantile(xs, 0.95) });
-    return { nodes, serial: q(serial), parallel: q(parallel), shared: quantile(shared, 0.5) };
+    const own = pSerial.length === 0 ? {} : { paired: { serial: quantileOf(pSerial, 0.5), parallel: quantileOf(pParallel, 0.5), boards: pSerial.length } };
+    return { nodes, serial: q(serial), parallel: q(parallel), shared: quantile(shared, 0.5), ...own };
   });
 }
 
@@ -586,7 +641,13 @@ export function ruleForms(
 }
 
 /** This function makes the tables of the portfolio for the records of `exact-v1` and of `screen-v1`, and the times of the workflow `Portfolio`. The optima give the forms at one cap. */
-export function portfolioReport(exact: readonly OracleRecord[], screen: readonly OracleRecord[], times: readonly TimeRecord[] = [], optima: readonly ExactOptimum[] = []): PortfolioReport {
+export function portfolioReport(
+  exact: readonly OracleRecord[],
+  screen: readonly OracleRecord[],
+  times: readonly TimeRecord[] = [],
+  optima: readonly ExactOptimum[] = [],
+  paired: readonly PairedLine[] = [],
+): PortfolioReport {
   const lines: string[] = [];
   const data: Record<string, unknown> = {};
   const fullSets: { corpus: string; guard: Guard; k: number; set: string[] }[] = [];
@@ -806,12 +867,20 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
   if (times.length > 0) {
     const per = strategyTimes(times);
     const sizes = [...new Set(times.map((t) => t.nodes))].sort((a, b) => a - b);
-    const sharedAt = (n: number): number => per.get(PORTFOLIO_BASE)?.get(n)?.median ?? Number.NaN;
+    const ratios = pairedRatios(paired);
     const machine = times.length;
+    const floors = sizes.flatMap((n) => {
+      const aa = ratios.aa.get(n) ?? [];
+      return aa.length === 0 ? [] : [`${n} nodes: ${f3(quantileOf(aa, 0.1))} to ${f3(quantileOf(aa, 0.9))}`];
+    });
     lines.push(
       "## The time of each strategy",
       "",
-      `The table gives the time of the route alone, in ms, over ${machine} timed runs. The column \`× shared\` is the median divided by the median of \`shared\` at the same size.`,
+      `The table gives the time of the route alone, in ms, over ${machine} timed runs.`,
+      "The column `× shared` is the median over the boards of the paired ratio of the route over the route of `shared` (MEASURE-ISOLATE). Each ratio comes from one job.",
+      floors.length === 0
+        ? "The times have no paired lines, so the column `× shared` is empty: the times of two shards come from two jobs."
+        : `The noise floor of the A/A arm of \`shared\` (p10 to p90) is ${floors.join(", ")}.`,
       "",
       `| size | strategies | median of the medians | strategies under 16 ms | strategies under 100 ms | \`shared\` median | \`shared\` q95 | score median of \`shared\` |`,
       "|---:|---:|---:|---:|---:|---:|---:|---:|",
@@ -833,7 +902,7 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
         return `| ${code(s)} | ${sizes
           .map((n) => {
             const t = m?.get(n);
-            return t === undefined ? "- | - | -" : `${ms(t.median)} | ${ms(t.q95)} | ${f3(t.median / sharedAt(n))}`;
+            return t === undefined ? "- | - | -" : `${ms(t.median)} | ${ms(t.q95)} | ${f3(pairedShared(ratios, s, n))}`;
           })
           .join(" | ")} |`;
       }),
@@ -841,13 +910,14 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
       "## The time of each set",
       "",
       "Each set also runs `corners` (the base of B3) and `shared` (the base of the guard), and scores each output. The times are in ms, over the boards of each size.",
+      "The columns `× shared` are the median over the boards of the paired ratios of the routes, with no score (MEASURE-ISOLATE).",
       "",
       "| corpus | guard | k | size | one after the other: median | q95 | × shared | in parallel: median | q95 | × shared | fits 16 ms | fits 100 ms |",
       "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
       ...fullSets.flatMap((f) =>
-        setTimes(times, f.set).map((t) => {
+        setTimes(times, f.set, ratios).map((t) => {
           const fit = (b: number): string => (t.serial.q95 <= b ? "both" : t.parallel.q95 <= b ? "in parallel" : t.serial.median <= b ? "median only" : "no");
-          return `| \`${f.corpus}\` | \`${f.guard}\` | ${f.k} | ${t.nodes} | ${ms(t.serial.median)} | ${ms(t.serial.q95)} | ${f3(t.serial.median / t.shared)} | ${ms(t.parallel.median)} | ${ms(t.parallel.q95)} | ${f3(t.parallel.median / t.shared)} | ${fit(16)} | ${fit(100)} |`;
+          return `| \`${f.corpus}\` | \`${f.guard}\` | ${f.k} | ${t.nodes} | ${ms(t.serial.median)} | ${ms(t.serial.q95)} | ${f3(t.paired?.serial ?? Number.NaN)} | ${ms(t.parallel.median)} | ${ms(t.parallel.q95)} | ${f3(t.paired?.parallel ?? Number.NaN)} | ${fit(16)} | ${fit(100)} |`;
         }),
       ),
       "",
@@ -855,17 +925,22 @@ export function portfolioReport(exact: readonly OracleRecord[], screen: readonly
       "",
     );
     data["times"] = Object.fromEntries([...per].map(([s, m]) => [s, Object.fromEntries(m)]));
-    data["setTimes"] = fullSets.map((f) => ({ ...f, times: setTimes(times, f.set) }));
+    data["setTimes"] = fullSets.map((f) => ({ ...f, times: setTimes(times, f.set, ratios) }));
+    data["pairedShared"] = Object.fromEntries(named.map((s) => [s, Object.fromEntries(sizes.map((n) => [n, pairedShared(ratios, s, n)]).filter(([, v]) => Number.isFinite(v)))]));
   }
   return { markdown: lines.join("\n"), data };
 }
 
-/** This function reads the lines of the time files. */
-function readTimes(paths: readonly string[]): TimeRecord[] {
-  return readRecords(paths) as unknown as TimeRecord[];
+/** This function tells if a line of the time files is a paired line (MEASURE-ISOLATE). */
+const isPaired = (line: unknown): line is PairedLine => (line as { paired?: { schema?: unknown } } | null)?.paired?.schema === "paired-time/1";
+
+/** This function reads the lines of the time files: the timed runs and the paired lines. */
+function readTimes(paths: readonly string[]): { times: TimeRecord[]; paired: PairedLine[] } {
+  const all = readRecords(paths) as unknown[];
+  return { times: all.filter((l) => !isPaired(l)) as TimeRecord[], paired: all.filter(isPaired) };
 }
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);
@@ -874,7 +949,8 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase(
   const paths = (name: string): string[] => (opt(name) ?? "").split(",").filter((p) => p.length > 0);
   const optimaPath = opt("--optima") ?? join(dirname(fileURLToPath(import.meta.url)), "../src/bench/exact/optima-exact-v1.json");
   const optima = optimaPath !== "none" && existsSync(optimaPath) ? (JSON.parse(readFileSync(optimaPath, "utf8")) as ExactOptimaFile).optima : [];
-  const report = portfolioReport(readRecords(paths("--exact")), readRecords(paths("--screen")), readTimes(paths("--time")), optima);
+  const time = readTimes(paths("--time"));
+  const report = portfolioReport(readRecords(paths("--exact")), readRecords(paths("--screen")), time.times, optima, time.paired);
   writeFileSync(opt("--out") ?? "portfolio.md", report.markdown + "\n");
   if (opt("--json")) writeFileSync(opt("--json")!, JSON.stringify(report.data, null, 1));
   console.log(report.markdown);

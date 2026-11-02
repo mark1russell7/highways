@@ -1,0 +1,304 @@
+{
+  "schema": "remeasure/1",
+  "claim": "route-scale",
+  "plan": {
+    "claim": "route-scale",
+    "rows": [
+      "ROUTE-SCALE",
+      "REL15"
+    ],
+    "old": "npm `@mark1russell7/highways@0.8.0`",
+    "board": "the dense board of 1000 boxes and 4000 edges (`data/scale/route-scale-fixture.json.gz`)",
+    "mode": "fresh",
+    "rounds": 3,
+    "warmup": 0,
+    "targets": [
+      {
+        "id": "shared",
+        "claim": 0.0695364238410596,
+        "source": "ROUTE-SCALE: `shared` goes from 302 s to 21 s"
+      },
+      {
+        "id": "shared-all",
+        "claim": 0.1,
+        "source": "REL15: approximately 10 times faster with `shared-all`"
+      },
+      {
+        "id": "portfolio",
+        "claim": 0.09333333333333334,
+        "source": "ROUTE-SCALE: `portfolio` goes from 300 s to 28 s"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "job": "job1",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9955240071706014,
+        "p90": 1.0086564404120502
+      }
+    },
+    {
+      "job": "job2",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9978509977745221,
+        "p90": 1.0045466682327837
+      }
+    },
+    {
+      "job": "job3",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.996737862149159,
+        "p90": 1.000480369058736
+      }
+    },
+    {
+      "job": "job4",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 1.00052012546745,
+        "p90": 1.0087758581985036
+      }
+    },
+    {
+      "job": "job5",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9987558566398805,
+        "p90": 1.0017279521059772
+      }
+    }
+  ],
+  "targets": [
+    {
+      "target": {
+        "id": "shared",
+        "claim": 0.0695364238410596,
+        "source": "ROUTE-SCALE: `shared` goes from 302 s to 21 s"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.08966598899644732,
+          "floor": {
+            "p10": 0.9955240071706014,
+            "p90": 1.0086564404120502
+          },
+          "inside": false,
+          "oldMs": 298039.942191,
+          "newMs": 26724.046177
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.0904700924994737,
+          "floor": {
+            "p10": 0.9978509977745221,
+            "p90": 1.0045466682327837
+          },
+          "inside": false,
+          "oldMs": 299556.560055,
+          "newMs": 27100.909697
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.08919045965717444,
+          "floor": {
+            "p10": 0.996737862149159,
+            "p90": 1.000480369058736
+          },
+          "inside": false,
+          "oldMs": 297099.306034,
+          "newMs": 26498.423669
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.0832151795810247,
+          "floor": {
+            "p10": 1.00052012546745,
+            "p90": 1.0087758581985036
+          },
+          "inside": false,
+          "oldMs": 168976.50541399998,
+          "newMs": 14061.410243
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.10521219864189106,
+          "floor": {
+            "p10": 0.9987558566398805,
+            "p90": 1.0017279521059772
+          },
+          "inside": false,
+          "oldMs": 207652.560131,
+          "newMs": 21847.582405
+        }
+      ],
+      "worst": 0.10521219864189106,
+      "slower": 0,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "shared-all",
+        "claim": 0.1,
+        "source": "REL15: approximately 10 times faster with `shared-all`"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.03592618590716582,
+          "floor": {
+            "p10": 0.9955240071706014,
+            "p90": 1.0086564404120502
+          },
+          "inside": false,
+          "oldMs": 1443241.11602,
+          "newMs": 51850.148643
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.03522868824814007,
+          "floor": {
+            "p10": 0.9978509977745221,
+            "p90": 1.0045466682327837
+          },
+          "inside": false,
+          "oldMs": 1452957.81201,
+          "newMs": 51185.797797
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.03478071185754953,
+          "floor": {
+            "p10": 0.996737862149159,
+            "p90": 1.000480369058736
+          },
+          "inside": false,
+          "oldMs": 1450127.298273,
+          "newMs": 50436.459718
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.029204784628975033,
+          "floor": {
+            "p10": 1.00052012546745,
+            "p90": 1.0087758581985036
+          },
+          "inside": false,
+          "oldMs": 932126.098235,
+          "newMs": 27222.541946
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.03651862528811046,
+          "floor": {
+            "p10": 0.9987558566398805,
+            "p90": 1.0017279521059772
+          },
+          "inside": false,
+          "oldMs": 1145669.8726450002,
+          "newMs": 41838.288782999996
+        }
+      ],
+      "worst": 0.03651862528811046,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "portfolio",
+        "claim": 0.09333333333333334,
+        "source": "ROUTE-SCALE: `portfolio` goes from 300 s to 28 s"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.09050435492102098,
+          "floor": {
+            "p10": 0.9955240071706014,
+            "p90": 1.0086564404120502
+          },
+          "inside": false,
+          "oldMs": 299571.408234,
+          "newMs": 27112.517055
+        },
+        {
+          "job": "job2",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.09196495571978017,
+          "floor": {
+            "p10": 0.9978509977745221,
+            "p90": 1.0045466682327837
+          },
+          "inside": false,
+          "oldMs": 299115.62806400005,
+          "newMs": 27508.155489999997
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.09132053181394786,
+          "floor": {
+            "p10": 0.996737862149159,
+            "p90": 1.000480369058736
+          },
+          "inside": false,
+          "oldMs": 297345.630732,
+          "newMs": 27153.761131
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.08409307505691205,
+          "floor": {
+            "p10": 1.00052012546745,
+            "p90": 1.0087758581985036
+          },
+          "inside": false,
+          "oldMs": 169565.133126,
+          "newMs": 14259.253467
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.10828292153540961,
+          "floor": {
+            "p10": 0.9987558566398805,
+            "p90": 1.0017279521059772
+          },
+          "inside": false,
+          "oldMs": 206455.950366,
+          "newMs": 22355.653474
+        }
+      ],
+      "worst": 0.10828292153540961,
+      "slower": 0,
+      "verdict": "smaller"
+    }
+  ],
+  "verdict": "smaller"
+}

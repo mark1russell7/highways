@@ -1,7 +1,9 @@
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/measures/bundles.ts";
+import { measureQuality } from "../../bench/quality.ts";
 import type { Point } from "../../geom.ts";
-import type { Graph, Route } from "../../model.ts";
+import type { Graph, Result, Route } from "../../model.ts";
 import { WayFinder } from "../../ways.ts";
+import { workCounts, workSince } from "../../work.ts";
 import { nearestPlace, orderAlongRoutes, tidyPlan, firstRoutes } from "../base.ts";
 import { follow } from "../follow.ts";
 import { memberAt, type Highway, type HighwayInput, type HighwayPlan } from "../model.ts";
@@ -26,8 +28,18 @@ export interface SearchOptions {
   readonly ambiguityWeight: number;
   /** The weight of the largest merge angle (B6), divided by 180 degrees. The default is 0.25. */
   readonly angleWeight: number;
+  /**
+   * The weight of the crossings of the routes (R1), divided by the number of routes (SEARCH-OBJECTIVE). The default is 0.
+   * The counters of the work budget do not count this term.
+   */
+  readonly crossingWeight?: number;
   /** The seed of the moves. The default is 1. */
   readonly seed: number;
+  /**
+   * The work budget (SEARCH-BUDGET), in millions of the units of `workUnits`. The search measures no new plan after the plans that it measured took this work.
+   * The units count the steps of the hot loops, so the same budget stops at the same plan on each machine. The value 0 is no limit. The default is 0.
+   */
+  readonly work?: number;
 }
 
 /** The default options of the strategy `search`. */
@@ -40,7 +52,9 @@ export const SEARCH_DEFAULTS: Readonly<SearchOptions> = Object.freeze({
   stretchWeight: 0.5,
   ambiguityWeight: 0.5,
   angleWeight: 0.25,
+  crossingWeight: 0,
   seed: 1,
+  work: 0,
 });
 
 /** The moves of the search. */
@@ -65,7 +79,7 @@ function random(seed: number): () => number {
 }
 
 /**
- * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180`. Higher is better.
+ * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180 - wx R1 / m`. Higher is better.
  * B3 is the 0.95 quantile of the stretch against the first routes. The score reads only the graph and the routes of the plan.
  */
 export function searchScore(graph: Graph, routes: readonly Route[], first: readonly Route[], o: Readonly<SearchOptions>): number {
@@ -73,7 +87,8 @@ export function searchScore(graph: Graph, routes: readonly Route[], first: reado
   const stretch = bundleStretch(routes, first).q95;
   const amb = o.ambiguityWeight > 0 ? ambiguity(graph, routes).value : 0;
   const angle = o.angleWeight > 0 ? mergeAngle(routes) / 180 : 0;
-  return o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle;
+  const cross = (o.crossingWeight ?? 0) > 0 ? measureQuality(graph, { routes }).crossings / Math.max(1, routes.length) : 0;
+  return o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle - (o.crossingWeight ?? 0) * cross;
 }
 
 /**
@@ -85,6 +100,33 @@ function acceptance(y: number): number {
   return 1 / (1 + y + (y * y) / 2);
 }
 
+/** The number of the units of `workUnits` in one unit of the option `work`. */
+export const SEARCH_WORK_UNIT = 1_000_000;
+
+/** The result of `searchRun` (SEARCH-BUDGET). */
+export interface SearchRun {
+  /** The best plan that the search measured. */
+  readonly plan: HighwayPlan;
+  /** The number of the plans that the search measured. */
+  readonly evaluations: number;
+  /** The units of `workUnits` that the measures of the plans took. */
+  readonly work: number;
+}
+
+/** One plan that `searchRun` measured, for the observer of `searchRun` (SEARCH-OBJECTIVE). */
+export interface SearchStep {
+  /** The number of the plan. The start plan has the number 1. */
+  readonly n: number;
+  /** The number of the current plan that the move changed. The start plan has 0. */
+  readonly from: number;
+  readonly plan: HighwayPlan;
+  /** The routes of the plan: the result of `follow`, as the bench measures it. */
+  readonly result: Result;
+  readonly score: number;
+  /** This value is true when the annealing keeps the plan as its current plan. The start plan has true. */
+  readonly accepted: boolean;
+}
+
 /**
  * This function gives the highways of a local search over the set of highways (HWY-059). The search starts at the plan of `from`.
  * Each move adds a highway of the pool, drops a highway, moves one edge to another highway, or moves one point of a spine.
@@ -93,10 +135,20 @@ function acceptance(y: number): number {
  * The score reads only this graph and its routes. Thus the search does not fit to the inputs of a screen.
  */
 export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): HighwayPlan {
+  return searchRun(input, o).plan;
+}
+
+/**
+ * This function is `searchPlan`, and it also gives the number of the plans that it measured and their work (SEARCH-BUDGET).
+ * With `work` more than 0, the search measures no new plan after the work of its measures is `work` × `SEARCH_WORK_UNIT` units or more.
+ * The function `observe` gets each measured plan. It does not change the search, and the work does not count its time.
+ */
+export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>, observe?: (step: SearchStep) => void): SearchRun {
   const graph = input.graph;
   const start = tidyPlan(candidatePlan(input, o.from));
   const budget = Math.max(0, Math.floor(o.evaluations));
-  if (budget === 0 || graph.edges.length === 0) return start;
+  const limit = Math.max(0, o.work ?? 0) * SEARCH_WORK_UNIT;
+  if (budget === 0 || graph.edges.length === 0) return { plan: start, evaluations: 0, work: 0 };
   const pool: Highway[] = [];
   for (const source of o.pool) if (source !== o.from) pool.push(...candidatePlan(input, source).highways);
   const finder = new WayFinder(graph.nodes);
@@ -104,7 +156,15 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
   const plugs = new Map(edgePlugs(graph).map((p) => [p.edge.id, p] as const));
   const routes = firstRoutes(input);
   const first = follow(graph, { highways: [] }).routes;
-  const scoreOf = (plan: HighwayPlan): number => searchScore(graph, follow(graph, plan).routes, first, o);
+  let work = 0;
+  let last: Result | undefined;
+  const scoreOf = (plan: HighwayPlan): number => {
+    const from = workCounts();
+    last = follow(graph, plan);
+    const score = searchScore(graph, last.routes, first, o);
+    work += workSince(from);
+    return score;
+  };
   const next = random(o.seed);
   const pick = <T>(list: readonly T[]): T => list[Math.floor(next() * list.length) % list.length]!;
   const tidy = (highways: Highway[]): HighwayPlan => tidyPlan(orderAlongRoutes({ highways }, routes));
@@ -153,18 +213,24 @@ export function searchPlan(input: HighwayInput, o: Readonly<SearchOptions>): Hig
 
   let current = start;
   let currentScore = scoreOf(start);
+  let currentN = 1;
+  observe?.({ n: 1, from: 0, plan: start, result: last!, score: currentScore, accepted: true });
   let best = start;
   let bestScore = currentScore;
   let temperature = Math.max(0, o.temperature);
-  for (let n = 1, tries = 0; n < budget && tries < 4 * budget; tries++) {
+  let n = 1;
+  for (let tries = 0; n < budget && tries < 4 * budget && (limit === 0 || work < limit); tries++) {
     const plan = moved(current, pick(SEARCH_MOVES));
     if (!plan) continue;
     n++;
     const score = scoreOf(plan);
     const delta = score - currentScore;
-    if (delta >= 0 || (temperature > 0 && next() < acceptance(-delta / temperature))) [current, currentScore] = [plan, score];
+    const from = currentN;
+    const accepted = delta >= 0 || (temperature > 0 && next() < acceptance(-delta / temperature));
+    if (accepted) [current, currentScore, currentN] = [plan, score, n];
+    observe?.({ n, from, plan, result: last!, score, accepted });
     if (score > bestScore + 1e-12) [best, bestScore] = [plan, score];
     if (n % SWEEP === 0) temperature *= 0.95;
   }
-  return best;
+  return { plan: best, evaluations: n, work };
 }

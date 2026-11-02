@@ -92,7 +92,7 @@ describe("fixPorts (FIX-PORTS)", () => {
 
 describe("the plug rules of the registry (PLUG-REGISTER)", () => {
   it("lists facing, side, justify, spread and leaders, and side and justify give the plugs of the options of corners", () => {
-    expect(listStrategies(STRATEGIES, "plugs").map((s) => s.name)).toEqual(["facing", "side", "justify", "spread", "leaders"]);
+    expect(listStrategies(STRATEGIES, "plugs").map((s) => s.name)).toEqual(["facing", "side", "justify", "spread", "leaders", "assign"]);
     const graph = rowCardsBoard({ cards: 4, rows: 6, columns: 2 });
     const route = (o: object): Result => cornersRouter({ name: "corners", ...o }).route(graph);
     expect(route({ plug: plugStrategies.side })).toEqual(route({ plugs: "side" }));

@@ -18,14 +18,14 @@
 // With `--profile <file>`, the script keeps a CPU profile of the first route in `<file>` and a CPU profile of the steps in a file with the suffix `.steps.cpuprofile`.
 // For each profile, it prints the 25 functions with the most self time.
 import { createHash } from "node:crypto";
-import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { Session } from "node:inspector/promises";
-import { arch, cpus, platform } from "node:os";
 import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
-import { adamStrategy, annealingStrategy, canalStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { adamStrategy, annealingStrategy, canalStrategy, nudgeStrategy, repelStrategy, springsStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { envOf } from "./gates/paired.ts";
 import { exactLines, routeHash } from "./xplat.ts";
 
 interface ProfileNode {
@@ -69,8 +69,8 @@ function routerOf(name: string): (graph: Graph) => Routed {
       return { result: p.result, ms: t, key: Math.max(0, t - run), members };
     };
   }
-  // The opt-in routers `shared-stretch` (LANE-STRETCH), `attraction` (HWY-044), `annealing` (RULE-021) and `tight` (WILD-023) are not in the registry. The name gives them here too.
-  const optIn: Readonly<Record<string, unknown>> = { "shared-stretch": sharedStretchStrategy, attraction: attractionStrategy, annealing: annealingStrategy, tight: tightStrategy, reroute: rerouteStrategy, canals: canalStrategy, adam: adamStrategy };
+  // The opt-in routers `shared-stretch` (LANE-STRETCH), `attraction` (HWY-044), `annealing` (RULE-021) and `tight` (WILD-023), and the PHYSICAL routers `repel`, `springs` and `nudge` are not in the registry. The name gives them here too.
+  const optIn: Readonly<Record<string, unknown>> = { "shared-stretch": sharedStretchStrategy, attraction: attractionStrategy, annealing: annealingStrategy, tight: tightStrategy, reroute: rerouteStrategy, canals: canalStrategy, adam: adamStrategy, repel: repelStrategy, springs: springsStrategy, nudge: nudgeStrategy };
   const s = (optIn[name] ?? (routerStrategies as unknown as Readonly<Record<string, unknown>>)[name]) as Strategy<"router", object> | undefined;
   if (s === undefined) throw new RangeError(`There is no router "${name}".`);
   const router = asRouter(s);
@@ -114,7 +114,8 @@ async function main(): Promise<void> {
   const graph = doc.graph;
   const route = routerOf(name);
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
-  const env = { os: platform(), arch: arch(), cpu: (cpus()[0]?.model ?? "").trim(), node: process.version, highways: pkg.version };
+  // The computer, the mode and the context of the times (MEASURE-ISOLATE). Each route is timed in this process.
+  const env = { ...envOf("process"), highways: pkg.version };
   console.log(`scale: ${name} on ${doc.manifestId ?? file} (${graph.nodes.length} nodes, ${graph.edges.length} edges), ${env.os} ${env.arch} node ${env.node}, ${env.cpu}.`);
 
   // With `--profile`, a CPU profile covers the first route, and a second profile covers the steps.
@@ -185,4 +186,4 @@ async function main(): Promise<void> {
   console.log(`scale: ${name}: hash ${hash}, exact ${exact}${row.same ? "" : " (the runs differ)"}.`);
 }
 
-if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) await main();

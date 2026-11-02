@@ -1,4 +1,5 @@
-// The join of the parts of the benchmark: `node scripts/bench-join.ts --parts <folder> [--json <file>] [--report <file>]`.
+// The join of the parts of the benchmark: `node scripts/bench-join.ts --parts <folder> --expect <parts> [--json <file>] [--report <file>]`.
+// `--expect` names the parts of the plan, with commas between them. The join fails when a part has no rows file or no report (FAIL-CLOSED).
 // Each job of the workflow `Bench` writes the rows of its part to `bench-<part>.json` in the folder. One part also writes its side tables to `side-<part>.txt`.
 // Each part also writes the report of the measure suite to `report-<part>.json`.
 // This script puts the rows in the order of one run, prints the tables as `pnpm bench` prints them, and writes one `bench.json` and one `report.json`.
@@ -10,6 +11,7 @@ import { formatFaults, formatLevels, formatTable, orderRows, type BenchRow } fro
 import { formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, joinReports, type SuiteReport } from "../src/bench/suite.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { routersOf } from "../src/strategies/model.ts";
+import { parseList, requireInputs } from "./gates/inputs.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -18,8 +20,12 @@ const opt = (name: string): string | undefined => {
 };
 const folder = opt("--parts");
 if (!folder) throw new Error("bench-join needs --parts <folder>");
+const expect = opt("--expect");
+if (expect === undefined) throw new Error("bench-join needs --expect <parts>: the names of the parts of the plan.");
 const files = readdirSync(folder).sort();
 const parts = files.filter((f) => /^bench-.+\.json$/.test(f));
+requireInputs("bench-join rows", parseList(expect), parts.map((f) => f.slice("bench-".length, -".json".length)));
+requireInputs("bench-join reports", parseList(expect), files.filter((f) => /^report-.+\.json$/.test(f)).map((f) => f.slice("report-".length, -".json".length)));
 const loaded: BenchRow[] = [];
 for (const file of parts) loaded.push(...(JSON.parse(readFileSync(join(folder, file), "utf8")) as BenchRow[]));
 const rows = orderRows(

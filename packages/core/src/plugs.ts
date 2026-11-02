@@ -1,5 +1,6 @@
 import { center, type Box, type Point } from "./geom.ts";
 import { fixedPortPoint, type End, type Node, type Side } from "./model.ts";
+import { clampToRange } from "./plugs/range.ts";
 
 /** A plug: the point where a route leaves or enters a node, and the outward normal of its side. */
 export interface Plug {
@@ -64,12 +65,13 @@ export function pointOnSide(box: Box, side: Side, toward: Point, inset = 6): Poi
 
 /**
  * This function places the plug of one end of an edge. A fixed plug stays at its point. A plug with a side stays on that side.
- * The router places a free plug on the side that faces `toward`.
+ * The router places a free plug on the side that faces `toward`. A free plug of a port with a `range` stays in that range (`clampToRange`).
  */
 export function placePlug(node: Node, end: End, toward: Point): Plug {
   const fixed = fixedPortPoint(node, end);
   const port = end.port === undefined ? undefined : node.ports?.find((p) => p.id === end.port);
   if (fixed) return { point: fixed, normal: SIDE_NORMAL[port?.side ?? nearestSide(node.box, fixed)] };
   const side = port?.side ?? sideToward(node.box, toward);
-  return { point: pointOnSide(node.box, side, toward), normal: SIDE_NORMAL[side] };
+  const point = pointOnSide(node.box, side, toward);
+  return { point: port?.range === undefined ? point : clampToRange(node.box, side, port, point), normal: SIDE_NORMAL[side] };
 }

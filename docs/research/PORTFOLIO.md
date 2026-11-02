@@ -670,6 +670,30 @@ This part is a design. The contract does not change in this item.
 - The iterative members can stop early. They are `hw:growth`, `hw:diffusion`, the families `mlseb` and `kdeeb`, and `shared-p2` and `shared-p3`.
 - A member with one pass, as `corners-side`, cannot stop early. The router keeps the check before each member for these.
 
+### The remeasure (MEASURE-ISOLATE)
+
+The times of this item are from separate jobs, so their speed claim was void. The workflow `Remeasure` (run 41455276356) timed 0.5.1 and the workspace in one job, with an A/A arm.
+Each of the 5 jobs runs each case in its own fresh processes, with 10 rounds and 1 warm-up. The [record](verdicts/remeasure/portfolio-speed.json) keeps each job.
+
+The ratio is the time of the workspace over the time of 0.5.1. The interval is over the 5 jobs, and the columns give each CPU model.
+
+| Measure | Interval | EPYC 7763, 3 jobs | EPYC 9V45, 1 job | EPYC 9V74, 1 job | 0.5.1 | Workspace | In order |
+|---|---|---|---:|---:|---:|---:|---|
+| The setup at 100 nodes | 0.226 to 0.257 | 0.226 to 0.232 | 0.257 | 0.243 | 211.7 ms | 47.8 ms | 0.129 to 0.161 |
+| The setup at 41 to 64 nodes | 0.441 to 0.456 | 0.441 to 0.456 | 0.453 | 0.455 | 47.4 ms | 21.1 ms | 0.303 to 0.341 |
+| The router at 100 nodes | 0.692 to 0.723 | 0.692 to 0.715 | 0.714 | 0.723 | 36.2 ms | 26.5 ms | 0.859 to 0.880 |
+| The router at 41 to 64 nodes | 2.093 to 2.252 | 2.093 to 2.158 | 2.215 | 2.252 | 23.2 ms | 48.3 ms | 3.865 to 4.007 |
+
+- The interval is the claim. The claim of the setup at 100 nodes is 0.226 to 0.257, not the single value 0.145 of this item.
+- So the gain of the setup at 100 nodes is smaller than the old claim. The times of the arms are the medians over the 5 jobs.
+- The 3 jobs on the EPYC 7763 give 0.226 to 0.232 for the setup at 100 nodes. The other CPU models give 0.243 and 0.257.
+- The CPU models of the users are not known. A future limit on these measures has one value for each CPU model.
+- At 41 to 64 nodes the router is 2.1 to 2.3 times slower than 0.5.1, in 5 jobs of 5. 0.5.1 used `shared` alone above 40 nodes, and the new bands run the fit there.
+- The A/A band of each job contains 1, so each job counts.
+- The column "In order" gives the earlier run 41381593646. It kept the cases in turn in one process, and it gave other values.
+- The public claim is the fresh run, because each case of a timing claim runs in fresh processes (BENCH-FRESH-CASES).
+- The two runs are separate CI runs on other jobs, so their difference does not show a cause. The separate case-order run measures the effect of the order.
+
 ### The predictions of PORTFOLIO-SPEED
 
 | Prediction | Result |

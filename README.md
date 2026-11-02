@@ -72,6 +72,8 @@ On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less in
 
 `sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39% and the crossings by 2.2 to 3 times. The routes are 20% to 32% longer.
 
+`sections` and `sections-tree` are slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-tree-of-sections-at-10-000-nodes-h3), `sections` takes 1.15 to 1.33 times the old time, and `sections-tree` 2.67 to 3.21 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) finds the change and fixes it.
+
 The metric `bends` counts each vertex of a curve, because a route is a polyline.
 
 ## The segments
@@ -124,7 +126,7 @@ A third table compares each curve type to the polylines of each router, on the f
 
 A fourth table measures the room of the links on a packed board of touching boxes. It compares the packed board, the board with a gutter only and the board that `makeRoom` opens. Three more tables change one knob of the room at a time: `maxGrowth`, the lane order with the spacing, and the gutter with the passes.
 
-The workflow `Bench` races the routers in CI, in parts that run at the same time. A change of `packages/core` on `main` races the fixtures to 10 000 nodes. Each night, the workflow races all the fixtures, to 100 000 nodes. A run by hand with `max` 100000 does the same. The last job joins the parts with `pnpm bench:join`. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
+The workflow `Bench` races the routers in CI, in parts that run at the same time. A change of `packages/core` on `main` races the fixtures to 10 000 nodes. Each night, the workflow races all the fixtures, to 100 000 nodes. A run by hand with `max` 100000 does the same. The last job joins the parts with `pnpm bench:join`. The join fails when a part of the plan has no rows or no report. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 
 The workflow divides the step `highway` of the suite into 10 shards to 1 000 nodes, one job each (BENCH-GREEN). A push run caps `mlseb` at 400 nodes, and the nightly run has no cap. Each part to 1 000 nodes pairs each strategy with `shared`. The ratio of the times comes from one CPU, so it compares better between runs than the time.
 

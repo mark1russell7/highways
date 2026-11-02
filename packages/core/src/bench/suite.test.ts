@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
+import type { Router } from "../model.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
-import { listStrategies, routersOf } from "../strategies/model.ts";
+import { createRegistry, listStrategies, routersOf, STEPS, type AnyStrategy } from "../strategies/model.ts";
 import { benchOne, benchRun } from "./run.ts";
 import { familySeed, formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, joinReports, PROPOSED_RULES, runSuite } from "./suite.ts";
 
@@ -63,7 +64,14 @@ describe("runSuite in parts (BENCH-CI)", () => {
   const tiny = FIXTURES.find((f) => f.name === "tiny-uniform")!;
   const small = FIXTURES.find((f) => f.name === "small-clustered")!;
   const family = { name: "packed-small", cols: 4, rows: 3, long: 3 };
-  const base = { max: 100, seeds: 2, repeat: 2, seedsMaxNodes: 10, fixtures: [tiny, small], roomFamilies: [family] };
+  // The test checks the join, not the strategies. Thus each step has its first 2 strategies, and the router `corners` for the curves (TEST-NO-LIMIT).
+  const registry = createRegistry(
+    STEPS.flatMap((step): AnyStrategy[] => {
+      const all = listStrategies(STRATEGIES, step) as readonly AnyStrategy[];
+      return [...all.slice(0, 2), ...(step === "router" ? all.filter((s, i) => i >= 2 && s.name === "corners") : [])];
+    }),
+  );
+  const base = { max: 100, seeds: 2, repeat: 2, seedsMaxNodes: 10, fixtures: [tiny, small], roomFamilies: [family], registry };
   const one = runSuite(base).report;
   const seedsOf = (report: typeof one, fixture: string) => new Set(report.rows.filter((r) => r.fixture === fixture).map((r) => r.seed)).size;
 
@@ -80,22 +88,21 @@ describe("runSuite in parts (BENCH-CI)", () => {
   });
 
   it("joins the reports of the parts into the report of one run", () => {
-    const routers = routersOf(STRATEGIES).map((r) => r.name);
+    const routers = routersOf(registry).map((r) => r.name);
     const parts = [
       runSuite({ ...base, fixtures: [tiny] }).report,
-      runSuite({ ...base, fixtures: [small], steps: ["router", "curve"], routers: routers.slice(0, 3) }).report,
-      runSuite({ ...base, fixtures: [small], steps: ["router", "group"], routers: routers.slice(3) }).report,
+      runSuite({ ...base, fixtures: [small], steps: ["router", "curve"], routers: routers.filter((r) => r !== "corners").slice(1).concat("corners") }).report,
+      runSuite({ ...base, fixtures: [small], steps: ["router", "group"], routers: routers.filter((r) => r !== "corners").slice(0, 1) }).report,
       runSuite({ ...base, fixtures: [small], steps: ["highway"] }).report,
     ];
-    const joined = joinReports([parts[2]!, parts[3]!, parts[0]!, parts[1]!], { roomFamilies: [family] });
+    const joined = joinReports([parts[2]!, parts[3]!, parts[0]!, parts[1]!], { roomFamilies: [family], registry });
     const key = (r: (typeof one.rows)[number]) => [r.step, r.fixture, r.seed, r.strategy, r.values];
     expect(joined.rows.map(key)).toEqual(one.rows.map(key));
     expect(joined.fronts).toEqual(one.fronts);
     expect(joined.rules).toEqual(one.rules);
     const medians = (s: (typeof one.summaries)[number]) => [s.step, s.fixture, s.strategy, s.seeds, s.violations, Object.keys(s.measures)];
     expect(joined.summaries.map(medians)).toEqual(one.summaries.map(medians));
-    // The parts run the whole suite again, and each built-in strategy adds rows. Thus the test gets more time than the default.
-  }, 30_000);
+  });
 });
 
 describe("runSuite in shards, with caps and the paired arm (BENCH-GREEN)", () => {
@@ -158,5 +165,19 @@ describe("runSuite in shards, with caps and the paired arm (BENCH-GREEN)", () =>
     const { ms: _b, paired, ...restB } = b.row;
     expect(restB).toEqual(restA);
     expect(paired?.base).toBe("shared");
+  });
+
+  it("routes one warm-up of each paired arm before the timed routes, and no warm-up without a pair", () => {
+    const graph = makeFixture(tiny);
+    const corners = routersOf(STRATEGIES).find((r) => r.name === "corners")!;
+    const shared = routersOf(STRATEGIES).find((r) => r.name === "shared")!;
+    const log: string[] = [];
+    const counted = (router: Router, tag: string): Router => ({ name: router.name, route: (g) => (log.push(tag), router.route(g)) });
+    benchRun(counted(corners, "A"), tiny.name, graph, 3, Infinity, counted(shared, "B"));
+    // The warm-up (B, A), then the timed routes with the order swapped at each route.
+    expect(log).toEqual(["B", "A", "B", "A", "A", "B", "B", "A"]);
+    log.length = 0;
+    benchRun(counted(corners, "A"), tiny.name, graph, 3);
+    expect(log).toEqual(["A", "A", "A"]);
   });
 });

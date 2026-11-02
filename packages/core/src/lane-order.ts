@@ -3,6 +3,7 @@
 import { byText } from "./compare.ts";
 import { dist, type Point } from "./geom.ts";
 import type { Route } from "./model.ts";
+import { WORK } from "./work.ts";
 
 /** Two points nearer than this distance are the same point. The value is the same as in `segments.ts`. */
 const SAME = 1e-6;
@@ -23,11 +24,18 @@ export interface PlacedRoute extends Placed {
 
 /** This function gives the index where `p` holds the points of `part` in a row, from `from` on, or -1. */
 export function findRun(p: readonly Point[], part: readonly Point[], from: number): number {
+  let steps = 0;
   for (let i = from; i + part.length <= p.length; i++) {
     let ok = true;
-    for (let j = 0; ok && j < part.length; j++) ok = dist(p[i + j]!, part[j]!) <= SAME;
-    if (ok) return i;
+    let j = 0;
+    for (; ok && j < part.length; j++) ok = dist(p[i + j]!, part[j]!) <= SAME;
+    steps += j;
+    if (ok) {
+      WORK.lane += steps;
+      return i;
+    }
   }
+  WORK.lane += steps;
   return -1;
 }
 
@@ -76,8 +84,12 @@ function partAfter(P: Placed, Q: Placed): Parting | undefined {
   for (let j = 1; ; j++) {
     const a = P.p[P.e + j];
     const b = Q.p[Q.e + j];
-    if (a === undefined || b === undefined) return undefined;
+    if (a === undefined || b === undefined) {
+      WORK.lane += j;
+      return undefined;
+    }
     if (a !== b && dist(a, b) > SAME) {
+      WORK.lane += j;
       const from = P.p[P.e + j - 2]!;
       const at = P.p[P.e + j - 1]!;
       const side = turn(from, at, a) - turn(from, at, b);
@@ -91,8 +103,12 @@ function partBefore(P: Placed, Q: Placed): Parting | undefined {
   for (let j = 1; ; j++) {
     const a = P.p[P.s - j];
     const b = Q.p[Q.s - j];
-    if (a === undefined || b === undefined) return undefined;
+    if (a === undefined || b === undefined) {
+      WORK.lane += j;
+      return undefined;
+    }
     if (a !== b && dist(a, b) > SAME) {
+      WORK.lane += j;
       const from = P.p[P.s - j + 2]!;
       const at = P.p[P.s - j + 1]!;
       // Seen backward, the left side is the right side. Thus the order turns around.

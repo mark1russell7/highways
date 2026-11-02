@@ -4,8 +4,7 @@
 // On the exact sets, the report compares the gap closed of each form with the offline choice of `portfolio-sets.ts`, the best single strategy and the oracle.
 // On `screen-v1`, `--pool` gives the records of all strategies, and the report compares the guarded B1. Each report also gives the times.
 // The column `differ` counts the inputs (train and test) where the winner of the router is not the offline choice. It must be 0.
-import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { quantile } from "../src/bench/measures/stats.ts";
 import { GAP_CAPS, GAP_RULES, type GapRule } from "../src/bench/screen/gap.ts";
@@ -303,7 +302,7 @@ export function apiReport(exact: readonly ExactRow[], screen: readonly ScreenRow
   return lines.join("\n");
 }
 
-if (process.argv[1] !== undefined && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase()) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
   const opt = (name: string): string | undefined => {
     const i = args.indexOf(name);

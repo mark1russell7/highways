@@ -13,13 +13,10 @@ on:
       run:
         description: "The id of the layout-contract run with the artifact xplat-graphs."
         default: "40688908137"
+  # Each pull request starts this workflow, so the check "Xplat OK" of the ruleset is always there (CI-OK).
+  # The job changes skips the cells when the pull request does not change the core or the trace.
+  # Xplat is not a job of ci.yml: release.yml gives ci.yml only "contents: read", and the job inputs needs "actions: read".
   pull_request:
-    paths:
-      - packages/core/src/**
-      - .github/workflows/xplat.yml
-      - packages/core/scripts/xplat.ts
-      - packages/core/scripts/xplat-summary.ts
-      - packages/core/scripts/data/xplat/**
 
 permissions:
   contents: read
@@ -32,8 +29,38 @@ defaults:
   run:
     shell: bash
 
+env:
+  # The cells of the matrices of trace and near: process.platform and the major node version (FAIL-CLOSED). Change it with the matrices.
+  CELLS: linux-node24,linux-node26,win32-node24,win32-node26
+
 jobs:
+  # The paths that start the cells. A dispatch always starts them.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      xplat: ${{ steps.diff.outputs.xplat }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: github.event_name == 'pull_request'
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then echo "xplat=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          files="$(git diff --name-only "$BASE...$HEAD")"
+          if grep -qE '^(packages/core/src/|packages/core/scripts/data/xplat/|packages/core/scripts/xplat(-summary)?\.ts$|\.github/workflows/xplat\.yml$)' <<< "$files"; then echo "xplat=true" >> "$GITHUB_OUTPUT"; else echo "xplat=false" >> "$GITHUB_OUTPUT"; fi
+
   inputs:
+    needs: changes
+    if: needs.changes.outputs.xplat == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -71,8 +98,8 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [24, 26]
@@ -106,8 +133,8 @@ jobs:
           if-no-files-found: warn
 
   locate:
-    needs: trace
-    if: ${{ always() }}
+    needs: [changes, trace]
+    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -121,7 +148,7 @@ jobs:
           pattern: xplat-trace-*
           path: cells
       - name: Find the first chunk of calls that differs
-        run: node packages/core/scripts/xplat-summary.ts --cells cells --targets targets.json
+        run: node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --targets targets.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: xplat-targets
@@ -133,8 +160,8 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      # The account runs at most 20 jobs at once. A cap of 6 keeps runners free for the gates and the deploys.
-      max-parallel: 6
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [24, 26]
@@ -169,8 +196,8 @@ jobs:
           if-no-files-found: warn
 
   summary:
-    needs: near
-    if: ${{ always() }}
+    needs: [changes, near]
+    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -190,7 +217,7 @@ jobs:
       - name: Write the summary
         run: |
           mkdir -p near
-          node packages/core/scripts/xplat-summary.ts --cells cells --near near --out xplat.md --json xplat.json
+          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --near near --out xplat.md --json xplat.json
           cat xplat.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -198,3 +225,32 @@ jobs:
           path: |
             xplat.md
             xplat.json
+
+  # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
+  # A skipped job fails it (template #85), except the jobs of the cells on a pull request without changes to the core.
+  xplat-ok:
+    name: Xplat OK
+    if: always()
+    needs: [changes, inputs, trace, locate, near, summary]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Each job passed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          # The jobs that their own if may skip, separated by spaces. Each other job must pass.
+          ALLOW_SKIP: ${{ needs.changes.outputs.xplat != 'true' && 'inputs trace locate near summary' || '' }}
+        run: |
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) \(.value.result)"' > results
+          cat results
+          if [ ! -s results ]; then echo "::error::no job in needs"; exit 1; fi
+          bad=0
+          while read -r job result; do
+            case "$result" in
+              success) ;;
+              skipped) case " $ALLOW_SKIP " in *" $job "*) ;; *) echo "::error::$job was skipped, and ALLOW_SKIP does not name it"; bad=1 ;; esac ;;
+              *) echo "::error::$job: $result"; bad=1 ;;
+            esac
+          done < results
+          exit $bad

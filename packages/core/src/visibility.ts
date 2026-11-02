@@ -2,6 +2,7 @@ import { TOLERANCE } from "./bench/properties.ts";
 import { dist, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
+import { WORK } from "./work.ts";
 
 /** The nodes as obstacles, with a grid for fast tests. */
 export class Obstacles {
@@ -24,11 +25,14 @@ export class Obstacles {
    */
   hit(a: Point, b: Point, pad: number, skip?: ReadonlySet<Node>): Node | undefined {
     let found: Node | undefined;
+    let tests = 0;
     this.#grid.someSegment(a, b, pad, (n) => {
+      tests++;
       if (skip?.has(n) || !hits(a, b, n, pad)) return false;
       found = n;
       return true;
     });
+    WORK.sight += tests;
     return found;
   }
 
@@ -286,6 +290,7 @@ export class CornerGraph {
           if (before && bj >= pj0 && bj <= pj1) continue;
           const list = this.#buckets.get(bucketKey(bi, bj));
           if (list === undefined) continue;
+          WORK.sight += list.length;
           for (const j of list) {
             if (j === self) continue;
             const d = dist(p, points[j]!);
@@ -299,6 +304,7 @@ export class CornerGraph {
       now.build();
       while (now.size > 0) {
         const j = now.pop();
+        WORK.sight++;
         // A node that stopped an earlier segment often stops this segment too, so the test takes these nodes first.
         // The order of the nodes does not change the result.
         const q = points[j]!;
@@ -415,11 +421,13 @@ export class CornerGraph {
     });
     let best = Infinity;
     let bestEnd = -1;
+    let settled = 0;
     while (heap.size > 0) {
       if (heap.topKey >= best) break;
       const i = heap.pop();
       if (closed[i] === stamp) continue;
       closed[i] = stamp;
+      settled += 1 + this.#adj[i]!.length;
       const gi = G[i]!;
       const tail = goal.get(i);
       if (tail !== undefined && gi + tail < best) {
@@ -435,6 +443,7 @@ export class CornerGraph {
         relax(j, gi + (cost ? cost(i, j, d) : d), i);
       }
     }
+    WORK.corner += settled;
     if (bestEnd < 0) return undefined;
     const k = goalOf.get(bestEnd)!;
     const out: Point[] = [to[k]!.point];

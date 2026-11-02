@@ -24,7 +24,7 @@ import { boardUnit, crossingAngles, detourSpread, drawnSegments, plugSpacing, to
 import { changeGraph, routeStability } from "./measures/stability.ts";
 import { quantile, summarize, type Spread } from "./measures/stats.ts";
 import { measureBoard } from "./room.ts";
-import { benchRun, type BenchRow, type Paired } from "./run.ts";
+import { benchRun, type BenchRow, type Paired, type TimingEnv } from "./run.ts";
 
 // The core runs in any host, so it reads the clock without the types of Node or the browser.
 const now = (): number => (globalThis as { performance?: { now(): number } }).performance?.now() ?? Date.now();
@@ -130,6 +130,8 @@ export interface SuiteRow {
   readonly values: Readonly<Record<string, number>>;
   /** The time of the paired baseline arm (`SuiteOptions.pair`). Only the first seed of a fixture has it. */
   readonly paired?: Paired;
+  /** The computer and the mode of the times (MEASURE-ISOLATE). The script of the benchmark sets it. */
+  readonly env?: TimingEnv;
 }
 
 /** A cell that the suite did not route, because the fixture is larger than the cap of the strategy (`SuiteOptions.caps`). */

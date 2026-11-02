@@ -60,6 +60,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
 | `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
+| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
 - `spread` keeps the room of a wall free of the corner insets (`inset`) and of the fixed plugs on the wall.
@@ -71,6 +72,24 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
   - The ends of one port share one plug. The option `rounds` sorts each wall again by the new places of the far ends.
 - The option `plug` of `corners` takes a plug rule. The other routers place the plugs as `facing` does.
 
+A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT-RANGE). A free plug of the port goes in this interval.
+
+- A row of a card is an example. Its plug anchors the row only in the part of the wall where the row can sit.
+- Each rule keeps a plug of a port with a range in that range. The rule keeps its order and its gap.
+  - When the range is too short for the gap, the gap shrinks evenly. No plug drops.
+- A port without a range gives the same plugs as before.
+- `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
+
+`assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
+
+1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
+2. The plugs keep the order of the far ends, so they do not cross at the wall, when goal 1 lets them.
+3. The plugs move the least distance from the plugs of `facing`.
+
+- An end without a range has the room of the wall as its range.
+- An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
+- A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
+
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 
 - The rule is a plug strategy, or the name of one in `STRATEGIES` (or in the option `registry`). `plugOptions` gives its options.
@@ -78,6 +97,8 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 - An end without a port stays free. With `newPorts: true`, it gets a new fixed port with the id `<edge id>:source` or `<edge id>:target`.
 - The output is a new graph. The function does not change the input.
 - The routes of `corners` on the output are the routes of `corners` with the option `plug` on the input.
+- The option `ranges` tells what to do with a plug out of the range of its port. With `keep`, the plug moves into its range.
+  - With `rule`, the plug stays where the rule puts it. The default is `keep`, but `rule` for `assign`.
 
 ```ts
 import { fixPorts, sectionsRouter } from "@mark1russell7/highways";
@@ -445,7 +466,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
-| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
@@ -589,6 +610,12 @@ The strategy `corridors` joins two ways when they share a long length. The lengt
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided`, `crossbars` and `slots` change the plan of the option `from`: `shared-ways` (the default), `corridors` or `none`.
 The routers `trunks` and `shared` keep their own code. A test pins their output, so the strategies `keys` and `shared-ways` read the same decision.
 
+The option `work` of `search` is a work budget, in millions of counted steps. The search measures no new plan after its plans took that work.
+Counters in the hot loops count the steps, so a budget stops at the same plan on each machine. The value 0 is no limit, and it is the default.
+`searchRun` gives the plan, the number of the measured plans and their work. One million steps take 1.5 ms to 2.7 ms on a CI runner.
+The third argument of `searchRun` is an observer. It gets each measured plan with its routes and its score, and it does not change the search.
+The option `crossingWeight` of `search` adds the crossings of the routes (R1) to the score, divided by the number of routes. The default is 0.
+
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
 The new strategy has the options of both. The keys of the options of a gate are not keys of the strategy before it. Gates can follow gates.
 
@@ -677,6 +704,21 @@ The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. The
 - `adamRouter(options)` gives the steps of Adam of RULE-020. The free legs of the routes move away from near legs and boxes, along their normals.
   No point of a run, of a trunk or of two routes moves. A route goes back when it gets more crossings or a break of a hard rule.
   Its options are `eta` (0.01 to 1), `samples` (4 to 32), `steps` (100 to 2000, the budget), `seed` and `clearance`. The same seed gives the same routes. `adamStrategy` is its router strategy.
+
+### The physical routers `repel`, `springs` and `nudge`
+
+The routers `repel`, `springs` and `nudge` of PHYSICAL are opt-in. They are not in `STRATEGIES`, so the default outputs do not change.
+They move the points of the routes with no grid and no search. So a small move of a node gives a small move of the routes.
+
+- `relaxRoutes(graph, routes, options)` gives the forces of PHYSICAL. Each route first gets `legs` legs of equal length, and its two ends stay.
+  The boxes push the points (`boxPush`, `clearance`). The points of other routes push the points (`edgePush`, `gap`). A spring pulls each point to the middle of its neighbors (`spring`).
+  All the points move together in each step, so the order of the edges does not change the result.
+- `keepRules(graph, routes, backup)` keeps the rule `no-pass-through`. A route through a box gets its route of `backup`, and then the route of `corners`.
+- `repelRouter(options)` starts from the straight lines of `straight`, and the forces of `relaxRoutes` move them. `repelStrategy` is its router strategy.
+- `springsRouter(options)` smooths the routes of `shared` with springs, and the boxes push the points. The corners become curves. `springsStrategy` is its router strategy.
+- `nudgeRouter(options)` moves the parallel legs of the routes of `shared` to even gaps, after the nudging of Wybrow, Marriott and Stuckey (2009).
+  A track is the legs of one axis on one line, so each lane of `shared` stays one lane. A track at an end of a route stays.
+  Its options are `reach` (4 to 96), `lane` (0 to 16) and `spacing` (0 to 32). `nudgeStrategy` is its router strategy.
 
 ### The portfolio router
 
@@ -858,7 +900,7 @@ console.log(graph.nodes.length, signTestPower(15)); // 41 12
 
 A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can give a different last bit on another platform or node version. A decision of a router must not depend on that bit.
 
-- The script `scripts/check-math.mjs` of the repository counts these calls in each source file. `pnpm test` fails when a count goes up.
+- The script `scripts/check-math.ts` of the repository counts these calls in each source file. `pnpm test` fails when a count goes up.
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).

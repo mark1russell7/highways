@@ -8,6 +8,7 @@ import { placePlug, pointOnSide, SIDE_NORMAL, sideToward, type Plug } from "../p
 import type { PlugInput, PlugPair } from "../strategies/model.ts";
 import type { Terminal } from "../visibility.ts";
 import { WayFinder } from "../ways.ts";
+import { clampToRange, rangeInterval } from "./range.ts";
 
 /** The options of `sidePlugs`. */
 export interface SidePlugOptions {
@@ -50,6 +51,12 @@ function freeSide(node: Node, end: End, toward: Point, inset: number): FreeSide 
   const m = Math.min(inset, len / 4);
   const at = side === "east" ? b.x + b.w : side === "west" ? b.x : side === "south" ? b.y + b.h : b.y;
   const point = pointOnSide(b, side, toward, inset);
+  // A port with a range (PORT-RANGE) keeps its plug in the interval of the range.
+  const range = port?.range === undefined ? undefined : rangeInterval(b, side, port, inset);
+  if (range) {
+    const facing = clampToRange(b, side, port, point, inset);
+    return { node, side, normal: SIDE_NORMAL[side], along, at, lo: range[0], hi: range[1], facing: { point: facing, normal: SIDE_NORMAL[side] } };
+  }
   return { node, side, normal: SIDE_NORMAL[side], along, at, lo: start + m, hi: start + len - m, facing: { point, normal: SIDE_NORMAL[side] } };
 }
 

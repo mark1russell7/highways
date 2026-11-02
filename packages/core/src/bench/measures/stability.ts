@@ -1,4 +1,4 @@
-import { inflate, type Box } from "../../geom.ts";
+import { frechet, inflate, type Box } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import type { Edge, Graph, Node, Result } from "../../model.ts";
 import { measureStability } from "../quality.ts";
@@ -19,8 +19,9 @@ export interface GraphChange {
 /**
  * This function makes a seeded small change of a graph: one node moves by `boardUnit`, one edge goes and one new edge comes.
  * The moved box keeps a gap of 4 units to the other boxes. The same graph and the same seed give the same change.
+ * With `edges: false`, the change only moves the node (Z11). The moved node is the node of the full change with the same seed.
  */
-export function changeGraph(graph: Graph, seed: number): GraphChange {
+export function changeGraph(graph: Graph, seed: number, options: { readonly edges?: boolean } = {}): GraphChange {
   const R = rng(seed * 2654435761 + 97);
   const n = graph.nodes.length;
   const u = boardUnit(graph);
@@ -51,7 +52,7 @@ export function changeGraph(graph: Graph, seed: number): GraphChange {
   let edges: Edge[] = [...graph.edges];
   let removed: string | undefined;
   let added: string | undefined;
-  if (edges.length > 1) {
+  if (edges.length > 1 && options.edges !== false) {
     const j = Math.floor(R() * edges.length);
     const gone = edges[j]!;
     removed = gone.id;
@@ -101,4 +102,47 @@ export function routeStability(graph: Graph, before: Result, after: Result, opti
   const s = measureStability(before, { routes });
   const u = boardUnit(graph);
   return { mean: s.mean / u, max: s.max / u, moved: s.moved };
+}
+
+/** The move response of a router (Z11 of MEAS0): the routes after a change that only moves one node by one unit of the board. */
+export interface MoveResponse {
+  /**
+   * The sum of the Fréchet distances of the routes, divided by the unit of the board and by the degree of the moved node (at least 1).
+   * The edges of the moved node move by approximately one unit, so 1 is a local response. A larger value tells that other routes also move.
+   */
+  readonly gain: number;
+  /** The share of the other routes that move more than 1 unit of length, as `moved` of Z10. An other route has no end at the moved node. */
+  readonly spill: number;
+}
+
+/**
+ * This function measures the move response of a router (Z11 of MEAS0). `change` is a change of `changeGraph` with `edges: false`.
+ * It gives `undefined` when no node moved. Above `sample` routes, a seeded sample serves, and the sum scales to all the routes.
+ */
+export function moveResponse(graph: Graph, change: GraphChange, before: Result, after: Result, options: RouteStabilityOptions = {}): MoveResponse | undefined {
+  const node = change.moved;
+  if (node === undefined) return undefined;
+  const max = options.sample ?? 2000;
+  const prev = new Map(before.routes.map((r) => [r.edge, r.points] as const));
+  const ends = new Map(graph.edges.map((e) => [e.id, e.source.node === node || e.target.node === node] as const));
+  let routes = after.routes.filter((r) => prev.has(r.edge));
+  const all = routes.length;
+  if (routes.length > max) {
+    const R = rng(options.seed ?? 1);
+    routes = Array.from({ length: max }, () => routes[Math.floor(R() * routes.length)]!);
+  }
+  const u = boardUnit(graph);
+  const degree = graph.edges.filter((e) => ends.get(e.id) === true).length;
+  let sum = 0;
+  let far = 0;
+  let spilled = 0;
+  for (const r of routes) {
+    const f = frechet(prev.get(r.edge)!, r.points);
+    sum += f;
+    if (ends.get(r.edge) === true) continue;
+    far++;
+    if (f > 1) spilled++;
+  }
+  const scale = routes.length > 0 ? all / routes.length : 0;
+  return { gain: (sum * scale) / u / Math.max(1, degree), spill: far > 0 ? spilled / far : 0 };
 }

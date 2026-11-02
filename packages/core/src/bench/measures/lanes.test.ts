@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Box } from "../../geom.ts";
 import type { Graph, Level, Result, Route } from "../../model.ts";
-import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeSeparation, runProfile } from "./lanes.ts";
+import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeBalance, routeSeparation, runProfile } from "./lanes.ts";
 import { linkAgreement } from "./levels.ts";
 
 const route = (edge: string, ...points: [number, number][]): Route => ({ edge, points: points.map(([x, y]) => ({ x, y })) });
@@ -139,5 +139,34 @@ describe("linkAgreement (Z9)", () => {
     expect(linkAgreement(graph, [], routes, 10)).toBeUndefined();
     const single: Level = { depth: 0, items: [{ id: "a1", box: B(0, 0, 4, 4), nodes: ["a1"] }, { id: "b1", box: B(40, 0, 10, 10), nodes: ["b1"] }], links: [] };
     expect(linkAgreement(graph, [single], routes, 10)).toBeUndefined();
+  });
+});
+
+describe("routeBalance (R16)", () => {
+  it("gives 0 for even gaps and for routes without parallel neighbors", () => {
+    // Three parallel routes, each 10 units from its neighbor: two pairs with the same gap.
+    const even = routeBalance([route("a", [0, 0], [100, 0]), route("b", [0, 10], [100, 10]), route("c", [0, 20], [100, 20])]);
+    expect(even.pairs).toBe(2);
+    expect(even.cv).toBeCloseTo(0);
+    expect(even.low).toBe(0);
+    expect(routeBalance([route("a", [0, 0], [100, 0]), route("b", [0, 0], [0, 100])])).toEqual({ cv: 0, low: 0, pairs: 0 });
+  });
+
+  it("gives a spread for uneven gaps, and counts only the nearest neighbor at each side", () => {
+    // The gaps are 4 and 16. The route "a" is not a neighbor of "c", because "b" is between them.
+    const uneven = routeBalance([route("a", [0, 0], [100, 0]), route("b", [0, 4], [100, 4]), route("c", [0, 20], [100, 20])]);
+    expect(uneven.pairs).toBe(2);
+    // The mean gap is 10, and the standard deviation is 6.
+    expect(uneven.cv).toBeCloseTo(0.6);
+    // The weighted median is 4, so no gap is less than 2.
+    expect(uneven.low).toBe(0);
+  });
+
+  it("weights each gap by the overlap, and does not count legs beyond the reach", () => {
+    // The pair a-b overlaps on 100 units with a gap of 2. The pair b-c overlaps on 10 units with a gap of 12.
+    const b = routeBalance([route("a", [0, 0], [100, 0]), route("b", [0, 2], [100, 2]), route("c", [90, 14], [200, 14])]);
+    expect(b.pairs).toBe(2);
+    expect(b.low).toBe(0);
+    expect(routeBalance([route("a", [0, 0], [100, 0]), route("b", [0, 50], [100, 50])]).pairs).toBe(0);
   });
 });
