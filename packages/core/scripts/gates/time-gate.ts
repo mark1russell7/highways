@@ -27,10 +27,6 @@ export interface TimeLimits {
   readonly timeFloorMs: number;
 }
 
-/** The margin of the resolution: a limit must be above 1.1 times the A/A value of its check. */
-export const RESOLUTION_MARGIN = 1.1;
-/** The largest spread of the tails of the reports for a valid tail check. The spread is the largest tail over the smallest tail, minus 1. */
-export const TAIL_SPREAD = 0.1;
 /** The status of a time test: `noise` tells that a check cannot decide, and `void` tells that the test has no paired time report. Only `pass` passes. */
 export type TimeStatus = "pass" | "fail" | "noise" | "void";
 
@@ -42,8 +38,8 @@ export interface TimeCheck {
   readonly limit: number;
   /** The worst A/A value of the check: the highest p90 of the noise floor, or the highest tail of the A/A ratios. */
   readonly aa: number;
-  /** For the tail: the spread of the tail values of the reports. */
-  readonly spread?: number;
+  /** The spread of the A/A values of the check over the reports: the largest value minus the smallest value. */
+  readonly aaSpread: number;
   /** This value is `false` when the A/A arm cannot resolve the limit. Then the check cannot decide. */
   readonly valid: boolean;
   /** The reason of a check that cannot decide or is not measured. */
@@ -68,6 +64,8 @@ export interface TimeTest {
   readonly jobs: number;
   /** The count of the jobs of the policy, `timeJobs`. */
   readonly policy: number;
+  /** The count of the reports that do not count, because their A/A band does not contain 1. A new job replaces each of them. */
+  readonly outside: number;
   /** The median ratio of each job, in the order of the reports. */
   readonly medians: readonly number[];
   /** The tail ratio of each job, in the order of the reports. A job with an empty tail set gives `null`. */
@@ -93,21 +91,27 @@ export interface TimeTest {
  *
  * - The reports must have the mode `process`, the base `baseline`, the arm `candidate` and the A/A arm. With `keys`, only those input ids count.
  * - The ratio of an input is the ratio of the report: the median of the arm over the median of the base.
- * - The median check: the worst median ratio over the reports is at `timeRatio` or below. It is valid only when `timeRatio` is above 1.1 times the worst A/A p90.
+ * - The median check: the worst median ratio over the reports is at `timeRatio` or below. It is valid only when `timeRatio` is above the worst A/A p90 plus the spread of the A/A p90 values.
  * - The tail check uses the tail set. An input with the base median and the arm median both below `timeFloorMs` is not in it.
  * - The tail check: the worst quantile `timeTailQ` over the reports is at `timeTail` or below.
- * - The tail check is valid only when `timeTail` is above 1.1 times the worst A/A tail, and the spread of the tails is at most 0.1.
+ * - The tail check is valid only when `timeTail` is above the worst A/A tail plus the spread of the A/A tails.
+ * - Each check decides on the worst job, so a candidate that passes in 4 jobs and not in the fifth fails.
  * - The A/A tail uses the A/A ratios of the same tail set. An empty tail set in only some reports makes the tail check not valid.
  * - An empty tail set in each report gives the line `TAIL_NOT_MEASURED` in the record. This tail is not a pass, and it does not stop a promotion.
  * - A failed valid check fails the test. Else a check that cannot decide gives `noise`, and the test does not pass.
+ * - A report counts only when its A/A band from p10 to p90 contains 1. A report with a band that does not contain 1 measured the runner.
  * - With fewer reports than `timeJobs`, each check gives "cannot decide (1 job of 5)" with the real counts. The test does not pass (FAIL-CLOSED).
  * - With no report or no input, the status is `void` and the test fails (FAIL-CLOSED).
  */
 export function pairedTimeTest(reports: readonly PairedReport[], baseline: string, candidate: string, keys: ReadonlySet<string> | undefined, limits: TimeLimits): TimeTest {
   const aa = aaId(baseline);
-  const mine = reports.filter((r) => r.mode === "process" && r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
-  const empty = { median: Number.NaN, tail: Number.NaN, pass: false, status: "void" as const, jobs: mine.length, policy: limits.timeJobs, medians: [], tails: [], cpus: mine.map((r) => r.env.cpu), inputs: 0, checks: [], faster: false };
-  if (mine.length === 0) return { ...empty, reason: `no paired time report of mode process has the base ${baseline}, the arm ${candidate} and the A/A arm` };
+  const matched = reports.filter((r) => r.mode === "process" && r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
+  // A job counts only when its A/A band contains 1. A job with a band that does not contain 1 measured the runner (STRATEGY.md 2026-11-02).
+  const mine = matched.filter((r) => r.noiseFloor === null || (r.noiseFloor.p10 <= 1 && r.noiseFloor.p90 >= 1));
+  const outside = matched.length - mine.length;
+  const empty = { median: Number.NaN, tail: Number.NaN, pass: false, status: "void" as const, jobs: mine.length, policy: limits.timeJobs, outside, medians: [], tails: [], cpus: mine.map((r) => r.env.cpu), inputs: 0, checks: [], faster: false };
+  if (matched.length === 0) return { ...empty, reason: `no paired time report of mode process has the base ${baseline}, the arm ${candidate} and the A/A arm` };
+  if (mine.length === 0) return { ...empty, reason: `the A/A band of each of the ${outside} paired time reports does not contain 1` };
   const at = { env: mine[0]!.env, mode: mine[0]!.mode };
   // The values of each report: the median ratio, the tail ratio, the A/A tail and the noise floor.
   const per = mine.map((report) => {
@@ -133,42 +137,41 @@ export function pairedTimeTest(reports: readonly PairedReport[], baseline: strin
   const min = (xs: readonly number[]): number => xs.reduce((x, y) => Math.min(x, y), Number.POSITIVE_INFINITY);
   const medians = per.map((x) => quantileOf(x.all, 0.5));
   // A report with no A/A noise floor gives an A/A value that is not a number, so its check cannot decide.
-  const aaP90 = max(per.map((x) => x.floor?.p90 ?? Number.NaN));
+  const aaP90s = per.map((x) => x.floor?.p90 ?? Number.NaN);
   const worstMedian = max(medians);
-  const medianCheck = check("median", worstMedian, limits.timeRatio, aaP90, undefined);
+  const medianCheck = check("median", worstMedian, limits.timeRatio, aaP90s);
   // A report with an empty tail set gives no tail. An empty tail set in each report gives a tail that is not measured. An empty tail set in only some reports cannot decide.
   const tails = per.map((x) => (x.tail.length === 0 ? null : quantileOf(x.tail, limits.timeTailQ)));
   const real = tails.filter((x): x is number => x !== null);
-  const aaTail = max(per.filter((x) => x.tail.length > 0).map((x) => quantileOf(x.aaTail, limits.timeTailQ)));
+  const aaTails = per.filter((x) => x.tail.length > 0).map((x) => quantileOf(x.aaTail, limits.timeTailQ));
   const some = `${tails.length - real.length} of ${tails.length} jobs have an empty tail set`;
   const tailCheck: TimeCheck =
     real.length === 0
-      ? { check: "tail", worst: Number.NaN, limit: limits.timeTail, aa: Number.NaN, valid: true, why: TAIL_NOT_MEASURED, verdict: "not measured" }
+      ? { check: "tail", worst: Number.NaN, limit: limits.timeTail, aa: Number.NaN, aaSpread: Number.NaN, valid: true, why: TAIL_NOT_MEASURED, verdict: "not measured" }
       : real.length < tails.length
-        ? { check: "tail", worst: max(real), limit: limits.timeTail, aa: aaTail, valid: false, why: some, verdict: "noise" }
-        : check("tail", max(real), limits.timeTail, aaTail, max(real) / min(real) - 1);
+        ? { check: "tail", worst: max(real), limit: limits.timeTail, aa: max(aaTails), aaSpread: max(aaTails) - min(aaTails), valid: false, why: some, verdict: "noise" }
+        : check("tail", max(real), limits.timeTail, aaTails);
   // Too few jobs: each check cannot decide, whatever its value (FAIL-CLOSED).
-  const few = mine.length < limits.timeJobs ? jobsOf(mine.length, limits.timeJobs) : undefined;
+  const few = mine.length < limits.timeJobs ? `${jobsOf(mine.length, limits.timeJobs)}${outside > 0 ? `, ${outside} with an A/A band that does not contain 1` : ""}` : undefined;
   const checks = few === undefined ? [medianCheck, tailCheck] : [medianCheck, tailCheck].map((c): TimeCheck => ({ ...c, valid: false, why: few, verdict: "noise" }));
   const status: TimeStatus = checks.some((c) => c.verdict === "fail") ? "fail" : checks.some((c) => c.verdict === "noise") ? "noise" : "pass";
   const p10 = min(per.map((x) => x.floor?.p10 ?? Number.NaN));
   const faster = status === "pass" && worstMedian < 1 && worstMedian < p10;
-  const record = { jobs: mine.length, policy: limits.timeJobs, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
+  const record = { jobs: mine.length, policy: limits.timeJobs, outside, medians, tails, cpus: mine.map((r) => r.env.cpu), ...(tailCheck.verdict === "not measured" ? { note: TAIL_NOT_MEASURED } : {}) };
   return { median: worstMedian, tail: tailCheck.worst, pass: status === "pass", status, ...record, inputs: per[0]!.all.length, checks, faster, ...at };
 }
 
-/** This function gives one check of the time test, with its resolution from the A/A value and, for the tail, the spread. */
-function check(name: "median" | "tail", worst: number, limit: number, aa: number, spread: number | undefined): TimeCheck {
-  const resolved = limit > aa * RESOLUTION_MARGIN;
-  const steady = spread === undefined || spread <= TAIL_SPREAD;
-  const valid = resolved && steady;
-  const why = !resolved
-    ? `the A/A ${name === "median" ? "p90" : "tail"} ${fmt(aa, 3)} times ${RESOLUTION_MARGIN} is not below the limit ${limit}`
-    : !steady
-      ? `the spread ${fmt(spread!, 3)} of the tails of the reports is above ${TAIL_SPREAD}`
-      : undefined;
+/**
+ * This function gives one check of the time test, with its resolution from the A/A values of the reports.
+ * The resolution is the worst A/A value plus the spread of the A/A values, with no margin factor (STRATEGY.md 2026-11-02).
+ */
+function check(name: "median" | "tail", worst: number, limit: number, aaValues: readonly number[]): TimeCheck {
+  const aa = aaValues.reduce((x, y) => Math.max(x, y), Number.NEGATIVE_INFINITY);
+  const aaSpread = aa - aaValues.reduce((x, y) => Math.min(x, y), Number.POSITIVE_INFINITY);
+  const valid = limit > aa + aaSpread;
+  const why = valid ? undefined : `the A/A ${name === "median" ? "p90" : "tail"} ${fmt(aa, 3)} plus its spread ${fmt(aaSpread, 3)} is not below the limit ${limit}`;
   const verdict = !valid ? "noise" : worst <= limit ? "pass" : "fail";
-  return { check: name, worst, limit, aa, ...(spread === undefined ? {} : { spread }), valid, ...(why === undefined ? {} : { why }), verdict };
+  return { check: name, worst, limit, aa, aaSpread, valid, ...(why === undefined ? {} : { why }), verdict };
 }
 
 const fmt = (x: number, d = 2): string => (Number.isFinite(x) ? x.toFixed(d) : String(x));

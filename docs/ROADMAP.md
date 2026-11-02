@@ -149,6 +149,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | RUNNER-SLOTS | Each heavy matrix runs 3 cells at most, and each heavy workflow has one concurrency group for each ref. The account runs at most 40 jobs at one time, and heavy work keeps 28 of them at most. | 2026-10-30 | #207 |
 | BENCH-JOIN-INSTALL | The join job of `Bench` installs the packages. The source of the core imports `@mark1russell7/layout-contract`, and the scheduled runs of 10-29 to 11-01 failed without it. | 2026-11-01 | #218 |
 | IMPORT-MAIN | The scripts of the core compare the real paths of `process.argv[1]` and the module. The old check did nothing through a link to the repository. #223 carried the same change of the scripts. | 2026-11-02 | #223, #221 |
+| WIN-TEST-SPREAD | The time test of a promotion takes its resolution from the A/A runs: the worst A/A value plus its spread, with no factor 1.1. A job counts only when its A/A band contains 1. | 2026-11-02 | this PR |
 
 ## Calibration
 
