@@ -215,6 +215,12 @@ importers:
       highs:
         specifier: ^1.15.4
         version: 1.15.4
+      highways-0-5-1:
+        specifier: npm:@mark1russell7/highways@0.5.1
+        version: '@mark1russell7/highways@0.5.1'
+      highways-0-8-0:
+        specifier: npm:@mark1russell7/highways@0.8.0
+        version: '@mark1russell7/highways@0.8.0'
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -455,6 +461,12 @@ packages:
     version: 1.0.2
     engines: {node: '>=22'}
     hasBin: true
+
+  '@mark1russell7/highways@0.5.1':
+    resolution: {integrity: sha512-+ACgCt5VFAuvSo4CdFLFhjWgMNYm7XkyQNPtQEuzw2PXayLrdgw+KjsGgtf7DwO5ytMBJ65u2yDaXzXnhsmW6w==}
+
+  '@mark1russell7/highways@0.8.0':
+    resolution: {integrity: sha512-Gw9nJB2tCto2VQNonWCk/9oz7gewKFd/2RELZ00x1L1g5dY5eUt4JEUgjuRm6wEi1BGRWaF03UJ2eDtesvk0xA==}
 
   '@mark1russell7/layout-contract@0.2.21':
     resolution: {integrity: sha512-Mls2V7uo5zGS6o5apBCJAKN3T4oZ3A2yuxUJUBzICDzIWT+YiIP+yOcBfVpjf22cPG5GMr+/abC7UJ4u4bXTlA==}
@@ -1547,6 +1559,14 @@ snapshots:
   '@mark1russell7/conventions@0.10.0': {}
 
   '@mark1russell7/cue@https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8': {}
+
+  '@mark1russell7/highways@0.5.1':
+    dependencies:
+      '@mark1russell7/layout-contract': 0.2.21
+
+  '@mark1russell7/highways@0.8.0':
+    dependencies:
+      '@mark1russell7/layout-contract': 0.2.21
 
   '@mark1russell7/layout-contract@0.2.21': {}
 
