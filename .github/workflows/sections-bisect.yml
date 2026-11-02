@@ -4,6 +4,10 @@
 # Each job makes a git worktree of the base and of each of its candidates. It times them in fresh processes on the fixture `large-clustered` (10 000 nodes).
 # In each round, the arms run in turn, with the A/A arm. A ratio is the time of a candidate over the time of the base in the same job.
 # The job `join` reads the 9 records. It writes the ratio of each candidate and the first candidate above the band of the base.
+# The confirm mode (SECTIONS-SLOW step 1b) starts when the input `pairs` is not empty. Then the bisect jobs do not run.
+# A step of the bisect compares two neighbors from two jobs. So each job of the confirm mode times one commit against its parent, in one job.
+# The job `confirm` times the commit, the parent and the A/A arm of the parent on the same board as the bisect.
+# The job `confirm-join` writes one row for each pair and router: the ratio, the A/A band of the job and the verdict.
 name: Sections bisect
 
 on:
@@ -15,6 +19,12 @@ on:
       rounds:
         description: "The timed rounds of each arm on each router, from 1 to 20."
         default: "3"
+      pairs:
+        description: "The confirm mode: pairs commit:parent with spaces between them. A parent HEAD or an empty parent is the checkout. Empty starts the bisect."
+        default: ""
+      confirmRounds:
+        description: "The timed rounds of each arm on each router in the confirm mode, from 1 to 20."
+        default: "10"
 
 permissions:
   contents: read
@@ -30,6 +40,7 @@ defaults:
 
 jobs:
   measure:
+    if: ${{ inputs.pairs == '' }}
     runs-on: ubuntu-latest
     # A job times 13 or 14 arms: the base, 11 or 12 candidates and the A/A arm. One route of sections or sections-tree takes 11 to 57 s at 10 000 nodes.
     # With 3 rounds and 2 routers, a job takes 40 to 80 min. The limit is 2 times the worst case, plus the setup.
@@ -71,7 +82,7 @@ jobs:
   join:
     needs: measure
     # The join also runs when a job fails. Then it writes the record with the gaps, and it fails.
-    if: ${{ always() }}
+    if: ${{ always() && inputs.pairs == '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -100,4 +111,106 @@ jobs:
           path: |
             sections-bisect.md
             sections-bisect.json
+          if-no-files-found: warn
+
+  plan:
+    if: ${{ inputs.pairs != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      # The script reads the pairs and the rounds. A bad input fails this job, so no measure job starts.
+      - id: plan
+        env:
+          PAIRS: ${{ inputs.pairs }}
+          ROUNDS: ${{ inputs.confirmRounds }}
+        run: |
+          set -o pipefail
+          matrix=$(node packages/core/scripts/sections-bisect.ts --plan "$PAIRS" --rounds "$ROUNDS")
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  confirm:
+    needs: plan
+    runs-on: ubuntu-latest
+    # A job times 3 arms: the commit, the parent and the A/A arm. One route of sections or sections-tree takes 11 to 57 s at 10 000 nodes.
+    # With 10 rounds and 2 routers, the worst case is 3 x 2 x 10 x 60 s = 60 min. The installs of the 3 worktrees add 5 min.
+    # The limit is 2 times 65 min: 130 min. With 20 rounds, the worst case is 125 min, so the limit holds too.
+    timeout-minutes: 130
+    strategy:
+      fail-fast: false
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      PAIR: ${{ matrix.pair }}
+      COMMIT: ${{ matrix.commit }}
+      PARENT: ${{ matrix.parent }}
+      ROUTERS: ${{ inputs.routers }}
+      ROUNDS: ${{ inputs.confirmRounds }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The worktrees of the base, the commit and the parent need the history.
+          fetch-depth: 0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time the commit of this pair against its parent
+        run: |
+          set -o pipefail
+          node packages/core/scripts/sections-bisect.ts --confirm --pair "$PAIR" --commit "$COMMIT" --parent "$PARENT" --routers "$ROUTERS" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" | tee "$GITHUB_WORKSPACE/out.md"
+          cat "$GITHUB_WORKSPACE/out.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: sections-confirm-pair${{ matrix.pair }}
+          path: out/confirm-pair*.json
+          if-no-files-found: warn
+
+  confirm-join:
+    needs: confirm
+    # The join also runs when a job fails. Then it writes the record with the gaps, and it fails.
+    if: ${{ always() && inputs.pairs != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: sections-confirm-pair*
+          path: jobs
+      # The join reads only node modules, so this job installs no packages.
+      - name: Join the records of the pairs
+        env:
+          PAIRS: ${{ inputs.pairs }}
+        run: |
+          # The script exits with the code 1 when the record is not complete. The summary gets the record before the step fails.
+          status=0
+          node packages/core/scripts/sections-bisect.ts --confirm-join jobs --pairs "$PAIRS" --summary sections-confirm.md --json sections-confirm.json > /dev/null || status=$?
+          [ -f sections-confirm.md ] && cat sections-confirm.md >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: sections-confirm-${{ github.sha }}
+          path: |
+            sections-confirm.md
+            sections-confirm.json
           if-no-files-found: warn

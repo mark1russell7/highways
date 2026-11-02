@@ -3,7 +3,8 @@
 // Each job times the base `fa1dd82~1` and its share of the candidate commits on one board, in fresh processes, with the A/A arm.
 // The join reads the record of each job. It gives each candidate its ratio against the base of its own job, and the first slower commit.
 // This module imports only node modules and the gates, so a job with no installed packages can start it.
-import { aaId, quantileOf, type PairedReport, type RecordEnv } from "./gates/paired.ts";
+import { aaId, type PairedReport, type RecordEnv } from "./gates/paired.ts";
+import { aaRatios, spreadOf, verdictOf, type PairVerdict } from "./gates/pair-confirm.ts";
 import { InputError } from "./gates/inputs.ts";
 import { H3_FIXTURE, H3_ROUTERS } from "./remeasure-verdict.ts";
 
@@ -120,31 +121,18 @@ export interface ShardRecord {
 
 /**
  * This function gives the A/A ratios of one router in one report, one value for each round.
- * The ratio of a round is the time of the A/A arm over the time of the base in the same round.
+ * The ratio of a round is the time of the A/A arm over the time of the base in the same round. The confirm gate has the rule.
  */
-export function aaRounds(report: PairedReport, router: string): number[] {
-  const input = report.inputs.find((i) => i.id === router);
-  if (input === undefined) return [];
-  const base = input.ms[BASE_ARM] ?? [];
-  const aa = input.ms[aaId(BASE_ARM)] ?? [];
-  const out: number[] = [];
-  for (let k = 0; k < Math.min(base.length, aa.length); k++) if (base[k]! > 0 && Number.isFinite(aa[k]!)) out.push(aa[k]! / base[k]!);
-  return out;
-}
+export const aaRounds = (report: PairedReport, router: string): number[] => aaRatios(report, router);
 
 /** This function gives the A/A spread of a router: p90 of |r - 1| over its A/A ratios. An empty list gives NaN. */
-export const aaSpread = (ratios: readonly number[]): number => quantileOf(ratios.map((r) => Math.abs(r - 1)), 0.9);
+export const aaSpread = (ratios: readonly number[]): number => spreadOf(ratios);
 
 /** The verdict of one candidate against the base. */
-export type RowVerdict = "slower" | "faster" | "inside" | "not measured";
+export type RowVerdict = PairVerdict;
 
 /** This function compares a ratio with the band of the base, 1 - spread to 1 + spread. A ratio on an edge is inside. */
-export function classify(ratio: number | null, spread: number): RowVerdict {
-  if (ratio === null || !Number.isFinite(ratio) || !Number.isFinite(spread)) return "not measured";
-  if (ratio > 1 + spread) return "slower";
-  if (ratio < 1 - spread) return "faster";
-  return "inside";
-}
+export const classify = (ratio: number | null, spread: number): RowVerdict => verdictOf(ratio, spread);
 
 /** The values of one candidate for one router. */
 export interface BisectRow {
