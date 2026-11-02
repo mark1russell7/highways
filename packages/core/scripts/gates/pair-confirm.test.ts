@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aaId, pairedReport, type ChildResult, type RawTimes } from "./paired.ts";
-import { COMMIT_ARM, PARENT_ARM, aaRatios, confirmPair, pairVerdicts, spreadOf, verdictOf } from "./pair-confirm.ts";
+import { COMMIT_ARM, PARENT_ARM, aaRatios, armRows, confirmPair, pairVerdicts, spreadOf, verdictOf } from "./pair-confirm.ts";
 
 // Made-up times only. No test reads a clock or starts a process.
 const ENV = { cpu: "Made-up CPU", cores: 4, os: "test", arch: "x64", node: "v0" };
@@ -34,6 +34,22 @@ describe("the timing of a pair", () => {
     expect(report.inputs.map((i) => i.id)).toEqual(["a", "b"]);
     expect(report.inputs[0]!.ratio[COMMIT_ARM]).toBeCloseTo(3, 10);
     expect(report.inputs[1]!.median[PARENT_ARM]).toBe(50);
+  });
+
+  it("times the arms of others after the commit, with the A/A arm last", async () => {
+    const { start, calls } = fakeStart({ old: 1, new: 2, fix: 4 }, { a: 100 });
+    const report = await confirmPair({ parent: ["old"], commit: ["new"], others: [{ id: "fixed", command: ["fix"] }], inputs: ["a"], rounds: 4, startChild: start, env: ENV, context: "test" });
+    expect(report.arms).toEqual([PARENT_ARM, COMMIT_ARM, "fixed", aaId(PARENT_ARM)]);
+    // 4 rounds x 1 input x 4 arms. The order rotates by one arm in each round.
+    expect(calls).toHaveLength(16);
+    expect(calls.slice(0, 4).map((c) => c.command)).toEqual(["old", "new", "fix", "old"]);
+    expect(calls.slice(4, 8).map((c) => c.command)).toEqual(["new", "fix", "old", "old"]);
+    expect(report.inputs[0]!.ratio["fixed"]).toBeCloseTo(4, 10);
+  });
+
+  it("refuses an arm of others with the id of another arm", async () => {
+    const { start } = fakeStart({ old: 1, new: 1 }, { a: 1 });
+    await expect(confirmPair({ parent: ["old"], commit: ["new"], others: [{ id: COMMIT_ARM, command: ["new"] }], inputs: ["a"], rounds: 1, startChild: start })).rejects.toThrow(RangeError);
   });
 
   it("refuses a bad count of rounds", async () => {
@@ -84,6 +100,23 @@ describe("the verdict of a pair", () => {
     expect(slow.verdict).toBe("slower");
     expect(pairVerdicts(report([100, 100, 100], [60, 61, 59], aa))[0]!.verdict).toBe("faster");
     expect(pairVerdicts(report([100, 100, 100], [101, 101, 101], aa))[0]!.verdict).toBe("inside");
+  });
+
+  it("gives the rows of each arm with the band of the A/A rounds, also for a base with another id", () => {
+    const arms = [{ id: "base" }, { id: "x" }, { id: aaId("base") }];
+    const raw: RawTimes = {
+      ms: new Map([["one", new Map([["base", [100, 100, 100]], ["x", [104, 104, 104]], [aaId("base"), [90, 100, 110]]])]]),
+      peak: new Map([["one", new Map()]]),
+    };
+    const rows = armRows(pairedReport("fresh", ENV, "test", arms, [{ id: "one" }], raw), "x");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.ratio).toBeCloseTo(1.04, 10);
+    expect(rows[0]!.baseMs).toBe(100);
+    expect(rows[0]!.armMs).toBe(104);
+    // The A/A ratios 0.9, 1, 1.1 give the spread p90 of 0.1, 0, 0.1: 0.1. So 1.04 is inside the band of one input.
+    expect(rows[0]!.spread).toBeCloseTo(0.1, 10);
+    expect(rows[0]!.verdict).toBe("inside");
+    expect(armRows(pairedReport("fresh", ENV, "test", arms, [{ id: "one" }], raw), "nope")[0]!.verdict).toBe("not measured");
   });
 
   it("refuses a report with other arms", () => {
