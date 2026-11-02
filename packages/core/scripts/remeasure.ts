@@ -3,6 +3,7 @@
 //
 // - One job: `node scripts/remeasure.ts --claim <h3|portfolio-speed|route-scale> --job <n> --out <dir> [--old-tree <dir>]`.
 //   It writes the report `paired-time/1` of the job to `<dir>/paired-job<n>.json`, and prints its table.
+//   With PORTFOLIO-SPEED, `--only <id,...>` times only these inputs. The case-order run (`scripts/case-order.ts`) times one case alone with it.
 // - The join: `node scripts/remeasure.ts --join <dir> --claim <claim> [--summary <file>] [--json <file>]`.
 //   It reads each file `paired-job<n>.json` below `<dir>`, and it fails when a job of the 5 jobs has no report (FAIL-CLOSED).
 // - A child of mode `fresh`: `node scripts/remeasure.ts --child <claim> --arm <old|workspace> --board <file> [--old-tree <dir>]`.
@@ -151,8 +152,9 @@ interface SpeedInput {
  * - `setup`: `portfolioFacts(graph)(base)`, the network of the stretch, the shortest distances and the facts of the output of `shared`.
  * - `router`: `routePortfolio(graph)` with the default options.
  * The output of `shared` of each version comes before the timed runs.
+ * The list `only` keeps only these inputs, and their boards (BENCH-FRESH-CASES). Without it, the function times each input.
  */
-async function measurePortfolioSpeed(): Promise<PairedReport> {
+async function measurePortfolioSpeed(only: readonly string[] | undefined): Promise<PairedReport> {
   const plan = CLAIM_PLANS["portfolio-speed"];
   const versions = { [OLD_ARM]: await loadCore("portfolio-speed", OLD_ARM, undefined), [NEW_ARM]: await loadCore("portfolio-speed", NEW_ARM, undefined) };
   const old = versions[OLD_ARM];
@@ -163,10 +165,13 @@ async function measurePortfolioSpeed(): Promise<PairedReport> {
     for (const nodes of PORTFOLIO_SPEED_NODES)
       for (const seed of PORTFOLIO_SPEED_SEEDS) {
         const board = `${cls}-${nodes}-s${seed}`;
+        const kinds = (["setup", "router"] as const).filter((kind) => only?.includes(`${kind}:${board}`) ?? true);
+        if (kinds.length === 0) continue;
         const graph = exactBoard(cls, nodes, seed);
         boards.push({ board, graph });
-        for (const kind of ["setup", "router"] as const) inputs.push({ id: `${kind}:${board}`, group: `${kind} ${portfolioSpeedBand(nodes)}`, value: { kind, board, graph } });
+        for (const kind of kinds) inputs.push({ id: `${kind}:${board}`, group: `${kind} ${portfolioSpeedBand(nodes)}`, value: { kind, board, graph } });
       }
+  if (inputs.length === 0) throw new Error(`The option --only names no input of PORTFOLIO-SPEED: ${only?.join(",")}.`);
   const armOf = (id: typeof OLD_ARM | typeof NEW_ARM): Arm<SpeedInput> => {
     const core = versions[id];
     const version = id === OLD_ARM ? "0.5.1" : "the workspace";
@@ -216,7 +221,7 @@ if (opt("--child") !== undefined) {
   if (!Number.isInteger(job) || job < 1) throw new RangeError("The option --job takes a whole number of 1 or more.");
   const dir = need("--out");
   mkdirSync(dir, { recursive: true });
-  const report = claim === "portfolio-speed" ? await measurePortfolioSpeed() : await measureFresh(claim, dir, opt("--old-tree"));
+  const report = claim === "portfolio-speed" ? await measurePortfolioSpeed(opt("--only")?.split(",")) : await measureFresh(claim, dir, opt("--old-tree"));
   writeFileSync(join(dir, reportFile(job)), JSON.stringify(report) + "\n");
   console.log([`# The remeasure of ${claim}, job ${job}`, "", ...pairedTable(report)].join("\n"));
 }

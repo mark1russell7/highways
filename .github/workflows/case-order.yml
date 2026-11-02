@@ -1,0 +1,132 @@
+# The case-order run (BENCH-FRESH-CASES step 1). Does the heap of earlier cases in one process change the time of a later case?
+# Each job runs one target with `scripts/case-order.ts`: in each round, one process of the cases in their normal order,
+# and two fresh processes for each case alone (the arm alone and its A/A arm). The processes run one at a time in the job.
+# The targets:
+# - screen: the paired screen of the promotion time test (`scripts/screen.ts`, screen-v3, the base shared against corners).
+# - levels: the times of the zoom levels (`scripts/levels.ts`) on the fixtures of the benchmark up to 1000 nodes.
+# - portfolio-speed: the remeasure of PORTFOLIO-SPEED (`scripts/remeasure.ts`), 0.5.1 against the workspace.
+# The job `join` gives the verdict of each target over its jobs, in `case-order.md`. The artifacts keep the raw records of each process (JSON lines).
+# The verdict is a record of the effect of the order, not sized. It gives σ and the processes n of a sized run for the budget b.
+name: Case order
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "The target: all, screen, levels or portfolio-speed."
+        type: choice
+        options: [all, screen, levels, portfolio-speed]
+        default: all
+      rounds:
+        description: "The rounds of each target. Each round has one process of each arm for each case."
+        default: "20"
+      jobs:
+        description: "The jobs of each target. E takes the band of R over the jobs."
+        type: choice
+        options: ["1", "2", "3"]
+        default: "1"
+      budget:
+        description: "The budget b. Empty gives the default of the target: 0.1 for the screen, and no budget for the others."
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run for each workflow and ref (RUNNER-SLOTS). A new dispatch waits for the run before it.
+  group: case-order-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    # The screen target runs 20 screens of screen-v3 and 1200 short processes. The time limit of a hosted job is 360 min.
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
+      matrix:
+        target: ${{ fromJSON(inputs.target == 'all' && '["screen","levels","portfolio-speed"]' || format('["{0}"]', inputs.target)) }}
+        job: ${{ fromJSON(inputs.jobs == '3' && '[1,2,3]' || inputs.jobs == '2' && '[1,2]' || '[1]') }}
+    env:
+      TARGET: ${{ matrix.target }}
+      JOB: ${{ matrix.job }}
+      ROUNDS: ${{ inputs.rounds }}
+      BUDGET: ${{ inputs.budget }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run the rounds of the target
+        run: |
+          set -o pipefail
+          node packages/core/scripts/case-order.ts --target "$TARGET" --job "$JOB" --rounds "$ROUNDS" --budget "$BUDGET" --out "$GITHUB_WORKSPACE/out" > "$GITHUB_WORKSPACE/out.md"
+          cat "$GITHUB_WORKSPACE/out.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: case-order-${{ matrix.target }}-job${{ matrix.job }}
+          path: |
+            out/case-order-*.jsonl
+            out/case-order-*.json
+            out/case-order-*.md
+          if-no-files-found: warn
+
+  join:
+    needs: measure
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BUDGET: ${{ inputs.budget }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: case-order-*
+          path: jobs
+      - name: Give the verdict of each target over its jobs
+        run: |
+          mkdir -p joined
+          {
+            echo "# The case-order run (BENCH-FRESH-CASES step 1)"
+            echo
+            echo "Commit ${GITHUB_SHA::7}. The verdicts are a record only. They are not sized."
+            echo "A time of the arm in-order comes after the other cases in one process. It is not the cost of the case."
+            echo
+          } > case-order.md
+          found=0
+          for target in screen levels portfolio-speed; do
+            if node packages/core/scripts/case-order.ts --join jobs --target "$target" --budget "$BUDGET" --json "joined/case-order-$target.json" --summary "joined/case-order-$target.md" > /dev/null; then
+              cat "joined/case-order-$target.md" >> case-order.md
+              echo >> case-order.md
+              found=1
+            fi
+          done
+          [ "$found" = 1 ] || echo "No target gave records." >> case-order.md
+          cat case-order.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: case-order-${{ github.sha }}
+          path: |
+            case-order.md
+            joined/
