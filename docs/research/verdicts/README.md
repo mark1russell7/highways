@@ -32,6 +32,13 @@ The folder [`opt-in/`](opt-in/) holds the verdicts of the opt-in routers that a 
 - Only the measured gain of `pnpm queue` reads these files. The results page does not read them.
 - Make the file with `--snapshot`, then keep only the rows of the opt-in routers.
 
+## The remeasures
+
+The folder [`remeasure/`](remeasure/) holds the record `remeasure.json` of each run of the workflow `Remeasure`. Each record has the 5 jobs, their A/A floors and their CPU models.
+
+- `h3.json` is run 41369331158. `portfolio-speed.json` is run 41381593646. `route-scale.json` is run 41382862417.
+- The results page does not read these files. The [roadmap](../../ROADMAP.md) gives the verdicts.
+
 ## The benchmark snapshot
 
 The folder [`../bench/`](../bench/) holds `bench.json` and `bench-meta.json` of one run of the workflow `Bench`. The Pages build copies them into the site and does not start the benchmark. To make a new snapshot, download the artifact `bench-<sha>` of a finished run on `main`. Then write its rows into `bench.json`, one row on each line, and its run, commit and date into `bench-meta.json`.

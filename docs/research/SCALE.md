@@ -68,6 +68,21 @@ The profile of a route of `shared`, by self time:
 - On `main`, `sig` and `byText` take 85% of the self time. After the signatures, `sig` takes 0.3%.
 - After the signatures, the lane order takes 83% of a route of `shared`.
 
+### The remeasure (MEASURE-ISOLATE)
+
+The times above are from separate jobs, so their speed claim was void. The workflow `Remeasure` (run 41382862417) timed 0.8.0 and the workspace in one job, with an A/A arm.
+Each of the 5 jobs runs each arm in a fresh process in each round. The [record](verdicts/remeasure/route-scale.json) keeps each job.
+
+| Router | Claim | Ratio in the 5 jobs | 0.8.0 | Workspace | Verdict |
+|---|---:|---|---:|---:|---|
+| `shared` | 0.070 | 0.083 to 0.105 | 297.1 s | 26.5 s | The gain is smaller than the claim. |
+| `shared-all` | 0.100 | 0.029 to 0.037 | 1443.2 s | 50.4 s | The claim holds. |
+| `portfolio` | 0.093 | 0.084 to 0.108 | 297.3 s | 27.1 s | The gain is smaller than the claim. |
+
+- The ratio follows the CPU model. The 3 jobs on EPYC 7763 give 0.089 to 0.092 for `shared` and `portfolio`. The job on EPYC 9V74 gives 0.105 and 0.108.
+- The A/A band of job 4 is 1.001 to 1.009. It does not contain 1, so job 4 does not count. Without job 4, no verdict changes.
+- The claim of `shared-all` holds in the 4 jobs that count. A fifth job that counts is not run yet.
+
 ### The output does not change
 
 - The route hash and the exact hash of each router on the board stay the same: `corners` `f3ccfe6861f93ffa`, `sections` `d8e7efc8f64bd7ca`, and `shared` and `portfolio` `a624d2afe8f7ea08`.

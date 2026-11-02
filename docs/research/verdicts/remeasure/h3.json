@@ -1,0 +1,611 @@
+{
+  "schema": "remeasure/1",
+  "claim": "h3",
+  "plan": {
+    "claim": "h3",
+    "rows": [
+      "H3"
+    ],
+    "old": "the core of `fa1dd82~1` (`0dff3fd`), in a git worktree",
+    "board": "the fixture `large-clustered` of `fa1dd82~1` (10 000 nodes)",
+    "mode": "fresh",
+    "rounds": 3,
+    "warmup": 0,
+    "targets": [
+      {
+        "id": "corners",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "corners-smooth",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "trunks",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "shared",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "shared-all",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "sections",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "sections-tree",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "job": "job1",
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9738792476108131,
+        "p90": 1.0350531507299077
+      }
+    },
+    {
+      "job": "job2",
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9401677479701169,
+        "p90": 1.0145451370046457
+      }
+    },
+    {
+      "job": "job3",
+      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 1.000487735403325,
+        "p90": 1.0490121704227928
+      }
+    },
+    {
+      "job": "job4",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9504047704814379,
+        "p90": 1.0593416383451553
+      }
+    },
+    {
+      "job": "job5",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.929017088065455,
+        "p90": 1.0822583669173889
+      }
+    }
+  ],
+  "targets": [
+    {
+      "target": {
+        "id": "corners",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.3799134221858249,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 49415.083076,
+          "newMs": 18773.453319
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.38969970363353984,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 47816.965151,
+          "newMs": 18634.257148
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 0.4601346428919058,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 61268.47755,
+          "newMs": 28191.749037999998
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.47082372825056695,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 44345.881102,
+          "newMs": 20879.093073
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.33938680624035883,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 38793.330144,
+          "newMs": 13165.944420999998
+        }
+      ],
+      "worst": 0.47082372825056695,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "corners-smooth",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.47471164728247667,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 46574.683656,
+          "newMs": 22109.544800000003
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.3889170574905401,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 51335.997991000004,
+          "newMs": 19965.445282
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 0.4682671694370751,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 62669.539297999996,
+          "newMs": 29346.087777
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.5020289565302508,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 46908.574965,
+          "newMs": 23549.462942
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.37004424660938057,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 40601.924196,
+          "newMs": 15024.50845
+        }
+      ],
+      "worst": 0.5020289565302508,
+      "slower": 0,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "trunks",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.38171227206797476,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 45826.197301,
+          "newMs": 17492.421892000002
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.4227881172771036,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 48286.085218,
+          "newMs": 20414.78306
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 0.4491508950611537,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 61035.065784,
+          "newMs": 27413.954426999997
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.5063057143758537,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 44240.572895,
+          "newMs": 22399.254864000002
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.4003082305526754,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 39771.098917999996,
+          "newMs": 15920.698235000002
+        }
+      ],
+      "worst": 0.5063057143758537,
+      "slower": 0,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "shared",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.3614567974030662,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 106781.535739,
+          "newMs": 38596.911929999995
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.35934871510222527,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 109607.72547300001,
+          "newMs": 39387.395314
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 0.3805252140743469,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 139795.496515,
+          "newMs": 53195.711237999996
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.4350626404960656,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 97741.548432,
+          "newMs": 42523.696146999995
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.3353488109504049,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 85607.430817,
+          "newMs": 28708.350133
+        }
+      ],
+      "worst": 0.4350626404960656,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "shared-all",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.18849349831951465,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 210076.606976,
+          "newMs": 39598.074563999995
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 0.1880281741406044,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 207187.60873500002,
+          "newMs": 38957.107775
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 0.19962516840973832,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 269826.696649,
+          "newMs": 53864.199759999996
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.23116704215175782,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 176660.971105,
+          "newMs": 40838.194154000004
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 0.1697253861111248,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 166719.06547600002,
+          "newMs": 28296.45776
+        }
+      ],
+      "worst": 0.23116704215175782,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "sections",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 1.2432982384951765,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 33766.865411,
+          "newMs": 41982.284285
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 1.1726686819220817,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 37060.312112,
+          "newMs": 43459.467356
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 1.2901120075773274,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 44035.933351,
+          "newMs": 56811.286381
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 1.3317550447356112,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 31608.389031,
+          "newMs": 42094.631548000005
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 1.147173192634073,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 32100.243580000002,
+          "newMs": 36824.538912
+        }
+      ],
+      "worst": 1.3317550447356112,
+      "slower": 5,
+      "verdict": "smaller"
+    },
+    {
+      "target": {
+        "id": "sections-tree",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 2.670550355165363,
+          "floor": {
+            "p10": 0.9738792476108131,
+            "p90": 1.0350531507299077
+          },
+          "inside": false,
+          "oldMs": 15276.184487999999,
+          "newMs": 40795.819910000006
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) 6973P-C",
+          "ratio": 2.7442497694082864,
+          "floor": {
+            "p10": 0.9401677479701169,
+            "p90": 1.0145451370046457
+          },
+          "inside": false,
+          "oldMs": 15275.540276000002,
+          "newMs": 41919.89788
+        },
+        {
+          "job": "job3",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "ratio": 2.6669416141763977,
+          "floor": {
+            "p10": 1.000487735403325,
+            "p90": 1.0490121704227928
+          },
+          "inside": false,
+          "oldMs": 20847.955084,
+          "newMs": 55600.278984
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 2.8284434957457667,
+          "floor": {
+            "p10": 0.9504047704814379,
+            "p90": 1.0593416383451553
+          },
+          "inside": false,
+          "oldMs": 14433.218296000001,
+          "newMs": 40823.542412
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "ratio": 3.2107527675788052,
+          "floor": {
+            "p10": 0.929017088065455,
+            "p90": 1.0822583669173889
+          },
+          "inside": false,
+          "oldMs": 11127.244937,
+          "newMs": 35726.832476999996
+        }
+      ],
+      "worst": 3.2107527675788052,
+      "slower": 5,
+      "verdict": "smaller"
+    }
+  ],
+  "verdict": "smaller"
+}
