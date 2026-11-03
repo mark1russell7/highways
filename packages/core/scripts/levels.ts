@@ -18,6 +18,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { quantile } from "@mark1russell7/rigor-statistics";
 import { measureIsolated, runChild, type Arm, type Mode, type PairedReport } from "./gates/paired.ts";
 import { roundsTable } from "./gates/time-gate.ts";
 
@@ -122,10 +123,10 @@ async function runLevels(): Promise<void> {
         : undefined;
   }
 
-  // This median takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
+  // This median takes the upper middle value of an even list: the method `higher` of `quantile`.
   const medianOf = (report: PairedReport | undefined, arm: string): string => {
     const ms = report?.inputs.map((i) => i.median[arm]).filter((x): x is number => x !== undefined) ?? [];
-    return ms.length === 0 ? "-" : Math.round([...ms].sort((a, b) => a - b)[Math.floor(ms.length / 2)]!).toString();
+    return ms.length === 0 ? "-" : Math.round(quantile(ms, 0.5, "higher")).toString();
   };
   const sizes = specs.map((spec) => {
     const graph = baseGraphs.get(spec.name);

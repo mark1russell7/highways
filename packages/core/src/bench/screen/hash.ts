@@ -1,7 +1,8 @@
 // The hash, the canonical JSON and the seeded random numbers of the screen. `sha256Hex`, `canonicalJson` and `RECORD_EPS` come from
-// `@mark1russell7/layout-contract` (PORTFOLIO-FIT). `mulberry32` comes from `@mark1russell7/rigor-generators` (HOME-COPIES).
+// `@mark1russell7/layout-contract` (PORTFOLIO-FIT). `mulberry32` and the hash of `fnv1a32` come from `@mark1russell7/rigor-generators` (HOME-COPIES).
 // The other functions have no equal in a home package, so they stay here.
 import { canonicalJson, sha256Hex } from "@mark1russell7/layout-contract";
+import { fnv1a32 as homeFnv1a32 } from "@mark1russell7/rigor-generators";
 
 export { mulberry32 } from "@mark1russell7/rigor-generators";
 
@@ -32,15 +33,10 @@ export function documentHash(value: object): string {
 
 /**
  * This function gives the 32-bit FNV-1a hash of the UTF-8 bytes of a text, as an unsigned integer.
- * This copy stays. It encodes a lone surrogate as 3 bytes. The `fnv1a32` of `@mark1russell7/rigor-generators` encodes it as U+FFFD, and its hash is different.
+ * It is `fnv1a32(text, { input: "wtf8" })` of `@mark1russell7/rigor-generators`, so a lone surrogate gives its own 3 bytes.
  */
 export function fnv1a32(text: string): number {
-  let h = 0x811c9dc5;
-  for (const byte of utf8(text)) {
-    h ^= byte;
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
+  return homeFnv1a32(text, { input: "wtf8" });
 }
 
 /** This function gives the seed of one step of a generator: `fnv1a32("<seed>:<step>")`. */

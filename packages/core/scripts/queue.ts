@@ -504,18 +504,13 @@ export function backtest(ideas: readonly Idea[], snapshots: readonly QueueSnapsh
   return out;
 }
 
-/** This function gives a list of random numbers from 0 to 1. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
-export function random(seed: number): () => number {
-  return mulberry32(seed);
-}
-
 /**
  * This function gives the rank correlation of the back test and its percentile bootstrap interval of 95 %.
  * Each resample takes as many pairs as the back test has, with replacement.
  */
 export function bootstrap(pairs: readonly BacktestPair[], resamples: number, seed: number): Backtest {
   const rho = (xs: readonly BacktestPair[]): number => spearman(xs.map((p) => p.predicted), xs.map((p) => p.measured));
-  const next = random(seed);
+  const next = mulberry32(seed);
   const values: number[] = [];
   for (let i = 0; i < resamples; i++) values.push(rho(Array.from({ length: pairs.length }, () => pairs[Math.floor(next() * pairs.length)]!)));
   values.sort((a, b) => a - b);

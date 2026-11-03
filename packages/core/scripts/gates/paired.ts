@@ -173,7 +173,12 @@ export function armOrder(arms: number, round: number, mode: Mode): number[] {
   return [...at.slice(shift), ...at.slice(0, shift)];
 }
 
-/** This function gives the quantile `q` of a list, with a linear interpolation between the two nearest values. An empty list gives NaN. */
+/**
+ * This function gives the quantile `q` of a list, with a linear interpolation between the two nearest values. An empty list gives NaN.
+ * This copy stays. The nearest home method is `quantile(values, q, "linear")` of `@mark1russell7/rigor-statistics`, with the same values for finite lists.
+ * The home throws for an empty list and for a NaN. Some callers give a NaN for a missing median, and this copy does not throw.
+ * With `Infinity` at a rank that it reads, this copy can give `NaN`, and the home gives `Infinity`. For -0, this copy gives 0.
+ */
 export function quantileOf(values: readonly number[], q: number): number {
   if (values.length === 0) return Number.NaN;
   const sorted = [...values].sort((a, b) => a - b);

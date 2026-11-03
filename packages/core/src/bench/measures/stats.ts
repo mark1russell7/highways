@@ -3,6 +3,10 @@ import { rng } from "../../fixtures.ts";
 /**
  * This function gives the `p` quantile of the values, with a linear step between two ranks (type 7 of Hyndman and Fan).
  * The result is `NaN` for an empty list.
+ *
+ * This copy stays. The nearest home method is `quantile(values, p, "linear")` of `@mark1russell7/rigor-statistics`, with the same values for finite lists.
+ * The home throws for an empty list, a NaN and a `p` out of [0, 1]. This copy clamps `p`.
+ * With `Infinity` at a rank that it reads, this copy gives `NaN` and the home gives `Infinity`. For -0, this copy gives 0.
  */
 export function quantile(values: readonly number[], p: number): number {
   if (values.length === 0) return Number.NaN;
