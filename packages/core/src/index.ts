@@ -58,3 +58,5 @@ export * from "./portfolio/index.ts";
 // One lane order for each stretch of runs (LANE-STRETCH), and its opt-in router `shared-stretch`.
 export * from "./lane-orders/stretch/index.ts";
 export { sharedStretchStrategy } from "./lane-orders/stretch/router.ts";
+// The stages of the routers and their options as data of the schema `strategy-space/1` (STAGE-DATA).
+export { ROUTE_SPACE_LEFT_OUT, ROUTE_SPACE_MISFITS, routeConfig, routeSpace } from "./route-space.ts";
