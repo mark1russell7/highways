@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-02",
-  "commit": "1c6fa5a8fa14c3f072dc5be4def25917743eca5e",
+  "date": "2026-11-03",
+  "commit": "f5c2548ba129be3a47ec81930e72f6862878dbcb",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -76,8 +76,9 @@
     "blockedByStepAndMeasure": 0,
     "openTargets": 87,
     "byStatus": {
+      "building": 6,
       "built": 24,
-      "queued": 153
+      "queued": 147
     },
     "byStep": {
       "curve": 8,
@@ -102,12 +103,12 @@
 
   ],
   "rows": [
-    {"id":"EDA-010","name":"Rip-up and reroute","step":"router","kind":"literature","wins":["R7","R6","R1","B5"],"gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":1,"slot":true,"canonical":"EDA-010","blockedBy":[],"status":"queued"},
-    {"id":"WILD-035","name":"Streets along the cuts","step":"highway","kind":"ours","wins":["B1","B2","B7","R14"],"gain":42,"uncertainty":1,"cost":2,"score":21,"rank":2,"slot":true,"canonical":"WILD-035","blockedBy":[],"status":"queued"},
-    {"id":"EDA-032","name":"Concave then convex link cost","step":"highway","kind":"ours","wins":["B1","M4","R12"],"gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":3,"slot":true,"canonical":"EDA-032","blockedBy":["idea:EDA-009"],"status":"queued"},
-    {"id":"RULE-051","name":"Streamlines of a summed current","step":"highway","kind":"ours","wins":["B1","B2","R8"],"gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":4,"slot":true,"canonical":"RULE-051","blockedBy":[],"status":"queued"},
-    {"id":"WILD-054","name":"An ink floor from moats","step":"whole","kind":"ours","wins":["B1"],"gain":40.5,"uncertainty":1,"cost":2,"score":20.25,"rank":5,"slot":true,"canonical":"WILD-054","blockedBy":[],"status":"queued"},
-    {"id":"WILD-003","name":"Plug auction","step":"plugs","kind":"ours","wins":["R10","R11","R1","R3"],"gain":40,"uncertainty":1,"cost":2,"score":20,"rank":6,"slot":true,"canonical":"WILD-003","blockedBy":[],"status":"queued"},
+    {"id":"EDA-010","name":"Rip-up and reroute","step":"router","kind":"literature","wins":["R7","R6","R1","B5"],"gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":1,"slot":true,"canonical":"EDA-010","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":1}},
+    {"id":"WILD-035","name":"Streets along the cuts","step":"highway","kind":"ours","wins":["B1","B2","B7","R14"],"gain":42,"uncertainty":1,"cost":2,"score":21,"rank":2,"slot":true,"canonical":"WILD-035","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":42,"uncertainty":1,"cost":2,"score":21,"rank":2}},
+    {"id":"EDA-032","name":"Concave then convex link cost","step":"highway","kind":"ours","wins":["B1","M4","R12"],"gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":3,"slot":true,"canonical":"EDA-032","blockedBy":["idea:EDA-009"],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":3}},
+    {"id":"RULE-051","name":"Streamlines of a summed current","step":"highway","kind":"ours","wins":["B1","B2","R8"],"gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":4,"slot":true,"canonical":"RULE-051","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":4}},
+    {"id":"WILD-054","name":"An ink floor from moats","step":"whole","kind":"ours","wins":["B1"],"gain":40.5,"uncertainty":1,"cost":2,"score":20.25,"rank":5,"slot":true,"canonical":"WILD-054","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":40.5,"uncertainty":1,"cost":2,"score":20.25,"rank":5}},
+    {"id":"WILD-003","name":"Plug auction","step":"plugs","kind":"ours","wins":["R10","R11","R1","R3"],"gain":40,"uncertainty":1,"cost":2,"score":20,"rank":6,"slot":true,"canonical":"WILD-003","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":40,"uncertainty":1,"cost":2,"score":20,"rank":6}},
     {"id":"WILD-033","name":"Savings merge with a fair share","step":"highway","kind":"hybrid","wins":["B1","B3","R6"],"gain":46.5,"uncertainty":0.85,"cost":2,"score":19.763,"rank":7,"slot":true,"canonical":"WILD-033","blockedBy":[],"status":"queued"},
     {"id":"NAT-037","name":"Current corridors","step":"highway","kind":"hybrid","wins":["B1","B2","B4","R5"],"gain":43,"uncertainty":0.85,"cost":2,"score":18.275,"rank":8,"slot":true,"canonical":"NAT-037","blockedBy":[],"status":"queued"},
     {"id":"NAT-010","name":"Termite hubs","step":"group","kind":"hybrid","wins":["R5","G8","B1"],"gain":42.5,"uncertainty":0.85,"cost":2,"score":18.063,"rank":9,"slot":true,"canonical":"NAT-010","blockedBy":[],"status":"queued"},
