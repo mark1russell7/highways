@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@20dea158bc3a00838428ea75cbe6ff88b25606bb # main
 
   # The heap gate (HEAP-GATE, packages/core/scripts/heap.ts). Each router of the joint bench routes the dense board in its own process,
   # with a heap cap from its measure in packages/core/scripts/data/heap/budgets.json. A memory regression of a router fails here.
