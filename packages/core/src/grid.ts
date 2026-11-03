@@ -8,7 +8,11 @@ import { WORK } from "./work.ts";
  */
 export class Grid<T> {
   readonly #cell: number;
-  readonly #buckets = new Map<number, number[]>();
+  // The table of the buckets, by the keys of `#key`, with open addressing. It gives the buckets of a map of the keys, with less work.
+  #keys = new Float64Array(64);
+  // The index of the list of each slot in `#lists`, plus 1. The value 0 marks an empty slot.
+  #slots = new Int32Array(64);
+  readonly #lists: number[][] = [];
   readonly #items: T[] = [];
   readonly #ids = new Map<T, number>();
   // The stamp of the last query that gave each item, by the index of the item.
@@ -23,6 +27,38 @@ export class Grid<T> {
   #key(i: number, j: number): number {
     // The key packs the two bucket indices into one number. Each index stays within ±2^20.
     return (i + 1_048_576) * 2_097_152 + (j + 1_048_576);
+  }
+
+  // The slot of the key: the slot that holds the key, or else the empty slot where the key goes.
+  #slot(key: number): number {
+    const keys = this.#keys;
+    const slots = this.#slots;
+    const mask = slots.length - 1;
+    // The hash mixes the low and the high 32 bits of the key.
+    let h = Math.imul((key | 0) ^ Math.imul((key / 4_294_967_296) | 0, 0x27d4eb2d), 0x9e3779b1);
+    h = (h ^ (h >>> 16)) & mask;
+    while (slots[h] !== 0 && keys[h] !== key) h = (h + 1) & mask;
+    return h;
+  }
+
+  // The list of the bucket (i, j), or `undefined` when the bucket is empty.
+  #bucket(i: number, j: number): number[] | undefined {
+    const s = this.#slots[this.#slot(this.#key(i, j))]!;
+    return s === 0 ? undefined : this.#lists[s - 1];
+  }
+
+  // The table doubles its size when it is half full, so that each probe stays short.
+  #grow(): void {
+    const keys = this.#keys;
+    const slots = this.#slots;
+    this.#keys = new Float64Array(keys.length * 2);
+    this.#slots = new Int32Array(slots.length * 2);
+    for (let h = 0; h < slots.length; h++) {
+      if (slots[h] === 0) continue;
+      const to = this.#slot(keys[h]!);
+      this.#keys[to] = keys[h]!;
+      this.#slots[to] = slots[h]!;
+    }
   }
 
   #id(item: T): number {
@@ -47,9 +83,17 @@ export class Grid<T> {
     for (let i = Math.floor(x0 / c); i <= i1; i++) {
       for (let j = Math.floor(y0 / c); j <= j1; j++) {
         const key = this.#key(i, j);
-        const list = this.#buckets.get(key);
-        if (list === undefined) this.#buckets.set(key, [id]);
-        else if (list[list.length - 1] !== id) list.push(id);
+        const h = this.#slot(key);
+        const s = this.#slots[h]!;
+        if (s === 0) {
+          this.#keys[h] = key;
+          this.#lists.push([id]);
+          this.#slots[h] = this.#lists.length;
+          if (2 * this.#lists.length > this.#slots.length) this.#grow();
+        } else {
+          const list = this.#lists[s - 1]!;
+          if (list[list.length - 1] !== id) list.push(id);
+        }
       }
     }
   }
@@ -61,9 +105,10 @@ export class Grid<T> {
     const seen = this.#seen;
     for (let i = Math.floor(x0 / c); i <= i1; i++) {
       for (let j = Math.floor(y0 / c); j <= j1; j++) {
-        const list = this.#buckets.get(this.#key(i, j));
+        const list = this.#bucket(i, j);
         if (list === undefined) continue;
-        for (const id of list) {
+        for (let t = 0; t < list.length; t++) {
+          const id = list[t]!;
           if (seen[id] === stamp) continue;
           seen[id] = stamp;
           visit(this.#items[id]!);
@@ -82,7 +127,7 @@ export class Grid<T> {
     const stamp = ++this.#stamp;
     const c = this.#cell;
     const items = this.#items;
-    const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (c / 2)));
+    const n = steps(b.x - a.x, b.y - a.y, c / 2);
     WORK.sight += n;
     let px = a.x;
     let py = a.y;
@@ -104,9 +149,10 @@ export class Grid<T> {
         const before = i >= pi0 && i <= pi1;
         for (let j = j0; j <= j1; j++) {
           if (before && j >= pj0 && j <= pj1) continue;
-          const list = this.#buckets.get(this.#key(i, j));
+          const list = this.#bucket(i, j);
           if (list === undefined) continue;
-          for (const id of list) {
+          for (let t = 0; t < list.length; t++) {
+            const id = list[t]!;
             if (seen[id] === stamp) continue;
             seen[id] = stamp;
             if (visit(items[id]!) === true) return true;
@@ -125,7 +171,7 @@ export class Grid<T> {
 
   // The buckets along a segment, widened by `margin`: the boxes of steps of at most half a bucket.
   #segment(a: Point, b: Point, margin: number, each: (x0: number, y0: number, x1: number, y1: number) => void): void {
-    const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (this.#cell / 2)));
+    const n = steps(b.x - a.x, b.y - a.y, this.#cell / 2);
     let px = a.x;
     let py = a.y;
     for (let k = 1; k <= n; k++) {
@@ -167,6 +213,25 @@ export class Grid<T> {
   someSegment(a: Point, b: Point, margin: number, test: (item: T) => boolean): boolean {
     return this.#walk(a, b, margin, test);
   }
+}
+
+/**
+ * This function gives the number of steps of a segment with the sides `dx` and `dy`: its length over `half`, rounded up, and at least 1.
+ * It gives the value of `Math.hypot`, but it calls `Math.hypot` only for a length near a whole number of steps.
+ * A side of 0 gives the other side as the length, as `Math.hypot` does.
+ * Else the square root has a relative error of a few units in the last place, and so does `Math.hypot`.
+ * Far from a whole number, the two lengths round up to the same number.
+ */
+function steps(dx: number, dy: number, half: number): number {
+  if (dx === 0 || dy === 0) return Math.max(1, Math.ceil((dx === 0 ? Math.abs(dy) : Math.abs(dx)) / half));
+  const s = dx * dx + dy * dy;
+  if (s > 1e-280 && s < 1e280) {
+    const q = Math.sqrt(s) / half;
+    const n = Math.ceil(q);
+    const near = q * 1e-12;
+    if (n - q > near && q - (n - 1) > near) return Math.max(1, n);
+  }
+  return Math.max(1, Math.ceil(Math.hypot(dx, dy) / half));
 }
 
 /** This function gives the bounding box of the segment `ab`. */
