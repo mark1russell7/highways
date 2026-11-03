@@ -82,6 +82,51 @@ function randomWall(rand: () => number): { ends: WallEnd[]; room: [number, numbe
   return { ends, room, gap, fixed };
 }
 
+/** A wall of `n` ends with mixed ranges, each a few plugs wide. The room has space for all the plugs. */
+function mixedWall(n: number, rand: () => number): { ends: WallEnd[]; room: [number, number] } {
+  const room: [number, number] = [0, n * 12];
+  const ends: WallEnd[] = [];
+  for (let i = 0; i < n; i++) {
+    const lo = Math.round(rand() * (room[1] - 24));
+    const len = 8 + Math.round(rand() * 24);
+    ends.push({ lo, hi: Math.min(room[1], lo + len), ideal: lo + rand() * len, key: rand() });
+  }
+  return { ends, room };
+}
+
+describe("the limit of work of assignWall (ASSIGN-BOUND)", () => {
+  for (const n of [16, 32, 128]) {
+    it(`gives a valid plan on 20 seeded walls of ${n} ends with mixed ranges`, { timeout: 5000 }, () => {
+      const rand = seeded(20261103 + n);
+      let got = 0;
+      const t0 = performance.now();
+      for (let w = 0; w < 20; w++) {
+        const { ends, room } = mixedWall(n, rand);
+        const plan = assignWall(ends, room, 8);
+        got += plan.anchored.filter(Boolean).length;
+        const at = [...plan.at].sort((a, b) => a - b);
+        expect(at).toHaveLength(n);
+        for (let i = 1; i < n; i++) expect(at[i]! - at[i - 1]!).toBeGreaterThanOrEqual(plan.gap - 1e-6);
+        for (const v of at) {
+          expect(v).toBeGreaterThanOrEqual(room[0] - 1e-6);
+          expect(v).toBeLessThanOrEqual(room[1] + 1e-6);
+        }
+      }
+      // CI reads these two lines for the time of a wall and the share of the ends in their ranges.
+      const ms = (performance.now() - t0) / 20;
+      console.info(`ASSIGN-BOUND n=${n}: ${ms.toFixed(2)} ms for each wall, ${(got / (20 * n)).toFixed(3)} of the ends in their ranges`);
+      expect(got / (20 * n)).toBeGreaterThan(0.7);
+    });
+  }
+
+  it("anchors each end on a wall of 32 ends when a tight order exists, with keys in another order", () => {
+    // Each range is a little wider than the gap, so only the order of the ranges anchors all the ends.
+    const ends: WallEnd[] = Array.from({ length: 32 }, (_, i) => ({ lo: i * 10, hi: i * 10 + 12, ideal: i * 10, key: (i * 7) % 32 }));
+    const plan = assignWall(ends, [0, 320], 10);
+    expect(plan.anchored.filter(Boolean)).toHaveLength(32);
+  });
+});
+
 describe("assignWall (PLUG-ASSIGN)", () => {
   it("anchors the most ends: the count of a brute force over each order, on 300 seeded walls of up to 8 ends", () => {
     const rand = seeded(20261029);

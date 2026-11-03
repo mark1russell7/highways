@@ -85,7 +85,7 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - A port without a range gives the same plugs as before.
 - `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
 
-`assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
+`assign` (PLUG-ASSIGN) solves each wall exactly, up to a limit of work (ASSIGN-BOUND). It has three goals, in this order:
 
 1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
 2. The plugs keep the order of the far ends, so they do not cross at the wall, when goal 1 lets them.
@@ -94,6 +94,7 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - An end without a range has the room of the wall as its range.
 - An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
 - A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
+- Each wall of up to 8 ends gets the exact plan. Over the limit of work, a greedy sweep gives the plan, and the count of goal 1 is not always the best.
 
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 
