@@ -465,6 +465,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - A strategy is a name of the registry or a strategy object. Thus a prototype file can export a strategy, and the registry does not change.
 - By default, the screen also runs the built-in strategies of the step. The summary gives the median of each measure, the sum of each hard rule and the Pareto front over the medians.
 - The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
+- In the step `highway`, the floor comes from the base routers only ([PASS-GRID](research/CATALOG.md#the-pass-throughs-of-packed-grid-pass-grid)). Thus a new plan does not move the floor of the other plans.
 - A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
