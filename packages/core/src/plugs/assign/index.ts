@@ -286,6 +286,9 @@ function jobsOf(order: readonly number[], win: readonly ([number, number] | unde
   return order.filter((e) => win[e] !== undefined).sort((a, b) => win[a]![1] - win[b]![1] || win[a]![0] - win[b]![0] || a - b);
 }
 
+/** The planner of a wall (ASSIGN-BOUND). `auto` applies the limits of work. `exact` and `sweep` ignore those limits: the measure of the sweep compares the two. */
+export type WallPlanner = "auto" | "exact" | "sweep";
+
 /** This function gives the sorted places that an exact plan needs: a start place plus a whole number of gaps. */
 function planPlaces(n: number, jobs: readonly number[], win: readonly ([number, number] | undefined)[], fixed: readonly number[], lo: number, hi: number, s: number): number[] {
   const allowed = (t: number): boolean => t >= lo - EPS && t <= hi + EPS && fixed.every((f) => t <= f - s + EPS || t >= f + s - EPS);
@@ -394,7 +397,7 @@ function sweepPlan(order: readonly number[], win: readonly ([number, number] | u
  * An end that cannot get a plug in its interval still gets a plug in the room. When the order of the keys loses ends, the plugs swap their places
  * to come nearer to that order, while each end keeps its interval.
  */
-export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = []): WallPlan {
+export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = [], plan: WallPlanner = "auto"): WallPlan {
   const n = ends.length;
   if (n === 0) return { at: [], anchored: [], gap };
   const [lo, hi] = room;
@@ -415,8 +418,8 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
   const inKey = items.filter((x) => x.end >= 0 && x.anchored).length;
   const can = win.filter((w) => w !== undefined).length;
   if (inKey < can && inKey < unionCap(win, pins, lo, hi, s, n)) {
-    const plan = exactFits(order, win, pins, lo, hi, s) ? bestPlan : sweepPlan;
-    const best = plan(
+    const planner = plan === "exact" || (plan === "auto" && exactFits(order, win, pins, lo, hi, s)) ? bestPlan : sweepPlan;
+    const best = planner(
       order,
       win,
       ends.map((e) => e.ideal),
@@ -441,6 +444,17 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
   });
   const anchored = ends.map((e, i) => at[i]! >= e.lo - 1e-7 && at[i]! <= e.hi + 1e-7 && win[i] !== undefined);
   return { at, anchored, gap: s };
+}
+
+/** This function gives a bound of goal 1 for a wall with the gap `s`: no plan puts more ends in their intervals. The measure of the sweep reads it on walls that the exact plan cannot reach. */
+export function anchorBound(ends: readonly WallEnd[], room: readonly [number, number], s: number, fixed: readonly number[] = []): number {
+  const [lo, hi] = room;
+  const win = ends.map((e): [number, number] | undefined => {
+    const a = Math.max(lo, e.lo);
+    const b = Math.min(hi, e.hi);
+    return a <= b + EPS ? [a, Math.max(a, b)] : undefined;
+  });
+  return unionCap(win, [...fixed].sort((x, y) => x - y), lo, hi, s, ends.length);
 }
 
 /** This function gives the most plugs with the gap `s` in the union of the intervals, out of the fixed zones, and at most `n`. It is a bound of goal 1. */
