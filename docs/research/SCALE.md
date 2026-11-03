@@ -190,3 +190,5 @@ Far from a whole number of steps, the two lengths round up to the same number. N
 
 So the walk has the same steps, the same buckets, the same items in the same order and the same work counts.
 A new test compares the grid with a copy of the grid of version 0.11.0, on seeded scripts of adds and queries.
+
+The gate run 41712051689 finds the head faster against its parent: ratio 0.964, interval over the A/A arm 0.950 to 0.988, A/A spread 0.019. The head is 0.904 times the fixed base `25a2be4`.

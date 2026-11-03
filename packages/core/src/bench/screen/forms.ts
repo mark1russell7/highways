@@ -178,8 +178,8 @@ export interface LayoutRecord {
   readonly hard: Readonly<Record<string, number>>;
   /** The tolerance of each hard rule of the run, for example `{ through: 0.5 }`. */
   readonly tolerance?: Readonly<Record<string, number>>;
-  /** This value is `true` when two runs on the same input give the same output. */
-  readonly deterministic: boolean;
+  /** This value is `true` when two runs on the same input give the same output. The contract 0.3 gives `null` for a skipped record. Highways writes only `true` or `false`. */
+  readonly deterministic: boolean | null;
   /** The id of the prediction of this run, from the predictions file. */
   readonly prediction?: string;
   /** The time of the run, in milliseconds. Only the times of CI compare. */
