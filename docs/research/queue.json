@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-02",
-  "commit": "1c6fa5a8fa14c3f072dc5be4def25917743eca5e",
+  "date": "2026-11-03",
+  "commit": "2df1a890b0e21d9b499af917710212a86f42b754",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -76,8 +76,9 @@
     "blockedByStepAndMeasure": 0,
     "openTargets": 87,
     "byStatus": {
+      "building": 6,
       "built": 24,
-      "queued": 153
+      "queued": 147
     },
     "byStep": {
       "curve": 8,
@@ -108,13 +109,13 @@
     {"id":"RULE-051","name":"Streamlines of a summed current","step":"highway","kind":"ours","wins":["B1","B2","R8"],"gain":41.5,"uncertainty":1,"cost":2,"score":20.75,"rank":4,"slot":true,"canonical":"RULE-051","blockedBy":[],"status":"queued"},
     {"id":"WILD-054","name":"An ink floor from moats","step":"whole","kind":"ours","wins":["B1"],"gain":40.5,"uncertainty":1,"cost":2,"score":20.25,"rank":5,"slot":true,"canonical":"WILD-054","blockedBy":[],"status":"queued"},
     {"id":"WILD-003","name":"Plug auction","step":"plugs","kind":"ours","wins":["R10","R11","R1","R3"],"gain":40,"uncertainty":1,"cost":2,"score":20,"rank":6,"slot":true,"canonical":"WILD-003","blockedBy":[],"status":"queued"},
-    {"id":"WILD-033","name":"Savings merge with a fair share","step":"highway","kind":"hybrid","wins":["B1","B3","R6"],"gain":46.5,"uncertainty":0.85,"cost":2,"score":19.763,"rank":7,"slot":true,"canonical":"WILD-033","blockedBy":[],"status":"queued"},
-    {"id":"NAT-037","name":"Current corridors","step":"highway","kind":"hybrid","wins":["B1","B2","B4","R5"],"gain":43,"uncertainty":0.85,"cost":2,"score":18.275,"rank":8,"slot":true,"canonical":"NAT-037","blockedBy":[],"status":"queued"},
-    {"id":"NAT-010","name":"Termite hubs","step":"group","kind":"hybrid","wins":["R5","G8","B1"],"gain":42.5,"uncertainty":0.85,"cost":2,"score":18.063,"rank":9,"slot":true,"canonical":"NAT-010","blockedBy":[],"status":"queued"},
-    {"id":"NAT-034","name":"Grassfire corridors","step":"highway","kind":"hybrid","wins":["R8","R12","B1","C7"],"gain":42,"uncertainty":0.85,"cost":2,"score":17.85,"rank":10,"slot":true,"canonical":"NAT-034","blockedBy":[],"status":"queued"},
-    {"id":"WILD-025","name":"Angle-priced crossings","step":"router","kind":"hybrid","wins":["R2","R1"],"gain":33,"uncertainty":1.02,"cost":2,"score":16.83,"rank":11,"slot":true,"canonical":"WILD-025","blockedBy":[],"status":"queued"},
+    {"id":"WILD-033","name":"Savings merge with a fair share","step":"highway","kind":"hybrid","wins":["B1","B3","R6"],"gain":46.5,"uncertainty":0.85,"cost":2,"score":19.763,"rank":7,"slot":true,"canonical":"WILD-033","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":46.5,"uncertainty":0.85,"cost":2,"score":19.763,"rank":7}},
+    {"id":"NAT-037","name":"Current corridors","step":"highway","kind":"hybrid","wins":["B1","B2","B4","R5"],"gain":43,"uncertainty":0.85,"cost":2,"score":18.275,"rank":8,"slot":true,"canonical":"NAT-037","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":43,"uncertainty":0.85,"cost":2,"score":18.275,"rank":8}},
+    {"id":"NAT-010","name":"Termite hubs","step":"group","kind":"hybrid","wins":["R5","G8","B1"],"gain":42.5,"uncertainty":0.85,"cost":2,"score":18.063,"rank":9,"slot":true,"canonical":"NAT-010","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":42.5,"uncertainty":0.85,"cost":2,"score":18.063,"rank":9}},
+    {"id":"NAT-034","name":"Grassfire corridors","step":"highway","kind":"hybrid","wins":["R8","R12","B1","C7"],"gain":42,"uncertainty":0.85,"cost":2,"score":17.85,"rank":10,"slot":true,"canonical":"NAT-034","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":42,"uncertainty":0.85,"cost":2,"score":17.85,"rank":10}},
+    {"id":"WILD-025","name":"Angle-priced crossings","step":"router","kind":"hybrid","wins":["R2","R1"],"gain":33,"uncertainty":1.02,"cost":2,"score":16.83,"rank":11,"slot":true,"canonical":"WILD-025","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":33,"uncertainty":1.02,"cost":2,"score":16.83,"rank":11}},
     {"id":"RULE-043","name":"Imitation of the exact solver","step":"router","kind":"ours","wins":["R1","R3","R6"],"gain":33.5,"uncertainty":1,"cost":2,"score":16.75,"rank":12,"slot":true,"canonical":"RULE-043","blockedBy":["idea:RULE-013"],"status":"queued"},
-    {"id":"RULE-017","name":"Layers of rules in priority order","step":"whole","kind":"ours","wins":["R1","R6"],"gain":33,"uncertainty":1,"cost":2,"score":16.5,"rank":13,"slot":true,"canonical":"RULE-017","blockedBy":[],"status":"queued"},
+    {"id":"RULE-017","name":"Layers of rules in priority order","step":"whole","kind":"ours","wins":["R1","R6"],"gain":33,"uncertainty":1,"cost":2,"score":16.5,"rank":13,"slot":true,"canonical":"RULE-017","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":33,"uncertainty":1,"cost":2,"score":16.5,"rank":13}},
     {"id":"NAT-012","name":"Branched transport junctions","step":"highway","kind":"literature","wins":["B1","B6","B2","R4"],"gain":47,"uncertainty":0.7,"cost":2,"score":16.45,"rank":14,"slot":true,"canonical":"NAT-012","blockedBy":[],"status":"queued"},
     {"id":"NAT-011","name":"Optimal channel networks","step":"highway","kind":"literature","wins":["B1","B2","B6"],"gain":43.5,"uncertainty":0.7,"cost":2,"score":15.225,"rank":15,"slot":true,"canonical":"NAT-011","blockedBy":[],"status":"queued"},
     {"id":"NAT-014","name":"Vascular tree by constrained construction","step":"highway","kind":"literature","wins":["B1","B6","B2"],"gain":43.5,"uncertainty":0.7,"cost":2,"score":15.225,"rank":16,"slot":true,"canonical":"NAT-014","blockedBy":[],"status":"queued"},
@@ -271,7 +272,7 @@
     {"id":"RULE-020","name":"Adam with a seeded sample of pairs","step":"router","kind":"hybrid","wins":["R1","R2","R8"],"gain":33.5,"uncertainty":1.02,"cost":1,"score":34.17,"rank":null,"slot":true,"canonical":"RULE-020","blockedBy":["idea:RULE-019"],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":26.5,"uncertainty":1.02,"cost":1,"score":27.03,"rank":5},"strategy":"adam","measured":1.5},
     {"id":"RULE-021","name":"Simulated annealing over candidate routes","step":"router","kind":"hybrid","wins":["R1","R12","B1","R5"],"gain":74,"uncertainty":0.85,"cost":1,"score":62.9,"rank":null,"slot":true,"canonical":"RULE-021","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":26,"uncertainty":0.85,"cost":1,"score":22.1,"rank":3},"strategy":"annealing","measured":1},
     {"id":"RULE-025","name":"Prices for rules that couple edges (dual ascent, ADMM)","step":"router","kind":"hybrid","wins":["R12","R1","R8","M4"],"gain":34,"uncertainty":0.85,"cost":2,"score":14.45,"rank":null,"slot":true,"canonical":"EDA-012","blockedBy":[],"status":"queued"},
-    {"id":"RULE-030","name":"Medial axis of the free space as the highway line","step":"highway","kind":"hybrid","wins":["R8","C7","B7"],"gain":2.5,"uncertainty":0.85,"cost":2,"score":1.063,"rank":null,"slot":true,"canonical":"NAT-034","blockedBy":[],"status":"queued"},
+    {"id":"RULE-030","name":"Medial axis of the free space as the highway line","step":"highway","kind":"hybrid","wins":["R8","C7","B7"],"gain":2.5,"uncertainty":0.85,"cost":2,"score":1.063,"rank":null,"slot":true,"canonical":"NAT-034","blockedBy":[],"status":"building","takenAt":"2026-11-03","predicted":{"formula":"queue/2","gain":42,"uncertainty":0.85,"cost":2,"score":17.85,"rank":10}},
     {"id":"RULE-038","name":"Rule weights from preferences","step":"whole","kind":"hybrid","wins":["R1","R2","B1"],"gain":72.5,"uncertainty":1.02,"cost":2,"score":36.975,"rank":null,"slot":true,"canonical":"RULE-038","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":3},"strategy":"preferences","measured":4},
     {"id":"RULE-044","name":"Corner graph with rule prices, then rip-up and reroute","step":"router","kind":"ours","wins":["R1","R3","R12","B2"],"gain":34,"uncertainty":1,"cost":1,"score":34,"rank":null,"slot":true,"canonical":"RULE-044","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":14,"uncertainty":1,"cost":1,"score":14,"rank":4},"strategy":"reroute","measured":1},
     {"id":"RULE-047","name":"Pull toward the lane slots of the highway skeleton","step":"highway","kind":"ours","wins":["B2","B1","B9"],"gain":41.5,"uncertainty":1,"cost":1,"score":41.5,"rank":null,"slot":true,"canonical":"RULE-047","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":35.5,"uncertainty":1,"cost":1,"score":35.5,"rank":1},"strategy":"slots","measured":28.5},

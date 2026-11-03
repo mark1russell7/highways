@@ -96,4 +96,14 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["whole/crops"]).toContain("WILD-048");
     expect(built.strategies["whole/choice"]).toContain("WILD-046");
   });
+
+  // The texts `describe` of the strategies of wave 6 (BUILD-W6) cite their ideas. The router `angle-cross` is opt-in, so it has no card.
+  it("gives the cards the ideas of the strategies of wave 6", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/savings"]).toContain("WILD-033");
+    expect(built.strategies["highway/current-corridors"]).toContain("NAT-037");
+    expect(built.strategies["highway/grassfire"]).toContain("NAT-034");
+    expect(built.strategies["group/termites"]).toContain("NAT-010");
+    expect(built.strategies["whole/layers"]).toContain("RULE-017");
+  });
 });

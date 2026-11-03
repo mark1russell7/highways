@@ -101,6 +101,8 @@ export interface SharedSearch {
   readonly graph: Graph;
   /** The number of corners of the corner graph. */
   readonly corners: number;
+  /** The point of each corner of the corner graph, by its index. The router `shared` gives it. */
+  readonly points?: readonly Point[];
   /** This function gives the key of the link between the indices `i` and `j`, for each order of the two. */
   link(i: number, j: number): number;
   /**
@@ -108,6 +110,8 @@ export interface SharedSearch {
    * The function `cost` can change the cost of the link from corner `i` to corner `j`, of length `d`. It must give at least `floor` × `d`.
    */
   find(w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number): { seq: Point[]; ids: number[] } | undefined;
+  /** This function does the search of `find`, and it does not stop at a clear straight line. The router `shared` gives it. */
+  readonly through?: (w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number) => { seq: Point[]; ids: number[] } | undefined;
   /** This function gives the free space across the link from corner `i` to corner `j` (`channelWidth`). The router keeps each width that it finds. */
   width(i: number, j: number): number;
 }
@@ -209,9 +213,14 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       const search: SharedSearch = {
         graph,
         corners: corners.points.length,
+        points: corners.points,
         link,
         find: (w, cost, floor = 1) => {
           const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
+          return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
+        },
+        through: (w, cost, floor = 1) => {
+          const way = corners.pathThrough(ways.out(w.ps), ways.out(w.pt), cost, floor);
           return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
         },
         width: (i, j) => widthOf(i, j),

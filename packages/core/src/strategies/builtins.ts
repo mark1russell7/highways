@@ -104,13 +104,23 @@ import { TRACING_DEFAULTS, tracing, type TracingOptions } from "../whole/tracing
 import { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "../highways/two-way/index.ts";
 import { GLOBAL_ORDER_DEFAULTS, globalOrderPlan, type GlobalOrderOptions } from "../highways/global-order/index.ts";
 import { APPROVAL_DEFAULTS, approvalPlan, type ApprovalOptions } from "../highways/approval/index.ts";
+import { TERMITE_DEFAULTS, termiteGroups, type TermiteOptions } from "../groups/termites/index.ts";
+import { CURRENT_CORRIDOR_DEFAULTS, currentCorridorPlan, type CurrentCorridorOptions } from "../highways/current-corridors/index.ts";
+import { GRASSFIRE_DEFAULTS, grassfirePlan, type GrassfireOptions } from "../highways/grassfire/index.ts";
+import { SAVINGS_DEFAULTS, savingsPlan, type SavingsOptions } from "../highways/savings/index.ts";
+import { LAYER_DEFAULTS, layers, type LayerOptions } from "../whole/layers/index.ts";
 import { ESCAPE_DEFAULTS, escapeEnds, type EscapeOptions } from "../plugs/escape/index.ts";
 import { CROP_DEFAULTS, crops, type CropOptions } from "../whole/crops/index.ts";
 import { CHOICE_DEFAULTS, choice, type ChoiceOptions } from "../whole/choice/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA } from "./schemas.ts";
+import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA,
+  CURRENT_CORRIDOR_SCHEMA,
+  GRASSFIRE_SCHEMA,
+  LAYER_SCHEMA,
+  SAVINGS_SCHEMA,
+  TERMITE_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -388,6 +398,7 @@ export const groupStrategies: {
   readonly keys: Strategy<"group", KeyOptions>;
   readonly kd: Strategy<"group", Required<KdOptions>>;
   readonly cut: Strategy<"group", Required<CutOptions>>;
+  readonly termites: Strategy<"group", Required<TermiteOptions>>;
 } = Object.freeze({
   quadtree: defineStrategy({
     step: "group",
@@ -420,6 +431,14 @@ export const groupStrategies: {
     defaults: { ...CUT_DEFAULTS },
     schema: CUT_SCHEMA,
     run: (graph: Graph, o: Readonly<Required<CutOptions>>) => cutGroups(graph, o),
+  }),
+  termites: defineStrategy({
+    step: "group",
+    name: "termites",
+    describe: "Termite hubs (NAT-010). The straight edge lines drop material on a grid, the deposits grow and space out, and each section puts its hub on its strongest peak.",
+    defaults: { ...TERMITE_DEFAULTS },
+    schema: TERMITE_SCHEMA,
+    run: (graph: Graph, o: Readonly<Required<TermiteOptions>>) => termiteGroups(graph, o),
   }),
 });
 
@@ -502,6 +521,9 @@ export const highwayStrategies: {
   readonly "two-way": Strategy<"highway", TwoWayOptions>;
   readonly "global-order": Strategy<"highway", GlobalOrderOptions>;
   readonly approval: Strategy<"highway", ApprovalOptions>;
+  readonly savings: Strategy<"highway", SavingsOptions>;
+  readonly "current-corridors": Strategy<"highway", CurrentCorridorOptions>;
+  readonly grassfire: Strategy<"highway", GrassfireOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -1049,6 +1071,33 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<ApprovalOptions>) => approvalPlan(input, o),
   }),
+  savings: defineStrategy({
+    step: "highway",
+    name: "savings",
+    describe: "A savings merge with a fair share (WILD-033). The merge that saves the most ink goes first, and it holds when each edge pays no more than its way alone.",
+    defaults: { ...SAVINGS_DEFAULTS } as SavingsOptions,
+    schema: SAVINGS_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<SavingsOptions>) => savingsPlan(input, o),
+  }),
+  "current-corridors": defineStrategy({
+    step: "highway",
+    name: "current-corridors",
+    describe: "Current corridors (NAT-037). Each edge sends one unit of current through the corner graph, and the links with the most current become corridors.",
+    defaults: { ...CURRENT_CORRIDOR_DEFAULTS } as CurrentCorridorOptions,
+    schema: CURRENT_CORRIDOR_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CurrentCorridorOptions>) => currentCorridorPlan(input, o),
+  }),
+  grassfire: defineStrategy({
+    step: "highway",
+    name: "grassfire",
+    describe: "Grassfire corridors (NAT-034). The fronts of a fire from the boxes meet on the medial axis, and the highways run on that axis in the middle of the gaps.",
+    defaults: { ...GRASSFIRE_DEFAULTS } as GrassfireOptions,
+    schema: GRASSFIRE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<GrassfireOptions>) => grassfirePlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -1185,6 +1234,7 @@ export const CURRICULUM_POOL: readonly PortfolioSetting[] = Object.freeze(
 export const wholeStrategies: {
   readonly pipeline: Strategy<"whole", PipelineOptions>;
   readonly "board-portfolio": Strategy<"whole", BoardPortfolioOptions>;
+  readonly layers: Strategy<"whole", LayerOptions>;
   readonly curriculum: Strategy<"whole", CurriculumOptions>;
   readonly preferences: Strategy<"whole", PreferenceOptions>;
   readonly fireflies: Strategy<"whole", FireflyOptions>;
@@ -1207,6 +1257,14 @@ export const wholeStrategies: {
     defaults: { ...BOARD_PORTFOLIO_DEFAULTS },
     schema: BOARD_PORTFOLIO_SCHEMA,
     run: (graph, o) => boardPortfolio(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
+  }),
+  layers: defineStrategy<"whole", LayerOptions>({
+    step: "whole",
+    name: "layers",
+    describe: "Layers of rules (RULE-017). The hard rules go first, then each rule in the given order holds its value within a slack while the next rule picks.",
+    defaults: { ...LAYER_DEFAULTS },
+    schema: LAYER_SCHEMA,
+    run: (graph, o) => layers(graph, BOARD_PORTFOLIO_SETTINGS, o),
   }),
   curriculum: defineStrategy<"whole", CurriculumOptions>({
     step: "whole",

@@ -15,6 +15,7 @@ export { sharedRouter, type ShareCost, type SharedHooks, type SharedNegotiation,
 export { ANNEALING_DEFAULTS, ANNEALING_SCHEMA, annealingRouter, annealingStrategy, annealWays, type AnnealingOptions } from "./annealing/index.ts";
 export { CANAL_DEFAULTS, CANAL_SCHEMA, canalHubs, canalRouter, canalStrategy, canalWays, halfPower, type CanalHub, type CanalOptions } from "./canals/index.ts";
 export { ADAM_DEFAULTS, ADAM_SCHEMA, adamRouter, adamRoutes, adamStrategy, type AdamOptions } from "./adam/index.ts";
+export { ANGLE_CROSS_DEFAULTS, ANGLE_CROSS_SCHEMA, angleCrossRouter, angleCrossStrategy, angleCrossWays, crossingPrice, type AngleCrossOptions } from "./angle-cross/index.ts";
 export { REROUTE_DEFAULTS, REROUTE_SCHEMA, rerouteRouter, rerouteStrategy, rerouteWays, turnsOf, type RerouteOptions } from "./reroute/index.ts";
 export { TIGHT_DEFAULTS, TIGHT_FIRSTS, TIGHT_SCHEMA, TIGHT_TIES, tightRouter, tightStrategy, waySlacks, type TightFirst, type TightOptions, type TightTies } from "./tight/index.ts";
 export { ATTRACTION_DEFAULTS, ATTRACTION_SCHEMA, attractionRouter, attractionStrategy, type AttractionOptions } from "./attraction/index.ts";

@@ -25,7 +25,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { median } from "@mark1russell7/rigor-statistics";
-import { adamStrategy, annealingStrategy, canalStrategy, nudgeStrategy, repelStrategy, springsStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { adamStrategy, angleCrossStrategy, annealingStrategy, canalStrategy, nudgeStrategy, repelStrategy, springsStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { envOf } from "./gates/paired.ts";
 import { exactLines, routeHash } from "./xplat.ts";
 
@@ -64,7 +64,7 @@ function routerOf(name: string): (graph: Graph) => Routed {
     };
   }
   // The opt-in routers `shared-stretch` (LANE-STRETCH), `attraction` (HWY-044), `annealing` (RULE-021) and `tight` (WILD-023), and the PHYSICAL routers `repel`, `springs` and `nudge` are not in the registry. The name gives them here too.
-  const optIn: Readonly<Record<string, unknown>> = { "shared-stretch": sharedStretchStrategy, attraction: attractionStrategy, annealing: annealingStrategy, tight: tightStrategy, reroute: rerouteStrategy, canals: canalStrategy, adam: adamStrategy, repel: repelStrategy, springs: springsStrategy, nudge: nudgeStrategy };
+  const optIn: Readonly<Record<string, unknown>> = { "shared-stretch": sharedStretchStrategy, attraction: attractionStrategy, annealing: annealingStrategy, tight: tightStrategy, reroute: rerouteStrategy, "angle-cross": angleCrossStrategy, canals: canalStrategy, adam: adamStrategy, repel: repelStrategy, springs: springsStrategy, nudge: nudgeStrategy };
   const s = (optIn[name] ?? (routerStrategies as unknown as Readonly<Record<string, unknown>>)[name]) as Strategy<"router", object> | undefined;
   if (s === undefined) throw new RangeError(`There is no router "${name}".`);
   const router = asRouter(s);

@@ -6,7 +6,7 @@ import { dist, type Point } from "../../geom.ts";
 import { MinHeap, type CornerGraph } from "../../visibility.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
-import { edgePlugs, sharedStretches, type KeyedWay } from "../stretches.ts";
+import { edgePlugs, sharedStretches, type EdgePlugs, type KeyedWay } from "../stretches.ts";
 
 /** The rule that picks the corridor links: the links with the most approvals, or a greedy cover of the edges. */
 export type ApprovalPick = "score" | "cover";
@@ -148,23 +148,31 @@ export function pickLinks(approvals: readonly ReadonlySet<number>[], o: Readonly
 export function approvalPlan(input: HighwayInput, o: Readonly<ApprovalOptions>): HighwayPlan {
   const finder = new WayFinder(input.graph.nodes, { ...(o.margin === undefined ? {} : { margin: o.margin }), ...(o.k === undefined ? {} : { k: o.k }) });
   const corners = finder.corners;
-  const id = new Map<Point, number>();
-  corners.points.forEach((p, i) => id.set(p, i));
-  const M = corners.points.length;
-  const link = (i: number, j: number): number => (i < j ? i * M + j : j * M + i);
   const plugs = edgePlugs(input.graph);
   const ends = plugs.map(({ ps, pt }) => [finder.out(ps), finder.out(pt)] as const);
   const approvals = ends.map(([a, b]) => (finder.obstacles.clear(a, b, finder.margin) ? new Set<number>() : approvedLinks(corners, a, b, o.eps)));
   const picked = pickLinks(approvals, o);
   if (picked.size === 0) return { highways: [] };
+  return discountedCorridorPlan(finder, plugs, picked, o);
+}
+
+/**
+ * This function routes each edge again with a discount on the links of `picked`, as keys `i × M + j` with `i < j`.
+ * Each stretch on those links that `minSize` edges or more share is a highway. The strategies `approval` and `current-corridors` end with this step.
+ */
+export function discountedCorridorPlan(finder: WayFinder, plugs: readonly EdgePlugs[], picked: ReadonlySet<number>, o: Readonly<{ discount: number; minSize: number }>): HighwayPlan {
+  const corners = finder.corners;
+  const id = new Map<Point, number>();
+  corners.points.forEach((p, i) => id.set(p, i));
+  const M = corners.points.length;
+  const link = (i: number, j: number): number => (i < j ? i * M + j : j * M + i);
   const share = Math.min(1, Math.max(0.05, 1 - o.discount));
   const cost = (i: number, j: number, d: number): number => (picked.has(link(i, j)) ? d * share : d);
   const ways: KeyedWay[] = [];
-  plugs.forEach(({ edge }, n) => {
-    const [a, b] = ends[n]!;
-    const way = corners.path(a, b, cost, share);
+  for (const { edge, ps, pt } of plugs) {
+    const way = corners.path(finder.out(ps), finder.out(pt), cost, share);
     if (way) ways.push({ edge: edge.id, key: "road", points: way });
-  });
+  }
   const onCorridor = (a: Point, b: Point): boolean => {
     const p = id.get(a);
     const q = id.get(b);

@@ -118,7 +118,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
             x += c.x;
             y += c.y;
           }
-          const c = { x: x / Math.max(1, s.nodes.length), y: y / Math.max(1, s.nodes.length) };
+          const c = s.hub ?? { x: x / Math.max(1, s.nodes.length), y: y / Math.max(1, s.nodes.length) };
           const j = corners.nearest(c);
           h = j >= 0 ? corners.points[j]! : c;
           hubs.set(s, h);

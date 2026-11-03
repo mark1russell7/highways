@@ -33,6 +33,7 @@ export * from "./whole/preferences/index.ts";
 export * from "./whole/fireflies/index.ts";
 export * from "./whole/tracing/index.ts";
 export * from "./whole/crops/index.ts";
+export * from "./whole/layers/index.ts";
 export * from "./whole/choice/index.ts";
 export * from "./whole/choice/table.ts";
 export * from "./bench/properties.ts";

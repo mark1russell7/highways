@@ -197,6 +197,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| BUILD-W6 | Wave 6: `savings` (WILD-033), `current-corridors` (NAT-037) and `grassfire` (NAT-034) of the step `highway`, `termites` (NAT-010) of the step `group`, the opt-in router `angle-cross` (WILD-025), and `layers` (RULE-017) of the step `whole`. RULE-043 is not built: it needs the exact program of RULE-013, and that program does not exist. RULE-017 takes its place. The next step is the 12 screens. | `active` | The screens | P1 |
 | BUILD-QUEUE | Up to 3 builds at a time take the ideas from the top of the [build queue](research/CATALOG.md#the-build-queue). Each build takes an idea with `pnpm queue --take`, skips a blocked idea and commits the new queue. | `later` | IDEA-QUEUE | P1 |
 | INTERIOR-ROUTE | Slice 2: inner box to inner box. Each edge between two nodes of one frame routes inside their nearest common frame, around the other nodes. Slice 1 (the plugs of the walls) shipped. FRAME-SIBLINGS does the edges between two nodes with one parent. Slice 2 keeps the nodes at two depths. | `later` | INTERIOR-ROUTE slice 1 | P1 |
 | FIX-PORTS-RESULT | `fixPorts` also gives the chosen plugs (port, point, side) as data, so a consumer does not read them back from the ports of the graph. The return type of today stays as it is. | `later` | FIX-PORTS | P2 |

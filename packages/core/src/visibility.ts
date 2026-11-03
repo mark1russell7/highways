@@ -107,6 +107,11 @@ export interface CornerGraphOptions {
    * Then a path can go along a long corridor between rows or columns of boxes. The default is false.
    */
   readonly cones?: boolean;
+  /**
+   * With `points`, the graph uses these points in place of the corners of the boxes and the lattice (NAT-034).
+   * A point in a box is not in the graph. Without `points`, the graph does not change.
+   */
+  readonly points?: readonly Point[];
 }
 
 /**
@@ -170,7 +175,10 @@ export class CornerGraph {
     for (const n of nodes) size += (n.box.w + n.box.h) / 2;
     this.#cell = Math.max(1, size / Math.max(1, nodes.length) + 2 * options.margin);
     this.#pointGrid = new Grid<number>(this.#cell);
-    for (const n of nodes) {
+    for (const c of options.points ?? []) {
+      if (!obstacles.inside(c, this.#pad)) this.#addPoint(c);
+    }
+    for (const n of options.points ? [] : nodes) {
       const b = inflate(n.box, options.margin);
       for (const c of [
         { x: b.x, y: b.y },
@@ -182,7 +190,7 @@ export class CornerGraph {
       }
     }
     const spacing = (options.lattice ?? 3) * this.#cell;
-    if (spacing > 0 && nodes.length > 0) {
+    if (spacing > 0 && nodes.length > 0 && !options.points) {
       let x0 = Infinity;
       let y0 = Infinity;
       let x1 = -Infinity;
@@ -426,6 +434,14 @@ export class CornerGraph {
    */
   path(from: Point, to: Point, cost?: (i: number, j: number, d: number) => number, floor: number = 1): Point[] | undefined {
     if (this.#obstacles.clear(from, to, this.#pad)) return [from, to];
+    return this.#search([{ point: from, cost: 0 }], [{ point: to, cost: 0 }], cost, floor, this.#k * 2)?.points;
+  }
+
+  /**
+   * This method gives a path of least cost through the corners, as `path` does, and it does not stop at a clear straight line (WILD-025).
+   * So a price on a link can move a way that needs no corner.
+   */
+  pathThrough(from: Point, to: Point, cost?: (i: number, j: number, d: number) => number, floor: number = 1): Point[] | undefined {
     return this.#search([{ point: from, cost: 0 }], [{ point: to, cost: 0 }], cost, floor, this.#k * 2)?.points;
   }
 

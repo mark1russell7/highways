@@ -71,8 +71,12 @@ export function lineDensity(lines: readonly (readonly Point[])[], box: { x: numb
       }
     }
   });
-  // A blur with a Gaussian kernel, first along x, then along y.
-  const sigma = Math.max(1e-6, bandwidth / cell);
+  return { w, h, cell, x0, y0, rho: blurImage(raw, w, h, bandwidth / cell) };
+}
+
+/** This function gives the image after a blur with a Gaussian kernel of the width `width` cells, first along x, then along y. */
+export function blurImage(raw: Float64Array, w: number, h: number, width: number): Float64Array {
+  const sigma = Math.max(1e-6, width);
   const r = Math.ceil(3 * sigma);
   const kernel = Array.from({ length: 2 * r + 1 }, (_, i) => Math.exp(-((i - r) ** 2) / (2 * sigma * sigma)));
   const sum = kernel.reduce((s, v) => s + v, 0);
@@ -96,7 +100,7 @@ export function lineDensity(lines: readonly (readonly Point[])[], box: { x: numb
       }
       rho[y * w + x] = v / sum;
     }
-  return { w, h, cell, x0, y0, rho };
+  return rho;
 }
 
 /** One ridge: its two ends and the length between them. */
