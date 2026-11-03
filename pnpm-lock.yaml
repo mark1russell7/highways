@@ -217,7 +217,7 @@ importers:
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/rigor-bench':
         specifier: ^0.2.1
-        version: 0.2.1
+        version: 0.2.2
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -487,8 +487,8 @@ packages:
     resolution: {integrity: sha512-Mls2V7uo5zGS6o5apBCJAKN3T4oZ3A2yuxUJUBzICDzIWT+YiIP+yOcBfVpjf22cPG5GMr+/abC7UJ4u4bXTlA==}
     engines: {node: '>=22.12'}
 
-  '@mark1russell7/rigor-bench@0.2.1':
-    resolution: {integrity: sha512-cPqzcEtATs0BlmMQOzAET9E0wQ6wCxRctF4kL/o8eou1chvIabXQrMCFevq3MffwemeURf0oBlhpa3TUk8agdw==}
+  '@mark1russell7/rigor-bench@0.2.2':
+    resolution: {integrity: sha512-l5IhEcn9VcUR4oyYOcBw27y1wBA3zOB/CV9DZ6XSn6y1fwMtO4S7zfdzaeIgulsg7fyuuhGPbIqEW9qqo63BXw==}
     engines: {node: '>=22'}
 
   '@mark1russell7/rigor-generators@0.1.0':
@@ -1607,7 +1607,7 @@ snapshots:
 
   '@mark1russell7/layout-contract@0.2.21': {}
 
-  '@mark1russell7/rigor-bench@0.2.1':
+  '@mark1russell7/rigor-bench@0.2.2':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.1
       '@mark1russell7/rigor-statistics': 0.1.5
