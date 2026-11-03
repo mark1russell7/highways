@@ -2,6 +2,7 @@
  * The highway strategy `manifolds` (WILD-036): a header for a fan from one node to a row of nodes.
  * The header lies in the gap before the row, the taps leave it at right angles, and the feed joins it from the node.
  */
+import { quantile } from "@mark1russell7/rigor-statistics";
 import { center, dist, type Point } from "../../geom.ts";
 import { nodeIndex, outerGraph, type Node } from "../../model.ts";
 import { basePlan, tidyPlan, type HighwayBase } from "../base.ts";
@@ -50,13 +51,11 @@ interface Candidate {
 }
 
 /**
- * This function gives the median of the values, or 0 when there is none.
- * This copy stays. It takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
+ * This function gives the upper median of the values, or 0 when there is none.
+ * An even list gives the upper middle value: `quantile(values, 0.5, "higher")` of `@mark1russell7/rigor-statistics`.
  */
-function median(values: readonly number[]): number {
-  if (values.length === 0) return 0;
-  const s = [...values].sort((a, b) => a - b);
-  return s[Math.floor(s.length / 2)]!;
+function upperMedianOrZero(values: readonly number[]): number {
+  return values.length === 0 ? 0 : quantile(values, 0.5, "higher");
 }
 
 /** This function compares two texts in the order of their code units. */
@@ -103,7 +102,7 @@ export function manifoldPlan(input: HighwayInput, options: Partial<ManifoldOptio
   const graph = outerGraph(input.graph);
   const nodes = nodeIndex(graph);
   const margin = 5;
-  const bandOf = { x: o.band * median(graph.nodes.map((n) => n.box.h)), y: o.band * median(graph.nodes.map((n) => n.box.w)) };
+  const bandOf = { x: o.band * upperMedianOrZero(graph.nodes.map((n) => n.box.h)), y: o.band * upperMedianOrZero(graph.nodes.map((n) => n.box.w)) };
   const fans = new Map<string, Tap[]>();
   const add = (id: string, tap: Tap): void => {
     const list = fans.get(id);
