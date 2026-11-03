@@ -538,7 +538,7 @@ function summarizeScreen(
       candidate: at.candidates.has(strategy),
       runs: ran.length,
       skipped: all.length - ran.length,
-      deterministic: ran.length === 0 ? null : ran.every((r) => r.deterministic),
+      deterministic: ran.length === 0 ? null : ran.every((r) => r.deterministic === true),
       hard,
       hardTotal: Object.values(hard).reduce((s, v) => s + v, 0),
       hardOverFloor: ran.reduce((n, r) => n + overFloor(r), 0),

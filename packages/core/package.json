@@ -59,7 +59,7 @@
     "gate:pool": "node scripts/sections-gate-pool.ts"
   },
   "dependencies": {
-    "@mark1russell7/layout-contract": "^0.2.15",
+    "@mark1russell7/layout-contract": "^0.3.3",
     "@mark1russell7/rigor-generators": "^0.1.1",
     "@mark1russell7/rigor-statistics": "^0.1.5"
   },
