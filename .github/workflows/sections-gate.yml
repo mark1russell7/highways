@@ -1,8 +1,11 @@
-# The sections time gate (GATE-LIMITS slice 1). It fails a pull request when `sections-tree` at 10 000 nodes gets slower.
+# The sections time gate (GATE-LIMITS slices 1 and 2). It fails a pull request when `sections-tree` at 10 000 nodes gets slower.
 # The job uses the confirm mode of `Sections bisect`: `scripts/sections-bisect.ts --gate` and `scripts/gates/pair-confirm.ts`.
 # It times four arms in turn, each route in a fresh process: the parent of the pull request, the head, the A/A copy of the parent and the fixed base.
 # Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`.
-# The check against the parent fails above 1 + max(0.05, the A/A spread of the job). The check against the fixed base fails above 1.10.
+# A run with an A/A spread above the noise cap 0.06 cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
+# A second run that cannot decide fails, so a noisy run does not pass.
+# The check against the parent fails above 1 + max(0.05, the pooled A/A spread of `packages/core/scripts/data/sections-gate/aa-pool.json`).
+# The check against the fixed base fails above 1.10.
 # The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`. `docs/PROMOTION.md` gives the values and their reasons.
 name: Sections gate
 
@@ -52,6 +55,7 @@ jobs:
             packages/core/scripts/sections-gate-verdict.ts
             packages/core/scripts/gates/pair-confirm.ts
             packages/core/scripts/gates/paired.ts
+            packages/core/scripts/gates/home-verdict.ts
             packages/core/scripts/data/sections-gate/**
             !**/*.md
             !**/*.test.ts
@@ -63,7 +67,12 @@ jobs:
     # The job times 4 arms x 10 rounds = 40 routes of sections-tree at 10 000 nodes. One route takes 30 to 60 s, so the routes take 20 to 40 min.
     # Each child loads its core and reads the board in about 3 s: 2 min more. The 3 or 4 worktrees and their installs take about 5 min.
     # The sum is 27 to 47 min. The limit is 2 times the worst case: 95 min.
+    # The jobs gate and retry run one after the other. The runs so far took 22 and 32 min, so the two runs take 2 x 32 = 64 min at the most.
+    # With the limits, the workflow takes 2 x 95 = 190 min at the most.
     timeout-minutes: 95
+    outputs:
+      # The value is false when the run cannot decide. Then the job retry runs.
+      decided: ${{ steps.time.outputs.decided }}
     env:
       # On a pull request, the checkout is the merge commit, and its first parent is the head of the base branch.
       PARENT: ${{ github.event_name == 'pull_request' && 'HEAD^1' || inputs.parent }}
@@ -81,11 +90,18 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Time the head against the parent and the fixed base
+        id: time
         run: |
-          # The script exits with the code 1 when a check does not pass. The summary gets the record before the step fails.
+          # The exit code is 0 for a pass, 1 for a fail and 3 for a run that cannot decide. The summary gets the record before the step ends.
           status=0
-          node packages/core/scripts/sections-bisect.ts --gate --parent "$PARENT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
+          node packages/core/scripts/sections-bisect.ts --gate --attempt 1 --parent "$PARENT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -eq 3 ]; then
+            echo "decided=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::The A/A spread of this run is above the noise cap, so the run cannot decide. The job retry runs the gate on a fresh runner."
+            exit 0
+          fi
+          echo "decided=true" >> "$GITHUB_OUTPUT"
           exit "$status"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
@@ -96,10 +112,49 @@ jobs:
             out/sections-gate.md
           if-no-files-found: warn
 
+  retry:
+    # The second run of the gate, on a fresh runner. It starts only after a first run that cannot decide.
+    needs: [changes, gate]
+    if: needs.changes.outputs.match == 'true' && needs.gate.result == 'success' && needs.gate.outputs.decided == 'false'
+    runs-on: ubuntu-latest
+    # The same work as the job gate: 27 to 47 min, and the limit is 95 min. The jobs gate and retry take 2 x 32 = 64 min at the most so far.
+    # With the limits, the workflow takes 2 x 95 = 190 min at the most.
+    timeout-minutes: 95
+    env:
+      PARENT: ${{ github.event_name == 'pull_request' && 'HEAD^1' || inputs.parent }}
+      ROUNDS: ${{ inputs.rounds || '10' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time the head against the parent and the fixed base once more
+        run: |
+          # In the second run, a run that cannot decide exits with the code 1, so a noisy run does not pass.
+          status=0
+          node packages/core/scripts/sections-bisect.ts --gate --attempt 2 --parent "$PARENT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
+          [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ] && [ -f out/sections-gate.md ]; then echo "::error::$(sed -n 3p out/sections-gate.md)"; fi
+          exit "$status"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: sections-gate-${{ github.sha }}-retry
+          path: |
+            out/sections-gate.json
+            out/sections-gate.md
+          if-no-files-found: warn
+
   sections-gate-ok:
     name: Sections gate OK
     if: always()
-    needs: [changes, gate]
+    needs: [changes, gate, retry]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
@@ -107,3 +162,5 @@ jobs:
       - uses: mark1russell7/template/.github/actions/gate-summary@20dea158bc3a00838428ea75cbe6ff88b25606bb # main
         with:
           needs: ${{ toJSON(needs) }}
+          # The job retry is skipped after a first run that decides. That skip is a pass. A failed or cancelled retry fails the check.
+          allow-skip: retry

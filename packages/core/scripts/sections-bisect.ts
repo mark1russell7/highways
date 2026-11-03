@@ -15,10 +15,12 @@
 //   It makes a git worktree of the base, the commit and the parent. `confirmPair` times the commit, the parent and the A/A arm of the parent on the board of the base.
 //   It writes `<dir>/confirm-pair<n>.json` and prints the table of the pair.
 // - The join of the confirm mode: `node scripts/sections-bisect.ts --confirm-join <dir> --pairs <pairs> [--summary <file>] [--json <file>]`.
-// - The sections time gate (GATE-LIMITS): `node scripts/sections-bisect.ts --gate --parent <ref> --trees <dir> --out <dir> [--rounds <n>]`.
+// - The sections time gate (GATE-LIMITS): `node scripts/sections-bisect.ts --gate --parent <ref> --trees <dir> --out <dir> [--rounds <n>] [--attempt <1|2>]`.
 //   It makes a git worktree of the base, the parent, the checkout and the fixed base of `data/sections-gate/fixed-base.json`.
 //   `confirmPair` times the parent, the checkout, the fixed base and the A/A arm of the parent on `sections-tree`, on the board of the base.
-//   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`, and exits with the code 1 when a check of the gate does not pass.
+//   The limit against the parent comes from the pool `data/sections-gate/aa-pool.json`. The verdict of `@mark1russell7/rigor-bench` goes into the record.
+//   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`. The exit code is 0 for a pass and 1 for a fail.
+//   The exit code is 3 when the first run (`--attempt 1`) cannot decide. A second run that cannot decide exits with the code 1.
 // `scripts/sections-bisect-verdict.ts` has the plan and the verdict. `scripts/sections-confirm-verdict.ts` has them for the confirm mode.
 // `scripts/sections-gate-verdict.ts` has the checks of the gate.
 import { spawnSync } from "node:child_process";
@@ -26,7 +28,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { envOf, measureIsolated, runChild, type Arm, type Input, type PairedReport } from "./gates/paired.ts";
-import { confirmPair } from "./gates/pair-confirm.ts";
+import { COMMIT_ARM, confirmPair } from "./gates/pair-confirm.ts";
 import {
   BASE_ARM,
   BASE_REF,
@@ -60,7 +62,21 @@ import {
   type PairRecord,
   type Side,
 } from "./sections-confirm-verdict.ts";
-import { BASE_FILE, FIXED_ARM, GATE_ROUNDS, GATE_ROUTER, GATE_SCHEMA, gateText, parseFixedBase, recordVerdict, type GateRecord } from "./sections-gate-verdict.ts";
+import {
+  BASE_FILE,
+  FIXED_ARM,
+  GATE_ROUNDS,
+  GATE_ROUTER,
+  GATE_SCHEMA,
+  POOL_FILE,
+  gateExit,
+  gateText,
+  parseFixedBase,
+  parsePool,
+  poolBand,
+  type GateRecord,
+  type HomeVerdict,
+} from "./sections-gate-verdict.ts";
 
 /** The parts of a version of the core that the arms call. Each candidate has the list `ROUTERS`, and the base has the fixtures. */
 interface Core {
@@ -225,11 +241,12 @@ async function runPair(pair: number, commitRef: string, parentRef: string, trees
 
 /**
  * This function runs the sections time gate: the parent, the checkout, the fixed base and the A/A arm of the parent, in fresh processes, on the board of the base.
- * The fixed base comes from the file `BASE_FILE` of the checkout.
+ * The fixed base comes from the file `BASE_FILE` of the checkout, and the pooled band comes from the file `POOL_FILE`.
  */
-async function runGate(parentRef: string, treesDir: string, out: string, rounds: number): Promise<GateRecord> {
+async function runGate(parentRef: string, treesDir: string, out: string, rounds: number, attempt: 1 | 2): Promise<GateRecord> {
   const { root, base, head } = refsOfRun();
   const fixedBase = parseFixedBase(readFileSync(join(HERE, "..", BASE_FILE), "utf8"));
+  const band = poolBand(parsePool(readFileSync(join(HERE, "..", POOL_FILE), "utf8")));
   const headSide = sideOf(root, head, HEAD_REF);
   const parent = sideOf(root, head, parentRef);
   const fixed = sideOf(root, head, fixedBase.commit);
@@ -246,7 +263,14 @@ async function runGate(parentRef: string, treesDir: string, out: string, rounds:
     const child = (sha: string): string[] => [...NODE, SCRIPT, "--child", "--tree", treeOf(sha), "--board", file];
     report = await confirmPair({ parent: child(parent.sha), commit: child(head), others: [{ id: FIXED_ARM, command: child(fixed.sha) }], inputs: routers, rounds });
   }
-  return { schema: GATE_SCHEMA, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh"), report };
+  let home: HomeVerdict | null = null;
+  if (report !== null) {
+    // Only this job needs the installed packages of the home, so the other modes of this script start with no install.
+    const { homeVerdict } = await import("./gates/home-verdict.ts");
+    const v = homeVerdict(report, GATE_ROUTER, COMMIT_ARM);
+    home = { outcome: v.outcome, reason: v.reason, low: v.interval?.low ?? null, high: v.interval?.high ?? null };
+  }
+  return { schema: GATE_SCHEMA, attempt, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, band, skipped, env: envOf("fresh"), report, home };
 }
 
 if (args.includes("--child")) {
@@ -267,12 +291,14 @@ if (args.includes("--child")) {
   const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));
   const out = resolve(need("--out"));
   mkdirSync(out, { recursive: true });
-  const record = await runGate(need("--parent"), resolve(need("--trees")), out, rounds);
+  const attempt = opt("--attempt") ?? "1";
+  if (attempt !== "1" && attempt !== "2") throw new Error(`The attempt of the gate is 1 or 2, not ${attempt}.`);
+  const record = await runGate(need("--parent"), resolve(need("--trees")), out, rounds, attempt === "1" ? 1 : 2);
   writeFileSync(join(out, "sections-gate.json"), JSON.stringify(record, null, 2) + "\n");
   const text = gateText(record).join("\n") + "\n";
   writeFileSync(join(out, "sections-gate.md"), text);
   console.log(text);
-  if (!recordVerdict(record).pass) process.exitCode = 1;
+  process.exitCode = gateExit(record);
 } else if (args.includes("--confirm")) {
   const pair = Number(need("--pair"));
   const [own] = parsePairs(`${need("--commit")}:${opt("--parent") ?? ""}`);
