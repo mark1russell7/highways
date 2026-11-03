@@ -335,10 +335,12 @@ export interface GateRecord {
   readonly fixture: string;
   readonly router: string;
   readonly rounds: number;
+  /** The timed head. Its `ref` is the input text, for example `HEAD`, and its `sha` is the full hash that the job resolved one time. */
   readonly head: Side;
+  /** The parent of the head. Its `ref` is the input text, for example `HEAD^1`, and its `sha` is the full hash that the job resolved one time. */
   readonly parent: Side;
   readonly fixed: Side;
-  /** The file of the fixed base of the head. */
+  /** The file of the fixed base of the checkout. */
   readonly fixedBase: FixedBase;
   /** The reason when the job timed no arm, else `null`. */
   readonly skipped: string | null;
@@ -394,6 +396,8 @@ const time = (ms: number | null | undefined): string => (ms == null || !Number.i
 /** This function keeps a text in one cell of a table. */
 const cell = (text: string): string => text.replace(/\|/g, "/");
 const short = (s: Side): string => `\`${s.sha.slice(0, 7)}\``;
+/** This function writes the input text of a side and its full hash, for example `` `HEAD^1` = `414ec5f...` ``. */
+const named = (s: Side): string => (s.ref === s.sha ? `\`${s.sha}\`` : `\`${cell(s.ref)}\` = \`${s.sha}\``);
 
 /** This function gives the Markdown text of a record of the gate: the outcome, the noise, the pool, the two checks and the times. */
 export function gateText(record: GateRecord): string[] {
@@ -408,8 +412,8 @@ export function gateText(record: GateRecord): string[] {
     `The job times \`${record.router}\` on the fixture \`${record.fixture}\` of \`fa1dd82~1\` (${short(record.board)}), with 10 000 nodes. Each arm routes the same board.`,
     `Each route has its own fresh process. Each arm has ${record.rounds} rounds, and in each round the arms take turns. The A/A arm is a second copy of the parent.`,
     "",
-    `- The head: ${short(record.head)} ${cell(record.head.subject)}`,
-    `- The parent: ${short(record.parent)} ${cell(record.parent.subject)}`,
+    `- The head: ${named(record.head)} ${cell(record.head.subject)}`,
+    `- The parent: ${named(record.parent)} ${cell(record.parent.subject)}`,
     `- The fixed base: ${short(record.fixed)} since ${record.fixedBase.date}. ${cell(record.fixedBase.reason)}`,
     "",
   ];
