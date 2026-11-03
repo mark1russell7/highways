@@ -1636,6 +1636,121 @@ The default does not change with this screen. The item SEARCH-CROSS tests the ch
 
 The mean Brier score of the 11 claims is 0.205.
 
+## Wave 4D (BUILD-W4D)
+
+Wave 4D builds the next six ideas of the queue. Each one is a strategy of its step:
+
+| Idea | Strategy | Step | Baseline |
+|---|---|---|---|
+| NAT-009 | `two-way` | `highway` | `shared` |
+| WILD-039 | `global-order` | `highway` | `shared` |
+| WILD-031 | `approval` | `highway` | `shared` |
+| EDA-022 | `escape` | `plugs` | `facing` |
+| WILD-048 | `crops` | `whole` | `pipeline` |
+| WILD-046 | `choice` | `whole` | `pipeline` |
+
+The screen examines each strategy alone and with three changes of its options. The modules are `scripts/screens/build-w4d*.ts`.
+The verdict is the verdict over families of `scripts/screen-verdict.ts` against the baseline of the step, on the named wins of the idea.
+
+### The design notes
+
+- `two-way` and `global-order` keep the highways of their plan `from`. They add a lane rule to the plan, so only the lane order of each run changes.
+  - `HighwayPlan.laneRule` is a new optional field. A plan with no lane rule gives the same runs as before, so the routes of each other strategy do not change.
+- `two-way` puts the edges of one direction of a run side by side. With `right`, the edges against the spine go first. With `outer`, the edges along the spine take the two outer sides.
+  - The option `weight` mixes the direction key with the bundle order. The value 0 gives the bundle order.
+- `global-order` gives the edges one order for all the runs. The key is the Hilbert rank of the source and the target, or the pseudo-angle of the edge.
+  - Sifting then moves each edge to the place with the fewest pairs that the runs put the other way. Sifting stops after 2000 edges.
+- `approval` routes each edge on the corner graph. Each link of a way within `1 + eps` of the shortest way gets the approval of the edge.
+  - The search of each edge stops at `1 + eps` times its first length. The pick `score` keeps the links with the most approvals, and `cover` keeps a greedy cover.
+  - The kept links go to `sharedStretches`, so the corridors are the stretches that 2 or more edges share.
+- `escape` routes the way of each edge between the facing plugs. The first leg after the stub gives the order of the plugs on each wall.
+  - It uses the walls of `spread` and the ranges of PORT-RANGE. A fixed plug does not move, and a plug of a port with a range stays in its range.
+- `crops` ranks the settings of `board-portfolio` on seeded windows of the board. Only the whole board with the pick routes in full.
+  - A board with `nodes` nodes or fewer runs `board-portfolio` with the same number of settings.
+- `choice` reads 9 features of the board and picks a setting by the vote of the nearest rows of `CHOICE_TABLE`.
+  - The table holds made-up boards of the families only, with seeds from 100 000, outside the screen sets.
+  - With an empty table, `choice` routes the first setting of the list, `shared`.
+- The new strategies use the helpers of the package. These are `MinHeap` of `visibility.ts`, `rng` of `fixtures.ts`, `summarize` of the bench measures and the walls of the plugs.
+
+### The results
+
+The records are these runs. The runs on `screen-v2` are at `557e3ac`, and the others are at `1c6fa5a`. The two commits differ only in one line of the roadmap.
+
+- The step `highway`: [41499056825](https://github.com/mark1russell7/highways/actions/runs/41499056825) on `screen-v2`, [41508652642](https://github.com/mark1russell7/highways/actions/runs/41508652642) on `screen-v3` and [41505308236](https://github.com/mark1russell7/highways/actions/runs/41505308236) on `screen-v1`.
+  - The first run on `screen-v3`, 41505228802, stopped at the limit of 15 minutes. The run 41508652642 has the limit of 45 minutes.
+- The step `plugs`: [41499105575](https://github.com/mark1russell7/highways/actions/runs/41499105575) on `screen-v2`, [41505273341](https://github.com/mark1russell7/highways/actions/runs/41505273341) on `screen-v3` and [41505325487](https://github.com/mark1russell7/highways/actions/runs/41505325487) on `screen-v1`.
+- The step `whole`: [41499124847](https://github.com/mark1russell7/highways/actions/runs/41499124847) on `screen-v2`, [41505291190](https://github.com/mark1russell7/highways/actions/runs/41505291190) on `screen-v3` and [41505342707](https://github.com/mark1russell7/highways/actions/runs/41505342707) on `screen-v1`.
+
+The rule of the stage is the rule of wave 3G. A cell gives the label and the breadth: the families against, of 6 or of 15, and the ties.
+The ratios are the paired ratios of the candidate over the baseline on `screen-v2`, as the median and the maximum. An input with a B1 of 0 for the baseline has no ratio.
+The time ratio is the median time over the median time of the baseline on `screen-v2`. B5 is the lane crossings, R10 is the plug angle and R11 is the least plug spacing.
+
+| Idea | Named wins on `screen-v1` | Named wins on `screen-v2` | Named wins on `screen-v3` | B1 ratio | B3 q95 ratio | Time | New hard-rule breaks | Stage |
+|---|---|---|---|---:|---:|---:|---|---|
+| NAT-009 `two-way` | B5 `no verdict` 0 of 6 (5 ties), R1 `better` 1 of 6 (3 ties) | B5 `no verdict` 1 of 6 (4 ties), R1 `better` 0 of 6 (3 ties) | B5 `no verdict` 1 of 15 (13 ties), R1 `better` 1 of 15 (8 ties) | 1.031 / 3.201 | 1.000 / 1.011 | 1.73 | 0 | `screened` |
+| WILD-039 `global-order` | B5 `worse` 0 of 6 (4 ties), R1 `better` 1 of 6 (3 ties) | B5 `worse` 0 of 6 (4 ties), R1 `better` 0 of 6 (3 ties) | B5 `worse` 0 of 15 (13 ties), R1 `better` 1 of 15 (8 ties) | 1.031 / 3.201 | 1.000 / 1.011 | 1.64 | 0 | `screened` |
+| WILD-031 `approval` | B1 `better` 0 of 6 (1 tie), B2 `better` 0 of 6 (1 tie), B3 `depends on the mix` 2 of 6 (1 tie) | B1 `better` 0 of 6 (1 tie), B2 `better` 1 of 6 (1 tie), B3 `no verdict` 2 of 6 (1 tie) | B1 `better` 0 of 15 (2 ties), B2 `better` 2 of 15 (2 ties), B3 `worse` 2 of 15 (3 ties) | 3.403 / 18.189 | 1.003 / 1.145 | 4.06 | 0 | `screened` |
+| EDA-022 `escape` | R1 `worse` 0 of 6 (1 tie), R11 `better` 1 of 6 (0 ties), B5 `no verdict` 0 of 6 (6 ties), R10 `no verdict` 0 of 6 (5 ties) | R1 `worse` 1 of 6 (0 ties), R11 `better` 1 of 6 (0 ties), B5 `no verdict` 0 of 6 (6 ties), R10 `worse` 0 of 6 (5 ties) | R1 `worse` 3 of 15 (3 ties), R11 `better` 2 of 15 (2 ties), B5 `no verdict` 0 of 15 (15 ties), R10 `worse` 0 of 15 (14 ties) | 0.879 / 2.000 | 1.008 / 1.500 | 1.48 | 0 | `screened` |
+| WILD-048 `crops` | R5 `worse` 0 of 6 (2 ties), B1 `better` 1 of 6 (1 tie) | R5 `worse` 0 of 6 (1 tie), B1 `better` 0 of 6 (1 tie) | R5 `worse` 0 of 15 (2 ties), B1 `better` 0 of 15 (2 ties) | 5.158 / 76.431 | 1.232 / 1.907 | 14.85 | 0 | `screened` |
+| WILD-046 `choice` | R1 `better` 0 of 6 (3 ties), R5 `worse` 0 of 6 (4 ties), B1 `better` 1 of 6 (3 ties) | R1 `better` 0 of 6 (3 ties), R5 `worse` 0 of 6 (3 ties), B1 `better` 0 of 6 (3 ties) | R1 `better` 3 of 15 (8 ties), R5 `worse` 0 of 15 (12 ties), B1 `better` 1 of 15 (10 ties) | 1.059 / 16.625 | 1.000 / 1.309 | 1.71 | 0 | `screened` |
+
+- No idea meets the rule of `kept`. Each idea has a named win that is not `better` on `screen-v2`, or that is `worse` on `screen-v1`.
+- `two-way` and `global-order` keep the highways of `shared-ways`. Only the lane order of the runs changes.
+  - Their R1 `better` against `shared` is the gain of `shared-ways`. Against `shared-ways`, R1 is a tie on each family of each set.
+  - Against `shared-ways`, `two-way` gets B5 `better` on `screen-v2` and `screen-v3` with 0 families against. `global-order` gets B5 `worse`.
+  - The lane order changes the routes of 21 of 60 inputs of `screen-v2` for `two-way`, and of 20 of 60 for `global-order`. The median time is 1.07 and 1.01 times `shared-ways`.
+- `approval` gets B1 `better` on each set with 0 families against, and B2 `better` with 1 family against on `screen-v2`.
+  - B3 q95 has no verdict on `screen-v2` and is `worse` on `screen-v3`. The guard B6 max is `worse` on `screen-v2` and `screen-v3`.
+  - The median crossings of each edge are 1.288 on `screen-v3`, against 2.079 of `shared`. The median turn R4 is 0.888, against 0.545.
+  - The variants `approval-eps0.05` and `approval-budget0.5` also get B1 and B2 `better` with 0 families against on `screen-v2`. B3 has no verdict for them.
+- `escape` gets R11 min `better` on each set, but R1 is `worse` on each set. R10 is `worse` on `screen-v2` and `screen-v3`, and B5 is a tie on each family.
+- `crops` gets B1 `better` and R5 q95 `worse` against `pipeline`. Against `board-portfolio`, B1 is `worse` and R5 is `better` on `screen-v3`, each with 2 families against.
+  - The median time is 14.85 times `pipeline` and 2.60 times `board-portfolio` on `screen-v2`.
+- The table of `choice` is empty, so `choice` routes the first setting, `shared`, unless that setting breaks a hard rule. The screen does not test the learned choice.
+  - Against `board-portfolio`, R1 and B1 are `worse` and R5 q95 is `better` on `screen-v2` and `screen-v3`. The median time is 0.30 times `board-portfolio`.
+- The variants of each strategy get the same labels as the strategy on most named wins. No variant meets the rule of `kept`.
+
+### The prediction of wave 4D
+
+| Claim | Result |
+|---|---|
+| 1. The head of the PR passes its checks. | The CI of #255 gives the last word. |
+| 2. The expected values of the digest tests do not change. | Met: no expected value changes. Each row of the other strategies in the 9 snapshots is the same as before. |
+| 3. One or more of the 6 ideas is `kept`. | Not met: each of the 6 ideas is `screened`. |
+| 4. Each of the 6 ideas is screened on `screen-v1`, `screen-v2` and `screen-v3`. | Met: 9 runs, one for each step and set. |
+| 5. The wave adds 1300 to 5200 lines. | Met: 1854 lines in the first push, before the records of the screens. |
+
+### The queue after wave 4D
+
+The six ideas of the wave are built, so they leave the queue. `pnpm queue` gives these counts after the wave:
+
+| Count | Before the wave | After the wave |
+|---|---:|---:|
+| rows | 186 | 186 |
+| ranked ideas | 159 | 153 |
+| duplicates | 9 | 9 |
+| blocked ideas | 13 | 12 |
+| open targets of the newest set | 78 (`screen-v3`) | 87 (`screen-v3`) |
+| ideas of the back test | 73 | 79 |
+
+- The new top 3 is `EDA-010`, `WILD-035` and `EDA-032`.
+- The rank correlation of the back test goes from 0.559 to 0.522.
+- The measured gains are 35.5 for WILD-031, 10.5 for NAT-009 and WILD-039, 5.5 for WILD-048, 3 for WILD-046 and 1.5 for EDA-022.
+
+### The snapshots of the verdicts
+
+The snapshots of the steps `highway`, `plugs` and `whole` hold the screens of this wave, with the registered strategies only. The variants are only in this section and in the idea records.
+For the other strategies, each row is the same as before. The snapshots of the step `plugs` also get the first rows of `assign` (PLUG-ASSIGN), a registered strategy that had no screen.
+
+- Over all the `better` verdicts of `screen-v1`, 34 of 112 have 1 or more families against them. Over all the `better` and `worse` verdicts, 61 of 222 have.
+- Over all the `better` verdicts of `screen-v2`, 48 of 141 have 1 or more families against them. Over all the `better` and `worse` verdicts, 115 of 295 have.
+- Over all the `better` verdicts of `screen-v3`, 87 of 141 have 1 or more families against them. Over all the `better` and `worse` verdicts, 163 of 290 have.
+
+### The measures with no value
+
+- The table of `choice` is empty, so the screen has no value for the learned choice of WILD-046.
+- B5 is 0 at the median for `shared`, `two-way` and `global-order`, and for `facing` and `escape`. Half of the inputs or more have no lane crossing.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.

@@ -85,4 +85,15 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["whole/fireflies"]).toContain("NAT-047");
     expect(built.strategies["whole/tracing"]).toContain("WILD-057");
   });
+
+  // The texts `describe` of the strategies of wave 4D (BUILD-W4D) cite their ideas.
+  it("gives the cards the ideas of the strategies of wave 4D", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/two-way"]).toContain("NAT-009");
+    expect(built.strategies["highway/global-order"]).toContain("WILD-039");
+    expect(built.strategies["highway/approval"]).toContain("WILD-031");
+    expect(built.strategies["plugs/escape"]).toContain("EDA-022");
+    expect(built.strategies["whole/crops"]).toContain("WILD-048");
+    expect(built.strategies["whole/choice"]).toContain("WILD-046");
+  });
 });
