@@ -1,5 +1,5 @@
-export { checkPlan, lengthBetween, memberAt, pointAt, type Highway, type HighwayInput, type HighwayMember, type HighwayPlan } from "./model.ts";
-export { follow, type FollowOptions } from "./follow.ts";
+export { checkPlan, lengthBetween, memberAt, pointAt, TWO_WAY_SIDES, type Highway, type HighwayInput, type HighwayMember, type HighwayPlan, type LaneRule, type TwoWaySide } from "./model.ts";
+export { follow, ruleLanes, type FollowOptions } from "./follow.ts";
 export { planOfResult } from "./result.ts";
 export { highwayRouter, highwayRouterStrategy } from "./router.ts";
 export { keysPlan, type KeysOptions } from "./keys/index.ts";
@@ -110,3 +110,6 @@ export { BRONCHIAL_DEFAULTS, BRONCHIAL_SPLITS, bronchialPlan, diamondAngle, spli
 export { INTERCHANGE_BASES, INTERCHANGE_DEFAULTS, interchangeCandidates, interchangePlan, type Interchange, type InterchangeBase, type InterchangeOptions } from "./interchanges/index.ts";
 export { SCALE_SPACE_DEFAULTS, scaleClusters, scaleSpaceGroups, scaleSpacePlan, type ScaleCluster, type ScaleSpaceOptions } from "./scale-space/index.ts";
 export * from "./gates/index.ts";
+export { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "./two-way/index.ts";
+export { addPairs, disagreement, GLOBAL_KEYS, GLOBAL_ORDER_DEFAULTS, globalOrderPlan, hilbertRank, keyOrder, pseudoAngle, SIFT_CAP, sift, type GlobalKey, type GlobalOrderOptions, type PairWeights } from "./global-order/index.ts";
+export { APPROVAL_DEFAULTS, APPROVAL_PICKS, approvalPlan, approvedLinks, distancesFrom, pickLinks, type ApprovalOptions, type ApprovalPick } from "./approval/index.ts";
