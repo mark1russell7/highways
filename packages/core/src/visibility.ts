@@ -118,8 +118,14 @@ export interface CornerGraphOptions {
 export class CornerGraph {
   readonly points: Point[] = [];
   readonly #adj: number[][] = [];
-  // The length of each link, in the order of #adj.
-  readonly #len: number[][] = [];
+  // The links of #adj in flat arrays for the search. The links of corner `i` are at the indices `#start[i]` to `#start[i + 1] - 1`.
+  // `#to` holds the other corner of each link and `#length` holds its length. The order of the links is the order of #adj.
+  readonly #start: Int32Array;
+  readonly #to: Int32Array;
+  readonly #length: Float64Array;
+  // The coordinates of the corners, in the order of `points`.
+  readonly #x: Float64Array;
+  readonly #y: Float64Array;
   readonly #obstacles: Obstacles;
   readonly #pointGrid: Grid<number>;
   readonly #cell: number;
@@ -130,9 +136,20 @@ export class CornerGraph {
   #parent = new Int32Array(0);
   #open = new Int32Array(0);
   #closed = new Int32Array(0);
+  // The estimate of A* of each open corner. The cost from each corner near a point of `to` to that point, for the corners whose `#goalAt` is the stamp.
+  #h = new Float64Array(0);
+  #goalTail = new Float64Array(0);
+  #goalAt = new Int32Array(0);
   #stamp = 0;
+  readonly #heap = new CornerHeap();
   // The corners in each bucket of the point grid, by the key of the bucket. A corner is in one bucket: the bucket of its point.
   readonly #buckets = new Map<number, number[]>();
+  // The lists of #buckets in a dense table over the bucket range of the corners (`#bucket`). It is undefined when the range is too large.
+  #cells: (number[] | undefined)[] | undefined;
+  #ci0 = 0;
+  #cj0 = 0;
+  #cw = 0;
+  #ch = 0;
   // The distance from the point of the last call of nearestVisible to each corner that the call found.
   #dist = new Float64Array(0);
   // The corners of one ring of nearestVisible, nearest first.
@@ -183,6 +200,7 @@ export class CornerGraph {
         }
       }
     }
+    this.#cells = this.#denseCells();
     const links: Set<number>[] = this.points.map(() => new Set<number>());
     for (let i = 0; i < this.points.length; i++) {
       // The k nearest corners of a corner in a long corridor are often all on one side. The cones add a link along the corridor.
@@ -191,11 +209,77 @@ export class CornerGraph {
         links[j]!.add(i);
       }
     }
+    const count = this.points.length;
+    this.#start = new Int32Array(count + 1);
     links.forEach((s, i) => {
       const adj = [...s].sort((a, b) => a - b);
       this.#adj.push(adj);
-      this.#len.push(adj.map((j) => dist(this.points[i]!, this.points[j]!)));
+      this.#start[i + 1] = this.#start[i]! + adj.length;
     });
+    this.#to = new Int32Array(this.#start[count]!);
+    this.#length = new Float64Array(this.#start[count]!);
+    this.#x = new Float64Array(count);
+    this.#y = new Float64Array(count);
+    for (let i = 0; i < count; i++) {
+      const p = this.points[i]!;
+      this.#x[i] = p.x;
+      this.#y[i] = p.y;
+      const adj = this.#adj[i]!;
+      const s = this.#start[i]!;
+      for (let m = 0; m < adj.length; m++) {
+        this.#to[s + m] = adj[m]!;
+        this.#length[s + m] = dist(p, this.points[adj[m]!]!);
+      }
+    }
+  }
+
+  /**
+   * This method puts the lists of #buckets into a dense table over the bucket range of the corners.
+   * It gives undefined when the table is much larger than the number of corners.
+   * The table holds the same lists, so a test of a bucket gives the same corners in the same order.
+   */
+  #denseCells(): (number[] | undefined)[] | undefined {
+    let i0 = Infinity;
+    let j0 = Infinity;
+    let i1 = -Infinity;
+    let j1 = -Infinity;
+    for (const list of this.#buckets.values()) {
+      const p = this.points[list[0]!]!;
+      const i = Math.floor(p.x / this.#cell);
+      const j = Math.floor(p.y / this.#cell);
+      i0 = Math.min(i0, i);
+      j0 = Math.min(j0, j);
+      i1 = Math.max(i1, i);
+      j1 = Math.max(j1, j);
+    }
+    // A key of #buckets packs two indices within ±2^20 without a collision. The table applies only in that range.
+    if (!(i0 >= -KEY_RANGE && j0 >= -KEY_RANGE && i1 < KEY_RANGE && j1 < KEY_RANGE)) return undefined;
+    const w = i1 - i0 + 1;
+    const h = j1 - j0 + 1;
+    if (w * h > 4 * this.points.length + 4096) return undefined;
+    const cells = new Array<number[] | undefined>(w * h).fill(undefined);
+    for (const list of this.#buckets.values()) {
+      const p = this.points[list[0]!]!;
+      cells[(Math.floor(p.x / this.#cell) - i0) * h + (Math.floor(p.y / this.#cell) - j0)] = list;
+    }
+    this.#ci0 = i0;
+    this.#cj0 = j0;
+    this.#cw = w;
+    this.#ch = h;
+    return cells;
+  }
+
+  /** This method gives the list of the corners in the bucket (`i`, `j`), as `#buckets` gives it. */
+  #bucket(i: number, j: number): number[] | undefined {
+    const cells = this.#cells;
+    if (cells !== undefined) {
+      const a = i - this.#ci0;
+      const b = j - this.#cj0;
+      if (a >= 0 && a < this.#cw && b >= 0 && b < this.#ch) return cells[a * this.#ch + b];
+      // A bucket out of the table and in the key range has no corner. The map gives the other buckets.
+      if (i >= -KEY_RANGE && i < KEY_RANGE && j >= -KEY_RANGE && j < KEY_RANGE) return undefined;
+    }
+    return this.#buckets.get(bucketKey(i, j));
   }
 
   #addPoint(c: Point): void {
@@ -288,7 +372,7 @@ export class CornerGraph {
         const before = bi >= pi0 && bi <= pi1;
         for (let bj = j0; bj <= j1; bj++) {
           if (before && bj >= pj0 && bj <= pj1) continue;
-          const list = this.#buckets.get(bucketKey(bi, bj));
+          const list = this.#bucket(bi, bj);
           if (list === undefined) continue;
           WORK.sight += list.length;
           for (const j of list) {
@@ -377,6 +461,9 @@ export class CornerGraph {
       this.#parent = new Int32Array(n);
       this.#open = new Int32Array(n);
       this.#closed = new Int32Array(n);
+      this.#h = new Float64Array(n);
+      this.#goalTail = new Float64Array(n);
+      this.#goalAt = new Int32Array(n);
     }
     const stamp = ++this.#stamp;
     const points = this.points;
@@ -397,27 +484,58 @@ export class CornerGraph {
     const starts = from.map((a) => this.#ends(a.point, count));
     // Without a start and a goal in one connected part, A* finds no path. This test stops it before it visits the whole part.
     if (!starts.some((list) => this.#joined(list, goal))) return undefined;
-    const heap = new MinHeap();
+    const goalTail = this.#goalTail;
+    const goalAt = this.#goalAt;
+    for (const [j, tail] of goal) {
+      goalTail[j] = tail;
+      goalAt[j] = stamp;
+    }
+    // The search keeps one entry for each open corner. A lower cost moves the entry up. The old search pushed a second entry instead.
+    // The corners come out in the same order: by key, and equal keys by index. A second entry of a corner came out after the corner was closed, and the search skipped it.
+    const heap = this.#heap;
+    heap.reset(n);
     const G = this.#g;
+    const H = this.#h;
     const parentOf = this.#parent;
     const open = this.#open;
     const closed = this.#closed;
-    const estimate = (p: Point): number => {
+    const X = this.#x;
+    const Y = this.#y;
+    const start = this.#start;
+    const next = this.#to;
+    const length = this.#length;
+    const one = to.length === 1;
+    const tx = one ? to[0]!.point.x : 0;
+    const ty = one ? to[0]!.point.y : 0;
+    // The estimate is `floor` times the distance to the nearest point of `to`, with the operations of `dist`. A corner keeps it while it is open.
+    const estimate = (j: number): number => {
+      if (one) {
+        const dx = X[j]! - tx;
+        const dy = Y[j]! - ty;
+        return floor * Math.sqrt(dx * dx + dy * dy);
+      }
       let h = Infinity;
-      for (const b of to) h = Math.min(h, dist(p, b.point));
+      for (const b of to) {
+        const dx = X[j]! - b.point.x;
+        const dy = Y[j]! - b.point.y;
+        h = Math.min(h, Math.sqrt(dx * dx + dy * dy));
+      }
       return floor * h;
-    };
-    const relax = (j: number, g: number, parent: number): void => {
-      if (closed[j] === stamp) return;
-      if (open[j] === stamp && G[j]! <= g) return;
-      open[j] = stamp;
-      G[j] = g;
-      parentOf[j] = parent;
-      heap.push(g + estimate(points[j]!), j);
     };
     // The parent of a first corner is -1 - i, where i is the index of its point in `from`.
     from.forEach((a, i) => {
-      for (const j of starts[i]!) relax(j, a.cost + dist(a.point, points[j]!), -1 - i);
+      for (const j of starts[i]!) {
+        const g = a.cost + dist(a.point, points[j]!);
+        if (open[j] === stamp) {
+          if (G[j]! <= g) continue;
+        } else {
+          open[j] = stamp;
+          H[j] = estimate(j);
+        }
+        G[j] = g;
+        parentOf[j] = -1 - i;
+        heap.set(g + H[j]!, j);
+      }
     });
     let best = Infinity;
     let bestEnd = -1;
@@ -425,22 +543,29 @@ export class CornerGraph {
     while (heap.size > 0) {
       if (heap.topKey >= best) break;
       const i = heap.pop();
-      if (closed[i] === stamp) continue;
       closed[i] = stamp;
-      settled += 1 + this.#adj[i]!.length;
+      const m0 = start[i]!;
+      const m1 = start[i + 1]!;
+      settled += 1 + (m1 - m0);
       const gi = G[i]!;
-      const tail = goal.get(i);
-      if (tail !== undefined && gi + tail < best) {
-        best = gi + tail;
+      if (goalAt[i] === stamp && gi + goalTail[i]! < best) {
+        best = gi + goalTail[i]!;
         bestEnd = i;
       }
-      const adj = this.#adj[i]!;
-      const len = this.#len[i]!;
-      for (let m = 0; m < adj.length; m++) {
-        const j = adj[m]!;
+      for (let m = m0; m < m1; m++) {
+        const j = next[m]!;
         if (closed[j] === stamp) continue;
-        const d = len[m]!;
-        relax(j, gi + (cost ? cost(i, j, d) : d), i);
+        const d = length[m]!;
+        const g = gi + (cost ? cost(i, j, d) : d);
+        if (open[j] === stamp) {
+          if (G[j]! <= g) continue;
+        } else {
+          open[j] = stamp;
+          H[j] = estimate(j);
+        }
+        G[j] = g;
+        parentOf[j] = i;
+        heap.set(g + H[j]!, j);
       }
     }
     WORK.corner += settled;
@@ -704,6 +829,96 @@ const coneOf = (dx: number, dy: number): number => (Math.abs(dx) >= Math.abs(dy)
 
 /** This function packs the two indices of a bucket into one number. Each index stays within ±2^20. */
 const bucketKey = (i: number, j: number): number => (i + 1_048_576) * 2_097_152 + (j + 1_048_576);
+
+/** The indices of a bucket of `bucketKey` are at least `-KEY_RANGE` and less than `KEY_RANGE`. */
+const KEY_RANGE = 1_048_576;
+
+/**
+ * A binary min-heap of corners by key, with one entry for each corner. The corners come out by key, and equal keys by index, as in `MinHeap`.
+ * The heap keeps the position of each corner, so the method `set` can give a lower key to a corner in the heap.
+ */
+class CornerHeap {
+  #d = new Float64Array(64);
+  #j = new Int32Array(64);
+  // The position of each corner in the heap plus one, or 0 when the corner is not in the heap.
+  #at = new Int32Array(0);
+  size = 0;
+
+  /** The smallest key. */
+  get topKey(): number {
+    return this.#d[0]!;
+  }
+
+  /** This method removes each entry, and makes the heap ready for the corners 0 to `n` - 1. */
+  reset(n: number): void {
+    if (this.#at.length < n) this.#at = new Int32Array(n);
+    for (let i = 0; i < this.size; i++) this.#at[this.#j[i]!] = 0;
+    this.size = 0;
+  }
+
+  /** This method adds the corner `value` with `key`. When the corner is in the heap, `key` replaces its key. The new key must not be larger. */
+  set(key: number, value: number): void {
+    let i = this.#at[value]! - 1;
+    if (i < 0) {
+      if (this.size === this.#d.length) {
+        const dd = new Float64Array(2 * this.size);
+        dd.set(this.#d);
+        this.#d = dd;
+        const jj = new Int32Array(2 * this.size);
+        jj.set(this.#j);
+        this.#j = jj;
+      }
+      i = this.size++;
+    }
+    const d = this.#d;
+    const jj = this.#j;
+    const at = this.#at;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (!(key < d[p]! || (key === d[p] && value < jj[p]!))) break;
+      d[i] = d[p]!;
+      jj[i] = jj[p]!;
+      at[jj[i]!] = i + 1;
+      i = p;
+    }
+    d[i] = key;
+    jj[i] = value;
+    at[value] = i + 1;
+  }
+
+  /** This method removes the corner with the smallest key and gives it. */
+  pop(): number {
+    const top = this.#j[0]!;
+    this.#at[top] = 0;
+    this.size--;
+    if (this.size > 0) this.#down(this.#d[this.size]!, this.#j[this.size]!);
+    return top;
+  }
+
+  // This method puts the pair (`di`, `ji`) at the root and moves it down to its place.
+  #down(di: number, ji: number): void {
+    const d = this.#d;
+    const jj = this.#j;
+    const at = this.#at;
+    const n = this.size;
+    let i = 0;
+    for (;;) {
+      const l = 2 * i + 1;
+      if (l >= n) break;
+      const r = l + 1;
+      let m = l;
+      if (r < n && (d[r]! < d[l]! || (d[r] === d[l] && jj[r]! < jj[l]!))) m = r;
+      if (!(d[m]! < di || (d[m] === di && jj[m]! < ji))) break;
+      d[i] = d[m]!;
+      jj[i] = jj[m]!;
+      at[jj[i]!] = i + 1;
+      i = m;
+    }
+    d[i] = di;
+    jj[i] = ji;
+    at[ji] = i + 1;
+  }
+}
 
 /**
  * A binary min-heap of (key, value) pairs in typed arrays. The pairs come out by key, and equal keys by value, so the order is deterministic.
