@@ -1,8 +1,21 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { aaId, pairedReport, type RawTimes } from "./paired.ts";
 import { COMMIT_ARM, PARENT_ARM, pairVerdicts } from "./pair-confirm.ts";
 import { homeVerdict, pairedTimes } from "./home-verdict.ts";
-import { FIXED_ARM, GATE_ROUTER, MIN_EFFECT, NOISE_CAP, gateExit, gateVerdict, parentLimit, type GateRecord, type PoolBand } from "../sections-gate-verdict.ts";
+import {
+  FIXED_ARM,
+  GATE_ROUTER,
+  NOISE_CAP,
+  PARENT_FLOOR,
+  POOL_FILE,
+  gateExit,
+  gateOptions,
+  gateVerdict,
+  homeRecord,
+  parsePool,
+  type GateRecord,
+} from "../sections-gate-verdict.ts";
 
 // The times in ms of two runs of the workflow `Sections gate`, copied from their artifacts `sections-gate.json`. Only the numbers are copied.
 // Run 41542329976 (#257): a quiet runner, with an A/A spread of 0.027.
@@ -42,8 +55,14 @@ function reportOf(run: typeof QUIET_RUN) {
   return pairedReport("fresh", ENV, "ci", arms, [{ id: GATE_ROUTER, group: GATE_ROUTER }], raw);
 }
 
-/** The band of a pool with fewer than 5 runs: the floor 1.05. The seed pool has 3 quiet runs. */
-const FLOOR: PoolBand = { runs: 3, ratios: 30, spread: 0.0427, pooled: false, limit: 1 + MIN_EFFECT };
+/** The pool of the repository: 3 quiet runs, 30 A/A cases. Its pooled spread is below the floor, so the floor log(1.05) gives the margin. */
+const POOL = parsePool(readFileSync(new URL(`../../${POOL_FILE}`, import.meta.url), "utf8"));
+
+/** This function gives the result of the gate on a report: the home decides with the options of the gate and the pool of the repository. */
+function decide(report: ReturnType<typeof reportOf>) {
+  const home = homeRecord(homeVerdict(report, GATE_ROUTER, COMMIT_ARM, gateOptions(POOL)));
+  return gateVerdict(report, home);
+}
 
 describe("the records of the home", () => {
   it("gives one case for each round, with the arm that ran first", () => {
@@ -60,45 +79,44 @@ describe("the records of the home", () => {
   });
 });
 
-describe("the two runs under the rule of slice 2", () => {
-  it("the quiet run 41542329976: the gate passes, and the home says same", () => {
-    const report = reportOf(QUIET_RUN);
-    const g = gateVerdict(report, FLOOR);
+describe("the two runs under the home verdict of slice 3", () => {
+  it("the quiet run 41542329976: the home says same, and the gate passes", () => {
+    const g = decide(reportOf(QUIET_RUN));
+    // The spread of slice 2 on |r - 1| and the spread of the home on |log r|. Both are below their cap.
     expect(g.parent!.spread).toBeCloseTo(0.0273, 4);
-    expect(g.parent!.spread).toBeLessThanOrEqual(NOISE_CAP);
+    expect(g.home!.noise!.spread!).toBeCloseTo(0.0272, 4);
+    expect(g.home!.noise!.noisy).toBe(false);
+    expect(g.home!.pool).toMatchObject({ cases: 30, runs: 3, floor: PARENT_FLOOR, pooled: false });
+    expect(g.home!.margin).toBe(PARENT_FLOOR);
     expect(g.checks[0].ratio).toBeCloseTo(0.9992, 4);
     expect(g.checks[1].ratio).toBeCloseTo(0.9978, 4);
-    expect(g.outcome).toBe("pass");
     expect(g.words).toBe("same");
-    const home = homeVerdict(report, GATE_ROUTER, COMMIT_ARM);
-    expect(home.outcome).toBe("same");
-    expect(home.interval!.low).toBeCloseTo(0.9913, 4);
-    expect(home.interval!.high).toBeCloseTo(1.0162, 4);
+    expect(g.home!.low!).toBeCloseTo(0.9913, 4);
+    expect(g.home!.high!).toBeCloseTo(1.0162, 4);
+    expect(g.outcome).toBe("pass");
   });
 
-  it("the noisy run 41548965076: the run cannot decide, and the home says cannot decide too", () => {
-    const report = reportOf(NOISY_RUN);
-    const g = gateVerdict(report, FLOOR);
+  it("the noisy run 41548965076: the home finds the spread above the cap, and the run cannot decide", () => {
+    const g = decide(reportOf(NOISY_RUN));
     expect(g.parent!.spread).toBeCloseTo(0.1961, 4);
-    // Slice 1 gave the limit 1 + the spread of the run, so the run passed. Slice 2 caps the noise.
-    expect(g.checks[0].ratio!).toBeLessThan(parentLimit(g.parent!.spread));
+    expect(g.home!.noise!.spread!).toBeGreaterThan(NOISE_CAP);
     expect(g.noisy).toBe(true);
     expect(g.checks[0].verdict).toBe("cannot decide");
     expect(g.checks[1].verdict).toBe("pass");
     expect(g.outcome).toBe("cannot decide");
     expect(g.words).toBe("cannot decide");
-    const home = homeVerdict(report, GATE_ROUTER, COMMIT_ARM);
-    expect(home.outcome).toBe("cannot decide");
-    expect(home.interval!.low).toBeCloseTo(0.8413, 4);
-    expect(home.interval!.high).toBeCloseTo(1.0156, 4);
+    expect(g.home!.reason).toContain("above the noise cap");
   });
 
   it("the noisy run starts the retry as the first run, and fails as the second run", () => {
     const report = reportOf(NOISY_RUN);
-    const base = { band: FLOOR, router: GATE_ROUTER, report } as unknown as GateRecord;
+    const home = homeRecord(homeVerdict(report, GATE_ROUTER, COMMIT_ARM, gateOptions(POOL)));
+    const base = { router: GATE_ROUTER, report, home } as unknown as GateRecord;
     expect(gateExit({ ...base, attempt: 1 })).toBe(3);
     expect(gateExit({ ...base, attempt: 2 })).toBe(1);
-    expect(gateExit({ ...base, report: reportOf(QUIET_RUN), attempt: 1 })).toBe(0);
+    const quiet = reportOf(QUIET_RUN);
+    const quietHome = homeRecord(homeVerdict(quiet, GATE_ROUTER, COMMIT_ARM, gateOptions(POOL)));
+    expect(gateExit({ ...base, report: quiet, home: quietHome, attempt: 1 })).toBe(0);
   });
 
   it("keeps the local band rule of the confirm mode: on the noisy run it says inside, and the home does not agree", () => {
