@@ -1636,6 +1636,63 @@ The default does not change with this screen. The item SEARCH-CROSS tests the ch
 
 The mean Brier score of the 11 claims is 0.205.
 
+## A score of search for ink, R1 and R4 (SEARCH-CROSS)
+
+SEARCH-OBJECTIVE found no variant of the score that follows the three measures. This item finds the cause, and it screens candidate scores.
+
+### Step 1: the cause
+
+The records come from the run [41446536480](https://github.com/mark1russell7/highways/actions/runs/41446536480) of the workflow `Search objective`, at `98f4613`.
+The run has 9064 moves of the default on 153 inputs. The script `scripts/search-objective.ts` gives each number of this section.
+
+B1 is `1 - drawn / length`. The value `drawn` is the drawn ink, and `length` is the total length of the routes of the plan.
+Thus a move that makes the routes longer raises B1, also when the drawn ink does not go down.
+
+| Part of the score of the default | ink | R1 | R4 |
+|---|---:|---:|---:|
+| B1 | 0.704 | 0.598 | -0.707 |
+| B1 with a fixed length: minus the drawn ink | 1.000 | 0.799 | -0.217 |
+| The length of the routes, the direction in which B1 goes up | 0.126 | 0.151 | -0.880 |
+
+- The cause is the length that B1 divides by. Longer routes turn more, and B1 goes up with the length. Thus B1 goes against R4.
+- The drawn ink alone goes against R4 only with ρ -0.217.
+- 4235 moves raise B1. 1603 of them (38%) also raise the drawn ink. B1 rewards these moves only for the greater length.
+- The moves of `cross-0.3-half` give the same split: -0.748 for B1, -0.177 for the drawn ink and -0.898 for the length (9095 moves).
+- The penalties B3 (ρ 0.826 against R4), B4 (0.625) and B6 (0.606) hold R4 against B1. Half penalties halve that hold, so R4 falls to 0.114.
+
+### The candidates
+
+Two new options of `search` give the candidates. Their defaults do not change the score or the routes.
+
+- `turnWeight` takes the mean total turn of the routes (R4, in half turns) off the score. The default is 0, no turn term.
+- `inkBase` `first` divides the drawn ink of B1 by the length of the first routes. This length is fixed for each input. The default `routes` keeps B1 as before.
+
+The option `--variants search-cross` of the script gives these variants. The last column is a fit on the old moves of the run 41446536480.
+
+| Variant | Options | ρ of ink, R1 and R4 on the old moves |
+|---|---|---|
+| `cross-0.3-half` | `crossingWeight` 0.3 and half penalties, the reference | 0.763, 0.763, 0.114 |
+| `turn-1` | `cross-0.3-half` and `turnWeight` 1 | 0.603, 0.548, 0.517 |
+| `ink-first` | `cross-0.3-half` and `inkBase` `first` | 0.744, 0.698, 0.259 |
+| `ink-first-turn-1` | the two changes together | 0.579, 0.504, 0.544 |
+| `turn-1.5-cross-0.6` | `crossingWeight` 0.6, `turnWeight` 1.5 and the full penalties | 0.573, 0.524, 0.529 |
+
+- A new score makes other moves, so the fit only gives the weights. The screen gives the result.
+- The records do not hold the first routes. Thus the fit uses the length of the start plan as the fixed length of `ink-first`.
+
+### Step 2: the work counters
+
+When an opt-in term is on, `searchRun` also gives `terms`. Each term has `calls`, the plans that it scored, and `steps`, the route points that it read.
+
+- The terms are `crossing`, `turn` and `inkFirst`. The term `inkFirst` reads the points of the first routes one time.
+- The units of `work` do not hold this work. Thus a work budget stops at the same plan as before.
+- The report of the screen gives the median calls and steps of each term next to the median ρ of the variant.
+
+### The measure of a pass
+
+A candidate passes step 1 when its median ρ is 0.5 or more for ink, R1 and R4, on `screen-v3` and the dense windows.
+Step 3 then gates the default on the seeds 6 to 10. The result of the screen comes in a later commit.
+
 ## Wave 4D (BUILD-W4D)
 
 Wave 4D builds the next six ideas of the queue. Each one is a strategy of its step:

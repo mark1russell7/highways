@@ -1,7 +1,8 @@
 import { mulberry32 } from "@mark1russell7/rigor-generators";
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/measures/bundles.ts";
+import { totalTurn } from "../../bench/measures/routes.ts";
 import { measureQuality } from "../../bench/quality.ts";
-import type { Point } from "../../geom.ts";
+import { polylineLength, type Point } from "../../geom.ts";
 import type { Graph, Result, Route } from "../../model.ts";
 import { WayFinder } from "../../ways.ts";
 import { workCounts, workSince } from "../../work.ts";
@@ -31,9 +32,19 @@ export interface SearchOptions {
   readonly angleWeight: number;
   /**
    * The weight of the crossings of the routes (R1), divided by the number of routes (SEARCH-OBJECTIVE). The default is 0.
-   * The counters of the work budget do not count this term.
+   * The counters of the work budget do not count this term. The record `terms` of `searchRun` counts it (SEARCH-CROSS).
    */
   readonly crossingWeight?: number;
+  /**
+   * The weight of the total turn of the routes (R4): the mean over the routes, in half turns (SEARCH-CROSS). The default is 0, no turn term.
+   * The counters of the work budget do not count this term. The record `terms` of `searchRun` counts it.
+   */
+  readonly turnWeight?: number;
+  /**
+   * The length that B1 divides the drawn ink by (SEARCH-CROSS). The value `routes` is the total length of the routes of the plan.
+   * The value `first` is the total length of the first routes, so B1 changes only with the drawn ink. The default is `routes`.
+   */
+  readonly inkBase?: SearchInkBase;
   /** The seed of the moves. The default is 1. */
   readonly seed: number;
   /**
@@ -42,6 +53,12 @@ export interface SearchOptions {
    */
   readonly work?: number;
 }
+
+/**
+ * The length that B1 divides the drawn ink by (SEARCH-CROSS). With `routes`, a move that makes the routes longer raises B1.
+ * Longer routes turn more, so B1 goes against R4. With `first`, the length is fixed.
+ */
+export type SearchInkBase = "routes" | "first";
 
 /** The default options of the strategy `search`. */
 export const SEARCH_DEFAULTS: Readonly<SearchOptions> = Object.freeze({
@@ -54,6 +71,8 @@ export const SEARCH_DEFAULTS: Readonly<SearchOptions> = Object.freeze({
   ambiguityWeight: 0.5,
   angleWeight: 0.25,
   crossingWeight: 0,
+  turnWeight: 0,
+  inkBase: "routes",
   seed: 1,
   work: 0,
 });
@@ -72,17 +91,75 @@ function random(seed: number): () => number {
   return mulberry32(Math.floor(seed));
 }
 
+/** The opt-in terms of the score that count their work (SEARCH-CROSS). */
+export type SearchTerm = "crossing" | "turn" | "inkFirst";
+
+/** The work of one opt-in term of the score (SEARCH-CROSS). */
+export interface SearchTermWork {
+  /** The number of the plans that the term scored. */
+  readonly calls: number;
+  /** The route points that the term read. The term `inkFirst` reads the points of the first routes one time. */
+  readonly steps: number;
+}
+
+/** The work of the opt-in terms of the score. Only a term that is on has an entry. */
+export type SearchTermWorks = Partial<Record<SearchTerm, SearchTermWork>>;
+
+/** This function gives the opt-in terms of the score that the options turn on. */
+function termsOn(o: Readonly<SearchOptions>): SearchTerm[] {
+  const on: SearchTerm[] = [];
+  if ((o.crossingWeight ?? 0) > 0) on.push("crossing");
+  if ((o.turnWeight ?? 0) > 0) on.push("turn");
+  if (o.inkBase === "first") on.push("inkFirst");
+  return on;
+}
+
+/** This function gives the total length of the routes. */
+function totalLength(routes: readonly Route[]): number {
+  let total = 0;
+  for (const r of routes) total += polylineLength(r.points);
+  return total;
+}
+
+/** This function gives the number of the points of the routes. */
+function pointCount(routes: readonly Route[]): number {
+  let n = 0;
+  for (const r of routes) n += r.points.length;
+  return n;
+}
+
 /**
- * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180 - wx R1 / m`. Higher is better.
- * B3 is the 0.95 quantile of the stretch against the first routes. The score reads only the graph and the routes of the plan.
+ * This function gives the score of the routes. The value `firstLength` is the total length of the first routes, for `inkBase` `first`.
+ * The function `count` gets each opt-in term that the score calls.
  */
-export function searchScore(graph: Graph, routes: readonly Route[], first: readonly Route[], o: Readonly<SearchOptions>): number {
-  const ink = inkSaved(routes);
+function scoreOfRoutes(
+  graph: Graph,
+  routes: readonly Route[],
+  first: readonly Route[],
+  firstLength: number,
+  o: Readonly<SearchOptions>,
+  count?: (term: SearchTerm) => void,
+): number {
+  const ink = o.inkBase === "first" ? inkSaved(routes, firstLength) : inkSaved(routes);
   const stretch = bundleStretch(routes, first).q95;
   const amb = o.ambiguityWeight > 0 ? ambiguity(graph, routes).value : 0;
   const angle = o.angleWeight > 0 ? mergeAngle(routes) / 180 : 0;
   const cross = (o.crossingWeight ?? 0) > 0 ? measureQuality(graph, { routes }).crossings / Math.max(1, routes.length) : 0;
-  return o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle - (o.crossingWeight ?? 0) * cross;
+  let score = o.inkWeight * ink - o.stretchWeight * stretch - o.ambiguityWeight * amb - o.angleWeight * angle - (o.crossingWeight ?? 0) * cross;
+  // The turn term changes the score only when it is on. Thus the score of each other set of options does not change.
+  const turnWeight = o.turnWeight ?? 0;
+  if (turnWeight > 0) score -= turnWeight * totalTurn(routes).mean;
+  if (count) for (const term of termsOn(o)) count(term);
+  return score;
+}
+
+/**
+ * This function gives the score of the routes of a plan: `w1 B1 - w3 B3 - w4 B4 - w6 B6 / 180 - wx R1 / m - wt R4`. Higher is better.
+ * B3 is the 0.95 quantile of the stretch against the first routes. The score reads only the graph and the routes of the plan.
+ * R4 is the mean total turn of a route, in half turns. With `inkBase` `first`, B1 divides the drawn ink by the length of the first routes.
+ */
+export function searchScore(graph: Graph, routes: readonly Route[], first: readonly Route[], o: Readonly<SearchOptions>): number {
+  return scoreOfRoutes(graph, routes, first, o.inkBase === "first" ? totalLength(first) : 0, o);
 }
 
 /**
@@ -105,6 +182,11 @@ export interface SearchRun {
   readonly evaluations: number;
   /** The units of `workUnits` that the measures of the plans took. */
   readonly work: number;
+  /**
+   * The work of each opt-in term of the score (SEARCH-CROSS). The value is there only when a term is on.
+   * The units of `work` do not hold this work, so the work budget stops at the same plan as before.
+   */
+  readonly terms?: SearchTermWorks;
 }
 
 /** One plan that `searchRun` measured, for the observer of `searchRun` (SEARCH-OBJECTIVE). */
@@ -150,12 +232,21 @@ export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>, obser
   const plugs = new Map(edgePlugs(graph).map((p) => [p.edge.id, p] as const));
   const routes = firstRoutes(input);
   const first = follow(graph, { highways: [] }).routes;
+  const firstLength = o.inkBase === "first" ? totalLength(first) : 0;
+  const on = termsOn(o);
+  const termWork = new Map<SearchTerm, { calls: number; steps: number }>(on.map((t) => [t, { calls: 0, steps: t === "inkFirst" ? pointCount(first) : 0 }]));
   let work = 0;
   let last: Result | undefined;
   const scoreOf = (plan: HighwayPlan): number => {
     const from = workCounts();
     last = follow(graph, plan);
-    const score = searchScore(graph, last.routes, first, o);
+    const points = on.length > 0 ? pointCount(last.routes) : 0;
+    const count = (term: SearchTerm): void => {
+      const w = termWork.get(term)!;
+      w.calls++;
+      if (term !== "inkFirst") w.steps += points;
+    };
+    const score = scoreOfRoutes(graph, last.routes, first, firstLength, o, on.length > 0 ? count : undefined);
     work += workSince(from);
     return score;
   };
@@ -226,5 +317,6 @@ export function searchRun(input: HighwayInput, o: Readonly<SearchOptions>, obser
     if (score > bestScore + 1e-12) [best, bestScore] = [plan, score];
     if (n % SWEEP === 0) temperature *= 0.95;
   }
-  return { plan: best, evaluations: n, work };
+  if (on.length === 0) return { plan: best, evaluations: n, work };
+  return { plan: best, evaluations: n, work, terms: Object.fromEntries(termWork) as SearchTermWorks };
 }

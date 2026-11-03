@@ -8,17 +8,21 @@ import { quantile } from "./stats.ts";
 /**
  * This function gives the share of the ink that shared segments save (B1 of MEAS0): `inkSaved = 1 - ink(S) / Σ_e L(r_e)`.
  * `ink(S)` counts a shared segment one time, as `measureQuality` does. The scale is 0 to 1, and higher is better. The cost is `n log n`.
+ *
+ * The argument `base` is a fixed length in place of `Σ_e L(r_e)` (SEARCH-CROSS). Then the value changes only with `ink(S)`.
+ * With `base`, the value can be below 0. A route that is longer than its base route makes it lower.
  */
-export function inkSaved(routes: readonly Route[]): number {
+export function inkSaved(routes: readonly Route[], base?: number): number {
   let total = 0;
   for (const r of routes) {
     total += polylineLength(r.points);
     WORK.score += r.points.length;
   }
-  if (total <= 0) return 0;
+  const length = base ?? total;
+  if (length <= 0) return 0;
   let ink = 0;
   for (const [a, b] of drawnSegments(routes)) ink += dist(a, b);
-  return Math.max(0, 1 - ink / total);
+  return base === undefined ? Math.max(0, 1 - ink / length) : 1 - ink / length;
 }
 
 /** The ambiguity of a result (B4 of MEAS0). */
