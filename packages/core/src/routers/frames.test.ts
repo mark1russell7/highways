@@ -1,3 +1,4 @@
+import { mulberry32 as seeded } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
 import { graphInput, inputGraph } from "../bench/screen/forms.ts";
 import { segmentHitsBox, type Box, type Point } from "../geom.ts";
@@ -71,18 +72,6 @@ function problems(g: Graph, routes: readonly Route[], inset: number): string[] {
         for (let i = 1; i < pts.length; i++) if (segmentHitsBox(pts[i - 1]!, pts[i]!, n.box, 1e-6)) out.push(`${edge.id}: segment ${i} crosses ${n.id}`);
   }
   return out;
-}
-
-/** A seeded generator (mulberry32). */
-function seeded(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /** A seeded variant of the board: 4 to 8 rows of other widths and places, plugs at random fractions on all four walls, and edges from random rows. */

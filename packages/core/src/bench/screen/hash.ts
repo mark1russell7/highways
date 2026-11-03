@@ -1,6 +1,9 @@
 // The hash, the canonical JSON and the seeded random numbers of the screen. `sha256Hex`, `canonicalJson` and `RECORD_EPS` come from
-// `@mark1russell7/layout-contract` (PORTFOLIO-FIT). The other functions have no equal in the contract, so they stay here.
+// `@mark1russell7/layout-contract` (PORTFOLIO-FIT). `mulberry32` comes from `@mark1russell7/rigor-generators` (HOME-COPIES).
+// The other functions have no equal in a home package, so they stay here.
 import { canonicalJson, sha256Hex } from "@mark1russell7/layout-contract";
+
+export { mulberry32 } from "@mark1russell7/rigor-generators";
 
 export { canonicalJson, RECORD_EPS, sha256Hex } from "@mark1russell7/layout-contract";
 
@@ -27,7 +30,10 @@ export function documentHash(value: object): string {
   return sha256Hex(canonicalJson(rest)).slice(0, 16);
 }
 
-/** This function gives the 32-bit FNV-1a hash of the UTF-8 bytes of a text, as an unsigned integer. */
+/**
+ * This function gives the 32-bit FNV-1a hash of the UTF-8 bytes of a text, as an unsigned integer.
+ * This copy stays. It encodes a lone surrogate as 3 bytes. The `fnv1a32` of `@mark1russell7/rigor-generators` encodes it as U+FFFD, and its hash is different.
+ */
 export function fnv1a32(text: string): number {
   let h = 0x811c9dc5;
   for (const byte of utf8(text)) {
@@ -40,17 +46,6 @@ export function fnv1a32(text: string): number {
 /** This function gives the seed of one step of a generator: `fnv1a32("<seed>:<step>")`. */
 export function stepSeed(seed: number, step: string): number {
   return fnv1a32(`${seed}:${step}`);
-}
-
-/** This function gives the generator `mulberry32` for a seed. Each call gives the next number from 0 to below 1. */
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return (): number => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /** This function rounds a number to 3 decimals (a step of `RECORD_EPS`), as the files of a corpus keep it. The value `-0` becomes `0`. */

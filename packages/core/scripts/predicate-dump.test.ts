@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { segmentHitsBox, segmentHitsRect, segmentsCross } from "../src/geom.ts";
+import { crossing } from "../src/highways/mesh/index.ts";
 import { nearestCentre } from "../src/highways/territories/index.ts";
 import type { Graph } from "../src/model.ts";
-import { predicateSink } from "../src/predicate-sink.ts";
+import { CALL_SITE_RULES, predicateSink } from "../src/predicate-sink.ts";
 import { graphInput, type LayoutInput } from "../src/bench/screen/index.ts";
 import { boxIsNear, clipLength, crossIsNear, dumpBoards, PredicateRecorder, screenBoard, segmentDepth, sideIsNear, summaryText } from "./predicate-dump.ts";
 
@@ -33,7 +34,31 @@ describe("predicate dump", () => {
     expect(lines).toHaveLength(2);
     expect(lines[0]).toMatchObject({ case: "test/board", fn: "geom.segmentsCross", a: [0, 0], b: [2, 0], c: [1, 0], d: [3, 0], floatAnswer: false, n: 1 });
     expect(String(lines[0]!["via"])).toMatch(/predicate-dump\.test\.ts:\d+$/);
+    expect(lines[0]).not.toHaveProperty("rule");
+    expect(Object.keys(lines[0]!)).toEqual(["case", "fn", "a", "b", "c", "d", "floatAnswer", "via", "n"]);
     expect(lines[1]).toMatchObject({ case: "test/board", totalSegmentPairs: 1, nearSegmentPairs: 1, totalBoxTests: 0, lines: 1 });
+  });
+
+  it("gives the key of the rule to a line of mesh.crossing, a site of CALL_SITE_RULES", () => {
+    const lines = dumpOne(() => {
+      // A touch at an inner point: the closed test of the mesh gives a crossing.
+      expect(crossing(P(0, 0), P(2, 0), P(1, 0), P(1, 3))).toBeDefined();
+    });
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatchObject({ fn: "mesh.crossing", floatAnswer: true, rule: "mesh.crossing", n: 1 });
+    expect(Object.keys(lines[0]!)).toEqual(["case", "fn", "a", "b", "c", "d", "floatAnswer", "rule", "via", "n"]);
+    expect(Object.keys(CALL_SITE_RULES)).toContain(lines[0]!["rule"]);
+  });
+
+  it("gives the key of the rule to a side line of physics.outOf, and no rule to the other side lines", () => {
+    const lines = dumpOne(() => {
+      predicateSink!.side("physics.outOf", P(1, 1), P(0, 0), P(2, 2), CALL_SITE_RULES["physics.outOf"].zero);
+      predicateSink!.side("test.side", P(1, 1), P(0, 0), P(2, 2), 0);
+    });
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toMatchObject({ fn: "physics.outOf", floatAnswer: -1, rule: "physics.outOf" });
+    expect(lines[1]).toMatchObject({ fn: "test.side", floatAnswer: 0 });
+    expect(lines[1]).not.toHaveProperty("rule");
   });
 
   it("finds a near pair at a large scale with the relative tolerance", () => {
