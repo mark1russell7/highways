@@ -1,6 +1,6 @@
 {
   "schema": "sections-gate-base/1",
-  "commit": "bce22a5590ec8dd49d92b84f1e056cc1ca02b800",
-  "date": "2026-11-02",
-  "reason": "The first fixed base: the head of main when the gate merges (GATE-LIMITS slice 1). The sections routers have the SECTIONS-SLOW drift at this commit, and the gate keeps them from a larger one."
+  "commit": "25a2be43b2eff6d771fc765b06c94f9b9cc0cb80",
+  "date": "2026-11-03",
+  "reason": "SEARCH-SPEED gain (#259). The confirm run 41646787837 on main is quiet (A/A spread 0.008) and gives head / old fixed base bce22a5 = 0.809. The PR run of #261 gave 0.774. The fixed base moves to 25a2be4, so the gate keeps the gain."
 }
