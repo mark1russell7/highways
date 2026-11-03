@@ -162,7 +162,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
 | R16 | Lane balance | Even gaps between parallel routes, also when each gap is wide | For each leg, the nearest leg of other edges at each side within 5° of parallel and 8 lane widths, with the overlap `w` and the gap `g`: `cv = sd_w(g) / mean_w(g)`, and `low` is the share of `w` with `g < median_w(g) / 2` | `cv` no unit and share 0..1, `↓` | `n log n` | score | yes, `R16.cv` and `R16.low` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
-| R17 | Row room | Room on the wall for the row of each port | For the plugs of each wall with `rowHeight` `h_i`, centered on the plug: `fit = count(row in its wall, with no overlap of a row or a plug) / count(rows)`, and `gap = min (a_(i+1) - a_i) / mean(h_i, h_(i+1))` | `fit` 0..1, `↑`, `gap` no unit, `↑` | `n log n` | score | yes, `R17.fit` and `R17.gap` of the screen, only on a board with rows | Own (PLUG-ROW-GAP) |
+| R18 | Row room | Room on the wall for the row of each port | For the plugs of each wall with `rowHeight` `h_i`, centered on the plug: `fit = count(row in its wall, with no overlap of a row or a plug) / count(rows)`, and `gap = min (a_(i+1) - a_i) / mean(h_i, h_(i+1))` | `fit` 0..1, `↑`, `gap` no unit, `↑` | `n log n` | score | yes, `R18.fit` and `R18.gap` of the screen, only on a board with rows | Own (PLUG-ROW-GAP) |
 
 ### Notes on the routes
 
@@ -171,7 +171,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 - [Purchase 1997][purchase97] found no significant effect of the angular resolution or of the orthogonality. Thus R11 and R14 get low weights, but MEAS1 still reports them.
 - R14 is a style, not a quality. A host app with an orthogonal style sets a high weight. A host app with curves sets a weight of 0.
 - R12 counts the parallel ink that is too near. R16 counts uneven gaps, also when each gap is wide. On `screen-v3`, their Spearman correlation is 0.64, so they are not independent. `R16.low` against R12 is 0.22.
-- R17 has no value on a board without `rowHeight`. So the corpus of today has no R17, and no gate reads it.
+- R18 has no value on a board without `rowHeight`. So the corpus of today has no R18, and no gate reads it.
 
 ## Bundles
 

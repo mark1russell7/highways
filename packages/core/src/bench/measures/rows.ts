@@ -1,5 +1,5 @@
 /**
- * The measure of the rows of the ports (PLUG-ROW-GAP): R17 tells if the row of each plug has room on its wall.
+ * The measure of the rows of the ports (PLUG-ROW-GAP): R18 tells if the row of each plug has room on its wall.
  */
 import type { Point } from "../../geom.ts";
 import { portOffset, type Graph, type Node, type Route, type Side } from "../../model.ts";
@@ -8,7 +8,7 @@ import { alongOf, roomOf } from "../../plugs/walls.ts";
 
 const EPS = 1e-6;
 
-/** The value of R17. */
+/** The value of R18. */
 export interface RowFit {
   /** The share of the rows that fit: each row stays on its wall, and it overlaps no other row or plug. */
   readonly fit: number;
@@ -23,7 +23,7 @@ interface WallPlug {
 }
 
 /**
- * This function gives R17 of the routes on a board, or `undefined` for a board without rows.
+ * This function gives R18 of the routes on a board, or `undefined` for a board without rows.
  * A plug is the first or the last point of a route. All the ends of one port are one plug.
  * A fixed port with a row counts also when no route uses it.
  */

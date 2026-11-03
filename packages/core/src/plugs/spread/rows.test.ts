@@ -45,7 +45,7 @@ function rowAndPlug(along: number, y: number): Graph {
 }
 
 describe("the row height of a port in the plug strategy spread (PLUG-ROW-GAP)", () => {
-  it("raises R17 on a board of tall rows: from 0 of 8 rows to 8 of 8, and the gap from 8/55 to 1", () => {
+  it("raises R18 on a board of tall rows: from 0 of 8 rows to 8 of 8, and the gap from 8/55 to 1", () => {
     const graph = tallRows(55);
     const before = rowFit(graph, routesOf(spreadEnds({ graph: withoutRows(graph) })));
     const after = rowFit(graph, routesOf(spreadEnds({ graph })));

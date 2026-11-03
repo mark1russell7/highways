@@ -101,9 +101,9 @@ const ROWS: readonly Row[] = [
   // BALANCE-STABILITY. R16 is the spread of the gaps between neighbor parallel legs of two edges, also when each gap is wide.
   ["R16.cv", "R16", "route.balance.cv", "no unit", "lower", true, "The spread of the gaps between parallel routes: the standard deviation of the gaps over their mean. A value of 0 is even."],
   ["R16.low", "R16", "route.balance.low", "0 to 1", "lower", true, "The share of the parallel overlap with a gap less than half of the median gap."],
-  // PLUG-ROW-GAP. R17 reads the `rowHeight` of the ports, so a board without rows has no value.
-  ["R17.fit", "R17", "route.row.fit", "0 to 1", "higher", true, "The share of the rows of the ports that fit on their walls, with no overlap of another row or plug. More is better."],
-  ["R17.gap", "R17", "route.row.gap", "no unit", "higher", true, "The least distance of two neighbor plugs of one wall, in the mean height of their rows. A value of 1 or more leaves room for each row."],
+  // PLUG-ROW-GAP. R18 reads the `rowHeight` of the ports, so a board without rows has no value.
+  ["R18.fit", "R18", "route.row.fit", "0 to 1", "higher", true, "The share of the rows of the ports that fit on their walls, with no overlap of another row or plug. More is better."],
+  ["R18.gap", "R18", "route.row.gap", "no unit", "higher", true, "The least distance of two neighbor plugs of one wall, in the mean height of their rows. A value of 1 or more leaves room for each row."],
   ["ink", "R1", "route.ink", "units", "lower", true],
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
