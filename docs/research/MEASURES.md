@@ -262,6 +262,7 @@ A zoom level shows a group as one item, and the edges between two items as one l
 | Z10 | Route stability | Routes that move little after a small change of the input | `measureStability(before, after)`: the mean and the max of the Fréchet distance, and the share of the routes that move | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z10.mean`, `Z10.max` and `Z10.moved` of the suite, up to 1000 nodes | [Bridgeman 2000][bridgeman00], [Archambault 2011][archambault11] |
 | Z11 | Move response | Routes that answer a move of one node only near that node | One node moves by one unit `u` and the edges stay: `gain = Σ_e frechet / u / max(1, degree)`, and `spill` is the share of the other routes that move more than 1 unit | `gain` no unit, 1 is local, and share 0..1, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z11.gain` and `Z11.spill` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
 | Z12 | Seed stability | Routes that do not change with the seed of a strategy | A strategy with the option `seed` routes again with `seed + 1`: the mean Fréchet distance and the share of the routes that move. A strategy without a seed has 0 | units and share, `↓` | `extra run`, then `quadratic` for each route | score | yes, `Z12.mean` and `Z12.moved` of the screen, up to 1000 nodes | [Bridgeman 2000][bridgeman00] |
+| Z13 | Flicker | Edges that do not leave and join the highways again and again over small edits | Over the seeded edits of the screen option `edits`, count each edge that is in a highway before an edit and alone after it, or the reverse. `flicker = flips / edges`, over the edges of one edit or more | count for each edge, `↓` | `extra run` for each edit, then `linear` | score | yes, `Z13.flicker` of the screen and of `compareAnyStep` with `edits`, for the step `highway` | Own (SPLIT-HYSTERESIS) |
 
 ### Notes on the zoom levels
 
@@ -272,6 +273,7 @@ A zoom level shows a group as one item, and the edges between two items as one l
 - Z12 reads only the option `seed` of the strategy. A strategy that keeps a seed inside, as the fit of `preferences`, has 0. A wrapper with its own fixed options hides the seed too.
 - The input change of Z10 and G9 is seeded: one node moves by `u`, one edge is added, or one edge is removed. The change is the same for each strategy.
 - For the step `highway`, the screen option `edits` gives Z10 over a sequence of seeded changes, with the plan before each change. It also gives the churn of the highways and the share of the highways that keep their id (BUILD-W2A).
+- Z13 counts only the joins and the leaves of an edge. A move from one highway to another highway is not a flip, because the churn of Z10 counts it. The gate `split-hysteresis` aims to lower Z13.
 
 ## Room
 

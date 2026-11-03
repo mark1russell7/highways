@@ -3,7 +3,7 @@ import { CASES } from "../../cases.ts";
 import { memberAt, type Highway, type HighwayPlan } from "../../highways/model.ts";
 import { STRATEGIES } from "../../strategies/builtins.ts";
 import { getStrategy } from "../../strategies/model.ts";
-import { highwayChurn, highwayEdits, highwayIdKeep } from "./highways.ts";
+import { highwayChurn, highwayEdits, highwayFlips, highwayIdKeep } from "./highways.ts";
 
 const spine = [
   { x: 0, y: 0 },
@@ -39,6 +39,17 @@ describe("highwayIdKeep", () => {
   });
 });
 
+describe("highwayFlips (Z13)", () => {
+  it("counts the edges that join or leave the highways, and not a move from one highway to another", () => {
+    const before: HighwayPlan = { highways: [highway("h0", ["a", "b"]), highway("h1", ["c", "d"])] };
+    // The edge a leaves, the edge e joins, and the edge c moves from h1 to h2.
+    const after: HighwayPlan = { highways: [highway("h0", ["b", "e"]), highway("h2", ["c", "d"])] };
+    expect(highwayFlips(before, before, all)).toBe(0);
+    expect(highwayFlips(before, after, all)).toBe(2);
+    expect(highwayFlips(before, after, new Set(["a", "c"]))).toBe(1);
+  });
+});
+
 describe("highwayEdits", () => {
   const graph = CASES.find((c) => c.name === "case-hub-chain")!.make();
 
@@ -47,6 +58,7 @@ describe("highwayEdits", () => {
     const one = highwayEdits(graph, corridors, undefined, 2, 7);
     expect(highwayEdits(graph, corridors, undefined, 2, 7)).toEqual(one);
     expect(one.mean).toBeGreaterThanOrEqual(0);
+    expect(one.flicker).toBeGreaterThanOrEqual(0);
     for (const v of [one.moved, one.churn]) {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
@@ -59,5 +71,11 @@ describe("highwayEdits", () => {
     expect(ids.mean).toBe(corridors.mean);
     expect(ids.churn).toBe(corridors.churn);
     if (!Number.isNaN(ids.ids)) expect(ids.ids).toBe(1);
+  });
+
+  it("gives the flicker Z13 to the gate split-hysteresis, with its memory from run to run", () => {
+    const gated = highwayEdits(graph, getStrategy(STRATEGIES, "highway", "corridors+split-hysteresis"), undefined, 3, 1);
+    expect(gated.flicker).toBeGreaterThanOrEqual(0);
+    expect(highwayEdits(graph, getStrategy(STRATEGIES, "highway", "corridors+split-hysteresis"), undefined, 3, 1)).toEqual(gated);
   });
 });

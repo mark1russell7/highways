@@ -162,6 +162,8 @@ const ROWS: readonly Row[] = [
   ["Z11.spill", "Z11", "route.stability.move.spill", "0 to 1", "lower", false, "The share of the routes of other nodes that move after one node moves by one unit. A value of 0 is a local response."],
   ["Z12.mean", "Z12", "route.stability.seed.mean", "units of the board", "lower", false, "The mean movement of the routes with the next seed of the strategy. A strategy without a seed has 0."],
   ["Z12.moved", "Z12", "route.stability.seed.moved", "0 to 1", "lower", false, "The share of the routes that move with the next seed of the strategy. A strategy without a seed has 0."],
+  // SPLIT-HYSTERESIS. Z13 is the flicker of the highway membership of the edges over the seeded edits of the screen option `edits`.
+  ["Z13.flicker", "Z13", "route.stability.highway-flicker", "count for each edge", "lower", false, "The mean count of the joins and the leaves of each edge over the seeded edits. A value of 0 tells that no edge joins or leaves a highway."],
   // The zoom levels and the groups. The default grouping rule reads the positions, so most of these measures depend on the placement.
   ["level-nesting", "Z6", "route.level.nesting", "count", "lower", false],
   // MEAS3A, for the steps `router`, `highway` and `group`. Z2 is the count of the hard rule `link-ends`. Z9 needs a result with zoom levels.

@@ -33,6 +33,14 @@ describe("compareAnyStep (COMPARE-ALL)", () => {
     expect(all.front.length).toBeGreaterThan(0);
   });
 
+  it("gives the flicker Z13 and Z10 over edits to the step highway only with the option edits", () => {
+    const registry = createRegistry([getStrategy(STRATEGIES, "highway", "corridors+split-hysteresis")]);
+    expect(compareAnyStep("highway", tiny, { registry, stabilityMax: 0 }).rows[0]!.values["Z13.flicker"]).toBeUndefined();
+    const row = compareAnyStep("highway", tiny, { registry, stabilityMax: 0, edits: 2 }).rows[0]!;
+    expect(row.values["Z13.flicker"]).toBeGreaterThanOrEqual(0);
+    expect(row.values["Z10.churn"]).toBeTypeOf("number");
+  });
+
   it("opens the gaps of a packed board with each room strategy, and measures the open board", () => {
     const board = packedGridBoard();
     const all = compareAnyStep("room", board);

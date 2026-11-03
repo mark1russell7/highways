@@ -1,6 +1,6 @@
 import { follow } from "../../highways/follow.ts";
 import { commonEdges, matchHighways } from "../../highways/gates/model.ts";
-import type { HighwayPlan } from "../../highways/model.ts";
+import { previousOf, type HighwayPlan } from "../../highways/model.ts";
 import { wayOptionsOf } from "../../highways/router.ts";
 import type { Graph } from "../../model.ts";
 import type { Strategy } from "../../strategies/model.ts";
@@ -49,6 +49,20 @@ export function highwayIdKeep(before: HighwayPlan, after: HighwayPlan, edges: Re
   return { matched: match.size, kept, share: match.size === 0 ? Number.NaN : kept / match.size };
 }
 
+/**
+ * This function counts the joins and the leaves of the edges over one edit (Z13, SPLIT-HYSTERESIS).
+ * An edge joins when it is a member of no highway before the edit and of a highway after the edit. A leave is the reverse.
+ * A move from one highway to another highway is not a join or a leave. Only the edges of `edges` count.
+ */
+export function highwayFlips(before: HighwayPlan, after: HighwayPlan, edges: ReadonlySet<string>): number {
+  const membersOf = (plan: HighwayPlan): Set<string> => new Set(plan.highways.flatMap((h) => h.members.map((m) => m.edge)));
+  const a = membersOf(before);
+  const b = membersOf(after);
+  let flips = 0;
+  for (const e of edges) if (a.has(e) !== b.has(e)) flips++;
+  return flips;
+}
+
 /** The stability of a highway strategy over a seeded sequence of edits. Each value is the mean over the edits. */
 export interface HighwayEdits {
   /** The mean Fréchet distance of the routes over one edit, in units of the board (Z10). */
@@ -59,11 +73,16 @@ export interface HighwayEdits {
   readonly churn: number;
   /** The share of the matched highways that keep their id over one edit (`highwayIdKeep`), or `NaN` without a match. */
   readonly ids: number;
+  /**
+   * The flicker of the edges (Z13): the mean count of the joins and the leaves of each edge over all the edits (`highwayFlips`).
+   * The mean is over the edges that are in the graphs of one edit or more. Lower is better.
+   */
+  readonly flicker: number;
 }
 
 /**
  * This function measures a highway strategy over a sequence of `edits` seeded edits. Each edit is the small change of `changeGraph` with the seed `seed + i`.
- * The strategy gets the graph and its plan before the edit as `previous`, so a strategy with memory can keep its highways.
+ * The strategy gets the graph and its plan before the edit as `previous` (`previousOf`), so a strategy with memory can keep its highways.
  * `follow` routes each plan with the way options of the strategy. The same graph, strategy, options and seed give the same values.
  */
 export function highwayEdits(graph: Graph, strategy: Strategy<"highway", object>, options: object | undefined, edits: number, seed = 1): HighwayEdits {
@@ -75,9 +94,11 @@ export function highwayEdits(graph: Graph, strategy: Strategy<"highway", object>
   const moved: number[] = [];
   const churn: number[] = [];
   const ids: number[] = [];
+  const seen = new Set<string>();
+  let flips = 0;
   for (let i = 0; i < edits; i++) {
     const next = changeGraph(g, seed + i).graph;
-    const p = strategy.run({ graph: next, previous: { graph: g, plan } }, options);
+    const p = strategy.run({ graph: next, previous: previousOf(g, plan) }, options);
     const r = follow(next, p, way);
     const s = routeStability(g, routes, r, { seed });
     const edges = commonEdges(g, next);
@@ -86,8 +107,10 @@ export function highwayEdits(graph: Graph, strategy: Strategy<"highway", object>
     churn.push(highwayChurn(plan, p, edges));
     const keep = highwayIdKeep(plan, p, edges);
     if (keep.matched > 0) ids.push(keep.share);
+    flips += highwayFlips(plan, p, edges);
+    for (const e of edges) seen.add(e);
     [g, plan, routes] = [next, p, r];
   }
   const avg = (v: readonly number[]): number => (v.length === 0 ? Number.NaN : v.reduce((a, b) => a + b, 0) / v.length);
-  return { mean: avg(mean), moved: avg(moved), churn: avg(churn), ids: avg(ids) };
+  return { mean: avg(mean), moved: avg(moved), churn: avg(churn), ids: avg(ids), flicker: seen.size === 0 ? 0 : flips / seen.size };
 }

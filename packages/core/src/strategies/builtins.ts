@@ -17,6 +17,7 @@ import { breakEvenGate, type BreakEvenOptions } from "../highways/gates/breakeve
 import { hysteresisGate, type HysteresisOptions } from "../highways/gates/hysteresis/index.ts";
 import { stableIdGate, type StableIdOptions } from "../highways/gates/ids/index.ts";
 import { gateStrategy } from "../highways/gates/model.ts";
+import { splitHysteresisGate, type SplitHysteresisOptions } from "../highways/gates/split-hysteresis/index.ts";
 import { stretchGate, type StretchOptions } from "../highways/gates/stretch/index.ts";
 import { DIFFUSION_DEFAULTS, diffusionPlan, type DiffusionOptions } from "../highways/diffusion/index.ts";
 import { FLOW_CLUSTER_DEFAULTS, flowClusterPlan, type FlowClusterOptions } from "../highways/flow-clusters/index.ts";
@@ -437,7 +438,8 @@ const corridors: Strategy<"highway", CorridorOptions> = defineStrategy({
 /**
  * The built-in highway strategies: the decisions of the routers `trunks` and `shared` as plans, and corridor signatures (HWY-031).
  * The strategies `corridors+<gate>` put a gate of BUILD-W2A after `corridors`: `breakeven` (HWY-047), `stretch` (HWY-048), `ambiguity` (HWY-049),
- * `hysteresis` (HWY-046) and `ids` (HWY-054). `gateStrategy` puts a gate after any other plan.
+ * `hysteresis` (HWY-046) and `ids` (HWY-054). The strategy `corridors+split-hysteresis` puts the gate `split-hysteresis` (HWY-061) after `corridors`.
+ * `gateStrategy` puts a gate after any other plan.
  * `follow` routes the edges along a plan, and `highwayRouter` gives a router that does both.
  */
 export const highwayStrategies: {
@@ -507,6 +509,7 @@ export const highwayStrategies: {
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
   readonly "corridors+hysteresis": Strategy<"highway", CorridorOptions & HysteresisOptions>;
   readonly "corridors+ids": Strategy<"highway", CorridorOptions & StableIdOptions>;
+  readonly "corridors+split-hysteresis": Strategy<"highway", CorridorOptions & SplitHysteresisOptions>;
 } = Object.freeze({
   keys: defineStrategy({
     step: "highway",
@@ -1054,6 +1057,7 @@ export const highwayStrategies: {
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
   "corridors+hysteresis": gateStrategy(corridors, hysteresisGate),
   "corridors+ids": gateStrategy(corridors, stableIdGate),
+  "corridors+split-hysteresis": gateStrategy(corridors, splitHysteresisGate),
 });
 
 /** The built-in plug rules: the strategies of the step `plugs`. The router `corners` routes between their plugs with its option `plug`. */

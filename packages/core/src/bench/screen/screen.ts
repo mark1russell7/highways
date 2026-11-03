@@ -101,6 +101,7 @@ export interface ScreenOptions {
   /**
    * The number of seeded edits of the step `highway` (BUILD-W2A). Each highway strategy runs again after each edit of `highwayEdits`, with its plan before the edit.
    * The records then get `Z10.edits.*`, the churn of the highways and the share of the highways that keep their id.
+   * They also get the flicker `Z13.flicker`: the mean count of the joins and the leaves of each edge.
    * The default is 0: no edits. The other steps and the base routers do not read it.
    */
   readonly edits?: number;
@@ -479,7 +480,7 @@ export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenSt
       const plan = edits > 0 && row.result ? plans.get(row.strategy) : undefined;
       if (plan) {
         const z = highwayEdits(graph, plan, own[row.strategy], edits, seed);
-        Object.assign(values, { "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids });
+        Object.assign(values, { "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids, "Z13.flicker": z.flicker });
       }
       const output = rowHash(row);
       const counts = row.result ? options.moves?.(row.strategy, graph) : undefined;
