@@ -216,11 +216,12 @@ export class Grid<T> {
 }
 
 /**
- * This function gives the number of steps of a segment with the sides `dx` and `dy`: its length over `half`, rounded up, and at least 1.
- * It gives the value of `Math.hypot`, but it calls `Math.hypot` only for a length near a whole number of steps.
+ * This function gives the number of steps of a segment with the sides `dx` and `dy`.
+ * The number is the length over `half`, rounded up, and at least 1. It is the number that `Math.hypot` gives.
+ *
  * A side of 0 gives the other side as the length, as `Math.hypot` does.
- * Else the square root has a relative error of a few units in the last place, and so does `Math.hypot`.
- * Far from a whole number, the two lengths round up to the same number.
+ * Else the square root and `Math.hypot` differ by a few units in the last place.
+ * Far from a whole number of steps, the two lengths round up to the same number. Near a whole number, the function uses `Math.hypot`.
  */
 function steps(dx: number, dy: number, half: number): number {
   if (dx === 0 || dy === 0) return Math.max(1, Math.ceil((dx === 0 ? Math.abs(dy) : Math.abs(dx)) / half));

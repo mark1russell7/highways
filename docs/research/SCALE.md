@@ -172,3 +172,21 @@ A new test compares the search with a copy of the search of version 0.11.0, with
 The `Sections gate` run 41691623211 of #276 timed the fix. The A/A spread of the run is 0.025, below the noise cap 0.058.
 The head takes 0.943 times the time of its parent (41.4 s against 43.9 s), and 0.928 times the time of the fixed base `25a2be4`.
 The interval of the head over the A/A arm is 0.930 to 0.950. So the fix is faster, and the gain is 5 % to 7 %.
+
+### The walk of the grid (SECTIONS-SLOW step 3)
+
+The same profile gives `Grid.#walk` 8.3 % self time and 17.6 % total time. No fix changed it.
+Most of its time comes from the legs of `square` in `levels.ts`, through `Obstacles.clear`. Each leg is a different segment, so the fix is in the walk.
+The line data of the profile shows two costs in the walk:
+
+- The look-up of each bucket takes 2.0 % of all the time. The key of a bucket is not a small integer, so the map hashes a boxed number.
+- `Math.hypot` takes 1.8 % of all the time. It gives the number of steps of each segment.
+
+The fix ([#280](https://github.com/mark1russell7/highways/pull/280)) keeps the buckets in a table with open addressing, by the same keys. Each key gives the same list of items.
+
+A segment parallel to an axis uses its other side as its length. `Math.hypot` gives the same value.
+For a different segment, a square root gives the length. The square root and `Math.hypot` differ by a few units in the last place.
+Far from a whole number of steps, the two lengths round up to the same number. Near a whole number, the walk uses `Math.hypot`.
+
+So the walk has the same steps, the same buckets, the same items in the same order and the same work counts.
+A new test compares the grid with a copy of the grid of version 0.11.0, on seeded scripts of adds and queries.
