@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+import { aaId, pairedReport, type RawTimes } from "./paired.ts";
 
 const script = (name: string): string => fileURLToPath(new URL(`../${name}`, import.meta.url));
 const run = (name: string, ...args: string[]) => {
@@ -109,6 +110,32 @@ describe("promotion", () => {
     const r = run("promotion.ts", "--candidate", "c", "--baseline", "b", "--corpus", full, "--fresh", empty, "--out", join(d, "p.md"));
     expect(r.status).not.toBe(0);
     expect(r.text).toContain("The files of --fresh");
+  });
+
+  it("takes the time test from the home rigor-bench over the 5 paired time reports (WIN-TEST-HOME)", () => {
+    const d = temp();
+    const ids = Array.from({ length: 10 }, (_, i) => `t/f${i}/s0`);
+    const corpus = join(d, "corpus.jsonl");
+    writeFileSync(corpus, ["b", "c"].flatMap((strategy) => ids.map((input) => JSON.stringify({ step: "router", strategy, input, set: "t", seed: 0, measures: {}, hard: {} }))).join("\n") + "\n");
+    const arms = [{ id: "b" }, { id: "c" }, { id: aaId("b") }];
+    // The candidate takes 0.8 times the base, and the A/A copy of the base takes its time, with a small jitter.
+    const ms = (salt: number, factor: number, i: number, g: number): number => 10 * factor * (1 + 0.01 * Math.sin(1.7 * i + 2.3 * g + salt));
+    const files = Array.from({ length: 5 }, (_, j) => {
+      const times = (salt: number, factor: number, i: number) => [0, 1, 2].map((k) => ms(salt, factor, i, 3 * j + k));
+      const raw: RawTimes = {
+        ms: new Map(ids.map((id, i) => [id, new Map([["b", times(0, 1, i)], ["c", times(2, 0.8, i)], [aaId("b"), times(1, 1, i)]])])),
+        peak: new Map(ids.map((id) => [id, new Map<string, number>()])),
+      };
+      const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
+      const f = join(d, `paired-job${j + 1}.json`);
+      writeFileSync(f, JSON.stringify(pairedReport("fresh", env, "ci", arms, ids.map((id) => ({ id })), raw, { job: String(j + 1), roundOffset: 3 * j, order: "turn" })));
+      return f;
+    });
+    const r = run("promotion.ts", "--candidate", "c", "--baseline", "b", "--corpus", corpus, "--time", files.join(","), "--out", join(d, "p.md"));
+    expect(r.text).toContain('Time: the pooled outcome "faster"');
+    expect(r.text).toContain("over 5 jobs of 5 and 10 inputs: pass, and faster than the baseline.");
+    expect(r.text).toContain("The verdict of each job: 1: faster (Test CPU)");
+    expect(r.text).toContain("The balance removed 0 records.");
   });
 });
 

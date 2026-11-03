@@ -80,37 +80,37 @@ The tie applies only to the classification of each input and each board: the sig
 
 [The minimum effects](#the-minimum-effects) gives the value of `minEffect` for each measure of `highways`.
 
-<!-- shared:win-test -->
+<!-- linked:win-test -->
 ## The win test
 
-The test compares the candidate with the current default on each input of the corpus. The guard measures are the guard measures of the step, which each repository lists. The win measures are the measures that the record of the idea names in `wins`.
+The win test has one home: [docs/WIN-TEST.md of rigor](https://github.com/mark1russell7/rigor/blob/9ea14d175f3a7479c57199a4f71aa4944e956c20/docs/WIN-TEST.md). layout-contract, packing and highways use the same text.
 
-| Test | Rule |
-|---|---|
-| Hard rules | On each input, each hard count of the candidate is at most that of the default. Two runs give the same output. |
-| Median | For each guard measure, the median ratio is at most `1 + medianWorse`. |
-| Tail | For each guard measure, at most a `tailShare` of the inputs have a ratio above `1 + tailWorse`. |
-| Gain | One win measure has a median ratio of `1 - gainMin` or better. The sign test and the bootstrap of [The noise guard](#the-noise-guard) pass for it. |
-| Time | The time ratio of an input is `t / b`, with `t` the median time of the candidate and `b` that of the default in one `paired-time/1` report. The test uses 5 CI jobs in mode `fresh`, each with the A/A arm. Each case runs in its own fresh processes. The worst median ratio of the 5 jobs is at most `timeRatio`. The tail set holds the inputs with `b` or `t` of `timeFloorMs` or more. On the tail set, the worst `timeTailQ` quantile of the 5 jobs is at most `timeTail`. The large bench fixtures stay in their CI time limit. |
-| Stability | On the base and change pairs of the corpus, each stability measure is a guard measure. It passes the median and tail tests. |
+- The link names one commit. Thus the text at the link does not change.
+- `docs/shared.lock.json` pins the commit and the SHA-256 of the block in the field `linked`.
+- `node scripts/check-shared.mjs --remote` downloads the block and compares its hash with the lock.
+- A new version of the win test changes the commit and the hash of the lock, in a pull request of each repository.
+<!-- /linked:win-test -->
 
-The A/A arm of the same jobs gives the resolution of the time test, not a fixed constant.
+### The settings of the time test
 
-- The median decision is valid only when `timeRatio` is above the worst A/A p90 of the 5 jobs plus their spread.
-- The tail decision is valid only when `timeTail` is more than the worst A/A `timeTailQ` quantile of the tail set plus their spread.
-- The spread of 5 values is the largest value minus the smallest value. The resolution has no margin factor and no fixed tolerance.
-- Each decision uses the worst of the 5 jobs, so each job must pass. A candidate that passes in 4 jobs and not in the fifth fails.
-- A job counts only when its A/A band from p10 to p90 contains 1. A job with a band that does not contain 1 measured the runner.
-- A new job replaces a job that does not count. The record keeps the run of each job.
-- The A/A quantile uses the ratios of the `~aa` arm in `inputs[].ratio`, with the linear quantile of `paired-time/1`.
-- A decision that is not valid gives the verdict `cannot decide (noise)`. The record names the check and the A/A value. A candidate without a decision does not promote.
-- An input under `timeFloorMs` in the two arms is too small to be a cost to the user.
-- An empty tail set in the 5 jobs gives the line `tail: not measured, no input above timeFloorMs` in the record. It does not stop a promotion.
-- An empty tail set in only some jobs makes the tail decision not valid.
-- The record keeps the 5 medians and tails, the worst A/A values with their spreads, and the CI run. It keeps the CPU model of each job.
+The [time test](https://github.com/mark1russell7/rigor/blob/9ea14d175f3a7479c57199a4f71aa4944e956c20/docs/WIN-TEST.md#the-time-test) of the home has its settings in each repository. `scripts/promotion.ts` keeps them in its object `P`.
 
-CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default in one job, with a fresh process for each arm, each input and each round. The order of the arms rotates by the round.
-<!-- /shared:win-test -->
+| Setting | Value | Source |
+|---|---|---|
+| `timeMargin` | 0.05 | The joint bench of the home, and the default of `@mark1russell7/rigor-bench` |
+| `noiseCap` | 0.06 | The noise cap of [The sections time gate](#the-sections-time-gate). The home gives no value. |
+| `jobs` | 5 | The 5 jobs of the workflow `Screen` with the input `paired` |
+| `cases` | Each input of the corpus where each arm runs | The screen |
+| `rounds` | 3 | The default of `--paired-repeats` of the screen |
+| `timeFloorMs` | 5 | highways |
+| `timeTail` | 2.0 | highways |
+| `timeTailQ` | 0.95 | highways |
+| `timeTailLevel` | 0.95 | The default of the home |
+
+- The functions `pooledVerdict`, `balanceOrders` and `limitVerdict` of `@mark1russell7/rigor-bench` give the outcomes. `scripts/gates/win-time.ts` has no rule of its own.
+- Each job of the screen writes its job number and its round offset in its report. The base runs first in each even global round and last in each odd one.
+- Thus the records of the 5 jobs merge, and each pair turns its order over the merged rounds.
+- The time test does not use `timeRatio` of [The parameters](#the-parameters).
 
 <!-- shared:noise-guard -->
 ### The noise guard
@@ -291,7 +291,7 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 | `units`, `units of the board` | `{ rel: 0.01 }` | A length in pixels moves with each small move of a point. A change of 1% or less is not visible. |
 | `degrees` | `{ rel: 0.01 }` | An angle is a continuous value of the geometry, as a length. |
 
-The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
+The [time test](https://github.com/mark1russell7/rigor/blob/9ea14d175f3a7479c57199a4f71aa4944e956c20/docs/WIN-TEST.md#the-time-test) uses its own rules (`timeMargin` and `timeTail`), so the times have no row.
 
 `highways` imports `compareMeasure` and `minEffectOf` from the contract `@mark1russell7/layout-contract` (0.2.7 or later). The contract has no dependencies, so the import adds only the contract to the core. A test checks that the functions agree with this note.
 

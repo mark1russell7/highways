@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { aaId, armOrder, childResult, envOf, measureIsolated, quantileOf, runChild, type Arm, type ChildResult } from "./paired.ts";
+import { aaId, armOrder, childResult, envOf, firstOf, measureIsolated, quantileOf, runChild, type Arm, type ChildResult } from "./paired.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
 
@@ -27,6 +27,18 @@ describe("armOrder", () => {
 
   it("rotates the order by the round in mode fresh", () => {
     expect([0, 1, 2, 3].map((r) => armOrder(3, r, "fresh"))).toEqual([[0, 1, 2], [1, 2, 0], [2, 0, 1], [0, 1, 2]]);
+  });
+
+  it("puts the base first in each even round and last in each odd round with the order turn", () => {
+    expect([0, 1, 2, 3].map((r) => armOrder(3, r, "fresh", "turn"))).toEqual([[0, 1, 2], [1, 2, 0], [0, 2, 1], [2, 1, 0]]);
+    // Each pair of the base and another arm starts with the base in each second round.
+    for (const arm of [1, 2, 3]) {
+      const firsts = Array.from({ length: 8 }, (_, r) => {
+        const order = armOrder(4, r, "fresh", "turn");
+        return order.indexOf(0) < order.indexOf(arm) ? "a" : "b";
+      });
+      expect(firsts).toEqual(["a", "b", "a", "b", "a", "b", "a", "b"]);
+    }
   });
 });
 
@@ -140,6 +152,21 @@ describe("measureIsolated in mode fresh", () => {
       "B:x", "C:x", "A:x", "B:y", "C:y", "A:y",
       "C:x", "A:x", "B:x", "C:y", "A:y", "B:y",
     ]);
+  });
+
+  it("writes the job, the round offset and the order turn, and uses the global round for the order", async () => {
+    const log: string[] = [];
+    const arms = ["A", "B"].map((id) => ({ id, command: [id] }));
+    const r = await measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 2, mode: "fresh", order: "turn", roundOffset: 3, job: "2", startChild: fakeStart({ A: 1, B: 1 }, log), env });
+    expect([r.job, r.roundOffset, r.order]).toEqual(["2", 3, "turn"]);
+    // The global rounds are 3 and 4. Round 3 runs the A/A copy, B and then the base. Round 4 runs the base, B and then the A/A copy.
+    expect(log.map((l) => l.split(":")[0])).toEqual(["A", "B", "A", "A", "B", "A"]);
+    expect([0, 1].map((k) => firstOf(r, k, 0, 1))).toEqual(["b", "a"]);
+    expect([0, 1].map((k) => firstOf(r, k, 0, 2))).toEqual(["b", "a"]);
+    // A report without the fields keeps the order rotate of its local rounds.
+    const old = await measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 2, mode: "fresh", startChild: fakeStart({ A: 1, B: 1 }, []), env });
+    expect([old.job, old.roundOffset, old.order]).toEqual([undefined, undefined, undefined]);
+    expect([0, 1].map((k) => firstOf(old, k, 0, 1))).toEqual(["a", "b"]);
   });
 
   it("passes the warm-up count to the child, and adds the A/A arm with the command of the base", async () => {
