@@ -48,6 +48,8 @@ function problems(g: Graph, routes: readonly Route[], inset: number): string[] {
   const out: string[] = [];
   const nodes = new Map(g.nodes.map((n) => [n.id, n]));
   for (const { edge, frame, plug } of splitFrames(g).inner) {
+    // A sibling edge has no plug of a wall. The function siblingProblems checks it.
+    if (plug === undefined) continue;
     const r = routes.find((x) => x.edge === edge.id);
     if (!r) {
       out.push(`${edge.id}: no route`);
@@ -177,5 +179,125 @@ describe("the inner routes of a frame (INTERIOR-ROUTE)", () => {
     expect(file.boxes.find((b) => b.id === "r1")?.parent).toBe("card");
     expect(inputGraph(file).nodes.find((n) => n.id === "r1")?.parent).toBe("card");
     expect(inputGraph(file).nodes.find((n) => n.id === "card")).not.toHaveProperty("parent");
+  });
+});
+
+/**
+ * A made-up board for the sibling edges (FRAME-SIBLINGS). The card `P` holds the rows `d` and `e`, the block `m` between them and the inner card `Q`.
+ * The card `Q` holds the rows `q1`, `q2` and `q3`. The row `q2` is between `q1` and `q3`. The row `q1` has a fixed port and `q3` has a port on its west side.
+ */
+function siblings(): Graph {
+  const end = (node: string, port?: string): Edge["source"] => (port === undefined ? { node } : { node, port });
+  const edge = (id: string, s: string, t: string, sp?: string, tp?: string): Edge => ({ id, source: end(s, sp), target: end(t, tp) });
+  return {
+    nodes: [
+      { id: "P", box: { x: 100, y: 100, w: 520, h: 300 } },
+      { id: "d", parent: "P", box: { x: 120, y: 120, w: 120, h: 40 } },
+      { id: "m", parent: "P", box: { x: 110, y: 200, w: 200, h: 60 } },
+      { id: "e", parent: "P", box: { x: 120, y: 330, w: 120, h: 40 } },
+      { id: "Q", parent: "P", box: { x: 340, y: 120, w: 260, h: 260 } },
+      ...[0, 1, 2].map((i): Node => ({ id: `q${i + 1}`, parent: "Q", box: { x: 360, y: 140 + i * 60, w: 220, h: 30 } })),
+      { id: "q1p", parent: "Q", box: { x: 360, y: 320, w: 80, h: 30 }, ports: [{ id: "f", side: "east", along: 0.5 }] },
+      { id: "q3p", parent: "Q", box: { x: 500, y: 320, w: 80, h: 30 }, ports: [{ id: "w", side: "west" }] },
+      { id: "far", box: { x: 700, y: 100, w: 80, h: 40 } },
+    ],
+    edges: [
+      edge("de", "d", "e"),
+      edge("dQ", "d", "Q"),
+      edge("q13", "q1", "q3"),
+      edge("port", "q1p", "q3p", "f", "w"),
+      edge("loop", "q2", "q2"),
+      edge("cross", "d", "q1"),
+      edge("away", "e", "far"),
+    ],
+  };
+}
+
+/** This function gives the problems of each sibling route. A problem is no route, a wrong frame, a point out of the bounds, an end off its node or a crossing. */
+function siblingProblems(g: Graph, routes: readonly Route[], inset: number, orthogonal: boolean): string[] {
+  const out: string[] = [];
+  const nodes = new Map(g.nodes.map((n) => [n.id, n]));
+  const onBorder = (p: Point, b: Box): boolean => within(p, b) && (p.x === b.x || p.x === b.x + b.w || p.y === b.y || p.y === b.y + b.h);
+  for (const { edge, frame, plug } of splitFrames(g).inner) {
+    if (plug !== undefined) continue;
+    const r = routes.find((x) => x.edge === edge.id);
+    if (!r) {
+      out.push(`${edge.id}: no route`);
+      continue;
+    }
+    if (r.frame !== frame) out.push(`${edge.id}: the frame is ${String(r.frame)}, not ${frame}`);
+    const bounds = shrink(nodes.get(frame)!.box, inset);
+    const s = nodes.get(edge.source.node)!.box;
+    const t = nodes.get(edge.target.node)!.box;
+    r.points.forEach((p, i) => {
+      if (!within(p, bounds)) out.push(`${edge.id}: point ${i} (${p.x}, ${p.y}) is out of the bounds`);
+    });
+    if (!onBorder(r.points[0]!, s)) out.push(`${edge.id}: the first point is not on the source node`);
+    if (!onBorder(r.points.at(-1)!, t)) out.push(`${edge.id}: the last point is not on the target node`);
+    for (let i = 1; i < r.points.length; i++) {
+      const [a, b] = [r.points[i - 1]!, r.points[i]!];
+      if (orthogonal && a.x !== b.x && a.y !== b.y) out.push(`${edge.id}: segment ${i} is slanted`);
+      for (const n of g.nodes)
+        if (n.parent === frame && n.id !== edge.source.node && n.id !== edge.target.node && segmentHitsBox(a, b, n.box, 1e-6)) out.push(`${edge.id}: segment ${i} crosses ${n.id}`);
+    }
+  }
+  return out;
+}
+
+describe("the sibling edges of a frame (FRAME-SIBLINGS)", () => {
+  it("takes out each edge between two children of one frame as an inner edge of that frame, without a plug", () => {
+    const { graph, inner } = splitFrames(siblings());
+    expect(inner.map((i) => [i.edge.id, i.frame])).toEqual([
+      ["de", "P"],
+      ["dQ", "P"],
+      ["q13", "Q"],
+      ["port", "Q"],
+      ["loop", "Q"],
+    ]);
+    for (const i of inner) expect(i, i.edge.id).not.toHaveProperty("plug");
+    // An edge between children of two frames and an edge to a node outside the frame stay outer edges.
+    expect(graph.edges.map((e) => e.id)).toEqual(["cross", "away"]);
+  });
+
+  it("routes each sibling edge in its frame, around the other children, in the modes corners and gutter", () => {
+    const g = siblings();
+    for (const options of [{}, { smooth: true }, { frameInset: 8 }, { inner: "gutter" }] satisfies Partial<CornersOptions>[]) {
+      const routes = cornersRouter({ name: "corners", ...options }).route(g).routes;
+      const gutter = "inner" in options;
+      expect(siblingProblems(g, routes, gutter ? 0 : (options.frameInset ?? 5), gutter), JSON.stringify(options)).toEqual([]);
+      expect(routes.map((r) => r.edge).sort(), JSON.stringify(options)).toEqual(g.edges.map((e) => e.id).sort());
+      const by = byEdge(routes);
+      // The edge between two frames and the edge out of the frame keep an outer route.
+      expect([by.get("cross")?.frame, by.get("away")?.frame]).toEqual([undefined, undefined]);
+      // The fixed port of q1p is the middle of its east side. The route ends on the west side of q3p.
+      expect(by.get("port")!.points[0], JSON.stringify(options)).toEqual({ x: 440, y: 335 });
+      expect(by.get("port")!.points.at(-1)!.x, JSON.stringify(options)).toBe(500);
+    }
+  });
+
+  it("routes a self-loop in its frame: corners gives a stub out and back at one plug, gutter gives an orthogonal loop around the corner of the node", () => {
+    const g = siblings();
+    const loop = (options: Partial<CornersOptions>): Route => byEdge(cornersRouter({ name: "corners", ...options }).route(g).routes).get("loop")!;
+    const corner = loop({});
+    expect(corner.frame).toBe("Q");
+    expect(corner.points).toHaveLength(4);
+    expect(corner.points[0]).toEqual(corner.points[3]);
+    const gutter = loop({ inner: "gutter" });
+    expect(gutter.frame).toBe("Q");
+    expect(gutter.points.length).toBeGreaterThan(2);
+    expect(gutter.points[0]).not.toEqual(gutter.points.at(-1));
+  });
+
+  it("gives each sibling edge a route from each router, and keeps it an outer route in each router except corners", () => {
+    const g = siblings();
+    const names = splitFrames(g)
+      .inner.filter((i) => i.plug === undefined)
+      .map((i) => i.edge.id);
+    for (const s of listStrategies(STRATEGIES, "router")) {
+      const routes = byEdge(s.run(g, {}).routes);
+      for (const id of names) expect(routes.has(id), `${s.name} ${id}`).toBe(true);
+      const framed = names.filter((id) => routes.get(id)?.frame !== undefined);
+      expect(framed, s.name).toEqual(s.name.startsWith("corners") ? names : []);
+    }
   });
 });
