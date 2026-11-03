@@ -162,6 +162,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
 | R16 | Lane balance | Even gaps between parallel routes, also when each gap is wide | For each leg, the nearest leg of other edges at each side within 5° of parallel and 8 lane widths, with the overlap `w` and the gap `g`: `cv = sd_w(g) / mean_w(g)`, and `low` is the share of `w` with `g < median_w(g) / 2` | `cv` no unit and share 0..1, `↓` | `n log n` | score | yes, `R16.cv` and `R16.low` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
+| R17 | Routes with no graph | Each route has a way to use | The routes with two points whose facing plugs have no way through the corner graph (`noGraphRoutes`) | count, `↓` | `extra run` | score | yes, `route.no-graph` of the screen | Own (PASS-GRID) |
 
 ### Notes on the routes
 

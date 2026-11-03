@@ -337,7 +337,7 @@ function boardInput(set: string, name: string, graph: Graph): LayoutInput {
 }
 
 /**
- * The board sets of the dump. The 5 screen sets run each step of the screen.
+ * The board sets of the dump. The 6 screen sets run each step of the screen.
  * The set `fixtures` has the fixtures of the benchmark up to 1 000 nodes (seed 0) and its 3 case boards.
  * The set `fixtures-large` has the fixture of 10 000 nodes, with the steps `router` and `group`, as the large parts of the workflow `Bench`.
  * The set `dense-board` has the dense board of ROUTE-SCALE, with the steps `router` and `highway`.
