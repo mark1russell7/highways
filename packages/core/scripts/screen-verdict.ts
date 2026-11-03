@@ -202,8 +202,7 @@ function main(): void {
       ? `The sign test over ${families.length} families passes at no count. It needs 6 families or more at the level ${LEVEL}.\n`
       : `The sign test over ${families.length} families passes at ${power} of ${families.length} families or more on one side, with no ties, at the level ${LEVEL}.\n`,
   );
-  console.log("The columns `through` and `base through` are absolute counts of the breaks of `no-pass-through` over the records. A verdict does not show them.
-");
+  console.log("The columns `through` and `base through` are absolute counts of the breaks of `no-pass-through` over the records. A verdict does not show them.\n");
   console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against | through | base through |");
   console.log("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|");
   for (const r of rows) {
