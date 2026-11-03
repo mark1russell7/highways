@@ -75,6 +75,8 @@ function counts(g: Graph, routes: readonly Route[]): Counts {
   const plugOf = new Map<string, string>();
   for (const r of mine) {
     const { edge, frame, plug } = inner.find((x) => x.edge.id === r.edge)!;
+    // A sibling edge has no plug of a wall. The tests of the sibling edges are in frames.test.ts.
+    if (plug === undefined) continue;
     plugOf.set(r.edge, (plug === "source" ? edge.source.port : edge.target.port)!);
     const f = nodes.get(frame)!.box;
     const pts = plug === "source" ? r.points : [...r.points].reverse();

@@ -3,7 +3,7 @@
  * Then each router takes each plug rule, because each router keeps a fixed plug at its point.
  */
 import { nearestSide, SIDE_NORMAL, type Plug } from "../plugs.ts";
-import { nodeIndex, portOffset, resolvePorts, splitFrames, type Edge, type End, type Graph, type Node, type Port, type Side } from "../model.ts";
+import { nodeIndex, outerGraph, portOffset, type Edge, type End, type Graph, type Node, type Port, type Side } from "../model.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { getStrategy, type Registry, type Strategy } from "../strategies/model.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
@@ -85,14 +85,14 @@ function freeId(taken: Set<string>, base: string): string {
  * A free port has no `at` and no `along`. A port of several ends takes the plug of its first end, in the order of the edges.
  * A fixed port keeps its values, and a port of no edge stays free.
  *
- * The rule sees the graph of `corners`: the plugs of `resolvePorts`, without the inner edges of the frames.
+ * The rule sees the graph of `outerGraph`: the plugs of `resolvePorts`, without the inner edges with a plug of a frame.
  * The rule is a strategy of the step `plugs`, or the name of one in the registry.
  * A new fixed port with a `range` is in its range (PORT-RANGE). When the rule gives a plug out of the range, the new plugs of that side move into their ranges.
  * The output is a new graph. The function does not change the input.
  */
 export function fixPorts(graph: Graph, rule: Strategy<"plugs"> | string, options: FixPortsOptions = {}): Graph {
   const strategy = typeof rule === "string" ? getStrategy(options.registry ?? STRATEGIES, "plugs", rule) : rule;
-  const outer = splitFrames(resolvePorts(graph)).graph;
+  const outer = outerGraph(graph);
   const pairs = strategy.run({ graph: outer, ways: new WayFinder(outer.nodes, options.ways) }, options.plugOptions);
   const byEdge = new Map<string, (typeof pairs)[number][]>();
   for (const p of pairs) {

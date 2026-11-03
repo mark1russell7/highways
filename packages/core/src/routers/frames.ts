@@ -43,6 +43,9 @@ const EPS = 1e-6;
  * This function gives the inner routes of the inner edges (`splitFrames`). Each route stays in the bounds of its frame:
  * the box of the frame, smaller by `frameInset`. It goes around the other nodes of the frame.
  * It leaves the plug of the frame into the frame, along the normal of the wall. Each route has the id of its frame in `frame`.
+ *
+ * A sibling edge (no `plug`) goes from the plug of its source node to the plug of its target node, as an outer edge does.
+ * Its two ends are children of the frame, and the route goes around the other children.
  */
 export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: FrameOptions): Route[] {
   const byId = nodeIndex(graph);
@@ -60,6 +63,19 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
   const routes: Route[] = [];
   for (const { edge, frame, plug } of inner) {
     const f = byId.get(frame)!;
+    if (plug === undefined) {
+      // A sibling edge: the room of the frame itself, with the two ends in it.
+      const key = JSON.stringify([frame]);
+      let room = rooms.get(key);
+      if (!room) rooms.set(key, (room = makeRoom(f, [], children, byId, inset, options)));
+      const s = room.nodes.get(edge.source.node);
+      const t = room.nodes.get(edge.target.node);
+      if (!s || !t) continue;
+      const ps = placePlug(s, edge.source, center(t.box));
+      const pt = placePlug(t, edge.target, center(s.box));
+      routes.push({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame });
+      continue;
+    }
     const [own, far] = plug === "source" ? [edge.source, edge.target] : [edge.target, edge.source];
     const chain = chainOf(byId, frame, far.node);
     const key = JSON.stringify([frame, ...chain]);
@@ -96,14 +112,19 @@ function gutterFrameRoutes(inner: readonly InnerEdge[], options: FrameOptions, b
   const routes: (Route | undefined)[] = inner.map(() => undefined);
   inner.forEach(({ edge, frame, plug }, at) => {
     const f = byId.get(frame)!;
-    const [own, far] = plug === "source" ? [edge.source, edge.target] : [edge.target, edge.source];
-    const chain = chainOf(byId, frame, far.node);
+    const [own, far] = plug === "target" ? [edge.target, edge.source] : [edge.source, edge.target];
+    // A sibling edge starts at the plug of its source node, in the room of the frame itself.
+    const chain = plug === undefined ? [] : chainOf(byId, frame, far.node);
     const key = JSON.stringify([frame, ...chain]);
     let room = rooms.get(key);
     if (!room) rooms.set(key, (room = { nodes: roomNodes(f, chain, children, byId, f.box, options), items: [], frame: f.box }));
     const end = room.nodes.get(far.node);
     if (!end) return;
-    const fp = placePlug(f, own, center(end.box));
+    const from = plug === undefined ? room.nodes.get(own.node) : f;
+    if (!from) return;
+    const placed = placePlug(from, own, center(end.box));
+    // The plug of a node faces out of the node. The gutter mode reads the normal of a wall plug, so the normal turns round.
+    const fp: Plug = plug === undefined ? { point: placed.point, normal: { x: -placed.normal.x, y: -placed.normal.y } } : placed;
     const port = fixedPortPoint(end, far) === undefined ? undefined : placePlug(end, far, fp.point);
     const side = far.port === undefined ? undefined : end.ports?.find((p) => p.id === far.port)?.side;
     room.items.push({ at, edge: { plug: fp, end, ...(port ? { port } : {}), ...(side ? { side } : {}) } });
@@ -119,7 +140,7 @@ function gutterFrameRoutes(inner: readonly InnerEdge[], options: FrameOptions, b
       const points = found[k];
       if (!points) return;
       const { edge, frame, plug } = inner[at]!;
-      routes[at] = { edge: edge.id, points: plug === "source" ? points : points.reverse(), frame };
+      routes[at] = { edge: edge.id, points: plug === "target" ? points.reverse() : points, frame };
     });
   }
   return routes.filter((r): r is Route => r !== undefined);

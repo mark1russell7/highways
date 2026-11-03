@@ -121,8 +121,17 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
 - The router `corners` routes each inner edge inside its frame. The route stays in the box of the frame, smaller by the option `frameInset`.
 - The route goes around the other nodes of the frame. It leaves the plug of the wall into the frame, along the normal of the wall.
 - Each inner route has the id of its frame in `Route.frame`. The inner routes come after the outer routes.
-- Each other router gives no route for an inner edge. To route both, use your outer router, then `corners` for the inner routes.
+- Each other router gives no route for an inner edge with a plug of a frame. To route both, use your outer router, then `corners` for the inner routes.
 - An outer edge to a plug of the frame routes as before. The outer route and the inner route meet at the plug.
+- A sibling edge is an inner edge too (FRAME-SIBLINGS). It joins two nodes with the same `parent`, and no end is a plug of a frame.
+  - The `InnerEdge` of a sibling edge has no `plug`. Its `frame` is the parent of the two nodes.
+  - The router `corners` routes it in the frame, around the other children. The two ends use the plugs of their nodes, as an outer edge does.
+  - A port of the node at an end is not a plug of a frame. The route uses that port.
+  - The siblings of a frame in a frame stay in the inner frame.
+  - Each other router gives a sibling edge an outer route, as before. `outerGraph` keeps the sibling edges.
+  - With your outer router and `corners`, a sibling edge gets two routes. Keep the inner route of `corners`.
+  - A self-loop of a child is a sibling edge. In the mode `corners`, it gets the short stub out and back at one plug, as an outer self-loop does.
+  - In the mode `gutter`, a self-loop goes out of one side of the node and comes back into a different side.
 - The default of `frameInset` is the margin of the router.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
 - The option `outside` sets the rule for a node box outside the box of its frame:
