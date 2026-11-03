@@ -13,10 +13,10 @@ on:
 
 permissions: {}
 
-# One deployment at a time. A newer push cancels a deployment that waits.
+# One deployment at a time. A newer push replaces a deployment that waits, but it does not stop a deployment that runs (rule `main-runs-finish`).
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   pages:
