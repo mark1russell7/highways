@@ -202,6 +202,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 - `hard` counts the breaks of each hard rule. A good run has 0 for each rule.
 - `tolerance` gives the tolerance of each hard rule of the run. It is a field next to `hard`, so `hard` holds only counts. The defaults are `overlap` 0.001 and `through` 0.5. A record of a packer writes `overlap`, and a record of a router writes `through`.
 - `deterministic` is `true` when two runs of the same input give the same output. The screen runs each input two times.
+- The contract 0.3 gives `deterministic` the value `null` on a skipped record. `parseLayoutRecord` also reads an old skipped record with `true` as `null`. The core writes only `true` or `false`, and a reader of the core counts a `null` as not deterministic.
 - `ms` is the time of the run. It is not a measure. Only the times of CI compare.
 - `skipped` gives the reason when a strategy did not run, for example an input over its `maxNodes`. Then the record has no measures.
 - `outputHash` is the hash of the output in the highways form (ACTIVATION). Two records with the same `outputHash` have the same output.
