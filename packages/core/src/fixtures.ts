@@ -3,10 +3,8 @@ import type { Box, Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Edge, Graph, Node, Port, Side } from "./model.ts";
 
-/** This function gives a seeded random source with values in [0, 1). It is `mulberry32` of `@mark1russell7/rigor-generators`. */
-export function rng(seed: number): () => number {
-  return mulberry32(seed);
-}
+/** The function `rng` gives a seeded random source with values in [0, 1). It is `mulberry32` of `@mark1russell7/rigor-generators`. */
+export { mulberry32 as rng };
 
 /**
  * The ways a fixture puts its nodes and picks its edges. In `collections`, each cluster is one collection,
@@ -56,7 +54,7 @@ export function fixtureRngSeed(seed: number, nodes: number): number {
  * Node boxes do not overlap, and a gap of 12 units stays between them.
  * The default source of random numbers is `rng(fixtureRngSeed(spec.seed, spec.nodes))`. A corpus family gives the same stream from its registry.
  */
-export function makeFixture(spec: FixtureSpec, random: () => number = rng(fixtureRngSeed(spec.seed, spec.nodes))): Graph {
+export function makeFixture(spec: FixtureSpec, random: () => number = mulberry32(fixtureRngSeed(spec.seed, spec.nodes))): Graph {
   const R = random;
   const gauss = (): number => Math.sqrt(-2 * Math.log(R() + 1e-12)) * Math.cos(2 * Math.PI * R());
   const side = Math.sqrt(spec.nodes) * SPACING;

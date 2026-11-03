@@ -1,3 +1,4 @@
+import { fnv1a32 } from "@mark1russell7/rigor-generators";
 import { center, dist, type Point } from "../../geom.ts";
 import { nodeIndex, type Graph, type Route } from "../../model.ts";
 import { placePlug } from "../../plugs.ts";
@@ -53,19 +54,6 @@ interface Way {
   readonly length: number;
 }
 
-/**
- * This function gives the FNV-1a hash of a string, as an unsigned 32-bit number.
- * This copy stays. It hashes the UTF-16 code units. The `fnv1a32` of `@mark1russell7/rigor-generators` hashes the UTF-8 bytes.
- */
-function fnv1a(text: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
-}
-
 /** This function mixes the bits of a 32-bit number (the finalizer of MurmurHash3). */
 function mix(x: number): number {
   let h = x >>> 0;
@@ -82,7 +70,8 @@ export function minHash(keys: Iterable<string>, count: number): number[] {
   const sig = new Array<number>(count).fill(0xffffffff);
   const seeds = Array.from({ length: count }, (_, i) => mix(Math.imul(i + 1, 0x9e3779b9)));
   for (const key of keys) {
-    const base = fnv1a(key);
+    // The hash reads the UTF-16 code units of the key.
+    const base = fnv1a32(key, { input: "utf16" });
     for (let i = 0; i < count; i++) {
       const v = mix(base ^ seeds[i]!);
       if (v < sig[i]!) sig[i] = v;
