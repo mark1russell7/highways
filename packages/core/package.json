@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
-    "@mark1russell7/rigor-bench": "^0.1.2",
+    "@mark1russell7/rigor-bench": "^0.2.0",
     "@types/node": "^26.6.4",
     "highs": "^1.15.4",
     "highways-0-5-1": "npm:@mark1russell7/highways@0.5.1",

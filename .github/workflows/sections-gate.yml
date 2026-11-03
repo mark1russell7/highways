@@ -1,10 +1,10 @@
-# The sections time gate (GATE-LIMITS slices 1 and 2). It fails a pull request when `sections-tree` at 10 000 nodes gets slower.
+# The sections time gate (GATE-LIMITS slices 1 to 3). It fails a pull request when `sections-tree` at 10 000 nodes gets slower.
 # The job uses the confirm mode of `Sections bisect`: `scripts/sections-bisect.ts --gate` and `scripts/gates/pair-confirm.ts`.
 # It times four arms in turn, each route in a fresh process: the parent of the pull request, the head, the A/A copy of the parent and the fixed base.
 # Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`.
-# A run with an A/A spread above the noise cap 0.06 cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
+# A run with an A/A spread above the noise cap log(1.06) on |log r| cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
 # A second run that cannot decide fails, so a noisy run does not pass.
-# The check against the parent fails above 1 + max(0.05, the pooled A/A spread of `packages/core/scripts/data/sections-gate/aa-pool.json`).
+# The check against the parent uses `timeVerdict` of `@mark1russell7/rigor-bench`, with the margin log(1.05) and the pool of `packages/core/scripts/data/sections-gate/aa-pool.json`.
 # The check against the fixed base fails above 1.10.
 # The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`. `docs/PROMOTION.md` gives the values and their reasons.
 name: Sections gate

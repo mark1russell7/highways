@@ -245,13 +245,13 @@ describe("the checks of the gate", () => {
     expect(g.reason).toContain("The home finds the head slower than the parent (ratio 1.190).");
   });
 
-  it("the home and the old rule disagree on a small step: the home finds it, and the home wins", () => {
-    // The old rule passed a ratio at or below 1 + max(0.05, the pooled spread) = 1.05. The rounds show a step of 3 % with no doubt.
+  it("passes a sure step of 3 %: the step is in the margin log(1.05), so the home calls it same", () => {
+    // The interval of the home is wholly above 1, but it is in the band of the margin. Since rigor-bench 0.2.0, same comes before slower.
     const g = decide(report(1.03, 1.03));
     expect(g.checks[0].ratio!).toBeLessThan(1 + 0.05);
     expect(g.home!.low!).toBeGreaterThan(1);
-    expect(g.words).toBe("slower");
-    expect(g.outcome).toBe("fail");
+    expect(g.words).toBe("same");
+    expect(g.outcome).toBe("pass");
   });
 
   it("the home and the old rule disagree on a wide head: the home cannot decide, and the home wins", () => {

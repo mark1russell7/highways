@@ -369,7 +369,7 @@ Slice 2 used the floor until the pool had 5 runs. The home counts cases, not run
 
 ### The shared home of the comparison
 
-Since slice 3, `timeVerdict` of `@mark1russell7/rigor-bench` (0.1.2 or later) decides the check against the parent. `scripts/gates/home-verdict.ts` maps the rounds to the `PairedTime` records of the home. The gate gives these options:
+Since slice 3, `timeVerdict` of `@mark1russell7/rigor-bench` (0.2.0 or later) decides the check against the parent. `scripts/gates/home-verdict.ts` maps the rounds to the `PairedTime` records of the home. The gate gives these options:
 
 | Option | Value |
 |---|---|
@@ -382,19 +382,19 @@ Since slice 3, `timeVerdict` of `@mark1russell7/rigor-bench` (0.1.2 or later) de
 The local code of the cap and of the pooled band is gone. The gate copies no verdict logic of the home.
 
 - The rule `difference` gives an interval of the median ratio of the head over the median ratio of the A/A arm.
-- The outcome is `slower` when the whole interval is above 1, and `faster` when it is below 1. It is `same` when the interval is in the band of the margin.
+- The outcome is `same` when the interval is in the band of the margin. Else it is `slower` when the whole interval is above 1, and `faster` when it is below 1.
 - Each other interval, and each run above the cap, gives `cannot decide`.
 
 On the two runs above, the home gives the same outcome as slice 2. The quiet run is `same`, and the noisy run is `cannot decide`.
 
-The home and the old rule 1 + max(0.05, the pooled spread) do not agree on each set of rounds. The tests of `scripts/sections-gate-verdict.test.ts` have two such sets of made-up rounds:
+The home and the old rule 1 + max(0.05, the pooled spread) do not agree on each set of rounds. The tests of `scripts/sections-gate-verdict.test.ts` have these sets of made-up rounds:
 
 | Rounds | The old rule | The home |
 |---|---|---|
-| The head is 3 % slower in each round, with a quiet A/A arm. | pass: 1.03 is below 1.05 | `slower`: the gate fails |
+| The head is 3 % slower in each round, with a quiet A/A arm. | pass: 1.03 is below 1.05 | `same`: the interval is in the margin, so the gate passes |
 | The head goes from 0.92 to 1.16, with the median 1.0625. | fail: 1.0625 is above 1.05 | `cannot decide`, with the interval 0.96 to 1.14: the retry |
 
-The home wins. The old rule compared one median with a fixed band, and it did not see how sure the ratio is. The interval of the home finds a small step that the rounds make sure. It also finds a large median that the rounds do not make sure. A head 19 % slower with a quiet A/A arm is `slower` under the two rules.
+The two agree on the step of 3 %. The margin log(1.05) is the claim of the gate: a change in 5 % is `same`. Since rigor-bench 0.2.0, `same` comes before `slower`, so the gate keeps its claim. On the wide head the home wins. The old rule compared one median with a fixed band, and it did not see how sure the ratio is. A head 19 % slower with a quiet A/A arm is `slower` under the two rules.
 
 The other rules stay local:
 
