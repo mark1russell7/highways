@@ -215,6 +215,9 @@ importers:
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
+      '@mark1russell7/rigor-bench':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -483,6 +486,10 @@ packages:
   '@mark1russell7/layout-contract@0.2.21':
     resolution: {integrity: sha512-Mls2V7uo5zGS6o5apBCJAKN3T4oZ3A2yuxUJUBzICDzIWT+YiIP+yOcBfVpjf22cPG5GMr+/abC7UJ4u4bXTlA==}
     engines: {node: '>=22.12'}
+
+  '@mark1russell7/rigor-bench@0.1.0':
+    resolution: {integrity: sha512-HWLgPMON9zLz9zBUY1bEVw/0d2Tg6JABpGJOR6QW5pPkGhclBIg4MzR4ERPVNJQLJtQu4PILb82n4SdLZq4ORQ==}
+    engines: {node: '>=22'}
 
   '@mark1russell7/rigor-generators@0.1.1':
     resolution: {integrity: sha512-N5o3II0AClHgsWCWtzuBzckQdReydJnLUS8Kdt9hWXVpTzb0dxucrN1bWdDN+75YompOR1rAmsIX8zuHqoQdqA==}
@@ -1591,6 +1598,10 @@ snapshots:
       '@mark1russell7/layout-contract': 0.2.21
 
   '@mark1russell7/layout-contract@0.2.21': {}
+
+  '@mark1russell7/rigor-bench@0.1.0':
+    dependencies:
+      '@mark1russell7/rigor-statistics': 0.1.5
 
   '@mark1russell7/rigor-generators@0.1.1': {}
 
