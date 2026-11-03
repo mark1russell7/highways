@@ -12,7 +12,7 @@ import { ROUTE_SPACE_LEFT_OUT, ROUTE_SPACE_MISFITS, routeConfig, routeSpace } fr
 import { ROUTERS } from "./routers/index.ts";
 import { laneRoutes, runKey, segmentsOf } from "./segments.ts";
 import { highwayStrategies } from "./strategies/builtins.ts";
-import { asRouter } from "./strategies/model.ts";
+import { asRouter, type Strategy } from "./strategies/model.ts";
 
 // STAGE-DATA: the routers of today as named points of `routeSpace`. Made-up boards only.
 
@@ -21,7 +21,7 @@ const named = routeSpace.named!;
 /** The router table of today: the routers of `ROUTERS`, then each highway strategy through `follow`, then the opt-in router `shared-stretch`. */
 const TABLE: ReadonlyMap<string, (graph: Graph) => Result> = new Map([
   ...ROUTERS.map((r) => [r.name, (g: Graph) => r.route(g)] as const),
-  ...Object.values(highwayStrategies).map((s) => [s.name, (g: Graph) => asRouter(highwayRouterStrategy(s)).route(g)] as const),
+  ...Object.values(highwayStrategies).map((s) => [s.name, (g: Graph) => asRouter(highwayRouterStrategy(s as Strategy<"highway", object>)).route(g)] as const),
   [sharedStretchStrategy.name, (g: Graph) => asRouter(sharedStretchStrategy).route(g)] as const,
 ]);
 
