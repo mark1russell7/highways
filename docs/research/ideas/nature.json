@@ -710,13 +710,74 @@
     "placementDependent": false,
     "screen": "shared-all on case-many-groups and mid-fanout with directed edges. Keep as a style option if end crossings are within +2% of laneOrder bundle. Keep as a default only if they drop.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-024",
       "NAT-043",
       "HWY-011"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-11-02",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/41499056825",
+      "records": [
+        "screen-v2/*/shared@557e3ac",
+        "screen-v2/*/two-way@557e3ac",
+        "screen-v2/*/two-way-left@557e3ac",
+        "screen-v2/*/two-way-outer@557e3ac",
+        "screen-v2/*/two-way-w0.5@557e3ac",
+        "screen-v3/*/shared@1c6fa5a",
+        "screen-v3/*/two-way@1c6fa5a",
+        "screen-v3/*/two-way-left@1c6fa5a",
+        "screen-v3/*/two-way-outer@1c6fa5a",
+        "screen-v3/*/two-way-w0.5@1c6fa5a",
+        "screen-v1/*/shared@1c6fa5a",
+        "screen-v1/*/two-way@1c6fa5a",
+        "screen-v1/*/two-way-left@1c6fa5a",
+        "screen-v1/*/two-way-outer@1c6fa5a",
+        "screen-v1/*/two-way-w0.5@1c6fa5a"
+      ],
+      "measures": {
+        "B5 against shared": {
+          "base": {
+            "dense-groups": 5.2,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 0.8,
+            "tiny-uniform": 0
+          },
+          "new": {
+            "dense-groups": 3.4,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 1.2,
+            "tiny-uniform": 0
+          }
+        },
+        "R1 against shared": {
+          "base": {
+            "dense-groups": 1069.2,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3,
+            "small-clustered": 639.1,
+            "tiny-uniform": 14.7
+          },
+          "new": {
+            "dense-groups": 978.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3,
+            "small-clustered": 596.8,
+            "tiny-uniform": 14.5
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 41499056825 at 557e3ac, and the screen-v1 run 41505308236 and the screen-v3 run 41508652642 at 1c6fa5a. Against shared, B5 has no verdict on each set, and R1 is better on screen-v2 with 0 families against. The median of B5 is 0 for both. Against shared-ways, the plan that it keeps, B5 is better on screen-v2 and screen-v3 with 0 families against, and R1 is a tie. The lane order changes the routes of 21 of 60 inputs of screen-v2. The median time is 1.73 times shared and 1.07 times shared-ways on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "NAT-010",

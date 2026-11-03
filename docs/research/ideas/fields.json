@@ -1198,12 +1198,109 @@
     "placementDependent": true,
     "screen": "small-clustered and case-dense-groups: crossings within 2 u of a box. Keep if they fall >= 30%.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "EDA-041",
       "EDA-016"
     ],
-    "wave": 5
+    "wave": 5,
+    "result": {
+      "date": "2026-11-02",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/41499105575",
+      "records": [
+        "screen-v2/*/facing@557e3ac",
+        "screen-v2/*/escape@557e3ac",
+        "screen-v2/*/escape-flow@557e3ac",
+        "screen-v2/*/escape-gap2@557e3ac",
+        "screen-v2/*/escape-r0@557e3ac",
+        "screen-v3/*/facing@1c6fa5a",
+        "screen-v3/*/escape@1c6fa5a",
+        "screen-v3/*/escape-flow@1c6fa5a",
+        "screen-v3/*/escape-gap2@1c6fa5a",
+        "screen-v3/*/escape-r0@1c6fa5a",
+        "screen-v1/*/facing@1c6fa5a",
+        "screen-v1/*/escape@1c6fa5a",
+        "screen-v1/*/escape-flow@1c6fa5a",
+        "screen-v1/*/escape-gap2@1c6fa5a",
+        "screen-v1/*/escape-r0@1c6fa5a"
+      ],
+      "measures": {
+        "R1 against facing": {
+          "base": {
+            "dense-groups": 2171.7,
+            "hub-chain": 58.6,
+            "many-groups": 828.7,
+            "packed-grid": 269.3,
+            "small-clustered": 1065,
+            "tiny-uniform": 15.2
+          },
+          "new": {
+            "dense-groups": 2221.8,
+            "hub-chain": 69.3,
+            "many-groups": 837.2,
+            "packed-grid": 274.6,
+            "small-clustered": 1073.1,
+            "tiny-uniform": 14.7
+          }
+        },
+        "R11 against facing": {
+          "base": {
+            "dense-groups": 0.041,
+            "hub-chain": 0.095,
+            "many-groups": 0.093,
+            "packed-grid": 0.113,
+            "small-clustered": 0.052,
+            "tiny-uniform": 0.117
+          },
+          "new": {
+            "dense-groups": 0.216,
+            "hub-chain": 0.333,
+            "many-groups": 0.259,
+            "packed-grid": 0.09,
+            "small-clustered": 0.213,
+            "tiny-uniform": 0.28
+          }
+        },
+        "B5 against facing": {
+          "base": {
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 0,
+            "tiny-uniform": 0
+          },
+          "new": {
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 0,
+            "small-clustered": 0,
+            "tiny-uniform": 0
+          }
+        },
+        "R10 against facing": {
+          "base": {
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 29.3,
+            "small-clustered": 0,
+            "tiny-uniform": 0
+          },
+          "new": {
+            "dense-groups": 0,
+            "hub-chain": 0,
+            "many-groups": 0,
+            "packed-grid": 33.0,
+            "small-clustered": 0,
+            "tiny-uniform": 0
+          }
+        }
+      },
+      "verdict": "screened",
+      "note": "The records are the screen-v2 run 41499105575 at 557e3ac, and the screen-v1 run 41505325487 and the screen-v3 run 41505273341 at 1c6fa5a. Against facing, R11 min is better on each set, with 1 family against on screen-v2. R1 is worse on each set, with 1 family against on screen-v2. B5 has no verdict, and R10 is worse on screen-v2 and screen-v3 with 0 families against. The guard B1 is worse on each set. It changes the routes of each input of screen-v2. The variants escape-flow, escape-gap2 and escape-r0 get the same signs. The median time is 1.48 times facing on screen-v2. It adds 0 hard-rule breaks."
+    }
   },
   {
     "id": "EDA-023",
