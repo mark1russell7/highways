@@ -87,7 +87,7 @@ The win test has one home: [docs/WIN-TEST.md of rigor](https://github.com/mark1r
 
 - The link names one commit. Thus the text at the link does not change.
 - `docs/shared.lock.json` pins the commit and the SHA-256 of the block in the field `linked`.
-- `node scripts/check-shared.mjs --remote` downloads the block and compares its hash with the lock.
+- In CI, the rule `shared-docs` of `@mark1russell7/conventions` downloads the block and compares its hash with the lock.
 - A new version of the win test changes the commit and the hash of the lock, in a pull request of each repository.
 <!-- /linked:win-test -->
 
