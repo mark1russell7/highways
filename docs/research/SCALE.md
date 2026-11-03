@@ -143,3 +143,30 @@ The ratio is the time of the workspace over the old time. The columns give each 
 - The old arm is the core before `fa1dd82`. So the ratio also contains each change after `fa1dd82`.
 - On this board, the 2 jobs on EPYC 9V45 differ more than the CPU models. So the CPU model does not explain all of the spread here.
 - The open item SECTIONS-SLOW finds the change that makes `sections` and `sections-tree` slower.
+
+### The profile of `sections-tree` and the second fix (SECTIONS-SLOW step 2)
+
+The workflow `Profile` (run 41505173044) profiled `sections-tree` on `large-clustered` at `bce22a5`, the commit before SEARCH-SPEED (#259).
+The run keeps one profile, the profile of `bce22a5`. It has no profile of `c6af859`.
+A function that `c6af859` does not have gets the share 0 % at `c6af859`.
+
+| Function | Self time at `bce22a5` | Total time at `bce22a5` | At `c6af859` | Changed by #259 |
+|---|---:|---:|---|---|
+| `CornerGraph.#search` | 20.8 % | 58.2 % | not there | yes |
+| `MinHeap.#down` | 11.1 % | | there | yes, 8.3 % of it is in `#search` |
+| `dist` | 10.1 % | | there | yes, 6.7 % of it is in `#search` |
+| `SoftGraph.path` | 8.7 % | 14.5 % | not there, 0 % | no |
+| `Grid.#walk` | 8.3 % | 17.6 % | there | no |
+| `CornerGraph.#nearestVisible` | 7.1 % | 13.8 % | there | only the table of buckets |
+
+The largest cost that #259 did not change is `SoftGraph.path`. Only `fewerFar` uses it, and `fewerFar` came after `c6af859` (#33).
+The search is a feature: it finds a way through fewer far boxes. But much of its time is waste, and a change can remove that waste:
+
+- One line takes 4.5 % of all the time. It gets the cost of each box of each link from a function, with a look-up in a set.
+- Each search makes three new arrays over all the vertices, and a new heap.
+
+The fix keeps the costs of the boxes in a typed array with a stamp, so the search uses `cost` one time for each box.
+The links, their lengths and their boxes are in flat typed arrays. The arrays of the search and the heap stay from one search to the next.
+The search adds the same box costs in the same order, so each path and each cost stays the same to the last bit.
+A new test compares the search with a copy of the search of version 0.11.0, with a new cost function in each search.
+The `Sections gate` run of the pull request times the fix.
