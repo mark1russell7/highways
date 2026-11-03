@@ -319,6 +319,9 @@ The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pul
 - The strategist gave the values of slice 1 on 2026-11-02, and the cap, the second run and the pool on 2026-11-03. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
 - The summary of each run (`sections-gate.md`) shows the A/A spread of the run, the cap and the pool with its count of runs and cases. It also shows the margin, the interval and the outcome.
 - The record `sections-gate.json` (schema `sections-gate/3`) keeps the same facts in its field `home`.
+- The job resolves the inputs `head` and `parent` to full hashes one time, at the start (GATE-CONFIRM-SHA). Then each job times only these hashes. A name that does not resolve fails the job.
+- The default head is the checkout, and the default parent is the first parent of the head. A dispatch with `-f head=<sha>` times that commit against its first parent.
+- The summary and the record give the input text and the full hash of each commit, for example "the parent: `HEAD^1` = `414ec5f...`".
 
 ### The scale of the home
 

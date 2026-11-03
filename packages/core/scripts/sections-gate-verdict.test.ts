@@ -101,7 +101,7 @@ function record(r: ReturnType<typeof report> | null, skipped: string | null = nu
     router: GATE_ROUTER,
     rounds: 10,
     head: { ...side("e", "feat(core): made-up change"), ref: "HEAD" },
-    parent: side("a", "made-up parent"),
+    parent: { ...side("a", "made-up parent"), ref: "HEAD^1" },
     fixed: side("f", "made-up fixed base"),
     fixedBase: { schema: BASE_SCHEMA, commit: sha("f"), date: "2026-11-02", reason: "The made-up first base." },
     skipped,
@@ -326,6 +326,9 @@ describe("the record of the gate", () => {
     expect(r.home!.pool).toMatchObject({ cases: 10, runs: 1 });
     const text = gateText(r).join("\n");
     expect(text).toContain("# The sections time gate, run 1 of 2: pass");
+    // The summary gives the input text and the full hash of the head and of the parent (GATE-CONFIRM-SHA).
+    expect(text).toContain(`- The head: \`HEAD\` = \`${sha("e")}\` feat(core): made-up change`);
+    expect(text).toContain(`- The parent: \`HEAD^1\` = \`${sha("a")}\` made-up parent`);
     expect(text).toContain("The gate passes. The home finds the head same against the parent (ratio 1.000)");
     expect(text).toContain("| the A/A spread of this run, on \\|log r\\| | 0.020 |");
     expect(text).toContain("| the noise cap | 0.058 = log(1.06). Above it, the run cannot decide. |");

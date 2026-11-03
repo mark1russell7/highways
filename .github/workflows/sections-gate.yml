@@ -1,6 +1,8 @@
 # The sections time gate (GATE-LIMITS slices 1 to 3). It fails a pull request when `sections-tree` at 10 000 nodes gets slower.
 # The job uses the confirm mode of `Sections bisect`: `scripts/sections-bisect.ts --gate` and `scripts/gates/pair-confirm.ts`.
 # It times four arms in turn, each route in a fresh process: the parent of the pull request, the head, the A/A copy of the parent and the fixed base.
+# The step commits resolves the head and the parent to full hashes one time (GATE-CONFIRM-SHA). Each later step gets only these hashes.
+# A dispatch with `-f head=<sha>` times that commit against its first parent. A name that does not resolve fails the job.
 # Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`.
 # A run with an A/A spread above the noise cap log(1.06) on |log r| cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
 # A second run that cannot decide fails, so a noisy run does not pass.
@@ -15,9 +17,12 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      head:
+        description: "The commit to time, as a hash or a name. The default is the checkout of the dispatch."
+        default: ""
       parent:
-        description: "The commit to time the checkout against. The default is the commit before the checkout."
-        default: "HEAD~1"
+        description: "The commit to time the head against. The default is the first parent of the head."
+        default: ""
       rounds:
         description: "The timed rounds of each arm, from 1 to 20."
         default: "10"
@@ -55,6 +60,7 @@ jobs:
             packages/core/scripts/sections-gate-verdict.ts
             packages/core/scripts/gates/pair-confirm.ts
             packages/core/scripts/gates/paired.ts
+            packages/core/scripts/gates/commits.ts
             packages/core/scripts/gates/home-verdict.ts
             packages/core/scripts/data/sections-gate/**
             !**/*.md
@@ -73,9 +79,12 @@ jobs:
     outputs:
       # The value is false when the run cannot decide. Then the job retry runs.
       decided: ${{ steps.time.outputs.decided }}
+      # The full hashes and the input texts of the head and the parent. The job retry times the same commits.
+      head: ${{ steps.commits.outputs.head }}
+      head-input: ${{ steps.commits.outputs.head-input }}
+      parent: ${{ steps.commits.outputs.parent }}
+      parent-input: ${{ steps.commits.outputs.parent-input }}
     env:
-      # On a pull request, the checkout is the merge commit, and its first parent is the head of the base branch.
-      PARENT: ${{ github.event_name == 'pull_request' && 'HEAD^1' || inputs.parent }}
       ROUNDS: ${{ inputs.rounds || '10' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -89,12 +98,27 @@ jobs:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Resolve the head and the parent to full hashes
+        id: commits
+        env:
+          # On a pull request, the checkout is the merge commit, and its first parent is the head of the base branch.
+          # An empty head is the checkout, and an empty parent is the first parent of the head.
+          HEAD_INPUT: ${{ github.event_name == 'pull_request' && 'HEAD' || inputs.head }}
+          PARENT_INPUT: ${{ github.event_name == 'pull_request' && 'HEAD^1' || inputs.parent }}
+        run: |
+          # A name that does not resolve exits with the code 1, so the job fails before it times an arm (FAIL-CLOSED).
+          node packages/core/scripts/gates/commits.ts --head "$HEAD_INPUT" --parent "$PARENT_INPUT" >> "$GITHUB_OUTPUT"
       - name: Time the head against the parent and the fixed base
         id: time
+        env:
+          HEAD_SHA: ${{ steps.commits.outputs.head }}
+          HEAD_INPUT: ${{ steps.commits.outputs.head-input }}
+          PARENT_SHA: ${{ steps.commits.outputs.parent }}
+          PARENT_INPUT: ${{ steps.commits.outputs.parent-input }}
         run: |
           # The exit code is 0 for a pass, 1 for a fail and 3 for a run that cannot decide. The summary gets the record before the step ends.
           status=0
-          node packages/core/scripts/sections-bisect.ts --gate --attempt 1 --parent "$PARENT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
+          node packages/core/scripts/sections-bisect.ts --gate --attempt 1 --head "$HEAD_SHA" --head-input "$HEAD_INPUT" --parent "$PARENT_SHA" --parent-input "$PARENT_INPUT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -eq 3 ]; then
             echo "decided=false" >> "$GITHUB_OUTPUT"
@@ -121,8 +145,12 @@ jobs:
     # With the limits, the workflow takes 2 x 95 = 190 min at the most.
     timeout-minutes: 95
     env:
-      PARENT: ${{ github.event_name == 'pull_request' && 'HEAD^1' || inputs.parent }}
       ROUNDS: ${{ inputs.rounds || '10' }}
+      # The job gate resolved the commits one time. This job times the same full hashes, also when the branch moved.
+      HEAD_SHA: ${{ needs.gate.outputs.head }}
+      HEAD_INPUT: ${{ needs.gate.outputs.head-input }}
+      PARENT_SHA: ${{ needs.gate.outputs.parent }}
+      PARENT_INPUT: ${{ needs.gate.outputs.parent-input }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -138,7 +166,7 @@ jobs:
         run: |
           # In the second run, a run that cannot decide exits with the code 1, so a noisy run does not pass.
           status=0
-          node packages/core/scripts/sections-bisect.ts --gate --attempt 2 --parent "$PARENT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
+          node packages/core/scripts/sections-bisect.ts --gate --attempt 2 --head "$HEAD_SHA" --head-input "$HEAD_INPUT" --parent "$PARENT_SHA" --parent-input "$PARENT_INPUT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -ne 0 ] && [ -f out/sections-gate.md ]; then echo "::error::$(sed -n 3p out/sections-gate.md)"; fi
           exit "$status"
