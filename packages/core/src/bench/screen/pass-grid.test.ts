@@ -8,8 +8,7 @@ import { STRATEGIES } from "../../strategies/builtins.ts";
 import { getStrategy, type Strategy } from "../../strategies/model.ts";
 import { WayFinder } from "../../ways.ts";
 import { checkProperties } from "../properties.ts";
-import { hardFloors } from "./floor.ts";
-import { inputGraph, type LayoutRecord } from "./forms.ts";
+import { inputGraph } from "./forms.ts";
 import { screenInputs, SCREEN_V2 } from "./set.ts";
 
 // The records of these numbers are the run 41499056825 of the workflow `Screen` (PASS-GRID).
@@ -74,35 +73,5 @@ describe("the pass-throughs of packed-grid (PASS-GRID)", () => {
     const g = board(8);
     const open = { ...g, nodes: makeRoom(g.nodes, roomLinks(g), { gutter: 8, spacing: 4 }).items };
     expect(through(open, routed(routerOf("corners"), open)).length).toBe(0);
-  });
-});
-
-describe("the floor of a screen", () => {
-  const rec = (strategy: string, step: string, input: string, breaks: number, skipped?: string): LayoutRecord =>
-    ({ strategy, step, input, hard: { "no-pass-through": breaks }, ...(skipped === undefined ? {} : { skipped }) }) as unknown as LayoutRecord;
-  const records = [rec("corners", "router", "a", 97), rec("shared", "router", "a", 97), rec("territories", "highway", "a", 94), rec("ridges", "highway", "b", 96), rec("new", "highway", "c", 1)];
-
-  it("takes only the base routers in the step highway", () => {
-    const floor = hardFloors(records, { step: "highway", candidates: new Set(["new"]) });
-    expect(floor.get("a")).toEqual({ "no-pass-through": 97 });
-  });
-
-  it("does not move when a plan has fewer breaks on one input", () => {
-    const more = [...records, rec("lucky", "highway", "a", 3)];
-    expect(hardFloors(more, { step: "highway", candidates: new Set() }).get("a")).toEqual(hardFloors(records, { step: "highway", candidates: new Set() }).get("a"));
-  });
-
-  it("takes the other built-in strategies on an input without a base router", () => {
-    const floor = hardFloors(records, { step: "highway", candidates: new Set(["new"]) });
-    expect(floor.get("b")).toEqual({ "no-pass-through": 96 });
-    expect(floor.has("c")).toBe(false);
-  });
-
-  it("keeps the fewest breaks of each built-in in the other steps", () => {
-    const floor = hardFloors(
-      [rec("corners", "router", "a", 97), rec("territories", "router", "a", 94), rec("skipped", "router", "a", 0, "too large")],
-      { step: "router", candidates: new Set() },
-    );
-    expect(floor.get("a")).toEqual({ "no-pass-through": 94 });
   });
 });

@@ -20,7 +20,6 @@ import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
 import { sameData, type TimingEnv } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
-import { hardFloors } from "./floor.ts";
 import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
 import { curvesHash, resultHash, type MoveCounter } from "./exercise.ts";
 import { outputHash } from "./activation.ts";
@@ -142,7 +141,6 @@ export interface ScreenStrategySummary {
   readonly hardTotal: number;
   /**
    * The breaks over the floor of each input. The floor is the counts of the built-in strategy with the fewest breaks on that input.
-   * In the step `highway`, the floor comes from the base routers only (`hardFloors`).
    * Each built-in breaks a rule on some boards, for example on a board where the boxes touch. Without built-ins, the floor is 0.
    */
   readonly hardOverFloor: number;
@@ -518,7 +516,15 @@ function summarizeScreen(
 ): ScreenSummary {
   const objectives = namedObjectives(FRONT_OBJECTIVES[at.step]);
   const names = [...new Set(records.map((r) => r.strategy))];
-  const floor = hardFloors(records, at);
+  const total = (r: LayoutRecord): number => Object.values(r.hard).reduce((n, v) => n + v, 0);
+  const floor = new Map<string, Readonly<Record<string, number>>>();
+  const best = new Map<string, number>();
+  for (const r of records) {
+    if (r.skipped !== undefined || at.candidates.has(r.strategy)) continue;
+    if (total(r) >= (best.get(r.input) ?? Number.POSITIVE_INFINITY)) continue;
+    best.set(r.input, total(r));
+    floor.set(r.input, r.hard);
+  }
   const overFloor = (r: LayoutRecord): number => Object.entries(r.hard).reduce((n, [k, v]) => n + Math.max(0, v - (floor.get(r.input)?.[k] ?? 0)), 0);
   const strategies = names.map((strategy): ScreenStrategySummary => {
     const all = records.filter((r) => r.strategy === strategy);
@@ -573,7 +579,6 @@ export function formatScreen(summary: ScreenSummary): string {
     "",
     `${summary.inputs} inputs, ${summary.strategies.length} strategies. Each cell of a measure is the median over the inputs.`,
     "The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input.",
-    ...(summary.step === "highway" ? ["In the step `highway`, the floor comes from the base routers only."] : []),
     ...(summary.env ? [`The times come from ${summary.env.cores} x ${summary.env.cpu} (${summary.env.os} ${summary.env.arch}, Node.js ${summary.env.node}), mode \`${summary.env.mode}\`${summary.env.context ? `, context \`${summary.env.context}\`` : ""}.`] : []),
     "",
     `| strategy | new | runs | skipped | hard | over the floor | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
