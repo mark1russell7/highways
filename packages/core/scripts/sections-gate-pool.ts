@@ -1,4 +1,4 @@
-// The pool of A/A rounds of the sections time gate (GATE-LIMITS slice 2): `pnpm --filter @mark1russell7/highways gate:pool`.
+// The pool of A/A rounds of the sections time gate (GATE-LIMITS slices 2 and 3): `pnpm --filter @mark1russell7/highways gate:pool`.
 // The script rebuilds `data/sections-gate/aa-pool.json` from the artifacts of the runs of the workflow `Sections gate`.
 //
 // - `node scripts/sections-gate-pool.ts [--from <dir>] [--main <ref>] [--out <file>] [--limit <n>]`
@@ -6,6 +6,7 @@
 //   That folder gets `runs.json`, the list of the runs. `--from <dir>` reads such a folder again, and makes no call to GitHub.
 // - A run goes into the pool only when its parent is a commit of `--main` (the default is `origin/main`) and its A/A spread is at or below the cap.
 //   The A/A arm times the parent, so each run of a pull request to `main` times a commit of `main`.
+//   `aaSpread` of `@mark1russell7/rigor-bench` gives that spread on the log scale, and `pooledBand` gives the band of the new pool.
 // - The script writes the file and prints a table of the runs. Commit the file in a pull request. No workflow commits it to `main`.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -13,11 +14,26 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { aaSpread, pooledBand } from "@mark1russell7/rigor-bench";
 import { InputError } from "./gates/inputs.ts";
-import { NOISE_CAP, POOL_FILE, buildPool, poolBand, poolEntry, type PoolEntry, type PoolRecord, type PoolRun } from "./sections-gate-verdict.ts";
+import {
+  NOISE_CAP,
+  POOL_FILE,
+  SPREAD_LEVEL,
+  buildPool,
+  poolEntry,
+  poolOptions,
+  ratioTimes,
+  type PoolEntry,
+  type PoolRecord,
+  type PoolRun,
+} from "./sections-gate-verdict.ts";
 
 const CORE = resolve(fileURLToPath(import.meta.url), "..", "..");
 const WORKFLOW = "Sections gate";
+
+/** This function gives the A/A spread of a list of ratios with the home: p90 of |log r|. */
+const logSpread = (ratios: readonly number[]): number => aaSpread(ratioTimes(ratios, "run"), SPREAD_LEVEL);
 
 /** One run of the list of `gh run list`. */
 interface ListedRun {
@@ -80,14 +96,14 @@ for (const r of runs) {
     }
     const record = JSON.parse(readFileSync(file, "utf8")) as PoolRecord;
     if (!onMain(record.parent.sha, values.main)) entries.push({ kept: false, run: facts, reason: `the parent is not a commit of ${values.main}` });
-    else entries.push(poolEntry(record, facts));
+    else entries.push(poolEntry(record, facts, logSpread));
   }
 }
 
 const kept: PoolRun[] = entries.flatMap((e) => (e.kept ? [e.run] : []));
 const pool = buildPool(kept);
 writeFileSync(out, JSON.stringify(pool, null, 2) + "\n");
-const band = poolBand(pool);
+const band = pooledBand(poolOptions(pool), SPREAD_LEVEL);
 console.log("| run | job | date | CPU | A/A spread | pool |");
 console.log("|---|---|---|---|---:|---|");
 for (const e of entries) {
@@ -95,6 +111,6 @@ for (const e of entries) {
   else console.log(`| ${e.run.run} | ${e.run.job} | ${e.run.date} | - | - | out: ${e.reason} |`);
 }
 console.log("");
-console.log(`The pool has ${band.runs} quiet runs (cap ${NOISE_CAP}) and ${band.ratios} A/A ratios. The pooled spread is ${band.spread?.toFixed(4) ?? "-"}.`);
-console.log(band.pooled ? `The limit against the parent is ${band.limit.toFixed(4)}.` : `The pool has too few runs, so the limit against the parent is the floor ${band.limit.toFixed(2)}.`);
+console.log(`The pool has ${pool.runs.length} quiet runs (cap ${NOISE_CAP.toFixed(4)} on |log r|) and ${band.cases} A/A cases.`);
+console.log(`The noise of the pooled band is ${band.noise.toFixed(4)} on |log r|, at least the floor log(1.05). The band "same" is ${band.low.toFixed(4)} to ${band.high.toFixed(4)}.`);
 console.log(`The artifacts are in ${dir}. The pool is in ${out}.`);
