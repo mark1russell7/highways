@@ -481,7 +481,7 @@ export interface JogMeasures {
 }
 
 /** This function gives the median of the values, or 0 when there are none. */
-function medianOf(values: readonly number[]): number {
+function medianOrZero(values: readonly number[]): number {
   return values.length === 0 ? 0 : median(values);
 }
 
@@ -564,7 +564,7 @@ export function measureJogs(curves: readonly LaneCurve[], jogs: JogTrace, style:
     });
   });
   const peakMax = peaks.reduce((a, b) => Math.max(a, b), 0);
-  return { count, biarcs, peakMedian: medianOf(peaks), peakMax, ...(biarcPeaks ? { peakRatio: medianOf(ratios) } : {}), endJump, innerJump };
+  return { count, biarcs, peakMedian: medianOrZero(peaks), peakMax, ...(biarcPeaks ? { peakRatio: medianOrZero(ratios) } : {}), endJump, innerJump };
 }
 
 /** The options of `benchHighways`. */
