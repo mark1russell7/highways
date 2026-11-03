@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { inkSaved } from "../../bench/measures/bundles.ts";
+import { totalTurn } from "../../bench/measures/routes.ts";
+import { polylineLength } from "../../geom.ts";
 import { follow } from "../follow.ts";
 import { commonTests, flows, hub } from "../fixtures.test-util.ts";
 import { checkPlan } from "../model.ts";
@@ -62,6 +65,57 @@ describe("the highway strategy search (HWY-059)", () => {
       expect(s.from).toBeLessThan(s.n);
       expect(s.score).toBe(searchScore(hub, s.result.routes, first, o));
     }
+  }, 30_000);
+
+  it("keeps the score and the run of the default with the new options at their defaults (SEARCH-CROSS)", () => {
+    const first = follow(hub, { highways: [] }).routes;
+    const routes = follow(hub, tidyPlan(candidatePlan({ graph: hub }, "corridors"))).routes;
+    const o = { ...SEARCH_DEFAULTS, evaluations: 6 };
+    const { turnWeight: _t, inkBase: _i, ...old } = o;
+    expect(searchScore(hub, routes, first, o)).toBe(searchScore(hub, routes, first, old));
+    const run = searchRun({ graph: hub }, o);
+    expect(run).toEqual(searchRun({ graph: hub }, old));
+    expect(run.terms).toBeUndefined();
+    expect(Object.keys(run)).toEqual(["plan", "evaluations", "work"]);
+  }, 30_000);
+
+  it("takes the mean total turn of the routes off the score with turnWeight (SEARCH-CROSS)", () => {
+    const first = follow(hub, { highways: [] }).routes;
+    const routes = follow(hub, tidyPlan(candidatePlan({ graph: hub }, "corridors"))).routes;
+    const turn = totalTurn(routes).mean;
+    expect(turn).toBeGreaterThan(0);
+    const base = searchScore(hub, routes, first, SEARCH_DEFAULTS);
+    expect(searchScore(hub, routes, first, { ...SEARCH_DEFAULTS, turnWeight: 0.5 })).toBeCloseTo(base - 0.5 * turn, 12);
+  });
+
+  it("divides the drawn ink by the length of the first routes with inkBase first (SEARCH-CROSS)", () => {
+    const first = follow(hub, { highways: [] }).routes;
+    const routes = follow(hub, tidyPlan(candidatePlan({ graph: hub }, "corridors"))).routes;
+    const firstLength = first.reduce((s, r) => s + polylineLength(r.points), 0);
+    const o = { ...SEARCH_DEFAULTS, stretchWeight: 0, ambiguityWeight: 0, angleWeight: 0 };
+    expect(searchScore(hub, routes, first, { ...o, inkBase: "first" })).toBe(inkSaved(routes, firstLength));
+    expect(searchScore(hub, routes, first, o)).toBe(inkSaved(routes));
+    // A longer route of the same drawn ink gives a lower value: the route doubles back on its own segment.
+    const longer = routes.map((r, i) => (i === 0 ? { ...r, points: [...r.points, r.points[r.points.length - 2]!, r.points[r.points.length - 1]!] } : r));
+    expect(inkSaved(longer, firstLength)).toBeCloseTo(inkSaved(routes, firstLength), 9);
+    expect(inkSaved(longer)).toBeGreaterThan(inkSaved(routes));
+  });
+
+  it("counts the calls and the steps of each opt-in term, and the observer sees the same score (SEARCH-CROSS)", () => {
+    const o = { ...SEARCH_DEFAULTS, evaluations: 6, crossingWeight: 0.3, turnWeight: 1, inkBase: "first" as const };
+    const steps: SearchStep[] = [];
+    const run = searchRun({ graph: hub }, o, (s) => steps.push(s));
+    expect(run).toEqual(searchRun({ graph: hub }, o));
+    expect(Object.keys(run.terms ?? {}).sort()).toEqual(["crossing", "inkFirst", "turn"]);
+    const points = steps.reduce((s, x) => s + x.result.routes.reduce((t, r) => t + r.points.length, 0), 0);
+    const firstPoints = follow(hub, { highways: [] }).routes.reduce((s, r) => s + r.points.length, 0);
+    expect(run.terms!.turn).toEqual({ calls: run.evaluations, steps: points });
+    expect(run.terms!.crossing).toEqual({ calls: run.evaluations, steps: points });
+    expect(run.terms!.inkFirst).toEqual({ calls: run.evaluations, steps: firstPoints });
+    const first = follow(hub, { highways: [] }).routes;
+    for (const s of steps) expect(s.score).toBe(searchScore(hub, s.result.routes, first, o));
+    const turnOnly = searchRun({ graph: hub }, { ...SEARCH_DEFAULTS, evaluations: 3, turnWeight: 1 });
+    expect(Object.keys(turnOnly.terms ?? {})).toEqual(["turn"]);
   }, 30_000);
 
   commonTests("search", { ...SEARCH_DEFAULTS, evaluations: 4 }, searchPlan, [flows]);

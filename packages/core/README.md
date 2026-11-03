@@ -633,6 +633,10 @@ Counters in the hot loops count the steps, so a budget stops at the same plan on
 The third argument of `searchRun` is an observer. It gets each measured plan with its routes and its score, and it does not change the search.
 The option `crossingWeight` of `search` adds the crossings of the routes (R1) to the score, divided by the number of routes. The default is 0.
 
+The option `turnWeight` adds the mean total turn of the routes (R4) to the score. The default is 0, no turn term.
+The option `inkBase` `first` divides the drawn ink of B1 by the length of the first routes. The default `routes` divides it by the length of the routes of the plan.
+When one of these terms is on, `searchRun` also gives `terms`: the calls and the route points of each term (SEARCH-CROSS).
+
 A gate keeps, drops or changes the highways of a plan. `gateStrategy(strategy, gate)` puts a gate after a highway strategy, with the name `<strategy>+<gate>`.
 The new strategy has the options of both. The keys of the options of a gate are not keys of the strategy before it. Gates can follow gates.
 
