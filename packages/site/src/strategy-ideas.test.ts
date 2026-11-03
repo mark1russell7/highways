@@ -96,4 +96,14 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["whole/crops"]).toContain("WILD-048");
     expect(built.strategies["whole/choice"]).toContain("WILD-046");
   });
+
+  // The texts `describe` of the strategies of wave 5 (BUILD-W5) cite their ideas.
+  it("gives the cards the ideas of the strategies of wave 5", () => {
+    const built = builtMap(strategyInputs());
+    expect(built.strategies["highway/cut-streets"]).toContain("WILD-035");
+    expect(built.strategies["highway/concave-convex"]).toContain("EDA-032");
+    expect(built.strategies["highway/currents"]).toContain("RULE-051");
+    expect(built.strategies["plugs/auction"]).toContain("WILD-003");
+    expect(built.strategies["whole/moats"]).toContain("WILD-054");
+  });
 });

@@ -104,13 +104,18 @@ import { TRACING_DEFAULTS, tracing, type TracingOptions } from "../whole/tracing
 import { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "../highways/two-way/index.ts";
 import { GLOBAL_ORDER_DEFAULTS, globalOrderPlan, type GlobalOrderOptions } from "../highways/global-order/index.ts";
 import { APPROVAL_DEFAULTS, approvalPlan, type ApprovalOptions } from "../highways/approval/index.ts";
+import { CUT_STREET_DEFAULTS, cutStreetPlan, type CutStreetOptions } from "../highways/cut-streets/index.ts";
+import { CONCAVE_DEFAULTS, concavePlan, type ConcaveOptions } from "../highways/concave-convex/index.ts";
+import { CURRENT_DEFAULTS, currentPlan, type CurrentOptions } from "../highways/currents/index.ts";
+import { AUCTION_DEFAULTS, auctionEnds, type AuctionOptions } from "../plugs/auction/index.ts";
 import { ESCAPE_DEFAULTS, escapeEnds, type EscapeOptions } from "../plugs/escape/index.ts";
 import { CROP_DEFAULTS, crops, type CropOptions } from "../whole/crops/index.ts";
 import { CHOICE_DEFAULTS, choice, type ChoiceOptions } from "../whole/choice/index.ts";
+import { MOAT_DEFAULTS, moats, type MoatOptions } from "../whole/moats/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA } from "./schemas.ts";
+import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA, CUT_STREET_SCHEMA, CONCAVE_SCHEMA, CURRENT_SCHEMA, AUCTION_SCHEMA, MOAT_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -502,6 +507,9 @@ export const highwayStrategies: {
   readonly "two-way": Strategy<"highway", TwoWayOptions>;
   readonly "global-order": Strategy<"highway", GlobalOrderOptions>;
   readonly approval: Strategy<"highway", ApprovalOptions>;
+  readonly "cut-streets": Strategy<"highway", CutStreetOptions>;
+  readonly "concave-convex": Strategy<"highway", ConcaveOptions>;
+  readonly currents: Strategy<"highway", CurrentOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -1049,6 +1057,33 @@ export const highwayStrategies: {
     maxNodes: 10_000,
     run: (input: HighwayInput, o: Readonly<ApprovalOptions>) => approvalPlan(input, o),
   }),
+  "cut-streets": defineStrategy({
+    step: "highway",
+    name: "cut-streets",
+    describe: "Streets along the cuts (WILD-035). The free pieces of the cut lines of a guillotine grouping become streets, and the edges between groups ride them.",
+    defaults: { ...CUT_STREET_DEFAULTS } as CutStreetOptions,
+    schema: CUT_STREET_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CutStreetOptions>) => cutStreetPlan(input, o),
+  }),
+  "concave-convex": defineStrategy({
+    step: "highway",
+    name: "concave-convex",
+    describe: "A concave then convex link cost (EDA-032). Below its capacity each more edge on a link costs less, and above it each more edge costs much more.",
+    defaults: { ...CONCAVE_DEFAULTS } as ConcaveOptions,
+    schema: CONCAVE_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<ConcaveOptions>) => concavePlan(input, o),
+  }),
+  currents: defineStrategy({
+    step: "highway",
+    name: "currents",
+    describe: "The streamlines of a summed current (RULE-051). The edges of one direction drive a current through the free space, and their ways follow it.",
+    defaults: { ...CURRENT_DEFAULTS } as CurrentOptions,
+    schema: CURRENT_SCHEMA,
+    maxNodes: 10_000,
+    run: (input: HighwayInput, o: Readonly<CurrentOptions>) => currentPlan(input, o),
+  }),
   "corridors+breakeven": gateStrategy(corridors, breakEvenGate),
   "corridors+stretch": gateStrategy(corridors, stretchGate),
   "corridors+ambiguity": gateStrategy(corridors, ambiguityGate),
@@ -1065,6 +1100,7 @@ export const plugStrategies: {
   readonly leaders: Strategy<"plugs", LeaderOptions>;
   readonly assign: Strategy<"plugs", AssignOptions>;
   readonly escape: Strategy<"plugs", EscapeOptions>;
+  readonly auction: Strategy<"plugs", AuctionOptions>;
 } = Object.freeze({
   facing: defineStrategy({
     step: "plugs",
@@ -1121,6 +1157,14 @@ export const plugStrategies: {
     defaults: { ...ESCAPE_DEFAULTS },
     schema: ESCAPE_SCHEMA,
     run: (input, o) => escapeEnds(input, o),
+  }),
+  auction: defineStrategy<"plugs", AuctionOptions>({
+    step: "plugs",
+    name: "auction",
+    describe: "A plug auction (WILD-003). Each side of a box has even slots, and the plugs of the box bid for them by angle, detour and crossings.",
+    defaults: { ...AUCTION_DEFAULTS },
+    schema: AUCTION_SCHEMA,
+    run: (input, o) => auctionEnds(input, o),
   }),
 });
 
@@ -1191,6 +1235,7 @@ export const wholeStrategies: {
   readonly tracing: Strategy<"whole", TracingOptions>;
   readonly crops: Strategy<"whole", CropOptions>;
   readonly choice: Strategy<"whole", ChoiceOptions>;
+  readonly moats: Strategy<"whole", MoatOptions>;
 } = Object.freeze({
   pipeline: defineStrategy<"whole", PipelineOptions>({
     step: "whole",
@@ -1255,6 +1300,14 @@ export const wholeStrategies: {
     defaults: { ...CHOICE_DEFAULTS },
     schema: CHOICE_SCHEMA,
     run: (graph, o) => choice(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
+  }),
+  moats: defineStrategy<"whole", MoatOptions>({
+    step: "whole",
+    name: "moats",
+    describe: "An ink floor from moats (WILD-054). The pipeline tries a fixed list of settings, and the largest share of the most ink to save wins.",
+    defaults: { ...MOAT_DEFAULTS },
+    schema: MOAT_SCHEMA,
+    run: (graph, o) => moats(graph, BOARD_PORTFOLIO_SETTINGS, o).output,
   }),
 });
 

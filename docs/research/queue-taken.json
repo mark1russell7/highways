@@ -3,6 +3,7 @@
     "id": "EDA-010",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "rip-up",
     "predicted": {
       "formula": "queue/2",
       "gain": 34,
@@ -44,6 +45,7 @@
     "id": "EDA-032",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "concave-convex",
     "predicted": {
       "formula": "queue/2",
       "gain": 41.5,
@@ -239,6 +241,7 @@
     "id": "RULE-051",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "currents",
     "predicted": {
       "formula": "queue/2",
       "gain": 41.5,
@@ -252,6 +255,7 @@
     "id": "WILD-003",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "auction",
     "predicted": {
       "formula": "queue/2",
       "gain": 40,
@@ -307,6 +311,7 @@
     "id": "WILD-035",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "cut-streets",
     "predicted": {
       "formula": "queue/2",
       "gain": 42,
@@ -390,6 +395,7 @@
     "id": "WILD-054",
     "takenAt": "2026-11-03",
     "by": "BUILD-W5",
+    "strategy": "moats",
     "predicted": {
       "formula": "queue/2",
       "gain": 40.5,

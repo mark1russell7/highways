@@ -62,6 +62,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
 | `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
 | `escape` | The ordered escape of EDA-022. The plugs of each wall take the order of the first legs of their ways, with the gap `slotSpacing`. |
+| `auction` | The plug auction of WILD-003. Each side has even slots, and the plugs of the box bid for them by angle, detour and crossings. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
 - `spread` keeps the room of a wall free of the corner insets (`inset`) and of the fixed plugs on the wall.
@@ -75,6 +76,10 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
   - With `sort`, the default, the plugs of a wall keep that order with the least moves. With `flow`, they go on even slots `slotSpacing` apart.
   - The option `cornerReserve` keeps a share of each side free at the corners. The option `rounds` routes the ways again from the new plugs.
   - A fixed plug does not move, and a plug of a port with a range stays in its range.
+- `auction` (WILD-003) gives each side of a box `slots` even slots or more. The free plugs of the box bid for them in an auction of Bertsekas.
+  - The cost of a slot adds `angle` times the angle to the far end and `detour` times the extra length. It also adds `crossing` times the crossings of the stubs.
+  - Each plug also has a private slot at its facing place, with a large cost. So each plug gets a place.
+  - A fixed plug does not move. A plug of a side port stays on its side, and a plug of a port with a range stays in its range.
 - The option `plug` of `corners` takes a plug rule. The other routers place the plugs as `facing` does.
 
 A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT-RANGE). A free plug of the port goes in this interval.
@@ -471,13 +476,13 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
-| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign`, `escape` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign`, `escape`, `auction` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `two-way`, `global-order`, `approval`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
-| `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum`, `preferences`, `fireflies`, `tracing`, `crops`, `choice` |
+| `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum`, `preferences`, `fireflies`, `tracing`, `crops`, `choice`, `moats` |
 
 `STEPS` gives the steps in the order of the pipeline: `group`, `plugs`, `router`, `highway`, `levels`, `curve`, `room`, `whole`.
 
@@ -533,6 +538,9 @@ Each of these steps has one default strategy. The default gives the output of th
 - `choice` (the step `whole`, WILD-046) reads 9 features of the board and picks one setting by the vote of the `k` nearest rows of `CHOICE_TABLE`.
   The table holds made-up boards only. `scripts/choice-train.ts` makes it from the families with seeds from 100 000, outside the screen sets.
   With an empty table, `choice` routes the first setting of the list. A setting with a break of a hard rule gives its place to the next one.
+- `moats` (the step `whole`, WILD-054) routes the first `settings` settings of `BOARD_PORTFOLIO_SETTINGS` and picks the setting with the largest ink share.
+  `inkFloor(pairs)` grows moats around the plugs, as in the bound of Goemans and Williamson. The floor is a lower bound of the ink of each drawing.
+  The ink share is the saved ink over the most ink that a drawing can save: `(length − ink) / (length − floor)`. The bound reads the first 400 plugs.
 - `strategyKey(router, step)` gives the option of a router that takes a strategy of the step. `pipeline` uses it for the steps `group`, `plugs` and `levels`.
 - `stepRouterStrategy(strategy)` runs a strategy of a step of `RoutedStep` as a router. `stepRouters(registry, step)` gives one router for each strategy of the step.
 
@@ -619,6 +627,9 @@ The step `highway` decides which edges share a way. It gives a plan, not routes.
 | `two-way` | The two-way lanes of NAT-009. Each run puts the edges of one direction side by side. The option `side` is `right`, `left` or `outer`. |
 | `global-order` | The global lane order of WILD-039. A Hilbert key or an angle key, then sifting, gives one order of the edges for all the runs. |
 | `approval` | The approval corridors of WILD-031. Each edge approves the links of its ways within `1 + eps` of its shortest way. The links with the most approvals become corridors. |
+| `cut-streets` | The streets along the cuts of WILD-035. The free pieces of the cut lines of a guillotine tree become streets. The edges between groups ride them. |
+| `concave-convex` | The concave then convex link cost of EDA-032. Below the capacity of a link each more edge costs less. Above it each more edge costs much more. |
+| `currents` | The summed currents of RULE-051. The edges of one direction class drive a current through the free cells, and their ways follow it. |
 
 The strategy `corridors` joins two ways when they share a long length. The length is `BREAK_EVEN` times the lane width or more, and the share `rho` of the shorter way or more.
 The strategies `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `lanes`, `divided`, `crossbars`, `slots`, `two-way` and `global-order` change the plan of the option `from`.
@@ -703,9 +714,9 @@ The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default out
 - A capacity term raises the cost of a link when its users are more than its width holds.
 - With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
 
-### The routers `tight`, `annealing`, `reroute`, `canals` and `adam`
+### The routers `tight`, `annealing`, `reroute`, `rip-up`, `canals` and `adam`
 
-The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Each one starts from the router `shared`.
+The routers `tight`, `annealing`, `reroute`, `rip-up`, `canals` and `adam` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Each one starts from the router `shared`.
 
 - `tightRouter(options)` gives the order of WILD-023: the edges whose second way costs much more than their first way go first.
   Its options are `penalty` (2 to 10), `first` (`tight` or `loose`) and `ties` (`id` or `length`). `tightStrategy` is its router strategy.
@@ -716,6 +727,9 @@ The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. The
 - `rerouteRouter(options)` gives the rule prices and the rip-up of RULE-044. A link costs more in a narrow channel and with edges of other keys.
   A link with an edge of the same key costs less. Each round routes again the share `q` of the edges with the largest prices.
   Its options are `alpha`, `beta`, `gamma` and `tau` (0 to 2), `rounds` (1 to 5), `q` (0.05 to 0.3) and `clearance`. `rerouteStrategy` is its router strategy.
+- `ripUpRouter(options)` gives the rip-up and reroute of EDA-010. Each round takes the ways with faults: crossings with other keys, and a way that goes out and back.
+  With `scope: "neighbours"`, the round also takes the ways that cross them. A link costs more with edges of other keys and with crossings.
+  A round stays only when the sum of the faults falls. Its options are `rounds`, `scope`, `order`, `seed`, `beta`, `gamma` and `cross`. `ripUpStrategy` is its router strategy.
 - `canalRouter(options)` gives the feeder trees of NAT-004. The edges of one key at a hub are sources of flux, and a link with more flux gets cheaper.
   Its options are `mu` (1 to 3), `steps` (30 to 150), `decay` (0.5 to 2) and `minMembers` (2 to 8). `canalStrategy` is its router strategy.
 - `adamRouter(options)` gives the steps of Adam of RULE-020. The free legs of the routes move away from near legs and boxes, along their normals.

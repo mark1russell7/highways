@@ -42,7 +42,7 @@ const round = (v: number): number => Math.round(v * 2) / 2;
  * This function gives the free pieces of the line `x = c` (axis `x`) or `y = c` (axis `y`). A box closer than `pad` to the line blocks it.
  * A piece shorter than `min` is not in the list. The pieces run over the board and `2 pad` past it.
  */
-function freePieces(finder: WayFinder, axis: "x" | "y", c: number, pad: number, min: number, lo: number, hi: number): FreeLine[] {
+export function freePieces(finder: WayFinder, axis: "x" | "y", c: number, pad: number, min: number, lo: number, hi: number): FreeLine[] {
   const blocks: [number, number][] = [];
   const strip = axis === "x" ? { x: c - pad, y: lo, w: 2 * pad, h: hi - lo } : { x: lo, y: c - pad, w: hi - lo, h: 2 * pad };
   finder.obstacles.query(strip, (n) => {

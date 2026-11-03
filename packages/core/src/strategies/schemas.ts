@@ -25,6 +25,11 @@ import type { ApprovalOptions } from "../highways/approval/index.ts";
 import type { EscapeOptions } from "../plugs/escape/index.ts";
 import type { CropOptions } from "../whole/crops/index.ts";
 import type { ChoiceOptions } from "../whole/choice/index.ts";
+import type { CutStreetOptions } from "../highways/cut-streets/index.ts";
+import type { ConcaveOptions } from "../highways/concave-convex/index.ts";
+import type { CurrentOptions } from "../highways/currents/index.ts";
+import type { AuctionOptions } from "../plugs/auction/index.ts";
+import type { MoatOptions } from "../whole/moats/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
 import type { KeyOptions } from "../groups/keys/index.ts";
 import type { HighwayBase } from "../highways/base.ts";
@@ -1220,4 +1225,53 @@ export const CROP_SCHEMA: OptionSchema<CropOptions> = {
 export const CHOICE_SCHEMA: OptionSchema<ChoiceOptions> = {
   k: { type: "integer", min: 1, max: 10, step: 1, marks: [1, 3, 5, 10], default: 3, describe: "The number of nearest boards of the table that vote." },
   features: { type: "enum", values: ["all", "size", "shape"], default: "all", describe: "The features that the model reads: each feature, the size of the board, or its shape." },
+};
+
+/** The declarations of the options of the highway strategy `cut-streets` (WILD-035). */
+export const CUT_STREET_SCHEMA: OptionSchema<CutStreetOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  grouping: { type: "enum", values: ["cut", "kd"], default: "cut", describe: "The grouping rule that cuts the board: the guillotine cut, or the median split." },
+  levels: { type: "integer", min: 1, max: 3, step: 1, default: 2, describe: "The number of levels of the tree whose cut lines become streets." },
+  reach: { type: "number", min: 0, max: 4, step: 0.5, marks: [0, 1, 2, 4], default: 1, describe: "The cost of each ramp to a street or from it, in margins." },
+  detour: { type: "number", min: 1, max: 3, step: 0.1, marks: [1.2, 1.6, 2, 3], default: 1.6, describe: "An edge rides the streets only when its way is this many times its first route, or shorter." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `concave-convex` (EDA-032). */
+export const CONCAVE_SCHEMA: OptionSchema<ConcaveOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  alpha: { type: "number", min: 0.3, max: 1, step: 0.05, marks: [0.3, 0.5, 0.75, 1], default: 0.5, describe: "The exponent of the concave cost below the capacity." },
+  beta: { type: "number", min: 0.15, max: 1, step: 0.05, marks: [0.15, 0.5, 1], default: 0.5, describe: "The growth of the convex cost above the capacity." },
+  power: { type: "number", min: 1, max: 4, step: 0.5, marks: [1, 2, 4], default: 2, describe: "The power of the convex cost above the capacity." },
+  mu: { type: "number", min: 1, max: 10, step: 0.5, marks: [1, 4, 10], default: 4, describe: "The cost of each edge above the capacity, as a share of the length." },
+  spacing: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 4, describe: "The width of one lane: the capacity of a link is its free width over this value." },
+  passes: { type: "integer", min: 1, max: 4, step: 1, default: 3, describe: "The number of passes of the negotiation." },
+  keys: { type: "enum", values: ["all", "collection"], default: "all", describe: "The edges that can share a link at a low cost: all the edges, or the edges of one collection." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `currents` (RULE-051). */
+export const CURRENT_SCHEMA: OptionSchema<CurrentOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  beta: { type: "number", min: 0, max: 2, step: 0.1, marks: [0, 0.5, 1, 2], default: 1, describe: "The pull of the current of the class on a way." },
+  cell: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 4, describe: "The side of a cell of the sheet. A large board gets larger cells." },
+  classes: { type: "integer", min: 1, max: 8, step: 1, marks: [1, 2, 4, 8], default: 4, describe: "The number of direction classes: 1, 2, 4 or 8. Another value gives 4." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the plug strategy `auction` (WILD-003). */
+export const AUCTION_SCHEMA: OptionSchema<AuctionOptions> = {
+  slots: { type: "integer", min: 2, max: 16, step: 1, marks: [2, 6, 10, 16], default: 6, describe: "The least number of slots on each side. A side gets more slots when its box has more plugs." },
+  angle: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2, 4], default: 1, describe: "The weight of the angle between the normal of the slot and the far end." },
+  detour: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 2, 4], default: 1, describe: "The weight of the detour of the slot against the facing plug." },
+  crossing: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 0.5, 1, 4], default: 0.5, describe: "The weight of each crossing of the straight stubs." },
+  eps: { type: "number", min: 0.01, max: 1, step: 0.01, marks: [0.01, 0.1, 1], default: 0.1, describe: "The last step of the prices, over the number of plugs plus 1." },
+};
+
+/** The declarations of the options of the whole strategy `moats` (WILD-054). */
+export const MOAT_SCHEMA: OptionSchema<MoatOptions> = {
+  settings: { type: "integer", min: 1, max: 12, step: 1, marks: [1, 4, 8, 12], default: 4, describe: "The number of settings that the strategy tries, from the start of its list." },
 };
