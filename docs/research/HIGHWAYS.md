@@ -11,8 +11,8 @@ The measures (`B1`, `R5`, `Z10` and the others) come from [the measures of a goo
 
 ## Summary
 
-- The note gives 60 ideas in four groups. The groups are edge bundling (22), clustering of edges (13), network design (10) and dynamic rules (15).
-- 32 ideas come from the literature, 11 are hybrids and 17 are our own. Thus 28 of 60 ideas are ours or hybrids.
+- The note gives 61 ideas in four groups. The groups are edge bundling (22), clustering of edges (13), network design (10) and dynamic rules (16).
+- 32 ideas come from the literature, 11 are hybrids and 18 are our own. Thus 29 of 61 ideas are ours or hybrids.
 - The router `shared` is already a heuristic of fixed-charge network design. A link that `k` edges of one key use costs `len (1 + (k - 1) discount)`.
 - A cost `f^α` for a link with `f` edges sets the when, the where and the merge angle with one number. Two equal flows merge with a half angle `θ`, and `cos θ = 2^(α - 1)`.
 - Two parallel edges at the gap `d` save ink only if they share more than `d √((2 + t) / (2 - t))`. With one line for the shared part (`t = 1`), the limit is `1.73 d`.
@@ -72,7 +72,7 @@ Each idea reads one of four kinds of input. The column Mode of the [index](#the-
 | [Edge bundling](#edge-bundling) | How the edges of a highway gather and look | HWY-001 to HWY-022 | 20 | 2 | 0 |
 | [Clustering of edges](#clustering-of-edges) | Which edges belong to one highway | HWY-023 to HWY-035 | 6 | 5 | 2 |
 | [Network design](#network-design) | Where a highway runs, and what it costs | HWY-036 to HWY-045 | 6 | 2 | 2 |
-| [Dynamic rules](#dynamic-rules) | When a highway forms, splits, changes its width or changes with the zoom | HWY-046 to HWY-060 | 0 | 2 | 13 |
+| [Dynamic rules](#dynamic-rules) | When a highway forms, splits, changes its width or changes with the zoom | HWY-046 to HWY-061 | 0 | 2 | 14 |
 | All | | 60 | 32 | 11 | 17 |
 
 ### The index of the ideas
@@ -141,6 +141,7 @@ The column Tier comes from the [ranking](#the-ranking-and-the-build-order). The 
 | [HWY-058](#hwy-058) | Orthogonal streets by set cover | ours | `highway` | A | M | 3 |
 | [HWY-059](#hwy-059) | Local search over the highway set on the measures | ours | `highway` | B | M | 3 |
 | [HWY-060](#hwy-060) | Interchanges: a network of highways | ours | `highway` | B | L | 3 |
+| [HWY-061](#hwy-061) | Split and merge with hysteresis for each edge | ours | `highway` | B | S | 1 |
 
 ## The derived formulas
 
@@ -975,6 +976,19 @@ Kind: ours. Step: `highway`. Mode: B. Prototype: L. Depends on the placement: ye
 - **Sources.** [Andrienko and Andrienko 2011][andrienko11].
 - **Related.** [HWY-041](#hwy-041), [HWY-033](#hwy-033), [HWY-042](#hwy-042).
 
+### HWY-061 Split and merge with hysteresis for each edge
+
+Kind: ours. Step: `highway`. Mode: B. Prototype: S. Depends on the placement: yes.
+
+- **What it does.** An edge leaves its highway when the gap of the spine is too narrow for the lanes. It also leaves when the highway is a long detour for it. The condition must hold for some runs in a row. The edge joins again only after more calm runs and a drop of the lane demand. So an edge does not leave and join in a loop over small edits.
+- **Math.** `Each run reads one link for each member edge: ends hw and gap, pressure p = lanes w / gap g, closure = (b - 1) a + pad - (route - alone). Split after k_s runs with g < m w and p > 1, or a negative closure. Merge after k_m > k_s runs with g >= 0.9 rest, p < 0.7 and a lower demand.`
+- **Cost.** `O(H m)` for each run, with the routes of `edgeLengths`. 1000 nodes: < 5 ms over the plan.
+- **Options.** `press runs 1..8`, `merge runs 2..12`, `lane width 1..20`, `detour budget 1..3`.
+- **Improves.** `Z13`, `Z10`. **Risks.** `B1`.
+- **Screen.** The seeded edits of the screen option `edits` (5 edits) on `screen-v1`. Keep if `Z13` drops by 20% against `corridors`, with `B1` within 5%.
+- **Sources.** None. The gate `split-hysteresis` (SPLIT-HYSTERESIS) builds it.
+- **Related.** [HWY-046](#hwy-046), [HWY-054](#hwy-054), [HWY-048](#hwy-048).
+
 ## The standard screen
 
 Each screen of this note uses the same frame. BUILD-W runs it in CI, through the records of the item SCREEN.
@@ -993,7 +1007,7 @@ The ranking weighs the expected value against the cost of a prototype. The value
 
 | Tier | Meaning | Ideas |
 |---|---|---|
-| 1 | High value, small cost. Build these first. | [HWY-031](#hwy-031), [HWY-050](#hwy-050), [HWY-046](#hwy-046), [HWY-047](#hwy-047), [HWY-048](#hwy-048), [HWY-049](#hwy-049), [HWY-026](#hwy-026), [HWY-034](#hwy-034), [HWY-043](#hwy-043), [HWY-054](#hwy-054), [HWY-015](#hwy-015), [HWY-037](#hwy-037) |
+| 1 | High value, small cost. Build these first. | [HWY-031](#hwy-031), [HWY-050](#hwy-050), [HWY-046](#hwy-046), [HWY-047](#hwy-047), [HWY-048](#hwy-048), [HWY-049](#hwy-049), [HWY-026](#hwy-026), [HWY-034](#hwy-034), [HWY-043](#hwy-043), [HWY-054](#hwy-054), [HWY-015](#hwy-015), [HWY-037](#hwy-037), [HWY-061](#hwy-061) |
 | 2 | High value with a medium cost, or medium value with a small cost | [HWY-018](#hwy-018), [HWY-045](#hwy-045), [HWY-003](#hwy-003), [HWY-017](#hwy-017), [HWY-056](#hwy-056), [HWY-052](#hwy-052), [HWY-038](#hwy-038), [HWY-039](#hwy-039), [HWY-023](#hwy-023), [HWY-025](#hwy-025), [HWY-020](#hwy-020), [HWY-005](#hwy-005), [HWY-016](#hwy-016), [HWY-051](#hwy-051), [HWY-055](#hwy-055), [HWY-012](#hwy-012), [HWY-019](#hwy-019), [HWY-011](#hwy-011), [HWY-024](#hwy-024), [HWY-032](#hwy-032), [HWY-028](#hwy-028), [HWY-042](#hwy-042) |
 | 3 | A reference, a renderer option, a slow method or a narrow use | [HWY-001](#hwy-001), [HWY-002](#hwy-002), [HWY-004](#hwy-004), [HWY-006](#hwy-006), [HWY-007](#hwy-007), [HWY-008](#hwy-008), [HWY-009](#hwy-009), [HWY-010](#hwy-010), [HWY-013](#hwy-013), [HWY-014](#hwy-014), [HWY-021](#hwy-021), [HWY-022](#hwy-022), [HWY-027](#hwy-027), [HWY-029](#hwy-029), [HWY-030](#hwy-030), [HWY-033](#hwy-033), [HWY-035](#hwy-035), [HWY-036](#hwy-036), [HWY-040](#hwy-040), [HWY-041](#hwy-041), [HWY-044](#hwy-044), [HWY-053](#hwy-053), [HWY-057](#hwy-057), [HWY-058](#hwy-058), [HWY-059](#hwy-059), [HWY-060](#hwy-060) |
 

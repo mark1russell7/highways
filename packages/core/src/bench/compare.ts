@@ -12,6 +12,7 @@ import { STRATEGIES } from "../strategies/builtins.ts";
 import { asRouter, createRegistry, defineStrategy, getStrategy, listStrategies, STEPS, type AnyStrategy, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { peakCurvature } from "./curves.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
+import { highwayEdits } from "./measures/highways.ts";
 import { paretoFront, type Objective } from "./measures/pareto.ts";
 import { roomOrderFaults } from "./measures/room.ts";
 import { boardUnit } from "./measures/routes.ts";
@@ -85,6 +86,11 @@ export interface CompareOptions {
   readonly stabilityMax?: number;
   /** The name of the graph in the rows. The default is `board`. */
   readonly name?: string;
+  /**
+   * The number of seeded edits for the stability of the highways (Z10 over edits and the flicker Z13). Only the step `highway` of `compareAnyStep` reads it.
+   * Each highway strategy runs again after each edit of `highwayEdits`, with its plan before the edit. The default is 0: no edits.
+   */
+  readonly edits?: number;
 }
 
 /** One strategy of one step on one graph: its measures and its output. */
@@ -341,7 +347,13 @@ function compareOne(step: Step, strategy: AnyStrategy, graph: Graph, registry: R
   if (step === "room") return roomRow(strategy as Strategy<"room">, graph, options.options?.[strategy.name]);
   if (isRoutedStep(step)) {
     const one = createRegistry([stepRouterStrategy(strategy as Strategy<RoutedStep>) as AnyStrategy]);
-    return { ...compareStep("router", graph, { ...options, registry: one }).rows[0]!, step };
+    const row = compareStep("router", graph, { ...options, registry: one }).rows[0]!;
+    const edits = step === "highway" && row.skipped === undefined ? Math.max(0, Math.floor(options.edits ?? 0)) : 0;
+    if (edits === 0) return { ...row, step };
+    // Z10 over edits and Z13: the strategy runs again after each seeded edit, with its plan before the edit, as the screen option `edits` does.
+    const z = highwayEdits(graph, strategy as Strategy<"highway", object>, options.options?.[strategy.name], edits, options.seed ?? 1);
+    const values = { ...row.values, "Z10.edits.mean": z.mean, "Z10.edits.moved": z.moved, "Z10.churn": z.churn, "Z10.ids": z.ids, "Z13.flicker": z.flicker };
+    return { ...row, step, values };
   }
   const curveRouter = step === "curve" ? [getStrategy(registry, "router", options.curveRouter ?? "corners") as AnyStrategy] : [];
   return compareStep(step, graph, { ...options, registry: createRegistry([...curveRouter, strategy]) }).rows[0]!;
@@ -351,6 +363,7 @@ function compareOne(step: Step, strategy: AnyStrategy, graph: Graph, registry: R
  * This function runs each strategy of any step of `STEPS` on one graph and measures it. Then it gives the Pareto front of `FRONT_OBJECTIVES`.
  * The steps `group`, `router` and `curve` give the rows of `compareStep`.
  * The step `highway` makes the plan of each strategy and routes it with `follow`, as the screen does. It measures the routes as the step `router`.
+ * With the option `edits`, the step `highway` also gives the measures over seeded edits: Z10 over edits and the flicker Z13.
  * The steps `plugs`, `levels` and `whole` also run each strategy as a router (`stepRouterStrategy`), and measure the routes as the step `router`.
  * The step `room` opens the gaps of the board with each strategy (`openGaps`). It measures the open board as the step `room` of `runSuite`.
  * The step `room` expects a packed board, for example `packedGridBoard`. On a board with wide gaps, a gap opens only when its links need more room.

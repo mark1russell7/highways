@@ -1,4 +1,18 @@
-export { checkPlan, lengthBetween, memberAt, pointAt, TWO_WAY_SIDES, type Highway, type HighwayInput, type HighwayMember, type HighwayPlan, type LaneRule, type TwoWaySide } from "./model.ts";
+export {
+  checkPlan,
+  lengthBetween,
+  memberAt,
+  pointAt,
+  previousOf,
+  TWO_WAY_SIDES,
+  type Highway,
+  type HighwayInput,
+  type HighwayMember,
+  type HighwayPlan,
+  type LaneRule,
+  type SplitState,
+  type TwoWaySide,
+} from "./model.ts";
 export { follow, ruleLanes, type FollowOptions } from "./follow.ts";
 export { planOfResult } from "./result.ts";
 export { highwayRouter, highwayRouterStrategy } from "./router.ts";

@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-02",
-  "commit": "1c6fa5a8fa14c3f072dc5be4def25917743eca5e",
+  "date": "2026-11-03",
+  "commit": "25a2be43b2eff6d771fc765b06c94f9b9cc0cb80",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -69,14 +69,14 @@
     }
   ],
   "counts": {
-    "rows": 186,
+    "rows": 187,
     "ranked": 153,
     "duplicates": 9,
     "blocked": 12,
     "blockedByStepAndMeasure": 0,
     "openTargets": 87,
     "byStatus": {
-      "built": 24,
+      "built": 25,
       "queued": 153
     },
     "byStep": {
@@ -260,6 +260,7 @@
     {"id":"EDA-022","name":"Ordered escape for plugs","step":"plugs","kind":"literature","wins":["R1","R11","B5","R10"],"gain":40,"uncertainty":0.7,"cost":1,"score":28,"rank":null,"slot":true,"canonical":"EDA-022","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":34,"uncertainty":0.7,"cost":1,"score":23.8,"rank":3},"strategy":"escape","measured":1.5},
     {"id":"EDA-038","name":"Lane collapse for each zoom","step":"levels","kind":"hybrid","wins":["Z4","B7","R12"],"gain":2.5,"uncertainty":0.85,"cost":1,"score":2.125,"rank":null,"slot":true,"canonical":"WILD-016","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13,"uncertainty":1.2,"cost":1,"score":15.6,"rank":2},"strategy":"detail","measured":1},
     {"id":"EDA-041","name":"Boundary leaders as plug stubs","step":"plugs","kind":"hybrid","wins":["R1","R11","R10"],"gain":39.5,"uncertainty":0.85,"cost":1,"score":33.575,"rank":null,"slot":true,"canonical":"EDA-041","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":13.5,"uncertainty":1.02,"cost":1,"score":13.77,"rank":6},"strategy":"leaders","measured":2.5},
+    {"id":"HWY-061","name":"Split and merge with hysteresis for each edge","step":"highway","kind":"ours","wins":["Z13","Z10"],"gain":2,"uncertainty":1,"cost":1,"score":2,"rank":null,"slot":true,"canonical":"HWY-061","blockedBy":[],"status":"built","strategy":"corridors+split-hysteresis"},
     {"id":"NAT-004","name":"Canalization feeder trees to hubs","step":"router","kind":"hybrid","wins":["B1","R1","B2"],"gain":72.5,"uncertainty":1.02,"cost":2,"score":36.975,"rank":null,"slot":true,"canonical":"NAT-004","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":59.5,"uncertainty":1.02,"cost":2,"score":30.345,"rank":2},"strategy":"canals","measured":2},
     {"id":"NAT-009","name":"Two-way lanes","step":"highway","kind":"hybrid","wins":["B5","R1"],"gain":33,"uncertainty":0.85,"cost":1,"score":28.05,"rank":null,"slot":true,"canonical":"NAT-009","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":29,"uncertainty":0.85,"cost":1,"score":24.65,"rank":1},"strategy":"two-way","measured":10.5},
     {"id":"NAT-016","name":"Closed venation backbone for levels","step":"levels","kind":"hybrid","wins":["B1","R1","Z3","B7"],"gain":73,"uncertainty":1.02,"cost":1,"score":74.46,"rank":null,"slot":true,"canonical":"NAT-016","blockedBy":[],"status":"built","takenAt":"2026-10-29","predicted":{"formula":"queue/2","gain":25,"uncertainty":1.02,"cost":1,"score":25.5,"rank":1},"strategy":"venation","measured":1},

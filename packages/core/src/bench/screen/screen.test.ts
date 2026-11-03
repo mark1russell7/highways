@@ -403,6 +403,7 @@ describe("screen", () => {
       ["highway", "corridors+ambiguity"],
       ["highway", "corridors+hysteresis"],
       ["highway", "corridors+ids"],
+      ["highway", "corridors+split-hysteresis"],
     ]);
     for (const r of records.filter((x) => x.step === "highway")) {
       expect(Object.keys(r.hard), r.strategy).toEqual([...SCREEN_RULES.highway]);
@@ -419,7 +420,7 @@ describe("screen", () => {
     expect(plain.measures["route.stability.highway-churn"]).toBeUndefined();
     const { records } = screen("highway", ["corridors", "corridors+ids"], { inputs: [tiny], baseline: false, baseRouters: [], edits: 2 });
     for (const r of records) {
-      for (const name of ["route.stability.edits.mean", "route.stability.edits.moved", "route.stability.highway-churn"]) expect(typeof r.measures[name], `${r.strategy} ${name}`).toBe("number");
+      for (const name of ["route.stability.edits.mean", "route.stability.edits.moved", "route.stability.highway-churn", "route.stability.highway-flicker"]) expect(typeof r.measures[name], `${r.strategy} ${name}`).toBe("number");
     }
     const [corridors, ids] = records;
     // The gate ids changes only the ids, so the routes and the pairs of edges do not change.

@@ -473,7 +473,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
 | `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign`, `escape` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
-| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `two-way`, `global-order`, `approval`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
+| `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `two-way`, `global-order`, `approval`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids`, `corridors+split-hysteresis` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
 | `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
@@ -643,8 +643,25 @@ The new strategy has the options of both. The keys of the options of a gate are 
 | `ambiguity` (HWY-049) | Each highway keeps its largest group of edges whose end nodes have an ambiguity of `maxAmbiguity` or less. The ambiguity is the share of the pairs of end nodes without an edge. |
 | `hysteresis` (HWY-046) | A new highway needs `kOn` edges. A highway of the plan before the edit stays while it has `kOff` edges. |
 | `ids` (HWY-054) | Each highway takes the id of the highway of the plan before the edit with the most common edges. The routes do not change. |
+| `split-hysteresis` (HWY-061) | An edge leaves its highway after `pressEvaluations` runs with a narrow gap or a long detour. It joins again after `mergeEvaluations` calm runs with a lower lane demand. |
 
 The gates `hysteresis` and `ids` read `HighwayInput.previous`: the graph and the plan before an edit. Without it, `hysteresis` uses the limit `kOn` and `ids` changes nothing.
+
+The gate `split-hysteresis` does one evaluation of its policy (`decideSplits`) for each run. A link joins each member edge to its highway, and its id holds the stable id of the highway.
+The plan gives the memory of the gate in `splits`. `previousOf(graph, plan)` puts it in `previous.splits` for the next run. A run without it starts from an empty memory.
+The gate forgets the links of each edge that the graph before the edit has and the graph does not have. The gate reads these values of the plan:
+
+| Value of the policy | Value of the plan |
+|---|---|
+| An end | A highway, or the gap that its spine goes through |
+| `size` | The width of the gap: two times the distance from the spine to the nearest box that is not an end of a member |
+| `restSize` | The width of all the lanes of the highway: `laneWidth` times the lanes |
+| `minSize` | The width of `minLanes` lanes. The default 2 is the `minSize` of the router `trunks`. |
+| `pressure` | The width of the lanes over the width of the gap. The yield pressure is 1. |
+| `closure` | The permitted detour of the edge less its actual detour. The need is the permitted detour: `detourBudget - 1` times the route alone, plus `detourPad`. |
+| `forced` | An edge between two nodes of different frames |
+| `demand` | The width of all the lanes of the plan |
+| `order` | The lane of the edge in its highway |
 The functions `keepMembers`, `edgeLengths`, `matchHighways`, `jaccard` and `commonEdges` help a new gate.
 
 A registry is data. No import changes it. The benchmark and the site take their lists from `STRATEGIES`, so a new built-in strategy gets its rows and its button with no other edit. A consumer makes its own registry:

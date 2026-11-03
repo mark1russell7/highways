@@ -1,5 +1,6 @@
 import { dist, type Point } from "../geom.ts";
 import type { Graph, Result } from "../model.ts";
+import type { SplitRecord } from "./gates/split-hysteresis/policy.ts";
 
 /** The input of a highway strategy: the boxes and the edges, and optionally the first routes of a router. */
 export interface HighwayInput {
@@ -11,9 +12,27 @@ export interface HighwayInput {
   readonly routes?: Result;
   /**
    * This value is the graph before an edit and the plan of the same strategy on it. A strategy that keeps its highways stable over edits reads it.
-   * The gates `hysteresis` (HWY-046) and `ids` (HWY-054) read it. The other strategies ignore it.
+   * The gates `hysteresis` (HWY-046), `ids` (HWY-054) and `split-hysteresis` (HWY-061) read it. The other strategies ignore it.
+   * The gate `split-hysteresis` reads its memory from `splits`. `previousOf` gives this value from the plan of the run before.
    */
-  readonly previous?: { readonly graph: Graph; readonly plan: HighwayPlan };
+  readonly previous?: { readonly graph: Graph; readonly plan: HighwayPlan; readonly splits?: SplitState };
+}
+
+/**
+ * The memory of the gate `split-hysteresis` (HWY-061) between two runs, as plain data.
+ * The timers and the split records are lists of pairs, sorted by the link id. A link id joins the id of a highway and the id of an edge.
+ */
+export interface SplitState {
+  /** The count of the runs of the gate before this run. */
+  readonly evaluations: number;
+  /** The count of the runs in a row with a split condition, for each link that is not split. */
+  readonly pressed: readonly (readonly [string, number])[];
+  /** The count of the runs in a row with the merge condition, for each split link. */
+  readonly relaxed: readonly (readonly [string, number])[];
+  /** The split links. */
+  readonly split: readonly (readonly [string, SplitRecord])[];
+  /** The plan before the gate, with stable ids. The next run matches its highways with these highways. */
+  readonly base: HighwayPlan;
 }
 
 /**
@@ -82,6 +101,13 @@ export interface HighwayPlan {
   readonly highways: readonly Highway[];
   /** The lane rule of the shared runs. Most strategies give no rule. */
   readonly laneRule?: LaneRule;
+  /** The memory of the gate `split-hysteresis` after this plan. Only that gate gives it. The next run gets it in `previous.splits`. */
+  readonly splits?: SplitState;
+}
+
+/** This function gives the value `previous` of the next run: the graph, the plan and the memory of the gate `split-hysteresis` in the plan. */
+export function previousOf(graph: Graph, plan: HighwayPlan): NonNullable<HighwayInput["previous"]> {
+  return { graph, plan, ...(plan.splits ? { splits: plan.splits } : {}) };
 }
 
 /** This function gives the point at a place on a polyline. A place outside the polyline gives its nearest end. */
