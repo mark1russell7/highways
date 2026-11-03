@@ -169,4 +169,6 @@ The fix keeps the costs of the boxes in a typed array with a stamp, so the searc
 The links, their lengths and their boxes are in flat typed arrays. The arrays of the search and the heap stay from one search to the next.
 The search adds the same box costs in the same order, so each path and each cost stays the same to the last bit.
 A new test compares the search with a copy of the search of version 0.11.0, with a new cost function in each search.
-The `Sections gate` run of the pull request times the fix.
+The `Sections gate` run 41691623211 of #276 timed the fix. The A/A spread of the run is 0.025, below the noise cap 0.058.
+The head takes 0.943 times the time of its parent (41.4 s against 43.9 s), and 0.928 times the time of the fixed base `25a2be4`.
+The interval of the head over the A/A arm is 0.930 to 0.950. So the fix is faster, and the gain is 5 % to 7 %.
