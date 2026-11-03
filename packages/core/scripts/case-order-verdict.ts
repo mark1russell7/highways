@@ -6,6 +6,7 @@
 // Each round runs each arm one time, in turn. Odd rounds reverse the order. The runs go in CI only, not on a local machine.
 // The verdict of a case is the equivalence verdict of the strategy (TOST): one effect interval E against the budget b.
 // This module starts no process and reads no clock, so the tests give made-up reports.
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import { quantileOf, type PairedReport, type RecordEnv } from "./gates/paired.ts";
 
 /** The targets of the run: the paired screen, the times of the zoom levels and the remeasure of PORTFOLIO-SPEED. */
@@ -326,16 +327,9 @@ export function jobRatios(s: JobSamples, r2: boolean): JobRatios {
   };
 }
 
-/** This function gives a random source of numbers in [0, 1) from a seed (mulberry32). The same seed gives the same numbers. */
+/** This function gives a random source of numbers in [0, 1) from a seed. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
 export function seeded(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(seed);
 }
 
 /** The rates of a resample of the alone processes. */

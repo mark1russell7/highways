@@ -197,7 +197,11 @@ function countRules(rules: readonly string[], violations: readonly { readonly ru
   return out;
 }
 
-/** This function gives the median of a list of numbers, or `NaN` for an empty list. */
+/**
+ * This function gives the median of a list of numbers, or `NaN` for an empty list.
+ * This copy stays. The local `quantile` gives `NaN` for an empty list and for `Infinity` next to the middle value.
+ * The functions of `@mark1russell7/rigor-statistics` throw or give a number there, and the records change.
+ */
 function median(values: readonly number[]): number {
   return quantile(values, 0.5);
 }

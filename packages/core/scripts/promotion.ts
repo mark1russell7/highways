@@ -11,6 +11,7 @@
 // The script reads files and does no layout, so it is a quick local check.
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
+import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { compareSpec, MEASURES, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
 import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
@@ -90,12 +91,7 @@ function pairs(records: readonly Rec[]): Pair[] {
     });
 }
 
-const median = (xs: readonly number[]): number => {
-  if (xs.length === 0) return NaN;
-  const s = [...xs].sort((x, y) => x - y);
-  const m = s.length >> 1;
-  return s.length % 2 === 1 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
-};
+const median = (xs: readonly number[]): number => (xs.length === 0 ? NaN : homeMedian(xs));
 const quantile = (xs: readonly number[], q: number): number => {
   if (xs.length === 0) return NaN;
   const s = [...xs].sort((x, y) => x - y);

@@ -1,3 +1,4 @@
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../../bench/measures/bundles.ts";
 import { measureQuality } from "../../bench/quality.ts";
 import type { Point } from "../../geom.ts";
@@ -66,16 +67,9 @@ export const SEARCH_MOVES: readonly SearchMove[] = Object.freeze(["add", "drop",
 /** The number of moves of one sweep of the annealing. */
 const SWEEP = 4;
 
-/** This function gives a seeded random source with values from 0 to 1 (mulberry32). */
+/** This function gives a seeded random source with values from 0 to 1 (`mulberry32`). The seed goes down to an integer first. */
 function random(seed: number): () => number {
-  let a = Math.floor(seed) >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(Math.floor(seed));
 }
 
 /**

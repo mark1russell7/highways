@@ -49,7 +49,10 @@ interface Candidate {
   readonly taps: readonly Tap[];
 }
 
-/** This function gives the median of the values, or 0 when there is none. */
+/**
+ * This function gives the median of the values, or 0 when there is none.
+ * This copy stays. It takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
+ */
 function median(values: readonly number[]): number {
   if (values.length === 0) return 0;
   const s = [...values].sort((a, b) => a - b);

@@ -123,6 +123,7 @@ export function fdebLines(input: HighwayInput, finder: WayFinder, o: Readonly<Fd
   const partners = partnersOf(segments, o.compatibility);
   const lengths = segments.map((s) => dist(s.a, s.b));
   const sorted = [...lengths].sort((a, b) => a - b);
+  // This median takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
   const median = sorted[Math.floor(sorted.length / 2)]!;
   const pad = finder.margin / 2;
   const reach = finder.margin * 2;
