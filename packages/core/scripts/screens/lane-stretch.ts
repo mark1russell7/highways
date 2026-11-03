@@ -2,6 +2,7 @@
 // Start: `pnpm screen --step router --strategy shared,shared-all --module scripts/screens/lane-stretch.ts` in `packages/core`. The baselines are `shared` and `shared-all`.
 // At the exit, the script writes an audit of the set `screen-v1` for each variant: the lane crossings (B5), the broken pairs, their total and the route time.
 // A broken pair is a pair of lanes of a run in the order against the relation `bundle`. Its lanes cross at an end of the run, and B5 does not count it.
+import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { laneCrossings } from "../../src/bench/measures/lanes.ts";
 import { inputGraph } from "../../src/bench/screen/forms.ts";
 import { SCREEN_V1, screenInputs } from "../../src/bench/screen/set.ts";
@@ -74,11 +75,8 @@ interface Audit {
   ms: number[];
 }
 
-/** This function gives the median of a list of numbers. */
-const median = (xs: readonly number[]): number => {
-  const s = [...xs].sort((a, b) => a - b);
-  return s.length === 0 ? 0 : s.length % 2 === 1 ? s[s.length >> 1]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
-};
+/** This function gives the median of a list of numbers, or 0 for an empty list. */
+const medianOrZero = (xs: readonly number[]): number => (xs.length === 0 ? 0 : homeMedian(xs));
 
 /** This function routes each input of the set with each variant, and gives the audit by variant and the B5 of each input. */
 function audit(): { totals: Record<string, Omit<Audit, "ms"> & { total: number; msMedian: number; msSum: number }>; perInput: Record<string, Record<string, number>> } {
@@ -111,10 +109,10 @@ function audit(): { totals: Record<string, Omit<Audit, "ms"> & { total: number; 
           a.stretches++;
           a.joinedRuns += s.runs.length;
         }
-        a.ms.push(median(times));
+        a.ms.push(medianOrZero(times));
         (perInput[id] ??= {})[name] = b5;
       }
-      totals[name] = { inputs: a.inputs, laneCrossings: a.laneCrossings, brokenPairs: a.brokenPairs, brokenDistinct: a.brokenDistinct, total: a.laneCrossings + a.brokenDistinct, stretches: a.stretches, joinedRuns: a.joinedRuns, msMedian: median(a.ms), msSum: a.ms.reduce((x, y) => x + y, 0) };
+      totals[name] = { inputs: a.inputs, laneCrossings: a.laneCrossings, brokenPairs: a.brokenPairs, brokenDistinct: a.brokenDistinct, total: a.laneCrossings + a.brokenDistinct, stretches: a.stretches, joinedRuns: a.joinedRuns, msMedian: medianOrZero(a.ms), msSum: a.ms.reduce((x, y) => x + y, 0) };
     }
   }
   return { totals, perInput };

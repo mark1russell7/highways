@@ -21,6 +21,7 @@
 //   The field `tests` gives the count of each `fn`, and `near` gives the near count of each `fn`.
 // The script writes each near input one time for each board. The field `n` counts the repeats of the line on the board.
 // The field `via` is the file and the line of the caller of the predicate, at the first test of the line.
+// A line of a call site with a rule in `CALL_SITE_RULES` (`src/predicate-sink.ts`) gets the key of the rule as `rule`. The other lines have no `rule`.
 // A side test in the body of a function gives the caller of that function as `via`.
 // A board with more than `--max-lines` lines (default 200 000) gets no more new lines. Its counts continue, and its total line gets `"truncated": true`.
 import { closeSync, mkdirSync, openSync, readFileSync, realpathSync, writeFileSync, writeSync } from "node:fs";
@@ -31,7 +32,7 @@ import { CASES } from "../src/cases.ts";
 import { FIXTURES, makeFixture } from "../src/fixtures.ts";
 import type { Point } from "../src/geom.ts";
 import type { Graph } from "../src/model.ts";
-import { setPredicateSink, type PredicateSink } from "../src/predicate-sink.ts";
+import { callSiteRuleOf, setPredicateSink, type PredicateSink } from "../src/predicate-sink.ts";
 import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../src/routers/index.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 import { graphInput, screen, SCREEN_SETS, SCREEN_STEPS, screenInputs, type LayoutInput, type ScreenSet, type ScreenStep } from "../src/bench/screen/index.ts";
@@ -228,7 +229,7 @@ export class PredicateRecorder implements PredicateSink {
     this.truncated = false;
   }
 
-  private keep(key: string, make: () => Record<string, unknown>): void {
+  private keep(fn: string, key: string, make: () => Record<string, unknown>): void {
     const line = this.lines.get(key);
     if (line) {
       line.n++;
@@ -239,7 +240,8 @@ export class PredicateRecorder implements PredicateSink {
       return;
     }
     const via = callerOf();
-    this.lines.set(key, { case: this.board, ...make(), ...(via !== undefined ? { via } : {}), n: 1 });
+    const rule = callSiteRuleOf(fn);
+    this.lines.set(key, { case: this.board, ...make(), ...(rule !== undefined ? { rule } : {}), ...(via !== undefined ? { via } : {}), n: 1 });
   }
 
   /** This function records one crossing test. */
@@ -251,7 +253,7 @@ export class PredicateRecorder implements PredicateSink {
     add(this.counts.near, fn);
     const shared = sharesEnd(a, b, c, d);
     if (shared) this.counts.nearShared++;
-    this.keep(`${fn}|${a.x},${a.y},${b.x},${b.y},${c.x},${c.y},${d.x},${d.y}|${answer}`, () => ({ fn, a: xy(a), b: xy(b), c: xy(c), d: xy(d), floatAnswer: answer, ...(shared ? { sharedEnd: true } : {}) }));
+    this.keep(fn, `${fn}|${a.x},${a.y},${b.x},${b.y},${c.x},${c.y},${d.x},${d.y}|${answer}`, () => ({ fn, a: xy(a), b: xy(b), c: xy(c), d: xy(d), floatAnswer: answer, ...(shared ? { sharedEnd: true } : {}) }));
   }
 
   /** This function records one box test. */
@@ -262,7 +264,7 @@ export class PredicateRecorder implements PredicateSink {
     this.counts.nearBoxes++;
     add(this.counts.near, fn);
     const shape = box ? `${box.x},${box.y},${box.w},${box.h}` : `${x0},${y0},${x1},${y1}`;
-    this.keep(`${fn}|${a.x},${a.y},${b.x},${b.y}|${shape}|${eps}|${answer}`, () => ({
+    this.keep(fn, `${fn}|${a.x},${a.y},${b.x},${b.y}|${shape}|${eps}|${answer}`, () => ({
       fn,
       a: xy(a),
       b: xy(b),
@@ -284,7 +286,7 @@ export class PredicateRecorder implements PredicateSink {
     if (Math.abs(two.d2 - two.d1) > TIE_NEAR * s) return;
     this.counts.nearNearest++;
     add(this.counts.near, fn);
-    this.keep(`${fn}|${p.x},${p.y},${c1.x},${c1.y},${c2.x},${c2.y}|${two.i1},${two.i2}|${answer}`, () => ({ fn, p: xy(p), c1: xy(c1), c2: xy(c2), i1: two.i1, i2: two.i2, floatAnswer: answer }));
+    this.keep(fn, `${fn}|${p.x},${p.y},${c1.x},${c1.y},${c2.x},${c2.y}|${two.i1},${two.i2}|${answer}`, () => ({ fn, p: xy(p), c1: xy(c1), c2: xy(c2), i1: two.i1, i2: two.i2, floatAnswer: answer }));
   }
 
   /** This function records one side test of a point against a line. */
@@ -294,7 +296,7 @@ export class PredicateRecorder implements PredicateSink {
     if (!sideIsNear(p, a, b)) return;
     this.counts.nearSides++;
     add(this.counts.near, fn);
-    this.keep(`${fn}|${p.x},${p.y},${a.x},${a.y},${b.x},${b.y}|${answer}`, () => ({ fn, p: xy(p), a: xy(a), b: xy(b), floatAnswer: answer }));
+    this.keep(fn, `${fn}|${p.x},${p.y},${a.x},${a.y},${b.x},${b.y}|${answer}`, () => ({ fn, p: xy(p), a: xy(a), b: xy(b), floatAnswer: answer }));
   }
 
   /** This function gives the near lines of the board, then its total line, as JSON objects. */

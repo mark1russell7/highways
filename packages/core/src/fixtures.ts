@@ -1,17 +1,11 @@
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import type { Box, Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Edge, Graph, Node, Port, Side } from "./model.ts";
 
-/** This function gives a seeded random source with values in [0, 1) (mulberry32). */
+/** This function gives a seeded random source with values in [0, 1). It is `mulberry32` of `@mark1russell7/rigor-generators`. */
 export function rng(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(seed);
 }
 
 /**

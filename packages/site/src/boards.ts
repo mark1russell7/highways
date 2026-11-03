@@ -1,3 +1,4 @@
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import type { Edge, Graph, Node, Port } from "@mark1russell7/highways";
 import type { CardText } from "./view.ts";
 
@@ -22,16 +23,9 @@ export interface Board {
 /** The free space between two cards, in units of the plane. The routes go in this space. */
 export const GAP = 48;
 
-/** This function gives a pseudo-random generator with a seed (mulberry32). The same seed gives the same numbers. */
+/** This function gives a pseudo-random generator with a seed. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
 export function seeded(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(seed);
 }
 
 /** A board while it grows: the functions add cards and edges in order. */

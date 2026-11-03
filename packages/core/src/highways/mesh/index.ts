@@ -1,5 +1,5 @@
 import { dist, type Point } from "../../geom.ts";
-import { predicateSink } from "../../predicate-sink.ts";
+import { CALL_SITE_RULES, predicateSink } from "../../predicate-sink.ts";
 import type { Graph } from "../../model.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import type { HighwayInput, HighwayPlan } from "../model.ts";
@@ -38,12 +38,18 @@ export function boxUnit(graph: Graph): number {
   return sides.length > 0 ? Math.max(1e-3, sides[Math.floor(sides.length / 2)]!) : 1;
 }
 
-/** This function gives the shares `t` of the segment `a b` and `u` of the segment `c d` at their crossing. Segments that do not cross give `undefined`. */
-function crossing(a: Point, b: Point, c: Point, d: Point): { t: number; u: number } | undefined {
+/**
+ * This function gives the shares `t` of the segment `a b` and `u` of the segment `c d` at their crossing. Segments that do not cross give `undefined`.
+ * The package index does not export it. The tests of `CALL_SITE_RULES` use it.
+ */
+export function crossing(a: Point, b: Point, c: Point, d: Point): { t: number; u: number } | undefined {
   const answer = crossingOf(a, b, c, d);
   if (predicateSink !== null) predicateSink.cross("mesh.crossing", a, b, c, d, answer !== undefined);
   return answer;
 }
+
+/** The tolerances of `crossingOf`: the rule `mesh.crossing` of `CALL_SITE_RULES`. */
+const CROSSING = CALL_SITE_RULES["mesh.crossing"];
 
 /** This function is the test of `crossing`, without the hook of the predicate sink. */
 function crossingOf(a: Point, b: Point, c: Point, d: Point): { t: number; u: number } | undefined {
@@ -52,10 +58,11 @@ function crossingOf(a: Point, b: Point, c: Point, d: Point): { t: number; u: num
   const sx = d.x - c.x;
   const sy = d.y - c.y;
   const den = rx * sy - ry * sx;
-  if (Math.abs(den) < 1e-12) return undefined;
+  if (Math.abs(den) < CROSSING.parallelTolerance) return undefined;
   const t = ((c.x - a.x) * sy - (c.y - a.y) * sx) / den;
   const u = ((c.x - a.x) * ry - (c.y - a.y) * rx) / den;
-  const eps = 1e-9;
+  const eps = CROSSING.shareTolerance;
+  // The test is closed (`touch` of the rule): a share at an end, within `eps`, is on the segment.
   return t >= -eps && t <= 1 + eps && u >= -eps && u <= 1 + eps ? { t: Math.max(0, Math.min(1, t)), u: Math.max(0, Math.min(1, u)) } : undefined;
 }
 

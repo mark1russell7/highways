@@ -1,3 +1,4 @@
+import { mulberry32 as seeded } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
 import { dist } from "../../geom.ts";
 import type { Graph, Result } from "../../model.ts";
@@ -7,18 +8,6 @@ import { fixPorts } from "../fix.ts";
 import { rangeInterval } from "../range.ts";
 import { tallCardsBoard } from "../row-cards.ts";
 import { assignWall, type WallEnd } from "./index.ts";
-
-/** A seeded random source (mulberry32). */
-function seeded(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 /** This function moves the place `p` up out of the zones of the fixed plugs. */
 function pushOut(p: number, fixed: readonly number[], s: number): number {
