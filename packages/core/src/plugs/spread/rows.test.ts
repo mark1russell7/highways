@@ -32,11 +32,15 @@ function tallRows(row: number): Graph {
   return { nodes, edges };
 }
 
-/** One card of 160 by 240 with a fixed row, and one free plug that faces a box at the height `y`. */
+/**
+ * One card of 320 by 240 with a fixed row, and one free plug with the ideal place `y` on its east wall.
+ * The ideal place is on the line from the center of the card to the far box. The wall is a quarter of the way along that line.
+ */
 function rowAndPlug(along: number, y: number): Graph {
-  const card: Node = { id: "card", box: { x: 0, y: 0, w: 160, h: 240 }, ports: [{ id: "row", side: "east", along, rowHeight: 55 }] };
+  const card: Node = { id: "card", box: { x: 0, y: 0, w: 320, h: 240 }, ports: [{ id: "row", side: "east", along, rowHeight: 55 }] };
+  const farY = 120 + (y - 120) * 4;
   return {
-    nodes: [card, { id: "far", box: { x: 800, y: y - 10, w: 20, h: 20 } }, { id: "west", box: { x: -800, y: 90, w: 20, h: 20 } }],
+    nodes: [card, { id: "far", box: { x: 790, y: farY - 10, w: 20, h: 20 } }, { id: "west", box: { x: -800, y: 90, w: 20, h: 20 } }],
     edges: [
       { id: "free", source: { node: "card" }, target: { node: "far" } },
       { id: "other", source: { node: "card" }, target: { node: "west" } },
@@ -58,7 +62,7 @@ describe("the row height of a port in the plug strategy spread (PLUG-ROW-GAP)", 
     const graph = rowAndPlug(200 / 240, 190);
     const before = spreadEnds({ graph: withoutRows(graph) });
     const after = spreadEnds({ graph });
-    expect(before[0]!.source.point.y).toBe(190);
+    expect(before[0]!.source.point.y).toBeCloseTo(190, 9);
     expect(after[0]!.source.point.y).toBeCloseTo(200 - 55 / 2, 9);
     expect(after[1]).toEqual(before[1]);
     expect(rowFit(graph, routesOf(before))?.fit).toBe(0);
@@ -98,8 +102,8 @@ describe("the row height of a port in the plug strategy spread (PLUG-ROW-GAP)", 
       ],
     };
     const y = spreadEnds({ graph }).map((p) => p.source.point.y);
-    expect(y[0]).toBeCloseTo(60, 9);
-    expect(y[1]).toBeCloseTo(115, 9);
+    expect(y[0]).toBeCloseTo(65, 9);
+    expect(y[1]).toBeCloseTo(120, 9);
     const short: Graph = { ...graph, nodes: [{ ...graph.nodes[0]!, ports: ports.map((p) => ({ ...p, range: [0.25, 0.3] as const })) }, ...graph.nodes.slice(1)] };
     const z = spreadEnds({ graph: short }).map((p) => p.source.point.y);
     expect(z[0]).toBeCloseTo(60, 9);

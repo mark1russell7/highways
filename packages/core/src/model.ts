@@ -30,7 +30,7 @@ export interface Port {
   readonly range?: readonly [number, number];
   /**
    * This length is the height of the row of the port on its card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
-   * The plug rules `spread` and `leaders` read it: two neighbor plugs stay as far apart as the mean of their rows, and a free plug leaves the row of a fixed plug.
+   * The plug rules `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, and a free plug leaves the row of a fixed plug.
    * When the wall has too little room, the distances shrink evenly. The other plug rules do not read it.
    * `resolvePorts` throws a `RangeError` for a bad height.
    */
