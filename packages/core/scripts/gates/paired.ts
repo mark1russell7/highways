@@ -4,6 +4,7 @@
 //
 // - Mode `process`: one process. In each round, the arms run in turn on each input. Odd rounds reverse the order (ABBA).
 // - Mode `fresh`: a fresh process for each arm, each input and each round. Each input takes the arms in turn. The order rotates by the round.
+//   The order `turn` puts the base first in each even global round and last in each odd one, so each pair with the base turns its order.
 //
 // The child protocol of mode `fresh`: the helper appends `--input <id> --warmup <n>` to the command of the arm.
 // The child runs the warm-up untimed, times one run itself, and prints one JSON line `{"ms": n, "peakRss"?: bytes}`. `runChild` does this for a script.
@@ -13,6 +14,14 @@ import { performance } from "node:perf_hooks";
 
 /** The mode of a paired time run: one process, or a fresh process for each arm in each round. */
 export type Mode = "process" | "fresh";
+
+/**
+ * The order of the arms in a round of mode `fresh`.
+ * - The order `rotate` rotates all the arms by the round. It is the order of each report without the field `order`.
+ * - The order `turn` puts the base first in an even global round and last in an odd global round. The other arms rotate.
+ *   Thus the pair of the base and each other arm starts with the base in each second round, as `firstArm` of rigor-bench.
+ */
+export type Order = "rotate" | "turn";
 
 /** One arm of a paired time run. Mode `process` calls `run`, and mode `fresh` starts `command` with the child protocol. */
 export interface Arm<I> {
@@ -65,6 +74,19 @@ export interface PairedOptions<I> {
   readonly env?: PairedEnv;
   /** The context of the run. The default is `pairedContext()`. */
   readonly context?: string;
+  /** The order of the arms of mode `fresh`. The default is `rotate`. */
+  readonly order?: Order;
+  /** The global round of the first round of this job. The default is 0. A run of many jobs sets it to `(job - 1) * repeats`. */
+  readonly roundOffset?: number;
+  /** The label of the job, for example the index of its CI job. */
+  readonly job?: string;
+}
+
+/** The fields of a report that tell the job of its rounds. Each field is optional, so an older report still reads. */
+export interface RunFields {
+  readonly job?: string;
+  readonly roundOffset?: number;
+  readonly order?: Order;
 }
 
 /** The statistics of the ratios of one arm over the base. */
@@ -97,8 +119,11 @@ export interface PairedInput {
   readonly peakRss?: Readonly<Record<string, number>>;
 }
 
-/** The report of a paired time run, with the schema `paired-time/1`. */
-export interface PairedReport {
+/**
+ * The report of a paired time run, with the schema `paired-time/1`.
+ * The optional fields `job`, `roundOffset` and `order` of `RunFields` tell the job, the global round of its round 0 and the order of the arms.
+ */
+export interface PairedReport extends RunFields {
   readonly schema: "paired-time/1";
   readonly mode: Mode;
   /** The context of the run: `BENCH_MODE`, else `ci` or `local`, then the flags of Node.js. */
@@ -161,16 +186,34 @@ export function envOf(mode: Mode): RecordEnv {
 }
 
 /**
- * This function gives the order of the arms in one round, as indexes into the arms.
+ * This function gives the order of the arms in one round, as indexes into the arms. The arm 0 is the base.
  *
  * - Mode `process`: the order of the arms, reversed in each odd round (ABBA).
- * - Mode `fresh`: the order of the arms, rotated by the index of the round.
+ * - Mode `fresh` with the order `rotate`: the order of the arms, rotated by the index of the round.
+ * - Mode `fresh` with the order `turn`: the base first in an even round and last in an odd round. The other arms rotate by half the round.
  */
-export function armOrder(arms: number, round: number, mode: Mode): number[] {
+export function armOrder(arms: number, round: number, mode: Mode, order: Order = "rotate"): number[] {
   const at = Array.from({ length: arms }, (_, i) => i);
   if (mode === "process") return round % 2 === 1 ? at.reverse() : at;
+  if (order === "turn" && arms > 1) {
+    const others = at.slice(1);
+    const shift = Math.floor(round / 2) % others.length;
+    const turned = [...others.slice(shift), ...others.slice(0, shift)];
+    return round % 2 === 0 ? [0, ...turned] : [...turned, 0];
+  }
   const shift = arms === 0 ? 0 : round % arms;
   return [...at.slice(shift), ...at.slice(0, shift)];
+}
+
+/**
+ * This function gives the first arm of a pair in the round `k` of a report. It gives `a` for the base and `b` for the other arm.
+ * It uses the mode, the order and the round offset of the report. The order `turn` uses the global round `roundOffset + k`.
+ */
+export function firstOf(report: PairedReport, k: number, baseAt: number, armAt: number): "a" | "b" {
+  const turn = report.order === "turn";
+  const round = turn ? (report.roundOffset ?? 0) + k : k;
+  const order = armOrder(report.arms.length, round, report.mode, turn ? "turn" : "rotate");
+  return order.indexOf(baseAt) < order.indexOf(armAt) ? "a" : "b";
 }
 
 /**
@@ -258,7 +301,7 @@ function ratioOf(rows: readonly { readonly group?: string; readonly ratio: numbe
  * - The ratio of an input is the median of the arm over the median of the base. An input with a base median of 0 gets no ratio.
  * - With the A/A arm, the noise floor is its ratios, and `moved` of each arm uses the band [p10, p90] of the A/A ratios.
  */
-export function pairedReport<I>(mode: Mode, env: PairedEnv, context: string | undefined, arms: readonly Arm<I>[], inputs: readonly Input<I>[], raw: RawTimes): PairedReport {
+export function pairedReport<I>(mode: Mode, env: PairedEnv, context: string | undefined, arms: readonly Arm<I>[], inputs: readonly Input<I>[], raw: RawTimes, run: RunFields = {}): PairedReport {
   const base = arms[0]!.id;
   const aa = arms.find((a) => a.id === aaId(base))?.id;
   const rows: PairedInput[] = inputs.map((input) => {
@@ -292,6 +335,9 @@ export function pairedReport<I>(mode: Mode, env: PairedEnv, context: string | un
     schema: "paired-time/1",
     mode,
     ...(context === undefined ? {} : { context }),
+    ...(run.job === undefined ? {} : { job: run.job }),
+    ...(run.roundOffset === undefined ? {} : { roundOffset: run.roundOffset }),
+    ...(run.order === undefined ? {} : { order: run.order }),
     env,
     base,
     arms: arms.map((a) => a.id),
@@ -357,15 +403,21 @@ function measureProcess<I>(o: PairedOptions<I>, arms: readonly Arm<I>[]): Paired
   return pairedReport("process", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
 }
 
-/** This function times the arms with a fresh process for each arm, each input and each round. In round r, each input takes the arms rotated by r. */
+/**
+ * This function times the arms with a fresh process for each arm, each input and each round.
+ * With the order `rotate`, each input takes the arms rotated by the round r. The order `turn` uses the global round `roundOffset + r`.
+ */
 async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
   const arms = armsOf(o);
   const start = o.startChild ?? startProcess;
   const warmup = o.warmup ?? 1;
+  const order = o.order ?? "rotate";
+  const offset = o.roundOffset ?? 0;
+  if (!Number.isInteger(offset) || offset < 0) throw new RangeError("The round offset is a whole number of 0 or more.");
   const raw = rawOf(o.inputs, arms);
   for (let round = 0; round < o.repeats; round++) {
     for (const input of o.inputs) {
-      for (const at of armOrder(arms.length, round, "fresh")) {
+      for (const at of armOrder(arms.length, order === "turn" ? offset + round : round, "fresh", order)) {
         const arm = arms[at]!;
         // The children run one at a time, because two children at one time change the times of each other.
         const result = await start(arm.command!, input.id, warmup);
@@ -378,7 +430,8 @@ async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
       }
     }
   }
-  return pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
+  const run: RunFields = { ...(o.job === undefined ? {} : { job: o.job }), ...(o.roundOffset === undefined ? {} : { roundOffset: offset }), ...(o.order === undefined ? {} : { order }) };
+  return pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw, run);
 }
 
 /**

@@ -165,7 +165,8 @@ jobs:
           [ -n "$ACTIVATION" ] && args+=(--activation "$ACTIVATION")
           # The paired time runs the arms of the comparison in this job (MEASURE-ISOLATE), one fresh process at a time.
           # Each job of a paired screen writes its own report, in mode fresh with the A/A arm (BENCH-FRESH-CASES).
-          [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired-job$JOB.json" --paired-base "$PAIRED")
+          # The job number gives the round offset of the report, so the rounds of the 5 jobs merge in the time test (WIN-TEST-HOME).
+          [ -n "$PAIRED" ] && args+=(--paired "$GITHUB_WORKSPACE/paired-job$JOB.json" --paired-base "$PAIRED" --paired-job "$JOB")
           start=$SECONDS
           pnpm --filter @mark1russell7/highways screen "${args[@]}"
           {

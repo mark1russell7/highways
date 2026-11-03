@@ -2,7 +2,7 @@
 // The home has the four outcomes faster, slower, same and cannot decide. This module maps the rounds of a report to its `PairedTime` records.
 // Only the scripts that have the installed packages import this module. The sections gate imports it with `import()` in its job.
 import { timeVerdict, type PairedTime, type TimeVerdict, type VerdictOptions } from "@mark1russell7/rigor-bench";
-import { aaId, armOrder, type PairedReport } from "./paired.ts";
+import { aaId, firstOf, type PairedReport } from "./paired.ts";
 
 /**
  * This function gives the records of the home for one arm against the base of a report on one input.
@@ -24,8 +24,7 @@ export function pairedTimes(report: PairedReport, input: string, arm: string): P
     const a = base[k];
     const b = other[k];
     if (!ok(a) || !ok(b)) continue;
-    const order = armOrder(report.arms.length, k, report.mode);
-    out.push({ case: `${input} #${k}`, round: k, first: order.indexOf(baseAt) < order.indexOf(at) ? "a" : "b", a, b });
+    out.push({ case: `${input} #${k}`, round: k, first: firstOf(report, k, baseAt, at), a, b });
   }
   return out;
 }

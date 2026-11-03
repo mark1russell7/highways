@@ -4,17 +4,18 @@
 // The script applies the win test to each set of records, and the verdict over families to each measure.
 // The verdict uses the families of the input ids, and the Holm correction over the measures.
 // The literal reading uses all the inputs. The exercised reading uses only the inputs where the candidate changes the output.
-// `--time` gives the paired time reports (`paired-time/1`) of the screens with `--paired`. The time test reads its ratios from them (MEASURE-ISOLATE).
+// `--time` gives the paired time reports (`paired-time/1`) of the screens with `--paired`. The time test reads its rounds from them (MEASURE-ISOLATE).
 // Without them, the time test has no result, so it fails: the times of the records do not come from one paired run.
 // Each file is the report of one job. The policy is 5 jobs (`timeJobs`). With fewer jobs, the time test cannot decide, so it does not promote.
-// A check that the A/A arm of the jobs cannot resolve gives "cannot decide (noise)", and it does not promote.
+// The time test is the block `win-test` of rigor (WIN-TEST-HOME): `pooledVerdict` and `limitVerdict` of `@mark1russell7/rigor-bench` give its outcomes.
 // The script reads files and does no layout, so it is a quick local check.
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
 import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { compareSpec, MEASURES, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
-import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
+import { parseReports } from "./gates/time-gate.ts";
+import { promotionTimeTest, timeText, type TimeTest } from "./gates/win-time.ts";
 
 /** The fields of a screen record that the test reads. */
 interface Rec {
@@ -44,8 +45,27 @@ const candidate = need("--candidate");
 const baseline = need("--baseline");
 const step = opt("--step") ?? "router";
 
-// The parameters of `docs/PROMOTION.md`.
-const P = { medianWorse: 0.02, tailWorse: 0.1, tailShare: 0.1, gainMin: 0.05, signP: 0.05, bootstrapRuns: 10000, bootstrapLevel: 0.95, timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2.0, timeFloorMs: 5, level: 0.05 };
+// The parameters of `docs/PROMOTION.md`. The settings of the time test are those of the block `win-test` of rigor (WIN-TEST-HOME).
+// - `timeMargin` 0.05 is the value of the joint bench in the home, and the default of rigor-bench. `timeTailLevel` 0.95 is the default of the home.
+// - `noiseCap` 0.06 is the cap of the sections time gate of highways. The home gives no value.
+// - `timeJobs` 5, `timeTailQ` 0.95, `timeTail` 2.0 and `timeFloorMs` 5 are the values of highways.
+const P = {
+  medianWorse: 0.02,
+  tailWorse: 0.1,
+  tailShare: 0.1,
+  gainMin: 0.05,
+  signP: 0.05,
+  bootstrapRuns: 10000,
+  bootstrapLevel: 0.95,
+  timeMargin: 0.05,
+  noiseCap: 0.06,
+  timeJobs: 5,
+  timeTailQ: 0.95,
+  timeTail: 2.0,
+  timeTailLevel: 0.95,
+  timeFloorMs: 5,
+  level: 0.05,
+};
 // The floors of `docs/PROMOTION.md`: the record name, the floor and the tolerance.
 const FLOORS: Readonly<Record<string, { floor: number; tol: number }>> = { "route.crossings": { floor: 0, tol: 0 }, "route.bundle.merge-angle.max": { floor: 0, tol: 60 } };
 // The guard measures of each step, by the keys of `MEASURES`. The step `whole` has no row, so it takes the guards of each routing step. `Z10.mean` is the stability guard.
@@ -220,8 +240,8 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
       return { key: x.m.key, n: x.rs.length, median: med, wins: x.wins, losses: x.losses, p: x.p, pHolm: adjusted[i]!, lo, hi, pass: adjusted[i]! < P.signP && hi < 1 };
     })
     .filter((g): g is GainRow => g !== undefined);
-  // The time: the worst median and the worst tail over the paired time reports of the jobs, with the resolution of the A/A arm (MEASURE-ISOLATE).
-  const time = pairedTimeTest(timeReports, baseline, candidate, new Set(ps.map((p) => p.c.input)), P);
+  // The time: the pooled verdict of the home over the paired time reports of the jobs, with the guard of the jobs and the time tail (WIN-TEST-HOME).
+  const time = promotionTimeTest(timeReports, baseline, candidate, new Set(ps.map((p) => p.c.input)), P);
   const hardPass = worse.length === 0;
   return {
     reading,
@@ -263,9 +283,8 @@ const yes = (b: boolean): string => (b ? "pass" : "fail");
 function winText(name: string, t: WinTest, all: number): string {
   const lines = [`#### ${name}: ${t.reading} reading, ${t.n} of ${all} inputs: ${yes(t.pass)}`, ""];
   lines.push(`- Hard rules: ${yes(t.hard.pass)}${t.hard.worse.length > 0 ? ` (${t.hard.worse.length} worse, for example ${t.hard.worse.slice(0, 3).join(", ")})` : ""}.`);
-  lines.push(`- ${timeText(t.time, P.timeTailQ)}`);
-  // The record keeps the CPU model of each job of the time test (MEASURE-ISOLATE).
-  if (t.time.cpus.length > 0) lines.push(`- The CPU model of each job of the time test: ${t.time.cpus.map((cpu, i) => `job ${i + 1}: ${cpu}`).join(", ")}.`);
+  // The record keeps the verdict and the CPU model of each job of the time test (WIN-TEST-HOME).
+  lines.push(...timeText(t.time).map((l, i) => (i === 0 ? `- ${l}` : l)));
   if (timeRun !== undefined) lines.push(`- The run of the jobs of the time test: ${timeRun}.`);
   lines.push("", "| Guard | Inputs | Median ratio | Tail share | Result |", "|---|---|---|---|---|");
   // A guard with no value in the records, for example a curve measure of a step without curves, has no row.

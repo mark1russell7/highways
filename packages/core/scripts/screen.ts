@@ -1,12 +1,14 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
 // [--options <file.json>] [--families <a,b>] [--members <from-to>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
-// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--paired <file> --paired-base <name> [--paired-arms <name,...>] [--paired-repeats <n>]]
+// [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--paired <file> --paired-base <name> [--paired-arms <name,...>] [--paired-repeats <n>] [--paired-job <n>]]
 // [--out screen.jsonl] [--summary screen.md]`.
 // `--paired` times the arms of a comparison with `measureIsolated` (MEASURE-ISOLATE), after the screen, and writes the report `paired-time/1` to the file.
 // The base is `--paired-base`. The other arms are `--paired-arms`, else the strategies of the call. Each arm routes each input where no arm skipped it.
 // The mode is `fresh` (BENCH-FRESH-CASES): a fresh process for each arm, each input and each round, one at a time. The rounds interleave the arms.
 // Each process routes the input 1 time untimed as its warm-up, then 1 timed time. The A/A arm is a second copy of the base.
 // `--paired-repeats` gives the timed rounds, and the default is 3. Only a step that gives routes has paired times.
+// Mode `fresh` uses the order `turn`: the base runs first in each even global round and last in each odd one (WIN-TEST-HOME).
+// `--paired-job <n>` names the CI job from 1. The report then has the field `job` and the round offset `(n - 1) * repeats`, so the rounds of the jobs merge.
 // The cost: each child starts Node.js and imports the core before its untimed warm-up. The estimate is 0.3 to 1 s for each child on a CI runner.
 // The children are inputs x arms x rounds. On `screen-v3` with 1 candidate, that is 150 x 3 x 3 = 1350 children, thus 7 to 23 minutes.
 // This fits in the 60 minutes that the workflow `Screen` gives a paired job. So the paired time keeps 3 rounds and each input, with no stride.
@@ -250,7 +252,12 @@ async function runScreen(): Promise<void> {
       if (mode === "fresh") return { id, command: [process.execPath, ...process.execArgv, SCRIPT, ...args, "--paired-child", id] };
       return { id, run: (graph: Graph) => router.route(graph) };
     });
-    const paired = await measureIsolated({ arms, inputs: pairedInputs, repeats, warmup: 1, mode });
+    // The order turn and the round offset of the job make each pair of the base turn its order over the merged rounds of all jobs (WIN-TEST-HOME).
+    const jobText = opt("--paired-job");
+    const jobNumber = jobText === undefined ? undefined : Number(jobText);
+    if (jobNumber !== undefined && !(Number.isInteger(jobNumber) && jobNumber >= 1)) throw new Error(`The option --paired-job needs a whole number of 1 or more, not ${jobText}.`);
+    const run = mode === "fresh" ? { order: "turn" as const, ...(jobNumber === undefined ? {} : { job: String(jobNumber), roundOffset: (jobNumber - 1) * repeats }) } : {};
+    const paired = await measureIsolated({ arms, inputs: pairedInputs, repeats, warmup: 1, mode, ...run });
     writeFileSync(pairedOut, JSON.stringify(paired) + "\n");
     pairedText = `\n## The paired time\n\n${pairedTable(paired).join("\n")}\n`;
   }
