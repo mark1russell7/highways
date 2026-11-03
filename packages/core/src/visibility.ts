@@ -667,13 +667,29 @@ export class SoftGraph {
   readonly points: Point[] = [];
   readonly #nodes: readonly Node[];
   readonly #obstacles: Obstacles;
-  readonly #adj: number[][] = [];
-  readonly #len: number[][] = [];
-  // The indices of the nodes that each link goes through, in the order of #adj.
-  readonly #through: (readonly number[])[][] = [];
+  // The links in flat arrays. The links of vertex `i` are at the indices `#start[i]` to `#start[i + 1] - 1`, in the order of the vertex indices.
+  // `#to` holds the other vertex of each link and `#length` holds its length.
+  readonly #start: Int32Array;
+  readonly #to: Int32Array;
+  readonly #length: Float64Array;
+  // The indices of the nodes that link `m` goes through are at the indices `#boxStart[m]` to `#boxStart[m + 1] - 1` of `#boxes`.
+  readonly #boxStart: Int32Array;
+  readonly #boxes: Int32Array;
   readonly #grid: Grid<number>;
   readonly #cell: number;
   readonly #k: number;
+  // The state of one search. A value of `#g`, `#closed`, `#goalTail` or `#cost` counts only when its stamp is the stamp of the search.
+  readonly #g: Float64Array;
+  readonly #gAt: Int32Array;
+  readonly #parent: Int32Array;
+  readonly #closed: Int32Array;
+  readonly #goalTail: Float64Array;
+  readonly #goalAt: Int32Array;
+  // The cost of each box in the search, by the index of its node. The search uses `cost` one time for each box of its links.
+  readonly #cost: Float64Array;
+  readonly #costAt: Int32Array;
+  #stamp = 0;
+  readonly #heap = new MinHeap();
 
   /** This constructor makes the graph of the nodes. */
   constructor(nodes: readonly Node[], obstacles: Obstacles, options: SoftGraphOptions) {
@@ -715,24 +731,42 @@ export class SoftGraph {
     // The boxes of each link, found one time for the two directions of the link.
     const known = new Map<number, readonly number[]>();
     const count = this.points.length;
-    links.forEach((set, i) => {
-      const adj = [...set].sort((a, b) => a - b);
-      this.#adj.push(adj);
-      this.#len.push(adj.map((j) => dist(this.points[i]!, this.points[j]!)));
-      this.#through.push(
-        adj.map((j) => {
-          const key = Math.min(i, j) * count + Math.max(i, j);
-          let list = known.get(key);
-          if (list === undefined) {
-            const found: number[] = [];
-            obstacles.through(this.points[i]!, this.points[j]!, (n) => found.push(index.get(n)!));
-            list = found;
-            known.set(key, list);
-          }
-          return list;
-        }),
-      );
-    });
+    const adjs = links.map((set) => [...set].sort((a, b) => a - b));
+    this.#start = new Int32Array(count + 1);
+    for (let i = 0; i < count; i++) this.#start[i + 1] = this.#start[i]! + adjs[i]!.length;
+    const total = this.#start[count]!;
+    this.#to = new Int32Array(total);
+    this.#length = new Float64Array(total);
+    this.#boxStart = new Int32Array(total + 1);
+    const boxes: number[] = [];
+    for (let i = 0; i < count; i++) {
+      const adj = adjs[i]!;
+      for (let m = 0; m < adj.length; m++) {
+        const j = adj[m]!;
+        const at = this.#start[i]! + m;
+        this.#to[at] = j;
+        this.#length[at] = dist(this.points[i]!, this.points[j]!);
+        const key = Math.min(i, j) * count + Math.max(i, j);
+        let list = known.get(key);
+        if (list === undefined) {
+          const found: number[] = [];
+          obstacles.through(this.points[i]!, this.points[j]!, (n) => found.push(index.get(n)!));
+          list = found;
+          known.set(key, list);
+        }
+        for (const b of list) boxes.push(b);
+        this.#boxStart[at + 1] = boxes.length;
+      }
+    }
+    this.#boxes = Int32Array.from(boxes);
+    this.#g = new Float64Array(count);
+    this.#gAt = new Int32Array(count);
+    this.#parent = new Int32Array(count);
+    this.#closed = new Int32Array(count);
+    this.#goalTail = new Float64Array(count);
+    this.#goalAt = new Int32Array(count);
+    this.#cost = new Float64Array(nodes.length);
+    this.#costAt = new Int32Array(nodes.length);
   }
 
   #add(c: Point): void {
@@ -761,6 +795,7 @@ export class SoftGraph {
    * This method gives a path of least cost from `from` to `to` (A*), with the two points as its ends.
    * The cost of a path is its length, plus `cost(n)` for each link of the path and each box `n` of that link.
    * Each cost must be 0 or more. The straight line from `from` to `to` is a path too, so the method always gives a path.
+   * The cost of a box must stay the same during one call. The search keeps the cost of each box of a link after its first use.
    */
   path(from: Point, to: Point, cost: (n: Node) => number): Point[] {
     const points = this.points;
@@ -772,43 +807,66 @@ export class SoftGraph {
       });
       return c;
     };
+    // A search starts a new stamp in place of new arrays. A vertex without the stamp in `#gAt` has the cost Infinity.
+    const stamp = ++this.#stamp;
+    const g = this.#g;
+    const gAt = this.#gAt;
+    const parent = this.#parent;
+    const closed = this.#closed;
+    const goalTail = this.#goalTail;
+    const goalAt = this.#goalAt;
+    const boxCost = this.#cost;
+    const boxCostAt = this.#costAt;
+    const start = this.#start;
+    const link = this.#to;
+    const length = this.#length;
+    const boxStart = this.#boxStart;
+    const boxes = this.#boxes;
     let best = dist(from, to) + extra(from, to);
     let bestEnd = -1;
-    const goal = new Map<number, number>();
-    for (const j of this.#nearest(to, 2 * this.#k)) goal.set(j, dist(points[j]!, to) + extra(points[j]!, to));
-    const n = points.length;
-    const g = new Float64Array(n).fill(Infinity);
-    const parent = new Int32Array(n).fill(-1);
-    const closed = new Uint8Array(n);
-    const heap = new MinHeap();
+    for (const j of this.#nearest(to, 2 * this.#k)) {
+      goalTail[j] = dist(points[j]!, to) + extra(points[j]!, to);
+      goalAt[j] = stamp;
+    }
+    const heap = this.#heap;
+    heap.clear();
     for (const j of this.#nearest(from, 2 * this.#k)) {
       const c = dist(from, points[j]!) + extra(from, points[j]!);
-      if (c < g[j]!) {
+      if (c < (gAt[j] === stamp ? g[j]! : Infinity)) {
         g[j] = c;
+        gAt[j] = stamp;
+        parent[j] = -1;
         heap.push(c + dist(points[j]!, to), j);
       }
     }
     while (heap.size > 0) {
       if (heap.topKey >= best) break;
       const i = heap.pop();
-      if (closed[i] === 1) continue;
-      closed[i] = 1;
+      if (closed[i] === stamp) continue;
+      closed[i] = stamp;
       const gi = g[i]!;
-      const tail = goal.get(i);
-      if (tail !== undefined && gi + tail < best) {
-        best = gi + tail;
+      if (goalAt[i] === stamp && gi + goalTail[i]! < best) {
+        best = gi + goalTail[i]!;
         bestEnd = i;
       }
-      const adj = this.#adj[i]!;
-      const len = this.#len[i]!;
-      const through = this.#through[i]!;
-      for (let m = 0; m < adj.length; m++) {
-        const j = adj[m]!;
-        if (closed[j] === 1) continue;
-        let c = gi + len[m]!;
-        for (const b of through[m]!) c += cost(nodes[b]!);
-        if (c < g[j]!) {
+      const end = start[i + 1]!;
+      for (let m = start[i]!; m < end; m++) {
+        const j = link[m]!;
+        if (closed[j] === stamp) continue;
+        let c = gi + length[m]!;
+        // The sum adds the costs of the boxes in the order of the link, so the cost of the path stays the same to the last bit.
+        const last = boxStart[m + 1]!;
+        for (let q = boxStart[m]!; q < last; q++) {
+          const b = boxes[q]!;
+          if (boxCostAt[b] !== stamp) {
+            boxCost[b] = cost(nodes[b]!);
+            boxCostAt[b] = stamp;
+          }
+          c += boxCost[b]!;
+        }
+        if (c < (gAt[j] === stamp ? g[j]! : Infinity)) {
           g[j] = c;
+          gAt[j] = stamp;
           parent[j] = i;
           heap.push(c + dist(points[j]!, to), j);
         }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rng } from "./fixtures.ts";
 import { dist, type Point } from "./geom.ts";
 import type { Node } from "./model.ts";
-import { CornerGraph, Obstacles, type CornerGraphOptions, type Terminal } from "./visibility.ts";
+import { CornerGraph, Obstacles, SoftGraph, type CornerGraphOptions, type Terminal } from "./visibility.ts";
 import { WORK } from "./work.ts";
 
 /** This function makes a board of `count` random boxes in a square of side `side`. A second group far away makes the corner buckets sparse. */
@@ -199,6 +199,125 @@ describe("the search of the corner graph (SEARCH-SPEED)", () => {
         const want = order.filter((e) => obstacles.clear(p, graph.points[e.j]!, pad)).slice(0, options.k).map((e) => e.j);
         expect(graph.nearestVisible(p, options.k)).toEqual(want);
       }
+    });
+  }
+});
+
+/** This function gives at most `k` points of `points` nearest to `p`, nearest first, and equal distances by index. The point `self` does not count. */
+function nearestOf(points: readonly Point[], p: Point, k: number, self = -1): number[] {
+  return points
+    .map((c, j) => ({ j, d: dist(p, c) }))
+    .filter((e) => e.j !== self)
+    .sort((u, v) => u.d - v.d || u.j - v.j)
+    .slice(0, k)
+    .map((e) => e.j);
+}
+
+/**
+ * This function is the reference search of `SoftGraph`: the graph and the search of version 0.11.0, from the points of the graph.
+ * It makes new arrays for each search and calls `cost` for each box of each link that it looks at.
+ */
+function referenceSoftPath(graph: SoftGraph, nodes: readonly Node[], obstacles: Obstacles, k: number, from: Point, to: Point, cost: (n: Node) => number): Point[] {
+  const points = graph.points;
+  const links = points.map(() => new Set<number>());
+  for (let i = 0; i < points.length; i++)
+    for (const j of nearestOf(points, points[i]!, k, i)) {
+      links[i]!.add(j);
+      links[j]!.add(i);
+    }
+  const index = new Map(nodes.map((n, i) => [n, i]));
+  const boxesOf = (i: number, j: number): number[] => {
+    const found: number[] = [];
+    obstacles.through(points[Math.min(i, j)]!, points[Math.max(i, j)]!, (n) => found.push(index.get(n)!));
+    return found;
+  };
+  const adj = links.map((s) => [...s].sort((a, b) => a - b));
+  const extra = (a: Point, b: Point): number => {
+    let c = 0;
+    obstacles.through(a, b, (m) => {
+      c += cost(m);
+    });
+    return c;
+  };
+  let best = dist(from, to) + extra(from, to);
+  let bestEnd = -1;
+  const goal = new Map<number, number>();
+  for (const j of nearestOf(points, to, 2 * k)) goal.set(j, dist(points[j]!, to) + extra(points[j]!, to));
+  const g = new Float64Array(points.length).fill(Infinity);
+  const parent = new Int32Array(points.length).fill(-1);
+  const closed = new Uint8Array(points.length);
+  const heap: [number, number][] = [];
+  const push = (key: number, j: number): void => {
+    heap.push([key, j]);
+  };
+  const top = (): number => {
+    let m = 0;
+    for (let q = 1; q < heap.length; q++) if (heap[q]![0] < heap[m]![0] || (heap[q]![0] === heap[m]![0] && heap[q]![1] < heap[m]![1])) m = q;
+    return m;
+  };
+  for (const j of nearestOf(points, from, 2 * k)) {
+    const c = dist(from, points[j]!) + extra(from, points[j]!);
+    if (c < g[j]!) {
+      g[j] = c;
+      push(c + dist(points[j]!, to), j);
+    }
+  }
+  while (heap.length > 0) {
+    const m = top();
+    if (heap[m]![0] >= best) break;
+    const i = heap.splice(m, 1)[0]![1];
+    if (closed[i] === 1) continue;
+    closed[i] = 1;
+    const gi = g[i]!;
+    const tail = goal.get(i);
+    if (tail !== undefined && gi + tail < best) {
+      best = gi + tail;
+      bestEnd = i;
+    }
+    for (const j of adj[i]!) {
+      if (closed[j] === 1) continue;
+      let c = gi + dist(points[i]!, points[j]!);
+      for (const b of boxesOf(i, j)) c += cost(nodes[b]!);
+      if (c < g[j]!) {
+        g[j] = c;
+        parent[j] = i;
+        push(c + dist(points[j]!, to), j);
+      }
+    }
+  }
+  const out: Point[] = [to];
+  for (let i = bestEnd; i >= 0; i = parent[i]!) out.push(points[i]!);
+  out.push(from);
+  return out.reverse();
+}
+
+describe("the search of the soft graph (SECTIONS-SLOW)", () => {
+  const BOARDS_SOFT: readonly [number, number, number, number][] = [
+    [11, 30, 500, 8],
+    [12, 50, 700, 6],
+    [13, 40, 300, 8],
+  ];
+  for (const [seed, count, side, k] of BOARDS_SOFT) {
+    it(`gives the paths of the reference search on board ${seed}, with a new cost in each search`, () => {
+      const nodes = board(seed, count, side);
+      const obstacles = new Obstacles(nodes, 180);
+      const graph = new SoftGraph(nodes, obstacles, { margin: 5, k });
+      const random = rng(400 + seed);
+      let through = 0;
+      for (let q = 0; q < 40; q++) {
+        const s = nodes[Math.floor(random() * nodes.length)]!;
+        const t = nodes[Math.floor(random() * nodes.length)]!;
+        const a = { x: s.box.x + s.box.w / 2, y: s.box.y + s.box.h / 2 };
+        const b = { x: t.box.x + t.box.w / 2, y: t.box.y + t.box.h / 2 };
+        // Each search gives the boxes other costs, so a cost that the last search kept does not count.
+        const far = 50 + random() * 400;
+        const near = new Set(nodes.filter(() => random() < 0.2));
+        const cost = (n: Node): number => (n === s || n === t ? 0 : near.has(n) ? far / 7 : far);
+        const want = referenceSoftPath(graph, nodes, obstacles, k, a, b, cost);
+        if (want.length > 2) through++;
+        expect(graph.path(a, b, cost)).toEqual(want);
+      }
+      expect(through).toBeGreaterThan(10);
     });
   }
 });
