@@ -12,6 +12,7 @@ import { levelRatio, linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
 import { boardUnit } from "../measures/routes.ts";
+import { rowFit } from "../measures/rows.ts";
 import { boxDisplacement, distanceDistortion, roomOrderFaults } from "../measures/room.ts";
 import { routeStability } from "../measures/stability.ts";
 import { routeSymmetry } from "../measures/symmetry.ts";
@@ -261,7 +262,7 @@ function groupShapeValues(graph: Graph, levels: readonly Level[]): Record<string
 /**
  * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
  * A router also gets the bundled share (B2), the merge angle (B6) and the bundle stretch (B3) against the routes `base` of `corners`.
- * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
+ * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4, and R17 of a board with rows. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
  * A result with zoom levels also gets the link agreement (Z9) and `groupShapeValues`, for a router and for a grouping rule.
  * A router also gets the symmetry of its routes (H3). A whole strategy also gets M2, M3 and M5 of the board of its output.
  */
@@ -302,6 +303,11 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     values["M4.laneThrough"] = lanesThrough(graph, open);
     const h3 = routeSymmetry(graph, routes);
     if (h3 !== undefined) values["H3.share"] = h3;
+    const rows = rowFit(graph, routes);
+    if (rows) {
+      values["R17.fit"] = rows.fit;
+      if (rows.gap !== undefined) values["R17.gap"] = rows.gap;
+    }
   }
   if ((givesRoutes(step) || step === "group") && row.result?.levels) {
     const levels = row.result.levels;
