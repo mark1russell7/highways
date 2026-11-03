@@ -1,3 +1,4 @@
+import { median } from "@mark1russell7/rigor-statistics";
 import { tracedHighwayCurves, type JogStyle, type JogTrace, type LaneCurve } from "../curves/highway/index.ts";
 import { CURVE_TYPES, curveSpace, distinctPoints, sampleCurve, type CubicSegment, type CurveSegment, type CurveSpace, type CurveType } from "../curves/index.ts";
 import { polylineLength, segmentsCross, type Point } from "../geom.ts";
@@ -480,10 +481,8 @@ export interface JogMeasures {
 }
 
 /** This function gives the median of the values, or 0 when there are none. */
-function medianOf(values: number[]): number {
-  values.sort((a, b) => a - b);
-  const n = values.length;
-  return n === 0 ? 0 : n % 2 === 1 ? values[(n - 1) / 2]! : (values[n / 2 - 1]! + values[n / 2]!) / 2;
+function medianOrZero(values: readonly number[]): number {
+  return values.length === 0 ? 0 : median(values);
 }
 
 /** This function gives the curvature of the cubic `(p0, c1, c2, p3)` at `t`. */
@@ -565,7 +564,7 @@ export function measureJogs(curves: readonly LaneCurve[], jogs: JogTrace, style:
     });
   });
   const peakMax = peaks.reduce((a, b) => Math.max(a, b), 0);
-  return { count, biarcs, peakMedian: medianOf(peaks), peakMax, ...(biarcPeaks ? { peakRatio: medianOf(ratios) } : {}), endJump, innerJump };
+  return { count, biarcs, peakMedian: medianOrZero(peaks), peakMax, ...(biarcPeaks ? { peakRatio: medianOrZero(ratios) } : {}), endJump, innerJump };
 }
 
 /** The options of `benchHighways`. */

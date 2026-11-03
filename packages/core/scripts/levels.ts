@@ -122,6 +122,7 @@ async function runLevels(): Promise<void> {
         : undefined;
   }
 
+  // This median takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
   const medianOf = (report: PairedReport | undefined, arm: string): string => {
     const ms = report?.inputs.map((i) => i.median[arm]).filter((x): x is number => x !== undefined) ?? [];
     return ms.length === 0 ? "-" : Math.round([...ms].sort((a, b) => a - b)[Math.floor(ms.length / 2)]!).toString();

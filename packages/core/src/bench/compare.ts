@@ -1,3 +1,4 @@
+import { median } from "@mark1russell7/rigor-statistics";
 import type { CurveSegment } from "../curves/model.ts";
 import { polylineLength, type Box } from "../geom.ts";
 import { highwayRouterStrategy } from "../highways/router.ts";
@@ -21,12 +22,7 @@ import { curveRuns, fixtureGroupOptions, FRONT_OBJECTIVES, groupRun, routeMeasur
 
 /** This function gives the median of a list that can hold `Infinity`. An empty list gives 0. */
 function medianOf(values: readonly number[]): number {
-  if (values.length === 0) return 0;
-  const s = [...values].sort((a, b) => a - b);
-  const mid = s.length >> 1;
-  if (s.length % 2 === 1) return s[mid]!;
-  const [a, b] = [s[mid - 1]!, s[mid]!];
-  return a === b ? a : (a + b) / 2;
+  return values.length === 0 ? 0 : median(values);
 }
 
 /**

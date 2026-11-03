@@ -24,6 +24,7 @@ import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
+import { median } from "@mark1russell7/rigor-statistics";
 import { adamStrategy, annealingStrategy, canalStrategy, nudgeStrategy, repelStrategy, springsStrategy, asRouter, attractionStrategy, checkProperties, exactStretches, measureQuality, rerouteStrategy, routePortfolio, routerStrategies, sharedStretchStrategy, tightStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { envOf } from "./gates/paired.ts";
 import { exactLines, routeHash } from "./xplat.ts";
@@ -41,13 +42,6 @@ interface Profile {
 
 /** The time of one step, in milliseconds, with one decimal. */
 const ms = (t: number): number => Math.round(t * 10) / 10;
-
-/** This function gives the median of a list of numbers. The list is not empty. */
-function median(values: readonly number[]): number {
-  const s = [...values].sort((a, b) => a - b);
-  const m = Math.floor(s.length / 2);
-  return s.length % 2 === 1 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
-}
 
 /** The route of one router, with the time of the key of the pick for the portfolio router. */
 interface Routed {

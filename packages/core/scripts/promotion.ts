@@ -11,6 +11,7 @@
 // The script reads files and does no layout, so it is a quick local check.
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
+import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { compareSpec, MEASURES, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
 import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
@@ -90,12 +91,7 @@ function pairs(records: readonly Rec[]): Pair[] {
     });
 }
 
-const median = (xs: readonly number[]): number => {
-  if (xs.length === 0) return NaN;
-  const s = [...xs].sort((x, y) => x - y);
-  const m = s.length >> 1;
-  return s.length % 2 === 1 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
-};
+const medianOrNaN = (xs: readonly number[]): number => (xs.length === 0 ? NaN : homeMedian(xs));
 const quantile = (xs: readonly number[], q: number): number => {
   if (xs.length === 0) return NaN;
   const s = [...xs].sort((x, y) => x - y);
@@ -138,7 +134,7 @@ function bootstrap(xs: readonly number[], seed = 1): { lo: number; hi: number } 
   const sample = new Array<number>(xs.length);
   for (let i = 0; i < P.bootstrapRuns; i++) {
     for (let j = 0; j < xs.length; j++) sample[j] = xs[Math.floor(rand() * xs.length)]!;
-    meds.push(median(sample));
+    meds.push(medianOrNaN(sample));
   }
   const a = (1 - P.bootstrapLevel) / 2;
   return { lo: quantile(meds, a), hi: quantile(meds, 1 - a) };
@@ -195,7 +191,7 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
   ]);
   const guardRows = guards.map((m): GuardRow => {
     const rs = ratios(m, ps);
-    const med = median(rs);
+    const med = medianOrNaN(rs);
     const tail = rs.length === 0 ? 0 : rs.filter((r) => r > 1 + P.tailWorse).length / rs.length;
     return { key: m.key, n: rs.length, median: med, tail, pass: rs.length > 0 && med <= 1 + P.medianWorse && tail <= P.tailShare };
   });
@@ -218,7 +214,7 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
   const adjusted = holm(raw.map((x) => x.p));
   const gain = raw
     .map((x, i): GainRow | undefined => {
-      const med = median(x.rs);
+      const med = medianOrNaN(x.rs);
       if (!(med <= 1 - P.gainMin)) return undefined;
       const { lo, hi } = bootstrap(x.rs);
       return { key: x.m.key, n: x.rs.length, median: med, wins: x.wins, losses: x.losses, p: x.p, pHolm: adjusted[i]!, lo, hi, pass: adjusted[i]! < P.signP && hi < 1 };

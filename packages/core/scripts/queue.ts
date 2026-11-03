@@ -6,6 +6,7 @@
 // With `--calibration`, the script writes the table of the predicted and the measured gain, and the rank correlation.
 // The queue also scores the enablers: each one removes a block of ideas. The header has the back test with its bootstrap interval.
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -503,16 +504,9 @@ export function backtest(ideas: readonly Idea[], snapshots: readonly QueueSnapsh
   return out;
 }
 
-/** This function gives a list of random numbers from 0 to 1 (mulberry32). The same seed gives the same list. */
+/** This function gives a list of random numbers from 0 to 1. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
 export function random(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(seed);
 }
 
 /**

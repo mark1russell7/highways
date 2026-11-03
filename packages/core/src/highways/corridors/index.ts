@@ -53,7 +53,10 @@ interface Way {
   readonly length: number;
 }
 
-/** This function gives the FNV-1a hash of a string, as an unsigned 32-bit number. */
+/**
+ * This function gives the FNV-1a hash of a string, as an unsigned 32-bit number.
+ * This copy stays. It hashes the UTF-16 code units. The `fnv1a32` of `@mark1russell7/rigor-generators` hashes the UTF-8 bytes.
+ */
 function fnv1a(text: string): number {
   let h = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {

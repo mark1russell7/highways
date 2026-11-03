@@ -1,5 +1,6 @@
 // The data of the strategy cards (STRATEGY-CARDS). The build gives the registry and the committed files to these functions.
 // This module has no access to the file system and to the network, so the page and the tests use the same rules.
+import { median } from "@mark1russell7/rigor-statistics";
 import type { Snapshot, VerdictLabel } from "./results-data.ts";
 
 /** This pattern finds the id of an idea record in a text, for example `HWY-031`. */
@@ -198,12 +199,6 @@ export function breadthText(label: VerdictLabel, b: { readonly against: number; 
   if (label === "worse") return `better on ${b.against} of ${b.of}${ties}`;
   return `wins ${signs.filter((s) => s === 1).length}, loses ${signs.filter((s) => s === -1).length} of ${b.of}`;
 }
-
-const median = (xs: readonly number[]): number => {
-  const s = [...xs].sort((a, b) => a - b);
-  const m = s.length >> 1;
-  return s.length % 2 === 1 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
-};
 
 /** This function gives the time of each router in the benchmark snapshot, with the paired ratio to `shared`. */
 export function benchTimes(rows: StrategiesInput["bench"]): Map<string, CardBench> {
