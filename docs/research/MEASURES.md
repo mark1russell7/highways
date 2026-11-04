@@ -187,6 +187,7 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B8 | Run profile | Bundles of a useful size | `runs`, `q_0.5` and `max` of the edges of each run | counts, in context | `linear` | score | yes, `B8.runs`, `B8.median` and `B8.max` of the screen | [Holten 2006][holten06], [Lhuillier 2017][lhuillier17] |
 | B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
 | B10 | Gap closed | Ink saved near the optimum | `gc = (B1(s) - B1(b)) / (B1* - B1(b))`. `b` is the baseline, and `B1*` is the optimum at the smallest cap at or above the largest stretch of `s`. | share of the gap, `↑`. 0 is the baseline, and 1 is the optimum | an exact solve for each input, kept in a file | score | yes, `gap` of the screen on `exact-v1`, with `gap.cap` and the views `gap.collection` and `gap.all` | [Magnanti and Wong 1984][magnanti84] |
+| B11 | Route overlap | Routes that a reader can follow | `share`: length on a line with two routes or more, over all length. `peak`: the most routes on one piece of a line. | 0..1 and count, `↓` | `n log n` | score | yes, `B11.share` and `B11.peak` of the suite | [Holten 2006][holten06] |
 
 ### Notes on the bundles
 

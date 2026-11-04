@@ -104,6 +104,8 @@ const ROWS: readonly Row[] = [
   ["ink", "R1", "route.ink", "units", "lower", true],
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
+  ["B11.share", "B11", "route.overlap.share", "0 to 1", "lower", false, "The share of the length of all routes on a piece of a line with two routes or more. A good result for a router with no lanes is near the value of `corners`."],
+  ["B11.peak", "B11", "route.overlap.peak", "count", "lower", false, "The most routes on one piece of a line. A good result for a router with no lanes is near the value of `corners`."],
   ["B4.ambiguity", "B4", "route.bundle.ambiguity", "0 to 1", "lower", false],
   // B2, B3 and B6 score the shared ways of the routes for a fixed placement, as B1 does. B3 compares with the routes of `corners` on the same input.
   ["B2.share", "B2", "route.bundle.share", "0 to 1", "higher", false],

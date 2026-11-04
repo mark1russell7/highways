@@ -785,7 +785,11 @@ The cost of this router is the shared length. A seam has no room for lanes, so r
 | Most routes on one piece of a line | 2 to 3 | 7 to 10 |
 | Total length against `corners` | 1 | 1.28 to 1.33 |
 
-The record is [`seam-share.jsonl`](bench/seam-share.jsonl), from `scripts/seam-share.ts`. The screen can flatter this router. The ink measure B1 gives credit for shared length, and `crossings` counts each crossing of two shared stretches one time. Thus a verdict of this router reads its rows with this table.
+The record is [`seam-share.jsonl`](bench/seam-share.jsonl), from `scripts/seam-share.ts`. The screen can flatter this router. The ink measure B1 gives credit for shared length, and `crossings` counts each crossing of two shared stretches one time. Thus the verdict of this router has the limits of B11 in `limits`.
+
+- Each limit is a rise over `corners` on one input: 0.10 of the share, and 2 routes of the peak.
+- An absolute limit does not work. On `hub-chain`, `corners` has a share of 60% and a peak of 10. On that board `seams` gives the same routes.
+- The limits apply only to a router with no lanes. The verdicts of the other strategies and the measure B1 do not change.
 
 ## The verdict over families of the screens (SCREEN-WEIGHT)
 
