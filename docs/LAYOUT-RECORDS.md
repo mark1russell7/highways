@@ -107,6 +107,9 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `bottleneck` | `left`, `right`, `edges`, `door`, `wall`, `overhang`, `gap` | `mulberry32` of the seed | `exact` |
 | `parallel-edges` | `pairs`, `copies`, `back`, `others`, `extra`, `gap` | `mulberry32` of the seed | `exact` |
 | `maze` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops` | `mulberry32` of the seed | `exact` |
+| `channel` | `cols`, `nets`, `pins`, `span`, `height`, `gap` | `mulberry32` of the seed | `exact` |
+| `comb` | `teeth`, `depth`, `slot`, `tooth`, `clear`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `spiral` | `turns`, `corridor`, `wall`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -129,6 +132,9 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `bottleneck`: two regions with a long wall between them and one narrow door. Each edge crosses the wall, so each edge wants the same free space. `overhang` sets the length of the way around the wall.
   - `parallel-edges`: many edges with the same two ends and no fixed plug. It is the only family with a second edge between two ends. `back` sets the share of the edges in the other direction.
   - `maze`: a closed maze of wall boxes with nodes in its cells. At `loops` 0, one way joins each two cells. Thus a straight line is far from the real way.
+  - `channel`: two rows of nodes across a channel, with fixed plugs on the channel side. This is the channel routing problem of the chip literature.
+  - `comb`: two combs that reach into each other. One corridor goes up and down between the teeth, so a way turns at each tooth.
+  - `spiral`: one wall in a square spiral, with nodes in the corridor. A node on the next arm is near, and the way to it is a full turn.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
