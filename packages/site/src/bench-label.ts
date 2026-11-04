@@ -5,6 +5,8 @@ export interface BenchMeta {
   readonly run?: number;
   readonly sha?: string;
   readonly date?: string;
+  /** The version of the engine at the commit of the snapshot. */
+  readonly core?: string;
 }
 
 /** The label of the snapshot, as HTML, and the warning when the snapshot is old. */
