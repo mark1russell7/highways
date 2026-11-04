@@ -1,6 +1,6 @@
 // The screenshots of the site at 1280 and 390 pixels, in light and dark. The workflow `Shots` starts this file.
 // Start: `node packages/site/scripts/shots.ts <out dir> <base url> <page,page>`. The variable `PLAYWRIGHT_DIR` names the folder that holds `playwright-core`.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -102,7 +102,7 @@ async function main(outDir: string, base: string, pages: string): Promise<void> 
   console.log(lines.join("\n"));
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const [outDir, base, pages] = process.argv.slice(2);
   if (outDir === undefined || base === undefined || pages === undefined) throw new Error("Give the out dir, the base url and the pages.");
   await main(outDir, base, pages);

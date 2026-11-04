@@ -50,8 +50,9 @@ jobs:
           google-chrome --version
       - name: Take the shots
         run: |
-          pnpm --filter @highways/site exec vite preview --port 4188 --strictPort > preview.log 2>&1 &
+          pnpm --filter @highways/site exec vite preview --host 127.0.0.1 --port 4188 --strictPort > preview.log 2>&1 &
           for _ in $(seq 1 30); do curl -sf http://127.0.0.1:4188/ > /dev/null && break; sleep 1; done
+          curl -sf http://127.0.0.1:4188/ > /dev/null || { cat preview.log; exit 1; }
           node packages/site/scripts/shots.ts out/shots http://127.0.0.1:4188/ "$PAGES"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
