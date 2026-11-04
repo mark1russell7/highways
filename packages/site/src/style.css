@@ -1800,8 +1800,13 @@ pre code {
   font-variant-numeric: tabular-nums;
 }
 
+.gen-seed {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 .gen-seed-box input[type="number"] {
   flex: 1;
+  min-width: 8ch;
 }
 
 .gen-status {
