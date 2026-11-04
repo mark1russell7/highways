@@ -908,6 +908,8 @@ The step `plugs` gives the plugs of the router `corners`. The step `group` gives
 - A list of other plans, for example the `generators` of `select`, is one `bool` param `<key>:<source>` for each source.
 - `ROUTE_SPACE_LEFT_OUT` gives each option that the space does not hold, with its reason. The router gets the default of that option.
 - `ROUTE_SPACE_MISFITS` gives each router of the table that is not a named point. The list is empty.
+- `configOfMember(name)` gives the point of a member of `MEMBER_FORMS`, or a reason. `routeConfig` of the point gives the routes of the member.
+- `MEMBER_MISFITS` gives each name with no point, with its reason.
 - The portfolio router is not in the space. It is a selector over the routers.
 
 ```ts

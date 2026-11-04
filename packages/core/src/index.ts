@@ -59,4 +59,4 @@ export * from "./portfolio/index.ts";
 export * from "./lane-orders/stretch/index.ts";
 export { sharedStretchStrategy } from "./lane-orders/stretch/router.ts";
 // The stages of the routers and their options as data of the schema `strategy-space/1` (STAGE-DATA).
-export { ROUTE_SPACE_LEFT_OUT, ROUTE_SPACE_MISFITS, routeConfig, routeSpace } from "./route-space.ts";
+export { configOfMember, MEMBER_MISFITS, ROUTE_SPACE_LEFT_OUT, ROUTE_SPACE_MISFITS, routeConfig, routeSpace, type MemberPoint } from "./route-space.ts";
