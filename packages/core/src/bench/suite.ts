@@ -10,6 +10,7 @@ import { byDataGroup } from "../groups/keys/index.ts";
 import { highwayRouterStrategy } from "../highways/router.ts";
 import { checkSections, type Section } from "../sections.ts";
 import { laneRoutes } from "../segments.ts";
+import { routeOverlap } from "./measures/overlap.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { asRouter, listStrategies, STEPS, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
@@ -271,12 +272,15 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
   const turn = totalTurn(routes);
   const detour = detourSpread(routes);
   const plugs = plugSpacing(graph, routes);
+  const overlap = routeOverlap(routes);
   return {
     "R1.crossings": row.quality.crossings,
     "R1.perEdge": row.quality.crossings / m,
     "R2.angle": ca.mean,
     "R2.min": ca.min,
     "B1.inkSaved": inkSaved(routes),
+    "B11.share": overlap.share,
+    "B11.peak": overlap.peak,
     "R4.turn": turn.mean,
     "R4.max": turn.max,
     "R5.median": detour.median,
