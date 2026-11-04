@@ -77,13 +77,15 @@ describe("the map from the strategies to their ideas", () => {
     expect(built.strategies["whole/curriculum"]).toContain("RULE-048");
   });
 
-  // The texts `describe` of the registered strategies of wave 4C (BUILD-W4C) cite their ideas. The routers `canals` and `adam` are opt-in, so they have no card.
+  // The texts `describe` of the registered strategies of wave 4C (BUILD-W4C) cite their ideas.
   it("gives the cards the ideas of the strategies of wave 4C", () => {
     const built = builtMap(strategyInputs());
     expect(built.strategies["highway/slots"]).toContain("RULE-047");
     expect(built.strategies["whole/preferences"]).toContain("RULE-038");
     expect(built.strategies["whole/fireflies"]).toContain("NAT-047");
     expect(built.strategies["whole/tracing"]).toContain("WILD-057");
+    expect(built.strategies["router/canals"]).toContain("NAT-004");
+    expect(built.strategies["router/adam"]).toContain("RULE-020");
   });
 
   // The texts `describe` of the strategies of wave 4D (BUILD-W4D) cite their ideas.

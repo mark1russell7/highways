@@ -53,7 +53,7 @@ export const MAX_LINES = 200_000;
  * The opt-in routers of `src/routers`. The step `router` of the dump runs them with the built-in routers, because some of them have their own copy of a predicate.
  * The router `portfolio` is not in the list, because it runs the built-in routers again. The list has no `shared-stretch`, so the rows of a dump stay the same.
  */
-export const OPT_IN_ROUTERS: readonly Strategy<"router">[] = OPT_IN_STRATEGIES.filter((s) => s.name !== "portfolio" && s.name !== "shared-stretch") as readonly Strategy<"router">[];
+export const OPT_IN_ROUTERS: readonly Strategy<"router">[] = OPT_IN_STRATEGIES.filter((s) => s.name !== "portfolio" && s.name !== "rules" && s.name !== "shared-stretch") as readonly Strategy<"router">[];
 
 const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 
