@@ -5,6 +5,7 @@ import { edgePlugs } from "./highways/stretches.ts";
 import { follow } from "./highways/follow.ts";
 import type { Graph, Result } from "./model.ts";
 import { byCollection, cornersRouter, sectionsRouter, sharedRouter, trunksRouter } from "./routers/index.ts";
+import { seamsRouter } from "./routers/seams/index.ts";
 import { laneRoutes } from "./segments.ts";
 import { WayFinder } from "./ways.ts";
 
@@ -54,7 +55,7 @@ describe("the field through of a route (CORNER-REACH)", () => {
     const graph = walledOff();
     const shared = sharedRouter({ name: "shared" }).route(graph);
     expect(breaks(graph, shared).length).toBeGreaterThan(0);
-    for (const router of [cornersRouter({ name: "corners" }), sharedRouter({ name: "shared" }), trunksRouter({ name: "trunks", rule: byCollection }), sectionsRouter({ name: "sections" })]) {
+    for (const router of [cornersRouter({ name: "corners" }), sharedRouter({ name: "shared" }), trunksRouter({ name: "trunks", rule: byCollection }), sectionsRouter({ name: "sections" }), seamsRouter({ name: "seams" })]) {
       const result = router.route(graph);
       expect(marked(result), router.name).toEqual(breaks(graph, result));
     }
@@ -67,6 +68,20 @@ describe("the field through of a route (CORNER-REACH)", () => {
     expect(ways.corners.path(ways.out(edge.ps!), ways.out(edge.pt!))).toBeUndefined();
     const route = sharedRouter({ name: "shared" }).route(graph).routes.find((r) => r.edge === "out")!;
     expect(route.through?.length).toBeGreaterThan(0);
+  });
+
+  it("is on the straight line of the router seams, when an edge has no way in both graphs (SEAMS-THROUGH)", () => {
+    const graph: Graph = {
+      nodes: [
+        { id: "shell", box: { x: 0, y: 0, w: 300, h: 300 } },
+        { id: "inner", box: { x: 130, y: 130, w: 40, h: 40 } },
+        { id: "far", box: { x: 500, y: 130, w: 40, h: 40 } },
+      ],
+      edges: [{ id: "e", source: { node: "inner" }, target: { node: "far" } }],
+    };
+    const [route] = seamsRouter({ name: "seams" }).route(graph).routes;
+    expect(route!.points).toHaveLength(2);
+    expect(route!.through).toEqual(["shell"]);
   });
 
   it("is absent on each route of a clean board, so a clean route keeps its bytes", () => {
