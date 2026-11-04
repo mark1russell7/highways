@@ -63,7 +63,7 @@ describe("the highway strategy grassfire (NAT-034)", () => {
     expect(inGap.length).toBeGreaterThan(0);
     const room = Math.min(...inGap.map((p) => roomAt(gate, p)));
     const finder = new WayFinder(gate.nodes);
-    const [{ ps, pt }] = edgePlugs(gate);
+    const { ps, pt } = edgePlugs(gate)[0]!;
     const hug = finder.corners.path(finder.out(ps!), finder.out(pt!))!.filter((p) => p.x >= 275 && p.x <= 325);
     expect(room).toBeGreaterThan(Math.min(...hug.map((p) => roomAt(gate, p))));
     expect(room).toBeGreaterThanOrEqual(30);
