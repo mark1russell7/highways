@@ -26,6 +26,7 @@ import { ARC_SOURCES } from "./highways/hub-arcs/index.ts";
 import { highwayRouterStrategy } from "./highways/router.ts";
 import { CANDIDATE_SOURCES } from "./highways/select/index.ts";
 import type { Graph, Result } from "./model.ts";
+import { MEMBER_FORMS, type MemberForm } from "./portfolio/members.ts";
 import { byCollection } from "./routers/trunks.ts";
 import { groupStrategies, highwayStrategies, levelStrategies, plugStrategies, routerStrategies } from "./strategies/builtins.ts";
 import type { Step, Strategy } from "./strategies/model.ts";
@@ -493,4 +494,75 @@ export function routeConfig(graph: Graph, config: StrategyConfig): Result {
   if (breaks.length > 0) throw new RangeError(`The config is not a config of the space highways: ${breaks.map((b) => b.detail).join("; ")}.`);
   const { router, options } = routerOf(canonicalConfig(routeSpace, config));
   return router.run(graph, options);
+}
+
+/** The point of a member in `routeSpace`: its config, or the reason that it has no config. */
+export type MemberPoint = { readonly ok: true; readonly config: StrategyConfig } | { readonly ok: false; readonly reason: string };
+
+/**
+ * The names with no point in `routeSpace`, with the reason of each. Each refused form of `MEMBER_FORMS` has a row here.
+ * The name `portfolio` is not a form. It has a row because a consumer can ask for it.
+ */
+export const MEMBER_MISFITS: Readonly<Record<string, string>> = Object.freeze({
+  portfolio: "It is a selector, not a router. One route for each board comes from a choice among the members, and the stage `routing` holds one router.",
+  "w3a:diffusion-l3": "Its option `lambda` is 3, and the schema of `diffusion` stops at 2. The space takes its ranges from the schemas, so the value is not in the space.",
+});
+
+/** This function gives the params of the options of a strategy, the reverse of `decode`, or a reason for an option with no param. */
+function encode(codecs: readonly Codec[], options: Options): Record<string, ParamValue> | string {
+  const out: Record<string, ParamValue> = {};
+  for (const [key, value] of Object.entries(options)) {
+    const c = codecs.find((x) => x.key === key);
+    if (c === undefined) return `The option ${key} has no param.`;
+    if (c.kind === "plain") out[c.param.name] = value as ParamValue;
+    else if (c.kind === "switch") {
+      out[c.flag.name] = value !== c.off;
+      if (value !== c.off) out[c.param.name] = value as ParamValue;
+    } else for (const s of c.sources) out[sourceParam(key, s)] = (value as readonly string[]).includes(s);
+  }
+  return out;
+}
+
+/** This function gives the config of a router with options, before a check. The option `plugs` goes to its stage, and the other options go to `routing`. */
+function routerPoint(id: string, options: Options): MemberPoint {
+  const r = ROUTING.get(id);
+  if (r === undefined) return { ok: false, reason: `The stage routing has no option ${id}.` };
+  const { plugs, ...own } = options;
+  const staged = r.reads.has("plugs") && typeof plugs === "string";
+  const routing = encode(r.coded.codecs, staged ? own : options);
+  if (typeof routing === "string") return { ok: false, reason: routing };
+  return { ok: true, config: pointOf(id, routing, staged ? { plugs: choice(plugs) } : {}) };
+}
+
+/** This function gives the config of a member form, before a check. */
+function formPoint(form: MemberForm): MemberPoint {
+  switch (form[0]) {
+    case "highway":
+      return { ok: true, config: form[1] === "shared-ways-all" ? pointOf("shared-ways", {}, { grouping: choice("edge-key", { rule: "all" }) }) : NAMED[form[1]]! };
+    case "gate":
+      return ROUTING.has(form[1])
+        ? { ok: true, config: pointOf(form[1], {}, { gate: choice(form[2], form[3] === undefined ? {} : { budget: form[3] }) }) }
+        : { ok: false, reason: `The stage routing has no option ${form[1]}.` };
+    case "plan":
+      return routerPoint(form[1], form[2]);
+    default:
+      return routerPoint(form[0], form[1]);
+  }
+}
+
+/**
+ * This function gives the canonical point in `routeSpace` of a member of `MEMBER_FORMS`. `routeConfig` of the point gives the routes of the member.
+ *
+ * - A name without a form gets a reason in place of a config. An option with no param and a break of `checkConfig` also give a reason.
+ * - The reason is the row of `MEMBER_MISFITS` when the name has a row. The function examines the form first, so a test finds a row that is out of date.
+ */
+export function configOfMember(name: string): MemberPoint {
+  const row = MEMBER_MISFITS[name];
+  const form = MEMBER_FORMS[name];
+  if (form === undefined) return { ok: false, reason: row ?? `The name ${name} is not a member of MEMBER_FORMS.` };
+  const raw = formPoint(form);
+  if (!raw.ok) return { ok: false, reason: row ?? raw.reason };
+  const breaks = checkConfig(routeSpace, raw.config);
+  if (breaks.length > 0) return { ok: false, reason: row ?? `The config is not a point of routeSpace: ${breaks.map((b) => `${b.claim}: ${b.detail}`).join("; ")}.` };
+  return { ok: true, config: canonicalConfig(routeSpace, raw.config) };
 }
