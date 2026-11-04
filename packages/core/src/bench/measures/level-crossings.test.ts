@@ -71,4 +71,28 @@ describe("levelCrossings", () => {
     expect(m.crossed[0]).toMatchObject({ way: "ends-overlap", items: ["w"], overlapEnd: 1 });
     expect(m.overlaps).toBe(2);
   });
+
+  it("shows a way that only the box of a section closes", () => {
+    const nodes = [
+      { id: "a0", box: { x: 0, y: 0, w: 10, h: 10 } },
+      { id: "b0", box: { x: 100, y: 0, w: 10, h: 10 } },
+      { id: "w0", box: { x: 50, y: -100, w: 4, h: 4 } },
+      { id: "w1", box: { x: 50, y: 100, w: 4, h: 4 } },
+    ];
+    const items: LevelItem[] = [
+      { id: "a", box: nodes[0]!.box, nodes: ["a0"] },
+      { id: "b", box: nodes[1]!.box, nodes: ["b0"] },
+      { id: "w", box: { x: 50, y: -100, w: 4, h: 204 }, nodes: ["w0", "w1"] },
+    ];
+    const m = levelCrossings(level(items, { x: 10, y: 5 }, { x: 100, y: 5 }), nodes);
+    expect(m.crossed[0]).toMatchObject({ way: "clear", boardWay: true, single: 0 });
+  });
+
+  it("gives no board way when the nodes close the room", () => {
+    const walls = ROOM.map((box, i) => ({ id: `w${i}`, box }));
+    const nodes = [...walls, { id: "a0", box: { x: 40, y: 40, w: 20, h: 20 } }, { id: "b0", box: { x: 200, y: 40, w: 20, h: 20 } }];
+    const items: LevelItem[] = nodes.map((n) => ({ id: n.id === "a0" ? "a" : n.id === "b0" ? "b" : n.id, box: n.box, nodes: [n.id] }));
+    const m = levelCrossings(level(items, { x: 60, y: 50 }, { x: 200, y: 50 }), nodes);
+    expect(m.crossed[0]).toMatchObject({ way: "none", boardWay: false });
+  });
 });

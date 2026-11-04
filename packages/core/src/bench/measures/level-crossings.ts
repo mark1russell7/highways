@@ -92,6 +92,8 @@ export interface CrossedLink {
   readonly overlapEnd: number;
   /** The way between the end items: `ends-overlap` when their boxes overlap, `clear` when a free region touches both, else `none`. */
   readonly way: "ends-overlap" | "clear" | "none";
+  /** This value is true when a free region of the nodes of the board touches a node of each end item. The value is undefined with no `board`. */
+  readonly boardWay?: boolean;
 }
 
 /** The crossings of one level. */
@@ -108,11 +110,24 @@ export interface LevelCrossings {
 /**
  * This function measures the crossings of a level. It uses `Obstacles.through`, the test of the rule that a link stays out of the boxes.
  * Only a crossed link with the way `clear` is a link that the router could draw with no crossing.
+ * With `board`, the function also tests the same way on the nodes of the board. So a way that only the boxes of the level close is visible.
  */
-export function levelCrossings(level: Level): LevelCrossings {
+export function levelCrossings(level: Level, board?: readonly Node[]): LevelCrossings {
   const nodes: Node[] = level.items.map((i) => ({ id: i.id, box: i.box }));
   const count = new Map(level.items.map((i) => [i.id, i.nodes.length] as const));
   const byId = new Map(nodes.map((n) => [n.id, n] as const));
+  const boxOf = new Map(board?.map((n) => [n.id, n.box] as const));
+  const members = new Map(level.items.map((i) => [i.id, i.nodes] as const));
+  let boardFree: FreeSpace | undefined;
+  /** This function gives the labels of the free regions around the nodes of an end item. */
+  const aroundItem = (id: string, free: FreeSpace): Set<number> => {
+    const out = new Set<number>();
+    for (const n of members.get(id) ?? []) {
+      const box = boxOf.get(n);
+      if (box) for (const l of free.around(box)) out.add(l);
+    }
+    return out;
+  };
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
@@ -142,7 +157,13 @@ export function levelCrossings(level: Level): LevelCrossings {
         for (const l of free.around(t.box)) if (near.has(l)) way = "clear";
       }
     }
-    crossed.push({ link, items: [...hit].map((n) => n.id), single, overlapEnd, way });
+    let boardWay: boolean | undefined;
+    if (board) {
+      boardFree ??= freeSpace(board.map((n) => n.box));
+      const near = aroundItem(link.source, boardFree);
+      boardWay = [...aroundItem(link.target, boardFree)].some((l) => near.has(l));
+    }
+    crossed.push({ link, items: [...hit].map((n) => n.id), single, overlapEnd, way, ...(boardWay === undefined ? {} : { boardWay }) });
     return hit.size;
   });
   let overlaps = 0;
