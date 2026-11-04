@@ -79,4 +79,12 @@ if (next !== undefined) {
 check("another board has another size", await until(() => stat("Size") !== "" && stat("Size") !== size, ROUTE_MS), stat("Size"));
 check("the board routes with no failure", await until(() => stat("Time") !== "" && !text("#status").includes("failed"), ROUTE_MS), text("#status"));
 
+// The site publishes its measures, with the time of the data.
+const kpi = (await fetch("kpi.json")
+  .then((response) => (response.ok ? response.json() : undefined))
+  .catch(() => undefined)) as { project?: string; at?: string; measures?: unknown[] } | undefined;
+check("the file of measures names this project", kpi?.project === "highways", kpi?.project);
+check("the file of measures has a data time", !Number.isNaN(Date.parse(kpi?.at ?? "")), kpi?.at);
+check("the file of measures has 4 measures", kpi?.measures?.length === 4, kpi?.measures?.length);
+
 export {};
