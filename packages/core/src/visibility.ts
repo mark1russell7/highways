@@ -1,4 +1,5 @@
 import { TOLERANCE } from "./bench/properties.ts";
+import { freeRegions } from "./free-regions.ts";
 import { dist, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
@@ -119,6 +120,11 @@ export interface CornerGraphOptions {
    * The nearest links of a corner can all stay on one side of a gap. Then one region of the plane falls into two parts.
    */
   readonly joinWork?: number;
+  /**
+   * With `false`, the join does not label the free regions of the board, and it looks at each point (JOIN-COST). The default is true.
+   * The two settings give the same links, unless the limit stops the join without the labels. A test holds this.
+   */
+  readonly joinRegions?: boolean;
 }
 
 /**
@@ -139,6 +145,8 @@ export class CornerGraph {
   joinStopped = false;
   /** This count gives the points that the join looked at. It is 0 on a graph of one part. */
   joinLooks = 0;
+  /** This count gives the cells of the table of free regions. It is 0 when the join did not label the regions. */
+  joinCells = 0;
   readonly #adj: number[][] = [];
   // The links of #adj in flat arrays for the search. The links of corner `i` are at the indices `#start[i]` to `#start[i + 1] - 1`.
   // `#to` holds the other corner of each link and `#length` holds its length. The order of the links is the order of #adj.
@@ -231,7 +239,7 @@ export class CornerGraph {
         links[j]!.add(i);
       }
     }
-    this.#joinParts(links, options.joinWork ?? JOIN_WORK);
+    this.#joinParts(links, options.joinWork ?? JOIN_WORK, options.joinRegions === false ? undefined : nodes);
     const count = this.points.length;
     this.#start = new Int32Array(count + 1);
     links.forEach((s, i) => {
@@ -261,8 +269,9 @@ export class CornerGraph {
    * The other parts go from large to small. Each of their corners links to the nearest corner in another part that it can see.
    * The order comes only from the indices of the corners and the sizes of the parts, and an equal distance goes to the lower index.
    * A graph with one part does not change. When the work reaches its limit, the method stops and sets `joinStopped`.
+   * With `nodes`, a corner looks only at the corners of its free region (JOIN-COST). The other corners cannot be in its sight, so the links stay the same.
    */
-  #joinParts(links: Set<number>[], work: number): void {
+  #joinParts(links: Set<number>[], work: number, nodes: readonly Node[] | undefined): void {
     const count = this.points.length;
     const part = new Int32Array(count).fill(-1);
     const members: number[][] = [];
@@ -285,18 +294,21 @@ export class CornerGraph {
     }
     if (work <= 0 || members.length < 2) return;
     const order = members.map((_, m) => m).sort((a, b) => members[b]!.length - members[a]!.length || a - b);
-    order.shift();
+    const largest = order.shift()!;
+    const poolOf = this.#joinPools(part, Math.min(work, count * (count - members[largest]!.length)), nodes);
     const far = new Float64Array(count);
     for (const m of order) {
       for (const i of members[m]!) {
-        if (this.joinLooks + count > work) {
+        const pool = poolOf(i);
+        if (pool.length === 0) continue;
+        if (this.joinLooks + pool.length > work) {
           this.joinStopped = true;
           return;
         }
-        this.joinLooks += count;
+        this.joinLooks += pool.length;
         const p = this.points[i]!;
         const others: number[] = [];
-        for (let j = 0; j < count; j++) {
+        for (const j of pool) {
           if (part[j] === m) continue;
           const q = this.points[j]!;
           far[j] = (p.x - q.x) ** 2 + (p.y - q.y) ** 2;
@@ -312,6 +324,31 @@ export class CornerGraph {
         }
       }
     }
+  }
+
+  /**
+   * This method gives a function that tells the corners for the join to look at from a corner.
+   * A corner looks at its free region, but a region of one part has nothing to join. Corners without a region stay in each list.
+   * The method labels the regions only when the table has at most `limit` cells. Past that limit the labels cost more than the looks that they save.
+   */
+  #joinPools(part: Int32Array, limit: number, nodes: readonly Node[] | undefined): (i: number) => readonly number[] {
+    const all = part.reduce<number[]>((list, _, i) => (list.push(i), list), []);
+    const regions = nodes === undefined ? undefined : freeRegions(nodes.map((n) => n.box), this.#pad, this.points, limit);
+    if (regions === undefined) return () => all;
+    this.joinCells = regions.cells;
+    const { labels } = regions;
+    const lists = new Map<number, number[]>();
+    for (const i of all) {
+      const list = lists.get(labels[i]!);
+      if (list === undefined) lists.set(labels[i]!, [i]);
+      else list.push(i);
+    }
+    const free = lists.get(0) ?? [];
+    const pools = new Map<number, readonly number[]>([[0, all]]);
+    for (const [label, list] of lists) {
+      if (label !== 0) pools.set(label, list.some((j) => part[j] !== part[list[0]!]) ? [...list, ...free] : free);
+    }
+    return (i) => pools.get(labels[i]!)!;
   }
 
   /**

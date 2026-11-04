@@ -94,9 +94,44 @@ describe("the join of the parts of the corner graph (CORNER-REACH)", () => {
 
   it("counts the work on a board of closed regions, where the join adds no link", () => {
     const { graph } = reg.generate("maze", 59);
+    const whole = new WayFinder(graph.nodes, { joinRegions: false });
+    expect(whole.corners.joinLooks).toBeGreaterThan(whole.corners.points.length);
+    expect(whole.corners.joinCells).toBe(0);
+    expect(whole.corners.linkCount).toBe(new WayFinder(graph.nodes, { joinWork: 0 }).corners.linkCount);
+  });
+
+  it("labels the regions once, so a board of closed regions has no looks (JOIN-COST)", () => {
+    const { graph } = reg.generate("maze", 59);
     const on = new WayFinder(graph.nodes);
-    expect(on.corners.joinLooks).toBeGreaterThan(on.corners.points.length);
+    expect(on.corners.joinLooks).toBe(0);
+    expect(on.corners.joinCells).toBeGreaterThan(0);
     expect(on.corners.linkCount).toBe(new WayFinder(graph.nodes, { joinWork: 0 }).corners.linkCount);
+  });
+
+  it("gives the same links with and without the labels (JOIN-COST)", () => {
+    const boards = [...FAILED.map((seed) => reg.generate("maze", seed).graph), ...LARGE_STOPPED.map((seed) => reg.generate("maze", seed, LARGE).graph)];
+    for (const graph of boards) {
+      const on = new WayFinder(graph.nodes);
+      const whole = new WayFinder(graph.nodes, { joinRegions: false });
+      expect(on.corners.linkCount).toBe(whole.corners.linkCount);
+      expect(on.corners.joinLooks).toBeLessThanOrEqual(whole.corners.joinLooks);
+      expect(on.corners.joinStopped).toBe(false);
+    }
+  });
+
+  it("gains links on a board where the limit stops the join without the labels, which is the one change of the labels (JOIN-COST)", () => {
+    const { graph } = reg.generate("maze", 1068, LARGE);
+    const whole = new WayFinder(graph.nodes, { joinWork: 100_000, joinRegions: false });
+    const on = new WayFinder(graph.nodes, { joinWork: 100_000 });
+    expect(whole.corners.joinStopped).toBe(true);
+    expect(on.corners.joinStopped).toBe(false);
+    expect(on.corners.linkCount).toBeGreaterThan(whole.corners.linkCount);
+    expect(on.corners.linkCount).toBe(new WayFinder(graph.nodes).corners.linkCount);
+  });
+
+  it("does no labeling on a board of one part, and a small limit keeps the join without labels (JOIN-COST)", () => {
+    expect(new WayFinder(reg.generate("tiny-uniform", 3).graph.nodes).corners.joinCells).toBe(0);
+    expect(new WayFinder(reg.generate("maze", 59).graph.nodes, { joinWork: 1 }).corners.joinCells).toBe(0);
   });
 
   it("does not set the flag when 0 turns the join off", () => {

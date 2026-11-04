@@ -39,6 +39,7 @@ jobs:
         with:
           paths: |
             packages/core/src/visibility.ts
+            packages/core/src/free-regions.ts
             packages/core/scripts/join-cost.ts
             .github/workflows/join-cost.yml
 
