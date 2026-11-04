@@ -257,7 +257,7 @@ The independent check `checkRoutes` in `bench/measures/through-check.ts` has no 
 
 The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
 
-The script `packages/core/scripts/through-check.ts` writes the record `through-check/1`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+The script `packages/core/scripts/through-check.ts` writes the record `through-check/2`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
 
 The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
 

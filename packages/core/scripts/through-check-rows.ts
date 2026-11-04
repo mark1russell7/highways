@@ -1,12 +1,12 @@
 /**
- * This module makes the rows of the record `through-check/1`, with no side effect (THROUGH-CHECK).
+ * This module makes the rows of the record `through-check/2`, with no side effect (THROUGH-CHECK).
  * The script `through-check.ts` writes them, and the gate `through-check.test.ts` makes them again and compares them with the record.
  * It keeps the routers and the lanes out of `src/bench/measures/through-check.ts`, so the imports of that module stay types only.
  * Each family of `highwaysRegistry()` runs at its defaults, for each router of `SCORED`, `OUTSIDE` and `SITE_ROUTERS`.
- * The board `INNER_BOARD` is one more family, because no family has inner routes at its defaults.
+ * The board `INNER_BOARDS` is one more family, because no family has inner routes at its defaults.
  * A row of `lanes` holds the routes of `laneRoutes`, with each shared segment open, at the lane settings of the site, so it shows what `keepThrough` copies.
  * The routers of `OUTSIDE` do not mark `through`, so the record keeps them in `unmarkedRows`, apart from `rows`.
- * The routers of `SITE_ROUTERS` are report rows, and so are the rows of `INNER_BOARD` and of `lanes`.
+ * The routers of `SITE_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
  */
 import { checkRoutes, deciding, falseThrough, flagged, HAIRLINE, THROUGH_CLASSES, type RouteCheck, type ThroughClass, type ThroughContact } from "../src/bench/measures/through-check.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
@@ -26,7 +26,13 @@ const SITE_NO_LADDER = sectionsRouter({ name: "sections-site-no-ladder", ...SITE
 const SITE_ROUTERS = [SITE, SITE_NO_LADDER];
 /** The lane settings of the site. */
 export const LANES = { width: 5, maxWidth: 30 };
-export const INNER_BOARD = { name: "frame-rows+inner", family: "frame-rows", dims: { inner: 4 } };
+export const INNER_BOARDS = [
+  { name: "frame-rows+inner", family: "frame-rows", dims: { inner: 4 } },
+  { name: "frame-rows+inner12", family: "frame-rows", dims: { inner: 12 } },
+];
+
+/** The seeds of each inner board. The inner routes are few, so these boards take more seeds than the families. */
+export const INNER_SEEDS = 10;
 const SAMPLE = 3;
 const UNMARKED_NOTE = "The routers straight and plugs do not mark through. Their flagged counts are outside each claim on through, and rows does not hold them.";
 
@@ -54,6 +60,8 @@ export interface Row {
   inner: number;
   innerMarked: number;
   innerFlagged: number;
+  innerFalse: number;
+  innerUnnamed: number;
   classes: Partial<Record<ThroughClass, ClassRow>>;
   innerClasses: Partial<Record<ThroughClass, ClassRow>>;
   unnamedClasses: Partial<Record<ThroughClass, ClassRow>>;
@@ -82,6 +90,8 @@ function addChecks(row: Row, seed: number, checks: readonly RouteCheck[]): void 
         row.innerFlagged++;
         addClass(row.innerClasses, id, deciding(c)!);
       }
+      if (falseThrough(c)) row.innerFalse++;
+      if (c.unnamed.length > 0) row.innerUnnamed++;
       continue;
     }
     row.routes++;
@@ -122,6 +132,8 @@ const blank = (router: string, family: string, view: Row["view"]): Row => ({
   inner: 0,
   innerMarked: 0,
   innerFlagged: 0,
+  innerFalse: 0,
+  innerUnnamed: 0,
   classes: {},
   innerClasses: {},
   unnamedClasses: {},
@@ -135,22 +147,24 @@ export interface ThroughScope {
   readonly log?: (line: string) => void;
 }
 
-/** This function gives the record `through-check/1` over `seeds` seeds. The counts are deterministic, and it reads no time. */
+/** This function gives the record `through-check/2` over `seeds` seeds. The counts are deterministic, and it reads no time. */
 export function throughRecord(seeds: number, scope: ThroughScope = {}) {
   const reg = highwaysRegistry();
   const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name)]), ...OUTSIDE];
-  const families = scope.families ?? [...HIGHWAYS_FAMILIES.map((f) => f.name), INNER_BOARD.name];
+  const families = scope.families ?? [...HIGHWAYS_FAMILIES.map((f) => f.name), ...INNER_BOARDS.map((b) => b.name)];
   const rows: Row[] = [];
   const unmarkedRows: Row[] = [];
   for (const family of families) {
     const graphs: Graph[] = [];
-    for (let seed = 0; seed < seeds; seed++) graphs.push(family === INNER_BOARD.name ? reg.generate(INNER_BOARD.family, seed, INNER_BOARD.dims).graph : reg.generate(family, seed).graph);
+    const innerBoard = INNER_BOARDS.find((b) => b.name === family);
+    const count = innerBoard ? INNER_SEEDS : seeds;
+    for (let seed = 0; seed < count; seed++) graphs.push(innerBoard ? reg.generate(innerBoard.family, seed, innerBoard.dims).graph : reg.generate(family, seed).graph);
     for (const name of wanted) {
       const router = SITE_ROUTERS.find((r) => r.name === name) ?? ROUTERS.find((r) => r.name === name)!;
       const row = blank(name, family, "routes");
       const lanes = blank(name, family, "lanes");
       // A lane route has no field `frame`, so the board of inner routes has no row of lanes.
-      const hasLanes = !OUTSIDE.includes(name) && family !== INNER_BOARD.name;
+      const hasLanes = !OUTSIDE.includes(name) && innerBoard === undefined;
       graphs.forEach((graph, seed) => {
         const result = router.route(graph);
         addChecks(row, seed, checkRoutes(graph, result.routes));
@@ -162,7 +176,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     }
   }
   return {
-    schema: "through-check/1",
+    schema: "through-check/2",
     seeds,
     size: "default",
     classes: THROUGH_CLASSES,
@@ -172,7 +186,8 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     unmarkedNote: UNMARKED_NOTE,
     site: SITE.name,
     siteNoLadder: SITE_NO_LADDER.name,
-    innerBoard: INNER_BOARD,
+    innerBoards: INNER_BOARDS,
+    innerSeeds: INNER_SEEDS,
     lanes: LANES,
     rows,
     unmarkedRows,
