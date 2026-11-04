@@ -4,11 +4,8 @@
 name: Join cost
 
 on:
+  # Each pull request starts this workflow. The job changes skips the work when the pull request changes no file of the join.
   pull_request:
-    paths:
-      - packages/core/src/visibility.ts
-      - packages/core/scripts/join-cost.ts
-      - .github/workflows/join-cost.yml
   workflow_dispatch:
     inputs:
       rounds:
@@ -28,7 +25,26 @@ defaults:
     shell: bash
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+        with:
+          paths: |
+            packages/core/src/visibility.ts
+            packages/core/scripts/join-cost.ts
+            .github/workflows/join-cost.yml
+
   measure:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

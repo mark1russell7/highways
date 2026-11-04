@@ -30,6 +30,8 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "corners-smooth.inner": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
   "corners.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
   "corners-smooth.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners.joinWork": "A route of these boards takes no link of the join (CORNER-REACH), so its limit changes no drawing.",
+  "corners-smooth.joinWork": "A route of these boards takes no link of the join (CORNER-REACH), so its limit changes no drawing.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */
