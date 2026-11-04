@@ -1,0 +1,41 @@
+{
+  "boxes": [
+    {"h": 200, "id": "wall-a", "w": 100, "x": 200, "y": -208},
+    {"h": 200, "id": "wall-b", "w": 100, "x": 200, "y": 8},
+    {"h": 20, "id": "s0", "w": 20, "x": 0, "y": -140},
+    {"h": 20, "id": "t0", "w": 20, "x": 480, "y": -140},
+    {"h": 20, "id": "s1", "w": 20, "x": 0, "y": -100},
+    {"h": 20, "id": "t1", "w": 20, "x": 480, "y": -100},
+    {"h": 20, "id": "s2", "w": 20, "x": 0, "y": -60},
+    {"h": 20, "id": "t2", "w": 20, "x": 480, "y": -60},
+    {"h": 20, "id": "s3", "w": 20, "x": 0, "y": -20},
+    {"h": 20, "id": "t3", "w": 20, "x": 480, "y": -20},
+    {"h": 20, "id": "s4", "w": 20, "x": 0, "y": 20},
+    {"h": 20, "id": "t4", "w": 20, "x": 480, "y": 20},
+    {"h": 20, "id": "s5", "w": 20, "x": 0, "y": 60},
+    {"h": 20, "id": "t5", "w": 20, "x": 480, "y": 60},
+    {"h": 20, "id": "s6", "w": 20, "x": 0, "y": 100},
+    {"h": 20, "id": "t6", "w": 20, "x": 480, "y": 100},
+    {"h": 20, "id": "s7", "w": 20, "x": 0, "y": 140},
+    {"h": 20, "id": "t7", "w": 20, "x": 480, "y": 140}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "sparse", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"id": "e0", "source": "s0", "target": "t0"},
+    {"id": "e1", "source": "s1", "target": "t1"},
+    {"id": "e2", "source": "s2", "target": "t2"},
+    {"id": "e3", "source": "s3", "target": "t3"},
+    {"id": "e4", "source": "s4", "target": "t4"},
+    {"id": "e5", "source": "s5", "target": "t5"},
+    {"id": "e6", "source": "s6", "target": "t6"},
+    {"id": "e7", "source": "s7", "target": "t7"}
+  ],
+  "family": "half-fits",
+  "generator": {"name": "move-board", "params": {"board": "half-fits"}, "seed": 0, "version": 1},
+  "hash": "6d1d517a50e45f6e",
+  "id": "moves-v1/half-fits/s0",
+  "schema": "layout-input/1",
+  "seed": 0,
+  "set": "moves-v1",
+  "source": "made-up"
+}

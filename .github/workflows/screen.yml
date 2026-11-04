@@ -35,7 +35,7 @@ on:
         description: "The time limit of the job, in minutes. With exact: the time limit of each shard. With paired: 60 or more. With time: 150 or more."
         default: "15"
       set:
-        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1 or exact-v1-bounds. The set exact-v1 also gives the gap closed (MEAS2)."
+        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), exact-v1, exact-v1-bounds or moves-v1 (the small boards of REBUILD-SILENT). The set exact-v1 also gives the gap closed (MEAS2)."
         default: "screen-v1"
       members:
         description: "The members of each family, as from-to, for example 10-23, in place of the members of the set (PROMO-CANALS). Empty: the members of the set."
