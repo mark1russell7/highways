@@ -7,8 +7,10 @@ import { CornerGraph, Obstacles } from "./visibility.ts";
 /**
  * The parts of the margin that the first step of a plug tries, in order (PLUG-OUT-BLOCKED).
  * The margin is a preference, not a wall. A small margin is better than a straight line through a box.
+ * The lowest step is above 0, because a search at 0 runs along the seam of two boxes that touch. Such a route crosses the boxes, but no measure sees it.
+ * Thus boxes that touch stay closed, and the route with no way says so in `through`.
  */
-export const OUT_STEPS: readonly number[] = [1, 0.5, 0.25, 0];
+export const OUT_STEPS: readonly number[] = [1, 0.5, 0.25, 0.0625];
 
 /** The options of a way finder. */
 export interface WayOptions {
@@ -32,11 +34,6 @@ export interface WayFinderOptions extends WayOptions {
   readonly joinWork?: number;
   /** With `false`, the join does not label the free regions. `CornerGraphOptions.joinRegions` tells more. */
   readonly joinRegions?: boolean;
-}
-
-/** This function removes a point that equals the point before it: a step of 0 starts the way at the plug. */
-function tidy(points: readonly Point[]): Point[] {
-  return points.filter((p, i) => i === 0 || p.x !== points[i - 1]!.x || p.y !== points[i - 1]!.y);
 }
 
 export class WayFinder {
@@ -87,7 +84,8 @@ export class WayFinder {
    * It searches first at the whole margin, so a route with a way there keeps its bytes.
    * The corner graph at the margin can have no link between two free ends: boxes that stand closer than twice the margin close each gap.
    * Then the method tries the first step of `out`, and the graphs of the lower steps of `OUT_STEPS`. It makes each graph at the first search that needs it.
-   * With `ends`, a straight line between two plugs that goes through no other box stops the method, and it gives `undefined`.
+   * A straight line between the two ends that goes through no box stops the method, and it gives `undefined`. `ends` names boxes that the line can touch.
+   * Thus the steps change only a line that goes through a box.
    */
   way(from: Plug | Point, to: Plug | Point, ends?: ReadonlySet<Node>): Point[] | undefined {
     const whole = (e: Plug | Point): Point => ("normal" in e ? this.#at(e, 0) : e);
@@ -97,7 +95,8 @@ export class WayFinder {
       if (first) return this.corners.pull(first);
     }
     if (!this.outSteps) return undefined;
-    if (ends && "normal" in from && "normal" in to && this.obstacles.clear(from.point, to.point, 0, ends)) return undefined;
+    const spot = (e: Plug | Point): Point => ("normal" in e ? e.point : e);
+    if (this.obstacles.clear(spot(from), spot(to), 0, ends)) return undefined;
     const end = (e: Plug | Point, step: number): Point => {
       if (!("normal" in e)) return e;
       return step === 0 ? this.out(e) : this.#at(e, Math.max(step, this.outStep(e)));
@@ -129,7 +128,7 @@ export class WayFinder {
     }
     const way = this.way(ps, pt, ends);
     if (!way) return [ps.point, pt.point];
-    const poly = tidy([ps.point, ...way, pt.point]);
+    const poly = [ps.point, ...way, pt.point];
     if (this.#smooth) {
       const round = roundCorners(poly, this.margin);
       if (this.obstacles.clearPath(round, 0, ends)) return round;
@@ -140,12 +139,12 @@ export class WayFinder {
   /** This method gives a way from a plug to a free point, or `undefined` when the graph has none. */
   fromPlug(ps: Plug, to: Point): Point[] | undefined {
     const way = this.way(ps, to);
-    return way && tidy([ps.point, ...way]);
+    return way && [ps.point, ...way];
   }
 
   /** This method gives a way from a free point to a plug, or `undefined` when the graph has none. */
   toPlug(from: Point, pt: Plug): Point[] | undefined {
     const way = this.way(from, pt);
-    return way && tidy([...way, pt.point]);
+    return way && [...way, pt.point];
   }
 }

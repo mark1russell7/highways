@@ -7,7 +7,7 @@
     1,
     0.5,
     0.25,
-    0
+    0.0625
   ],
   "rows": [
     {
@@ -113,79 +113,79 @@
     {
       "name": "corners",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "corners-smooth",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "trunks",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "shared",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "shared-all",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "sections",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     },
     {
       "name": "sections-tree",
       "boards": 150,
-      "boardsChanged": 10,
+      "boardsChanged": 0,
       "routes": 17671,
-      "routesChanged": 924,
-      "changedThroughOff": 924,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
       "changedThroughOn": 0,
       "throughOff": 924,
-      "throughOn": 0
+      "throughOn": 924
     }
   ]
 }

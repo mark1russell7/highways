@@ -84,32 +84,30 @@ describe("the first step of a plug", () => {
     }
   });
 
-  it("changes only the routes through a box on `screen-v3`, and each one loses its box", { timeout: 60_000 }, () => {
+  it("keeps two boxes that touch closed, so a route does not run along their seam", () => {
+    const nodes = [box("wall-a", 100, 0, 20, 50), box("wall-b", 100, 50, 20, 50), box("left", 0, 40, 20, 20), box("right", 200, 40, 20, 20), box("cap-a", 100, -2000, 20, 2000), box("cap-b", 100, 100, 20, 2000)];
+    const ends = new Set<Node>([nodes[2]!, nodes[3]!]);
+    const ps: Plug = { point: { x: 20, y: 50 }, normal: { x: 1, y: 0 } };
+    const pt: Plug = { point: { x: 200, y: 50 }, normal: { x: -1, y: 0 } };
+    const way = new WayFinder(nodes).between(ps, pt, ends);
+    // The only way goes around the ends of the wall, 2000 units from the seam.
+    expect(Math.max(...way.map((p) => Math.abs(p.y - 50)))).toBeGreaterThan(2000);
+  });
+
+  it("keeps the routes of `packed-grid`, whose boxes touch and leave no channel, and each route says so", { timeout: 60_000 }, () => {
     const on = [cornersRouter({ name: "corners" }), sharedRouter({ name: "shared" }), sectionsRouter({ name: "sections", maxNodes: 100_000 })];
     const off = [cornersRouter({ name: "corners", outSteps: false }), sharedRouter({ name: "shared", outSteps: false }), sectionsRouter({ name: "sections", maxNodes: 100_000, outSteps: false })];
     const inputs = screenInputs(SCREEN_SETS["screen-v3"]!).filter((i) => i.id.includes("packed-grid"));
     expect(inputs).toHaveLength(10);
     on.forEach((router, n) => {
-      let changed = 0;
+      let through = 0;
       for (const input of inputs) {
         const graph = inputGraph(input);
-        const before = off[n]!.route(graph).routes;
         const after = router.route(graph).routes;
-        expect(after.filter((r) => r.through !== undefined), router.name).toEqual([]);
-        before.forEach((r, i) => {
-          if (JSON.stringify(r.points) === JSON.stringify(after[i]!.points)) return;
-          changed++;
-          expect(r.through).toBeDefined();
-        });
+        expect(after, router.name).toEqual(off[n]!.route(graph).routes);
+        through += after.filter((r) => r.through !== undefined).length;
       }
-      expect(changed, router.name).toBe(924);
+      expect(through, router.name).toBe(924);
     });
-  });
-
-  it("has no two equal points in a row when the step is 0", () => {
-    const nodes = [box("low", 0, 100, 200, 40), box("lid", 40, 99.5, 120, 0.25), box("far", 300, 40, 40, 40)];
-    const ways = new WayFinder(nodes);
-    const way = ways.between(up(100, 100), { point: { x: 300, y: 60 }, normal: { x: -1, y: 0 } }, new Set<Node>([nodes[0]!, nodes[2]!]));
-    for (let i = 1; i < way.length; i++) expect(way[i]).not.toEqual(way[i - 1]);
   });
 });

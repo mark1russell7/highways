@@ -2,7 +2,7 @@
  * This script counts the routes through boxes on the family `escape`, with the steps of the margin off and on (PLUG-OUT-BLOCKED).
  * It counts the routes of `corners` by the part of the ladder that gave them. `steps` counts the lowest first step of the two plugs on the graph at the margin.
  * `lowerGraphs` counts the ways of the graph of each lower step, and `straight` the routes with no way in a graph. The method `between` makes one way for each route, as `corners` does.
- * The list `screen` counts the routes of each default router on `screen-v3` that change, with the steps off and on.
+ * The list `screen` counts the routes of each default router on `screen-v3` that change, with the steps off and on. The boxes of `packed-grid` touch, so its routes stay.
  * The counts are deterministic, and the script reads no time. The first argument is the out file.
  */
 import { mkdirSync, writeFileSync } from "node:fs";

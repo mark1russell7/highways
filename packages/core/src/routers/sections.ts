@@ -148,7 +148,6 @@ export function sectionsRouter(options: SectionsOptions): Router {
 
       // The ways between two places, found one time. A place is a hub or a free point.
       const pieces = new Map<string, Point[]>();
-      const closed = new Set<string>();
       const users = new Map<string, string[]>();
       const piece = (ka: string, a: Point, kb: string, b: Point, used: string[]): Point[] => {
         const forward = ka <= kb;
@@ -157,7 +156,6 @@ export function sectionsRouter(options: SectionsOptions): Router {
         if (!p) {
           const [from, to] = forward ? [a, b] : [b, a];
           const way = ways.way(from, to);
-          if (!way) closed.add(key);
           p = dedupe(way ?? [from, to]);
           pieces.set(key, p);
         }
@@ -203,8 +201,8 @@ export function sectionsRouter(options: SectionsOptions): Router {
         for (let i = 1; i < chain.length; i++) append(piece(chain[i - 1]!.id, hub(chain[i - 1]!), chain[i]!.id, hub(chain[i]!), used));
         append(piece(chain[chain.length - 1]!.id, hub(chain[chain.length - 1]!), at(end), end, used));
         append([pt.point]);
-        // A way through the hubs that is too long, or that goes out and back, gives way to the direct way. A piece with no way does the same when the steps of the margin are on.
-        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin || goesOutAndBack(out) || (ways.outSteps && used.some((k) => closed.has(k)))) {
+        // A way through the hubs that is too long, or that goes out and back, gives way to the direct way.
+        if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin || goesOutAndBack(out)) {
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
