@@ -182,13 +182,14 @@ describe("the inner routes of a frame (INTERIOR-ROUTE)", () => {
   });
 });
 
+const endOf = (node: string, port?: string): Edge["source"] => (port === undefined ? { node } : { node, port });
+const edge = (id: string, s: string, t: string, sp?: string, tp?: string): Edge => ({ id, source: endOf(s, sp), target: endOf(t, tp) });
+
 /**
  * A made-up board for the sibling edges (FRAME-SIBLINGS). The card `P` holds the rows `d` and `e`, the block `m` between them and the inner card `Q`.
  * The card `Q` holds the rows `q1`, `q2` and `q3`. The row `q2` is between `q1` and `q3`. The row `q1` has a fixed port and `q3` has a port on its west side.
  */
 function siblings(): Graph {
-  const end = (node: string, port?: string): Edge["source"] => (port === undefined ? { node } : { node, port });
-  const edge = (id: string, s: string, t: string, sp?: string, tp?: string): Edge => ({ id, source: end(s, sp), target: end(t, tp) });
   return {
     nodes: [
       { id: "P", box: { x: 100, y: 100, w: 520, h: 300 } },
@@ -213,7 +214,17 @@ function siblings(): Graph {
   };
 }
 
-/** This function gives the problems of each sibling route. A problem is no route, a wrong frame, a point out of the bounds, an end off its node or a crossing. */
+/** This function gives the nodes below `frame` that hold the node `id`, or the node itself at no depth. */
+function holders(nodes: ReadonlyMap<string, Node>, frame: string, id: string): string[] {
+  const out: string[] = [];
+  for (let p = nodes.get(id)!.parent; p !== undefined && p !== frame; p = nodes.get(p)!.parent) out.push(p);
+  return out;
+}
+
+/**
+ * This function gives the problems of each route without a plug. A problem is no route, a wrong frame, a point out of the bounds, an end off its node or a crossing.
+ * The obstacles are the children of the frame and of each frame that holds an end. A frame that holds an end is not an obstacle.
+ */
 function siblingProblems(g: Graph, routes: readonly Route[], inset: number, orthogonal: boolean): string[] {
   const out: string[] = [];
   const nodes = new Map(g.nodes.map((n) => [n.id, n]));
@@ -229,6 +240,7 @@ function siblingProblems(g: Graph, routes: readonly Route[], inset: number, orth
     const bounds = shrink(nodes.get(frame)!.box, inset);
     const s = nodes.get(edge.source.node)!.box;
     const t = nodes.get(edge.target.node)!.box;
+    const open = new Set([frame, ...holders(nodes, frame, edge.source.node), ...holders(nodes, frame, edge.target.node)]);
     r.points.forEach((p, i) => {
       if (!within(p, bounds)) out.push(`${edge.id}: point ${i} (${p.x}, ${p.y}) is out of the bounds`);
     });
@@ -238,7 +250,8 @@ function siblingProblems(g: Graph, routes: readonly Route[], inset: number, orth
       const [a, b] = [r.points[i - 1]!, r.points[i]!];
       if (orthogonal && a.x !== b.x && a.y !== b.y) out.push(`${edge.id}: segment ${i} is slanted`);
       for (const n of g.nodes)
-        if (n.parent === frame && n.id !== edge.source.node && n.id !== edge.target.node && segmentHitsBox(a, b, n.box, 1e-6)) out.push(`${edge.id}: segment ${i} crosses ${n.id}`);
+        if (n.parent !== undefined && open.has(n.parent) && !open.has(n.id) && n.id !== edge.source.node && n.id !== edge.target.node && segmentHitsBox(a, b, n.box, 1e-6))
+          out.push(`${edge.id}: segment ${i} crosses ${n.id}`);
     }
   }
   return out;
@@ -253,10 +266,11 @@ describe("the sibling edges of a frame (FRAME-SIBLINGS)", () => {
       ["q13", "Q"],
       ["port", "Q"],
       ["loop", "Q"],
+      ["cross", "P"],
     ]);
     for (const i of inner) expect(i, i.edge.id).not.toHaveProperty("plug");
-    // An edge between children of two frames and an edge to a node outside the frame stay outer edges.
-    expect(graph.edges.map((e) => e.id)).toEqual(["cross", "away"]);
+    // An edge to a node outside the frame stays an outer edge.
+    expect(graph.edges.map((e) => e.id)).toEqual(["away"]);
   });
 
   it("routes each sibling edge in its frame, around the other children, in the modes corners and gutter", () => {
@@ -267,8 +281,8 @@ describe("the sibling edges of a frame (FRAME-SIBLINGS)", () => {
       expect(siblingProblems(g, routes, gutter ? 0 : (options.frameInset ?? 5), gutter), JSON.stringify(options)).toEqual([]);
       expect(routes.map((r) => r.edge).sort(), JSON.stringify(options)).toEqual(g.edges.map((e) => e.id).sort());
       const by = byEdge(routes);
-      // The edge between two frames and the edge out of the frame keep an outer route.
-      expect([by.get("cross")?.frame, by.get("away")?.frame]).toEqual([undefined, undefined]);
+      // The edge at two depths routes in the common frame. The edge out of the frame keeps an outer route.
+      expect([by.get("cross")?.frame, by.get("away")?.frame]).toEqual(["P", undefined]);
       // The fixed port of q1p is the middle of its east side. The route ends on the west side of q3p.
       expect(by.get("port")!.points[0], JSON.stringify(options)).toEqual({ x: 440, y: 335 });
       expect(by.get("port")!.points.at(-1)!.x, JSON.stringify(options)).toBe(500);
@@ -299,5 +313,149 @@ describe("the sibling edges of a frame (FRAME-SIBLINGS)", () => {
       const framed = names.filter((id) => routes.get(id)?.frame !== undefined);
       expect(framed, s.name).toEqual(s.name.startsWith("corners") ? names : []);
     }
+  });
+});
+
+/**
+ * A made-up board for the edges at two depths (INTERIOR-ROUTE slice 2). The frame `P` holds the nodes `a`, `m` and `b`, and the nested frames `Q`, `Z` and `R`.
+ * `Q` holds `q1`, `q2` and `qp`. `Z` holds `z1`, and `Z` stands between `Q` and `b`. `R` holds `r1` and the frame `R2`, and `R2` holds `s1`, `s2` and `s3`.
+ * The node `far` and the frame `G` with `g1` are not in `P`.
+ */
+function depths(): Graph {
+  return {
+    nodes: [
+      { id: "P", box: { x: 100, y: 100, w: 720, h: 420 } },
+      { id: "a", parent: "P", box: { x: 120, y: 130, w: 80, h: 30 }, ports: [{ id: "e", side: "east", along: 0.5 }] },
+      { id: "m", parent: "P", box: { x: 240, y: 110, w: 30, h: 200 } },
+      { id: "Q", parent: "P", box: { x: 300, y: 120, w: 200, h: 170 } },
+      { id: "q1", parent: "Q", box: { x: 320, y: 140, w: 80, h: 30 } },
+      { id: "q2", parent: "Q", box: { x: 320, y: 220, w: 80, h: 30 } },
+      { id: "qp", parent: "Q", box: { x: 420, y: 220, w: 60, h: 30 }, ports: [{ id: "n", side: "north", along: 0.5 }] },
+      { id: "Z", parent: "P", box: { x: 530, y: 120, w: 120, h: 170 }, ports: [{ id: "s", side: "south", along: 0.5 }] },
+      { id: "z1", parent: "Z", box: { x: 550, y: 150, w: 80, h: 30 } },
+      { id: "b", parent: "P", box: { x: 700, y: 180, w: 80, h: 30 } },
+      { id: "R", parent: "P", box: { x: 300, y: 310, w: 500, h: 195 } },
+      { id: "r1", parent: "R", box: { x: 320, y: 340, w: 100, h: 30 } },
+      { id: "R2", parent: "R", box: { x: 460, y: 325, w: 320, h: 165 } },
+      { id: "s1", parent: "R2", box: { x: 480, y: 345, w: 100, h: 30 } },
+      { id: "s2", parent: "R2", box: { x: 480, y: 430, w: 100, h: 30 } },
+      { id: "s3", parent: "R2", box: { x: 620, y: 385, w: 100, h: 30 } },
+      { id: "far", box: { x: 900, y: 120, w: 80, h: 40 } },
+      { id: "G", box: { x: 900, y: 300, w: 120, h: 120 } },
+      { id: "g1", parent: "G", box: { x: 920, y: 330, w: 80, h: 30 } },
+    ],
+    edges: [
+      edge("a-q1", "a", "q1"),
+      edge("r1-a", "r1", "a"),
+      edge("q1-r1", "q1", "r1"),
+      edge("a-s1", "a", "s1"),
+      edge("q2-s2", "q2", "s2"),
+      edge("q1-b", "q1", "b"),
+      edge("port", "a", "qp", "e", "n"),
+      edge("Z-r1", "Z", "r1", "s"),
+      edge("Q-s3", "Q", "s3"),
+      edge("a-b", "a", "b"),
+      edge("out", "a", "far"),
+      edge("none", "q1", "g1"),
+      edge("hold", "Q", "q1"),
+    ],
+  };
+}
+
+const AT_TWO_DEPTHS = ["a-q1", "r1-a", "q1-r1", "a-s1", "q2-s2", "q1-b", "port", "Z-r1", "Q-s3"];
+
+/** A made-up board: the frame `Q` goes over the east wall of `P`, and the end `x` in `Q` goes out of `P` too. The plug `w` is on the west wall of `P`. */
+function overflow(edges: readonly Edge[]): Graph {
+  return {
+    nodes: [
+      { id: "P", box: { x: 100, y: 100, w: 300, h: 200 }, ports: [{ id: "w", side: "west", along: 0.5 }] },
+      { id: "a", parent: "P", box: { x: 120, y: 120, w: 60, h: 30 } },
+      { id: "Q", parent: "P", box: { x: 260, y: 120, w: 200, h: 120 } },
+      { id: "x", parent: "Q", box: { x: 280, y: 140, w: 160, h: 30 } },
+    ],
+    edges,
+  };
+}
+
+describe("the edges at two depths of a frame (INTERIOR-ROUTE slice 2)", () => {
+  it("takes out each edge as an inner edge of the nearest common frame, without a plug", () => {
+    const { graph, inner } = splitFrames(depths());
+    expect(inner.map((i) => [i.edge.id, i.frame])).toEqual([...AT_TWO_DEPTHS.map((id) => [id, "P"]), ["a-b", "P"]]);
+    for (const i of inner) expect(i, i.edge.id).not.toHaveProperty("plug");
+    // No frame holds both ends of `out` and `none`. The node `Q` holds the other end of `hold`, and `hold` has no plug.
+    expect(graph.edges.map((e) => e.id)).toEqual(["out", "none", "hold"]);
+  });
+
+  it("takes the nearest frame, not an outer one, for two nodes at the third depth", () => {
+    const g: Graph = { ...depths(), edges: [edge("deep", "s1", "s3"), edge("near", "r1", "s2")] };
+    const nested: Graph = { ...g, nodes: g.nodes.map((n) => (n.id === "s3" ? { ...n, parent: "R" } : n)) };
+    expect(splitFrames(g).inner.map((i) => [i.edge.id, i.frame])).toEqual([
+      ["deep", "R2"],
+      ["near", "R"],
+    ]);
+    expect(splitFrames(nested).inner.map((i) => [i.edge.id, i.frame])).toEqual([
+      ["deep", "R"],
+      ["near", "R"],
+    ]);
+  });
+
+  it("routes each edge in the common frame in the modes corners and gutter, into the frames of its ends and around each other node and frame", () => {
+    const g = depths();
+    for (const options of [{}, { smooth: true }, { frameInset: 8 }, { inner: "gutter" }, { inner: "gutter", bendCost: 2 }] satisfies Partial<CornersOptions>[]) {
+      const routes = cornersRouter({ name: "corners", ...options }).route(g).routes;
+      const gutter = "inner" in options;
+      expect(siblingProblems(g, routes, gutter ? 0 : (options.frameInset ?? 5), gutter), JSON.stringify(options)).toEqual([]);
+      expect(routes.map((r) => r.edge).sort(), JSON.stringify(options)).toEqual(g.edges.map((e) => e.id).sort());
+      const by = byEdge(routes);
+      for (const id of [...AT_TWO_DEPTHS, "a-b"]) expect(by.get(id)?.frame, `${id} ${JSON.stringify(options)}`).toBe("P");
+      for (const id of ["out", "none", "hold"]) expect(by.get(id)?.frame, `${id} ${JSON.stringify(options)}`).toBeUndefined();
+    }
+  });
+
+  it("uses the port of the node at each end, in the two directions of an edge", () => {
+    const g = depths();
+    for (const mode of ["corners", "gutter"] as const) {
+      const by = byEdge(cornersRouter({ name: "corners", inner: mode }).route(g).routes);
+      expect(by.get("port")!.points[0], mode).toEqual({ x: 200, y: 145 });
+      expect(by.get("port")!.points.at(-1), mode).toEqual({ x: 450, y: 220 });
+      // The node `Z` is an end of `Z-r1`, and its port is not a plug of a frame: `Z` does not hold `r1`.
+      expect(by.get("Z-r1")!.points[0], mode).toEqual({ x: 590, y: 290 });
+      const swapped: Graph = { ...g, edges: [edge("rev", "qp", "a", "n", "e")] };
+      const rev = cornersRouter({ name: "corners", inner: mode }).route(swapped).routes[0]!;
+      expect([rev.frame, rev.points[0], rev.points.at(-1)], mode).toEqual(["P", { x: 450, y: 220 }, { x: 200, y: 145 }]);
+    }
+  });
+
+  it("gives one lane to each route of a shared room in the mode gutter", () => {
+    const g: Graph = { ...depths(), edges: [edge("one", "a", "q1"), edge("two", "a", "q2"), edge("three", "m", "qp")] };
+    const routes = cornersRouter({ name: "corners", inner: "gutter" }).route(g).routes;
+    expect(routes).toHaveLength(3);
+    expect(siblingProblems(g, routes, 0, true)).toEqual([]);
+  });
+
+  it("keeps an outer route in each router except corners, and no router loses a route", () => {
+    const g = depths();
+    for (const s of listStrategies(STRATEGIES, "router")) {
+      const routes = byEdge(s.run(g, {}).routes);
+      for (const e of g.edges) expect(routes.has(e.id), `${s.name} ${e.id}`).toBe(true);
+      const framed = AT_TWO_DEPTHS.filter((id) => routes.get(id)?.frame !== undefined);
+      expect(framed, s.name).toEqual(s.name.startsWith("corners") ? AT_TWO_DEPTHS : []);
+    }
+  });
+
+  it("applies the rule outside to an end out of the common frame, in the two modes", () => {
+    const g = overflow([edge("deep", "a", "x")]);
+    for (const mode of ["corners", "gutter"] as const) {
+      expect(() => cornersRouter({ name: "c", inner: mode }).route(g), mode).toThrow(/"x" is not inside the box of its frame "P"/);
+      expect(cornersRouter({ name: "c", inner: mode, outside: "skip" }).route(g).routes, mode).toEqual([]);
+      const [clamp] = cornersRouter({ name: "c", inner: mode, outside: "clamp" }).route(g).routes;
+      expect(clamp?.frame, mode).toBe("P");
+      for (const p of clamp!.points) expect(within(p, { x: 100, y: 100, w: 300, h: 200 }), mode).toBe(true);
+    }
+  });
+
+  it("keeps the rule of an edge from a plug of a frame to a node at depth, with no edge at two depths in the room", () => {
+    const g = overflow([edge("plug", "P", "x", "w")]);
+    expect(corners.route(g).routes.map((r) => [r.edge, r.frame])).toEqual([["plug", "P"]]);
   });
 });
