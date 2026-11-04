@@ -43,6 +43,7 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "corners-smooth.joinRegions": "The regions (JOIN-COST) skip only pairs that cannot link, so the drawing stays the same.",
   "sections.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
   "sections-tree.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
+  "rules.guard": "No board count of these boards rises above the base (RENDER-RULES), so each guard leaves the routes as they are.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */
