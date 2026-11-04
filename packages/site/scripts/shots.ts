@@ -14,6 +14,28 @@ const PHONE = 390;
 /** The time for the worker of a page to draw its boards, in milliseconds. */
 const SETTLE_MS = 6000;
 
+/** The time for a canvas to draw after a click, in milliseconds. */
+const CLICK_MS = 900;
+
+/** One more picture of the map of a page, after clicks on the elements of `clicks`. The clicks of one view add to the clicks of the views before it. */
+export interface MapView {
+  readonly name: string;
+  readonly clicks: readonly string[];
+}
+
+/** The views of the map of each page. They show the stroke of a closed run, the lanes of an open run, and each zoom level. */
+export const MAP_VIEWS: Readonly<Record<string, readonly MapView[]>> = {
+  "examples.html": [
+    { name: "closed-near", clicks: ["#zoom-in", "#zoom-in", "#zoom-in"] },
+    { name: "open-fit", clicks: ["#zoom-fit", "#open-all"] },
+    { name: "open-near", clicks: ["#zoom-in", "#zoom-in", "#zoom-in"] },
+    { name: "far-1", clicks: ["#close-all", "#zoom-fit", "#zoom-out"] },
+    { name: "far-2", clicks: ["#zoom-out"] },
+    { name: "far-3", clicks: ["#zoom-out"] },
+    { name: "far-4", clicks: ["#zoom-out"] },
+  ],
+};
+
 /** One screenshot: a page at one width and one color scheme. */
 export interface Shot {
   readonly page: string;
@@ -54,6 +76,11 @@ export function shotPlan(pages: string): readonly Shot[] {
   );
 }
 
+/** This function gives the file of a view of the map. Only the light scheme has views. */
+export function mapViewFile(shot: Shot, view: MapView): string | undefined {
+  return shot.colorScheme === "light" ? shot.file.replace(/\.png$/, `-${view.name}.png`) : undefined;
+}
+
 /** This function gives the line of the report for one shot. */
 export function reportLine(shot: Shot, state: PageState): string {
   const fit = state.scroll > state.view ? "OVERFLOW" : "ok";
@@ -67,6 +94,8 @@ interface Tab {
   waitForTimeout(ms: number): Promise<void>;
   evaluate<T>(read: () => T): Promise<T>;
   screenshot(options: { readonly path: string; readonly fullPage: boolean }): Promise<unknown>;
+  click(selector: string): Promise<void>;
+  locator(selector: string): { screenshot(options: { readonly path: string }): Promise<unknown> };
 }
 
 /** The part of a browser of `playwright-core` that this file calls. */
@@ -85,6 +114,13 @@ async function takeShot(browser: Browser, shot: Shot, base: string, outDir: stri
   await tab.waitForTimeout(SETTLE_MS);
   const size = await tab.evaluate(() => ({ view: innerWidth, scroll: document.documentElement.scrollWidth }));
   await tab.screenshot({ path: join(outDir, shot.file), fullPage: true });
+  for (const view of MAP_VIEWS[shot.page] ?? []) {
+    const file = mapViewFile(shot, view);
+    if (file === undefined) continue;
+    for (const selector of view.clicks) await tab.click(selector);
+    await tab.waitForTimeout(CLICK_MS);
+    await tab.locator("#map").screenshot({ path: join(outDir, file) });
+  }
   await context.close();
   return reportLine(shot, { ...size, errors });
 }

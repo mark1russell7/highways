@@ -217,6 +217,7 @@ The rule for the next predictions:
 | FIX-PORTS-RESULT | `fixPorts` also gives the chosen plugs (port, point, side) as data, so a consumer does not read them back from the ports of the graph. The return type of today stays as it is. | `later` | FIX-PORTS | P2 |
 | INNER-ONE-CALL | One call routes the outer edges and the inner edges of the frames. Today the inner routes need a second call (`splitFrames`, then `frameRoutes`) after the outer route. | `later` | INTERIOR-GUTTER | P2 |
 | PROMOTION-NO-PAIR | The promotion test gives "not measured" for a measure with no pairs. Today the verdict throws for a candidate with no lanes. | `later` | | P2 |
+| LANE-WIDTH-CHAIN | One lane width along a chain of ways. The room gives each way its own width, so painted lanes cross more near a join. The record pins these counts. This item takes them down, or states why it cannot. | next | | P1 |
 | MARGIN-MEANING | The docs state what a margin means, and the 41 routes of class `wall` outside `packed-grid` at margin 20 get a cause and a fix or a stated limit. | `later` | LANE-ROOM | P2 |
 | OUTER-HOOK | An outer route leaves a plug that faces away from its way, and it comes back past the wall. The record holds 93 such routes on `corners`, and 900 on `sections-tree`, on 245 boards. Read each cause, then fix the shape or state the limit. | next | | P2 |
 | ROUTER-BUDGET | The time of each router at each size. Read each cost as its real order of growth or a waste to fix, and open an item for each router over its budget. | next | | P1 |

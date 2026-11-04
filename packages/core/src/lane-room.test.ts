@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { highwayCurves } from "./curves/highway/index.ts";
 import { sampleCurve } from "./curves/sample.ts";
-import { LANE_CLEAR, LANE_LEAST, LANE_ROOM_LIMIT, laneRoom } from "./lane-room.ts";
+import { LANE_CLEAR, LANE_LEAST, LANE_ROOM_LIMIT, laneRoom, withLaneRoom } from "./lane-room.ts";
 import type { Node, Result } from "./model.ts";
 import { laneRoutes, pullApart, runKey, segmentsOf } from "./segments.ts";
 import { Obstacles } from "./visibility.ts";
@@ -68,6 +68,76 @@ describe("laneRoom", () => {
 
   it("gives no room on one side when a way runs on the wall of a box", () => {
     expect(room([box("wall", 40, -20, 20, 20)], [{ x: 0, y: 0 }, { x: 100, y: 0 }])).toEqual({ left: 0, right: LANE_ROOM_LIMIT });
+  });
+});
+
+describe("the room at a join of two ways (LANE-ROOM)", () => {
+  // Two ways meet at (0, 0): one comes from the west, and one goes to the south. The wedge at the outer side of the join is to the north-east.
+  const [west, south] = [{ x: -100, y: 0 }, { x: 0, y: 100 }];
+  const corner = { x: 0, y: 0 };
+  const ways = (first: readonly { x: number; y: number }[], second: readonly { x: number; y: number }[]) => [
+    { id: "a", key: "a", points: first, edges: ["e", "f"] },
+    { id: "b", key: "b", points: second, edges: ["e", "f"] },
+  ];
+  const wedge = [box("n", 6, -40, 30, 30)];
+
+  it("reads a box in the wedge, on the outer side of both ways", () => {
+    const [a, b] = withLaneRoom(ways([west, corner], [corner, south]), new Obstacles(wedge, 50));
+    expect(laneRoom([west, corner], new Obstacles(wedge, 50)).left).toBe(LANE_ROOM_LIMIT);
+    expect(a!.room!.left).toBeLessThan(LANE_ROOM_LIMIT);
+    expect(b!.room!.left).toBeLessThan(LANE_ROOM_LIMIT);
+    expect(a!.room!.right).toBe(LANE_ROOM_LIMIT);
+    expect(b!.room!.right).toBe(LANE_ROOM_LIMIT);
+  });
+
+  it("keeps the sides of each way when a way runs toward the join or away from it", () => {
+    const [a] = withLaneRoom(ways([corner, west], [corner, south]), new Obstacles(wedge, 50));
+    expect(a!.room!.right).toBeLessThan(LANE_ROOM_LIMIT);
+    expect(a!.room!.left).toBe(LANE_ROOM_LIMIT);
+  });
+
+  it("reads the offset where the link reaches the corner of the box", () => {
+    // The link at an offset r runs from (0, -r) to (r, 0). It reaches the corner (6, -6) at r = 12.
+    const [a] = withLaneRoom(ways([west, corner], [corner, south]), new Obstacles([box("n", 6, -36, 30, 30)], 50));
+    expect(a!.room!.left).toBeCloseTo(12, 5);
+  });
+
+  it("does not read a box beside a way past a join as a box in the wedge", () => {
+    // This box is to the east of the way to the south, so it is outside the wedge. It limits that way alone.
+    const beside = [box("n", 8, 6, 30, 30)];
+    const [a, b] = withLaneRoom(ways([west, corner], [corner, south]), new Obstacles(beside, 50));
+    expect(a!.room!.left).toBe(LANE_ROOM_LIMIT);
+    expect(b!.room!.left).toBeLessThan(10);
+  });
+
+  it("does not read a wedge when no other way meets the end of a way", () => {
+    const [a] = withLaneRoom(ways([west, corner], [{ x: 500, y: 500 }, { x: 600, y: 500 }]), new Obstacles(wedge, 50));
+    expect(a!.room!.left).toBe(LANE_ROOM_LIMIT);
+  });
+
+  it("does not read a way that goes back along the same leg as a join", () => {
+    const [a] = withLaneRoom(ways([west, corner], [corner, west]), new Obstacles(wedge, 50));
+    expect(a!.room!.left).toBe(LANE_ROOM_LIMIT);
+  });
+
+  it("keeps a lane out of the box on the link from one way to the next", () => {
+    const [a, b] = withLaneRoom(ways([west, corner], [corner, south]), new Obstacles(wedge, 50));
+    const edges = ["e", "f", "g", "h", "i"];
+    const result: Result = {
+      routes: edges.map((edge) => ({ edge, points: [{ x: -110, y: 0 }, west, corner, south, { x: 0, y: 110 }] })),
+      runs: [{ ...a!, edges }, { ...b!, edges }],
+    };
+    const graph = segmentsOf(result);
+    const open = new Set(graph.segments.map((s) => runKey(s.edges)));
+    for (const route of laneRoutes(result, open, 5, 30)) {
+      for (let i = 1; i < route.points.length; i++) {
+        const [p, q] = [route.points[i - 1]!, route.points[i]!];
+        for (let t = 0; t <= 1; t += 0.05) {
+          const [x, y] = [p.x + (q.x - p.x) * t, p.y + (q.y - p.y) * t];
+          expect(x > 6 && x < 36 && y > -40 && y < -10, route.edge).toBe(false);
+        }
+      }
+    }
   });
 });
 

@@ -40,6 +40,7 @@ describe("benchHighways", () => {
     const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
     expect(run!.crossings).toBeGreaterThan(0);
     // LANE-ROOM: each way has its own width, so two lanes can meet where the shifts of both ends of a short way meet. Before it, this value was 0.
+    // This test is a ratchet. The item LANE-WIDTH-CHAIN takes the value back toward 0, or states why it cannot.
     expect(bundle!.crossings).toBeLessThanOrEqual(2);
     expect(bundle!.crossings).toBeLessThan(run!.crossings);
     expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);

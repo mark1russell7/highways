@@ -92,7 +92,85 @@ export function laneRoom(points: readonly Point[], obstacles: Obstacles): LaneRo
   return room;
 }
 
-/** This function gives the shared ways with the field `room`. It takes the runs or the bundles of a router, and its obstacles. */
+/**
+ * This function gives the room in the wedge at the outer side of a turn from `before` over `at` to `after`.
+ * The room has the sides of that direction.
+ * A lane goes straight from the end of one way to the start of the next one.
+ * That link stays in the triangle of `at` and the two offset points.
+ * A box in the wedge stops the link at the offset where the line of the link reaches the box. The other side has no wedge.
+ */
+function wedgeRoom(before: Point, at: Point, after: Point, obstacles: Obstacles): LaneRoom {
+  const room = { left: LANE_ROOM_LIMIT, right: LANE_ROOM_LIMIT };
+  const [dir, next] = [unit({ x: at.x - before.x, y: at.y - before.y }), unit({ x: after.x - at.x, y: after.y - at.y })];
+  if (dir === undefined || next === undefined) return room;
+  const turn = dir.x * next.y - dir.y * next.x;
+  if (Math.abs(turn) <= 1e-9) return room;
+  const outer = turn > 0 ? "left" : "right";
+  const sign = outer === "left" ? 1 : -1;
+  const normal = (d: Point): Point => ({ x: sign * d.y, y: -sign * d.x });
+  const across = unit({ x: normal(dir).x + normal(next).x, y: normal(dir).y + normal(next).y });
+  if (across === undefined) return room;
+  const scale = normal(dir).x * across.x + normal(dir).y * across.y;
+  const past: HalfPlane = { at, normal: dir, least: TOUCH };
+  const ahead: HalfPlane = { at, normal: { x: -next.x, y: -next.y }, least: TOUCH };
+  const reach = LANE_ROOM_LIMIT;
+  obstacles.query({ x: at.x - reach, y: at.y - reach, w: 2 * reach, h: 2 * reach }, ({ box }) => {
+    const corners = [{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y }, { x: box.x + box.w, y: box.y + box.h }, { x: box.x, y: box.y + box.h }];
+    for (const p of clip(clip(corners, past), ahead)) {
+      const offset = ((p.x - at.x) * across.x + (p.y - at.y) * across.y) / scale;
+      room[outer] = Math.min(room[outer], Math.max(0, offset));
+    }
+  });
+  return room;
+}
+
+const placeKey = (p: Point): string => `${p.x},${p.y}`;
+
+/** This record is a neighbor of a corner of a way: the place of the neighbor, and the index of its way. */
+interface Neighbor {
+  readonly point: Point;
+  readonly way: number;
+}
+
+/** This function gives the neighbors of each corner of the ways, by the place of the corner. */
+function cornerNeighbors(ways: readonly SharedRun[]): Map<string, Neighbor[]> {
+  const out = new Map<string, Neighbor[]>();
+  ways.forEach((way, index) => {
+    way.points.forEach((p, i) => {
+      const near = [way.points[i - 1], way.points[i + 1]].filter((q): q is Point => q !== undefined && dist(p, q) > 0);
+      const list = out.get(placeKey(p)) ?? [];
+      for (const point of near) list.push({ point, way: index });
+      out.set(placeKey(p), list);
+    });
+  });
+  return out;
+}
+
+/**
+ * This function gives the room of the way `index` at its joins with the other ways.
+ * A join is a corner of another way at an end of this way.
+ * No leg of a way owns the wedge at the outer side of a join. So `laneRoom` of a way does not read a box there.
+ */
+function joinRoom(points: readonly Point[], index: number, neighbors: ReadonlyMap<string, readonly Neighbor[]>, obstacles: Obstacles): LaneRoom {
+  const room = { left: LANE_ROOM_LIMIT, right: LANE_ROOM_LIMIT };
+  const [first, last] = [points[0]!, points[points.length - 1]!];
+  const afterFirst = points.find((p) => dist(p, first) > 0);
+  const beforeLast = [...points].reverse().find((p) => dist(p, last) > 0);
+  if (afterFirst === undefined || beforeLast === undefined) return room;
+  const others = (p: Point): readonly Point[] => (neighbors.get(placeKey(p)) ?? []).filter((n) => n.way !== index).map((n) => n.point);
+  const near = [...others(first).map((exit) => wedgeRoom(exit, first, afterFirst, obstacles)), ...others(last).map((exit) => wedgeRoom(beforeLast, last, exit, obstacles))];
+  return { left: Math.min(room.left, ...near.map((r) => r.left)), right: Math.min(room.right, ...near.map((r) => r.right)) };
+}
+
+/**
+ * This function gives the shared ways with the field `room`. It takes the runs or the bundles of a router, and its obstacles.
+ * The room of a way is the room along the way and at its joins with the other ways of the list.
+ */
 export function withLaneRoom<T extends SharedRun>(ways: readonly T[], obstacles: Obstacles): T[] {
-  return ways.map((way) => ({ ...way, room: laneRoom(way.points, obstacles) }));
+  const neighbors = cornerNeighbors(ways);
+  return ways.map((way, index) => {
+    const along = laneRoom(way.points, obstacles);
+    const joins = joinRoom(way.points, index, neighbors, obstacles);
+    return { ...way, room: { left: Math.min(along.left, joins.left), right: Math.min(along.right, joins.right) } };
+  });
 }

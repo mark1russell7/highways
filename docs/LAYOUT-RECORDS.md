@@ -271,6 +271,9 @@ A row with the view `lanes` also tells what the room of each way does. Its field
 - `laneLength` and `laneBends` sum the shape of the lanes.
 - `fullLength` and `fullBends` sum the same lanes with no room.
 - `laneCrossings` and `fullCrossings` count the crossings of the board with the lanes, with the room and with no room. The room adds crossings, because each way has its own width.
+- `bySeed` holds one entry for each board. It has `laneCrossings` and `fullCrossings`, `polyline` and `painted`, and the four counts of the bundles.
+- `polyline` and `painted` are the fields of `PairSplit`, for the polylines and for the sampled `highway` curves of the whole board. `points` and `beforePoints` are crossing points. `pairs` and `beforePairs` are pairs of edges. `added` and `lost` are the pairs that cross on one side only. A crossing point counts once for each pair of edges. So `points` can be over the count of `measureQuality`, because `measureQuality` keeps one copy of each drawn segment.
+- `bundleBody` and `bundleEnds` are `crossings` and `endCrossings` of `measureHighways`, with the room. `fullBundleBody` and `fullBundleEnds` are the same counts with no room. These counts hold only two lanes of one bundle.
 
 The gate fails when `deepUnmarked` or `silentLanes` is over 0 on a row. It also compares the classes of the site settings with a stated list, and that list makes no claim. A flagged lane on a closed route that the record flags too is a contact of the route, not of the lanes.
 

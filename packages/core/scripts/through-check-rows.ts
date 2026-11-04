@@ -6,20 +6,26 @@
  * The board `INNER_BOARDS` is one more family, because no family has inner routes at its defaults.
  * A row of `lanes` holds the routes of `laneRoutes`, with each shared segment open, at the lane settings of the site, so it shows what `keepThrough` copies.
  * The routers of `OUTSIDE` do not mark `through`, so the record keeps them in `unmarkedRows`, apart from `rows`.
- * The routers of `SITE_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
+ * The routers of `SITE_ROUTERS` and `REPORT_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
  */
+import { measureHighways } from "../src/bench/curves.ts";
+import { crossingPairs, splitPairs, type EdgeLine, type PairSplit } from "../src/bench/measures/crossing-pairs.ts";
 import { measureQuality } from "../src/bench/quality.ts";
 import { checkRoutes, deciding, falseThrough, flagged, HAIRLINE, THROUGH_CLASSES, type RouteCheck, type ThroughClass, type ThroughContact } from "../src/bench/measures/through-check.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
+import { curveSpace, sampleCurve } from "../src/curves/index.ts";
+import { highwayCurves } from "../src/curves/highway/index.ts";
 import { polylineLength } from "../src/geom.ts";
 import type { Graph, Result, Route } from "../src/model.ts";
 import { ROUTERS, sectionsRouter } from "../src/routers/index.ts";
-import { laneRoutes, runKey, segmentsOf } from "../src/segments.ts";
+import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../src/segments.ts";
 
 /** The command that writes the record again, from the repository root. */
 export const REGENERATE = "node packages/core/scripts/through-check.ts packages/core/scripts/data/through-check/record.json";
 export const SCORED = ["corners", "trunks", "shared", "sections"];
 export const OUTSIDE = ["straight", "plugs"];
+/** The routers with a report row on the families. `shared-all` has the most lanes in a bundle, so it shows the largest cost of the room. */
+export const REPORT_ROUTERS = ["shared-all"];
 /** The settings of the router of the site (`packages/site/src/examples.ts`). The ladder of plugs is on. */
 const SITE_SETTINGS = { margin: 20, stretch: 3, cap: 6 };
 const SITE = sectionsRouter({ name: "sections-site", ...SITE_SETTINGS });
@@ -28,6 +34,13 @@ const SITE_NO_LADDER = sectionsRouter({ name: "sections-site-no-ladder", ...SITE
 const SITE_ROUTERS = [SITE, SITE_NO_LADDER];
 /** The lane settings of the site. */
 export const LANES = { width: 5, maxWidth: 30 };
+/** The options of the measure of the painted curves, as in `benchHighways`. The curves use the defaults of `highwayCurves`. */
+const PAINT = { radius: 12, minRadius: 4 };
+/**
+ * The tolerance of the samples of a painted curve, for the crossings of the whole board. Over the 75 boards of `sections`, tolerances from 0.005 to 0.1 move the crossing points by 0.6 %.
+ * The same tolerances move the pairs of edges by 0.1 %, so a small change of points tells less than the same change of pairs.
+ */
+const PAINT_SAMPLE = 0.02;
 export const INNER_BOARDS = [
   { name: "frame-rows+inner", family: "frame-rows", dims: { inner: 4 } },
   { name: "frame-rows+inner12", family: "frame-rows", dims: { inner: 12 } },
@@ -43,6 +56,23 @@ export interface ClassRow {
   sample: string[];
   leastDepth: number;
   mostDepth: number;
+}
+
+/** The crossings of the lanes of one board, with the room of each way and with no room. */
+export interface SeedCrossings {
+  seed: number;
+  /** The count of `measureQuality` on the polylines, which keeps one copy of each drawn segment. */
+  laneCrossings: number;
+  fullCrossings: number;
+  /** The crossing points and the pairs of edges of the polylines. */
+  polyline: PairSplit;
+  /** The crossing points and the pairs of edges of the painted `highway` curves, over the whole board. */
+  painted: PairSplit;
+  /** The counts of `measureHighways` on the painted curves: two lanes of one bundle that cross in its body, and at its ends. */
+  bundleBody: number;
+  bundleEnds: number;
+  fullBundleBody: number;
+  fullBundleEnds: number;
 }
 
 /** The counts of one view of one router on one family. */
@@ -84,6 +114,8 @@ export interface Row {
   /** The crossings of the board with these lanes, and with the same lanes with no room. Each way has its own width, so a lane can cross more near a join. */
   laneCrossings: number;
   fullCrossings: number;
+  /** The same crossings by seed, with the distinct pairs of edges and the painted curves. */
+  bySeed: SeedCrossings[];
   classes: Partial<Record<ThroughClass, ClassRow>>;
   innerClasses: Partial<Record<ThroughClass, ClassRow>>;
   unnamedClasses: Partial<Record<ThroughClass, ClassRow>>;
@@ -140,8 +172,16 @@ export function laneView(result: Result): readonly Route[] {
   return laneRoutes(result, open, LANES.width, LANES.maxWidth);
 }
 
+/** This function gives the painted curves of a board as sampled lines, and the counts of its bundles. */
+function painted(board: Graph, graph: SegmentGraph, open: ReadonlySet<string>): { readonly lines: EdgeLine[]; readonly body: number; readonly ends: number } {
+  const space = curveSpace(board.nodes.map((n) => n.box));
+  const curves = highwayCurves(graph, open, LANES.width, { maxWidth: LANES.maxWidth, space });
+  const bundle = measureHighways(graph, open, LANES.width, curves, { maxWidth: LANES.maxWidth, minRadius: PAINT.minRadius, ends: PAINT.radius });
+  return { lines: curves.map((c) => ({ edge: c.edge, points: sampleCurve(c.segments, PAINT_SAMPLE) })), body: bundle.crossings, ends: bundle.endCrossings };
+}
+
 /** This function adds the marks, the length and the bends of the lanes of one board to a row of `lanes`. */
-function addLaneShape(row: Row, board: Graph, result: Result, view: readonly Route[], checks: readonly RouteCheck[], closed: readonly RouteCheck[]): void {
+function addLaneShape(row: Row, seed: number, board: Graph, result: Result, view: readonly Route[], checks: readonly RouteCheck[], closed: readonly RouteCheck[]): void {
   const out = new Set(view.filter((r) => r.outOfRoom).map((r) => r.edge));
   const closedFlags = new Set(closed.filter(flagged).map((c) => c.edge));
   row.outOfRoom += out.size;
@@ -152,7 +192,8 @@ function addLaneShape(row: Row, board: Graph, result: Result, view: readonly Rou
   }
   const graph = segmentsOf(result);
   const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
-  const full = laneRoutes({ ...graph, segments: graph.segments.map(({ room: _room, ...s }) => s) }, open, LANES.width, LANES.maxWidth);
+  const noRoom = { ...graph, segments: graph.segments.map(({ room: _room, ...s }) => s) };
+  const full = laneRoutes(noRoom, open, LANES.width, LANES.maxWidth);
   for (const r of view) {
     row.laneLength += polylineLength(r.points);
     row.laneBends += r.points.length - 2;
@@ -161,8 +202,22 @@ function addLaneShape(row: Row, board: Graph, result: Result, view: readonly Rou
     row.fullLength += polylineLength(r.points);
     row.fullBends += r.points.length - 2;
   }
-  row.laneCrossings += measureQuality(board, { ...result, routes: [...view] }).crossings;
-  row.fullCrossings += measureQuality(board, { ...result, routes: full }).crossings;
+  const laneCrossings = measureQuality(board, { ...result, routes: [...view] }).crossings;
+  const fullCrossings = measureQuality(board, { ...result, routes: full }).crossings;
+  const [paint, paintFull] = [painted(board, graph, open), painted(board, noRoom, open)];
+  row.laneCrossings += laneCrossings;
+  row.fullCrossings += fullCrossings;
+  row.bySeed.push({
+    seed,
+    laneCrossings,
+    fullCrossings,
+    polyline: splitPairs(crossingPairs(view), crossingPairs(full)),
+    painted: splitPairs(crossingPairs(paint.lines), crossingPairs(paintFull.lines)),
+    bundleBody: paint.body,
+    bundleEnds: paint.ends,
+    fullBundleBody: paintFull.body,
+    fullBundleEnds: paintFull.ends,
+  });
   row.laneLength = Math.round(row.laneLength * 1000) / 1000;
   row.fullLength = Math.round(row.fullLength * 1000) / 1000;
 }
@@ -210,6 +265,7 @@ const blank = (router: string, family: string, view: Row["view"]): Row => ({
   fullBends: 0,
   laneCrossings: 0,
   fullCrossings: 0,
+  bySeed: [],
   classes: {},
   innerClasses: {},
   unnamedClasses: {},
@@ -226,7 +282,7 @@ export interface ThroughScope {
 /** This function gives the record `through-check/4` over `seeds` seeds. The counts are deterministic, and it reads no time. */
 export function throughRecord(seeds: number, scope: ThroughScope = {}) {
   const reg = highwaysRegistry();
-  const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name)]), ...OUTSIDE];
+  const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name), ...REPORT_ROUTERS]), ...OUTSIDE];
   const families = scope.families ?? [...HIGHWAYS_FAMILIES.map((f) => f.name), ...INNER_BOARDS.map((b) => b.name)];
   const rows: Row[] = [];
   const unmarkedRows: Row[] = [];
@@ -236,6 +292,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     const count = innerBoard ? INNER_SEEDS : seeds;
     for (let seed = 0; seed < count; seed++) graphs.push(innerBoard ? reg.generate(innerBoard.family, seed, innerBoard.dims).graph : reg.generate(family, seed).graph);
     for (const name of wanted) {
+      if (innerBoard && REPORT_ROUTERS.includes(name)) continue;
       const router = SITE_ROUTERS.find((r) => r.name === name) ?? ROUTERS.find((r) => r.name === name)!;
       const row = blank(name, family, "routes");
       const lanes = blank(name, family, "lanes");
@@ -250,7 +307,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
           const view = laneView(result);
           const checks = checkRoutes(graph, view);
           addChecks(lanes, seed, checks);
-          addLaneShape(lanes, graph, result, view, checks, closed);
+          addLaneShape(lanes, seed, graph, result, view, checks, closed);
         }
       });
       (OUTSIDE.includes(name) ? unmarkedRows : rows).push(row);
