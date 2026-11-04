@@ -919,6 +919,18 @@ The solver part stays outside: the gradient, the projection and the step. A solv
 
 The order of work is: first the solver with hand-written terms ([RULE-022](#rule-022) or [RULE-019](#rule-019)), then the rule format, then the compiler from Vex formulas to terms.
 
+The first slice exists: the router `rules` has one solver, three hand-written terms and a rule format as data. The solver of `adam` is the first solver, so RULE-019 is not a condition. The energy of `adam` is a rule file, and that file gives the bytes of `adam` on the 150 boards of `screen-v3`. Vex has no derivative of a formula at this time, so the compiler from Vex formulas stays open.
+
+The second slice adds [RULE-019](#rule-019): the term `angle`, the preset `energy` and the option `descent`. The variables stay the shifts of the free legs, so a leg moves by 2 clearances at most. The term `angle` alone raises the median crossing angle on 10 of 15 families, and on 0 families it falls. In the preset `energy`, the angle rises on 4 families and falls on 1, because the other terms outweigh it. Weights are the open question, and [RULE-038](#rule-038) and [RULE-048](#rule-048) attack them.
+
+The third slice adds the field `variable` of a rule file. `points` moves each free point in x and in y, and `legs` stays the default. Each row of the record `scripts/data/rules/energy.json` states its variable. The record is local, it covers the 150 boards of `screen-v3`, and it has no times. On points, the preset `energy` with gradient descent raises the median crossing angle on 6 of 15 families, and the angle falls on 2. The last guard of the solver gives back the routes of `shared` when a board gets more crossings or more hard breaks. That guard gives back 87 of 150 boards on points and 62 on legs. So these counts measure the guard too, and they are not a verdict on the terms.
+
+The fourth slice adds the field `guard` of a rule file. The value `board` stays the default: a board with more crossings than its first routes goes back as a whole. The value `routes` sends back one moved route at a time, until the board count is at its first count or lower. It compares three keys in order. They are the largest fall of the board count, the most crossings with other moved routes, and the lowest index.
+
+Each trial counts the whole board with `drawnCrossings`, which is the count of `measureQuality`. A board with `m` moved routes takes `m²/2` counts in the worst case. A hard break keeps the whole-board fallback.
+
+**A limit of a check of one route.** Route sums do not add up to the board count. A check of one route compares that route with the others, and a fall that two moved routes share enters the sum of each route. So a board can rise when no route is worse. The case is seed 5 of `hub-chain` on `points`. Routes 97 and 98 fall from 2 crossings with each other to 0. They rise by 1 and by 2 with fixed routes. Each route sets the fall against its own rise, so neither route is worse, and the board rises by 1. A second form is seed 2 of `hub-chain` on `points`. Route 95 rises by 1 with route 102, which stayed. Its way back crosses a third route, so the route is not worse and it stays. The record counts this form as the cause `chain`. Each later rule that reads route sums has this limit. So a guard reads the board count.
+
 ## Learned rules
 
 A learned method takes its rules from examples. This repository uses made-up data only. So each learned idea needs a corpus first: preference pairs from a panel, or the answers of an exact solver on small boards. A learned method stays deterministic only with frozen weights and no sampling at run time.

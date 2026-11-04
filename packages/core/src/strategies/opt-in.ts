@@ -1,6 +1,6 @@
 import { sharedStretchStrategy } from "../lane-orders/stretch/router.ts";
 import { portfolioStrategy } from "../portfolio/router.ts";
-import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../routers/index.ts";
+import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, rulesStrategy, springsStrategy, tightStrategy } from "../routers/index.ts";
 import { STRATEGIES } from "./builtins.ts";
 import { register, type AnyStrategy, type Registry, type Step } from "./model.ts";
 
@@ -17,6 +17,7 @@ export const OPT_IN_STRATEGIES: readonly AnyStrategy[] = [
   portfolioStrategy,
   repelStrategy,
   rerouteStrategy,
+  rulesStrategy,
   sharedStretchStrategy,
   springsStrategy,
   tightStrategy,

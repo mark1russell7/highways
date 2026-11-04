@@ -532,7 +532,7 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
-- `OPT_IN_STRATEGIES` lists the 11 opt-in routers. `STRATEGIES` does not hold them, so the default race and the screens do not change.
+- `OPT_IN_STRATEGIES` lists the 12 opt-in routers. `STRATEGIES` does not hold them, so the default race and the screens do not change.
 - `ALL_STRATEGIES` is the registry of `STRATEGIES` and `OPT_IN_STRATEGIES`. A page that shows each strategy reads it.
 - `STEP_DEFAULTS` gives the default strategy of each step. The steps `highway` and `curve` have no default.
 - `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `plugStrategies`, `routerStrategies`, `highwayStrategies`, `levelStrategies`, `curveStrategies`, `roomStrategies` and `wholeStrategies` give each built-in strategy with its typed options.
@@ -774,6 +774,20 @@ The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. The
 - `adamRouter(options)` gives the steps of Adam of RULE-020. The free legs of the routes move away from near legs and boxes, along their normals.
   No point of a run, of a trunk or of two routes moves. A route goes back when it gets more crossings or a break of a hard rule.
   Its options are `eta` (0.01 to 1), `samples` (4 to 32), `steps` (100 to 2000, the budget), `seed` and `clearance`. The same seed gives the same routes. `adamStrategy` is its router strategy.
+
+### The router `rules`
+
+The router `rules` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change. A rule file is data: each rule has a selection, a term and a weight. `compileRules` turns a file into one energy, and `solveRules` moves the free legs of `shared` down it with the steps of Adam. A hard rule is not a term: a route that breaks one goes back to its first points.
+
+- `rulesRouter({ name, rules })` takes a rule file. `checkRules(file)` gives one text for each fault.
+- The preset `energy` holds the energy of RULE-019, with the term `angle` at each crossing. The option `descent: "gradient"` takes plain steps over all near legs, and no sample.
+- The term `angle` alone raises the crossing angle on 10 of the 15 families of `screen-v3`. Inside `energy`, the other terms outweigh it, and the angle rises on 4 families and falls on 1. The record is `scripts/data/rules/energy.json`.
+- The selections are `free`, `free-pairs`, `free-boxes` and `free-crossings`. The terms are `hold`, `spring`, `gap` and `angle`.
+- The field `variable` of a rule file tells what the solver moves. `legs` moves each free leg along its normal, and `points` moves each free point in x and y. The default is `legs`.
+- The field `guard` of a rule file tells what happens when the crossings of a board rise. `board` gives back the first routes of the whole board. `routes` sends back one moved route at a time, and each step costs one count of the board for each moved route. The default is `board`.
+- `freeVariables(graph, result, set, clearance)` gives the variables of a rule file on a result.
+- `ADAM_RULES` is the energy of the router `adam`, and `adam` runs that file. `ELASTIC_RULES` is RULE-001, and `REPULSION_RULES` is RULE-003.
+- The terms are TypeScript at this time, because the solver needs the slope of each term.
 
 ### The physical routers `repel`, `springs` and `nudge`
 

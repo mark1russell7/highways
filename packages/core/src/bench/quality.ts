@@ -43,6 +43,27 @@ const SAMPLE = 2_000;
 
 const key = (p: Point): string => `${Math.round(p.x * 8)},${Math.round(p.y * 8)}`;
 
+/** This function adds the drawn segments of a route to `segs`: one for each distinct pair of ends in `seen`. */
+function addDrawn(p: readonly Point[], seen: Set<string>, segs: [Point, Point][]): void {
+  for (let i = 1; i < p.length; i++) {
+    const ka = key(p[i - 1]!);
+    const kb = key(p[i]!);
+    if (ka === kb) continue;
+    const k = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    segs.push([p[i - 1]!, p[i]!]);
+  }
+}
+
+/** This function gives the crossings of the drawn segments of routes. It is the count of `measureQuality`, with no other measure. */
+export function drawnCrossings(routes: readonly (readonly Point[])[]): number {
+  const segs: [Point, Point][] = [];
+  const seen = new Set<string>();
+  for (const points of routes) addDrawn(points, seen, segs);
+  return countCrossings(segs)[0];
+}
+
 /** This function measures the quality of a result. */
 export function measureQuality(graph: Graph, result: Result): Quality {
   const byId = nodeIndex(graph);
@@ -62,15 +83,7 @@ export function measureQuality(graph: Graph, result: Result): Quality {
   let angleN = 0;
   for (const r of result.routes) {
     const p = r.points;
-    for (let i = 1; i < p.length; i++) {
-      const ka = key(p[i - 1]!);
-      const kb = key(p[i]!);
-      if (ka === kb) continue;
-      const k = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      segs.push([p[i - 1]!, p[i]!]);
-    }
+    addDrawn(p, seen, segs);
     bends += bendCount(p);
     infl += inflectionCount(p);
     const ends = endNodes(graph, byId, r.edge);

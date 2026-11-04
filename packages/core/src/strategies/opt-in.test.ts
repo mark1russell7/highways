@@ -6,9 +6,9 @@ import { ALL_STRATEGIES, OPT_IN_STRATEGIES, STEP_DEFAULTS } from "./opt-in.ts";
 const DEFAULT_ROUTERS = ["straight", "plugs", "corners", "corners-smooth", "trunks", "shared", "shared-all", "sections", "sections-tree"];
 
 describe("the opt-in strategies (PHYSICAL-VISIBLE)", () => {
-  it("has the 11 opt-in routers, in the order of their names", () => {
+  it("has the 12 opt-in routers, in the order of their names", () => {
     const names = OPT_IN_STRATEGIES.map((s) => s.name);
-    expect(names).toEqual(["adam", "annealing", "attraction", "canals", "nudge", "portfolio", "repel", "reroute", "shared-stretch", "springs", "tight"]);
+    expect(names).toEqual(["adam", "annealing", "attraction", "canals", "nudge", "portfolio", "repel", "reroute", "rules", "shared-stretch", "springs", "tight"]);
     for (const s of OPT_IN_STRATEGIES) expect(s.step, s.name).toBe("router");
   });
 
