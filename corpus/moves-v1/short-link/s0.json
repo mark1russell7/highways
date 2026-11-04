@@ -1,0 +1,20 @@
+{
+  "boxes": [
+    {"h": 40, "id": "bar", "w": 300, "x": 350, "y": 470},
+    {"h": 30, "id": "cap", "w": 40, "x": 430, "y": 420}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "sparse", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"id": "e0", "source": "cap", "target": "bar"},
+    {"id": "e1", "source": "bar", "target": "cap"},
+    {"id": "e2", "source": "cap", "target": "bar"}
+  ],
+  "family": "short-link",
+  "generator": {"name": "move-board", "params": {"board": "short-link"}, "seed": 0, "version": 1},
+  "hash": "fb41dc1e85c7ddbc",
+  "id": "moves-v1/short-link/s0",
+  "schema": "layout-input/1",
+  "seed": 0,
+  "set": "moves-v1",
+  "source": "made-up"
+}

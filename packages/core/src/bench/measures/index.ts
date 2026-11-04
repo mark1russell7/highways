@@ -10,4 +10,5 @@ export * from "./pareto.ts";
 export * from "./order.ts";
 export * from "./highways.ts";
 export * from "./lanes.ts";
+export * from "./rows.ts";
 export * from "./symmetry.ts";

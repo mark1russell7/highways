@@ -85,6 +85,14 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - A port without a range gives the same plugs as before.
 - `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
 
+A port can have a `rowHeight`: the height of its row on the card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
+
+- `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, or `plugGap` when that is more.
+- A free plug leaves the row of a fixed plug when the wall has the room. It goes past the fixed plug when the near part of the wall has no room.
+- When the wall has too little room, the distances shrink evenly. No plug drops.
+- A port without a `rowHeight` gives the same plugs as before. The other plug rules do not read it.
+- `resolvePorts` throws a `RangeError` for a height that is negative or not finite.
+
 `assign` (PLUG-ASSIGN) solves each wall exactly, up to a limit of work (ASSIGN-BOUND). It has three goals, in this order:
 
 1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
