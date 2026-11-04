@@ -167,6 +167,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SEAMS-THROUGH | Each route of the router `seams` that goes through a box has the field `through`, by the rule `no-pass-through`. On the 150 boards of `screen-v3`, 0 of 17671 routes get the field, and the route bytes do not change. On a board with a box in a box, the test holds the line and its field. | 2026-11-04 | [#303](https://github.com/mark1russell7/highways/pull/303) |
 | GATE-SCOPE | The sections gate reads the imports of its measured route, so a change of another router skips it. A walk that fails runs the gate, and a daily run times main in full. Of the last 30 pull requests on the old paths, 10 skip. | 2026-11-04 | [GATE-SCOPE](PROMOTION.md) |
 | GATE-NOISE | One read of 18 gate runs and 20 records, in `scripts/data/gate-noise/read-2026-11-04.json`: 3 of 20 records and 2 of 18 first tries are above the cap, and 1 of 18 runs is above it two times. The cap stays. | 2026-11-04 | [GATE-NOISE](PROMOTION.md) |
+| CATALOG-LOOKUP | `strategyOfKey(key)` gives the strategy of a key such as `router/adam`, or a reason. `KEYED_STRATEGIES` holds 120 strategies: the 107 of `STRATEGIES` and 13 opt-in strategies. It adds `seams` and `shared-ways-all` to `ALL_STRATEGIES`. No route changes. | 2026-11-04 | [#315](https://github.com/mark1russell7/highways/pull/315) |
 
 ## Calibration
 
