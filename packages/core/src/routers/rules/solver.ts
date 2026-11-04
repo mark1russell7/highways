@@ -1,5 +1,5 @@
 import { checkProperties } from "../../bench/properties.ts";
-import { measureQuality } from "../../bench/quality.ts";
+import { drawnCrossings, measureQuality } from "../../bench/quality.ts";
 import { rng } from "../../fixtures.ts";
 import { segmentsCross, type Box, type Point } from "../../geom.ts";
 import { Grid } from "../../grid.ts";
@@ -41,6 +41,10 @@ export interface SolverOutcome {
   readonly afterPass: readonly (readonly Point[])[];
   /** The points of each route after the fix of hard rules. The last guard reads these points. */
   readonly final: readonly (readonly Point[])[];
+  /** The routes that the guard `routes` sent back. */
+  readonly sentBack: number;
+  /** The counts of the board that the guard `routes` made. */
+  readonly counts: number;
 }
 
 /** The cap of the rounds of the pass of crossings. */
@@ -63,6 +67,42 @@ export function crossingsOf(a: readonly Point[], others: readonly (readonly Poin
     for (let i = 1; i < a.length; i++) for (let k = 1; k < b.length; k++) if (segmentsCross(a[i - 1]!, a[i]!, b[k - 1]!, b[k]!)) n++;
   });
   return n;
+}
+
+/**
+ * This function sends back moved routes until the count of the board is not above the count of `first` (RENDER-RULES). It changes `points`.
+ * At each step it tries each moved route. It chooses the largest fall of the count, then the most crossings with other moved routes, then the lowest index.
+ * The second key serves a pair of routes, where no single route lowers the count. The loop ends, because all routes sent back equal `first`.
+ * A step costs one count of the board for each moved route.
+ */
+export function sendBack(points: (readonly Point[])[], first: readonly (readonly Point[])[]): { readonly sent: number; readonly counts: number } {
+  const limit = drawnCrossings(first);
+  let count = drawnCrossings(points);
+  let counts = 2;
+  let sent = 0;
+  while (count > limit) {
+    const moved = points.flatMap((p, i) => (p === first[i] ? [] : [i]));
+    let best = -1;
+    let bestCount = Infinity;
+    let bestPair = -1;
+    for (const route of moved) {
+      const keep = points[route]!;
+      points[route] = first[route]!;
+      const trial = drawnCrossings(points);
+      points[route] = keep;
+      counts++;
+      if (trial > bestCount) continue;
+      const pair = crossingsOf(keep, moved.map((i) => points[i]!), moved.indexOf(route)) - crossingsOf(keep, [], 0);
+      if (trial === bestCount && pair <= bestPair) continue;
+      best = route;
+      bestCount = trial;
+      bestPair = pair;
+    }
+    points[best] = first[best]!;
+    count = bestCount;
+    sent++;
+  }
+  return { sent, counts };
 }
 
 /** This function gives the boxes in `reach` of the bounds of `points`. */
@@ -187,7 +227,7 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   const first = result.routes.map((r) => r.points);
   const variables = freeVariables(input, result, set, c);
   if (variables.length === 0) {
-    o.report?.({ variables: 0, routes: 0, dropped: "none", capped: false, first, afterPass: first, final: first });
+    o.report?.({ variables: 0, routes: 0, dropped: "none", capped: false, first, afterPass: first, final: first, sentBack: 0, counts: 0 });
     return result;
   }
   const shift = new Float64Array(variables.length);
@@ -294,9 +334,11 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
     for (const i of fix) points[i] = first[i]!;
     out = build(points);
   }
+  const guarded = set.guard === "routes" ? sendBack(points, first) : { sent: 0, counts: 0 };
+  if (guarded.sent > 0) out = build(points);
   // The output keeps the routes of `shared` when it has a break of a hard rule, or more crossings, after the fixes.
   const breaks = checkProperties(input, out, 1).length > checkProperties(input, result, 1).length;
   const crossings = !breaks && measureQuality(input, out).crossings > measureQuality(input, result).crossings;
-  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none", capped, first, afterPass, final: points });
+  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none", capped, first, afterPass, final: points, sentBack: guarded.sent, counts: guarded.counts });
   return breaks || crossings ? result : out;
 }
