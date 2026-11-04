@@ -1,0 +1,617 @@
+{
+  "set": "screen-v3",
+  "unit": "degrees, the median over the boards with a crossing of the mean crossing angle",
+  "families": 15,
+  "rises": {
+    "adam": 3,
+    "gradient": 4,
+    "angleOnly": 10
+  },
+  "falls": {
+    "adam": 1,
+    "gradient": 1,
+    "angleOnly": 0
+  },
+  "table": [
+    {
+      "family": "bipartite",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.26,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "dense-groups",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 10681,
+          "r2Median": 59.22,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "fan-out",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 1677,
+          "r2Median": 49.8,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 1677,
+          "r2Median": 49.8,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 1673,
+          "r2Median": 49.94,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 1674,
+          "r2Median": 50.22,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 1658,
+          "r2Median": 50.68,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "frame-rows",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "hub-chain",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 33.34,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 33.34,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 33.34,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 33.34,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 33.35,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "local-mesh",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 34.85,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 34.85,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 34.85,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 34.85,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 34.85,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "many-groups",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.49,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 8285,
+          "r2Median": 49.94,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.94,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 8286,
+          "r2Median": 50.04,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 8286,
+          "r2Median": 49.82,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "packed-grid",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        }
+      }
+    },
+    {
+      "family": "pipeline",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 32.48,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 32.48,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 32.48,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 32.48,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 44.48,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "small-clustered",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 6391,
+          "r2Median": 58.49,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 6391,
+          "r2Median": 58.49,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 6391,
+          "r2Median": 58.49,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 6380,
+          "r2Median": 58.46,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 6381,
+          "r2Median": 58.61,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "sparse-long",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "thin-bars",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 571,
+          "r2Median": 30.25,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 566,
+          "r2Median": 29.19,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 564,
+          "r2Median": 30.23,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 566,
+          "r2Median": 29.16,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 571,
+          "r2Median": 31.16,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "tiny-uniform",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 60.6,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 60.6,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 60.6,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 62.34,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 62.7,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "two-hubs",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2577,
+          "r2Median": 45.5,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2569,
+          "r2Median": 45.59,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2565,
+          "r2Median": 45.6,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2569,
+          "r2Median": 45.58,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 2561,
+          "r2Median": 45.53,
+          "breaks": 0
+        }
+      }
+    },
+    {
+      "family": "uneven-sizes",
+      "arms": {
+        "shared": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 12598,
+          "r2Median": 56.22,
+          "breaks": 0
+        },
+        "energy-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 12597,
+          "r2Median": 56.27,
+          "breaks": 0
+        },
+        "energy-gradient": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 12598,
+          "r2Median": 56.27,
+          "breaks": 0
+        },
+        "elastic-adam": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 12595,
+          "r2Median": 56.26,
+          "breaks": 0
+        },
+        "angle-only": {
+          "boards": 10,
+          "crossedBoards": 10,
+          "crossings": 12595,
+          "r2Median": 56.23,
+          "breaks": 0
+        }
+      }
+    }
+  ]
+}
