@@ -4,8 +4,10 @@
 // `node packages/core/scripts/join-cost.ts --rounds 15` writes `out/join-cost.json` and `out/join-cost.md`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
+import { inputGraph } from "../src/bench/screen/forms.ts";
+import { SCREEN_V3, screenInputs } from "../src/bench/screen/set.ts";
 import { highwaysRegistry } from "../src/families/index.ts";
-import type { Node } from "../src/model.ts";
+import { outerGraph, type Node } from "../src/model.ts";
 import { WayFinder } from "../src/ways.ts";
 import { measureIsolated, pairedContext, pairedEnv, type Input } from "./gates/paired.ts";
 
@@ -25,10 +27,18 @@ function tiled(nodes: readonly Node[]): Node[] {
   return [...nodes, ...nodes.map((n) => ({ ...n, id: `${n.id}~copy`, box: { ...n.box, x: n.box.x + width + 200 } }))];
 }
 
-/** This function gives the boards of the run. */
-function boards(): Input<readonly Node[]>[] {
+/** This function gives the boards of `screen-v3`. */
+function screenBoards(): { readonly id: string; readonly nodes: readonly Node[] }[] {
+  return screenInputs(SCREEN_V3).map((input, i) => ({ id: `screen-${i}-${input.family}`, nodes: outerGraph(inputGraph(input)).nodes }));
+}
+
+/** This function gives the boards of the run, with the six largest boards of `screen-v3`. */
+function boards(screen: readonly { readonly id: string; readonly nodes: readonly Node[] }[]): Input<readonly Node[]>[] {
   const reg = highwaysRegistry();
-  const out: Input<readonly Node[]>[] = [];
+  const out: Input<readonly Node[]>[] = [...screen]
+    .sort((a, b) => b.nodes.length - a.nodes.length || a.id.localeCompare(b.id))
+    .slice(0, 6)
+    .map((b) => ({ id: b.id, group: "screen", value: b.nodes }));
   for (const [size, dims] of SIZES) {
     for (const seed of SEEDS) {
       const { nodes } = reg.generate("maze", seed, dims as never).graph;
@@ -40,7 +50,9 @@ function boards(): Input<readonly Node[]>[] {
 }
 
 const { values } = parseArgs({ options: { rounds: { type: "string", default: "15" } } });
-const inputs = boards();
+const screen = screenBoards();
+const screenLooks = screen.map((b) => new WayFinder(b.nodes).corners.joinLooks);
+const inputs = boards(screen);
 const report = measureIsolated({
   arms: [
     { id: "off", run: (nodes: readonly Node[]) => new WayFinder(nodes, { joinWork: 0 }) },
@@ -57,18 +69,22 @@ const report = measureIsolated({
 
 const rows = inputs.map((input) => {
   const ways = new WayFinder(input.value!);
+  const links = ways.corners.linkCount - new WayFinder(input.value!, { joinWork: 0 }).corners.linkCount;
   const row = report.inputs.find((r) => r.id === input.id)!;
-  return { id: input.id, points: ways.corners.points.length, stopped: ways.corners.joinStopped, off: row.median["off"]!, on: row.median["on"]! };
+  return { id: input.id, points: ways.corners.points.length, looks: ways.corners.joinLooks, links, stopped: ways.corners.joinStopped, off: row.median["off"]!, on: row.median["on"]! };
 });
 mkdirSync("out", { recursive: true });
-writeFileSync("out/join-cost.json", JSON.stringify({ report, rows }));
-const table = rows.map((r) => `| ${r.id} | ${r.points} | ${r.stopped} | ${r.off.toFixed(1)} | ${r.on.toFixed(1)} | ${(r.on - r.off).toFixed(1)} |`);
+const withWork = screenLooks.filter((n) => n > 0).length;
+const closed = rows.filter((r) => r.looks > 0 && r.links === 0).length;
+writeFileSync("out/join-cost.json", JSON.stringify({ report, rows, screen: { boards: screen.length, withWork } }));
+const table = rows.map((r) => `| ${r.id} | ${r.points} | ${r.looks} | ${r.links} | ${r.stopped} | ${r.off.toFixed(1)} | ${r.on.toFixed(1)} | ${(r.on - r.off).toFixed(1)} |`);
 const noise = report.noiseFloor ? `${report.noiseFloor.p10.toFixed(3)} to ${report.noiseFloor.p90.toFixed(3)}` : "none";
 const md = [
   `CPU: ${report.env.cpu}. Median ratio on/off: ${report.ratios["on"]!.median.toFixed(3)}. A/A band: ${noise}.`,
+  `Boards of screen-v3 with join work: ${withWork} of ${screen.length}. Boards here with work and no new link: ${closed} of ${rows.length}.`,
   "",
-  "| Board | Points | Stopped | off ms | on ms | Added ms |",
-  "| --- | --- | --- | --- | --- | --- |",
+  "| Board | Points | Looks | New links | Stopped | off ms | on ms | Added ms |",
+  "| --- | --- | --- | --- | --- | --- | --- | --- |",
   ...table,
 ].join("\n");
 writeFileSync("out/join-cost.md", `${md}\n`);

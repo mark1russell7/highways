@@ -86,6 +86,18 @@ describe("the join of the parts of the corner graph (CORNER-REACH)", () => {
     }
   });
 
+  it("does no work on a board of one part", () => {
+    const { graph } = reg.generate("tiny-uniform", 3);
+    expect(new WayFinder(graph.nodes).corners.joinLooks).toBe(0);
+  });
+
+  it("counts the work on a board of closed regions, where the join adds no link", () => {
+    const { graph } = reg.generate("maze", 59);
+    const on = new WayFinder(graph.nodes);
+    expect(on.corners.joinLooks).toBeGreaterThan(on.corners.points.length);
+    expect(on.corners.linkCount).toBe(new WayFinder(graph.nodes, { joinWork: 0 }).corners.linkCount);
+  });
+
   it("does not set the flag when 0 turns the join off", () => {
     const { graph } = reg.generate("maze", 181679);
     expect(new WayFinder(graph.nodes, { joinWork: 0 }).corners.joinStopped).toBe(false);

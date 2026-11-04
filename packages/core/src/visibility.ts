@@ -137,6 +137,8 @@ export class CornerGraph {
   readonly points: Point[] = [];
   /** This flag is true when the limit of `joinWork` stopped the join, so a link between two parts can be missing. */
   joinStopped = false;
+  /** This count gives the points that the join looked at. It is 0 on a graph of one part. */
+  joinLooks = 0;
   readonly #adj: number[][] = [];
   // The links of #adj in flat arrays for the search. The links of corner `i` are at the indices `#start[i]` to `#start[i + 1] - 1`.
   // `#to` holds the other corner of each link and `#length` holds its length. The order of the links is the order of #adj.
@@ -284,15 +286,14 @@ export class CornerGraph {
     if (work <= 0 || members.length < 2) return;
     const order = members.map((_, m) => m).sort((a, b) => members[b]!.length - members[a]!.length || a - b);
     order.shift();
-    let left = work;
     const far = new Float64Array(count);
     for (const m of order) {
       for (const i of members[m]!) {
-        if (left < count) {
+        if (this.joinLooks + count > work) {
           this.joinStopped = true;
           return;
         }
-        left -= count;
+        this.joinLooks += count;
         const p = this.points[i]!;
         const others: number[] = [];
         for (let j = 0; j < count; j++) {
@@ -303,7 +304,7 @@ export class CornerGraph {
         }
         others.sort((a, b) => far[a]! - far[b]! || a - b);
         for (const j of others) {
-          left--;
+          this.joinLooks++;
           if (!this.#obstacles.clear(p, this.points[j]!, this.#pad)) continue;
           links[i]!.add(j);
           links[j]!.add(i);
