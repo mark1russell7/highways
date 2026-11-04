@@ -22,7 +22,7 @@ function bipartite(count: number, skip: (i: number, j: number) => boolean = () =
   return ids.flatMap((i) => ids.filter((j) => !skip(i, j)).map((j) => edge(`e${i}-${j}`, `l${i}`, `r${j}`)));
 }
 
-/** This function gives `count` nodes `l<i>` at the x value 0 and `count` nodes `r<i>` at the x value 600, with the gap `gap` in y. */
+/** This function gives `count` nodes `l<i>` at x 0 and `count` nodes `r<i>` at x 600. Each column has the gap `gap` in y. */
 function columns(count: number, gap: number): Graph["nodes"] {
   const ids = Array.from({ length: count }, (_, i) => i);
   return ids.flatMap((i) => [node(`l${i}`, 0, gap * i), node(`r${i}`, 600, gap * i)]);
