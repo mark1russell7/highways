@@ -15,15 +15,18 @@ export { solveRules, type SolverOptions } from "./solver.ts";
 export interface RulesOptions extends SolverOptions {
   /** The rule file. The default is `elastic`. */
   readonly preset: keyof typeof RULE_PRESETS;
+  /** The method. The default is `adam`. */
+  readonly descent: "adam" | "gradient";
 }
 
 /** The default options of the router `rules`. The solver has the defaults of the router `adam`. */
-export const RULES_DEFAULTS: Readonly<RulesOptions> = Object.freeze({ ...ADAM_DEFAULTS, preset: "elastic" });
+export const RULES_DEFAULTS: Readonly<RulesOptions> = Object.freeze({ ...ADAM_DEFAULTS, preset: "elastic", descent: "adam" });
 
 /** The declarations of the options of the router `rules` (RULE-036). */
 export const RULES_SCHEMA: OptionSchema<RulesOptions> = {
   ...ADAM_SCHEMA,
-  preset: { type: "enum", values: ["elastic", "repulsion", "adam"], default: "elastic", describe: "The rule file. A caller of `rulesRouter` gives its own file as data." },
+  preset: { type: "enum", values: ["elastic", "repulsion", "adam", "energy"], default: "elastic", describe: "The rule file. A caller of `rulesRouter` gives its own file as data." },
+  descent: { type: "enum", values: ["adam", "gradient"], default: "adam", describe: "The method: `adam` with a sample of legs, or `gradient` over all near legs." },
 };
 
 /**

@@ -2,9 +2,10 @@ import { checkProperties } from "../../bench/properties.ts";
 import { measureQuality } from "../../bench/quality.ts";
 import { rng } from "../../fixtures.ts";
 import { segmentsCross, type Point } from "../../geom.ts";
+import { Grid } from "../../grid.ts";
 import { outerGraph, type Graph, type Result, type Route } from "../../model.ts";
 import type { RuleSet } from "./language.ts";
-import { compileRules, reachOf, type Leg, type LegView, type TermContext } from "./terms.ts";
+import { compileRules, reachOf, type Leg, type LegRef, type LegView, type TermContext } from "./terms.ts";
 
 /** The options of the solver of a rule file. */
 export interface SolverOptions {
@@ -18,6 +19,8 @@ export interface SolverOptions {
   readonly seed: number;
   /** The length that makes the energy a pure number, and the default distance of a term `gap`. */
   readonly clearance: number;
+  /** The method: `adam` with a sample of legs (RULE-020), or `gradient`, plain steps over all near legs (RULE-019). The default is `adam`. */
+  readonly descent?: "adam" | "gradient";
 }
 
 /** The moment factors of Adam (Kingma and Ba 2015), as the record gives them. */
@@ -61,8 +64,23 @@ function boundsOf(p: readonly Point[]): readonly [number, number, number, number
   return b;
 }
 
+/** This function gives a function that makes the grid of each leg of `routes` one time, at its first use. */
+function lazyGrid(routes: readonly (readonly Point[])[], cell: number): () => Grid<LegRef> {
+  let grid: Grid<LegRef> | undefined;
+  return () => {
+    if (grid === undefined) {
+      const made = new Grid<LegRef>(Math.max(1, 4 * cell));
+      routes.forEach((pts, route) => {
+        for (let k = 0; k + 1 < pts.length; k++) made.addSegment({ route, k }, pts[k]!, pts[k + 1]!);
+      });
+      grid = made;
+    }
+    return grid;
+  };
+}
+
 /**
- * This function moves the free legs of `result` down the energy of the rule file `set`, with the steps of Adam (RULE-036).
+ * This function moves the free legs of `result` down the energy of the rule file `set` (RULE-036).
  * A hard rule is not a term. A route that breaks one goes back to its first points, and so does a route with more crossings.
  */
 export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readonly<SolverOptions>): Result {
@@ -133,7 +151,25 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   });
   const random = rng(Math.max(0, Math.floor(o.seed)));
   const steps = Math.max(1, Math.floor(o.steps));
-  const context: TermContext = { clearance: c, samples: Math.max(1, Math.floor(o.samples)), random, all, pointOf };
+  const gradient = o.descent === "gradient";
+  // A leg moves by 2 c at most, and a point moves with two legs. So two legs farther apart than this distance stay out of reach at each step.
+  const reach = reachOf(set, c) + 8 * c;
+  const legGrid = lazyGrid(first, c);
+  const nearLegs = new Map<string, readonly LegRef[]>();
+  const nearOf = (route: number, k: number): readonly LegRef[] => {
+    const key = `${route}:${k}`;
+    let list = nearLegs.get(key);
+    if (list === undefined) {
+      const near: LegRef[] = [];
+      legGrid().querySegment(first[route]![k]!, first[route]![k + 1]!, reach, (other) => {
+        if (other.route !== route) near.push(other);
+      });
+      list = near;
+      nearLegs.set(key, list);
+    }
+    return list;
+  };
+  const context: TermContext = { clearance: c, samples: gradient ? 0 : Math.max(1, Math.floor(o.samples)), random, all, pointOf, nearOf };
   let b1 = 1;
   let b2 = 1;
   for (let t = 0; t < steps; t++) {
@@ -151,6 +187,10 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
     });
     for (let i = 0; i < legs.length; i++) {
       const g = grads[i]!;
+      if (gradient) {
+        shift[i] = Math.max(-2 * c, Math.min(2 * c, shift[i]! - eta * c * g));
+        continue;
+      }
       m1[i] = BETA1 * m1[i]! + (1 - BETA1) * g;
       m2[i] = BETA2 * m2[i]! + (1 - BETA2) * g * g;
       const mh = m1[i]! / (1 - b1);

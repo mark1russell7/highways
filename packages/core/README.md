@@ -775,14 +775,18 @@ The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. The
   No point of a run, of a trunk or of two routes moves. A route goes back when it gets more crossings or a break of a hard rule.
   Its options are `eta` (0.01 to 1), `samples` (4 to 32), `steps` (100 to 2000, the budget), `seed` and `clearance`. The same seed gives the same routes. `adamStrategy` is its router strategy.
 
-### The physical routers `repel`, `springs` and `nudge`
+### The router `rules`
 
 The router `rules` is opt-in. It is not in `STRATEGIES`, so the default outputs do not change. A rule file is data: each rule has a selection, a term and a weight. `compileRules` turns a file into one energy, and `solveRules` moves the free legs of `shared` down it with the steps of Adam. A hard rule is not a term: a route that breaks one goes back to its first points.
 
 - `rulesRouter({ name, rules })` takes a rule file. `checkRules(file)` gives one text for each fault.
-- The selections are `legs`, `leg-pairs` and `leg-boxes`. The terms are `hold`, `spring` and `gap`.
+- The preset `energy` holds the energy of RULE-019, with the term `angle` at each crossing. The option `descent: "gradient"` takes plain steps over all near legs, and no sample.
+- The term `angle` alone raises the crossing angle on 10 of the 15 families of `screen-v3`. Inside `energy`, the other terms outweigh it, and the angle rises on 4 families and falls on 1. The record is `scripts/data/rules/energy.json`.
+- The selections are `legs`, `leg-pairs`, `leg-boxes` and `leg-crossings`. The terms are `hold`, `spring`, `gap` and `angle`.
 - `ADAM_RULES` is the energy of the router `adam`, and `adam` runs that file. `ELASTIC_RULES` is RULE-001, and `REPULSION_RULES` is RULE-003.
 - The terms are TypeScript at this time, because the solver needs the slope of each term.
+
+### The physical routers `repel`, `springs` and `nudge`
 
 The routers `repel`, `springs` and `nudge` of PHYSICAL are opt-in. They are not in `STRATEGIES`, so the default outputs do not change.
 They move the points of the routes with no grid and no search. So a small move of a node gives a small move of the routes.

@@ -1,11 +1,12 @@
-/** What a rule selects: each free leg, each free leg with a sample of other legs, or each free leg with its near boxes. */
-export type RuleSelect = "legs" | "leg-pairs" | "leg-boxes";
+/** What a rule selects: each free leg, each free leg with other legs, each free leg with its near boxes, or the crossings of the two legs next to a free leg. */
+export type RuleSelect = "legs" | "leg-pairs" | "leg-boxes" | "leg-crossings";
 
 /**
  * What a rule measures at each thing that it selects.
  * `hold` keeps a leg near its first place. `spring` shortens the two legs next to a leg. `gap` pushes a leg away from a thing nearer than a distance.
+ * `angle` turns a crossing toward a right angle.
  */
-export type RuleTerm = "hold" | "spring" | "gap";
+export type RuleTerm = "hold" | "spring" | "gap" | "angle";
 
 /** One rule of the drawing: a selection and a term, with a weight (RULE-036). A rule is data, so a file can hold it. */
 export interface Rule {
@@ -27,6 +28,7 @@ const TERM_SELECTS: Readonly<Record<RuleTerm, readonly RuleSelect[]>> = {
   hold: ["legs"],
   spring: ["legs"],
   gap: ["leg-pairs", "leg-boxes"],
+  angle: ["leg-crossings"],
 };
 
 /** This function gives one text for each fault of a rule file. An empty list tells that the compiler takes the file. */
@@ -69,5 +71,16 @@ export const REPULSION_RULES: RuleSet = {
   ],
 };
 
+/** The rule file of the energy of RULE-019: length, clearance from routes and boxes, and the crossing angle. */
+export const ENERGY_RULES: RuleSet = {
+  rules: [
+    { select: "legs", term: "hold", weight: 0.05 },
+    { select: "legs", term: "spring", weight: 1 },
+    { select: "leg-pairs", term: "gap", weight: 1 },
+    { select: "leg-boxes", term: "gap", weight: 4 },
+    { select: "leg-crossings", term: "angle", weight: 1 },
+  ],
+};
+
 /** The rule files that the option `preset` of the router `rules` names. */
-export const RULE_PRESETS: Readonly<Record<"elastic" | "repulsion" | "adam", RuleSet>> = { elastic: ELASTIC_RULES, repulsion: REPULSION_RULES, adam: ADAM_RULES };
+export const RULE_PRESETS: Readonly<Record<"elastic" | "repulsion" | "adam" | "energy", RuleSet>> = { elastic: ELASTIC_RULES, repulsion: REPULSION_RULES, adam: ADAM_RULES, energy: ENERGY_RULES };

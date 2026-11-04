@@ -921,6 +921,8 @@ The order of work is: first the solver with hand-written terms ([RULE-022](#rule
 
 The first slice exists: the router `rules` has one solver, three hand-written terms and a rule format as data. The solver of `adam` is the first solver, so RULE-019 is not a condition. The energy of `adam` is a rule file, and that file gives the bytes of `adam` on the 150 boards of `screen-v3`. Vex has no derivative of a formula at this time, so the compiler from Vex formulas stays open.
 
+The second slice adds [RULE-019](#rule-019): the term `angle`, the preset `energy` and the option `descent`. The variables stay the shifts of the free legs, so a leg moves by 2 clearances at most. The term `angle` alone raises the median crossing angle on 10 of 15 families, and on 0 families it falls. In the preset `energy`, the angle rises on 4 families and falls on 1, because the other terms outweigh it. Weights are the open question, and [RULE-038](#rule-038) and [RULE-048](#rule-048) attack them.
+
 ## Learned rules
 
 A learned method takes its rules from examples. This repository uses made-up data only. So each learned idea needs a corpus first: preference pairs from a panel, or the answers of an exact solver on small boards. A learned method stays deterministic only with frozen weights and no sampling at run time.

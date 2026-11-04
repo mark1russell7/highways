@@ -1,4 +1,4 @@
-import type { Box, Point } from "../../geom.ts";
+import { segmentsCross, type Box, type Point } from "../../geom.ts";
 import { checkRules, type Rule, type RuleSet } from "./language.ts";
 
 /** A free leg of a route. No end of it is an end of its route or a point of another route. No run or trunk holds it. */
@@ -23,7 +23,7 @@ export interface LegRef {
 export interface TermContext {
   /** The length that makes a term a pure number: the option `clearance` of the solver. */
   readonly clearance: number;
-  /** The number of other legs that each leg samples. */
+  /** The number of other legs that each leg samples. The value 0 reads each leg of `nearOf`, with no sample. */
   readonly samples: number;
   /** The seeded source of the samples. */
   readonly random: () => number;
@@ -31,6 +31,8 @@ export interface TermContext {
   readonly all: readonly LegRef[];
   /** This function gives a point of a route at this step. */
   readonly pointOf: (route: number, k: number) => Point;
+  /** This function gives the legs of other routes that a leg can reach at any step. */
+  readonly nearOf: (route: number, k: number) => readonly LegRef[];
 }
 
 /** A leg at one step of the solver, with its two ends and its middle. */
@@ -83,13 +85,15 @@ function springTerm(w: number): CompiledTerm {
   };
 }
 
-/** This function compiles `w (1 - d / D)²` over a sample of the legs of other routes, for `d` under `D`. */
+/** This function compiles `w (1 - d / D)²` over a sample of the legs of other routes, or over all near legs, for `d` under `D`. */
 function pairGapTerm(w: number, distance: number | undefined): CompiledTerm {
   return ({ leg, mid }, context, g) => {
     const D = distance ?? context.clearance;
+    const near = context.samples === 0 ? context.nearOf(leg.route, leg.k) : undefined;
+    const count = near?.length ?? context.samples;
     let sum = g;
-    for (let s = 0; s < context.samples; s++) {
-      const other = context.all[Math.floor(context.random() * context.all.length)]!;
+    for (let s = 0; s < count; s++) {
+      const other = near?.[s] ?? context.all[Math.floor(context.random() * context.all.length)]!;
       if (other.route === leg.route) continue;
       const q = nearestOn(mid, context.pointOf(other.route, other.k), context.pointOf(other.route, other.k + 1));
       const dx = mid.x - q.x;
@@ -125,10 +129,47 @@ function boxGapTerm(w: number, distance: number | undefined): CompiledTerm {
   };
 }
 
+/**
+ * This function adds the slope of `w cos²θ` of one leg with the direction `u`, at each crossing with a leg of another route.
+ * The direction `u` changes with the shift by `side` times the normal `n`.
+ */
+function addAngle(sum: number, w: number, p: Point, q: Point, side: number, leg: Leg, context: TermContext, k: number): number {
+  const ux = q.x - p.x;
+  const uy = q.y - p.y;
+  const uu = ux * ux + uy * uy;
+  if (uu <= 1e-9) return sum;
+  const un = ux * leg.nx + uy * leg.ny;
+  let out = sum;
+  for (const other of context.nearOf(leg.route, k)) {
+    const c = context.pointOf(other.route, other.k);
+    const d = context.pointOf(other.route, other.k + 1);
+    if (!segmentsCross(p, q, c, d)) continue;
+    const vx = d.x - c.x;
+    const vy = d.y - c.y;
+    const vv = vx * vx + vy * vy;
+    if (vv <= 1e-9) continue;
+    const uv = ux * vx + uy * vy;
+    const vn = vx * leg.nx + vy * leg.ny;
+    // E = (u · v)² / (|u|² |v|²), so dE/dt = 2 (u · v) (n · v) / (|u|² |v|²) - 2 (u · v)² (u · n) / (|u|⁴ |v|²), times the side.
+    out += w * side * ((2 * uv * vn) / (uu * vv) - (2 * uv * uv * un) / (uu * uu * vv));
+  }
+  return out;
+}
+
+/** This function compiles `w cos²θ` at each crossing of the two legs next to a leg (RULE-019, RULE-049). A shift does not turn the leg, so only these two legs turn. */
+function angleTerm(w: number): CompiledTerm {
+  return ({ leg, a, b }, context, g) => {
+    const before = context.pointOf(leg.route, leg.k - 1);
+    const after = context.pointOf(leg.route, leg.k + 2);
+    return addAngle(addAngle(g, w, before, a, 1, leg, context, leg.k - 1), w, b, after, -1, leg, context, leg.k + 1);
+  };
+}
+
 /** This function compiles one rule. */
 function compileRule(rule: Rule): CompiledTerm {
   if (rule.term === "hold") return holdTerm(rule.weight);
   if (rule.term === "spring") return springTerm(rule.weight);
+  if (rule.term === "angle") return angleTerm(rule.weight);
   return rule.select === "leg-pairs" ? pairGapTerm(rule.weight, rule.distance) : boxGapTerm(rule.weight, rule.distance);
 }
 
