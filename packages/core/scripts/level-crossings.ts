@@ -1,9 +1,9 @@
 /**
  * This script counts the level links that go through a box of an item of their level.
  * The first table is `maze` as one flat level, with one item for each node. The real routers do not make this level.
- * The second table is the router `sections` on each family, with the arms `base`, `join` (`levelJoinWork: JOIN_WORK`) and `far` (`throughCost: 0`).
+ * The second table is one router on each family, with the arms `base`, `join` (`levelJoinWork: JOIN_WORK`) and `far` (`throughCost: 0`).
  * The counts and the bytes are deterministic, and the script reads no time.
- * The environment gives `FAMILIES`, `SEEDS`, `LARGE_SEEDS` and `SAMPLES`. The first argument is the out file. The script writes the file after each row.
+ * The environment gives `ROUTER` (`sections` or `sections-tree`), `FAMILIES`, `SEEDS`, `LARGE_SEEDS` and `SAMPLES`. The first argument is the out file. The script writes the file after each row.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -33,7 +33,12 @@ const SAMPLES = Number(process.env["SAMPLES"] ?? 3);
 const reg = highwaysRegistry();
 const names: string[] = process.env["FAMILIES"]?.split(",") ?? reg.families().map((f: { name: string }) => f.name);
 
-const base = { name: "base", maxNodes: 100_000 };
+/** The options of each variant that the script can count. `sections-tree` is the preset of the strategy with that name. */
+const VARIANTS: Readonly<Record<string, { readonly stretch?: number }>> = { sections: {}, "sections-tree": { stretch: Infinity } };
+const ROUTER = process.env["ROUTER"] ?? "sections";
+const variant = VARIANTS[ROUTER];
+if (variant === undefined) throw new Error(`no variant ${ROUTER}`);
+const base = { name: "base", maxNodes: 100_000, ...variant };
 const arms = { base: sectionsRouter(base), join: sectionsRouter({ ...base, levelJoinWork: JOIN_WORK }), far: sectionsRouter({ ...base, throughCost: 0 }) };
 
 /** The counts of one arm. The class of a link is in `endsOverlapLinks`, `clearWayLinks` or `noWayLinks`. */
@@ -97,7 +102,7 @@ function compare(level: Level, m: LevelCrossings, other: Level, n: LevelCrossing
   });
 }
 
-/** This function counts the router `sections` on the first seeds of one family. */
+/** This function counts the variant on the first seeds of one family. */
 function row(family: string, dims: Record<string, number> | undefined, seeds: number): object {
   const a = { base: freshArm(), join: freshArm(), far: freshArm() };
   const change = { join: freshChange(), far: freshChange() };
@@ -163,7 +168,7 @@ function flat(seed: number, large: boolean): object {
   };
 }
 
-const record = { schema: "level-crossings/2", seeds: SEEDS, largeSeeds: LARGE_SEEDS, flat: [] as object[], rows: [] as object[] };
+const record = { schema: "level-crossings/2", router: ROUTER, seeds: SEEDS, largeSeeds: LARGE_SEEDS, flat: [] as object[], rows: [] as object[] };
 /** This function writes the record, so that a stopped run keeps the rows that it has. */
 function save(): void {
   mkdirSync(dirname(OUT), { recursive: true });

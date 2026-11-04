@@ -1,5 +1,6 @@
 {
   "schema": "level-crossings/2",
+  "router": "sections",
   "seeds": 20,
   "largeSeeds": 4,
   "flat": [],
