@@ -167,6 +167,8 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
 - The option `bendCost` is the cost of one bend in units of length. A larger cost gives fewer bends. The default is 16.
 - Each gap that two or more routes share gets one lane for each route. The lanes are evenly spaced, in an order with few crossings.
 - The space between two lanes is the margin of the router. In a narrow gap, the space becomes smaller.
+- Each way has the field `room`: the distance to the nearest box on each side. `laneRoutes` and `pullApart` keep the lanes of each side in it, in their order, and 1 unit from the box.
+- Two lanes of a side stay at least `LANE_LEAST` apart. A lane that then reaches a box gets the field `outOfRoom`. So a renderer can show that lane, and a count can read it.
 - An edge with no way through the free room gets no route, as with `skip`. Rows that touch each other with gap 0 can block a way.
 
 ```ts

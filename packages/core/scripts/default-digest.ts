@@ -1,4 +1,5 @@
 // One digest for each default router over the 150 boards of `screen-v3`. Two commits with the same digests give the same route bytes.
+// The field `room` of a way is left out: it reads the boxes and it moves no point of a route.
 // Run from `packages/core`: `node scripts/default-digest.ts <out.json>`.
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
@@ -14,7 +15,7 @@ const digests: Record<string, string> = {};
 for (const router of routers) {
   const hash = createHash("sha256");
   const run = router.run as (graph: unknown, options: object) => unknown;
-  for (const input of inputs) hash.update(`${input.id}\n${JSON.stringify(run(inputGraph(input), router.defaults))}\n`);
+  for (const input of inputs) hash.update(`${input.id}\n${JSON.stringify(run(inputGraph(input), router.defaults), (key, value) => (key === "room" ? undefined : value))}\n`);
   digests[router.name] = hash.digest("hex").slice(0, 16);
   console.log(router.name, digests[router.name]);
 }

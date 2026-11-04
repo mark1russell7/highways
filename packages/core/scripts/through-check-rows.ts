@@ -73,6 +73,8 @@ export interface Row {
   outOfRoom: number;
   /** The lanes of class `deep` with no field `outOfRoom`. */
   deepUnmarked: number;
+  /** The flagged lanes with no field `outOfRoom`, on an edge that its closed route does not flag. So the lanes make this contact, and no mark tells it. */
+  silentLanes: number;
   /** The summed length and bends of the lanes, with the room of each way. */
   laneLength: number;
   laneBends: number;
@@ -136,10 +138,15 @@ export function laneView(result: Result): readonly Route[] {
 }
 
 /** This function adds the marks, the length and the bends of the lanes of one board to a row of `lanes`. */
-function addLaneShape(row: Row, result: Result, view: readonly Route[], checks: readonly RouteCheck[]): void {
+function addLaneShape(row: Row, result: Result, view: readonly Route[], checks: readonly RouteCheck[], closed: readonly RouteCheck[]): void {
   const out = new Set(view.filter((r) => r.outOfRoom).map((r) => r.edge));
+  const closedFlags = new Set(closed.filter(flagged).map((c) => c.edge));
   row.outOfRoom += out.size;
-  for (const c of checks) if (flagged(c) && deciding(c)!.class === "deep" && !out.has(c.edge)) row.deepUnmarked++;
+  for (const c of checks) {
+    if (!flagged(c) || out.has(c.edge)) continue;
+    if (deciding(c)!.class === "deep") row.deepUnmarked++;
+    if (!closedFlags.has(c.edge)) row.silentLanes++;
+  }
   const graph = segmentsOf(result);
   const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
   const full = laneRoutes({ ...graph, segments: graph.segments.map(({ room: _room, ...s }) => s) }, open, LANES.width, LANES.maxWidth);
@@ -191,6 +198,7 @@ const blank = (router: string, family: string, view: Row["view"]): Row => ({
   crossings: 0,
   outOfRoom: 0,
   deepUnmarked: 0,
+  silentLanes: 0,
   laneLength: 0,
   laneBends: 0,
   fullLength: 0,
@@ -228,13 +236,14 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
       const hasLanes = !OUTSIDE.includes(name) && innerBoard === undefined;
       graphs.forEach((graph, seed) => {
         const result = router.route(graph);
-        addChecks(row, seed, checkRoutes(graph, result.routes));
+        const closed = checkRoutes(graph, result.routes);
+        addChecks(row, seed, closed);
         addInnerShape(row, graph, result);
         if (hasLanes) {
           const view = laneView(result);
           const checks = checkRoutes(graph, view);
           addChecks(lanes, seed, checks);
-          addLaneShape(lanes, result, view, checks);
+          addLaneShape(lanes, result, view, checks, closed);
         }
       });
       (OUTSIDE.includes(name) ? unmarkedRows : rows).push(row);

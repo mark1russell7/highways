@@ -1,6 +1,6 @@
 import { dist, type Point } from "./geom.ts";
 import { findRun, orderPlaced, placeRoutes } from "./lane-order.ts";
-import { LANE_LEAST } from "./lane-room.ts";
+import { LANE_CLEAR, LANE_LEAST } from "./lane-room.ts";
 import type { LaneRoom, Result, Route } from "./model.ts";
 import { keepThrough } from "./through.ts";
 
@@ -159,7 +159,8 @@ export function runKey(edges: readonly string[]): string {
  * The lanes are `laneWidth` apart, and an open segment is at most `maxWidth` wide. The other segments stay as one way.
  *
  * A segment with a room keeps its lanes in that room. Each side compresses on its own, so each lane keeps its order and its side.
- * Two lanes of a side stay at least `least` apart. A lane that the room then cannot hold gets the field `outOfRoom`.
+ * The outer lane keeps `LANE_CLEAR` from the box when it can, and two lanes of a side stay at least `least` apart.
+ * A lane that then reaches the room can touch or enter a box, and it gets the field `outOfRoom`.
  *
  * Lane 0 is on the left of the segment, from its first point to its last, with the y axis down.
  * The function takes a result or its segments. It gives a route for each edge, with the ends at their plugs.
@@ -178,9 +179,9 @@ function laneOffset(s: Segment, lane: number, spacing: number, least: number): {
   if (s.room === undefined || full === 0) return { offset: full, out: false };
   const room = full > 0 ? s.room.left : s.room.right;
   const widest = ((s.count - 1) / 2) * spacing;
-  const scale = Math.min(1, Math.max(room / widest, least / spacing));
+  const scale = Math.min(1, Math.max((room - LANE_CLEAR) / widest, least / spacing));
   const offset = full * scale;
-  return { offset, out: Math.abs(offset) > room + SAME };
+  return { offset, out: Math.abs(offset) >= room - SAME };
 }
 
 /** This function gives the route of each path, with the lanes of each segment at the spacing that `spacingOf` gives. */

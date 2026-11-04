@@ -29,23 +29,35 @@ describe("laneRoom", () => {
   it("reads the nearest box on each side of a way, less the clearance", () => {
     // The y axis points down, so the left of a way that goes east is north.
     const nodes = [box("north", 20, -30, 20, 18), box("south", 50, 7, 20, 20)];
-    expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }])).toEqual({ left: 12 - LANE_CLEAR, right: 7 - LANE_CLEAR });
+    expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }])).toEqual({ left: 12, right: 7 });
   });
 
   it("swaps the sides when the way runs the other way", () => {
     const nodes = [box("north", 20, -30, 20, 18), box("south", 50, 7, 20, 20)];
-    expect(room(nodes, [{ x: 100, y: 0 }, { x: 0, y: 0 }])).toEqual({ left: 7 - LANE_CLEAR, right: 12 - LANE_CLEAR });
+    expect(room(nodes, [{ x: 100, y: 0 }, { x: 0, y: 0 }])).toEqual({ left: 7, right: 12 });
   });
 
   it("reads each leg of a way with a bend, on both axes", () => {
     const nodes = [box("east", 110, 40, 20, 20)];
     // The way goes east, then south. The box stands to the left of the second leg.
-    expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }])).toEqual({ left: 10 - LANE_CLEAR, right: LANE_ROOM_LIMIT });
+    expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }])).toEqual({ left: 10, right: LANE_ROOM_LIMIT });
   });
 
   it("does not count a box past the end of a leg, or a box that a leg leaves from", () => {
     const nodes = [box("past", 120, -5, 10, 10), box("source", -20, -10, 20, 20)];
     expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }])).toEqual({ left: LANE_ROOM_LIMIT, right: LANE_ROOM_LIMIT });
+  });
+
+  it("reads a box beyond a bend, at the outer side, where a lane reaches past both legs", () => {
+    // The way goes east, then south. Its left is the outer side. The corner of the box is 5 from each leg line.
+    const nodes = [box("corner", 105, -25, 20, 20)];
+    expect(room(nodes, [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }]).left).toBeCloseTo(5);
+  });
+
+  it("does not read a box past the end of a slanted leg as a box on the way", () => {
+    // The corners of the box project over the leg, and on both sides of it. The box itself stays past the end.
+    const nodes = [box("past", 80, 80, 40, 40)];
+    expect(room(nodes, [{ x: 0, y: 0 }, { x: 70, y: 70 }])).toEqual({ left: LANE_ROOM_LIMIT, right: LANE_ROOM_LIMIT });
   });
 
   it("gives no room for a way through a box", () => {
@@ -59,14 +71,14 @@ describe("laneRoom", () => {
 
 describe("the lanes of a way with a room (LANE-ROOM)", () => {
   it("keeps the full width when the room holds it", () => {
-    const { routes, ys } = lanesAt({ left: 10, right: 10 }, 5);
+    const { routes, ys } = lanesAt({ left: 10 + LANE_CLEAR, right: 10 + LANE_CLEAR }, 5);
     expect(ys).toEqual(lanesAt(undefined, 5).ys);
     expect(ys).toEqual([-10, -5, 0, 5, 10]);
     expect(routes.some((r) => r.outOfRoom)).toBe(false);
   });
 
   it("compresses each side on its own, and keeps the order and the side of each lane", () => {
-    const { routes, ys } = lanesAt({ left: 5, right: 20 }, 5);
+    const { routes, ys } = lanesAt({ left: 5 + LANE_CLEAR, right: 20 }, 5);
     expect(ys).toEqual([-5, -2.5, 0, 5, 10]);
     expect(routes.some((r) => r.outOfRoom)).toBe(false);
   });
@@ -77,7 +89,7 @@ describe("the lanes of a way with a room (LANE-ROOM)", () => {
         const { routes, ys } = lanesAt({ left, right }, width);
         expect([...ys].sort((a, b) => a - b)).toEqual(ys);
         expect(ys[2]).toBe(0);
-        const fits = Math.min(left, right) >= 2 * LANE_LEAST;
+        const fits = Math.min(left, right) > 2 * LANE_LEAST;
         if (fits) {
           expect(Math.min(...ys)).toBeGreaterThanOrEqual(-left - 1e-9);
           expect(Math.max(...ys)).toBeLessThanOrEqual(right + 1e-9);
@@ -90,7 +102,7 @@ describe("the lanes of a way with a room (LANE-ROOM)", () => {
   it("stops at the smallest distance, and marks each lane that the room cannot hold", () => {
     const { routes, ys } = lanesAt({ left: 1, right: 20 }, 5);
     expect(ys).toEqual([-2 * LANE_LEAST, -LANE_LEAST, 0, 5, 10]);
-    expect(routes.filter((r) => r.outOfRoom).map((r) => r.edge)).toEqual(["a"]);
+    expect(routes.filter((r) => r.outOfRoom).map((r) => r.edge)).toEqual(["a", "b"]);
   });
 
   it("marks both outer lanes on a way with no room", () => {
@@ -111,6 +123,6 @@ describe("the lanes of a way with a room (LANE-ROOM)", () => {
 
   it("gives the room to `pullApart` too", () => {
     const routes = pullApart(segmentsOf(runOf({ left: 2, right: 8 })), { spacing: 5, maxWidth: 20 });
-    expect(routes.map((r) => r.points[2]!.y)).toEqual([-2, -1, 0, 5, 10]);
+    expect(routes.map((r) => r.points[2]!.y)).toEqual([-2, -1, 0, 3.5, 7]);
   });
 });

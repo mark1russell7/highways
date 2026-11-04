@@ -6,6 +6,9 @@ import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-row
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
 const STALE = `The record through-check/4 is stale. Write it again with: ${REGENERATE}`;
+/** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
+const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
+const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
 /** This function gives the keys of the rows that differ. A row in only one list differs. */
@@ -68,6 +71,33 @@ describe("the gate through-check/4", () => {
 
   it("has no inner route with a contact", () => {
     expect(fresh.rows.filter((r) => r.innerFlagged > 0).map(keyOf)).toEqual([]);
+  });
+
+  it("leaves no lane in a box with no mark (LANE-ROOM)", () => {
+    const lanes = fresh.rows.filter((r) => r.view === "lanes");
+    expect(lanes.length).toBeGreaterThan(0);
+    expect(lanes.filter((r) => r.silentLanes > 0 || r.deepUnmarked > 0).map(keyOf)).toEqual([]);
+  });
+
+  it("keeps the lanes of the default routers to the marked lanes and the seams of the closed routes", () => {
+    for (const router of SCORED) {
+      const rows = fresh.rows.filter((r) => r.router === router && r.view === "lanes");
+      const added = rows.reduce((n, r) => n + r.flagged, 0) - scored(router).reduce((n, r) => n + r.flagged, 0);
+      expect([router, added <= rows.reduce((n, r) => n + r.outOfRoom, 0)]).toEqual([router, true]);
+    }
+  });
+
+  // This test compares the rows of the site settings and makes no claim on them. Any change shows here (MARGIN-MEANING).
+  it("shows the counts of the site settings", () => {
+    const sum = (view: Row["view"]) => {
+      const classes: Record<string, number> = {};
+      for (const r of fresh.rows.filter((row) => row.router === fresh.site && row.view === view)) {
+        for (const [id, c] of Object.entries(r.classes)) classes[id] = (classes[id] ?? 0) + c.routes;
+      }
+      return classes;
+    };
+    expect(sum("routes")).toEqual(SITE_ROUTES);
+    expect(sum("lanes")).toEqual(SITE_LANES);
   });
 
   it("keeps the routers that do not mark through on their own rows", () => {
