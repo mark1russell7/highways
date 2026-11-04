@@ -16,10 +16,15 @@ export interface AssignOptions {
   readonly plugGap?: number;
   /** The distance from a plug to a corner of its box, or a quarter of the wall when the wall is short. The default is 6. */
   readonly inset?: number;
+  /**
+   * The least share of `plugGap` that a wall can use to put more ends in their ranges (ASSIGN-BOUND). The whole wall takes the largest gap that keeps those ends.
+   * The default 1 keeps `plugGap`. The value 0 lets the gap go to 0.
+   */
+  readonly rangeShrink?: number;
 }
 
 /** The defaults of the plug strategy `assign`. */
-export const ASSIGN_DEFAULTS: Required<AssignOptions> = Object.freeze({ plugGap: 8, inset: 6 });
+export const ASSIGN_DEFAULTS: Required<AssignOptions> = Object.freeze({ plugGap: 8, inset: 6, rangeShrink: 1 });
 
 /** One end of a wall for `assignWall`. The places are on the axis along the wall. */
 export interface WallEnd {
@@ -39,7 +44,7 @@ export interface WallPlan {
   readonly at: number[];
   /** For each end, `true` when its plug is in its interval. */
   readonly anchored: boolean[];
-  /** The gap of the wall: the option `gap`, or less when the room of the wall is too short for all its plugs. */
+  /** The gap of the wall: the option `gap`, or less on a short room. With `leastGap`, the gap can also shrink for more ends in a short range. */
   readonly gap: number;
 }
 
@@ -57,6 +62,9 @@ const SWEEP_PLACES = 8;
 
 /** The most ends of a wall for the exact plan. A wall with more ends does not count its places, because that count alone has a high cost. */
 const PLAN_ENDS_LIMIT = 64;
+
+/** The steps of the bisection of a gap in a short range. The result is within 1/4096 of the span of the search. */
+const SHRINK_STEPS = 12;
 
 /** This function gives the index of the first value of the sorted list `list` that is `v` or more. */
 function lowerBound(list: readonly number[], v: number): number {
@@ -436,8 +444,11 @@ function packedPlan(order: readonly number[], first: readonly number[], win: rea
  *
  * An end that cannot get a plug in its interval still gets a plug in the room. When the order of the keys loses ends, the plugs swap their places
  * to come nearer to that order, while each end keeps its interval.
+ *
+ * With `leastGap` under `gap`, the gap of the wall can shrink as far as `leastGap`, for more ends in their intervals (ASSIGN-BOUND).
+ * The wall takes the largest gap with the count of `leastGap`. A wall over the exact limit searches the gap with the sweep.
  */
-export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = [], plan: WallPlanner = "auto"): WallPlan {
+export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = [], plan: WallPlanner = "auto", leastGap: number = gap): WallPlan {
   const n = ends.length;
   if (n === 0) return { at: [], anchored: [], gap };
   const [lo, hi] = room;
@@ -449,26 +460,32 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
     return a <= b + EPS ? [a, Math.max(a, b)] : undefined;
   });
   const order = ends.map((_, i) => i).sort((a, b) => ends[a]!.key - ends[b]!.key || a - b);
-  let items = keyOrderPlan(order, win, pins, lo, hi, s);
-  if (!items) {
-    // The bisection of the gap can miss by a rounding error. A gap of 0 always fits.
-    s = 0;
-    items = keyOrderPlan(order, win, pins, lo, hi, s)!;
-  }
-  const inKey = items.filter((x) => x.end >= 0 && x.anchored).length;
   const can = win.filter((w) => w !== undefined).length;
-  if (inKey < can && inKey < unionCap(win, pins, lo, hi, s, n)) {
-    const planner = plan === "exact" || (plan === "auto" && exactFits(order, win, pins, lo, hi, s)) ? bestPlan : sweepPlan;
-    const best = planner(
-      order,
-      win,
-      ends.map((e) => e.ideal),
-      pins,
-      lo,
-      hi,
-      s,
-    );
-    if (best.filter((x) => x.end >= 0 && x.anchored).length > inKey) items = untangle(best, ends, win);
+  const ideals = ends.map((e) => e.ideal);
+  const itemsAt = (g: number, mode: WallPlanner): { items: Item[]; g: number } => {
+    let items = keyOrderPlan(order, win, pins, lo, hi, g);
+    if (!items) {
+      // The bisection of the gap can miss by a rounding error. A gap of 0 always fits.
+      g = 0;
+      items = keyOrderPlan(order, win, pins, lo, hi, g)!;
+    }
+    const inKey = countAnchored(items);
+    if (inKey < can && inKey < unionCap(win, pins, lo, hi, g, n)) {
+      const planner = mode === "exact" || (mode === "auto" && exactFits(order, win, pins, lo, hi, g)) ? bestPlan : sweepPlan;
+      const best = planner(order, win, ideals, pins, lo, hi, g);
+      if (countAnchored(best) > inKey) items = untangle(best, ends, win);
+    }
+    return { items, g };
+  };
+  const first = itemsAt(s, plan);
+  let items = first.items;
+  s = first.g;
+  const floor = Math.max(0, Math.min(leastGap, s));
+  if (floor < s && countAnchored(items) < can) {
+    const search: WallPlanner = plan === "auto" && n > PLAN_EXACT_ENDS ? "sweep" : plan;
+    const count = (g: number): number => countAnchored(itemsAt(g, search).items);
+    const shrunk = shrinkGap(s, floor, countAnchored(items), count);
+    if (shrunk < s) ({ items, g: s } = itemsAt(shrunk, plan));
   }
   // The places of the order: each end in its interval, or in the room. A fixed plug stays at its place.
   const span = items.map((x): [number, number] => (x.end < 0 ? [x.at, x.at] : x.anchored ? win[x.end]! : [lo, hi]));
@@ -484,6 +501,29 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
   });
   const anchored = ends.map((e, i) => at[i]! >= e.lo - 1e-7 && at[i]! <= e.hi + 1e-7 && win[i] !== undefined);
   return { at, anchored, gap: s };
+}
+
+/** This function gives the count of the ends in their intervals of a plan. */
+function countAnchored(items: readonly Item[]): number {
+  return items.filter((x) => x.end >= 0 && x.anchored).length;
+}
+
+/**
+ * This function gives the largest gap from `floor` up to `s` with the count of `floor`.
+ * The result is `s` when `floor` gains nothing over the count `atTop` of `s`.
+ * A smaller gap keeps each plan valid, so the count only goes up when the gap goes down. The sweep can break this rule. The bisection still ends at a gap with that count.
+ */
+function shrinkGap(s: number, floor: number, atTop: number, count: (g: number) => number): number {
+  const most = count(floor);
+  if (most <= atTop) return s;
+  let good = floor;
+  let bad = s;
+  for (let i = 0; i < SHRINK_STEPS; i++) {
+    const mid = (good + bad) / 2;
+    if (count(mid) >= most) good = mid;
+    else bad = mid;
+  }
+  return good;
 }
 
 /** This function gives a bound of goal 1 for a wall with the gap `s`: no plan puts more ends in their intervals. The measure of the sweep reads it on walls that the exact plan cannot reach. */
@@ -562,6 +602,7 @@ export function assignEnds(input: PlugInput, options: AssignOptions = {}): PlugP
   const { graph } = input;
   const gap = options.plugGap ?? ASSIGN_DEFAULTS.plugGap;
   const inset = options.inset ?? ASSIGN_DEFAULTS.inset;
+  const leastGap = gap * (options.rangeShrink ?? ASSIGN_DEFAULTS.rangeShrink);
   const byId = nodeIndex(graph);
   const slots = new Map<string, Slot>();
   const walls = new Map<string, { node: Node; side: Side; slots: Slot[]; fixed: number[] }>();
@@ -620,7 +661,7 @@ export function assignEnds(input: PlugInput, options: AssignOptions = {}): PlugP
   for (const wall of walls.values()) {
     const room = roomOf(wall.node.box, wall.side, inset);
     const list = wall.slots.map((s) => ({ lo: s.range?.[0] ?? room[0], hi: s.range?.[1] ?? room[1], ideal: s.ideal, key: keyOf(wall.node.box, wall.side, farPoint(s)) }));
-    const plan = assignWall(list, room, gap, wall.fixed);
+    const plan = assignWall(list, room, gap, wall.fixed, "auto", leastGap);
     wall.slots.forEach((s, i) => {
       s.at = plan.at[i]!;
     });
