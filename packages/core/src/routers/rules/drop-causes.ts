@@ -23,7 +23,9 @@ export interface DropCauses {
   readonly counts: boolean;
   /** Two moved routes fall with each other, and each route counts that fall against its own rises. So no route is worse, and the board rises. */
   readonly shared: boolean;
-  /** None of the five causes applied. */
+  /** A moved route rises with a second route, and its way back crosses a third route that moved or stayed. So the route is not worse, and it does not go back. */
+  readonly chain: boolean;
+  /** None of the six causes applied. */
   readonly outside: boolean;
   /** The rise of the count of the board. */
   readonly boardRise: number;
@@ -43,6 +45,8 @@ export function dropCauses(first: readonly (readonly Point[])[], final: readonly
   let pair = false;
   let fall = false;
   let worse = false;
+  // A moved route and the route that it rises with, when the way back of the moved route lowers that pair.
+  const held: (readonly [number, number])[] = [];
   for (let i = 0; i < first.length; i++) {
     if (moved[i]) {
       routeRise += crossingsOf(final[i]!, [], 0) - crossingsOf(first[i]!, [], 0);
@@ -55,10 +59,13 @@ export function dropCauses(first: readonly (readonly Point[])[], final: readonly
       routeRise += rise;
       if (moved[i] && moved[j] && rise < 0) fall = true;
       if (moved[i] && moved[j] && rise > 0 && now <= between(first[i]!, final[j]!) && now <= between(final[i]!, first[j]!)) pair = true;
+      if (rise > 0 && moved[i] && now > between(first[i]!, final[j]!)) held.push([i, j]);
+      if (rise > 0 && moved[j] && now > between(final[i]!, first[j]!)) held.push([j, i]);
     }
   }
   const fix = board.final > board.afterPass || worse;
   const counts = routeRise <= 0;
   const shared = fall && !worse && !counts;
-  return { pair, fix, cap: capped, counts, shared, outside: !pair && !fix && !capped && !counts && !shared, boardRise: board.final - board.first, routeRise };
+  const chain = !worse && !counts && held.some(([a, b]) => final.some((route, k) => k !== a && k !== b && between(first[a]!, route) > between(final[a]!, route)));
+  return { pair, fix, cap: capped, counts, shared, chain, outside: !pair && !fix && !capped && !counts && !shared && !chain, boardRise: board.final - board.first, routeRise };
 }

@@ -929,7 +929,7 @@ The fourth slice adds the field `guard` of a rule file. The value `board` stays 
 
 Each trial counts the whole board with `drawnCrossings`, which is the count of `measureQuality`. A board with `m` moved routes takes `m²/2` counts in the worst case. A hard break keeps the whole-board fallback.
 
-**A limit of a check of one route.** Route sums do not add up to the board count. A check of one route compares that route with the others, and a fall that two moved routes share enters the sum of each route. So a board can rise when no route is worse. The case is seed 5 of `hub-chain` on `points`. Routes 97 and 98 fall from 2 crossings with each other to 0. They rise by 1 and by 2 with fixed routes. Each route sets the fall against its own rise, so neither route is worse, and the board rises by 1. Each later rule that reads route sums has this limit. So a guard reads the board count.
+**A limit of a check of one route.** Route sums do not add up to the board count. A check of one route compares that route with the others, and a fall that two moved routes share enters the sum of each route. So a board can rise when no route is worse. The case is seed 5 of `hub-chain` on `points`. Routes 97 and 98 fall from 2 crossings with each other to 0. They rise by 1 and by 2 with fixed routes. Each route sets the fall against its own rise, so neither route is worse, and the board rises by 1. A second form is seed 2 of `hub-chain` on `points`. Route 95 rises by 1 with route 102, which stayed. Its way back crosses a third route, so the route is not worse and it stays. The record counts this form as the cause `chain`. Each later rule that reads route sums has this limit. So a guard reads the board count.
 
 ## Learned rules
 
