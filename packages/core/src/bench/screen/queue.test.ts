@@ -2,11 +2,30 @@ import { describe, expect, it } from "vitest";
 import { loadIdeas, type Idea } from "../../../scripts/ideas.ts";
 import { builders, strategyIdeas } from "../../../scripts/strategy-ideas.ts";
 import { STEPS, STRATEGIES, listStrategies } from "../../strategies/index.ts";
-import { bootstrap, buildQueue, committedQueue, ENABLERS, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openTargets, queueText, readQueue, spearman, unblocked, type QueueSnapshot } from "../../../scripts/queue.ts";
+import { type QueueRow, bootstrap, buildQueue, committedQueue, ENABLERS, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openIdeas, openTargets, queueText, readQueue, refillText, spearman, unblocked, type QueueSnapshot, WEEK_SLOTS } from "../../../scripts/queue.ts";
 
 const ideas = loadIdeas();
 const old = committedQueue();
 const queue = readQueue(old?.queue.date ?? "", old?.queue.commit ?? "");
+
+describe("the refill of the queue (QUEUE-REFILL)", () => {
+  const row = (id: string, status: QueueRow["status"] = "queued", canonical = id, blockedBy: readonly string[] = []) => ({ id, status, canonical, blockedBy });
+
+  it("counts only the ideas that a build can take now", () => {
+    expect(openIdeas([row("a"), row("b", "built"), row("c", "queued", "a"), row("d", "queued", "d", ["ENABLER"])])).toBe(1);
+  });
+
+  it("asks for a refill only under one week of build slots", () => {
+    const rows = Array.from({ length: 3 }, (_, i) => row(`i${String(i)}`));
+    expect(refillText(rows, 4)).toContain("Refill the queue");
+    expect(refillText(rows, 3)).not.toContain("Refill");
+  });
+
+  it("gives a count for the committed queue", () => {
+    expect(openIdeas(queue.rows)).toBeGreaterThan(0);
+    expect(refillText(queue.rows)).toContain(`${String(WEEK_SLOTS)} build slots`);
+  });
+});
 
 describe("the idea queue (IDEA-QUEUE)", () => {
   it("is current: the committed queue.json equals the output of the script", () => {

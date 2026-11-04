@@ -9,6 +9,7 @@ import type { PlugInput, PlugPair } from "../../strategies/model.ts";
 import { isotonic } from "../justify.ts";
 import { placeInIntervals, rangeInterval } from "../range.ts";
 import { alongOf, keyOf, pointAt, roomOf } from "../walls.ts";
+import { placeRows } from "./rows.ts";
 
 /** The options of the plug strategy `spread`. */
 export interface SpreadOptions {
@@ -33,6 +34,8 @@ interface Slot {
   readonly rank: readonly [number, number];
   /** The interval of the range of the port on the axis along the wall (PORT-RANGE), or `undefined` for a port without a range. */
   readonly range?: readonly [number, number];
+  /** The height of the row of the port (PLUG-ROW-GAP), or `undefined` for a port without a row. */
+  readonly row?: number;
   /** The far end of the first end of the slot: a fixed plug, or the key of its slot. */
   far?: Plug | string;
   /** The place of the plug on the axis along the wall. */
@@ -45,6 +48,8 @@ interface Wall {
   readonly side: Side;
   readonly slots: Slot[];
   readonly fixed: number[];
+  /** Each fixed plug of the wall, by its place on the axis along the wall, with the height of its row, or 0. */
+  readonly rows: Map<number, number>;
 }
 
 /**
@@ -172,13 +177,17 @@ export function spreadWith(input: PlugInput, options: SpreadOptions = {}, leader
     let wall = walls.get(key);
     if (!wall) {
       const fixed: number[] = [];
+      const rows = new Map<number, number>();
       for (const p of node.ports ?? []) {
         const at = portOffset(node.box, p);
         if (at === undefined) continue;
         const point = { x: node.box.x + at.x, y: node.box.y + at.y };
-        if ((p.side ?? nearestSide(node.box, point)) === side) fixed.push(point[alongOf(side)]);
+        if ((p.side ?? nearestSide(node.box, point)) !== side) continue;
+        const v = point[alongOf(side)];
+        fixed.push(v);
+        rows.set(v, Math.max(rows.get(v) ?? 0, p.rowHeight ?? 0));
       }
-      walls.set(key, (wall = { node, side, slots: [], fixed }));
+      walls.set(key, (wall = { node, side, slots: [], fixed, rows }));
     }
     return wall;
   };
@@ -191,7 +200,7 @@ export function spreadWith(input: PlugInput, options: SpreadOptions = {}, leader
     const side = port?.side ?? sideToward(node.box, toward);
     const ideal = placePlug(node, end, toward).point[alongOf(side)];
     const range = rangeInterval(node.box, side, port, inset);
-    const slot: Slot = { node, side, ideal, rank: [port ? node.ports!.indexOf(port) : -1, slots.size], at: ideal, ...(range ? { range } : {}) };
+    const slot: Slot = { node, side, ideal, rank: [port ? node.ports!.indexOf(port) : -1, slots.size], at: ideal, ...(range ? { range } : {}), ...(port?.rowHeight ? { row: port.rowHeight } : {}) };
     slots.set(key, slot);
     wallOf(node, side).slots.push(slot);
     return key;
@@ -226,11 +235,13 @@ export function spreadWith(input: PlugInput, options: SpreadOptions = {}, leader
       const tie = (a: Slot, b: Slot): number => (round === 0 ? a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] : order.get(a)! - order.get(b)!);
       const sorted = [...wall.slots].sort((a, b) => keys.get(a)! - keys.get(b)! || tie(a, b));
       sorted.forEach((s, i) => order.set(s, i));
-      if (leader === "opo") {
-        // The even places: the plugs split the room into equal parts, so the plug spacing of the wall is the largest that it can be.
-        const even = new Map<Slot, number>(sorted.map((s, i) => [s, lo + ((i + 0.5) * (hi - lo)) / sorted.length]));
-        placeWall(sorted, wall.fixed, lo, hi, gap, (s) => even.get(s)!);
-      } else placeWall(sorted, wall.fixed, lo, hi, gap);
+      // The even places: the plugs split the room into equal parts, so the plug spacing of the wall is the largest that it can be.
+      const even = leader === "opo" ? new Map<Slot, number>(sorted.map((s, i) => [s, lo + ((i + 0.5) * (hi - lo)) / sorted.length])) : undefined;
+      const idealOf = even ? (s: Slot): number => even.get(s)! : (s: Slot): number => s.ideal;
+      if (sorted.some((s) => s.row !== undefined) || [...wall.rows.values()].some((r) => r > 0)) {
+        const [start, end] = roomOf(wall.node.box, wall.side, 0);
+        placeRows(sorted, { start, end, lo, hi, gap, fixed: wall.rows }, idealOf);
+      } else placeWall(sorted, wall.fixed, lo, hi, gap, idealOf);
     }
   }
   return ends.map((x) => ({ edge: x.edge, source: resolve(x.source), target: resolve(x.target) }));
