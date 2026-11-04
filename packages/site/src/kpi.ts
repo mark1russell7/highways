@@ -6,7 +6,17 @@ import type { BenchMeta } from "./bench-label.ts";
 export const KPI_PROJECT = "highways";
 
 /** The page of each measure that tells if a page is live. A page gets its measure when its file exists. */
-export const KPI_PAGES = { "playground-live": "playground.html", "atlas-live": "atlas.html", "explorer-live": "explorer.html" } as const;
+export const KPI_PAGES = { "atlas-live": "atlas.html", "explorer-live": "explorer.html" } as const;
+
+/** The facts of the committed files that the measures read. */
+export interface KpiFacts {
+  /** The demo lists each strategy that no ruling keeps off the page. */
+  readonly demoComplete: boolean;
+  /** The number of cells of the coverage record. The page shows the coverage over them. */
+  readonly coverageCells: number;
+  /** The core of each verdict of the Results page. An entry is `undefined` when a verdict does not name its core. */
+  readonly verdictCores: readonly (string | undefined)[];
+}
 
 /** One measure of the file. */
 export interface SiteMeasure {
@@ -41,20 +51,32 @@ export function minorsBehind(measured: string, engine: string): number | undefin
 }
 
 /**
+ * This function gives the largest count of `minorsBehind` over the cores of the records of the Results page.
+ * So a current snapshot does not hide an old verdict. It gives `undefined` when the count of one record is not known.
+ */
+export function resultsLag(cores: readonly (string | undefined)[], engine: string): number | undefined {
+  const lags = cores.map((c) => (c === undefined ? undefined : minorsBehind(c, engine)));
+  return lags.some((lag) => lag === undefined) ? undefined : Math.max(...(lags as number[]));
+}
+
+/**
  * This function gives the input of the writer. It gives `undefined` when the snapshot has no date, because the time of the data is then not known.
  *
  * @param meta - The fields of `bench-meta.json`.
  * @param core - The version of the engine in the repository.
  * @param hasPage - This function tells if a file of a page exists.
+ * @param facts - The facts of the committed files.
  */
-export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: string) => boolean): SiteKpi | undefined {
+export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: string) => boolean, facts: KpiFacts): SiteKpi | undefined {
   if (meta.date === undefined) return undefined;
-  const lag = meta.core === undefined ? undefined : minorsBehind(meta.core, core);
+  const lag = resultsLag([meta.core, ...facts.verdictCores], core);
   return {
     project: KPI_PROJECT,
     at: `${meta.date}T00:00:00Z`,
     measures: [
       ...(lag === undefined ? [] : [{ id: "results-lag", value: lag, unit: "releases" }]),
+      { id: "playground-live", value: facts.demoComplete ? 1 : 0 },
+      { id: "coverage-shown", value: facts.coverageCells > 0 ? 1 : 0 },
       ...Object.entries(KPI_PAGES).map(([id, file]) => ({ id, value: hasPage(file) ? 1 : 0 })),
     ],
   };

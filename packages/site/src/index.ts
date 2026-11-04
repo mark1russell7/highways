@@ -1,4 +1,4 @@
-import { FIXTURES, getStrategy, makeFixture, STRATEGIES, strategyKey, type BenchRow, type Graph, type Step, type Strategy } from "@mark1russell7/highways";
+import { FIXTURES, getStrategy, makeFixture, strategyKey, type BenchRow, type Graph, type Step, type Strategy } from "@mark1russell7/highways";
 import benchText from "../content/bench.md?raw";
 import demoText from "../content/demo.md?raw";
 import levelsText from "../content/levels.md?raw";
@@ -6,6 +6,7 @@ import noBenchText from "../content/nobench.md?raw";
 import readme from "../../../README.md?raw";
 import { benchLabel } from "./bench-label.ts";
 import { html, inline, README, sectionOf } from "./content.ts";
+import { COMPARE_STRATEGIES, OPT_IN_NOTES, OPT_IN_TAG } from "./opt-in.ts";
 import { demoPickers, groupKey, PICK_LABELS, type DemoPick, type DemoPicker } from "./demo-data.ts";
 import { genPanel } from "./gen-controls.ts";
 import { cleanGen, genGraph, readGen, START_GEN, writeGen, type GenSpec } from "./generated.ts";
@@ -26,7 +27,7 @@ const DEMO_FIXTURES = FIXTURES.filter((f) => f.nodes <= 1000);
 // The registry of the core gives a picker for each step, so a new strategy or step shows up here with no edit.
 const PICKERS = demoPickers();
 const pickerOf = (step: Step): DemoPicker => PICKERS.find((p) => p.step === step)!;
-const ROUTERS = pickerOf("router").names.map((name) => getStrategy(STRATEGIES, "router", name));
+const ROUTERS = pickerOf("router").names.map((name) => getStrategy(COMPARE_STRATEGIES, "router", name));
 // The steps whose rule a router reads with an option, for example the grouping rule of `sections`. Only such a router uses the pick.
 const RULE_STEPS = PICKERS.map((p) => p.step).filter((step): step is Exclude<Step, "router"> => step !== "router" && ROUTERS.some((r) => strategyKey(r, step)));
 const START = { fixture: "small-clustered", router: "shared" };
@@ -167,10 +168,18 @@ $("routers-body").innerHTML = html(README.routers);
 
 const routerRow = $("routers");
 for (const r of ROUTERS) {
+  const optIn = OPT_IN_NOTES[r.name] !== undefined;
+  // The tag stands once, before the first opt-in router. Each opt-in router comes after each built-in router.
+  if (optIn && routerRow.querySelector(".router-tag") === null) {
+    const tag = document.createElement("span");
+    tag.className = "tag opt-in router-tag";
+    tag.textContent = OPT_IN_TAG;
+    routerRow.append(tag);
+  }
   const b = document.createElement("button");
   b.type = "button";
   b.role = "radio";
-  b.className = "exit";
+  b.className = optIn ? "exit opt-in" : "exit";
   b.dataset["router"] = r.name;
   b.textContent = r.name;
   b.title = r.describe;
@@ -275,7 +284,7 @@ for (const picker of PICKERS) {
   if (picker.none) select.append(new Option(picker.none, ""));
   for (const name of picker.names) {
     const o = new Option(name, name);
-    o.title = getStrategy(STRATEGIES, step, name).describe;
+    o.title = getStrategy(COMPARE_STRATEGIES, step, name).describe;
     select.append(o);
   }
   select.value = state.picks[step];
@@ -294,15 +303,15 @@ for (const picker of PICKERS) {
 function chosen(): { step: Step; strategy: Strategy<Step, object> }[] {
   const out: { step: Step; strategy: Strategy<Step, object> }[] = [];
   const router = ROUTERS.find((r) => r.name === state.router)!;
-  if (state.picks.highway) out.push({ step: "highway", strategy: getStrategy(STRATEGIES, "highway", state.picks.highway) });
+  if (state.picks.highway) out.push({ step: "highway", strategy: getStrategy(COMPARE_STRATEGIES, "highway", state.picks.highway) });
   else {
     out.push({ step: "router", strategy: router });
-    for (const step of RULE_STEPS) if (strategyKey(router, step) && state.picks[step]) out.push({ step, strategy: getStrategy(STRATEGIES, step, state.picks[step]) });
+    for (const step of RULE_STEPS) if (strategyKey(router, step) && state.picks[step]) out.push({ step, strategy: getStrategy(COMPARE_STRATEGIES, step, state.picks[step]) });
   }
-  if (state.picks.room) out.push({ step: "room", strategy: getStrategy(STRATEGIES, "room", state.picks.room) });
-  out.push({ step: "curve", strategy: getStrategy(STRATEGIES, "curve", state.picks.curve) });
+  if (state.picks.room) out.push({ step: "room", strategy: getStrategy(COMPARE_STRATEGIES, "room", state.picks.room) });
+  out.push({ step: "curve", strategy: getStrategy(COMPARE_STRATEGIES, "curve", state.picks.curve) });
   // The whole strategy shows only its controls. The options of `pipeline` are the picks of the other lists.
-  const whole = state.picks.whole ? getStrategy(STRATEGIES, "whole", state.picks.whole) : undefined;
+  const whole = state.picks.whole ? getStrategy(COMPARE_STRATEGIES, "whole", state.picks.whole) : undefined;
   if (whole && controlOptions(whole).length > 0) out.push({ step: "whole", strategy: whole });
   return out;
 }
@@ -407,6 +416,12 @@ function showChosenRouter(): void {
 // The web font changes the width of each router, so the row needs a second look when the font is ready.
 void document.fonts.ready.then(showChosenRouter);
 
+/** This function gives the text of an opt-in router, which has no section in the README. */
+function optInMethod(name: string): string {
+  const note = OPT_IN_NOTES[name];
+  return note === undefined ? "" : `${getStrategy(COMPARE_STRATEGIES, "router", name).describe} ${OPT_IN_TAG}. ${note.text}`;
+}
+
 /** This function routes the chosen fixture with the chosen router, then draws the result. */
 async function update(): Promise<void> {
   const mine = ++ticket;
@@ -422,8 +437,8 @@ async function update(): Promise<void> {
   const name = state.picks.highway || state.router;
   title.textContent = name;
   method.replaceChildren(title);
-  if (state.picks.highway) method.insertAdjacentHTML("beforeend", ` ${esc(getStrategy(STRATEGIES, "highway", name).describe)} The function <code>follow</code> routes the plan.`);
-  else method.insertAdjacentHTML("beforeend", inline(README.methods.get(state.router) ?? ""));
+  if (state.picks.highway) method.insertAdjacentHTML("beforeend", ` ${esc(getStrategy(COMPARE_STRATEGIES, "highway", name).describe)} The function <code>follow</code> routes the plan.`);
+  else method.insertAdjacentHTML("beforeend", inline(README.methods.get(state.router) ?? optInMethod(state.router)));
   options();
   const status = $("status");
   status.textContent = `Routing ${fmt.format(graph.edges.length)} edges with ${name}…`;
@@ -448,10 +463,10 @@ async function update(): Promise<void> {
   prefetch(graph);
 }
 
-/** This function routes the other routers of a small fixture in the background, so that a change of router is fast. */
+/** This function routes the built-in routers of a small fixture in the background, so that a change of router is fast. An opt-in router routes only when the visitor picks it. */
 function prefetch(graph: Graph): void {
   if (graph.nodes.length > 400) return;
-  for (const r of ROUTERS) void route(state.fixture, pickOf(r.name, ""), false);
+  for (const r of ROUTERS) if (OPT_IN_NOTES[r.name] === undefined) void route(state.fixture, pickOf(r.name, ""), false);
 }
 
 function render(): void {
