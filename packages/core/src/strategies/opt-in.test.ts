@@ -1,7 +1,10 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { STRATEGIES } from "./builtins.ts";
 import { listStrategies, STEPS, type AnyStrategy, type Step } from "./model.ts";
-import { ALL_STRATEGIES, KEYED_STRATEGIES, OPT_IN_STRATEGIES, STEP_DEFAULTS, keyOfStrategy, strategyOfKey } from "./opt-in.ts";
+import { ALL_STRATEGIES, BASELINE_STRATEGIES, KEYED_STRATEGIES, keyOfStrategy, OPT_IN_STRATEGIES, STEP_DEFAULTS, strategyOfKey, UNSCREENED_STRATEGIES } from "./opt-in.ts";
 
 const DEFAULT_ROUTERS = ["straight", "plugs", "corners", "corners-smooth", "trunks", "shared", "shared-all", "sections", "sections-tree"];
 
@@ -38,12 +41,28 @@ describe("the keys of the strategies (CATALOG-LOOKUP)", () => {
     expect(new Set(every.map(keyOfStrategy)).size).toBe(every.length);
   });
 
-  it("holds the built-in strategies and the 13 opt-in strategies", () => {
+  it("holds the built-in strategies and the 13 opt-in strategies, with no remainder", () => {
     const builtIn = STEPS.flatMap((step) => listStrategies(STRATEGIES, step) as readonly AnyStrategy[]);
     expect(builtIn).toHaveLength(107);
-    expect(every).toHaveLength(120);
-    const optIn = every.filter((s) => !builtIn.includes(s)).map(keyOfStrategy).sort();
-    expect(optIn).toEqual([...OPT_IN_STRATEGIES.map(keyOfStrategy), "router/seams", "highway/shared-ways-all"].sort());
+    const listed = [...builtIn, ...OPT_IN_STRATEGIES, ...BASELINE_STRATEGIES, ...UNSCREENED_STRATEGIES];
+    expect(listed).toHaveLength(120);
+    expect(new Set(every)).toEqual(new Set(listed));
+    expect(BASELINE_STRATEGIES.map(keyOfStrategy)).toEqual(["highway/shared-ways-all"]);
+    expect(UNSCREENED_STRATEGIES.map(keyOfStrategy)).toEqual(["router/seams"]);
+  });
+
+  it("has each strategy of the source, so a strategy on no list fails", () => {
+    const filesOf = (dir: string): string[] =>
+      readdirSync(dir).flatMap((f) => {
+        const path = join(dir, f);
+        return statSync(path).isDirectory() ? filesOf(path) : path.endsWith(".ts") && !path.includes(".test.") ? [path] : [];
+      });
+    const keys = filesOf(fileURLToPath(new URL("..", import.meta.url))).flatMap((file) =>
+      [...readFileSync(file, "utf8").matchAll(/defineStrategy(?:<[^>]*>)?\(\{\s*step:\s*"(\w+)",\s*name:\s*"([^"]+)"/g)].map((m) => `${m[1]}/${m[2]}`),
+    );
+    // The form of the source can change, and a search that finds little proves nothing.
+    expect(keys.length).toBeGreaterThan(60);
+    expect(keys.filter((key) => !strategyOfKey(key).ok)).toEqual([]);
   });
 
   it("keeps the same name in two steps apart", () => {

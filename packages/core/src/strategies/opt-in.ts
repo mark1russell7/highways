@@ -27,11 +27,14 @@ export const OPT_IN_STRATEGIES: readonly AnyStrategy[] = [
 /** The registry of each built-in strategy and each opt-in strategy. A page that shows every strategy reads this registry. A benchmark and a screen read `STRATEGIES`. */
 export const ALL_STRATEGIES: Registry = register(STRATEGIES, ...OPT_IN_STRATEGIES);
 
-/**
- * The registry of each strategy that has a key. It adds the router `seams` and the highway `shared-ways-all` to `ALL_STRATEGIES`.
- * These two strategies are opt-in too. They stay out of `OPT_IN_STRATEGIES`, because each strategy of that list has a recorded note on the compare page.
- */
-export const KEYED_STRATEGIES: Registry = register(ALL_STRATEGIES, seamsStrategy, sharedWaysAll);
+/** The baselines: a screen compares a strategy with them, and no chooser offers them. */
+export const BASELINE_STRATEGIES: readonly AnyStrategy[] = [sharedWaysAll];
+
+/** The opt-in strategies with no recorded numbers. Each one moves to `OPT_IN_STRATEGIES`, with its note on the compare page, after its screen. */
+export const UNSCREENED_STRATEGIES: readonly AnyStrategy[] = [seamsStrategy];
+
+/** The registry of each strategy that has a key: `ALL_STRATEGIES`, `BASELINE_STRATEGIES` and `UNSCREENED_STRATEGIES`. A test holds that no strategy of the source is outside it. */
+export const KEYED_STRATEGIES: Registry = register(ALL_STRATEGIES, ...BASELINE_STRATEGIES, ...UNSCREENED_STRATEGIES);
 
 /** The result of a lookup by key: the strategy, or the reason that the key has no strategy. */
 export type StrategyLookup = { readonly ok: true; readonly strategy: AnyStrategy } | { readonly ok: false; readonly reason: string };

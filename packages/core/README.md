@@ -531,7 +531,7 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `createRegistry(strategies)` makes a registry. Two strategies with one step and one name are an error.
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
-- `keyOfStrategy(strategy)` gives the key of a strategy: its step, a slash and its name, for example `router/adam`. `strategyOfKey(key)` gives the strategy of a key, or a reason. It reads `KEYED_STRATEGIES`, which holds each built-in and each opt-in strategy.
+- `keyOfStrategy(strategy)` gives the key of a strategy: its step, a slash and its name, for example `router/adam`. `strategyOfKey(key)` gives the strategy of a key, or a reason. It reads `KEYED_STRATEGIES`, which holds each built-in and each opt-in strategy. `BASELINE_STRATEGIES` gives the strategies of that registry that no chooser offers. `UNSCREENED_STRATEGIES` gives the opt-in strategies that wait for their screen.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
 - `OPT_IN_STRATEGIES` lists the 11 opt-in routers. `STRATEGIES` does not hold them, so the default race and the screens do not change.
 - `ALL_STRATEGIES` is the registry of `STRATEGIES` and `OPT_IN_STRATEGIES`. A page that shows each strategy reads it.
