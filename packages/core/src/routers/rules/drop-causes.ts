@@ -15,13 +15,15 @@ export interface BoardCounts {
 export interface DropCauses {
   /** Two moved routes cross more than their first shapes do, and neither route alone removes that rise. */
   readonly pair: boolean;
-  /** The fix of hard rules raised the count of the board, and no check of crossings ran after it. */
+  /** The fix of hard rules raised the count of the board, or it left a moved route worse than its first shape. No check of crossings ran after it. */
   readonly fix: boolean;
   /** The pass of crossings stopped at its cap of rounds, with routes still going back. */
   readonly cap: boolean;
   /** The count of the board rose, and the count of the pass, which adds the routes, did not rise. */
   readonly counts: boolean;
-  /** None of the four causes applied. */
+  /** Two moved routes fall with each other, and each route counts that fall against its own rises. So no route is worse, and the board rises. */
+  readonly shared: boolean;
+  /** None of the five causes applied. */
   readonly outside: boolean;
   /** The rise of the count of the board. */
   readonly boardRise: number;
@@ -39,17 +41,24 @@ export function dropCauses(first: readonly (readonly Point[])[], final: readonly
   const moved = first.map((pts, i) => pts !== final[i]);
   let routeRise = 0;
   let pair = false;
+  let fall = false;
+  let worse = false;
   for (let i = 0; i < first.length; i++) {
-    if (moved[i]) routeRise += crossingsOf(final[i]!, [], 0) - crossingsOf(first[i]!, [], 0);
+    if (moved[i]) {
+      routeRise += crossingsOf(final[i]!, [], 0) - crossingsOf(first[i]!, [], 0);
+      if (crossingsOf(final[i]!, final, i) > crossingsOf(first[i]!, final, i)) worse = true;
+    }
     for (let j = i + 1; j < first.length; j++) {
       if (!moved[i] && !moved[j]) continue;
       const now = between(final[i]!, final[j]!);
       const rise = now - between(first[i]!, first[j]!);
       routeRise += rise;
+      if (moved[i] && moved[j] && rise < 0) fall = true;
       if (moved[i] && moved[j] && rise > 0 && now <= between(first[i]!, final[j]!) && now <= between(final[i]!, first[j]!)) pair = true;
     }
   }
-  const fix = board.final > board.afterPass;
+  const fix = board.final > board.afterPass || worse;
   const counts = routeRise <= 0;
-  return { pair, fix, cap: capped, counts, outside: !pair && !fix && !capped && !counts, boardRise: board.final - board.first, routeRise };
+  const shared = fall && !worse && !counts;
+  return { pair, fix, cap: capped, counts, shared, outside: !pair && !fix && !capped && !counts && !shared, boardRise: board.final - board.first, routeRise };
 }
