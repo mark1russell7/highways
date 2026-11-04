@@ -8,7 +8,8 @@
 // - That item opens when the median ratio of a large group passes 2.00 and the p90 of the A/A arm.
 // - Under both lines, that item stays a note on the roadmap.
 //
-// The goal of JOIN-COST reads the same lines, on `default` and `largest` only. The group `tiled` stays a report row (fixed before the build).
+// The goal of JOIN-COST reads the same lines, on `default` and `largest` only.
+// The group `tiled` is outside the family of the corner graph. It is a report row, and neither the trigger nor the goal reads it.
 // The arm `whole` is the join without the labels of free regions. The groups `unpicked` and `sample` are report rows: their boards are not worst cases.
 // Each board also compares the bytes of the routes of `on` and `whole`, because the labels must change no route.
 //
@@ -38,7 +39,7 @@ const SEEDS: readonly number[] = [59, 1068, 2077, 3086, 7122, 9140];
 
 /** The groups of the default size, and the groups of the large boards. The trigger reads these groups. */
 const DEFAULT_GROUPS: readonly string[] = ["default", "screen"];
-const LARGE_GROUPS: readonly string[] = ["largest", "tiled"];
+const LARGE_GROUPS: readonly string[] = ["largest"];
 
 /** The seeds of the group `unpicked`, and the step through `screen-v3` of the group `sample`. No result chose these boards. */
 const UNPICKED_SEEDS: readonly number[] = [1, 2, 3, 4, 5, 6];
