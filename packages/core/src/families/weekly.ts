@@ -1,7 +1,7 @@
 // The families of FAMILIES-WEEKLY. Each batch adds worst cases that the families of the screen sets do not cover.
 // These families are in no screen set. Each family uses only the stream of the registry, whole numbers, `Math.floor` and `Math.min`. Thus each family is `exact`.
 import type { CorpusDimension } from "@mark1russell7/layout-contract";
-import type { Graph, Port } from "../model.ts";
+import type { Graph, Port, Side } from "../model.ts";
 import { caseFamily, count } from "./cases.ts";
 import { Builder, ceilSqrt, choose, int, SEEDING, shuffle } from "./coverage.ts";
 import { numberDimension, type HighwaysFamily } from "./model.ts";
@@ -383,5 +383,178 @@ export const SPIRAL: HighwaysFamily = caseFamily({
   },
 });
 
+/** The dimensions of `switchbox`. */
+const SWITCHBOX_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("pins", 2, 40, 10, "The number of pin nodes on each of the four sides of the box."),
+  count("pitch", 24, 120, 40, "The distance between two pins of a side, in units."),
+  count("nets", 0, 80, 16, "The number of edges. Each pin takes one edge at most."),
+  count("blocks", 0, 40, 4, "The number of boxes inside the switchbox. A board holds fewer when it has few cells."),
+]);
+
+/**
+ * The family `switchbox`: the switchbox routing problem of the chip literature. The pins have fixed plugs on the four sides of an empty box.
+ * Each edge joins two pins, and the plug of a pin faces into the box. Thus the routes share the tracks of the box in two directions.
+ */
+export const SWITCHBOX: HighwaysFamily = caseFamily({
+  name: "switchbox",
+  meaning: "Four rows of pins with fixed plugs around a box, as in switchbox routing of chips.",
+  dimensions: SWITCHBOX_DIMENSIONS,
+  generator: "family.switchbox",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const pins = v["pins"]!;
+    const pitch = v["pitch"]!;
+    const size = pins * pitch;
+    const pin = 16;
+    const off = 4;
+    const at = (i: number): number => i * pitch + Math.floor((pitch - pin) / 2);
+    const plug = (side: Side): Port[] => [{ id: "p", side, along: 0.5 }];
+    for (let i = 0; i < pins; i++) {
+      b.node(`n${i}`, at(i) + pin + off, 0, pin, pin, { ports: plug("south") });
+      b.node(`s${i}`, at(i) + pin + off, size + pin + 2 * off, pin, pin, { ports: plug("north") });
+      b.node(`w${i}`, 0, at(i) + pin + off, pin, pin, { ports: plug("east") });
+      b.node(`e${i}`, size + pin + 2 * off, at(i) + pin + off, pin, pin, { ports: plug("west") });
+    }
+    const cell = 2 * pitch;
+    const across = Math.floor(pins / 2);
+    const cells = across * across;
+    choose(random, cells, v["blocks"]!).forEach((c, i) => b.node(`b${i}`, (c % across) * cell + pitch + pin + off - Math.floor(pitch / 2), Math.floor(c / across) * cell + pitch + pin + off - Math.floor(pitch / 2), pitch, pitch));
+    const order = shuffle(random, 4 * pins);
+    const idOf = (k: number): string => `${"nswe"[k % 4]}${Math.floor(k / 4)}`;
+    for (let n = 0; n < Math.min(v["nets"]!, 2 * pins); n++) b.link({ node: idOf(order[2 * n]!), port: "p" }, { node: idOf(order[2 * n + 1]!), port: "p" });
+    return b.graph();
+  },
+});
+
+/** The dimensions of `escape`. */
+const ESCAPE_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("cols", 2, 40, 10, "The number of columns of pads."),
+  count("rows", 2, 40, 10, "The number of rows of pads."),
+  count("pad", 8, 60, 20, "The width and the height of a pad, in units."),
+  count("gap", 4, 80, 16, "The free space between two pads, in units. A small gap holds few routes."),
+  count("nets", 0, 400, 30, "The number of edges. Each edge joins one pad to its own terminal. A board holds no more edges than pads."),
+  count("margin", 20, 400, 120, "The free space between the pads and the ring of terminals, in units."),
+]);
+
+/**
+ * The family `escape`: the escape routing problem of chip packages. A dense grid of pads stands in a ring of terminals.
+ * Each edge goes from a pad to a terminal, so a route from an inner pad goes out along the gaps between the other pads.
+ */
+export const ESCAPE: HighwaysFamily = caseFamily({
+  name: "escape",
+  meaning: "A dense grid of pads in a ring of terminals: each route leaves along the gaps between the pads.",
+  dimensions: ESCAPE_DIMENSIONS,
+  generator: "family.escape",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const cols = v["cols"]!;
+    const rows = v["rows"]!;
+    const pad = v["pad"]!;
+    const pitch = pad + v["gap"]!;
+    const margin = v["margin"]!;
+    const term = 24;
+    const from = term + margin;
+    const pads = choose(random, rows * cols, v["nets"]!);
+    const onSide = Math.ceil(pads.length / 4);
+    // A side of the ring holds `onSide` terminals, so a small grid has a ring that is wider than the grid.
+    const wide = Math.max(cols * pitch - v["gap"]!, onSide * (term + 4));
+    const tall = Math.max(rows * pitch - v["gap"]!, onSide * (term + 4));
+    const left = from + Math.floor((wide - (cols * pitch - v["gap"]!)) / 2);
+    const top = from + Math.floor((tall - (rows * pitch - v["gap"]!)) / 2);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) b.node(`p${r * cols + c}`, left + c * pitch, top + r * pitch, pad, pad);
+    const along = (length: number, t: number): number => Math.floor((length * (2 * t + 1)) / (2 * onSide)) - Math.floor(term / 2);
+    const place = (i: number): readonly [number, number] => {
+      const t = Math.floor(i / 4);
+      const side = i % 4;
+      if (side === 0) return [from + along(wide, t), 0];
+      if (side === 1) return [from + wide + margin, from + along(tall, t)];
+      if (side === 2) return [from + along(wide, t), from + tall + margin];
+      return [0, from + along(tall, t)];
+    };
+    const order = shuffle(random, pads.length);
+    pads.forEach((p, i) => {
+      const [x, y] = place(order[i]!);
+      b.node(`t${i}`, x, y, term, term);
+      b.link({ node: `p${p}` }, { node: `t${i}` });
+    });
+    return b.graph();
+  },
+});
+
+/** The dimensions of `rings`. */
+const RINGS_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("rings", 1, 12, 4, "The number of closed walls, each one inside the next."),
+  count("corridor", 40, 200, 90, "The width of the corridor between two walls, in units."),
+  count("wall", 4, 60, 12, "The thickness of a wall, in units."),
+  count("door", 8, 200, 48, "The width of the one door of each wall, in units. A door is no wider than its side."),
+  count("nodes", 2, 120, 16, "The number of nodes. The corridors hold fewer nodes when there are few rings."),
+  count("edges", 0, 240, 16, "The number of tries for an edge between two nodes."),
+]);
+
+/**
+ * The family `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
+ * A way from one corridor to the next goes around to the door, so the side of the door decides the length of the way.
+ */
+export const RINGS: HighwaysFamily = caseFamily({
+  name: "rings",
+  meaning: "Closed walls, each one inside the next, with one door on a random side of each wall.",
+  dimensions: RINGS_DIMENSIONS,
+  generator: "family.rings",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const rings = v["rings"]!;
+    const corridor = v["corridor"]!;
+    const wall = v["wall"]!;
+    const pitch = corridor + wall;
+    const mid = rings * pitch;
+    let piece = 0;
+    const bar = (x: number, y: number, w: number, h: number): void => {
+      if (w > 0 && h > 0) b.node(`wall${piece++}`, x, y, w, h);
+    };
+    for (let k = 0; k < rings; k++) {
+      const outer = (k + 1) * pitch;
+      const inner = outer - wall;
+      const lo = mid - outer;
+      const hi = mid + inner;
+      const open = int(random, 0, 3);
+      const door = Math.min(v["door"]!, 2 * inner - 1);
+      const start = int(random, 0, 2 * inner - door);
+      // Each piece has this form: `from` and `length` run along a side of the wall, and `across` is the place of the side.
+      const side = (index: number, across: number, from: number, length: number, flat: boolean): void => {
+        const put = (at: number, run: number): void => (flat ? bar(at, across, run, wall) : bar(across, at, wall, run));
+        if (index !== open) {
+          put(from, length);
+          return;
+        }
+        const skip = flat ? wall : 0;
+        put(from, skip + start);
+        put(from + skip + start + door, length - skip - start - door);
+      };
+      side(0, lo, lo, 2 * outer, true);
+      side(1, hi, lo + wall, 2 * inner, false);
+      side(2, hi, lo, 2 * outer, true);
+      side(3, lo, lo + wall, 2 * inner, false);
+    }
+    const w = Math.floor(corridor / 2);
+    const h = Math.floor(corridor / 3);
+    const cells: (readonly [number, number])[] = [];
+    for (let band = 0; band < rings; band++) {
+      const reach = (band + 1) * pitch - wall - Math.floor(corridor / 2);
+      const onSide = band + 1;
+      for (let t = 0; t < onSide; t++) {
+        const along = Math.floor((reach * (2 * t + 1)) / onSide) - reach;
+        cells.push([mid + along, mid - reach], [mid + reach, mid + along], [mid - along, mid + reach], [mid - reach, mid - along]);
+      }
+    }
+    const places = choose(random, cells.length, v["nodes"]!);
+    places.forEach((c, i) => b.node(`n${i}`, cells[c]![0] - Math.floor(w / 2), cells[c]![1] - Math.floor(h / 2), w, h));
+    for (let n = 0; n < v["edges"]!; n++) b.link({ node: `n${int(random, 0, places.length - 1)}` }, { node: `n${int(random, 0, places.length - 1)}` });
+    return b.graph();
+  },
+});
+
 /** The families of FAMILIES-WEEKLY, in the order of their batches. */
-export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL]);
+export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS]);
