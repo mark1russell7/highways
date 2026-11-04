@@ -263,6 +263,8 @@ The router `sections-site` has the settings of the examples page, with `outSteps
 
 A row with the view `lanes` opens each shared segment. The compare page draws that form. The examples page starts with no segment open, so its first drawing has the view `routes`.
 
+An inner route marks `through` against the boxes of its room: the children of its frame, except the nodes that hold an end. The walls of the room are no boxes of the board, so `through` does not name them. The boards `frame-rows+inner` and `frame-rows+inner12` hold the inner routes, with 10 seeds each, because no family has an inner route at its defaults. The fields `innerMarked`, `innerFlagged`, `innerFalse` and `innerUnnamed` count them.
+
 The gate `packages/core/scripts/through-check.test.ts` makes the whole record again and compares it with the file. A stale file fails, and the message gives the command that writes it.
 The gate also holds each router of `scored`, on each family of the registry. Its list of contacts with no `through` is 53 routes of class `plug-seam` on `packed-grid`, and no other class or family. No route has a name in `through` that it does not meet.
 

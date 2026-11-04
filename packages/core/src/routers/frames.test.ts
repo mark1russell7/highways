@@ -459,3 +459,42 @@ describe("the edges at two depths of a frame (INTERIOR-ROUTE slice 2)", () => {
     expect(corners.route(g).routes.map((r) => [r.edge, r.frame])).toEqual([["plug", "P"]]);
   });
 });
+
+describe("the field through of an inner route (INNER-THROUGH)", () => {
+  // A made-up frame. The child `wall` goes from the top of the frame to its bottom, so no way joins the plug on the west wall to the child `far`.
+  const closed: Graph = {
+    nodes: [
+      { id: "P", box: { x: 0, y: 0, w: 300, h: 100 }, ports: [{ id: "w", side: "west", along: 0.5 }] },
+      { id: "wall", parent: "P", box: { x: 140, y: 0, w: 20, h: 100 } },
+      { id: "far", parent: "P", box: { x: 220, y: 30, w: 40, h: 40 } },
+    ],
+    edges: [{ id: "cut", source: { node: "far" }, target: { node: "P", port: "w" } }],
+  };
+
+  it("names the box of a room that the route goes through", () => {
+    const [route] = corners.route(closed).routes;
+    expect(route?.frame).toBe("P");
+    expect(route?.through).toEqual(["wall"]);
+  });
+
+  it("does not name an end of the route or a wall of the room", () => {
+    const sibling: Graph = {
+      nodes: [
+        { id: "P", box: { x: 0, y: 0, w: 300, h: 100 } },
+        { id: "a", parent: "P", box: { x: 20, y: 30, w: 40, h: 40 } },
+        { id: "wall", parent: "P", box: { x: 140, y: 0, w: 20, h: 100 } },
+        { id: "b", parent: "P", box: { x: 220, y: 30, w: 40, h: 40 } },
+      ],
+      edges: [{ id: "cut", source: { node: "a" }, target: { node: "b" } }],
+    };
+    expect(corners.route(sibling).routes.map((r) => [r.edge, r.through])).toEqual([["cut", ["wall"]]]);
+  });
+
+  it("leaves each route of the board with a way clean, in each mode", () => {
+    for (const mode of ["corners", "gutter"] as const) {
+      const { routes } = cornersRouter({ name: "c", inner: mode }).route(board());
+      expect(routes.filter((r) => r.frame !== undefined).length, mode).toBeGreaterThan(0);
+      expect(routes.filter((r) => r.through !== undefined), mode).toEqual([]);
+    }
+  });
+});

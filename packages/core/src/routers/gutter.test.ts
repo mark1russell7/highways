@@ -184,15 +184,17 @@ describe("the inner routes of the mode gutter (INTERIOR-GUTTER)", () => {
       expect(same).toEqual(base);
     }
     const digest = createHash("sha256")
-      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes)))
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes.map(({ through: _through, ...route }) => route))))
       .digest("hex");
-    // The digest of the routes of version 0.9.2, before the mode gutter. With `outSteps: false`, the routes stay.
+    // The digest of the routes of version 0.9.2, before the mode gutter. With `outSteps: false`, the routes stay. That version had no field `through`.
     expect(digest).toBe("bddc6d12c64fda12e9f0d3edb083f662c061675f7cfff3861140424828c23a83");
     const ladder = createHash("sha256")
-      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes)))
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.map(({ through: _through, ...route }) => route))))
       .digest("hex");
     // PLUG-OUT-BLOCKED: three inner routes that went straight through the rows take the gaps between the rows.
     expect(ladder).toBe("c370d476f448b879c643fef8a84533bd2aee81a0d58059cfb9fe16a93b4efa1c");
+    // INNER-THROUGH: no digest reads the field `through`, so this list counts the routes that say they go through a box.
+    expect(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.filter((r) => r.through !== undefined).length)).toEqual([0, 11, 0]);
   });
 
   it("gives fewer bends or the same with a larger bend cost", () => {

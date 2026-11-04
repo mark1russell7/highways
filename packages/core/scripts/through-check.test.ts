@@ -51,6 +51,15 @@ describe("the gate through-check/2", () => {
     expect(named.map(keyOf)).toEqual([]);
   });
 
+  it("names no box of an inner route that the route does not meet, and each box that it goes through", () => {
+    const inner = fresh.rows.filter((r) => r.inner > 0);
+    expect(inner.map((r) => [r.router, r.family])).toEqual([
+      ["corners", "frame-rows+inner"],
+      ["corners", "frame-rows+inner12"],
+    ]);
+    for (const r of inner) expect([r.family, r.innerFalse, r.innerUnnamed]).toEqual([r.family, 0, 0]);
+  });
+
   it("keeps the routers that do not mark through on their own rows", () => {
     expect(record.unmarked).toEqual(["straight", "plugs"]);
     expect(record.rows.filter((r) => record.unmarked.includes(r.router))).toEqual([]);
