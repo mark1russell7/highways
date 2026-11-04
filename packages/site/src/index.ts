@@ -395,6 +395,18 @@ function boardOf(done: RouteDone | undefined): Graph {
   return board;
 }
 
+/** This function scrolls the row on a phone, so that the chosen router is in view. */
+function showChosenRouter(): void {
+  const chosen = routerRow.querySelector<HTMLElement>('.exit[aria-checked="true"]');
+  if (chosen === null) return;
+  const row = routerRow.getBoundingClientRect();
+  const box = chosen.getBoundingClientRect();
+  if (box.left < row.left || box.right > row.right) routerRow.scrollLeft += box.left - row.left - (row.width - box.width) / 2;
+}
+
+// The web font changes the width of each router, so the row needs a second look when the font is ready.
+void document.fonts.ready.then(showChosenRouter);
+
 /** This function routes the chosen fixture with the chosen router, then draws the result. */
 async function update(): Promise<void> {
   const mine = ++ticket;
@@ -403,10 +415,8 @@ async function update(): Promise<void> {
     const on = b.dataset["router"] === state.router && state.picks.highway === "";
     b.setAttribute("aria-checked", String(on));
     b.tabIndex = on ? 0 : -1;
-    // On a phone, the row scrolls so that the chosen router is in view.
-    const x = b.offsetLeft - routerRow.offsetLeft;
-    if (on && (x < routerRow.scrollLeft || x + b.offsetWidth > routerRow.scrollLeft + routerRow.clientWidth)) routerRow.scrollLeft = x - 8;
   }
+  showChosenRouter();
   const method = $("method");
   const title = document.createElement("strong");
   const name = state.picks.highway || state.router;
