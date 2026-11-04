@@ -658,6 +658,7 @@ The runs are the screen of `screen-v1` of the pull request ([40738632085](https:
 - The step `highway` has no front on `screen-v2`. On `screen-v1`, `territories` is the only strategy without a break over the floor, so it is the front.
 - On `packed-grid/s6`, `territories` has 88 pass-throughs, and `ridges` has 85. Thus `territories` goes from keep to drop.
 - Each strategy of the step `highway` has a break over the floor on `screen-v2`. All of these breaks are pass-throughs on `packed-grid`, where the boxes touch.
+- [PASS-GRID](#the-pass-throughs-of-packed-grid-pass-grid) gives the cause.
 
 #### The mean B1 against `shared`
 
@@ -704,6 +705,64 @@ The mean B1 over the inputs gives each input the same weight. `screen-v1` has 1 
 | 6. In 3 or more families, the spread of the main measure of `shared` over 10 seeds is 2 or more times its spread over 3 seeds. | 0.35 | Partly met: 1 of the 4 families with 3 seeds (`dense-groups`, 6.43). `hub-chain` and `many-groups` had 1 seed and no spread. |
 
 This change sets no verdict and no portfolio set. SELECT can use the split `default`: it fits on the members 0 to 6 and gets its score on the members 7 to 9.
+
+## The pass-throughs of `packed-grid` (PASS-GRID)
+
+The step `highway` had no front on `screen-v2` and on `screen-v3`. This section gives the cause, on the records of run [41499056825](https://github.com/mark1russell7/highways/actions/runs/41499056825) (`screen-v2`, commit `557e3ac`). The test `pass-grid.test.ts` gives the same counts on the seeds 6 and 8.
+
+### The counts
+
+The table gives the rule `no-pass-through` of the 78 strategies. The base routers are `corners`, `shared` and `trunks`. They have one count on each seed.
+
+| Seed | Edges | Least count, and its strategy | Base routers | Strategies at the base count | Highest count, and its strategy |
+|---|---:|---|---:|---:|---|
+| `s0` | 132 | 93, `territories` | 94 | 75 | 103, `edge-paths` |
+| `s1` | 130 | 92, the base routers | 92 | 76 | 100, `edge-paths` |
+| `s2` | 132 | 94, the base routers | 94 | 75 | 101, `edge-paths` |
+| `s3` | 133 | 92, `territories` | 93 | 75 | 97, `edge-paths` |
+| `s4` | 132 | 89, `territories` | 92 | 73 | 101, `edge-paths` |
+| `s5` | 131 | 82, `manifolds` | 83 | 75 | 88, `edge-paths` |
+| `s6` | 128 | 85, `ridges` | 87 | 73 | 92, `edge-paths` |
+| `s7` | 137 | 97, the base routers | 97 | 77 | 105, `edge-paths` |
+| `s8` | 133 | 94, `territories` | 97 | 73 | 109, `edge-paths` |
+| `s9` | 135 | 95, the base routers | 95 | 75 | 106, `edge-paths` |
+
+The worst seeds are `s4` and `s8`, 3 over the least count, and `s6`, 2 over it.
+
+### The cause
+
+The cause has two parts. The high count comes from the way finder. The empty front comes from the floor. The plan and `follow` are not the cause. This item changes no code of the router or of the screen.
+
+- The way finder: the boxes touch, so each corner in the board is in a box. The corner graph of `s8` has 92 points, and none is in the board.
+- The first point of a way is 5 units from the plug along its normal. On this board, that point is in a neighbor box, so `CornerGraph.path` finds no way.
+- Then `WayFinder.between` gives the straight line from plug to plug. On `s4`, `s6` and `s8`, each edge of `corners` has no way in the graph. On `s8`, each of the 133 routes has 2 points.
+- For example, the edge `e1` of `s8` goes from `p0-2` to `p2-2`. Its route is (350, 90) to (350, 180), through `p1-2`.
+- `follow` has the same fallback for its ramps, because it uses the same corner graph. Thus each plan gets the base count, with a small change.
+- The floor: it is the least count of 78 strategies on each input. The least count moves between `territories`, `ridges` and `manifolds`. No strategy has it on each seed, so no strategy is at the floor.
+- This count is not a true floor. A route along the seams keeps the rule, because the rule shrinks each box by 0.5 units. The test routes each edge of `s8` so, with 0 breaks.
+- With the gaps of `makeRoom` open, `corners` also has 0 breaks on `s8`.
+
+### The flaw of the floor
+
+The floor of an input is the least count of the 78 strategies on that input. No strategy holds that least count on each seed, so no strategy is free of a break over the floor. A plan that saves one route on one seed also moves the floor of each other strategy.
+
+This flaw is an argument for a floor from the base routers. The choice of the floor waits for data from the new set of the boards after `makeRoom`. This item does not change the floor.
+
+### A replay of a floor from the base routers
+
+The table is a replay on the records of the last screens, with a script. It makes no claim. No code of the screen has this floor.
+
+| Run | Set | Commit | Front of the floor of today | Front of the replay | Strategies at the floor in the replay | Out of the front in the replay |
+|---|---|---|---:|---:|---:|---|
+| [41505308236](https://github.com/mark1russell7/highways/actions/runs/41505308236) | `screen-v1` | `1c6fa5a` | 1 | 34 | 75 | `level-links`, `edge-paths`, `steiner` |
+| [41499056825](https://github.com/mark1russell7/highways/actions/runs/41499056825) | `screen-v2` | `557e3ac` | 0 | 28 | 74 | `level-links`, `edge-paths`, `steiner`, `territories` |
+| [41508652642](https://github.com/mark1russell7/highways/actions/runs/41508652642) | `screen-v3` | `1c6fa5a` | 0 | 34 | 74 | `level-links`, `edge-paths`, `steiner`, `territories` |
+
+In the replay, `territories` is out of the front on `screen-v2` and `screen-v3`. It adds one pass-through, the edge `e34` of `s6`, although it has the lowest total.
+
+### What stays open
+
+On `packed-grid`, most routes of each strategy go through boxes. The next step is a screen set of the boards after `makeRoom`. Ways along the seams come later, as an opt-in strategy.
 
 ## The verdict over families of the screens (SCREEN-WEIGHT)
 

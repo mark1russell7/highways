@@ -851,6 +851,41 @@ A test examines each built-in strategy with `checkSchema`. Thus an option of `de
 
 The step `plugs` gives the plugs of the router `corners`. The step `group` gives the grouping rule of the zoom levels, and the step `levels` makes the levels.
 
+### The strategy space `routeSpace`
+
+`routeSpace` gives the stages of the routers and their options as data of the schema `strategy-space/1` of `@mark1russell7/layout-contract`. Its engine is `highways`.
+
+| Stage | Options | Routers that read it |
+|---|---|---|
+| `grouping` | `edge-key`, `quadtree`, `kd`, `cut`, `data-keys` | `edge-key`: `trunks`, `shared`, `keys`, `shared-ways`, `soft-keys`. The other options: `sections`. |
+| `plugs` | `facing`, `side`, and `rule-<name>` for each plug strategy | `corners` |
+| `routing` | 6 routers and 61 highway plans | Each config |
+| `gate` | `breakeven`, `stretch`, `ambiguity`, `hysteresis`, `ids` | Each highway plan without the keys of the gate |
+| `lane-order` | `bundle`, `run`, `stretch` | `trunks`, `shared`, `sections`, `keys`, `shared-ways`. Only `shared` and `shared-ways` take `stretch`. |
+| `smoothing` | `smooth` | Each router with the option `smooth` |
+| `levels` | `depths`, `venation`, `detail` | `sections` |
+
+- Each router of the router table is a point of `routeSpace.named`, with its name. `routeConfig` of the point gives the same routes as the router.
+- `routeConfig(graph, config)` checks the config with `checkConfig`. A config with a break causes a `RangeError`.
+- A param that a config leaves out takes its default. Two spellings of one config give one `configId`.
+- A router that does not read a stage has `null` there. The constraints of the space keep the other options out.
+- An infinite limit is a `bool` param `limit<Key>` and a conditional param. An option without a default is a `bool` param `set<Key>` and a conditional param.
+- A list of other plans, for example the `generators` of `select`, is one `bool` param `<key>:<source>` for each source.
+- `ROUTE_SPACE_LEFT_OUT` gives each option that the space does not hold, with its reason. The router gets the default of that option.
+- `ROUTE_SPACE_MISFITS` gives each router of the table that is not a named point. The list is empty.
+- The portfolio router is not in the space. It is a selector over the routers.
+
+```ts
+import { checkSpace, configId } from "@mark1russell7/layout-contract";
+import { CASES, routeConfig, routeSpace } from "@mark1russell7/highways";
+
+checkSpace(routeSpace); // []
+const graph = CASES[0]!.make();
+const result = routeConfig(graph, routeSpace.named!["shared-all"]!);
+// The config of `shared-all` is the router `shared` with the key rule `all`.
+configId(routeSpace, { space: "highways", stages: { routing: { option: "corridors" } } });
+```
+
 ## Measures and the report
 
 The [note on the measures](https://github.com/mark1russell7/highways/blob/main/docs/research/MEASURES.md) gives an id, a formula and a scale to each measure. Each measure is a pure function, and its TSDoc names its id.
