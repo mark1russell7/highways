@@ -1,6 +1,6 @@
 // The results page (SITE-LIVE). The build gives all its data from the committed files, so the page reads no network.
 import data from "virtual:results";
-import { LABELS, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
+import { ageText, LABELS, recordAge, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
 import { cardId } from "./strategies-data.ts";
 import "./style.css";
 
@@ -12,6 +12,17 @@ const $ = <T extends HTMLElement>(id: string): T => {
 
 const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const REPO = "https://github.com/mark1russell7/highways";
+/** The date of the viewer. A page built some time ago still shows the true age of its records. */
+const TODAY = new Date().toISOString().slice(0, 10);
+const count = (n: number): string => n.toLocaleString("en-US");
+const percent = (value: number): string => `${Number((value * 100).toFixed(2))} %`;
+
+/** This function gives the age and the core of a verdict snapshot as HTML. An older core has a mark, so the color is not the only sign. */
+function ageHtml(t: VerdictTable): string {
+  const age = recordAge(t.date, t.core, data.core, TODAY);
+  const core = age.sameCore ? `the core of this site, <code>${esc(t.core)}</code>` : `core <code>${esc(t.core)}</code>, and this site builds on <code>${esc(data.core)}</code>`;
+  return `${age.sameCore ? "" : '<b aria-hidden="true">⚠</b> '}From run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)}, ${ageText(age.days)}, on ${core}.`;
+}
 
 /** The mark of each label. The page does not show a label by its color only. */
 const GLYPH: Readonly<Record<VerdictLabel, string>> = { better: "▲", worse: "▼", "depends on the mix": "◆", "no verdict": "○" };
@@ -50,6 +61,7 @@ $("ideas-body").innerHTML = data.text["The ideas"] ?? "";
 $("new-body").innerHTML = data.text["What is new"] ?? "";
 $("queue-body").innerHTML = data.text["The build queue"] ?? "";
 $("measures-body").innerHTML = data.text["The measures"] ?? "";
+$("coverage-body").innerHTML = data.text["The coverage of the space"] ?? "";
 
 /** The definition of each measure by its name in a record, from `MEASURES` of the core. */
 const DEFINITION = new Map(data.measures.filter((m) => m.definition !== "").map((m) => [m.name, m.definition] as const));
@@ -62,6 +74,7 @@ function tiles(): void {
   const verdicts = last.reduce((n, t) => n + t.strategies.length * t.guards.length, 0);
   const kept = data.ideas.stages.find((s) => s.stage === "kept")?.count ?? 0;
   const items: [string, string, string][] = [
+    [percent(data.coverage?.value ?? 0), "of the space has a fitted model", "#coverage"],
     [String(verdicts), `verdicts on <code>${esc(data.splitSet)}</code>`, "#verdicts"],
     [`${data.split.length} of ${data.betterCount}`, "<code>better</code> verdicts with families against them", "#split"],
     [`${kept} of ${data.ideas.total}`, "ideas kept by the screen", "#ideas"],
@@ -112,8 +125,10 @@ function grid(): void {
   const t = table();
   if (t === undefined) {
     $("grid").innerHTML = "<p>No snapshot.</p>";
+    $("age").innerHTML = "";
     return;
   }
+  $("age").innerHTML = ageHtml(t);
   const rows = t.strategies.filter((s) => s.name.toLowerCase().includes(state.find) && s.cells.some((c) => state.labels.has(c.label)));
   const counts = LABELS.map((l) => [l, t.strategies.reduce((n, s) => n + s.cells.filter((c) => c.label === l).length, 0)] as const);
   $("summary").innerHTML = `${rows.length} of ${t.strategies.length} strategies of the step <code>${esc(t.step)}</code> on <code>${esc(t.set)}</code> against <code>${esc(t.base)}</code>. ${counts
@@ -228,11 +243,26 @@ function news(): void {
     .join("");
 }
 
-// The data line of this page: the run and the date of each snapshot.
+// The panel of the coverage of the space: the value, its denominator and the weekly points.
+function coverage(): void {
+  const c = data.coverage;
+  if (c === undefined) return;
+  const last = c.trend.at(-1);
+  $("coverage-value").innerHTML = `<b>${percent(c.value)}</b>: ${count(c.fitted)} of ${count(c.cells)} cells. A cell is one of ${count(c.measures)} measures on one of ${count(c.strategies + c.options + c.inputs)} dimensions: ${count(c.strategies)} strategies, ${count(c.options)} options and ${count(c.inputs)} input dimensions.`;
+  $("coverage-trend").innerHTML = `<table><thead><tr><th scope="col">Date</th><th scope="col">Core</th><th scope="col">Cells with a fit</th><th scope="col">Cells</th><th scope="col">Value</th></tr></thead><tbody>${c.trend
+    .map((p) => `<tr><td>${esc(p.date)}</td><td><code>${esc(p.core)}</code></td><td>${count(p.fitted)}</td><td>${count(p.cells)}</td><td>${percent(p.value)}${p.reason ? ` <small>${esc(p.reason)}</small>` : ""}</td></tr>`)
+    .join("")}</tbody></table>`;
+  $("coverage-age").textContent = last === undefined ? "" : `The last point is ${ageText(recordAge(last.date, last.core, data.core, TODAY).days)}.`;
+}
+
+// The data line of this page: the run, the date, the age and the core of each snapshot.
 function snapshots(): void {
   $("snapshots").innerHTML = `Snapshots: ${data.tables
-    .map((t) => `<code>${esc(t.set)}</code> <code>${esc(t.step)}</code> from the run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)}`)
-    .join(", ")}.`;
+    .map((t) => {
+      const age = recordAge(t.date, t.core, data.core, TODAY);
+      return `<code>${esc(t.set)}</code> <code>${esc(t.step)}</code> from the run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)} (${ageText(age.days)}, core <code>${esc(t.core)}</code>)`;
+    })
+    .join(", ")}. This site builds on core <code>${esc(data.core)}</code>.`;
 }
 
 function draw(): void {
@@ -243,6 +273,7 @@ function draw(): void {
 tiles();
 draw();
 split();
+coverage();
 ideas();
 queue();
 measures();

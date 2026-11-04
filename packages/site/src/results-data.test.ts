@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, keptRows, linkHtml, parseSnapshot, QUEUE_TOP, queueView, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, ageText, coverageView, keptRows, linkHtml, parseSnapshot, QUEUE_TOP, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -46,7 +46,48 @@ describe("results data", () => {
   });
 });
 
+describe("the age of a record", () => {
+  it("counts the days to today, and compares the core with the core of the site", () => {
+    expect(recordAge("2026-11-02", "0.10.0", "0.14.0", "2026-11-04")).toEqual({ days: 2, sameCore: false });
+    expect(recordAge("2026-11-04", "0.14.0", "0.14.0", "2026-11-04")).toEqual({ days: 0, sameCore: true });
+  });
+
+  it("does not give a negative age for a date after the date of the viewer", () => {
+    expect(recordAge("2026-11-05", "0.14.0", "0.14.0", "2026-11-04").days).toBe(0);
+  });
+
+  it("gives the age as text", () => {
+    expect([0, 1, 2].map(ageText)).toEqual(["from today", "1 day old", "2 days old"]);
+  });
+});
+
+describe("the view of the coverage", () => {
+  it("keeps the counts of the record and the points of the trend", () => {
+    const record = JSON.stringify({ schema: "x", measures: 2, strategies: 3, options: 4, inputs: 5, cells: 24, fitted: 6, value: 0.25, fits: [] });
+    const point = { date: "2026-11-04", core: "0.14.0", cells: 24, fitted: 6, value: 0.25 };
+    expect(coverageView(record, JSON.stringify([point]))).toEqual({ measures: 2, strategies: 3, options: 4, inputs: 5, cells: 24, fitted: 6, value: 0.25, trend: [point] });
+  });
+});
+
 describe("the committed files of the results page", () => {
+  it("has the run, the date and the core of each verdict snapshot", () => {
+    const { tables, core } = readResults(root);
+    expect(tables.length).toBeGreaterThanOrEqual(15);
+    expect(core).toMatch(/^\d+\.\d+\.\d+/);
+    for (const t of tables) {
+      expect(t.run, `${t.set} ${t.step}`).toBeGreaterThan(0);
+      expect(t.date, `${t.set} ${t.step}`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(t.core, `${t.set} ${t.step}`).toMatch(/^\d+\.\d+\.\d+/);
+    }
+  });
+
+  it("shows the value of the coverage with its denominator and its weekly points", () => {
+    const { coverage } = readResults(root);
+    expect(coverage!.cells).toBe(coverage!.measures * (coverage!.strategies + coverage!.options + coverage!.inputs));
+    expect(coverage!.value).toBe(coverage!.fitted / coverage!.cells);
+    expect(coverage!.trend.at(-1)!.cells).toBe(coverage!.cells);
+  });
+
   const files = snapshotFiles(root);
 
   it("has a snapshot with a full header for each set and step", () => {
