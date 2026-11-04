@@ -11,7 +11,6 @@ import {
   packedGridBoard,
   runKey,
   segmentsOf,
-  STRATEGIES,
   toSvgPath,
   type AnyCompareRow,
   type Box,
@@ -26,6 +25,7 @@ import {
 } from "@mark1russell7/highways";
 import { BOARDS } from "./boards.ts";
 import { cleanGen, genGraph, readGen, START_GEN, writeGen, type GenSpec } from "./generated.ts";
+import { COMPARE_STRATEGIES } from "./opt-in.ts";
 import { controlOptions, readValue } from "./options.ts";
 
 export { controlOptions, type ControlOption } from "./options.ts";
@@ -199,7 +199,7 @@ export interface HashPick {
  * The key holds one name or more, with a comma between two names. The function keeps each name of the step one time, in the order of the hash.
  * It reads the raw text, so a `+` of a name stays a `+`.
  */
-export function readPick(hash: string, step: Step, registry: Registry = STRATEGIES): HashPick {
+export function readPick(hash: string, step: Step, registry: Registry = COMPARE_STRATEGIES): HashPick {
   const raw = hash.replace(/^#/, "").split("&").find((part) => part.startsWith("pick="));
   const text = raw === undefined ? "" : raw.slice("pick=".length);
   const names = text.split(",").map((n) => {
@@ -238,7 +238,7 @@ export const START: CompareState = { step: "router", board: "delivery", options:
  * This function keeps the options that a strategy of the step declares, with the values that fit the declaration.
  * It moves a number into its range. It drops an unknown key, a value of the wrong type and a value that equals the default.
  */
-export function cleanOptions(step: Step, options: OptionValues, registry: Registry = STRATEGIES): OptionValues {
+export function cleanOptions(step: Step, options: OptionValues, registry: Registry = COMPARE_STRATEGIES): OptionValues {
   const out: Record<string, Record<string, number | boolean | string>> = {};
   for (const strategy of listStrategies(registry, step) as readonly Strategy<Step, object>[]) {
     const given = options[strategy.name];
@@ -254,7 +254,7 @@ export function cleanOptions(step: Step, options: OptionValues, registry: Regist
 }
 
 /** This function reads the state of the page from the URL hash, for example `#step=curve&board=delivery&arc.radius=20&pick=arc`. */
-export function parseHash(hash: string, registry: Registry = STRATEGIES): CompareState {
+export function parseHash(hash: string, registry: Registry = COMPARE_STRATEGIES): CompareState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const stepText = params.get("step");
   const step = PAGE_STEPS.find((s) => s === stepText) ?? START.step;
@@ -415,7 +415,7 @@ export interface PanelProgress {
 
 /** The options of `computePanels`. */
 export interface PanelOptions {
-  /** The strategies of each step. The default is the registry of the built-in strategies. */
+  /** The strategies of each step. The default is `COMPARE_STRATEGIES`, the built-in strategies and the opt-in routers. */
   readonly registry?: Registry;
   /** This function gets the progress after each strategy. The worker of the page sends it to the page. */
   readonly progress?: (p: PanelProgress) => void;
@@ -427,7 +427,7 @@ export interface PanelOptions {
  * The worker of the page calls it, so the page stays responsive.
  */
 export function computePanels(state: CompareState, options: PanelOptions = {}): ComparePanels {
-  const registry = options.registry ?? STRATEGIES;
+  const registry = options.registry ?? COMPARE_STRATEGIES;
   const board = compareBoardOf(state);
   const own = cleanOptions(state.step, state.options, registry);
   const t0 = performance.now();

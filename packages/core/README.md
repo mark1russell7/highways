@@ -532,6 +532,9 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
+- `OPT_IN_STRATEGIES` lists the 11 opt-in routers. `STRATEGIES` does not hold them, so the default race and the screens do not change.
+- `ALL_STRATEGIES` is the registry of `STRATEGIES` and `OPT_IN_STRATEGIES`. A page that shows each strategy reads it.
+- `STEP_DEFAULTS` gives the default strategy of each step. The steps `highway` and `curve` have no default.
 - `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `plugStrategies`, `routerStrategies`, `highwayStrategies`, `levelStrategies`, `curveStrategies`, `roomStrategies` and `wholeStrategies` give each built-in strategy with its typed options.
 
 ### The steps `plugs`, `levels` and `whole`

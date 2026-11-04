@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { listStrategies, STEPS, STRATEGIES } from "@mark1russell7/highways";
+import { ALL_STRATEGIES, listStrategies, STEPS } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
 import { EXTRA_LINKS, OPTION_LINKS, strategyIdeas } from "../../core/scripts/strategy-ideas.ts";
 import { ideaRecords } from "./results-files.ts";
@@ -8,7 +8,7 @@ import { builtMap, strategyInputs } from "./strategies-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const records = new Map(ideaRecords(root).map((r) => [r.id, r]));
-const registered = new Map<string, ReturnType<typeof listStrategies>[number]>(STEPS.flatMap((step) => listStrategies(STRATEGIES, step).map((s) => [`${step}:${s.name}`, s] as const)));
+const registered = new Map<string, ReturnType<typeof listStrategies>[number]>(STEPS.flatMap((step) => listStrategies(ALL_STRATEGIES, step).map((s) => [`${step}:${s.name}`, s] as const)));
 const map = strategyIdeas(strategyInputs());
 const cited = (text: string): string[] => text.match(IDEA_ID) ?? [];
 

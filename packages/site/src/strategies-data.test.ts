@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
-import { createRegistry, defineStrategy, listStrategies, STEPS, STRATEGIES, BUILT_IN_STRATEGIES, type Step } from "@mark1russell7/highways";
+import { ALL_STRATEGIES, createRegistry, defineStrategy, listStrategies, STEP_DEFAULTS, STEPS, STRATEGIES, BUILT_IN_STRATEGIES, type Step } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
-import { benchTimes, breadthText, cardId, guaranteeOf, rangeText, STEP_DEFAULTS, statusCounts, statusOf, valueText } from "./strategies-data.ts";
+import { benchTimes, breadthText, cardId, guaranteeOf, rangeText, statusCounts, statusOf, valueText } from "./strategies-data.ts";
 import { readStrategies } from "./strategies-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -11,7 +11,7 @@ describe("the strategy cards", () => {
 
   it("have one card for each registered strategy of each step", () => {
     for (const step of STEPS) {
-      expect(data.cards.filter((c) => c.step === step).map((c) => c.name), step).toEqual(listStrategies(STRATEGIES, step).map((s) => s.name));
+      expect(data.cards.filter((c) => c.step === step).map((c) => c.name), step).toEqual(listStrategies(ALL_STRATEGIES, step).map((s) => s.name));
     }
     expect(new Set(data.cards.map((c) => cardId(c.step, c.name))).size).toBe(data.cards.length);
     const linked = data.cards.filter((c) => c.ideas.length + c.optionIdeas.length > 0);
@@ -41,7 +41,8 @@ describe("the strategy cards", () => {
     const shared = data.cards.find((c) => c.step === "router" && c.name === "shared")!;
     expect(shared.status).toBe("default");
     expect(shared.bench?.ratio).toBe(1);
-    expect(data.cards.filter((c) => c.step === "router").every((c) => c.bench !== undefined)).toBe(true);
+    const defaults = listStrategies(STRATEGIES, "router").map((s) => s.name);
+    expect(data.cards.filter((c) => c.step === "router" && defaults.includes(c.name)).every((c) => c.bench !== undefined)).toBe(true);
     expect(data.cards.find((c) => c.name === "weiszfeld")!.status).toBe("kept");
     expect(corridors.compare).toBe("#step=highway&pick=corridors");
   });
