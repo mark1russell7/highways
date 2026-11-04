@@ -7,6 +7,8 @@
 // - That item opens when the median ratio of a default-size group passes 1.10 and the p90 of the A/A arm.
 // - That item opens when the median ratio of a large group passes 2.00 and the p90 of the A/A arm.
 // - Under both lines, that item stays a note on the roadmap.
+//
+// The router `shared` has the same fault, so it gets a second paired run with its own A/A arm. That run only reports: the trigger does not read it.
 // `node packages/core/scripts/join-cost.ts --rounds 15` writes `out/join-cost.json` and `out/join-cost.md`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
@@ -14,7 +16,7 @@ import { inputGraph } from "../src/bench/screen/forms.ts";
 import { SCREEN_V3, screenInputs } from "../src/bench/screen/set.ts";
 import { highwaysRegistry } from "../src/families/index.ts";
 import { outerGraph, type Graph } from "../src/model.ts";
-import { cornersRouter } from "../src/routers/index.ts";
+import { cornersRouter, sharedRouter, type SharedOptions } from "../src/routers/index.ts";
 import { WayFinder } from "../src/ways.ts";
 import { measureIsolated, pairedContext, pairedEnv, type Input } from "./gates/paired.ts";
 
@@ -85,6 +87,23 @@ const report = measureIsolated({
   context: pairedContext(),
 });
 
+// The option `joinWork` is not a typed option of `shared`. The router gives its options to `WayFinder`, so the value arrives.
+const sharedOff = sharedRouter({ name: "shared", joinWork: 0 } as SharedOptions);
+const sharedOn = sharedRouter({ name: "shared" });
+const sharedReport = measureIsolated({
+  arms: [
+    { id: "off", run: (graph: Graph) => sharedOff.route(graph) },
+    { id: "on", run: (graph: Graph) => sharedOn.route(graph) },
+  ],
+  inputs: inputs.filter((input) => input.group !== "tiled"),
+  repeats: Math.max(5, Math.floor(Number(values.rounds) / 3)),
+  warmup: 1,
+  mode: "process",
+  aa: true,
+  env: pairedEnv(),
+  context: pairedContext(),
+});
+
 const rows = inputs.map((input) => {
   const { nodes } = input.value!;
   const ways = new WayFinder(nodes);
@@ -100,13 +119,16 @@ const aaTop = report.noiseFloor?.p90 ?? 1;
 const past = (names: readonly string[], line: number): string[] => names.filter((g) => groups[g]! > line && groups[g]! > aaTop);
 const opens = [...past(DEFAULT_GROUPS, 1.1), ...past(LARGE_GROUPS, 2)];
 const verdict = opens.length > 0 ? `the item opens (${opens.join(", ")})` : "the item stays a note";
-writeFileSync("out/join-cost.json", JSON.stringify({ report, rows, screen: { boards: screen.length, withWork }, verdict }));
+const sharedGroups = sharedReport.ratios["on"]!.groups;
+const sharedNoise = sharedReport.noiseFloor ? `${sharedReport.noiseFloor.p10.toFixed(3)} to ${sharedReport.noiseFloor.p90.toFixed(3)}` : "none";
+writeFileSync("out/join-cost.json", JSON.stringify({ report, sharedReport, rows, screen: { boards: screen.length, withWork }, verdict }));
 const table = rows.map((r) => `| ${r.id} | ${r.points} | ${r.looks} | ${r.links} | ${r.stopped} | ${r.off.toFixed(1)} | ${r.on.toFixed(1)} | ${(r.on - r.off).toFixed(1)} |`);
 const noise = report.noiseFloor ? `${report.noiseFloor.p10.toFixed(3)} to ${report.noiseFloor.p90.toFixed(3)}` : "none";
 const md = [
   `CPU: ${report.env.cpu}. Median ratio on/off: ${report.ratios["on"]!.median.toFixed(3)}. A/A band: ${noise}.`,
   `Group ratios on/off: ${Object.entries(groups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}.`,
   `Trigger of the free-space test: ${verdict}.`,
+  `Report only, the trigger does not read it: shared on/off ${Object.entries(sharedGroups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}, A/A band ${sharedNoise}.`,
   `Boards of screen-v3 with join work: ${withWork} of ${screen.length}. Boards here with work and no new link: ${closed} of ${rows.length}.`,
   "",
   "| Board | Points | Looks | New links | Stopped | off ms | on ms | Added ms |",
