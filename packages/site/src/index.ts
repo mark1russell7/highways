@@ -593,7 +593,7 @@ async function bench(): Promise<void> {
           `<tr><th scope="row"><button type="button" class="table-pick" data-router="${esc(r.router)}" title="Show ${esc(r.router)} on the map"><code>${esc(r.router)}</code></button></th>${cols
             .map((c, i) => {
               const v = c.get(r);
-              return `<td class="${v === best[i] && list.length > 1 ? "best" : ""}">${c.show(v, r)}</td>`;
+              return `<td class="${v === best[i] && list.length > 1 ? "best" : ""}" data-label="${esc(c.name)}">${c.show(v, r)}</td>`;
             })
             .join("")}</tr>`,
       )
