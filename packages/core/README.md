@@ -182,7 +182,10 @@ const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }
 
 A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
 
-- A router gives a straight line when it finds no way. The field tells you that the line goes through a box.
+- A margin is a preference, not a wall. When the whole margin gives no way, a router tries the steps of `OUT_STEPS`: one half, one quarter and 0 of the margin (PLUG-OUT-BLOCKED).
+- A route of these steps can pass closer to a box than the margin. A route with a way at the whole margin keeps its bytes.
+- The option `outSteps: false` keeps the whole margin, so a closed gap gives the straight line.
+- A router gives a straight line when it finds no way at any step. The field tells you that the line goes through a box.
 - The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
 - When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.

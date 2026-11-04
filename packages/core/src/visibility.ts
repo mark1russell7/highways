@@ -537,6 +537,11 @@ export class CornerGraph {
     return out;
   }
 
+  /** This method tells if a search can start at `p`: the point sees a corner of the graph. */
+  sees(p: Point): boolean {
+    return this.#ends(p, this.#k * 2).length > 0;
+  }
+
   /**
    * This method gives a shortest path from `from` to `to` in the graph (A*), with the two points as its ends.
    * It gives `undefined` when the graph links no corner near `from` to a corner near `to`.

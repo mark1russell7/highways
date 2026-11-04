@@ -1,5 +1,5 @@
 import { center, dist, type Point } from "../geom.ts";
-import { nodeIndex, outerGraph, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, outerGraph, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
 import { orderRun } from "../lane-order.ts";
 import { stretchLaneOrders, type LaneStretchOrder } from "../lane-orders/stretch/index.ts";
@@ -427,7 +427,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       }
 
       const routes: Route[] = [];
-      for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? [w.ps.point, w.pt.point] });
+      for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? (ways.outSteps ? ways.between(w.ps, w.pt, new Set<Node>([byId.get(w.edge.source.node)!, byId.get(w.edge.target.node)!])) : [w.ps.point, w.pt.point]) });
       const shared: SharedRun[] = [];
       const routeOf = new Map(routes.map((r) => [r.edge, r]));
       const list = [...runs.values()];

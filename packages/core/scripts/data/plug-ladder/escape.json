@@ -1,0 +1,191 @@
+{
+  "schema": "plug-ladder/1",
+  "family": "escape",
+  "router": "corners",
+  "seeds": 10,
+  "steps": [
+    1,
+    0.5,
+    0.25,
+    0
+  ],
+  "rows": [
+    {
+      "name": "default",
+      "routes": 300,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        300,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0
+    },
+    {
+      "name": "nets 60",
+      "routes": 600,
+      "throughOff": 45,
+      "throughOn": 0,
+      "steps": [
+        555,
+        45,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0
+    },
+    {
+      "name": "gap 40, nets 100",
+      "routes": 1000,
+      "throughOff": 123,
+      "throughOn": 0,
+      "steps": [
+        877,
+        123,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0
+    },
+    {
+      "name": "gap 4, nets 60",
+      "routes": 600,
+      "throughOff": 535,
+      "throughOn": 0,
+      "steps": [
+        312,
+        288,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        250,
+        0,
+        0
+      ],
+      "straight": 0
+    }
+  ],
+  "screen": [
+    {
+      "name": "straight",
+      "boards": 150,
+      "boardsChanged": 0,
+      "routes": 17671,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
+      "changedThroughOn": 0,
+      "throughOff": 0,
+      "throughOn": 0
+    },
+    {
+      "name": "plugs",
+      "boards": 150,
+      "boardsChanged": 0,
+      "routes": 17671,
+      "routesChanged": 0,
+      "changedThroughOff": 0,
+      "changedThroughOn": 0,
+      "throughOff": 0,
+      "throughOn": 0
+    },
+    {
+      "name": "corners",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "corners-smooth",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "trunks",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "shared",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "shared-all",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "sections",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    },
+    {
+      "name": "sections-tree",
+      "boards": 150,
+      "boardsChanged": 10,
+      "routes": 17671,
+      "routesChanged": 924,
+      "changedThroughOff": 924,
+      "changedThroughOn": 0,
+      "throughOff": 924,
+      "throughOn": 0
+    }
+  ]
+}
