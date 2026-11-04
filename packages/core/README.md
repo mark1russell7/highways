@@ -968,7 +968,7 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges` and `maze`. They are in no screen set.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb` and `spiral`. They are in no screen set.
 - The screen set `screen-v3` has the first 15 families, each with 10 seeds.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.
 

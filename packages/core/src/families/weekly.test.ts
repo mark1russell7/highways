@@ -13,6 +13,9 @@ const DIGESTS: Readonly<Record<string, readonly [string, number, number]>> = {
   bottleneck: ["39ecce7a699a7de6", 50, 45],
   "parallel-edges": ["70d01b6efcab602c", 48, 82],
   maze: ["0e0a3a5343a13867", 41, 15],
+  channel: ["5296fc30bdd9be46", 32, 24],
+  comb: ["4641bb3c97cfb4e0", 30, 15],
+  spiral: ["323f37b3b4588463", 36, 13],
 };
 
 const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -53,9 +56,9 @@ function reached(table: readonly (readonly boolean[])[]): number {
 }
 
 describe("the families of FAMILIES-WEEKLY", () => {
-  it("has 3 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
+  it("has 6 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
     expect(WEEKLY_FAMILIES.map((f) => f.name)).toEqual(Object.keys(DIGESTS));
-    expect(HIGHWAYS_FAMILIES.slice(-3)).toEqual(WEEKLY_FAMILIES);
+    expect(HIGHWAYS_FAMILIES.slice(-6)).toEqual(WEEKLY_FAMILIES);
     for (const f of WEEKLY_FAMILIES) expect([f.version, f.owner, f.crossEngine], f.name).toEqual([1, "highways", "exact"]);
   });
 
@@ -99,6 +102,50 @@ describe("the families of FAMILIES-WEEKLY", () => {
       expect(south.y + south.h - Math.max(...others.map((n) => n.box.y + n.box.h))).toBeGreaterThanOrEqual(200);
       for (const e of g.edges) expect([e.source.node[0], e.target.node[0]]).toEqual(["a", "b"]);
     }
+  });
+
+  it("gives `channel` fixed plugs that face the channel, one edge for each plug, and no edge past `span`", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("channel", seed, { cols: 12, nets: 200, pins: 3, span: 2 }).graph;
+      expect(g.nodes).toHaveLength(24);
+      const used = g.edges.flatMap((e) => [`${e.source.node}:${e.source.port}`, `${e.target.node}:${e.target.port}`]);
+      expect(new Set(used).size, `${seed}`).toBe(used.length);
+      for (const e of g.edges) {
+        expect([e.source.node[0], e.target.node[0]]).toEqual(["n", "s"]);
+        expect(Math.abs(Number(e.source.node.slice(1)) - Number(e.target.node.slice(1)))).toBeLessThanOrEqual(2);
+      }
+      expect(g.edges.length).toBeLessThanOrEqual(36);
+    }
+    expect(boxOf(reg.generate("channel", 0, { height: 50 }).graph, "s0").y - 40).toBe(50);
+  });
+
+  it("makes `comb` one corridor: the teeth of a comb touch its back, and a tooth reaches past the tip of the next one", () => {
+    const g = reg.generate("comb", 0, { teeth: 4, depth: 200, slot: 60, tooth: 10, clear: 30 }).graph;
+    const up = boxOf(g, "up1");
+    const low = boxOf(g, "low1");
+    const backN = boxOf(g, "back-n");
+    const backS = boxOf(g, "back-s");
+    expect(up.y).toBe(backN.y + backN.h);
+    expect(low.y + low.h).toBe(backS.y);
+    expect(low.x - (up.x + up.w)).toBe(60);
+    expect(low.y - backN.h).toBe(30);
+    expect(up.y + up.h).toBeGreaterThan(low.y);
+    expect(backS.y - (up.y + up.h)).toBe(30);
+  });
+
+  it("gives each piece of the `spiral` wall a touch with the next piece, and the corridor its width between two arms", () => {
+    const corridor = 80;
+    const wall = 10;
+    const g = reg.generate("spiral", 0, { turns: 3, corridor, wall, nodes: 4, edges: 0 }).graph;
+    const box = (i: number): Box => boxOf(g, `wall${i}`);
+    expect(g.nodes.filter((n) => n.id.startsWith("wall"))).toHaveLength(12);
+    for (let i = 0; i + 1 < 12; i++) {
+      const [a, b] = [box(i), box(i + 1)];
+      const touches = (a.x + a.w === b.x || b.x + b.w === a.x || a.y + a.h === b.y || b.y + b.h === a.y) && !overlap(a, b);
+      expect(touches, `${i}`).toBe(true);
+    }
+    expect(box(0).y - (box(4).y + box(4).h)).toBe(corridor);
+    expect(box(1).x - (box(5).x + box(5).w) === corridor || box(5).x - (box(1).x + box(1).w) === corridor).toBe(true);
   });
 
   it("gives `parallel-edges` the same two ends for each copy of a pair, with no fixed plug", () => {
