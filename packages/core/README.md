@@ -60,7 +60,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
 | `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
-| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
+| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. The option `rangeShrink` lets a wall take a smaller gap for more plugs in their ranges. |
 | `escape` | The ordered escape of EDA-022. The plugs of each wall take the order of the first legs of their ways, with the gap `slotSpacing`. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.

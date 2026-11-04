@@ -989,6 +989,7 @@ export const SPREAD_SCHEMA: OptionSchema<SpreadOptions> = {
 export const ASSIGN_SCHEMA: OptionSchema<AssignOptions> = {
   plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
   inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
+  rangeShrink: { type: "number", min: 0, max: 1, step: 0.05, default: 1, describe: "The least share of `plugGap` that a wall can use to put more ends in their ranges. The value 1 keeps the gap." },
 };
 
 /** The declarations of the options of the whole strategy `pipeline`. */
