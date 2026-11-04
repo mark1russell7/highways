@@ -181,6 +181,7 @@ export const NAMED_GENS: readonly NamedGen[] = [
   { id: "switchbox", name: "Pins on the four sides of a box", spec: { family: "switchbox", seed: 73, dims: {} } },
   { id: "escape", name: "A grid of pads in a ring of terminals", spec: { family: "escape", seed: 79, dims: {} } },
   { id: "rings", name: "Closed walls with one door each", spec: { family: "rings", seed: 83, dims: {} } },
+  { id: "walled-level", name: "A maze with one tiny knot of nodes", spec: { family: "walled-level", seed: 89, dims: {} } },
   { id: "large-grid", name: "A large grid of nodes", spec: { family: "tiny-uniform", seed: 5, dims: { layout: "grid", nodes: 200, edgesPerNode: 2 } } },
   { id: "hub-nodes", name: "Hub nodes with many edges", spec: { family: "small-clustered", seed: 9, dims: { layout: "hubs", nodes: 120, fixedPorts: 0 } } },
   { id: "far-links", name: "Long links between far rows", spec: { family: "hub-chain", seed: 12, dims: { rows: 6, cols: 24, long: 120 } } },

@@ -17,7 +17,7 @@ import { JOIN_WORK } from "../src/visibility.ts";
 /** The largest dimensions of `maze`. */
 const LARGE = { cols: 24, rows: 16, nodes: 60, edges: 120 };
 /** The families with a row at the largest size. */
-const LARGE_FAMILIES = new Set(["maze"]);
+const LARGE_FAMILIES = new Set(["maze", "walled-level"]);
 /** The members of `maze` for the flat table. */
 const FLAT = [
   { seed: 60599, large: false },
