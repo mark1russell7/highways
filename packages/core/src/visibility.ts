@@ -272,6 +272,7 @@ export class CornerGraph {
    * With `nodes`, a corner looks only at the corners of its free region (JOIN-COST). The other corners cannot be in its sight, so the links stay the same.
    */
   #joinParts(links: Set<number>[], work: number, nodes: readonly Node[] | undefined): void {
+    if (work <= 0) return;
     const count = this.points.length;
     const part = new Int32Array(count).fill(-1);
     const members: number[][] = [];
@@ -292,7 +293,7 @@ export class CornerGraph {
       }
       members.push(list.sort((a, b) => a - b));
     }
-    if (work <= 0 || members.length < 2) return;
+    if (members.length < 2) return;
     const order = members.map((_, m) => m).sort((a, b) => members[b]!.length - members[a]!.length || a - b);
     const largest = order.shift()!;
     const poolOf = this.#joinPools(part, Math.min(work, count * (count - members[largest]!.length)), nodes);
