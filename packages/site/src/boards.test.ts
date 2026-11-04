@@ -8,11 +8,12 @@ import { BOARDS, EXAMPLE_BOARDS, ordersBoard } from "./boards.ts";
  * A change that only makes the router faster keeps each digest. A digest covers the routes, the shared runs, the levels, the run keys and the lane routes.
  * ER3b changed the routes of the three boards, because their edges took the hubs out and back.
  * ER3c changed only the points of the level links of the board `courses`. Those links go through the groups now, not around the outer edge.
+ * LANE-ROOM added the field `room` to each way. With `room` left out, each earlier digest came back, and 0 of the 248 lanes moved at these settings.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  delivery: "6ed6c5d4875e531d3fb182313c5fde5b794f177dda2c80d1b41bfe4c30d7e7c0",
-  services: "db7dfedbdf302d726add19839ebf0bfebd83414ec4c0e3a101e7a2f7062884dd",
-  courses: "e497e24c5f35ba4beee8547c4427e4a3f27632696cd49516026442c93761c3de",
+  delivery: "816782d77a216ee506a00b67b1d2088f3bc0d83b0af90f16f14c373141bed5f6",
+  services: "f87937e1b76238681743cfc7c834f2c9182afc4435420de27becf5fd986e322c",
+  courses: "4a4cbcbcfe9d602d6abd502372bf83ba2852c11a21fef6d42426f6eecb67be53",
 };
 
 /** The router of the examples page. */

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { highwayCurves } from "./curves/highway/index.ts";
 import { sampleCurve } from "./curves/sample.ts";
 import { LANE_CLEAR, LANE_LEAST, LANE_ROOM_LIMIT, laneRoom, withLaneRoom } from "./lane-room.ts";
-import type { Node, Result } from "./model.ts";
+import type { Node, Result, SharedRun } from "./model.ts";
 import { laneRoutes, pullApart, runKey, segmentsOf } from "./segments.ts";
 import { Obstacles } from "./visibility.ts";
 
@@ -75,7 +75,7 @@ describe("the room at a join of two ways (LANE-ROOM)", () => {
   // Two ways meet at (0, 0): one comes from the west, and one goes to the south. The wedge at the outer side of the join is to the north-east.
   const [west, south] = [{ x: -100, y: 0 }, { x: 0, y: 100 }];
   const corner = { x: 0, y: 0 };
-  const ways = (first: readonly { x: number; y: number }[], second: readonly { x: number; y: number }[]) => [
+  const ways = (first: readonly { x: number; y: number }[], second: readonly { x: number; y: number }[]): readonly SharedRun[] => [
     { id: "a", key: "a", points: first, edges: ["e", "f"] },
     { id: "b", key: "b", points: second, edges: ["e", "f"] },
   ];
