@@ -51,8 +51,8 @@ export interface LevelLinkOptions extends WayOptions {
   readonly throughCost?: number;
   /**
    * The limit of the work of the join of parts on the corner graphs of a level, in looks. The value goes to `joinWork` of `CornerGraph`.
-   * The default is 0, so the level graphs have no join. This default has a known limit: a level of walled items can lose links.
-   * The member 60599 of the family `maze` as one level loses 6 links, and its largest member 7122 loses 11. The value `JOIN_WORK` gives them back.
+   * The default is 0, so the level graphs have no join. At `levelJoinWork` 0, a level link of walled items can go through a wall box, and no link is lost.
+   * A level link of a real router can also go through a box, with or without the join. The section "Level links through boxes" of `docs/research/GROUPING.md` has the counts.
    */
   readonly levelJoinWork?: number;
 }

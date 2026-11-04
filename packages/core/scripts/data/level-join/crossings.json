@@ -1,0 +1,452 @@
+{
+  "schema": "level-crossings/2",
+  "seeds": 4,
+  "largeSeeds": 1,
+  "flat": [
+    {
+      "seed": 60599,
+      "size": "default",
+      "links": {
+        "off": 11,
+        "on": 11
+      },
+      "changed": 3,
+      "crossings": {
+        "off": 3,
+        "on": 0
+      }
+    },
+    {
+      "seed": 39410,
+      "size": "default",
+      "links": {
+        "off": 14,
+        "on": 14
+      },
+      "changed": 8,
+      "crossings": {
+        "off": 18,
+        "on": 0
+      }
+    },
+    {
+      "seed": 10,
+      "size": "default",
+      "links": {
+        "off": 12,
+        "on": 12
+      },
+      "changed": 5,
+      "crossings": {
+        "off": 7,
+        "on": 0
+      }
+    },
+    {
+      "seed": 3086,
+      "size": "largest",
+      "links": {
+        "off": 116,
+        "on": 116
+      },
+      "changed": 22,
+      "crossings": {
+        "off": 61,
+        "on": 0
+      }
+    },
+    {
+      "seed": 7122,
+      "size": "largest",
+      "links": {
+        "off": 113,
+        "on": 113
+      },
+      "changed": 52,
+      "crossings": {
+        "off": 0,
+        "on": 0
+      }
+    }
+  ],
+  "rows": [
+    {
+      "family": "maze",
+      "size": "default",
+      "boards": 4,
+      "cleanBoards": 0,
+      "levels": 16,
+      "overlapLevels": 8,
+      "overlapPairs": 106,
+      "links": 129,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 9,
+          "better": 0,
+          "worse": 7,
+          "added": 12,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 59,
+        "crossedLinks": 26,
+        "endsOverlapLinks": 6,
+        "clearWayLinks": 0,
+        "noWayLinks": 20,
+        "noWayBoardWayLinks": 20,
+        "overlapEnd": 52,
+        "single": 2,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 59,
+        "crossedLinks": 26,
+        "endsOverlapLinks": 6,
+        "clearWayLinks": 0,
+        "noWayLinks": 20,
+        "noWayBoardWayLinks": 20,
+        "overlapEnd": 52,
+        "single": 2,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 71,
+        "crossedLinks": 27,
+        "endsOverlapLinks": 6,
+        "clearWayLinks": 1,
+        "noWayLinks": 20,
+        "noWayBoardWayLinks": 20,
+        "overlapEnd": 52,
+        "single": 11,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    },
+    {
+      "family": "spiral",
+      "size": "default",
+      "boards": 4,
+      "cleanBoards": 0,
+      "levels": 16,
+      "overlapLevels": 8,
+      "overlapPairs": 79,
+      "links": 133,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 12,
+          "better": 0,
+          "worse": 12,
+          "added": 24,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 65,
+        "crossedLinks": 28,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 1,
+        "noWayLinks": 27,
+        "noWayBoardWayLinks": 27,
+        "overlapEnd": 27,
+        "single": 29,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 65,
+        "crossedLinks": 28,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 1,
+        "noWayLinks": 27,
+        "noWayBoardWayLinks": 27,
+        "overlapEnd": 27,
+        "single": 29,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 89,
+        "crossedLinks": 28,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 1,
+        "noWayLinks": 27,
+        "noWayBoardWayLinks": 27,
+        "overlapEnd": 27,
+        "single": 44,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    },
+    {
+      "family": "comb",
+      "size": "default",
+      "boards": 4,
+      "cleanBoards": 0,
+      "levels": 14,
+      "overlapLevels": 6,
+      "overlapPairs": 32,
+      "links": 110,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 5,
+          "better": 0,
+          "worse": 5,
+          "added": 21,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 63,
+        "crossedLinks": 25,
+        "endsOverlapLinks": 18,
+        "clearWayLinks": 0,
+        "noWayLinks": 7,
+        "noWayBoardWayLinks": 7,
+        "overlapEnd": 39,
+        "single": 18,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 63,
+        "crossedLinks": 25,
+        "endsOverlapLinks": 18,
+        "clearWayLinks": 0,
+        "noWayLinks": 7,
+        "noWayBoardWayLinks": 7,
+        "overlapEnd": 39,
+        "single": 18,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 84,
+        "crossedLinks": 25,
+        "endsOverlapLinks": 18,
+        "clearWayLinks": 0,
+        "noWayLinks": 7,
+        "noWayBoardWayLinks": 7,
+        "overlapEnd": 39,
+        "single": 39,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    },
+    {
+      "family": "channel",
+      "size": "default",
+      "boards": 4,
+      "cleanBoards": 4,
+      "levels": 12,
+      "overlapLevels": 0,
+      "overlapPairs": 0,
+      "links": 104,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    },
+    {
+      "family": "bottleneck",
+      "size": "default",
+      "boards": 4,
+      "cleanBoards": 4,
+      "levels": 17,
+      "overlapLevels": 7,
+      "overlapPairs": 9,
+      "links": 309,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 0,
+        "crossedLinks": 0,
+        "endsOverlapLinks": 0,
+        "clearWayLinks": 0,
+        "noWayLinks": 0,
+        "noWayBoardWayLinks": 0,
+        "overlapEnd": 0,
+        "single": 0,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    },
+    {
+      "family": "maze",
+      "size": "largest",
+      "boards": 1,
+      "cleanBoards": 0,
+      "levels": 5,
+      "overlapLevels": 3,
+      "overlapPairs": 155,
+      "links": 329,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 63,
+          "better": 1,
+          "worse": 57,
+          "added": 199,
+          "removed": 1
+        }
+      },
+      "base": {
+        "crossings": 488,
+        "crossedLinks": 142,
+        "endsOverlapLinks": 11,
+        "clearWayLinks": 0,
+        "noWayLinks": 131,
+        "noWayBoardWayLinks": 131,
+        "overlapEnd": 296,
+        "single": 7,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 488,
+        "crossedLinks": 142,
+        "endsOverlapLinks": 11,
+        "clearWayLinks": 0,
+        "noWayLinks": 131,
+        "noWayBoardWayLinks": 131,
+        "overlapEnd": 296,
+        "single": 7,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 686,
+        "crossedLinks": 142,
+        "endsOverlapLinks": 11,
+        "clearWayLinks": 0,
+        "noWayLinks": 131,
+        "noWayBoardWayLinks": 131,
+        "overlapEnd": 328,
+        "single": 11,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": []
+    }
+  ]
+}
