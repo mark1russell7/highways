@@ -53,8 +53,11 @@ export function clampToRange(box: Box, side: Side, port: Port | undefined, point
  *
  * When the order cannot keep each plug in its interval, the plugs take the order of their ideal places in their intervals. Thus the intervals win over the order.
  * The result is in the order of `ideal`.
+ *
+ * With `need`, the least distance of two neighbors is `need(a, b)` for the indexes `a` and `b` of `ideal`, in place of `gap`.
+ * Then all the distances shrink by one factor when the intervals are too short.
  */
-export function placeInIntervals(ideal: readonly number[], lo: readonly number[], hi: readonly number[], gap: number): number[] {
+export function placeInIntervals(ideal: readonly number[], lo: readonly number[], hi: readonly number[], gap: number, need?: (a: number, b: number) => number): number[] {
   const k = ideal.length;
   if (k === 0) return [];
   let order = ideal.map((_, i) => i);
@@ -69,21 +72,27 @@ export function placeInIntervals(ideal: readonly number[], lo: readonly number[]
     const c = order.map((i) => Math.max(lo[i]!, Math.min(hi[i]!, ideal[i]!)));
     order = [...order].sort((a, b) => c[a]! - c[b]! || a - b);
   }
-  // The largest gap that the order lets: the plug j and the later plug i need (i - j)·s <= hi_i - lo_j.
-  let s = Math.max(0, gap);
+  // The offset of each plug in units of s: its index, or the sum of the distances of `need`. With `need`, s is a factor from 0 to 1.
+  const steps: number[] = [0];
+  for (let i = 1; i < k; i++) steps.push(need ? steps[i - 1]! + need(order[i - 1]!, order[i]!) : i);
+  // The largest s that the order lets: the plug j and the later plug i need (steps_i - steps_j)·s <= hi_i - lo_j.
+  let s = need ? 1 : Math.max(0, gap);
   for (let i = 1; i < k; i++) {
     const hiI = hi[order[i]!]!;
-    for (let j = 0; j < i; j++) s = Math.min(s, (hiI - lo[order[j]!]!) / (i - j));
+    for (let j = 0; j < i; j++) {
+      const d = steps[i]! - steps[j]!;
+      if (d > 0) s = Math.min(s, (hiI - lo[order[j]!]!) / d);
+    }
   }
   s = Math.max(0, s);
-  // With y_i = x_i - i·s, the gap becomes the rule y_i <= y_(i+1), and each y_i has the bounds L_i and U_i.
+  // With y_i = x_i - steps_i·s, the gap becomes the rule y_i <= y_(i+1), and each y_i has the bounds L_i and U_i.
   // The bounds become monotone: L_i is the most of the lower bounds before i, and U_i is the least of the upper bounds after i.
   const lower = new Array<number>(k);
   const upper = new Array<number>(k);
   let run = -Infinity;
-  for (let i = 0; i < k; i++) lower[i] = run = Math.max(run, lo[order[i]!]! - i * s);
+  for (let i = 0; i < k; i++) lower[i] = run = Math.max(run, lo[order[i]!]! - steps[i]! * s);
   run = Infinity;
-  for (let i = k - 1; i >= 0; i--) upper[i] = run = Math.min(run, hi[order[i]!]! - i * s);
+  for (let i = k - 1; i >= 0; i--) upper[i] = run = Math.min(run, hi[order[i]!]! - steps[i]! * s);
   // Pool adjacent violators with bounds. The value of a block is its mean, clamped to the bounds of the block.
   // The lower bound of a block is the lower bound of its last item, and its upper bound is the upper bound of its first item.
   const sum: number[] = [];
@@ -93,7 +102,7 @@ export function placeInIntervals(ideal: readonly number[], lo: readonly number[]
   const value: number[] = [];
   const clamp = (v: number, a: number, b: number): number => Math.max(a, Math.min(b, v));
   for (let i = 0; i < k; i++) {
-    sum.push(ideal[order[i]!]! - i * s);
+    sum.push(ideal[order[i]!]! - steps[i]! * s);
     size.push(1);
     blockLo.push(lower[i]!);
     blockHi.push(upper[i]!);
@@ -114,7 +123,7 @@ export function placeInIntervals(ideal: readonly number[], lo: readonly number[]
   const out = new Array<number>(k);
   let i = 0;
   value.forEach((v, b) => {
-    for (let j = 0; j < size[b]!; j++, i++) out[order[i]!] = v + i * s;
+    for (let j = 0; j < size[b]!; j++, i++) out[order[i]!] = v + steps[i]! * s;
   });
   return out;
 }

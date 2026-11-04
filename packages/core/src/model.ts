@@ -28,6 +28,13 @@ export interface Port {
    * `resolvePorts` throws a `RangeError` for a bad range.
    */
   readonly range?: readonly [number, number];
+  /**
+   * This length is the height of the row of the port on its card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
+   * The plug rules `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, and a free plug leaves the row of a fixed plug.
+   * When the wall has too little room, the distances shrink evenly. The other plug rules do not read it.
+   * `resolvePorts` throws a `RangeError` for a bad height.
+   */
+  readonly rowHeight?: number;
 }
 
 /** A node: a box that routes must not go through. */
@@ -171,7 +178,7 @@ export function portOffset(box: Box, port: Port): Point | undefined {
 
 /**
  * This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`.
- * It also throws a `RangeError` for a bad `range` of a plug. A bad range has a value that is not finite or is outside 0 to 1, or a start after its end.
+ * It also throws a `RangeError` for a bad `rowHeight`, and for a bad `range` of a plug. A bad range has a value that is not finite or is outside 0 to 1, or a start after its end.
  */
 export function checkPort(node: Node, port: Port): void {
   const at = `The plug "${port.id}" of the node "${node.id}"`;
@@ -183,6 +190,8 @@ export function checkPort(node: Node, port: Port): void {
     if (lo < 0 || hi > 1) throw new RangeError(`${at} has the range [${lo}, ${hi}]. It must be in the side, from 0 to 1.`);
     if (lo > hi) throw new RangeError(`${at} has the range [${lo}, ${hi}]. Its start must not be after its end.`);
   }
+  if (port.rowHeight !== undefined && (typeof port.rowHeight !== "number" || !Number.isFinite(port.rowHeight) || port.rowHeight < 0))
+    throw new RangeError(`${at} has the row height ${String(port.rowHeight)}. It must be a finite number that is not negative.`);
   if (port.along === undefined) return;
   if (typeof port.along !== "number" || !Number.isFinite(port.along) || port.along < 0 || port.along > 1)
     throw new RangeError(`${at} has the along value ${String(port.along)}. It must be a finite number from 0 to 1.`);
