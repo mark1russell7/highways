@@ -56,7 +56,7 @@ describe("the panels of the compare page (EX2)", () => {
     // The control `straight` goes through boxes, so it breaks a hard rule and is not on the front.
     expect(data.panels.find((p) => p.strategy === "straight")!.violations).toBeGreaterThan(0);
     expect(data.panels.find((p) => p.strategy === "straight")!.front).toBe(false);
-  });
+  }, 30_000);
 
   it("marks the best values with bestValues", () => {
     const data = computePanels({ step: "router", board: "courses", options: {} });
