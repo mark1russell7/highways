@@ -182,7 +182,11 @@ const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }
 
 A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
 
-- A router gives a straight line when it finds no way. The field tells you that the line goes through a box.
+- A margin is a preference, not a wall. When the whole margin gives no way, a router tries the steps of `OUT_STEPS`: one half, one quarter and one sixteenth of the margin (PLUG-OUT-BLOCKED).
+- The lowest step is above 0. Boxes that touch stay closed, so a route does not run along their seam. A route with no way says so in `through`.
+- A route of these steps can pass closer to a box than the margin. A route with a way at the whole margin keeps its bytes.
+- The option `outSteps: false` keeps the whole margin, so a closed gap gives the straight line.
+- A router gives a straight line when it finds no way at any step. The field tells you that the line goes through a box.
 - The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
 - When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
@@ -905,6 +909,8 @@ The step `plugs` gives the plugs of the router `corners`. The step `group` gives
 - A list of other plans, for example the `generators` of `select`, is one `bool` param `<key>:<source>` for each source.
 - `ROUTE_SPACE_LEFT_OUT` gives each option that the space does not hold, with its reason. The router gets the default of that option.
 - `ROUTE_SPACE_MISFITS` gives each router of the table that is not a named point. The list is empty.
+- `configOfMember(name)` gives the point of a member of `MEMBER_FORMS`, or a reason. `routeConfig` of the point gives the routes of the member.
+- `MEMBER_MISFITS` gives each name with no point, with its reason.
 - The portfolio router is not in the space. It is a selector over the routers.
 
 ```ts

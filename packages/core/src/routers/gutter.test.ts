@@ -184,10 +184,15 @@ describe("the inner routes of the mode gutter (INTERIOR-GUTTER)", () => {
       expect(same).toEqual(base);
     }
     const digest = createHash("sha256")
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes)))
+      .digest("hex");
+    // The digest of the routes of version 0.9.2, before the mode gutter. With `outSteps: false`, the routes stay.
+    expect(digest).toBe("bddc6d12c64fda12e9f0d3edb083f662c061675f7cfff3861140424828c23a83");
+    const ladder = createHash("sha256")
       .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes)))
       .digest("hex");
-    // The digest of the routes of version 0.9.2, before the mode gutter.
-    expect(digest).toBe("bddc6d12c64fda12e9f0d3edb083f662c061675f7cfff3861140424828c23a83");
+    // PLUG-OUT-BLOCKED: three inner routes that went straight through the rows take the gaps between the rows.
+    expect(ladder).toBe("c370d476f448b879c643fef8a84533bd2aee81a0d58059cfb9fe16a93b4efa1c");
   });
 
   it("gives fewer bends or the same with a larger bend cost", () => {

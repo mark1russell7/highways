@@ -155,8 +155,8 @@ export function sectionsRouter(options: SectionsOptions): Router {
         let p = pieces.get(key);
         if (!p) {
           const [from, to] = forward ? [a, b] : [b, a];
-          const way = corners.path(from, to);
-          p = dedupe(way ? corners.pull(way) : [from, to]);
+          const way = ways.way(from, to);
+          p = dedupe(way ?? [from, to]);
           pieces.set(key, p);
         }
         if (!used.includes(key)) used.push(key);
