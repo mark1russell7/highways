@@ -85,6 +85,14 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - A port without a range gives the same plugs as before.
 - `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
 
+A port can have a `rowHeight`: the height of its row on the card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
+
+- `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, or `plugGap` when that is more.
+- A free plug leaves the row of a fixed plug when the wall has the room. It goes past the fixed plug when the near part of the wall has no room.
+- When the wall has too little room, the distances shrink evenly. No plug drops.
+- A port without a `rowHeight` gives the same plugs as before. The other plug rules do not read it.
+- `resolvePorts` throws a `RangeError` for a height that is negative or not finite.
+
 `assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
 
 1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
@@ -132,6 +140,14 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - With your outer router and `corners`, a sibling edge gets two routes. Keep the inner route of `corners`.
   - A self-loop of a child is a sibling edge. In the mode `corners`, it gets the short stub out and back at one plug, as an outer self-loop does.
   - In the mode `gutter`, a self-loop goes out of one side of the node and comes back into a different side.
+- An edge at two depths is an inner edge too (INTERIOR-ROUTE slice 2). It joins two nodes with different `parent` values, and a frame holds the two nodes.
+  - The `InnerEdge` of such an edge has no `plug`. Its `frame` is the nearest common frame of the two nodes.
+  - The router `corners` routes it in that frame, in the modes `corners` and `gutter`. The two ends use the plugs of their nodes.
+  - The route enters each nested frame that holds an end. It goes around the other nodes and around each nested frame that holds no end.
+  - A port of a frame that does not hold the other end is a port of a node. The route uses that port.
+  - In a room with such an edge, the option `outside` also applies to a box out of the common frame.
+  - Each other router gives such an edge an outer route, as before. With your outer router and `corners`, the edge gets two routes. Keep the inner route of `corners`.
+  - An edge with no common frame stays an outer edge. An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
 - The default of `frameInset` is the margin of the router.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
 - The option `outside` sets the rule for a node box outside the box of its frame:

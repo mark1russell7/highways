@@ -28,6 +28,13 @@ export interface Port {
    * `resolvePorts` throws a `RangeError` for a bad range.
    */
   readonly range?: readonly [number, number];
+  /**
+   * This length is the height of the row of the port on its card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
+   * The plug rules `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, and a free plug leaves the row of a fixed plug.
+   * When the wall has too little room, the distances shrink evenly. The other plug rules do not read it.
+   * `resolvePorts` throws a `RangeError` for a bad height.
+   */
+  readonly rowHeight?: number;
 }
 
 /** A node: a box that routes must not go through. */
@@ -39,8 +46,9 @@ export interface Node {
   readonly data?: Readonly<Record<string, unknown>>;
   /**
    * This id names the frame node that holds the node. A frame is a node that another node names as its parent.
+   *
    * An edge from a plug of a frame to a node in the frame is an inner edge (`splitFrames`). The router `corners` routes it inside the frame.
-   * An edge between two children of one frame is an inner edge of that frame too, when no end is a plug of a frame.
+   * An edge between two nodes in one frame, at any depths, is an inner edge of their nearest common frame. No end of such an edge is a plug of a frame.
    * A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
    */
   readonly parent?: string;
@@ -170,7 +178,7 @@ export function portOffset(box: Box, port: Port): Point | undefined {
 
 /**
  * This function throws a `RangeError` when the `along` of a plug is bad: not finite, outside 0 to 1, without `side` or with `at`.
- * It also throws a `RangeError` for a bad `range` of a plug. A bad range has a value that is not finite or is outside 0 to 1, or a start after its end.
+ * It also throws a `RangeError` for a bad `rowHeight`, and for a bad `range` of a plug. A bad range has a value that is not finite or is outside 0 to 1, or a start after its end.
  */
 export function checkPort(node: Node, port: Port): void {
   const at = `The plug "${port.id}" of the node "${node.id}"`;
@@ -182,6 +190,8 @@ export function checkPort(node: Node, port: Port): void {
     if (lo < 0 || hi > 1) throw new RangeError(`${at} has the range [${lo}, ${hi}]. It must be in the side, from 0 to 1.`);
     if (lo > hi) throw new RangeError(`${at} has the range [${lo}, ${hi}]. Its start must not be after its end.`);
   }
+  if (port.rowHeight !== undefined && (typeof port.rowHeight !== "number" || !Number.isFinite(port.rowHeight) || port.rowHeight < 0))
+    throw new RangeError(`${at} has the row height ${String(port.rowHeight)}. It must be a finite number that is not negative.`);
   if (port.along === undefined) return;
   if (typeof port.along !== "number" || !Number.isFinite(port.along) || port.along < 0 || port.along > 1)
     throw new RangeError(`${at} has the along value ${String(port.along)}. It must be a finite number from 0 to 1.`);
@@ -224,8 +234,10 @@ export function fixedPortPoint(node: Node, end: End): Point | undefined {
 
 /**
  * An inner edge of the frame `frame`. It goes from a plug of the frame to a node in that frame, at any depth.
+ *
  * A sibling edge is an inner edge too: it joins two children of the frame, and no end is a plug of a frame (FRAME-SIBLINGS).
- * `plug` tells which end of the edge is the plug of the frame. A sibling edge has no `plug`.
+ * An edge at two depths joins two nodes with different parents. `frame` is their nearest common frame, and no end is a plug of a frame (INTERIOR-ROUTE slice 2).
+ * `plug` tells which end of the edge is the plug of the frame. A sibling edge and an edge at two depths have no `plug`.
  */
 export interface InnerEdge {
   readonly edge: Edge;
@@ -255,11 +267,22 @@ function holds(byId: ReadonlyMap<string, Node>, frame: string, id: string): bool
   return false;
 }
 
+/** This function gives the nearest frame that holds the two nodes, or `undefined`. When one node holds the other, the function gives `undefined`. */
+function commonFrame(byId: ReadonlyMap<string, Node>, a: string, b: string): string | undefined {
+  if (holds(byId, a, b) || holds(byId, b, a)) return undefined;
+  for (let p = byId.get(a)?.parent; p !== undefined; p = byId.get(p)?.parent) if (holds(byId, p, b)) return p;
+  return undefined;
+}
+
 /**
  * This function checks the parents of a graph (`checkParents`), and takes its inner edges out.
  * An inner edge of the frame F has a plug of F (`End.port`) at one end. F holds the node at the other end.
  *
  * A sibling edge of the frame F is an inner edge too. Its two ends have the parent F, and no end is a plug of a frame. It has no `plug`.
+ *
+ * An edge at two depths is an inner edge of the nearest common frame of its two ends. It has no `plug` either. An edge with no common frame stays an outer edge.
+ * An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
+ *
  * The graph that it gives keeps each node and the other edges. A graph without `parent` comes back as the same object, with no inner edge.
  */
 export function splitFrames(graph: Graph): { readonly graph: Graph; readonly inner: readonly InnerEdge[] } {
@@ -271,8 +294,8 @@ export function splitFrames(graph: Graph): { readonly graph: Graph; readonly inn
     if (e.source.port !== undefined && holds(byId, e.source.node, e.target.node)) inner.push({ edge: e, frame: e.source.node, plug: "source" });
     else if (e.target.port !== undefined && holds(byId, e.target.node, e.source.node)) inner.push({ edge: e, frame: e.target.node, plug: "target" });
     else {
-      const frame = byId.get(e.source.node)?.parent;
-      if (frame === undefined || byId.get(e.target.node)?.parent !== frame) return true;
+      const frame = commonFrame(byId, e.source.node, e.target.node);
+      if (frame === undefined) return true;
       inner.push({ edge: e, frame });
     }
     return false;
@@ -283,7 +306,7 @@ export function splitFrames(graph: Graph): { readonly graph: Graph; readonly inn
 /**
  * This function gives the graph of a router without frames. It has the plugs of `resolvePorts`, and no inner edges with a plug of a frame (`splitFrames`).
  * Each router except `corners` uses it at the start of `route`. So an inner edge with a plug of a frame gets no route from such a router.
- * The graph keeps each sibling edge, so that such a router gives it an outer route (FRAME-SIBLINGS).
+ * The graph keeps each inner edge without a plug, so that such a router gives it an outer route (FRAME-SIBLINGS).
  */
 export function outerGraph(graph: Graph): Graph {
   const resolved = resolvePorts(graph);
