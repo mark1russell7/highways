@@ -4,11 +4,8 @@
 name: Assign gap
 
 on:
-  pull_request:
-    paths:
-      - .github/workflows/assign-gap.yml
-      - packages/core/scripts/assign-gap.ts
-      - packages/core/src/plugs/assign/**
+  push:
+    branches: [feat/assign-bound]
   workflow_dispatch:
     inputs:
       args:

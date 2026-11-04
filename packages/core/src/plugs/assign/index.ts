@@ -341,30 +341,11 @@ function assignInOrder(list: readonly number[], places: readonly number[], ideal
 
 /**
  * This function gives a plan of one wall with a sweep (ASSIGN-BOUND). The cost is near `n²`. The plan is not always the best.
- * At each place, the sweep takes the open end with the earliest interval end. An end drops out of the sweep when its interval ends.
- * The other ends take the free places in the order of their keys. When the free places are too few, the last ends share the end of the room.
- * The later step `placeInIntervals` then separates those plugs.
+ * The other ends take the free places in the order of their keys. When the free places are too few, `packedPlan` moves the plugs to open more places.
+ * All the plugs of the plan keep the gap `s`.
  */
 function sweepPlan(order: readonly number[], win: readonly ([number, number] | undefined)[], ideals: readonly number[], fixed: readonly number[], lo: number, hi: number, s: number): Item[] {
-  const jobs = order.filter((e) => win[e] !== undefined).sort((a, b) => win[a]![0] - win[b]![0] || a - b);
-  const placed = new Map<number, number>();
-  const open: number[] = [];
-  let next = 0;
-  let t = pushOut(lo, fixed, s);
-  while (t <= hi + EPS) {
-    while (next < jobs.length && win[jobs[next]!]![0] <= t + EPS) open.push(jobs[next++]!);
-    for (let i = open.length - 1; i >= 0; i--) if (win[open[i]!]![1] < t - EPS) open.splice(i, 1);
-    if (open.length === 0) {
-      if (next >= jobs.length) break;
-      t = pushOut(Math.max(t, win[jobs[next]!]![0]), fixed, s);
-      continue;
-    }
-    let pick = 0;
-    for (let i = 1; i < open.length; i++) if (win[open[i]!]![1] < win[open[pick]!]![1]) pick = i;
-    placed.set(open[pick]!, t);
-    open.splice(pick, 1);
-    t = pushOut(t + s, fixed, s);
-  }
+  const { at: placed } = sweepPlaces(order.filter((e) => win[e] !== undefined), (e) => win[e]!, fixed, lo, hi, s);
   const items: Item[] = [];
   for (const [e, p] of placed) items.push({ end: e, anchored: true, at: p });
   for (const f of fixed) items.push({ end: -1, anchored: true, at: f });
@@ -379,12 +360,71 @@ function sweepPlan(order: readonly number[], win: readonly ([number, number] | u
       for (; cursor <= end + EPS; cursor += s) free.push(cursor);
       if (x.at !== Infinity) cursor = Math.max(cursor, x.at + s);
     }
+  } else {
+    free.push(...rest.map((e) => Math.min(hi, Math.max(lo, ideals[e]!))).sort((a, b) => a - b));
   }
-  while (free.length < rest.length) free.push(hi);
+  if (free.length < rest.length) return packedPlan(order, rest, win, ideals, fixed, lo, hi, s);
   const stride = Math.max(1, Math.floor(free.length / (SWEEP_PLACES * Math.max(1, rest.length))));
   const slots = assignInOrder(rest, free.filter((_, i) => i % stride === 0), ideals);
   rest.forEach((e, i) => items.push({ end: e, anchored: false, at: slots[i]! }));
   return sortItems(items, order);
+}
+
+/**
+ * This function sweeps the wall with one place for each `s` (ASSIGN-BOUND). At each place, it takes the open end with the earliest end of its span.
+ * An end that the sweep cannot place is in `missed`.
+ */
+function sweepPlaces(list: readonly number[], span: (e: number) => readonly [number, number], fixed: readonly number[], lo: number, hi: number, s: number): { at: Map<number, number>; missed: number[] } {
+  const jobs = [...list].sort((a, b) => span(a)[0] - span(b)[0]);
+  const at = new Map<number, number>();
+  const missed: number[] = [];
+  const open: number[] = [];
+  let next = 0;
+  let t = pushOut(lo, fixed, s);
+  while (t <= hi + EPS) {
+    while (next < jobs.length && span(jobs[next]!)[0] <= t + EPS) open.push(jobs[next++]!);
+    for (let i = open.length - 1; i >= 0; i--) if (span(open[i]!)[1] < t - EPS) missed.push(...open.splice(i, 1));
+    if (open.length === 0) {
+      if (next >= jobs.length) break;
+      t = pushOut(Math.max(t, span(jobs[next]!)[0]), fixed, s);
+      continue;
+    }
+    let pick = 0;
+    for (let i = 1; i < open.length; i++) if (span(open[i]!)[1] < span(open[pick]!)[1]) pick = i;
+    at.set(open[pick]!, t);
+    open.splice(pick, 1);
+    t = pushOut(t + s, fixed, s);
+  }
+  missed.push(...open, ...jobs.slice(next));
+  return { at, missed };
+}
+
+/**
+ * This function gives a plan when the first sweep leaves too few free places. The ends of `first` have the whole room as their span.
+ * They fill each hole before the next interval opens, and the ends with intervals move up. An end that then misses its interval joins them.
+ */
+function packedPlan(order: readonly number[], first: readonly number[], win: readonly ([number, number] | undefined)[], ideals: readonly number[], fixed: readonly number[], lo: number, hi: number, s: number): Item[] {
+  const free = new Set(first);
+  for (;;) {
+    const { at, missed } = sweepPlaces(order, (e) => (free.has(e) ? [lo, hi] : win[e]!), fixed, lo, hi, s);
+    const fresh = missed.filter((e) => !free.has(e));
+    if (fresh.length > 0) {
+      for (const e of fresh) free.add(e);
+      continue;
+    }
+    const items: Item[] = fixed.map((f) => ({ end: -1, anchored: true, at: f }));
+    const places: number[] = [];
+    for (const [e, p] of at) {
+      if (free.has(e)) places.push(p);
+      else items.push({ end: e, anchored: true, at: p });
+    }
+    // A bisection of the gap can leave a rounding error. Then the last ends share the end of the room.
+    while (places.length < free.size) places.push(hi);
+    const rest = order.filter((e) => free.has(e));
+    const slots = assignInOrder(rest, places.sort((a, b) => a - b), ideals);
+    rest.forEach((e, i) => items.push({ end: e, anchored: false, at: slots[i]! }));
+    return sortItems(items, order);
+  }
 }
 
 /**

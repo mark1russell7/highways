@@ -84,6 +84,9 @@ function rowOf(family: string, n: number, walls: number, exact: boolean): Row {
     const { ends, room } = make(n, rand);
     const sweep = assignWall(ends, room, GAP, [], "sweep");
     const got = count(sweep.anchored);
+    // A count means nothing when the plan breaks its gap.
+    const at = [...sweep.at].sort((a, b) => a - b);
+    for (let i = 1; i < n; i++) if (at[i]! - at[i - 1]! < sweep.gap - 1e-6) throw new Error(`The sweep breaks the gap: ${family}, ${n} ends, wall ${w}.`);
     sumSweep += got;
     sumBound += anchorBound(ends, room, sweep.gap);
     if (!exact) continue;
@@ -126,7 +129,14 @@ for (const family of values.families.split(",")) {
   for (const n of sizes) keep(rowOf(family, n, walls, false));
   for (const n of sizes) {
     if (n > 64) break;
-    const row = rowOf(family, n, walls, true);
+    let row: Row;
+    try {
+      row = rowOf(family, n, walls, true);
+    } catch (e) {
+      // The memo of the exact plan has a limit of entries. So this size is past the reach of the exact plan.
+      if (e instanceof RangeError) break;
+      throw e;
+    }
     keep(row);
     if (row.slowestExactMs! > capMs) break;
   }

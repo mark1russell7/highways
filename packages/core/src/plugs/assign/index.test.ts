@@ -119,6 +119,19 @@ describe("the limit of work of assignWall (ASSIGN-BOUND)", () => {
     });
   }
 
+  it("keeps the gap on a tight wall: the first sweep leaves no free place for the last end", () => {
+    // These ten ranges come from a seeded wall. The first sweep places nine ends with no free place, so the last end needs a new place.
+    const spans = [[48, 63], [7, 19], [24, 36], [37, 52], [84, 90], [54, 69], [68, 77], [4, 16], [90, 90], [75, 90]] as const;
+    const ends: WallEnd[] = spans.map(([lo, hi], i) => ({ lo, hi, ideal: (lo + hi) / 2, key: i }));
+    for (const planner of ["sweep", "exact"] as const) {
+      const plan = assignWall(ends, [0, 90], 8, [], planner);
+      const at = [...plan.at].sort((a, b) => a - b);
+      expect(plan.gap).toBe(8);
+      for (let i = 1; i < 10; i++) expect(at[i]! - at[i - 1]!, planner).toBeGreaterThanOrEqual(8 - 1e-6);
+      expect(plan.anchored.filter(Boolean).length, planner).toBe(9);
+    }
+  });
+
   it("stays at or under the exact count, and loses at most 1 end on 30 seeded walls of 10 ends", () => {
     const rand = seeded(20261104);
     for (let w = 0; w < 30; w++) {
