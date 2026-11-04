@@ -10,7 +10,6 @@ on:
         description: "The pages, with commas, for example compare.html,results.html."
         type: string
         default: compare.html
-  pull_request:
 
 permissions:
   contents: read
