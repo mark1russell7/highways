@@ -289,6 +289,8 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 | `shared-all` | `case-hub-chain` | 2 → 3 | 603 → 73 |
 | `shared-all` | `case-many-groups` | 12 → 0 | 2301 → 687 |
 
+This table reads version 1 of the bundle counter, which read the middle of a sampled piece. `BUNDLE_COUNTER` gives the current version. The counts of two versions do not compare.
+
 With `bundle`, 90% or more of the end crossings that stay are necessary. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
 
 ### Where the lanes leave a trunk
@@ -309,6 +311,8 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 | `trunks` | `case-dense-groups` | 45.6% → 0.6% | 0 → 0 |
 | `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 3 → 0 |
 | `trunks-all` | `case-many-groups` | 68.2% → 47.6% | 1 → 0 |
+
+This table reads version 1 of the bundle counter, which read the middle of a sampled piece. `BUNDLE_COUNTER` gives the current version. The counts of two versions do not compare.
 
 The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
 
