@@ -15,6 +15,10 @@ on:
   # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
   # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
+  schedule:
+    # The paths of the job changes leave out the code that the import walk does not reach. So this run times main in full each day.
+    # The check against the fixed base shows a rise that many pull requests made together. The check against the parent shows only the last commit.
+    - cron: "17 6 * * *"
   workflow_dispatch:
     inputs:
       head:
@@ -49,22 +53,33 @@ jobs:
     outputs:
       match: ${{ steps.changes.outputs.match }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      # The paths come from the imports of the measured route (GATE-SCOPE). A pull request that changes another router does not start the job gate.
+      - id: scope
+        run: |
+          {
+            echo 'paths<<PATHS'
+            node packages/core/scripts/gates/scope.ts || echo '**'
+            echo PATHS
+          } >> "$GITHUB_OUTPUT"
       - id: changes
         uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
         with:
-          # The source of the core, and the files of the gate itself. A pull request that changes only docs does not start the job gate.
-          paths: |
-            packages/core/src/**
-            .github/workflows/sections-gate.yml
-            packages/core/scripts/sections-bisect.ts
-            packages/core/scripts/sections-gate-verdict.ts
-            packages/core/scripts/gates/pair-confirm.ts
-            packages/core/scripts/gates/paired.ts
-            packages/core/scripts/gates/commits.ts
-            packages/core/scripts/gates/home-verdict.ts
-            packages/core/scripts/data/sections-gate/**
-            !**/*.md
-            !**/*.test.ts
+          paths: ${{ steps.scope.outputs.paths }}
+      # This step gives the paths to the matcher of the action. A change inside the walk runs the gate, and a change outside it skips. Any other result fails the job.
+      - name: Prove the paths
+        env:
+          PATHS: ${{ steps.scope.outputs.paths }}
+        run: |
+          matcher=$(find "$RUNNER_WORKSPACE/../_actions/mark1russell7/template" -name match.jq | head -n 1)
+          decide() { printf '%s\n' "$1" | jq -R -s -r --arg paths "$PATHS" --arg ignore "" -f "$matcher"; }
+          [ "$(decide packages/core/src/routers/sections.ts)" = true ] || { echo "::error::A change of the measured router does not run the gate."; exit 1; }
+          [ "$PATHS" = '**' ] || [ "$(decide packages/core/src/routers/repel/index.ts)" = false ] || { echo "::error::A change of another router runs the gate."; exit 1; }
 
   gate:
     needs: changes
