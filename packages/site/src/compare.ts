@@ -34,6 +34,8 @@ const $ = <T extends HTMLElement>(id: string): T => {
 };
 
 const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+/** This function escapes a text and shows each span between backticks as code. */
+const codeText = (text: string): string => esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 const fmt = new Intl.NumberFormat("en-US");
 
 /** The names of the axes of the fronts that are not columns of the page. */
@@ -244,7 +246,7 @@ const noteOf = (p: Panel): OptInNote | undefined => (state.step === "router" ? O
 function noteHtml(p: Panel): string {
   const note = noteOf(p);
   if (!note) return "";
-  const text = esc(note.text).replace(/`([^`]+)`/g, "<code>$1</code>");
+  const text = codeText(note.text);
   const skipped = p.skipped ? " This board is too large for a live run, so the page shows only these recorded numbers." : "";
   return `<p class="cmp-note">${text}${skipped} Stage: ${esc(note.stage)}.</p>`;
 }
@@ -303,7 +305,7 @@ function show(all: ComparePanels): void {
       const toggle = `<button type="button" class="link cmp-pick" data-pick="${esc(p.strategy)}" aria-pressed="${on}">${on ? "Remove the pick" : "Pick"}</button>`;
       return `<article class="${cls}" id="panel-${esc(p.strategy)}" aria-labelledby="title-${esc(p.strategy)}">
         <header class="cmp-head"><h3 id="title-${esc(p.strategy)}">${esc(p.strategy)}</h3><div class="cmp-tags">${tagsOf(p)}${toggle}</div></header>
-        <p class="cmp-describe">${esc(p.describe)}${options ? `<br />Options: ${options}` : ""}</p>
+        <p class="cmp-describe">${codeText(p.describe)}${options ? `<br />Options: ${options}` : ""}</p>
         ${noteHtml(p)}
         ${svgOf(p, board.name)}
         <dl class="cmp-measures">${measures}</dl>
