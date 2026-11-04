@@ -445,7 +445,7 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 | `tightMargin` | 1 | `levelLinks` | The margin of the second corner graph of the level links. |
 | `plugInset` | 6 | `levelLinks` | A plug of a level link stays this far from the corners of its side. |
 | `throughCost` | 8 | `levelLinks` | The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5. |
-| `levelJoinWork` | 0 | `levelLinks` | The limit of the work of the join of parts on the level graphs. A level of walled items can lose links at 0. |
+| `levelJoinWork` | 0 | `levelLinks` | The limit of the work of the join of parts on the level graphs. At 0, a level link of walled items can go through a wall box, and no link is lost. |
 | `routesAt`, `itemAt` | 22, 120 | `pickLevel` | The far-view thresholds, in pixels on the screen. `PICK` holds them. |
 
 `SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
@@ -989,7 +989,7 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb` and `spiral`. They are in no screen set.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape` and `rings`. They are in no screen set.
 - The screen set `screen-v3` has the first 15 families, each with 10 seeds.
 - The screen set `screen-v4` has the 60 boards of `screen-v2`, each after `makeRoom`.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.

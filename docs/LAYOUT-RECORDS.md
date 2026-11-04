@@ -110,6 +110,9 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `channel` | `cols`, `nets`, `pins`, `span`, `height`, `gap` | `mulberry32` of the seed | `exact` |
 | `comb` | `teeth`, `depth`, `slot`, `tooth`, `clear`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
 | `spiral` | `turns`, `corridor`, `wall`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `switchbox` | `pins`, `pitch`, `nets`, `blocks` | `mulberry32` of the seed | `exact` |
+| `escape` | `cols`, `rows`, `pad`, `gap`, `nets`, `margin` | `mulberry32` of the seed | `exact` |
+| `rings` | `rings`, `corridor`, `wall`, `door`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -135,6 +138,9 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `channel`: two rows of nodes across a channel, with fixed plugs on the channel side. This is the channel routing problem of the chip literature.
   - `comb`: two combs that reach into each other. One corridor goes up and down between the teeth, so a way turns at each tooth.
   - `spiral`: one wall in a square spiral, with nodes in the corridor. A node on the next arm is near, and the way to it is a full turn.
+  - `switchbox`: pins with fixed plugs on the four sides of a box. This is the switchbox routing problem of the chip literature.
+  - `escape`: a dense grid of pads in a ring of terminals. This is the escape routing problem of chip packages.
+  - `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
