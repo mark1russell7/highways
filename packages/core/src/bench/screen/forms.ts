@@ -197,6 +197,14 @@ export interface LayoutRecord {
   readonly trace?: readonly RecordTrace[];
 }
 
+/**
+ * This function gives the sum of the breaks of the hard rule `no-pass-through` of a strategy over its records.
+ * The value is an absolute count. It has no floor and no base, so a verdict "not worse than the base" does not hide it.
+ */
+export function passThroughs(records: readonly LayoutRecord[], strategy: string): number {
+  return records.reduce((n, r) => n + (r.strategy === strategy ? (r.hard["no-pass-through"] ?? 0) : 0), 0);
+}
+
 /** The facts of one stage of a run, as the `StageTrace` of the contract: its id, its time and its trace measures. */
 export interface RecordTrace {
   readonly id: string;

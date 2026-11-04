@@ -1,7 +1,7 @@
 // The families of FAMILIES-WEEKLY. Each batch adds worst cases that the families of the screen sets do not cover.
 // These families are in no screen set. Each family uses only the stream of the registry, whole numbers, `Math.floor` and `Math.min`. Thus each family is `exact`.
 import type { CorpusDimension } from "@mark1russell7/layout-contract";
-import type { Graph } from "../model.ts";
+import type { Graph, Port } from "../model.ts";
 import { caseFamily, count } from "./cases.ts";
 import { Builder, ceilSqrt, choose, int, SEEDING, shuffle } from "./coverage.ts";
 import { numberDimension, type HighwaysFamily } from "./model.ts";
@@ -218,5 +218,170 @@ export const MAZE: HighwaysFamily = caseFamily({
   },
 });
 
+/** The dimensions of `channel`. */
+const CHANNEL_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("cols", 2, 60, 16, "The number of nodes in each of the two rows."),
+  count("nets", 0, 240, 24, "The number of tries for an edge from the north row to the south row."),
+  count("pins", 1, 12, 4, "The number of fixed plugs on the channel side of each node. A full node takes no more edges."),
+  count("span", 0, 60, 8, "The largest distance in columns between the two ends of an edge."),
+  count("height", 8, 400, 96, "The height of the channel between the two rows, in units. A low channel has few tracks."),
+  count("gap", 2, 60, 8, "The free space between two nodes of a row, in units."),
+]);
+
+/**
+ * The family `channel`: the channel routing problem of the chip literature. Two rows of nodes face each other across a channel.
+ * The plugs are fixed on the channel side.
+ * Each edge goes from the north row to the south row, so all the routes share the tracks of the channel.
+ * The plugs of a column can block each other.
+ */
+export const CHANNEL: HighwaysFamily = caseFamily({
+  name: "channel",
+  meaning: "Two rows of nodes across a narrow channel, with fixed plugs, as in channel routing of chips.",
+  dimensions: CHANNEL_DIMENSIONS,
+  generator: "family.channel",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const cols = v["cols"]!;
+    const pins = v["pins"]!;
+    const span = v["span"]!;
+    const freePlugs = (): number[][] => Array.from({ length: cols }, () => shuffle(random, pins));
+    const north = freePlugs();
+    const south = freePlugs();
+    const nets: (readonly [number, number, number, number])[] = [];
+    for (let n = 0; n < v["nets"]!; n++) {
+      const top = int(random, 0, cols - 1);
+      const low = int(random, Math.max(0, top - span), Math.min(cols - 1, top + span));
+      if (north[top]!.length === 0 || south[low]!.length === 0) continue;
+      nets.push([top, north[top]!.pop()!, low, south[low]!.pop()!]);
+    }
+    const width = 80;
+    const tall = 40;
+    const portsOf = (side: "north" | "south", prefix: string): Port[] => Array.from({ length: pins }, (_, p) => ({ id: `${prefix}${p}`, side, along: (p + 1) / (pins + 1) }));
+    for (let c = 0; c < cols; c++) {
+      const x = c * (width + v["gap"]!);
+      b.node(`n${c}`, x, 0, width, tall, { ports: portsOf("south", "p") });
+      b.node(`s${c}`, x, tall + v["height"]!, width, tall, { ports: portsOf("north", "p") });
+    }
+    for (const [top, topPin, low, lowPin] of nets) b.link({ node: `n${top}`, port: `p${topPin}` }, { node: `s${low}`, port: `p${lowPin}` });
+    return b.graph();
+  },
+});
+
+/** The dimensions of `comb`. */
+const COMB_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("teeth", 2, 30, 8, "The number of teeth of each of the two combs."),
+  count("depth", 40, 800, 240, "The length of a tooth, in units."),
+  count("slot", 24, 200, 72, "The width of the corridor between two teeth, in units."),
+  count("tooth", 4, 80, 16, "The thickness of a tooth and of the back of a comb, in units."),
+  count("clear", 8, 200, 48, "The free space past the tip of a tooth, in units. A corridor turns through this space."),
+  count("nodes", 2, 120, 12, "The number of nodes, in the corridor between the combs."),
+  count("edges", 0, 240, 16, "The number of tries for an edge between two nodes."),
+]);
+
+/**
+ * The family `comb`: two combs that reach into each other, so one corridor goes up and down between the teeth.
+ * The way between two nodes turns at each tooth between them. The straight line crosses each of those teeth.
+ */
+export const COMB: HighwaysFamily = caseFamily({
+  name: "comb",
+  meaning: "Two combs that reach into each other: one corridor turns at each tooth, and each way is long.",
+  dimensions: COMB_DIMENSIONS,
+  generator: "family.comb",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const teeth = v["teeth"]!;
+    const depth = v["depth"]!;
+    const slot = v["slot"]!;
+    const tooth = v["tooth"]!;
+    const clear = v["clear"]!;
+    const pitch = tooth + slot;
+    const inner = depth + clear;
+    const width = 2 * teeth * pitch - slot;
+    b.node("back-n", 0, 0, width, tooth);
+    b.node("back-s", 0, tooth + inner, width, tooth);
+    for (let k = 0; k < teeth; k++) {
+      b.node(`up${k}`, 2 * k * pitch, tooth, tooth, depth);
+      b.node(`low${k}`, (2 * k + 1) * pitch, tooth + clear, tooth, depth);
+    }
+    const slots = 2 * teeth - 1;
+    const rows = Math.floor(inner / slot);
+    const w = Math.floor(slot / 2);
+    const h = Math.floor(slot / 3);
+    const places = choose(random, slots * rows, v["nodes"]!);
+    places.forEach((c, i) => b.node(`n${i}`, (c % slots) * pitch + tooth + Math.floor((slot - w) / 2), tooth + Math.floor(c / slots) * slot + Math.floor((slot - h) / 2), w, h));
+    for (let n = 0; n < v["edges"]!; n++) b.link({ node: `n${int(random, 0, places.length - 1)}` }, { node: `n${int(random, 0, places.length - 1)}` });
+    return b.graph();
+  },
+});
+
+/** The dimensions of `spiral`. */
+const SPIRAL_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("turns", 1, 16, 5, "The number of full turns of the wall."),
+  count("corridor", 30, 200, 90, "The width of the corridor between two arms of the wall, in units."),
+  count("wall", 4, 60, 12, "The thickness of the wall, in units."),
+  count("nodes", 2, 120, 16, "The number of nodes in the corridor. A short corridor holds fewer nodes."),
+  count("edges", 0, 240, 16, "The number of tries for an edge between two nodes."),
+]);
+
+/**
+ * The family `spiral`: one wall in a square spiral, with nodes in the corridor. The way out from the middle grows with the square of the turns.
+ * Each corner of the wall sees only a short part of the corridor. The way to a near node on the next arm goes around a full turn.
+ */
+export const SPIRAL: HighwaysFamily = caseFamily({
+  name: "spiral",
+  meaning: "One wall in a square spiral: a node on the next arm is near, and the way to it is a full turn.",
+  dimensions: SPIRAL_DIMENSIONS,
+  generator: "family.spiral",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const corridor = v["corridor"]!;
+    const wall = v["wall"]!;
+    const step = corridor + wall;
+    const w = Math.floor(corridor / 2);
+    const h = Math.floor(corridor / 3);
+    const inX = Math.floor((corridor - w) / 2);
+    const inY = Math.floor((corridor - h) / 2);
+    // The wall starts at the middle and goes east, south, west and north. Each piece starts past the corner of the piece before it.
+    // The cells of a piece are on its outer side.
+    const pieces: (readonly [number, number, number, number])[] = [];
+    const cells: (readonly [number, number])[] = [];
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < 4 * v["turns"]!; i++) {
+      const long = step * (Math.floor(i / 2) + 1);
+      const inCells = Math.floor(long / corridor);
+      const side = i % 4;
+      if (side === 0) {
+        pieces.push(i === 0 ? [x, y, long + wall, wall] : [x + wall, y, long, wall]);
+        for (let c = 0; c < inCells; c++) cells.push([x + c * corridor + inX, y - corridor + inY]);
+        x += long;
+      } else if (side === 1) {
+        pieces.push([x, y + wall, wall, long]);
+        for (let c = 0; c < inCells; c++) cells.push([x + wall + inX, y + c * corridor + inY]);
+        y += long;
+      } else if (side === 2) {
+        pieces.push([x - long, y, long, wall]);
+        for (let c = 0; c < inCells; c++) cells.push([x - (c + 1) * corridor + inX, y + wall + inY]);
+        x -= long;
+      } else {
+        pieces.push([x, y - long, wall, long]);
+        for (let c = 0; c < inCells; c++) cells.push([x - corridor + inX, y - (c + 1) * corridor + inY]);
+        y -= long;
+      }
+    }
+    // The board moves so that each box is at or past the origin.
+    const left = Math.min(...pieces.map((p) => p[0]), ...cells.map((c) => c[0]));
+    const top = Math.min(...pieces.map((p) => p[1]), ...cells.map((c) => c[1]));
+    pieces.forEach(([px, py, pw, ph], i) => b.node(`wall${i}`, px - left, py - top, pw, ph));
+    const places = choose(random, cells.length, v["nodes"]!);
+    places.forEach((c, i) => b.node(`n${i}`, cells[c]![0] - left, cells[c]![1] - top, w, h));
+    for (let n = 0; n < v["edges"]!; n++) b.link({ node: `n${int(random, 0, places.length - 1)}` }, { node: `n${int(random, 0, places.length - 1)}` });
+    return b.graph();
+  },
+});
+
 /** The families of FAMILIES-WEEKLY, in the order of their batches. */
-export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE]);
+export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL]);

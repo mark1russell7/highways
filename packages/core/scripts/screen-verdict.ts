@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
 import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
-import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
+import { parseLines, passThroughs, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 import { requireGrid } from "./gates/inputs.ts";
@@ -67,6 +67,10 @@ interface GuardVerdict {
   readonly p: number;
   readonly families: readonly FamilyVerdict[];
   readonly breadth: Breadth;
+  /** The absolute count of the pass-throughs of the strategy over its records. A snapshot from before PASS-GRID has no such field. */
+  readonly through: number;
+  /** The absolute count of the pass-throughs of the base over its records. */
+  readonly baseThrough: number;
 }
 
 /** This function gives the breadth of a verdict from its families, with the rule of `docs/VERDICT.md` of the contract. */
@@ -109,7 +113,7 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string, measures
       const v = verdict(pair, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
       const values = (s: string): number[] => pair.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
       const old = compareMeasure(mean(values(strategy)), mean(values(base)), { direction: info.better, minEffect: tie });
-      out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v) });
+      out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v), through: passThroughs(pair, strategy), baseThrough: passThroughs(pair, base) });
     }
   }
   return out;
@@ -203,12 +207,13 @@ function main(): void {
       ? `The sign test over ${families.length} families passes at no count. It needs 6 families or more at the level ${LEVEL}.\n`
       : `The sign test over ${families.length} families passes at ${power} of ${families.length} families or more on one side, with no ties, at the level ${LEVEL}.\n`,
   );
-  console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against |");
-  console.log("|---|---|---|---|---:|---:|---:|---|---:|");
+  console.log("The columns `through` and `base through` are absolute counts of the breaks of `no-pass-through` over the records. A verdict does not show them.\n");
+  console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against | through | base through |");
+  console.log("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|");
   for (const r of rows) {
     const signs = r.families.map((f) => SIGN[f.sign]).join(" ");
     const against = `${r.breadth.against} of ${r.breadth.of}${r.breadth.ties > 0 ? ` (${r.breadth.ties} ${r.breadth.ties === 1 ? "tie" : "ties"})` : ""}`;
-    console.log(`| ${r.strategy} | ${r.guard} | ${r.label} | ${r.old} | ${f3(r.stratified)} | ${f3(r.pooled)} | ${r.p.toFixed(4)} | ${signs} | ${against} |`);
+    console.log(`| ${r.strategy} | ${r.guard} | ${r.label} | ${r.old} | ${f3(r.stratified)} | ${f3(r.pooled)} | ${r.p.toFixed(4)} | ${signs} | ${against} | ${r.through} | ${r.baseThrough} |`);
   }
 }
 

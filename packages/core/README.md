@@ -60,7 +60,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
 | `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
-| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
+| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. The option `rangeShrink` lets a wall take a smaller gap for more plugs in their ranges. |
 | `escape` | The ordered escape of EDA-022. The plugs of each wall take the order of the first legs of their ways, with the gap `slotSpacing`. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
@@ -986,8 +986,9 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges` and `maze`. They are in no screen set.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb` and `spiral`. They are in no screen set.
 - The screen set `screen-v3` has the first 15 families, each with 10 seeds.
+- The screen set `screen-v4` has the 60 boards of `screen-v2`, each after `makeRoom`.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.
 
 ```ts

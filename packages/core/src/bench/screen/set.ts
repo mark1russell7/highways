@@ -1,6 +1,7 @@
 import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
 import { highwaysRegistry, type HighwaysBoard } from "../../families/index.ts";
 import type { Graph } from "../../model.ts";
+import { makeRoom, roomLinks } from "../../room/index.ts";
 import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
 import { MOVES_V1 } from "./moves-set.ts";
@@ -183,8 +184,47 @@ export function signTestPower(families: number, level = 0.05): number | undefine
   return undefined;
 }
 
+/** The room of each board of `screen-v4`: the options of `makeRoom`. They have the values of the defaults of `makeRoom`. */
+export const SCREEN_V4_ROOM: Readonly<{ gutter: number; spacing: number }> = Object.freeze({ gutter: 8, spacing: 4 });
+
+/** The member seeds of each family of `screen-v4` that the split `default` holds out. */
+export const SCREEN_V4_HELD_OUT: readonly number[] = [7, 8, 9];
+
+/** This function gives a family with the boards of `family` after `makeRoom`. The generator record names the room and the generator of the first board. */
+function roomFamily(family: ScreenFamily): ScreenFamily {
+  return {
+    ...family,
+    shows: `${family.shows} The board comes after makeRoom.`,
+    make: (k) => {
+      const graph = family.make(k);
+      return { ...graph, nodes: makeRoom(graph.nodes, roomLinks(graph), SCREEN_V4_ROOM).items };
+    },
+    generator: (k) => {
+      const { seed, ...base } = family.generator(k);
+      return { name: "room", version: 1, params: { ...SCREEN_V4_ROOM, base }, seed };
+    },
+  };
+}
+
+const V4_FAMILIES = V2_FAMILIES.map(roomFamily);
+
+/**
+ * The screen set `screen-v4` (PASS-GRID): the 60 boards of `screen-v2`, each after `makeRoom` with `SCREEN_V4_ROOM`.
+ * The set compares the routers on boards with room between the boxes. It keeps the 6 families, the member seeds and the split of `screen-v2`.
+ *
+ * The screen of this set uses the same floor rule as the other sets.
+ * This set does not change. The tests compare it with the files in `corpus/screen-v4`.
+ */
+export const SCREEN_V4: ScreenSet = {
+  id: "screen-v4",
+  families: V4_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V4_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V4_HELD_OUT,
+};
+
 /**
  * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
+ * `screen-v4` has the boards of `screen-v2` after `makeRoom` (PASS-GRID).
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
  * `moves-v1` has one small board for each reason of REBUILD-SILENT.
  */
@@ -192,6 +232,7 @@ export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
   [SCREEN_V2.id]: SCREEN_V2,
   [SCREEN_V3.id]: SCREEN_V3,
+  [SCREEN_V4.id]: SCREEN_V4,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
   [MOVES_V1.id]: MOVES_V1,

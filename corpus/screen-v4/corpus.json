@@ -1,0 +1,1093 @@
+{
+  "schema": "layout-corpus/1",
+  "corpus": "screen-v4",
+  "specs": [
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "fixture",
+          "version": 1,
+          "params": {
+            "kind": "uniform",
+            "nodes": 10,
+            "edgesPerNode": 1.5
+          }
+        }
+      },
+      "seeds": [
+        1,
+        1010,
+        2019,
+        3028,
+        4037,
+        5046,
+        6055,
+        7064,
+        8073,
+        9082
+      ]
+    },
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "fixture",
+          "version": 1,
+          "params": {
+            "kind": "clustered",
+            "nodes": 100,
+            "edgesPerNode": 2,
+            "fixedPorts": 0.2
+          }
+        }
+      },
+      "seeds": [
+        2,
+        1011,
+        2020,
+        3029,
+        4038,
+        5047,
+        6056,
+        7065,
+        8074,
+        9083
+      ]
+    },
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "fixture",
+          "version": 1,
+          "params": {
+            "kind": "clustered",
+            "nodes": 150,
+            "edgesPerNode": 2
+          }
+        }
+      },
+      "seeds": [
+        3,
+        1012,
+        2021,
+        3030,
+        4039,
+        5048,
+        6057,
+        7066,
+        8075,
+        9084
+      ]
+    },
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "case.hub-chain",
+          "version": 1,
+          "params": {}
+        }
+      },
+      "seeds": [
+        3,
+        1012,
+        2021,
+        3030,
+        4039,
+        5048,
+        6057,
+        7066,
+        8075,
+        9084
+      ]
+    },
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "case.many-groups",
+          "version": 1,
+          "params": {}
+        }
+      },
+      "seeds": [
+        7,
+        1016,
+        2025,
+        3034,
+        4043,
+        5052,
+        6061,
+        7070,
+        8079,
+        9088
+      ]
+    },
+    {
+      "generator": "room",
+      "version": 1,
+      "params": {
+        "gutter": 8,
+        "spacing": 4,
+        "base": {
+          "name": "case.packed-grid",
+          "version": 1,
+          "params": {
+            "cols": 12,
+            "rows": 8,
+            "long": 48
+          }
+        }
+      },
+      "seeds": [
+        11,
+        1020,
+        2029,
+        3038,
+        4047,
+        5056,
+        6065,
+        7074,
+        8083,
+        9092
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "screen-v4/tiny-uniform/s0",
+      "hash": "9d3dd44a9c11b7eb",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s1",
+      "hash": "6269791e02e0de4a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s2",
+      "hash": "dfa58b5545d9924c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s3",
+      "hash": "d487f51d3eb40213",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s4",
+      "hash": "7a418bec88914505",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s5",
+      "hash": "3c48a7945d3cd049",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s6",
+      "hash": "73948fe0ca3f7117",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s7",
+      "hash": "d399b150e1a3419a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s8",
+      "hash": "60a5dff80a655434",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/tiny-uniform/s9",
+      "hash": "0fa5596312372e1a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "medium",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s0",
+      "hash": "1e83b5b1bb1f1e7c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s1",
+      "hash": "725d69d0b0326d8e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s2",
+      "hash": "aabd02a037ca6af2",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s3",
+      "hash": "586349d78c0d1e7b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s4",
+      "hash": "e0cb3c34dc14ff3d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s5",
+      "hash": "fd337a517b1462f9",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s6",
+      "hash": "ebe1ce0bc1676862",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s7",
+      "hash": "de5af2d05d268b6f",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s8",
+      "hash": "62a2bd6a025daae4",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/small-clustered/s9",
+      "hash": "cb27a340c9cd6aae",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "fixed"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s0",
+      "hash": "f36b0c604ccff23d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s1",
+      "hash": "3cc5c7b4df14c94d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s2",
+      "hash": "c9cd7e39ef647eb7",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s3",
+      "hash": "af6318510108b9d3",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s4",
+      "hash": "a75f2d31a37d9f51",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s5",
+      "hash": "da95d576e526af86",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s6",
+      "hash": "c7969a59a4dd6e74",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s7",
+      "hash": "8d10647e00600cd1",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s8",
+      "hash": "f13a69ff2d5788b0",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/dense-groups/s9",
+      "hash": "f5a8e28b62911e8d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s0",
+      "hash": "d56566e6723a9563",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s1",
+      "hash": "19a0c89ca50c06b0",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s2",
+      "hash": "bbee24faf5f292e7",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s3",
+      "hash": "a6d36963c527579a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s4",
+      "hash": "20621a7457e853bc",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s5",
+      "hash": "3f6b9e9507c24805",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s6",
+      "hash": "9a68bc7f7ff5540d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s7",
+      "hash": "aa1453f9372c1b81",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s8",
+      "hash": "b7077f543d9d8892",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/hub-chain/s9",
+      "hash": "a407aa64c74539e6",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "hubChain",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s0",
+      "hash": "74a78818ad0433af",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s1",
+      "hash": "a1e6608c96d60c39",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s2",
+      "hash": "35239c7b06032a4c",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s3",
+      "hash": "2aad9f720993cd8b",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s4",
+      "hash": "6c9a26729b02d7b1",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s5",
+      "hash": "91b9b085166385f1",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s6",
+      "hash": "a7ee849a9d494089",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s7",
+      "hash": "95c13da8ed10edec",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s8",
+      "hash": "e84822b1325b82da",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/many-groups/s9",
+      "hash": "3add3d7d3db64bc2",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "clustered",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s0",
+      "hash": "a1f792822f63b716",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s1",
+      "hash": "2fea3337a1fc4518",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s2",
+      "hash": "c8c983a4cf186ead",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s3",
+      "hash": "1308425e7f94116a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s4",
+      "hash": "697ad59f2bdc44ae",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s5",
+      "hash": "4fea0d05f2cac209",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s6",
+      "hash": "49a047ad8d6944ab",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s7",
+      "hash": "2d0420f9ca914754",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s8",
+      "hash": "f900eea8a9896877",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "screen-v4/packed-grid/s9",
+      "hash": "d785a162aca8e26a",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "100",
+        "edgeDensity": "medium",
+        "edgeShape": "longRange",
+        "ports": "free"
+      }
+    }
+  ],
+  "claims": {
+    "declared": {
+      "minCount": 10,
+      "thin": [],
+      "counts": {
+        "tiny-uniform": 10,
+        "small-clustered": 10,
+        "dense-groups": 10,
+        "hub-chain": 10,
+        "many-groups": 10,
+        "packed-grid": 10
+      },
+      "familyBy": {
+        "*": []
+      },
+      "familyMin": 10
+    }
+  }
+}
