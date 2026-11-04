@@ -6,6 +6,7 @@ export * from "./set.ts";
 export * from "./screen.ts";
 export * from "./generators.ts";
 export * from "./exact-set.ts";
+export * from "./moves-set.ts";
 export * from "./gap.ts";
 export * from "./activation.ts";
 export * from "./exercise.ts";

@@ -59,7 +59,7 @@ export const flatT12 = variant("quickbundles-t12", quickBundlesPlan, { ...QUICKB
 
 // HWY-051: the split of the highways that do not fit, on the plans of `shared-ways` and `corridors`, and with a smaller width.
 export const lanesShared = variant("lanes-shared-ways", lanesLogged, { ...LANES_DEFAULTS } as LanesOptions);
-export const lanesCorridors = variant("lanes-corridors", lanesLogged, { ...LANES_DEFAULTS, from: "corridors" } as LanesOptions);
+export const lanesCorridors = variant("lanes-corridors", lanesLogged, { ...LANES_DEFAULTS, from: "corridors", measure: "all" } as LanesOptions);
 export const lanesW16 = variant("lanes-w16", lanesLogged, { ...LANES_DEFAULTS, maxWidth: 16 } as LanesOptions);
 
 // HWY-055: the local growth with other shares, stretch limits and orders.

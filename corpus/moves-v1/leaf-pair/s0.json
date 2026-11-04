@@ -1,0 +1,20 @@
+{
+  "boxes": [
+    {"h": 20, "id": "hub", "w": 40, "x": 0, "y": 20},
+    {"h": 20, "id": "a", "w": 40, "x": 600, "y": 0},
+    {"h": 20, "id": "b", "w": 40, "x": 600, "y": 40}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "sparse", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"id": "e0", "source": "hub", "target": "a"},
+    {"id": "e1", "source": "hub", "target": "b"}
+  ],
+  "family": "leaf-pair",
+  "generator": {"name": "move-board", "params": {"board": "leaf-pair"}, "seed": 0, "version": 1},
+  "hash": "b7197c2438c3c642",
+  "id": "moves-v1/leaf-pair/s0",
+  "schema": "layout-input/1",
+  "seed": 0,
+  "set": "moves-v1",
+  "source": "made-up"
+}

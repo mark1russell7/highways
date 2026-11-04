@@ -4,6 +4,7 @@ import type { Graph } from "../../model.ts";
 import { makeRoom, roomLinks } from "../../room/index.ts";
 import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
+import { MOVES_V1 } from "./moves-set.ts";
 
 /** A family of boards of a screen set. The member `k` of the family has the seed `k`. */
 export interface ScreenFamily {
@@ -225,6 +226,7 @@ export const SCREEN_V4: ScreenSet = {
  * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
  * `screen-v4` has the boards of `screen-v2` after `makeRoom` (PASS-GRID).
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
+ * `moves-v1` has one small board for each reason of REBUILD-SILENT.
  */
 export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
@@ -233,6 +235,7 @@ export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V4.id]: SCREEN_V4,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
+  [MOVES_V1.id]: MOVES_V1,
 };
 
 /** This function gives the id of the member `seed` of a family of a set: `<set>/<family>/s<seed>`. */
