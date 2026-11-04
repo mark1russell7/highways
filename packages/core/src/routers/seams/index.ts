@@ -2,7 +2,7 @@ import { center, inflate, type Point } from "../../geom.ts";
 import { nodeIndex, resolvePorts, splitFrames, type Graph, type Node, type Result, type Route, type Router } from "../../model.ts";
 import { placePlug } from "../../plugs.ts";
 import { defineStrategy, type Strategy } from "../../strategies/model.ts";
-import { joinNote } from "../../through.ts";
+import { joinNote, markThrough } from "../../through.ts";
 import { CornerGraph, Obstacles } from "../../visibility.ts";
 import { WayFinder } from "../../ways.ts";
 
@@ -63,7 +63,7 @@ export function seamsRouter(options: Partial<SeamOptions> & { readonly name: str
         const way = ways.corners.path(ways.out(ps), ways.out(pt));
         routes.push({ edge: e.id, points: way ? [ps.point, ...ways.corners.pull(way), pt.point] : seamWay(ps.point, pt.point) });
       }
-      return { routes, ...joinNote(ways) };
+      return { routes: markThrough(graph, routes, ways.obstacles), ...joinNote(ways) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
