@@ -1,6 +1,7 @@
 import { dist, type Point } from "./geom.ts";
 import { findRun, orderPlaced, placeRoutes } from "./lane-order.ts";
 import type { Result, Route } from "./model.ts";
+import { keepThrough } from "./through.ts";
 
 /** A piece of drawn way. A shared segment carries several edges, in lane order. A private segment carries one edge. */
 export interface Segment {
@@ -157,8 +158,9 @@ export function runKey(edges: readonly string[]): string {
  */
 export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<string>, laneWidth: number, maxWidth: number = Infinity): Route[] {
   const graph = "paths" in source ? source : segmentsOf(source);
-  if (open.size === 0) return graph.paths.map((path) => ({ edge: path.edge, points: pathPoints(graph, path) }));
-  return lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0));
+  const keep = (routes: Route[]): Route[] => ("paths" in source ? routes : keepThrough(source, routes));
+  if (open.size === 0) return keep(graph.paths.map((path) => ({ edge: path.edge, points: pathPoints(graph, path) })));
+  return keep(lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0)));
 }
 
 /** This function gives the route of each path, with the lanes of each segment at the spacing that `spacingOf` gives. */
