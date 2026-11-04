@@ -1,4 +1,4 @@
-/** What a rule selects: each free leg, each free leg with other legs, each free leg with its near boxes, or the crossings of the two legs next to a free leg. */
+/** What a rule selects: each free leg, a free leg with other legs, or a free leg with its near boxes. `leg-crossings` selects the crossings of the two legs next to a free leg. */
 export type RuleSelect = "legs" | "leg-pairs" | "leg-boxes" | "leg-crossings";
 
 /**
