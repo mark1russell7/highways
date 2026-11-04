@@ -132,6 +132,14 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - With your outer router and `corners`, a sibling edge gets two routes. Keep the inner route of `corners`.
   - A self-loop of a child is a sibling edge. In the mode `corners`, it gets the short stub out and back at one plug, as an outer self-loop does.
   - In the mode `gutter`, a self-loop goes out of one side of the node and comes back into a different side.
+- An edge at two depths is an inner edge too (INTERIOR-ROUTE slice 2). It joins two nodes with different `parent` values, and a frame holds the two nodes.
+  - The `InnerEdge` of such an edge has no `plug`. Its `frame` is the nearest common frame of the two nodes.
+  - The router `corners` routes it in that frame, in the modes `corners` and `gutter`. The two ends use the plugs of their nodes.
+  - The route enters each nested frame that holds an end. It goes around the other nodes and around each nested frame that holds no end.
+  - A port of a frame that does not hold the other end is a port of a node. The route uses that port.
+  - In a room with such an edge, the option `outside` also applies to a box out of the common frame.
+  - Each other router gives such an edge an outer route, as before. With your outer router and `corners`, the edge gets two routes. Keep the inner route of `corners`.
+  - An edge with no common frame stays an outer edge. An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
 - The default of `frameInset` is the margin of the router.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
 - The option `outside` sets the rule for a node box outside the box of its frame:
