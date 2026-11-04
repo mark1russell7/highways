@@ -782,7 +782,9 @@ The router `rules` is opt-in. It is not in `STRATEGIES`, so the default outputs 
 - `rulesRouter({ name, rules })` takes a rule file. `checkRules(file)` gives one text for each fault.
 - The preset `energy` holds the energy of RULE-019, with the term `angle` at each crossing. The option `descent: "gradient"` takes plain steps over all near legs, and no sample.
 - The term `angle` alone raises the crossing angle on 10 of the 15 families of `screen-v3`. Inside `energy`, the other terms outweigh it, and the angle rises on 4 families and falls on 1. The record is `scripts/data/rules/energy.json`.
-- The selections are `legs`, `leg-pairs`, `leg-boxes` and `leg-crossings`. The terms are `hold`, `spring`, `gap` and `angle`.
+- The selections are `free`, `free-pairs`, `free-boxes` and `free-crossings`. The terms are `hold`, `spring`, `gap` and `angle`.
+- The field `variable` of a rule file tells what the solver moves. `legs` moves each free leg along its normal, and `points` moves each free point in x and y. The default is `legs`.
+- `freeVariables(graph, result, set, clearance)` gives the variables of a rule file on a result.
 - `ADAM_RULES` is the energy of the router `adam`, and `adam` runs that file. `ELASTIC_RULES` is RULE-001, and `REPULSION_RULES` is RULE-003.
 - The terms are TypeScript at this time, because the solver needs the slope of each term.
 

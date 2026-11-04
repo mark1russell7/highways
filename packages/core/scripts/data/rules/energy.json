@@ -3,89 +3,195 @@
   "unit": "degrees, the median over the boards with a crossing of the mean crossing angle",
   "families": 15,
   "rises": {
-    "adam": 3,
-    "gradient": 4,
-    "angleOnly": 10
+    "energy-adam": 3,
+    "energy-gradient": 4,
+    "elastic-adam": 6,
+    "angle-only": 10,
+    "energy-adam-points": 7,
+    "energy-gradient-points": 6,
+    "elastic-adam-points": 5,
+    "angle-only-points": 7
   },
   "falls": {
-    "adam": 1,
-    "gradient": 1,
-    "angleOnly": 0
+    "energy-adam": 1,
+    "energy-gradient": 1,
+    "elastic-adam": 2,
+    "angle-only": 0,
+    "energy-adam-points": 2,
+    "energy-gradient-points": 2,
+    "elastic-adam-points": 3,
+    "angle-only-points": 0
   },
   "table": [
     {
       "family": "bipartite",
+      "freeLegs": 572,
+      "freePoints": 1109,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 3282,
           "r2Median": 64.19,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 3282,
           "r2Median": 64.19,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 3282,
           "r2Median": 64.19,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 3282,
           "r2Median": 64.19,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 3,
           "crossedBoards": 10,
           "crossings": 3282,
           "r2Median": 64.26,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 3282,
+          "r2Median": 64.19,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 8,
+          "crossedBoards": 10,
+          "crossings": 3281,
+          "r2Median": 64.19,
           "breaks": 0
         }
       }
     },
     {
       "family": "dense-groups",
+      "freeLegs": 2087,
+      "freePoints": 6178,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 10692,
           "r2Median": 59.01,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 10692,
           "r2Median": 59.01,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 9,
           "crossedBoards": 10,
           "crossings": 10692,
           "r2Median": 59.01,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 2,
           "crossedBoards": 10,
           "crossings": 10681,
           "r2Median": 59.22,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 9,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 10692,
+          "r2Median": 59.01,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 10692,
           "r2Median": 59.01,
@@ -95,237 +201,525 @@
     },
     {
       "family": "fan-out",
+      "freeLegs": 1007,
+      "freePoints": 2394,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 1677,
           "r2Median": 49.8,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 1677,
           "r2Median": 49.8,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 7,
           "crossedBoards": 10,
           "crossings": 1673,
           "r2Median": 49.94,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 3,
           "crossedBoards": 10,
           "crossings": 1674,
           "r2Median": 50.22,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 1658,
           "r2Median": 50.68,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 1616,
+          "r2Median": 51.29,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 1618,
+          "r2Median": 51.07,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 1615,
+          "r2Median": 51.08,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 8,
+          "crossedBoards": 10,
+          "crossings": 1662,
+          "r2Median": 51.52,
           "breaks": 0
         }
       }
     },
     {
       "family": "frame-rows",
+      "freeLegs": 108,
+      "freePoints": 346,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 703,
           "r2Median": 50.33,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 8,
           "crossedBoards": 10,
           "crossings": 703,
           "r2Median": 50.33,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 8,
           "crossedBoards": 10,
           "crossings": 703,
           "r2Median": 50.33,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 8,
           "crossedBoards": 10,
           "crossings": 703,
           "r2Median": 50.33,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 703,
           "r2Median": 50.33,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 703,
+          "r2Median": 50.33,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 3,
+          "crossedBoards": 10,
+          "crossings": 695,
+          "r2Median": 50.52,
           "breaks": 0
         }
       }
     },
     {
       "family": "hub-chain",
+      "freeLegs": 1481,
+      "freePoints": 2848,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 586,
           "r2Median": 33.34,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 586,
           "r2Median": 33.34,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 586,
           "r2Median": 33.34,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 7,
           "crossedBoards": 10,
           "crossings": 586,
           "r2Median": 33.34,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 586,
           "r2Median": 33.35,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 3,
+          "crossedBoards": 10,
+          "crossings": 576,
+          "r2Median": 33.45,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 575,
+          "r2Median": 33.34,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 3,
+          "crossedBoards": 10,
+          "crossings": 576,
+          "r2Median": 33.27,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 586,
+          "r2Median": 34.18,
           "breaks": 0
         }
       }
     },
     {
       "family": "local-mesh",
+      "freeLegs": 1915,
+      "freePoints": 3830,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 225,
           "r2Median": 34.85,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 225,
           "r2Median": 34.85,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 225,
           "r2Median": 34.85,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 225,
           "r2Median": 34.85,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 225,
           "r2Median": 34.85,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 52.9,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 68.19,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 45.84,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 10,
+          "crossings": 225,
+          "r2Median": 90,
           "breaks": 0
         }
       }
     },
     {
       "family": "many-groups",
+      "freeLegs": 1958,
+      "freePoints": 4514,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 8287,
           "r2Median": 49.49,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 7,
           "crossedBoards": 10,
           "crossings": 8285,
           "r2Median": 49.94,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 7,
           "crossedBoards": 10,
           "crossings": 8287,
           "r2Median": 49.94,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 8286,
           "r2Median": 50.04,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 9,
           "crossedBoards": 10,
           "crossings": 8286,
           "r2Median": 49.82,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.49,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.49,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.49,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 9,
+          "crossedBoards": 10,
+          "crossings": 8287,
+          "r2Median": 49.49,
           "breaks": 0
         }
       }
     },
     {
       "family": "packed-grid",
+      "freeLegs": 0,
+      "freePoints": 0,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2693,
           "r2Median": 49.95,
           "breaks": 924
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2693,
           "r2Median": 49.95,
           "breaks": 924
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2693,
           "r2Median": 49.95,
           "breaks": 924
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2693,
           "r2Median": 49.95,
           "breaks": 924
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2693,
+          "r2Median": 49.95,
+          "breaks": 924
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2693,
           "r2Median": 49.95,
@@ -335,119 +729,263 @@
     },
     {
       "family": "pipeline",
+      "freeLegs": 677,
+      "freePoints": 1458,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 6,
           "crossings": 9,
           "r2Median": 32.48,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 6,
           "crossings": 9,
           "r2Median": 32.48,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 6,
           "crossings": 9,
           "r2Median": 32.48,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 7,
           "crossedBoards": 6,
           "crossings": 9,
           "r2Median": 32.48,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 6,
           "crossings": 9,
           "r2Median": 44.48,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 6,
+          "crossings": 7,
+          "r2Median": 27.74,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 6,
+          "crossings": 7,
+          "r2Median": 27.74,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 0,
+          "crossedBoards": 6,
+          "crossings": 7,
+          "r2Median": 27.71,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 6,
+          "crossings": 9,
+          "r2Median": 48.97,
           "breaks": 0
         }
       }
     },
     {
       "family": "small-clustered",
+      "freeLegs": 1307,
+      "freePoints": 3878,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 6391,
           "r2Median": 58.49,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 6391,
           "r2Median": 58.49,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 9,
           "crossedBoards": 10,
           "crossings": 6391,
           "r2Median": 58.49,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 3,
           "crossedBoards": 10,
           "crossings": 6380,
           "r2Median": 58.46,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 6381,
           "r2Median": 58.61,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 8,
+          "crossedBoards": 10,
+          "crossings": 6379,
+          "r2Median": 58.67,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 7,
+          "crossedBoards": 10,
+          "crossings": 6386,
+          "r2Median": 58.67,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 8,
+          "crossedBoards": 10,
+          "crossings": 6388,
+          "r2Median": 58.67,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 6391,
+          "r2Median": 58.49,
           "breaks": 0
         }
       }
     },
     {
       "family": "sparse-long",
+      "freeLegs": 386,
+      "freePoints": 745,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2625,
           "r2Median": 59.73,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 2625,
           "r2Median": 59.73,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 2625,
           "r2Median": 59.73,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 2625,
           "r2Median": 59.73,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 2625,
+          "r2Median": 59.73,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 2624,
+          "r2Median": 59.6,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 2624,
+          "r2Median": 59.6,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 2624,
+          "r2Median": 59.6,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 9,
+          "crossedBoards": 10,
+          "crossings": 2624,
           "r2Median": 59.73,
           "breaks": 0
         }
@@ -455,160 +993,352 @@
     },
     {
       "family": "thin-bars",
+      "freeLegs": 832,
+      "freePoints": 1623,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 571,
           "r2Median": 30.25,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 1,
           "crossedBoards": 10,
           "crossings": 566,
           "r2Median": 29.19,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 2,
           "crossedBoards": 10,
           "crossings": 564,
           "r2Median": 30.23,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 566,
           "r2Median": 29.16,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 571,
           "r2Median": 31.16,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 563,
+          "r2Median": 31.55,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 567,
+          "r2Median": 30.66,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 563,
+          "r2Median": 30.78,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 9,
+          "crossedBoards": 10,
+          "crossings": 571,
+          "r2Median": 30.25,
           "breaks": 0
         }
       }
     },
     {
       "family": "tiny-uniform",
+      "freeLegs": 152,
+      "freePoints": 326,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 147,
           "r2Median": 60.6,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 147,
           "r2Median": 60.6,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 5,
           "crossedBoards": 10,
           "crossings": 147,
           "r2Median": 60.6,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 147,
           "r2Median": 62.34,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 3,
           "crossedBoards": 10,
           "crossings": 147,
           "r2Median": 62.7,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 7,
+          "crossedBoards": 10,
+          "crossings": 146,
+          "r2Median": 62.68,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 7,
+          "crossedBoards": 10,
+          "crossings": 146,
+          "r2Median": 64.27,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 7,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 62.9,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 7,
+          "crossedBoards": 10,
+          "crossings": 147,
+          "r2Median": 60.6,
           "breaks": 0
         }
       }
     },
     {
       "family": "two-hubs",
+      "freeLegs": 840,
+      "freePoints": 2538,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 2577,
           "r2Median": 45.5,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 2569,
           "r2Median": 45.59,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 1,
           "crossedBoards": 10,
           "crossings": 2565,
           "r2Median": 45.6,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 0,
           "crossedBoards": 10,
           "crossings": 2569,
           "r2Median": 45.58,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 4,
           "crossedBoards": 10,
           "crossings": 2561,
           "r2Median": 45.53,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2577,
+          "r2Median": 45.5,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2577,
+          "r2Median": 45.5,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 10,
+          "crossedBoards": 10,
+          "crossings": 2577,
+          "r2Median": 45.5,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 2563,
+          "r2Median": 46.04,
           "breaks": 0
         }
       }
     },
     {
       "family": "uneven-sizes",
+      "freeLegs": 1114,
+      "freePoints": 3257,
       "arms": {
         "shared": {
+          "variable": "none",
           "boards": 10,
+          "sameAsShared": 10,
           "crossedBoards": 10,
           "crossings": 12598,
           "r2Median": 56.22,
           "breaks": 0
         },
         "energy-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 12597,
           "r2Median": 56.27,
           "breaks": 0
         },
         "energy-gradient": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 12598,
           "r2Median": 56.27,
           "breaks": 0
         },
         "elastic-adam": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 2,
           "crossedBoards": 10,
           "crossings": 12595,
           "r2Median": 56.26,
           "breaks": 0
         },
         "angle-only": {
+          "variable": "legs",
           "boards": 10,
+          "sameAsShared": 6,
           "crossedBoards": 10,
           "crossings": 12595,
           "r2Median": 56.23,
+          "breaks": 0
+        },
+        "energy-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 12587,
+          "r2Median": 56.28,
+          "breaks": 0
+        },
+        "energy-gradient-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 5,
+          "crossedBoards": 10,
+          "crossings": 12581,
+          "r2Median": 56.27,
+          "breaks": 0
+        },
+        "elastic-adam-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 4,
+          "crossedBoards": 10,
+          "crossings": 12583,
+          "r2Median": 56.22,
+          "breaks": 0
+        },
+        "angle-only-points": {
+          "variable": "points",
+          "boards": 10,
+          "sameAsShared": 6,
+          "crossedBoards": 10,
+          "crossings": 12578,
+          "r2Median": 56.27,
           "breaks": 0
         }
       }
