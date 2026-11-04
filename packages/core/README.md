@@ -95,6 +95,8 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
 - A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
 - Each wall of up to 8 ends gets the exact plan. Over the limit of work, a greedy sweep gives the plan, and the count of goal 1 is not always the best.
+- The record [`assign-gap.jsonl`](../../docs/research/bench/assign-gap.jsonl) compares the sweep with the exact plan on 720 seeded walls of 4 families. The sweep has fewer ends in their ranges on 12 walls. The worst wall loses 3 of 25 ends, on a tight wall of 32 ends.
+- The exact plan reaches 32 to 64 ends, by family. Over that size, the record has only an upper bound, and a plan cannot always reach the bound.
 
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 

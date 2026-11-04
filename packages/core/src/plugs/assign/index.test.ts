@@ -132,6 +132,23 @@ describe("the limit of work of assignWall (ASSIGN-BOUND)", () => {
     }
   });
 
+  it("never passes the exact count on a tight wall", () => {
+    const rand = seeded(20261105);
+    for (const n of [10, 12, 14, 16]) {
+      for (let w = 0; w < 20; w++) {
+        const room: [number, number] = [0, n * 9];
+        const ends: WallEnd[] = Array.from({ length: n }, () => {
+          const lo = Math.round(rand() * room[1]);
+          const hi = Math.min(room[1], lo + 8 + Math.round(rand() * 8));
+          return { lo, hi, ideal: lo + rand() * (hi - lo), key: rand() };
+        });
+        const best = assignWall(ends, room, 8, [], "exact").anchored.filter(Boolean).length;
+        const sweep = assignWall(ends, room, 8, [], "sweep").anchored.filter(Boolean).length;
+        expect(sweep, `${n} ends, wall ${w}`).toBeLessThanOrEqual(best);
+      }
+    }
+  });
+
   it("stays at or under the exact count, and loses at most 1 end on 30 seeded walls of 10 ends", () => {
     const rand = seeded(20261104);
     for (let w = 0; w < 30; w++) {

@@ -4,8 +4,6 @@
 name: Assign gap
 
 on:
-  push:
-    branches: [feat/assign-bound]
   workflow_dispatch:
     inputs:
       args:
