@@ -93,7 +93,7 @@ A port can have a `rowHeight`: the height of its row on the card, along the wall
 - A port without a `rowHeight` gives the same plugs as before. The other plug rules do not read it.
 - `resolvePorts` throws a `RangeError` for a height that is negative or not finite.
 
-`assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
+`assign` (PLUG-ASSIGN) solves each wall exactly, up to a limit of work (ASSIGN-BOUND). It has three goals, in this order:
 
 1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
 2. The plugs keep the order of the far ends, so they do not cross at the wall, when goal 1 lets them.
@@ -102,6 +102,9 @@ A port can have a `rowHeight`: the height of its row on the card, along the wall
 - An end without a range has the room of the wall as its range.
 - An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
 - A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
+- Each wall of up to 8 ends gets the exact plan. Over the limit of work, a greedy sweep gives the plan, and the count of goal 1 is not always the best.
+- The record [`assign-gap.jsonl`](../../docs/research/bench/assign-gap.jsonl) compares the sweep with the exact plan on 720 seeded walls of 4 families. The sweep has fewer ends in their ranges on 12 walls. The worst wall loses 3 of 25 ends, on a tight wall of 32 ends.
+- The record compares the two plans up to 32 to 64 ends, by family. A family stops at the first size with a wall over 5 s of exact plan. Over that size, the record has only an upper bound, and a plan cannot always reach the bound.
 
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 
