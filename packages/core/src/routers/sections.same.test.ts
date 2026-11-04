@@ -15,6 +15,7 @@ import { sectionsRouter, type SectionsOptions } from "./sections.ts";
  * ER3c changed only the points of the level links of each digest except `small-clustered` with the options `site`.
  * Those links go through the groups now, not around the outer edge.
  * CORNER-REACH added the field `through`, which the digest leaves out. So each digest stays, and the routes did not change.
+ * PLUG-OUT-BLOCKED changed three digests of the options `site`: `LADDER_DIGESTS` gives them. With `outSteps: false`, each digest of this list stays.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
   "case-dense-groups/site": "c7dad0bc5c890c06d4d2c318d94209b5afaafc3a66f1278dd298b68a3659c654",
@@ -25,6 +26,16 @@ const DIGESTS: Readonly<Record<string, string>> = {
   "case-many-groups/sections": "ea75b3af84bf1bf7aff23040a79660b423c5ac47d7cf3ee5c6940dba4576cb02",
   "small-clustered/site": "6be966b0b4b9aa74fab2e4d75a0183fba159d29410e5ab5d6ad6ee9cfb111b51",
   "small-clustered/sections": "e9a0ee8fb9ba1785b0fb1aa5f60d3cc3af989f9b096be81e35c44e7febf654ba",
+};
+
+/**
+ * The digests of the boards where the margin of 20 closes a gap that exists (PLUG-OUT-BLOCKED).
+ * The routes through boxes go from 19 to 0, 66 to 0 and 5 to 0. The level links read the routes, so they change too.
+ */
+const LADDER_DIGESTS: Readonly<Record<string, string>> = {
+  "case-dense-groups/site": "ec0773151f8a1e14d47a02f5721e26ec2904b0f4f13828161199fae6719543f9",
+  "case-many-groups/site": "ad3cc6391a9d0f9bbee939f6fed83677742138403b9e2aa1c6fb9b23273e7963",
+  "small-clustered/site": "00218ff3bb4b8e208167b79f007790bd0ec78c27c9b9ebbe0d00bd6ed753fe93",
 };
 
 /** The options of the router of the example boards of the site, and the defaults. */
@@ -52,6 +63,15 @@ describe("the output of the sections router", () => {
   for (const [name, make] of GRAPHS)
     for (const options of OPTIONS)
       it(`stays the same on ${name} with the options ${options.name}`, () => {
-        expect(digest(make(), options)).toBe(DIGESTS[`${name}/${options.name}`]);
+        const key = `${name}/${options.name}`;
+        expect(digest(make(), options)).toBe(LADDER_DIGESTS[key] ?? DIGESTS[key]);
+        expect(digest(make(), { ...options, outSteps: false })).toBe(DIGESTS[key]);
       });
+
+  it("gives the route with no way at the margin of 20 a way, and leaves no route through a box", () => {
+    const site = OPTIONS[0]!;
+    const through = (graph: Graph, outSteps: boolean): number => sectionsRouter({ ...site, outSteps }).route(graph).routes.filter((r) => r.through !== undefined).length;
+    expect(GRAPHS.map(([, make]) => through(make(), false))).toEqual([19, 0, 66, 5]);
+    expect(GRAPHS.map(([, make]) => through(make(), true))).toEqual([0, 0, 0, 0]);
+  });
 });

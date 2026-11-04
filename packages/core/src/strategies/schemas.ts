@@ -99,6 +99,7 @@ const WAY_SCHEMA: OptionSchema<WayOptions> = {
   margin: { type: "number", min: 1, max: 20, step: 1, default: 5, describe: "The distance from a box to the corners of the graph." },
   k: { type: "integer", min: 2, max: 16, step: 1, default: 8, describe: "The number of visible neighbours of each corner." },
   smooth: { type: "boolean", default: false, describe: "With `true`, a way in clear view uses the inflection rule, and the other ways get round corners." },
+  outSteps: { type: "boolean", default: true, describe: "With `false`, a way keeps the whole margin, so a closed gap gives the straight line." },
 };
 
 /** The declarations of the options of the stretch order (LANE-STRETCH): the method and the passes of `sifting`. A generator can list each value. */
@@ -964,6 +965,7 @@ export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
 export const DEPTHS_SCHEMA: OptionSchema<DepthLevelOptions> = {
   margin: WAY_SCHEMA.margin,
   k: WAY_SCHEMA.k,
+  outSteps: WAY_SCHEMA.outSteps,
   tightMargin: SECTIONS_SCHEMA.tightMargin,
   plugInset: SECTIONS_SCHEMA.plugInset,
   throughCost: SECTIONS_SCHEMA.throughCost,
