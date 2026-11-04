@@ -24,7 +24,10 @@ export type InnerMode = "corners" | "gutter";
 export interface FrameOptions extends WayOptions {
   /** The rule for a node box outside the box of its frame. The default is `throw`. */
   readonly outside?: Outside;
-  /** The distance from the walls of a frame to the bounds of its inner routes. The default is the margin of the router. The mode `gutter` does not use it. */
+  /**
+   * The distance from the walls of a frame to the bounds of its inner routes. The default is the margin of the router. The mode `gutter` does not use it.
+   * A child closer to a wall than this distance gives that wall half of its free strip.
+   */
   readonly frameInset?: number;
   /** The mode of the inner routes. The default is `corners`. */
   readonly inner?: InnerMode;
@@ -34,6 +37,7 @@ export interface FrameOptions extends WayOptions {
 
 /** The inside of one frame for the inner edges to one depth: the bounds, the way finder and the obstacles by id. */
 interface Room {
+  readonly bounds: Box;
   readonly ways: WayFinder;
   readonly nodes: ReadonlyMap<string, Node>;
 }
@@ -97,8 +101,9 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
     if (!end) continue;
     const fp = placePlug(f, own, center(end.box));
     const inward = { x: -fp.normal.x, y: -fp.normal.y };
-    // The way starts on the bounds, straight in from the plug of the wall.
-    const start: Plug = { point: { x: fp.point.x + inward.x * inset, y: fp.point.y + inward.y * inset }, normal: inward };
+    // The way starts on the bounds, straight in from the plug of the wall. That stop is the first stop of the way, so the way takes no second step inward.
+    const depth = insetOfWall(f.box, room.bounds, inward);
+    const start: Plug = { point: { x: fp.point.x + inward.x * depth, y: fp.point.y + inward.y * depth }, normal: inward, noStep: true };
     const ep = placePlug(end, far, fp.point);
     const ends = new Set<Node>([end]);
     const points =
@@ -214,8 +219,9 @@ function makeRoom(
   deep: boolean,
 ): Room {
   const margin = options.margin ?? 5;
-  const bounds = shrink(f.box, inset);
-  const nodes = roomNodes(f, chain, children, byId, bounds, options, deep);
+  const nodes = roomNodes(f, chain, children, byId, shrink(f.box, inset), options, deep);
+  // The rule `clamp` cuts a box to the bounds at `inset`, so a box that it cut does not move them.
+  const bounds = roomBounds(f.box, inset, [...nodes.values()].filter((n) => n.box === byId.get(n.id)?.box));
   // The band of each wall starts half a margin outside the bounds, so that a way keeps in the bounds.
   const w = shrink(bounds, -(margin / 2 + EPS));
   const t = 2 * margin + 1;
@@ -225,7 +231,32 @@ function makeRoom(
     { x: w.x - t, y: w.y, w: t, h: w.h },
     { x: w.x + w.w, y: w.y, w: t, h: w.h },
   ].map((box, i) => ({ id: `${WALL}${i}`, box }));
-  return { ways: new WayFinder([...nodes.values(), ...walls], options), nodes };
+  // The walls give each graph the clearance of the whole margin, so a graph at a lower step can reach past the bounds. The bounds hold each stop of each graph.
+  return { ways: new WayFinder([...nodes.values(), ...walls], { ...options, bounds: shrink(bounds, -EPS) }), nodes, bounds };
+}
+
+/**
+ * This function gives the bounds of a room: the box of the frame, smaller by `inset`.
+ * A child in the strip of a wall closes a way along that wall. So that wall takes half of its free strip, and a way stays between the child and the wall.
+ */
+function roomBounds(f: Box, inset: number, nodes: Iterable<Node>): Box {
+  let [west, north, east, south] = [Infinity, Infinity, Infinity, Infinity];
+  for (const { box } of nodes) {
+    west = Math.min(west, box.x - f.x);
+    north = Math.min(north, box.y - f.y);
+    east = Math.min(east, f.x + f.w - box.x - box.w);
+    south = Math.min(south, f.y + f.h - box.y - box.h);
+  }
+  const side = (strip: number): number => (inset < strip ? inset : Math.max(0, strip / 2));
+  const [x, y] = [f.x + side(west), f.y + side(north)];
+  return { x, y, w: Math.max(0, f.x + f.w - side(east) - x), h: Math.max(0, f.y + f.h - side(south) - y) };
+}
+
+/** This function gives the distance from a wall of the frame `f` to the bounds of its room. `inward` is the normal of the wall, into the frame. */
+function insetOfWall(f: Box, bounds: Box, inward: Point): number {
+  if (inward.x > 0) return bounds.x - f.x;
+  if (inward.x < 0) return f.x + f.w - bounds.x - bounds.w;
+  return inward.y > 0 ? bounds.y - f.y : f.y + f.h - bounds.y - bounds.h;
 }
 
 /**

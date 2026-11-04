@@ -152,6 +152,7 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - Each other router gives such an edge an outer route, as before. With your outer router and `corners`, the edge gets two routes. Keep the inner route of `corners`.
   - An edge with no common frame stays an outer edge. An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
 - The default of `frameInset` is the margin of the router.
+- A route takes its first stop on the bounds, and each other stop stays in them. A child closer to a wall than `frameInset` gives that wall half of its free strip.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
 - The option `outside` sets the rule for a node box outside the box of its frame:
   - `throw` (the default) throws a `RangeError`.

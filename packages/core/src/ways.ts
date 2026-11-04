@@ -1,5 +1,5 @@
 import { inflectionCurve, roundCorners } from "./curves.ts";
-import type { Point } from "./geom.ts";
+import { dist, inBox, type Box, type Point } from "./geom.ts";
 import type { Node } from "./model.ts";
 import type { Plug } from "./plugs.ts";
 import { CornerGraph, Obstacles } from "./visibility.ts";
@@ -34,6 +34,8 @@ export interface WayFinderOptions extends WayOptions {
   readonly joinWork?: number;
   /** With `false`, the join does not label the free regions. `CornerGraphOptions.joinRegions` tells more. */
   readonly joinRegions?: boolean;
+  /** With a box, each stop of a way stays in that box: the corners of each graph, and the first step from a plug. The room of a frame gives its bounds. */
+  readonly bounds?: Box;
 }
 
 export class WayFinder {
@@ -46,7 +48,8 @@ export class WayFinder {
   readonly outSteps: boolean;
   readonly #smooth: boolean;
   readonly #nodes: readonly Node[];
-  readonly #graphOptions: Pick<WayFinderOptions, "joinWork" | "joinRegions"> & { readonly k: number };
+  readonly #graphOptions: Pick<WayFinderOptions, "joinWork" | "joinRegions" | "bounds"> & { readonly k: number };
+  readonly #bounds: Box | undefined;
   readonly #lower: (CornerGraph | undefined)[] = [];
 
   /** This constructor makes the obstacles and the corner graph of the nodes. */
@@ -56,7 +59,13 @@ export class WayFinder {
     this.outSteps = options.outSteps ?? true;
     this.obstacles = new Obstacles(nodes, 180);
     this.#nodes = nodes;
-    this.#graphOptions = { k: options.k ?? 8, ...(options.joinWork === undefined ? {} : { joinWork: options.joinWork }), ...(options.joinRegions === undefined ? {} : { joinRegions: options.joinRegions }) };
+    this.#bounds = options.bounds;
+    this.#graphOptions = {
+      k: options.k ?? 8,
+      ...(options.joinWork === undefined ? {} : { joinWork: options.joinWork }),
+      ...(options.joinRegions === undefined ? {} : { joinRegions: options.joinRegions }),
+      ...(options.bounds === undefined ? {} : { bounds: options.bounds }),
+    };
     this.corners = new CornerGraph(nodes, this.obstacles, { margin: this.margin, ...this.#graphOptions });
   }
 
@@ -67,14 +76,14 @@ export class WayFinder {
 
   /**
    * This method gives the index in `OUT_STEPS` of the first step of a plug.
-   * A step is good when its point is out of each box, the step goes through no box and the point sees a corner.
+   * A good step has a point in the bounds and out of each box. The step goes through no box, and the point sees a corner.
    * With no good step, the method gives 0, so the search finds no start.
    */
   outStep(p: Plug): number {
     if (!this.outSteps) return 0;
     for (let i = 0; i < OUT_STEPS.length; i++) {
       const q = this.#at(p, i);
-      if (!this.obstacles.inside(q, 0) && this.obstacles.clear(p.point, q, 0) && this.corners.sees(q)) return i;
+      if (this.#fits(q) && !this.obstacles.inside(q, 0) && this.obstacles.clear(p.point, q, 0) && this.corners.sees(q)) return i;
     }
     return 0;
   }
@@ -89,7 +98,7 @@ export class WayFinder {
    */
   way(from: Plug | Point, to: Plug | Point, ends?: ReadonlySet<Node>): Point[] | undefined {
     const whole = (e: Plug | Point): Point => ("normal" in e ? this.#at(e, 0) : e);
-    const open = (e: Plug | Point): boolean => !("normal" in e) || this.obstacles.clear(e.point, this.#at(e, 0), 0);
+    const open = (e: Plug | Point): boolean => !("normal" in e) || (this.#fits(this.#at(e, 0)) && this.obstacles.clear(e.point, this.#at(e, 0), 0));
     if (!this.outSteps || (open(from) && open(to))) {
       const first = this.corners.path(whole(from), whole(to));
       if (first) return this.corners.pull(first);
@@ -114,8 +123,14 @@ export class WayFinder {
     return undefined;
   }
 
+  /** This method tells if the point is in the bounds of the ways. With no bounds, each point is in them. */
+  #fits(p: Point): boolean {
+    return this.#bounds === undefined || inBox(p, this.#bounds);
+  }
+
   /** This method gives the point of a step of `OUT_STEPS`, along the normal of the plug. */
   #at(p: Plug, step: number): Point {
+    if (p.noStep) return p.point;
     const d = this.margin * OUT_STEPS[step]!;
     return { x: p.point.x + p.normal.x * d, y: p.point.y + p.normal.y * d };
   }
@@ -128,7 +143,9 @@ export class WayFinder {
     }
     const way = this.way(ps, pt, ends);
     if (!way) return [ps.point, pt.point];
-    const poly = [ps.point, ...way, pt.point];
+    // A plug with no step lies on the way. A plug that faces it can step to the same point.
+    const stops = ps.noStep || pt.noStep ? way.filter((p, i) => i === 0 || dist(p, way[i - 1]!) > 0) : way;
+    const poly = [...(ps.noStep ? [] : [ps.point]), ...stops, ...(pt.noStep ? [] : [pt.point])];
     if (this.#smooth) {
       const round = roundCorners(poly, this.margin);
       if (this.obstacles.clearPath(round, 0, ends)) return round;

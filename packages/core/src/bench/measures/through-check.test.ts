@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Point } from "../../geom.ts";
 import type { Graph, Route } from "../../model.ts";
 import { Obstacles } from "../../visibility.ts";
-import { checkRoutes, closedDepth, deciding, falseThrough, flagged, type RouteCheck } from "./through-check.ts";
+import { checkRoutes, closedDepth, deciding, falseThrough, flagged, spikeEnds, type RouteCheck } from "./through-check.ts";
 
 const box = (id: string, x: number, y: number, w: number, h: number, parent?: string) => ({ id, box: { x, y, w, h }, ...(parent !== undefined ? { parent } : {}) });
 const SOURCE = box("s", 0, 40, 10, 20);
@@ -16,6 +16,27 @@ function check(nodes: Graph["nodes"], points: readonly Point[], through?: readon
   const route: Route = { edge: "e", points, ...(through ? { through } : {}) };
   return checkRoutes(graph, [route])[0]!;
 }
+
+describe("the shape spike", () => {
+  it("reads a route that goes in and comes back, on both axes and in each direction", () => {
+    expect(spikeEnds([p(0, 0), p(8, 0), p(5, 40), p(5, 80)])).toBe(1);
+    expect(spikeEnds([p(0, 0), p(-8, 0), p(-5, 40), p(-5, 80)])).toBe(1);
+    expect(spikeEnds([p(0, 0), p(0, 8), p(40, 5), p(80, 5)])).toBe(1);
+    expect(spikeEnds([p(0, 0), p(0, -8), p(40, -5), p(80, -5)])).toBe(1);
+  });
+
+  it("counts each end of a route", () => {
+    expect(spikeEnds([p(5, 80), p(5, 40), p(8, 0), p(0, 0)])).toBe(1);
+    expect(spikeEnds([p(0, 0), p(8, 0), p(5, 40), p(5, 80), p(2, 120), p(10, 120)])).toBe(2);
+  });
+
+  it("does not read a right angle, a straight line, a short route or a leg of no length", () => {
+    expect(spikeEnds([p(0, 0), p(8, 0), p(8, 40)])).toBe(0);
+    expect(spikeEnds([p(0, 0), p(8, 0), p(20, 0)])).toBe(0);
+    expect(spikeEnds([p(0, 0), p(8, 0)])).toBe(0);
+    expect(spikeEnds([p(0, 0), p(0, 0), p(8, 0), p(8, 0), p(9, 40)])).toBe(0);
+  });
+});
 
 describe("closedDepth", () => {
   const b = { x: 0, y: 0, w: 10, h: 10 };
