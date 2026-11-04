@@ -53,6 +53,13 @@ export class Obstacles {
     });
   }
 
+  /** This method gives each node whose box the segment `ab` goes through to `visit`, with the test of the rule `no-pass-through`. */
+  across(a: Point, b: Point, visit: (n: Node) => void): void {
+    this.#grid.querySegment(a, b, 0, (n) => {
+      if (segmentHitsBox(a, b, inflate(n.box, -TOLERANCE))) visit(n);
+    });
+  }
+
   /** This method gives each node whose bucket the box touches to `visit`. A node can be outside the box. */
   query(box: Box, visit: (n: Node) => void): void {
     this.#grid.query(box, visit);

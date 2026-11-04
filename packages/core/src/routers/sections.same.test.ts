@@ -14,6 +14,7 @@ import { sectionsRouter, type SectionsOptions } from "./sections.ts";
  * ER3b changed the routes of the boards whose edges took the hubs out and back.
  * ER3c changed only the points of the level links of each digest except `small-clustered` with the options `site`.
  * Those links go through the groups now, not around the outer edge.
+ * CORNER-REACH added the field `through`, which the digest leaves out. So each digest stays, and the routes did not change.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
   "case-dense-groups/site": "c7dad0bc5c890c06d4d2c318d94209b5afaafc3a66f1278dd298b68a3659c654",
@@ -43,7 +44,8 @@ function digest(graph: Graph, options: SectionsOptions): string {
   const segments = segmentsOf(result);
   const keys = segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges));
   const lanes = laneRoutes(segments, new Set(keys), 2.4, 16);
-  return createHash("sha256").update(JSON.stringify({ result, keys, lanes })).digest("hex");
+  // The field `through` is a report on a route, not a part of it. Without it, each digest still pins the same route.
+  return createHash("sha256").update(JSON.stringify({ result, keys, lanes }, (key, value: unknown) => (key === "through" ? undefined : value))).digest("hex");
 }
 
 describe("the output of the sections router", () => {
