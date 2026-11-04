@@ -1,0 +1,63 @@
+# The screenshots of the site at 1280 and 390 pixels, in light and dark (SITE-LIVE). The images are an artifact, and a session reads them.
+# A local browser job can wait for a free machine, so this workflow takes the shots on a runner. It is not a heavy workflow: one job, one core, a few minutes.
+# A dispatch on a branch runs the copy of this file on that branch. A change to this file or to its script also runs it on a pull request.
+name: Shots
+
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "The pages, with commas, for example compare.html,results.html."
+        type: string
+        default: compare.html
+  pull_request:
+    paths:
+      - .github/workflows/shots.yml
+      - packages/site/scripts/shots.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run for each workflow and ref (RUNNER-SLOTS). A new dispatch waits for the run before it.
+  group: shots-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PAGES: ${{ inputs.pages || 'compare.html' }}
+      PLAYWRIGHT_DIR: /tmp/playwright
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @highways/site run build
+      # Playwright stays out of the lockfile: only this job uses it.
+      - name: Install the browser
+        run: |
+          mkdir -p "$PLAYWRIGHT_DIR"
+          npm install --prefix "$PLAYWRIGHT_DIR" --no-save playwright@1.49.1
+          "$PLAYWRIGHT_DIR/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Take the shots
+        run: |
+          pnpm --filter @highways/site exec vite preview --port 4188 --strictPort > preview.log 2>&1 &
+          for _ in $(seq 1 30); do curl -sf http://127.0.0.1:4188/ > /dev/null && break; sleep 1; done
+          node packages/site/scripts/shots.mjs out/shots http://127.0.0.1:4188/ "$PAGES"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: shots
+          path: out/shots
