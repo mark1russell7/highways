@@ -18,7 +18,7 @@ on:
   schedule:
     # The paths of the job changes leave out the code that the import walk does not reach. So this run times main in full each day.
     # The check against the fixed base shows a rise that many pull requests made together. The check against the parent shows only the last commit.
-    - cron: "17 6 * * *"
+    - cron: "24 6 * * *"
   workflow_dispatch:
     inputs:
       head:
