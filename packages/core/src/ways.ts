@@ -22,6 +22,8 @@ export interface WayOptions {
 export interface WayFinderOptions extends WayOptions {
   /** The limit of the work that joins the parts of the corner graph. `CornerGraphOptions.joinWork` tells more. */
   readonly joinWork?: number;
+  /** With `false`, the join does not label the free regions. `CornerGraphOptions.joinRegions` tells more. */
+  readonly joinRegions?: boolean;
 }
 
 export class WayFinder {
@@ -35,7 +37,7 @@ export class WayFinder {
     this.margin = options.margin ?? 5;
     this.#smooth = options.smooth ?? false;
     this.obstacles = new Obstacles(nodes, 180);
-    this.corners = new CornerGraph(nodes, this.obstacles, { margin: this.margin, k: options.k ?? 8, ...(options.joinWork === undefined ? {} : { joinWork: options.joinWork }) });
+    this.corners = new CornerGraph(nodes, this.obstacles, { margin: this.margin, k: options.k ?? 8, ...(options.joinWork === undefined ? {} : { joinWork: options.joinWork }), ...(options.joinRegions === undefined ? {} : { joinRegions: options.joinRegions }) });
   }
 
   /** This method gives the point at `margin` from the plug, along its normal. */

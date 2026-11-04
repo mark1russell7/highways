@@ -19,6 +19,8 @@ export interface CornersOptions extends FrameOptions {
   readonly maxNodes?: number;
   /** The limit of the work that joins the parts of the corner graph. `CornerGraphOptions.joinWork` tells more. */
   readonly joinWork?: number;
+  /** With `false`, the join does not label the free regions. `CornerGraphOptions.joinRegions` tells more. */
+  readonly joinRegions?: boolean;
   /**
    * The place of a free plug. The default is `facing`: the plug faces the other end (`placePlug`).
    * With `side`, the search starts from the whole free side, and the plug goes where the way leaves the side (`sidePlugs`, WILD-001).

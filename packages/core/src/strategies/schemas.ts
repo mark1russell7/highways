@@ -134,6 +134,7 @@ const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
 export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   ...WAY_SCHEMA,
   joinWork: { type: "integer", min: 0, max: 268435456, step: 1048576, default: JOIN_WORK, describe: "The limit of the work that joins the parts of the corner graph. 0 turns the join off." },
+  joinRegions: { type: "boolean", default: true, describe: "With `true`, the join looks only at the free region of a corner. The links stay the same." },
   plugs: {
     type: "enum",
     values: ["facing", "side"],
