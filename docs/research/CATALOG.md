@@ -764,6 +764,19 @@ In the replay, `territories` is out of the front on `screen-v2` and `screen-v3`.
 
 On `packed-grid`, most routes of each strategy go through boxes. The next step is a screen set of the boards after `makeRoom`. Ways along the seams come later, as an opt-in strategy.
 
+### Ways along the seams (PASS-SEAMS)
+
+The opt-in router `seams` takes each box smaller by 1 and gives the corner graph the margin 1. Thus the corners of the graph are on the real corners, and two boxes that touch have a free line between them. An edge with a way in the plain corner graph keeps it. The other edges go from plug to plug along the sides of the boxes.
+
+| Seed | Edges | Pass-throughs of `corners` | Pass-throughs of `seams` | Other breaks of `seams` | Length against `corners` | Bends for each route |
+|---|---:|---:|---:|---:|---:|---:|
+| `s0` | 132 | 94 | 0 | 0 | 1.29 | 1.62 |
+| `s4` | 132 | 92 | 0 | 0 | 1.30 | 1.59 |
+| `s6` | 128 | 87 | 0 | 0 | 1.32 | 1.55 |
+| `s8` | 133 | 97 | 0 | 0 | 1.29 | 1.83 |
+
+The test `routers/seams/index.test.ts` checks 0 pass-throughs on each of the 10 seeds. A count does not depend on the machine. These rows are a local check, not a verdict. A seam has no room for lanes, so routes can share one line, and only a screen gives the cost of that.
+
 ## The verdict over families of the screens (SCREEN-WEIGHT)
 
 Step 1 (VERDICT, #139) made the family the unit of a verdict. This step gives the families to the manifests and scores the records of both screens again with `verdict` of `layout-contract` 0.2.11.
