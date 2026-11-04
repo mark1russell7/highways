@@ -46,6 +46,15 @@ check("the route breaks no rule", stat("Broken rules") === "0", stat("Broken rul
 check("the router gives shared segments", /^[1-9][\d,]* shared segments/.test(text("#bundle-hint")), text("#bundle-hint"));
 check("the map draws the routes", await until(() => pixels().colors > 3), pixels().colors);
 
+// On a phone, the row of the routers scrolls. The chosen router stays in view after the web font loads.
+const inView = (): boolean => {
+  const row = ($("#routers") as Element).getBoundingClientRect();
+  const chosen = $('#routers [aria-checked="true"]')?.getBoundingClientRect();
+  return chosen !== undefined && chosen.left >= row.left - 1 && chosen.right <= row.right + 1;
+};
+await document.fonts.ready;
+check("the chosen router stays in view", await until(inView), $('#routers [aria-checked="true"]')?.getBoundingClientRect().left);
+
 // A zoom draws the map again.
 const atStart = pixels().sum;
 click("#zoom-in");
