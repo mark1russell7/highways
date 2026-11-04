@@ -9,6 +9,7 @@
     0.25,
     0.0625
   ],
+  "stroke": 1.1,
   "rows": [
     {
       "name": "default",
@@ -27,7 +28,11 @@
         0,
         0
       ],
-      "straight": 0
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
     },
     {
       "name": "nets 60",
@@ -46,7 +51,11 @@
         0,
         0
       ],
-      "straight": 0
+      "straight": 0,
+      "changed": 45,
+      "underStroke": 41,
+      "underTwoStrokes": 45,
+      "least": 0.0074648810300162695
     },
     {
       "name": "gap 40, nets 100",
@@ -65,7 +74,11 @@
         0,
         0
       ],
-      "straight": 0
+      "straight": 0,
+      "changed": 123,
+      "underStroke": 117,
+      "underTwoStrokes": 123,
+      "least": 0.03815262650938991
     },
     {
       "name": "gap 4, nets 60",
@@ -84,7 +97,11 @@
         0,
         0
       ],
-      "straight": 0
+      "straight": 0,
+      "changed": 535,
+      "underStroke": 88,
+      "underTwoStrokes": 535,
+      "least": 0.0132441618530352
     }
   ],
   "screen": [
@@ -186,6 +203,650 @@
       "changedThroughOn": 0,
       "throughOff": 924,
       "throughOn": 924
+    }
+  ],
+  "families": [
+    {
+      "family": "tiny-uniform",
+      "boards": 10,
+      "routes": 150,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        150,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "small-clustered",
+      "boards": 10,
+      "routes": 2000,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        2000,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "dense-groups",
+      "boards": 10,
+      "routes": 3000,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        3000,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "hub-chain",
+      "boards": 10,
+      "routes": 1179,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1179,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "many-groups",
+      "boards": 10,
+      "routes": 1891,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1891,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "packed-grid",
+      "boards": 10,
+      "routes": 1336,
+      "throughOff": 942,
+      "throughOn": 942,
+      "steps": [
+        1336,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 942,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "frame-rows",
+      "boards": 10,
+      "routes": 319,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        319,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "pipeline",
+      "boards": 10,
+      "routes": 783,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        783,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "fan-out",
+      "boards": 10,
+      "routes": 1038,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1038,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "two-hubs",
+      "boards": 10,
+      "routes": 1210,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1210,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "uneven-sizes",
+      "boards": 10,
+      "routes": 1324,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1324,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "thin-bars",
+      "boards": 10,
+      "routes": 601,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        601,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "sparse-long",
+      "boards": 10,
+      "routes": 338,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        338,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "local-mesh",
+      "boards": 10,
+      "routes": 1891,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        1891,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "bipartite",
+      "boards": 10,
+      "routes": 578,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        578,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "bottleneck",
+      "boards": 10,
+      "routes": 461,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        461,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "parallel-edges",
+      "boards": 10,
+      "routes": 834,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        834,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "maze",
+      "boards": 10,
+      "routes": 138,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        138,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "channel",
+      "boards": 10,
+      "routes": 234,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        234,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "comb",
+      "boards": 10,
+      "routes": 140,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        140,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "spiral",
+      "boards": 10,
+      "routes": 143,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        143,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "switchbox",
+      "boards": 10,
+      "routes": 160,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        160,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "escape",
+      "boards": 10,
+      "routes": 300,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        300,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "rings",
+      "boards": 10,
+      "routes": 140,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        140,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "family": "walled-level",
+      "boards": 10,
+      "routes": 130,
+      "throughOff": 0,
+      "throughOn": 0,
+      "steps": [
+        130,
+        0,
+        0,
+        0
+      ],
+      "lowerGraphs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "straight": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    }
+  ],
+  "site": [
+    {
+      "name": "case-dense-groups",
+      "routes": 300,
+      "throughOff": 19,
+      "throughOn": 0,
+      "changed": 20,
+      "underStroke": 3,
+      "underTwoStrokes": 9,
+      "least": 0.0010652471986395153
+    },
+    {
+      "name": "case-hub-chain",
+      "routes": 119,
+      "throughOff": 0,
+      "throughOn": 0,
+      "changed": 0,
+      "underStroke": 0,
+      "underTwoStrokes": 0,
+      "least": null
+    },
+    {
+      "name": "case-many-groups",
+      "routes": 187,
+      "throughOff": 66,
+      "throughOn": 0,
+      "changed": 66,
+      "underStroke": 15,
+      "underTwoStrokes": 66,
+      "least": 0.14948926136283577
+    },
+    {
+      "name": "small-clustered",
+      "routes": 200,
+      "throughOff": 5,
+      "throughOn": 0,
+      "changed": 5,
+      "underStroke": 1,
+      "underTwoStrokes": 2,
+      "least": 0.8052485690205027
     }
   ]
 }

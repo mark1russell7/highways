@@ -41,6 +41,14 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "corners-smooth.joinRegions": "The regions (JOIN-COST) skip only pairs that cannot link, so the drawing stays the same.",
   "sections.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
   "sections-tree.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
+  "corners.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "corners-smooth.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "trunks.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared-all.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared-stretch.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "sections.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "sections-tree.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */
