@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { highwaysRegistry } from "./families/index.ts";
+import { FIXTURES, makeFixture } from "./fixtures.ts";
 import { edgePlugs } from "./highways/stretches.ts";
 import type { Graph } from "./model.ts";
 import { cornersRouter } from "./routers/index.ts";
@@ -128,5 +129,10 @@ describe("the join of the parts of the corner graph (CORNER-REACH)", () => {
     const links = (w: WayFinder): number[][] => w.corners.points.map((_, i) => [...w.corners.neighbours(i)]);
     expect(links(new WayFinder(graph.nodes))).toEqual(links(new WayFinder(graph.nodes)));
     expect(JSON.stringify(cornersRouter({ name: "corners" }).route(graph))).toBe(JSON.stringify(cornersRouter({ name: "corners" }).route(graph)));
+  });
+
+  it("does no work on the board of the speed claim H3, so that claim does not read the join", () => {
+    const { nodes } = makeFixture(FIXTURES.find((f) => f.name === "large-clustered")!);
+    expect(new WayFinder(nodes).corners.joinLooks).toBe(0);
   });
 });
