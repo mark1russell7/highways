@@ -132,22 +132,25 @@ describe("the limit of work of assignWall (ASSIGN-BOUND)", () => {
     }
   });
 
-  it("never passes the exact count on a tight wall", () => {
+  it("never passes the exact count: a sweep above the exact plan is a fault", () => {
+    // The first sweep broke the gap, and thus passed the exact count on this wall (10 against 9) and on 11 of 480 seeded walls.
+    const spans = [[48, 63], [7, 19], [24, 36], [37, 52], [84, 90], [54, 69], [68, 77], [4, 16], [90, 90], [75, 90]] as const;
+    const pinned: WallEnd[] = spans.map(([lo, hi], i) => ({ lo, hi, ideal: (lo + hi) / 2, key: i }));
+    const count = (ends: WallEnd[], room: [number, number], planner: "sweep" | "exact"): number => assignWall(ends, room, 8, [], planner).anchored.filter(Boolean).length;
+    expect(count(pinned, [0, 90], "sweep")).toBeLessThanOrEqual(count(pinned, [0, 90], "exact"));
     const rand = seeded(20261105);
     for (const n of [10, 12, 14, 16]) {
-      for (let w = 0; w < 20; w++) {
+      for (let w = 0; w < 40; w++) {
         const room: [number, number] = [0, n * 9];
         const ends: WallEnd[] = Array.from({ length: n }, () => {
           const lo = Math.round(rand() * room[1]);
           const hi = Math.min(room[1], lo + 8 + Math.round(rand() * 8));
           return { lo, hi, ideal: lo + rand() * (hi - lo), key: rand() };
         });
-        const best = assignWall(ends, room, 8, [], "exact").anchored.filter(Boolean).length;
-        const sweep = assignWall(ends, room, 8, [], "sweep").anchored.filter(Boolean).length;
-        expect(sweep, `${n} ends, wall ${w}`).toBeLessThanOrEqual(best);
+        expect(count(ends, room, "sweep"), `${n} ends, wall ${w}`).toBeLessThanOrEqual(count(ends, room, "exact"));
       }
     }
-  });
+  }, 30_000);
 
   it("stays at or under the exact count, and loses at most 1 end on 30 seeded walls of 10 ends", () => {
     const rand = seeded(20261104);
