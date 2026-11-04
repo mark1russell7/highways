@@ -116,6 +116,8 @@ export interface Result {
   readonly bundles?: readonly Bundle[];
   /** The stretches of way that several routes share, if the router gives them. */
   readonly runs?: readonly SharedRun[];
+  /** This flag tells that the limit of the work stopped the join of the corner graph. Then a route can miss a way that exists. */
+  readonly joinStopped?: true;
 }
 
 /**

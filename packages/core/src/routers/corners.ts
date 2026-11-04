@@ -4,7 +4,7 @@ import { placePlug, type Plug } from "../plugs.ts";
 import { spacePlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
 import type { PlugPair, Strategy } from "../strategies/model.ts";
-import { markThrough } from "../through.ts";
+import { joinNote, markThrough } from "../through.ts";
 import { WayFinder } from "../ways.ts";
 import { frameRoutes, type FrameOptions } from "./frames.ts";
 
@@ -17,6 +17,10 @@ export interface CornersOptions extends FrameOptions {
   readonly name: string;
   /** The benchmark skips a fixture with more nodes. */
   readonly maxNodes?: number;
+  /** The limit of the work that joins the parts of the corner graph. `CornerGraphOptions.joinWork` tells more. */
+  readonly joinWork?: number;
+  /** With `false`, the join does not label the free regions. `CornerGraphOptions.joinRegions` tells more. */
+  readonly joinRegions?: boolean;
   /**
    * The place of a free plug. The default is `facing`: the plug faces the other end (`placePlug`).
    * With `side`, the search starts from the whole free side, and the plug goes where the way leaves the side (`sidePlugs`, WILD-001).
@@ -53,7 +57,7 @@ export function cornersRouter(options: CornersOptions): Router {
       // The inner routes come after the outer routes.
       const done = (): Result => {
         const outer = markThrough(graph, routes, ways.obstacles);
-        return { routes: inner.length > 0 ? [...outer, ...frameRoutes(graph, inner, options)] : outer };
+        return { routes: inner.length > 0 ? [...outer, ...frameRoutes(graph, inner, options)] : outer, ...joinNote(ways) };
       };
       if (!options.plug && (options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
         for (const e of graph.edges) {

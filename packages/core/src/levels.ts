@@ -49,6 +49,12 @@ export interface LevelLinkOptions extends WayOptions {
    * The value 0 turns the second way off and gives the links of version 0.1.5. The default is 8.
    */
   readonly throughCost?: number;
+  /**
+   * The limit of the work of the join of parts on the corner graphs of a level, in looks. The value goes to `joinWork` of `CornerGraph`.
+   * The default is 0, so the level graphs have no join. This default has a known limit: a level of walled items can lose links.
+   * The member 60599 of the family `maze` as one level loses 6 links, and its largest member 7122 loses 11. The value `JOIN_WORK` gives them back.
+   */
+  readonly levelJoinWork?: number;
 }
 
 /** The default values of the three limits of `LevelLinkOptions`. */
@@ -156,10 +162,11 @@ function levelWays(nodes: readonly Node[], options: LevelLinkOptions): LevelWays
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
-  const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true });
+  const joinWork = options.levelJoinWork ?? 0;
+  const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true, joinWork });
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
-  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true }));
+  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true, joinWork }));
   let soft: SoftGraph | undefined;
   const softGraph = (): SoftGraph => (soft ??= new SoftGraph(nodes, obstacles, { margin, k }));
   return { obstacles, corners, margin, out, tight: tightGraph, free: new Map(), soft: softGraph, size: size / Math.max(1, nodes.length) };
