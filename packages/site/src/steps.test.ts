@@ -19,6 +19,7 @@ import {
 } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
 import { COLUMNS, computePanels, PAGE_STEPS, STEP_NAMES } from "./compare-data.ts";
+import { COMPARE_STRATEGIES } from "./opt-in.ts";
 import { demoPickers, demoRoute } from "./demo-data.ts";
 import { controlOptions, isControl, textOptions } from "./options.ts";
 
@@ -55,7 +56,7 @@ describe("each step and each strategy on the pages (COMPARE-ALL)", () => {
     const counts: string[] = [];
     for (const step of STEPS) {
       const data = computePanels({ step, board: TINY, options: {} });
-      expect(data.panels.map((p) => p.strategy), step).toEqual(names(STRATEGIES, step));
+      expect(data.panels.map((p) => p.strategy), step).toEqual(names(COMPARE_STRATEGIES, step));
       for (const p of data.panels) for (const c of COLUMNS[step]) expect(p.measures.some((m) => m.key === c.key), `${step} ${p.strategy} ${c.key}`).toBe(true);
       counts.push(`${step} ${data.panels.length}`);
     }

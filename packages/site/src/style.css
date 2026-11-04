@@ -1268,6 +1268,23 @@ pre code {
   white-space: nowrap;
 }
 
+.tag.opt-in {
+  font-weight: 700;
+  border-style: dashed;
+}
+
+.opt-in-mark {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cmp-note {
+  font-size: 0.82rem;
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 0.6rem;
+  border-left: 3px dashed var(--rule);
+}
+
 .cmp-panel.picked {
   outline: 3px solid var(--sign-bg);
   outline-offset: 2px;
