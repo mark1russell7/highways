@@ -14,6 +14,9 @@
 // Each board also compares the bytes of the routes of `on` and `whole`, because the labels must change no route.
 //
 // The router `shared` has the same fault, so it gets a second paired run with its own A/A arm. That run only reports: the trigger does not read it.
+// The router `sections-tree` is the route that users run, so it gets a third paired run with its own A/A arm, and the goal reads that run too.
+// That run also times the board `large-clustered` of the gate of the sections, because its level graphs do the most work. The goal reads that group at 1.10.
+// The arm `levels` turns on `levelJoinWork`. It is a report row: it shows the cost that the default of 0 avoids.
 // `node packages/core/scripts/join-cost.ts --rounds 15` writes `out/join-cost.json` and `out/join-cost.md`.
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -22,8 +25,10 @@ import { parseArgs } from "node:util";
 import { inputGraph } from "../src/bench/screen/forms.ts";
 import { SCREEN_V3, screenInputs } from "../src/bench/screen/set.ts";
 import { highwaysRegistry } from "../src/families/index.ts";
+import { FIXTURES, makeFixture } from "../src/fixtures.ts";
 import { outerGraph, type Graph } from "../src/model.ts";
-import { cornersRouter, sharedRouter, type SharedOptions } from "../src/routers/index.ts";
+import { cornersRouter, sectionsRouter, sharedRouter, type SectionsOptions, type SharedOptions } from "../src/routers/index.ts";
+import { JOIN_WORK } from "../src/visibility.ts";
 import { WayFinder } from "../src/ways.ts";
 import { measureIsolated, pairedContext, pairedEnv, type Input } from "./gates/paired.ts";
 
@@ -124,6 +129,27 @@ const sharedReport = measureIsolated({
   context: pairedContext(),
 });
 
+const tree = { name: "sections-tree", stretch: Infinity, maxNodes: 100_000 } as const;
+// The option `joinWork` is not a typed option of `sections`. The router gives its options to `WayFinder`, so the value arrives.
+const treeOff = sectionsRouter({ ...tree, joinWork: 0 } as SectionsOptions);
+const treeOn = sectionsRouter(tree);
+const treeLevels = sectionsRouter({ ...tree, levelJoinWork: JOIN_WORK });
+const gateBoard = makeFixture(FIXTURES.find((f) => f.name === "large-clustered")!);
+const treeReport = measureIsolated({
+  arms: [
+    { id: "off", run: (graph: Graph) => treeOff.route(graph) },
+    { id: "on", run: (graph: Graph) => treeOn.route(graph) },
+    { id: "levels", run: (graph: Graph) => treeLevels.route(graph) },
+  ],
+  inputs: [...inputs.filter((input) => input.group !== "tiled"), { id: "large-clustered", group: "large-clustered", value: gateBoard }],
+  repeats: Math.max(5, Math.floor(Number(values.rounds) / 3)),
+  warmup: 1,
+  mode: "process",
+  aa: true,
+  env: pairedEnv(),
+  context: pairedContext(),
+});
+
 /** This function gives the hash of the routes of a board. */
 const bytes = (router: { route(graph: Graph): unknown }, graph: Graph): string => createHash("sha256").update(JSON.stringify(router.route(graph))).digest("hex").slice(0, 12);
 
@@ -161,18 +187,24 @@ const aaTop = report.noiseFloor?.p90 ?? 1;
 const past = (names: readonly string[], line: number): string[] => names.filter((g) => groups[g]! > line && groups[g]! > aaTop);
 const opens = [...past(DEFAULT_GROUPS, 1.1), ...past(LARGE_GROUPS, 2)];
 const verdict = opens.length > 0 ? `the item opens (${opens.join(", ")})` : "the item stays a note";
-const missed = [...past(["default"], 1.1), ...past(["largest"], 2)];
+const treeGroups = treeReport.ratios["on"]!.groups;
+const treeTop = treeReport.noiseFloor?.p90 ?? 1;
+const treePast = (name: string, line: number): string[] => (treeGroups[name]! > line && treeGroups[name]! > treeTop ? [`sections-tree ${name}`] : []);
+const missed = [...past(["default"], 1.1), ...past(["largest"], 2), ...treePast("default", 1.1), ...treePast("largest", 2), ...treePast("large-clustered", 1.1)];
 const goal = missed.length > 0 ? `not met (${missed.join(", ")})` : "met";
 const sharedGroups = sharedReport.ratios["on"]!.groups;
 const sharedNoise = sharedReport.noiseFloor ? `${sharedReport.noiseFloor.p10.toFixed(3)} to ${sharedReport.noiseFloor.p90.toFixed(3)}` : "none";
-writeFileSync("out/join-cost.json", JSON.stringify({ report, sharedReport, rows, screen: { boards: screen.length, withWork }, verdict, goal, changed }));
+writeFileSync("out/join-cost.json", JSON.stringify({ report, sharedReport, treeReport, rows, screen: { boards: screen.length, withWork }, verdict, goal, changed }));
 const table = rows.map((r) => `| ${r.id} | ${r.points} | ${r.cells} | ${r.looks} | ${r.wholeLooks} | ${r.links} | ${r.stopped} | ${r.same} | ${r.off.toFixed(1)} | ${r.on.toFixed(1)} | ${r.whole.toFixed(1)} | ${(r.on - r.off).toFixed(1)} |`);
+const treeNoise = treeReport.noiseFloor ? `${treeReport.noiseFloor.p10.toFixed(3)} to ${treeReport.noiseFloor.p90.toFixed(3)}` : "none";
 const noise = report.noiseFloor ? `${report.noiseFloor.p10.toFixed(3)} to ${report.noiseFloor.p90.toFixed(3)}` : "none";
 const md = [
   `CPU: ${report.env.cpu}. Median ratio on/off: ${report.ratios["on"]!.median.toFixed(3)}. A/A band: ${noise}.`,
   `Group ratios on/off: ${Object.entries(groups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}.`,
   `Group ratios whole/off: ${Object.entries(report.ratios["whole"]!.groups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}.`,
-  `Goal of JOIN-COST (default 1.10, largest 2.00): ${goal}. Trigger of the free-space test: ${verdict}.`,
+  `Group ratios of sections-tree, on/off: ${Object.entries(treeGroups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}. A/A band: ${treeNoise}.`,
+  `Report only, levelJoinWork on/off: ${Object.entries(treeReport.ratios["levels"]!.groups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}.`,
+  `Goal of JOIN-COST (default 1.10, largest 2.00, and large-clustered of sections-tree 1.10, for corners and sections-tree): ${goal}. Trigger of the free-space test: ${verdict}.`,
   `Boards where the labels changed the bytes of the routes: ${changed.length} of ${rows.length}${changed.length > 0 ? ` (${changed.join(", ")})` : ""}.`,
   `Boards that pay and gain no link: ${paying.length} of ${rows.length}, with ${paying.filter((r) => r.looks === 0).length} that pay only the labels. Median added time of those boards: ${(paying.length > 0 ? median(paying.map((r) => r.on - r.off)) : 0).toFixed(2)} ms.`,
   `Report only, the trigger does not read it: shared on/off ${Object.entries(sharedGroups).map(([g, r]) => `${g} ${r.toFixed(3)}`).join(", ")}, A/A band ${sharedNoise}.`,

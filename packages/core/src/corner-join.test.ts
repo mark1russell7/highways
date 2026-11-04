@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { highwaysRegistry } from "./families/index.ts";
 import { FIXTURES, makeFixture } from "./fixtures.ts";
 import { edgePlugs } from "./highways/stretches.ts";
+import { levelLinks } from "./levels.ts";
 import type { Graph } from "./model.ts";
 import { cornersRouter } from "./routers/index.ts";
-import { CornerGraph, Obstacles } from "./visibility.ts";
+import { CornerGraph, JOIN_WORK, Obstacles } from "./visibility.ts";
 import { WayFinder } from "./ways.ts";
 
 const reg = highwaysRegistry();
@@ -169,5 +170,19 @@ describe("the join of the parts of the corner graph (CORNER-REACH)", () => {
   it("does no work on the board of the speed claim H3, so that claim does not read the join", () => {
     const { nodes } = makeFixture(FIXTURES.find((f) => f.name === "large-clustered")!);
     expect(new WayFinder(nodes).corners.joinLooks).toBe(0);
+  });
+});
+
+describe("levelJoinWork", () => {
+  const { graph } = reg.generate("maze", 60599);
+  const items = graph.nodes.map((n) => ({ id: n.id, box: n.box, nodes: [n.id] }));
+  const pairs = graph.edges.map((e) => ({ source: e.source.node, target: e.target.node, count: 1 })).filter((p) => p.source !== p.target);
+
+  it("is 0 by default, so the level graphs have no join", () => {
+    expect(levelLinks(items, pairs)).toEqual(levelLinks(items, pairs, { levelJoinWork: 0 }));
+  });
+
+  it("gives the level graphs the join when it has a value", () => {
+    expect(levelLinks(items, pairs, { levelJoinWork: JOIN_WORK })).not.toEqual(levelLinks(items, pairs));
   });
 });

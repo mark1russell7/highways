@@ -338,6 +338,7 @@ export const SECTIONS_SCHEMA: OptionSchema<RouterPreset<SectionsOptions>> = {
     default: 8,
     describe: "The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5.",
   },
+  levelJoinWork: { type: "integer", min: 0, max: 268435456, step: 1048576, default: 0, describe: "The limit of the work of the join of parts on the level graphs. The value 0 turns that join off." },
   group: { type: "strategy", step: "group", describe: "The grouping rule: a strategy of the step `group`. Without it, the router uses the quadtree." },
   groupOptions: { type: "object", describe: "The options of the strategy `group`." },
   levels: { type: "list", describe: "The depths of the tree that get a level with groups. Without it, each depth gets a level." },
@@ -966,6 +967,7 @@ export const DEPTHS_SCHEMA: OptionSchema<DepthLevelOptions> = {
   tightMargin: SECTIONS_SCHEMA.tightMargin,
   plugInset: SECTIONS_SCHEMA.plugInset,
   throughCost: SECTIONS_SCHEMA.throughCost,
+  levelJoinWork: SECTIONS_SCHEMA.levelJoinWork,
   levels: SECTIONS_SCHEMA.levels,
 };
 

@@ -40,6 +40,8 @@ jobs:
           paths: |
             packages/core/src/visibility.ts
             packages/core/src/free-regions.ts
+            packages/core/src/levels.ts
+            packages/core/src/routers/sections.ts
             packages/core/scripts/join-cost.ts
             .github/workflows/join-cost.yml
 
@@ -47,7 +49,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     env:
       ROUNDS: ${{ inputs.rounds || '15' }}
     steps:
