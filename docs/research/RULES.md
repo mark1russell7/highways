@@ -923,6 +923,8 @@ The first slice exists: the router `rules` has one solver, three hand-written te
 
 The second slice adds [RULE-019](#rule-019): the term `angle`, the preset `energy` and the option `descent`. The variables stay the shifts of the free legs, so a leg moves by 2 clearances at most. The term `angle` alone raises the median crossing angle on 10 of 15 families, and on 0 families it falls. In the preset `energy`, the angle rises on 4 families and falls on 1, because the other terms outweigh it. Weights are the open question, and [RULE-038](#rule-038) and [RULE-048](#rule-048) attack them.
 
+The third slice adds the field `variable` of a rule file. `points` moves each free point in x and in y, and `legs` stays the default. Each row of the record `scripts/data/rules/energy.json` states its variable. The record is local, it covers the 150 boards of `screen-v3`, and it has no times. On points, the preset `energy` with gradient descent raises the median crossing angle on 6 of 15 families, and the angle falls on 2. The last guard of the solver gives back the routes of `shared` when a board gets more crossings or more hard breaks. That guard gives back 87 of 150 boards on points and 62 on legs. So these counts measure the guard too, and they are not a verdict on the terms.
+
 ## Learned rules
 
 A learned method takes its rules from examples. This repository uses made-up data only. So each learned idea needs a corpus first: preference pairs from a panel, or the answers of an exact solver on small boards. A learned method stays deterministic only with frozen weights and no sampling at run time.
