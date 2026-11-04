@@ -1,0 +1,81 @@
+{
+  "schema": "level-join/1",
+  "item": "JOIN-COST",
+  "commit": "dd2bc53",
+  "branch": "measure/level-join",
+  "command": "node packages/core/scripts/level-join.ts",
+  "where": "local, one core. The counts and the bytes are deterministic, and the run reads no time.",
+  "set": "screen-v3",
+  "arms": "LEVEL_JOIN off against on. The value on sets the limit JOIN_WORK on the level graphs.",
+  "notIn": "The bench caller in src/bench/room.ts.",
+  "control": {
+    "on": 6,
+    "off": 0,
+    "bytesDiffer": true
+  },
+  "boards": 150,
+  "summary": [
+    {
+      "way": "sections",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 1143
+    },
+    {
+      "way": "sections-tree",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 1143
+    },
+    {
+      "way": "sections+venation",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 2286
+    },
+    {
+      "way": "sections+detail",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 1143
+    },
+    {
+      "way": "hw:level-links",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 21
+    },
+    {
+      "way": "room",
+      "boards": 150,
+      "boardsGaining": 0,
+      "linksGained": 0,
+      "levelBytesChanged": 0,
+      "wholeBytesChanged": 0,
+      "stopsOn": 0,
+      "looksOn": 59
+    }
+  ],
+  "gained": [],
+  "errors": []
+}
