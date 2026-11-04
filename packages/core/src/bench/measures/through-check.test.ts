@@ -1,9 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Point } from "../../geom.ts";
-import { highwaysRegistry, HIGHWAYS_FAMILIES } from "../../families/index.ts";
 import type { Graph, Route } from "../../model.ts";
-import { cornersRouter } from "../../routers/index.ts";
 import { Obstacles } from "../../visibility.ts";
 import { checkRoutes, closedDepth, deciding, falseThrough, flagged, type RouteCheck } from "./through-check.ts";
 
@@ -167,36 +165,4 @@ describe("the independence of the check", () => {
   it("has no name of the test behind through", () => {
     for (const name of ["visibility", "segmentHitsBox", "segmentHitsRect", "segmentBoxDistance", "across", "Obstacles", "Grid", "inflate", "TOLERANCE"]) expect(code, name).not.toContain(name);
   });
-});
-
-describe("the record through-check/1", () => {
-  const record = JSON.parse(readFileSync(new URL("../../../scripts/data/through-check/record.json", import.meta.url), "utf8")) as {
-    readonly unmarked: readonly string[];
-    readonly rows: readonly { readonly router: string }[];
-    readonly unmarkedRows: readonly { readonly router: string; readonly family: string; readonly routes: number; readonly marked: number }[];
-  };
-
-  it("keeps the routers that do not mark through on their own rows", () => {
-    expect(record.unmarked).toEqual(["straight", "plugs"]);
-    expect(record.rows.filter((r) => record.unmarked.includes(r.router))).toEqual([]);
-    for (const name of record.unmarked) {
-      const rows = record.unmarkedRows.filter((r) => r.router === name);
-      expect(rows.map((r) => r.family)).toEqual(expect.arrayContaining(HIGHWAYS_FAMILIES.map((f) => f.name)));
-      for (const r of rows) expect([r.family, r.routes > 0, r.marked]).toEqual([r.family, true, 0]);
-    }
-  });
-});
-
-describe("the property no-false-through", () => {
-  const reg = highwaysRegistry();
-  const corners = cornersRouter({ name: "corners" });
-
-  it.each(HIGHWAYS_FAMILIES.map((f) => f.name))("holds for corners on %s, over 2 seeds", (name) => {
-    for (const seed of [0, 1]) {
-      const { graph } = reg.generate(name, seed);
-      const checks = checkRoutes(graph, corners.route(graph).routes);
-      expect(checks.filter(falseThrough).map((c) => c.edge)).toEqual([]);
-      expect(checks.flatMap((c) => c.falseNames)).toEqual([]);
-    }
-  }, 60_000);
 });

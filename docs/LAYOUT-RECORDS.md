@@ -251,13 +251,20 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
-This tolerance lies on the same defect that the rule measures. A route up to 0.5 inside a box reads clear under `no-pass-through`, and the field `through` uses the same test. So the band hid the route `e284` of `case-dense-groups`, on `sections` with the settings of the site. A stop of that route is 0.42 inside `n138`, and the route has no `through`.
+This tolerance lies on the same defect that the rule measures. A route up to 0.5 inside a box reads clear under `no-pass-through`, and the field `through` uses the same test. So the band hid the route `e284` of `case-dense-groups`, on `sections` with the margin of the site and with `outSteps: false`. A stop of that route is 0.42 inside `n138`, and the route has no `through`. The site keeps `outSteps` on, and then that route is out of the band.
 
 The independent check `checkRoutes` in `bench/measures/through-check.ts` has no such band. It takes each route and each box as closed shapes, and it shares no code with the rule. A touch is a contact, and two boxes that touch make a wall.
 
-The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are, and no gate reads the count of the check.
+The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
 
 The script `packages/core/scripts/through-check.ts` writes the record `through-check/1`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+
+The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
+
+A row with the view `lanes` opens each shared segment. The compare page draws that form. The examples page starts with no segment open, so its first drawing has the view `routes`.
+
+The gate `packages/core/scripts/through-check.test.ts` makes the whole record again and compares it with the file. A stale file fails, and the message gives the command that writes it.
+The gate also holds each router of `scored`, on each family of the registry. Its list of contacts with no `through` is 53 routes of class `plug-seam` on `packed-grid`, and no other class or family. No route has a name in `through` that it does not meet.
 
 The packer is exact, so the shared rule `no-overlap` uses the smaller tolerance 0.001. A route is a curve on the line of the margin, so the rule `through` uses 0.5. A route in the margin of a box, outside the box, is a soft measure, not a break. The joint corpus keeps the packed inputs with a gap of 0 and no margin as a stress cell. On them, the rule `through` is expected to break. Each other joint input has a margin and a gap larger than 0.
 

@@ -25,6 +25,7 @@
   ],
   "unmarkedNote": "The routers straight and plugs do not mark through. Their flagged counts are outside each claim on through, and rows does not hold them.",
   "site": "sections-site",
+  "siteNoLadder": "sections-site-no-ladder",
   "innerBoard": {
     "name": "frame-rows+inner",
     "family": "frame-rows",
@@ -211,7 +212,7 @@
       "family": "tiny-uniform",
       "view": "routes",
       "routes": 45,
-      "marked": 1,
+      "marked": 0,
       "flagged": 0,
       "falseThrough": 0,
       "partFalse": 0,
@@ -228,6 +229,46 @@
     },
     {
       "router": "sections-site",
+      "family": "tiny-uniform",
+      "view": "lanes",
+      "routes": 45,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "tiny-uniform",
+      "view": "routes",
+      "routes": 45,
+      "marked": 1,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "tiny-uniform",
       "view": "lanes",
       "routes": 45,
@@ -473,6 +514,78 @@
       "family": "small-clustered",
       "view": "routes",
       "routes": 600,
+      "marked": 0,
+      "flagged": 9,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "wall": {
+          "routes": 9,
+          "sample": [
+            "0:e16",
+            "0:e23",
+            "0:e62"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "small-clustered",
+      "view": "lanes",
+      "routes": 600,
+      "marked": 0,
+      "flagged": 21,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "wall": {
+          "routes": 7,
+          "sample": [
+            "0:e16",
+            "0:e23",
+            "0:e62"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "deep": {
+          "routes": 14,
+          "sample": [
+            "0:e146",
+            "0:e178",
+            "0:e186"
+          ],
+          "leastDepth": 0.628935080738529,
+          "mostDepth": 5.697306053780835
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "small-clustered",
+      "view": "routes",
+      "routes": 600,
       "marked": 18,
       "flagged": 9,
       "falseThrough": 0,
@@ -509,7 +622,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "small-clustered",
       "view": "lanes",
       "routes": 600,
@@ -794,6 +907,104 @@
       "family": "dense-groups",
       "view": "routes",
       "routes": 900,
+      "marked": 0,
+      "flagged": 6,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "wall": {
+          "routes": 5,
+          "sample": [
+            "0:e10",
+            "2:e15",
+            "2:e66"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "corner": {
+          "routes": 1,
+          "sample": [
+            "0:e161"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "dense-groups",
+      "view": "lanes",
+      "routes": 900,
+      "marked": 0,
+      "flagged": 30,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "deep": {
+          "routes": 18,
+          "sample": [
+            "0:e0",
+            "0:e27",
+            "0:e41"
+          ],
+          "leastDepth": 0.5259419478882421,
+          "mostDepth": 4.297772258664281
+        },
+        "wall": {
+          "routes": 5,
+          "sample": [
+            "0:e10",
+            "0:e94",
+            "2:e15"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "corner": {
+          "routes": 1,
+          "sample": [
+            "0:e161"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "band": {
+          "routes": 6,
+          "sample": [
+            "1:e7",
+            "1:e65",
+            "1:e203"
+          ],
+          "leastDepth": 0.18607315399886204,
+          "mostDepth": 0.5
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "dense-groups",
+      "view": "routes",
+      "routes": 900,
       "marked": 68,
       "flagged": 8,
       "falseThrough": 0,
@@ -847,7 +1058,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "dense-groups",
       "view": "lanes",
       "routes": 900,
@@ -1137,6 +1348,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "hub-chain",
+      "view": "routes",
+      "routes": 356,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "hub-chain",
+      "view": "lanes",
+      "routes": 356,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "many-groups",
       "view": "routes",
@@ -1330,6 +1581,65 @@
       "family": "many-groups",
       "view": "routes",
       "routes": 568,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "many-groups",
+      "view": "lanes",
+      "routes": 568,
+      "marked": 0,
+      "flagged": 10,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "deep": {
+          "routes": 1,
+          "sample": [
+            "0:e103"
+          ],
+          "leastDepth": 1.6800992239019479,
+          "mostDepth": 1.6800992239019479
+        },
+        "band": {
+          "routes": 9,
+          "sample": [
+            "0:e141",
+            "0:e151",
+            "0:e158"
+          ],
+          "leastDepth": 0.05548047910946252,
+          "mostDepth": 0.4492873307064116
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "many-groups",
+      "view": "routes",
+      "routes": 568,
       "marked": 205,
       "flagged": 0,
       "falseThrough": 0,
@@ -1357,7 +1667,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "many-groups",
       "view": "lanes",
       "routes": 568,
@@ -1866,6 +2176,110 @@
       }
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "packed-grid",
+      "view": "routes",
+      "routes": 403,
+      "marked": 292,
+      "flagged": 53,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 9,
+      "hairline": 1,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "plug-seam": {
+          "routes": 53,
+          "sample": [
+            "0:e1",
+            "0:e4",
+            "0:e13"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {
+        "corner": {
+          "routes": 6,
+          "sample": [
+            "0:e96",
+            "0:e98",
+            "0:e114"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "band": {
+          "routes": 3,
+          "sample": [
+            "2:e94",
+            "2:e95",
+            "2:e138"
+          ],
+          "leastDepth": 0.05305039787799615,
+          "mostDepth": 0.4735883424407348
+        }
+      }
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "packed-grid",
+      "view": "lanes",
+      "routes": 403,
+      "marked": 292,
+      "flagged": 53,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 9,
+      "hairline": 1,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "plug-seam": {
+          "routes": 53,
+          "sample": [
+            "0:e1",
+            "0:e4",
+            "0:e13"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {
+        "corner": {
+          "routes": 6,
+          "sample": [
+            "0:e96",
+            "0:e98",
+            "0:e114"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        },
+        "band": {
+          "routes": 3,
+          "sample": [
+            "2:e94",
+            "2:e95",
+            "2:e138"
+          ],
+          "leastDepth": 0.05305039787799615,
+          "mostDepth": 0.4735883424407348
+        }
+      }
+    },
+    {
       "router": "corners",
       "family": "frame-rows",
       "view": "routes",
@@ -2087,6 +2501,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "frame-rows",
+      "view": "routes",
+      "routes": 96,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "frame-rows",
+      "view": "lanes",
+      "routes": 96,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "pipeline",
       "view": "routes",
@@ -2268,6 +2722,46 @@
     },
     {
       "router": "sections-site",
+      "family": "pipeline",
+      "view": "lanes",
+      "routes": 236,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "pipeline",
+      "view": "routes",
+      "routes": 236,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "pipeline",
       "view": "lanes",
       "routes": 236,
@@ -2517,6 +3011,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "fan-out",
+      "view": "routes",
+      "routes": 311,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "fan-out",
+      "view": "lanes",
+      "routes": 311,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "two-hubs",
       "view": "routes",
@@ -2719,6 +3253,46 @@
     },
     {
       "router": "sections-site",
+      "family": "two-hubs",
+      "view": "lanes",
+      "routes": 363,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "two-hubs",
+      "view": "routes",
+      "routes": 363,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "two-hubs",
       "view": "lanes",
       "routes": 363,
@@ -2987,6 +3561,65 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "uneven-sizes",
+      "view": "routes",
+      "routes": 390,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "uneven-sizes",
+      "view": "lanes",
+      "routes": 390,
+      "marked": 0,
+      "flagged": 39,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "deep": {
+          "routes": 38,
+          "sample": [
+            "0:e8",
+            "0:e10",
+            "0:e16"
+          ],
+          "leastDepth": 0.51199621748151,
+          "mostDepth": 9.379472065754896
+        },
+        "wall": {
+          "routes": 1,
+          "sample": [
+            "0:e48"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "thin-bars",
       "view": "routes",
@@ -3172,6 +3805,57 @@
       "family": "thin-bars",
       "view": "routes",
       "routes": 179,
+      "marked": 2,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "thin-bars",
+      "view": "lanes",
+      "routes": 179,
+      "marked": 2,
+      "flagged": 8,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "deep": {
+          "routes": 8,
+          "sample": [
+            "2:e2",
+            "2:e3",
+            "2:e8"
+          ],
+          "leastDepth": 1.5,
+          "mostDepth": 6
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "thin-bars",
+      "view": "routes",
+      "routes": 179,
       "marked": 121,
       "flagged": 0,
       "falseThrough": 0,
@@ -3199,7 +3883,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "thin-bars",
       "view": "lanes",
       "routes": 179,
@@ -3471,6 +4155,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "sparse-long",
+      "view": "routes",
+      "routes": 102,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "sparse-long",
+      "view": "lanes",
+      "routes": 102,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "local-mesh",
       "view": "routes",
@@ -3632,6 +4356,68 @@
     },
     {
       "router": "sections-site",
+      "family": "local-mesh",
+      "view": "routes",
+      "routes": 545,
+      "marked": 0,
+      "flagged": 27,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "wall": {
+          "routes": 27,
+          "sample": [
+            "0:e26",
+            "0:e28",
+            "0:e82"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "local-mesh",
+      "view": "lanes",
+      "routes": 545,
+      "marked": 0,
+      "flagged": 27,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "wall": {
+          "routes": 27,
+          "sample": [
+            "0:e26",
+            "0:e28",
+            "0:e82"
+          ],
+          "leastDepth": 0,
+          "mostDepth": 0
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "local-mesh",
       "view": "routes",
       "routes": 545,
@@ -3662,7 +4448,7 @@
       "unnamedClasses": {}
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "local-mesh",
       "view": "lanes",
       "routes": 545,
@@ -3904,6 +4690,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "bipartite",
+      "view": "routes",
+      "routes": 172,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "bipartite",
+      "view": "lanes",
+      "routes": 172,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "bottleneck",
       "view": "routes",
@@ -4116,6 +4942,56 @@
     },
     {
       "router": "sections-site",
+      "family": "bottleneck",
+      "view": "lanes",
+      "routes": 136,
+      "marked": 0,
+      "flagged": 2,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "band": {
+          "routes": 2,
+          "sample": [
+            "2:e16",
+            "2:e26"
+          ],
+          "leastDepth": 0.08425183064809971,
+          "mostDepth": 0.4684452912981669
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "bottleneck",
+      "view": "routes",
+      "routes": 136,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "bottleneck",
       "view": "lanes",
       "routes": 136,
@@ -4395,6 +5271,65 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "parallel-edges",
+      "view": "routes",
+      "routes": 249,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "parallel-edges",
+      "view": "lanes",
+      "routes": 249,
+      "marked": 0,
+      "flagged": 4,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {
+        "deep": {
+          "routes": 3,
+          "sample": [
+            "0:e16",
+            "1:e75",
+            "2:e71"
+          ],
+          "leastDepth": 1.2208875569897941,
+          "mostDepth": 3.5232560846125125
+        },
+        "band": {
+          "routes": 1,
+          "sample": [
+            "1:e74"
+          ],
+          "leastDepth": 0.33082679320972375,
+          "mostDepth": 0.33082679320972375
+        }
+      },
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "maze",
       "view": "routes",
@@ -4556,6 +5491,46 @@
     },
     {
       "router": "sections-site",
+      "family": "maze",
+      "view": "routes",
+      "routes": 43,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "maze",
+      "view": "lanes",
+      "routes": 43,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "maze",
       "view": "routes",
       "routes": 43,
@@ -4575,7 +5550,7 @@
       "unnamedClasses": {}
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "maze",
       "view": "lanes",
       "routes": 43,
@@ -4816,6 +5791,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "channel",
+      "view": "routes",
+      "routes": 70,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "channel",
+      "view": "lanes",
+      "routes": 70,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "comb",
       "view": "routes",
@@ -4977,6 +5992,46 @@
     },
     {
       "router": "sections-site",
+      "family": "comb",
+      "view": "routes",
+      "routes": 41,
+      "marked": 2,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "comb",
+      "view": "lanes",
+      "routes": 41,
+      "marked": 2,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "comb",
       "view": "routes",
       "routes": 41,
@@ -5005,7 +6060,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "comb",
       "view": "lanes",
       "routes": 41,
@@ -5206,6 +6261,46 @@
       "family": "spiral",
       "view": "routes",
       "routes": 41,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "spiral",
+      "view": "lanes",
+      "routes": 41,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "spiral",
+      "view": "routes",
+      "routes": 41,
       "marked": 39,
       "flagged": 0,
       "falseThrough": 0,
@@ -5231,7 +6326,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "spiral",
       "view": "lanes",
       "routes": 41,
@@ -5470,6 +6565,46 @@
       "unnamedClasses": {}
     },
     {
+      "router": "sections-site-no-ladder",
+      "family": "switchbox",
+      "view": "routes",
+      "routes": 48,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "switchbox",
+      "view": "lanes",
+      "routes": 48,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
       "router": "corners",
       "family": "escape",
       "view": "routes",
@@ -5653,6 +6788,46 @@
       "family": "escape",
       "view": "routes",
       "routes": 90,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "escape",
+      "view": "lanes",
+      "routes": 90,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "escape",
+      "view": "routes",
+      "routes": 90,
       "marked": 81,
       "flagged": 0,
       "falseThrough": 0,
@@ -5680,7 +6855,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "escape",
       "view": "lanes",
       "routes": 90,
@@ -5875,7 +7050,7 @@
       "family": "rings",
       "view": "routes",
       "routes": 42,
-      "marked": 27,
+      "marked": 0,
       "flagged": 0,
       "falseThrough": 0,
       "partFalse": 0,
@@ -5892,6 +7067,46 @@
     },
     {
       "router": "sections-site",
+      "family": "rings",
+      "view": "lanes",
+      "routes": 42,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "rings",
+      "view": "routes",
+      "routes": 42,
+      "marked": 27,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "rings",
       "view": "lanes",
       "routes": 42,
@@ -6075,6 +7290,46 @@
       "family": "walled-level",
       "view": "routes",
       "routes": 39,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site",
+      "family": "walled-level",
+      "view": "lanes",
+      "routes": 39,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
+      "family": "walled-level",
+      "view": "routes",
+      "routes": 39,
       "marked": 11,
       "flagged": 0,
       "falseThrough": 0,
@@ -6100,7 +7355,7 @@
       }
     },
     {
-      "router": "sections-site",
+      "router": "sections-site-no-ladder",
       "family": "walled-level",
       "view": "lanes",
       "routes": 39,
@@ -6221,6 +7476,26 @@
     },
     {
       "router": "sections-site",
+      "family": "frame-rows+inner",
+      "view": "routes",
+      "routes": 96,
+      "marked": 0,
+      "flagged": 0,
+      "falseThrough": 0,
+      "partFalse": 0,
+      "unnamed": 0,
+      "hairline": 0,
+      "hairlineClear": 0,
+      "skipsFrame": 0,
+      "inner": 0,
+      "innerMarked": 0,
+      "innerFlagged": 0,
+      "classes": {},
+      "innerClasses": {},
+      "unnamedClasses": {}
+    },
+    {
+      "router": "sections-site-no-ladder",
       "family": "frame-rows+inner",
       "view": "routes",
       "routes": 96,

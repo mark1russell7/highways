@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import { checkRoutes, falseThrough } from "../bench/measures/through-check.ts";
 import { CASES } from "../cases.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import type { Graph } from "../model.ts";
@@ -70,7 +71,11 @@ describe("the output of the sections router", () => {
 
   it("gives the route with no way at the margin of 20 a way, and leaves no route through a box", () => {
     const site = OPTIONS[0]!;
-    const through = (graph: Graph, outSteps: boolean): number => sectionsRouter({ ...site, outSteps }).route(graph).routes.filter((r) => r.through !== undefined).length;
+    const through = (graph: Graph, outSteps: boolean): number => {
+      const checks = checkRoutes(graph, sectionsRouter({ ...site, outSteps }).route(graph).routes);
+      expect(checks.filter(falseThrough).map((c) => c.edge)).toEqual([]);
+      return checks.filter((c) => c.marked).length;
+    };
     expect(GRAPHS.map(([, make]) => through(make(), false))).toEqual([19, 0, 66, 5]);
     expect(GRAPHS.map(([, make]) => through(make(), true))).toEqual([0, 0, 0, 0]);
   });
