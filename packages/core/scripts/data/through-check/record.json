@@ -78,6 +78,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -112,6 +114,8 @@
       "laneBends": 113,
       "fullLength": 5775.43,
       "fullBends": 113,
+      "laneCrossings": 37,
+      "fullCrossings": 37,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -146,6 +150,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -180,6 +186,8 @@
       "laneBends": 136,
       "fullLength": 5988.389,
       "fullBends": 136,
+      "laneCrossings": 43,
+      "fullCrossings": 43,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -214,6 +222,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -248,6 +258,8 @@
       "laneBends": 113,
       "fullLength": 5775.43,
       "fullBends": 113,
+      "laneCrossings": 37,
+      "fullCrossings": 37,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -282,6 +294,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -316,6 +330,8 @@
       "laneBends": 179,
       "fullLength": 7276.779,
       "fullBends": 179,
+      "laneCrossings": 69,
+      "fullCrossings": 69,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -350,6 +366,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -384,6 +402,8 @@
       "laneBends": 176,
       "fullLength": 8733.669,
       "fullBends": 176,
+      "laneCrossings": 82,
+      "fullCrossings": 82,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -418,6 +438,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -452,6 +474,8 @@
       "laneBends": 173,
       "fullLength": 8691.357,
       "fullBends": 173,
+      "laneCrossings": 82,
+      "fullCrossings": 82,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -486,6 +510,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -520,6 +546,8 @@
       "laneBends": 1968,
       "fullLength": 180109.394,
       "fullBends": 1968,
+      "laneCrossings": 3096,
+      "fullCrossings": 3096,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -554,6 +582,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -588,6 +618,8 @@
       "laneBends": 2296,
       "fullLength": 184309.051,
       "fullBends": 2296,
+      "laneCrossings": 3537,
+      "fullCrossings": 3537,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -622,6 +654,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -656,6 +690,8 @@
       "laneBends": 3178,
       "fullLength": 191296.346,
       "fullBends": 3178,
+      "laneCrossings": 4668,
+      "fullCrossings": 4527,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -690,6 +726,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -724,6 +762,8 @@
       "laneBends": 3447,
       "fullLength": 233486.905,
       "fullBends": 3445,
+      "laneCrossings": 7195,
+      "fullCrossings": 6945,
       "classes": {
         "band": {
           "routes": 1,
@@ -776,6 +816,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 9,
@@ -821,6 +863,8 @@
       "laneBends": 4354,
       "fullLength": 303240.004,
       "fullBends": 4353,
+      "laneCrossings": 10953,
+      "fullCrossings": 10720,
       "classes": {
         "wall": {
           "routes": 8,
@@ -874,6 +918,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 9,
@@ -928,6 +974,8 @@
       "laneBends": 4290,
       "fullLength": 301841.854,
       "fullBends": 4289,
+      "laneCrossings": 10886,
+      "fullCrossings": 10651,
       "classes": {
         "wall": {
           "routes": 8,
@@ -990,6 +1038,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1024,6 +1074,8 @@
       "laneBends": 3043,
       "fullLength": 302006.942,
       "fullBends": 3043,
+      "laneCrossings": 5868,
+      "fullCrossings": 5868,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1058,6 +1110,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1092,6 +1146,8 @@
       "laneBends": 3585,
       "fullLength": 310133.037,
       "fullBends": 3585,
+      "laneCrossings": 6528,
+      "fullCrossings": 6528,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1126,6 +1182,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1160,6 +1218,8 @@
       "laneBends": 5657,
       "fullLength": 331480.059,
       "fullBends": 5657,
+      "laneCrossings": 10605,
+      "fullCrossings": 10195,
       "classes": {
         "band": {
           "routes": 1,
@@ -1211,6 +1271,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1245,6 +1307,8 @@
       "laneBends": 5498,
       "fullLength": 394436.236,
       "fullBends": 5498,
+      "laneCrossings": 13497,
+      "fullCrossings": 13019,
       "classes": {
         "band": {
           "routes": 2,
@@ -1305,6 +1369,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 5,
@@ -1358,6 +1424,8 @@
       "laneBends": 7064,
       "fullLength": 504999.61,
       "fullBends": 7064,
+      "laneCrossings": 19559,
+      "fullCrossings": 19360,
       "classes": {
         "wall": {
           "routes": 5,
@@ -1411,6 +1479,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 5,
@@ -1482,6 +1552,8 @@
       "laneBends": 6886,
       "fullLength": 501437.032,
       "fullBends": 6886,
+      "laneCrossings": 19116,
+      "fullCrossings": 18901,
       "classes": {
         "wall": {
           "routes": 5,
@@ -1553,6 +1625,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1587,6 +1661,8 @@
       "laneBends": 938,
       "fullLength": 104227.215,
       "fullBends": 938,
+      "laneCrossings": 197,
+      "fullCrossings": 197,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1621,6 +1697,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1655,6 +1733,8 @@
       "laneBends": 938,
       "fullLength": 104227.215,
       "fullBends": 938,
+      "laneCrossings": 197,
+      "fullCrossings": 197,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1689,6 +1769,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1723,6 +1805,8 @@
       "laneBends": 938,
       "fullLength": 104227.215,
       "fullBends": 938,
+      "laneCrossings": 197,
+      "fullCrossings": 197,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1757,6 +1841,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1791,6 +1877,8 @@
       "laneBends": 1189,
       "fullLength": 123386.689,
       "fullBends": 1189,
+      "laneCrossings": 397,
+      "fullCrossings": 389,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1825,6 +1913,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1859,6 +1949,8 @@
       "laneBends": 1268,
       "fullLength": 139210.093,
       "fullBends": 1268,
+      "laneCrossings": 496,
+      "fullCrossings": 496,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1893,6 +1985,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1927,6 +2021,8 @@
       "laneBends": 1268,
       "fullLength": 139210.093,
       "fullBends": 1268,
+      "laneCrossings": 496,
+      "fullCrossings": 496,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1961,6 +2057,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -1995,6 +2093,8 @@
       "laneBends": 2124,
       "fullLength": 165452.517,
       "fullBends": 2124,
+      "laneCrossings": 2587,
+      "fullCrossings": 2587,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2029,6 +2129,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2063,6 +2165,8 @@
       "laneBends": 2124,
       "fullLength": 165452.517,
       "fullBends": 2124,
+      "laneCrossings": 2587,
+      "fullCrossings": 2587,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2097,6 +2201,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2131,6 +2237,8 @@
       "laneBends": 2122,
       "fullLength": 165396.109,
       "fullBends": 2122,
+      "laneCrossings": 2556,
+      "fullCrossings": 2556,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2165,6 +2273,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2199,6 +2309,8 @@
       "laneBends": 3154,
       "fullLength": 203948.379,
       "fullBends": 3156,
+      "laneCrossings": 5533,
+      "fullCrossings": 5350,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2233,6 +2345,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -2267,6 +2381,8 @@
       "laneBends": 3042,
       "fullLength": 268176.449,
       "fullBends": 3039,
+      "laneCrossings": 6810,
+      "fullCrossings": 6795,
       "classes": {
         "band": {
           "routes": 1,
@@ -2310,6 +2426,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -2355,6 +2473,8 @@
       "laneBends": 2761,
       "fullLength": 260103.745,
       "fullBends": 2761,
+      "laneCrossings": 6585,
+      "fullCrossings": 6581,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -2400,6 +2520,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2456,6 +2578,8 @@
       "laneBends": -58,
       "fullLength": 96936.205,
       "fullBends": -58,
+      "laneCrossings": 873,
+      "fullCrossings": 873,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2512,6 +2636,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2568,6 +2694,8 @@
       "laneBends": -58,
       "fullLength": 96936.205,
       "fullBends": -58,
+      "laneCrossings": 873,
+      "fullCrossings": 873,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2624,6 +2752,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2680,6 +2810,8 @@
       "laneBends": -58,
       "fullLength": 96936.205,
       "fullBends": -58,
+      "laneCrossings": 873,
+      "fullCrossings": 873,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2736,6 +2868,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2802,6 +2936,8 @@
       "laneBends": 152,
       "fullLength": 112361.187,
       "fullBends": 152,
+      "laneCrossings": 843,
+      "fullCrossings": 843,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2868,6 +3004,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -2934,6 +3072,8 @@
       "laneBends": 395,
       "fullLength": 154090.999,
       "fullBends": 395,
+      "laneCrossings": 1013,
+      "fullCrossings": 1013,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -3000,6 +3140,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -3066,6 +3208,8 @@
       "laneBends": 395,
       "fullLength": 154090.999,
       "fullBends": 395,
+      "laneCrossings": 1013,
+      "fullCrossings": 1013,
       "classes": {
         "plug-seam": {
           "routes": 53,
@@ -3132,6 +3276,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3166,6 +3312,8 @@
       "laneBends": 278,
       "fullLength": 41920.872,
       "fullBends": 278,
+      "laneCrossings": 313,
+      "fullCrossings": 313,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3200,6 +3348,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3234,6 +3384,8 @@
       "laneBends": 278,
       "fullLength": 41920.872,
       "fullBends": 278,
+      "laneCrossings": 313,
+      "fullCrossings": 313,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3268,6 +3420,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3302,6 +3456,8 @@
       "laneBends": 278,
       "fullLength": 41920.872,
       "fullBends": 278,
+      "laneCrossings": 311,
+      "fullCrossings": 311,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3336,6 +3492,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3370,6 +3528,8 @@
       "laneBends": 524,
       "fullLength": 50410.451,
       "fullBends": 525,
+      "laneCrossings": 537,
+      "fullCrossings": 520,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3404,6 +3564,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3438,6 +3600,8 @@
       "laneBends": 619,
       "fullLength": 58547.429,
       "fullBends": 619,
+      "laneCrossings": 911,
+      "fullCrossings": 907,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3472,6 +3636,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3506,6 +3672,8 @@
       "laneBends": 619,
       "fullLength": 58547.429,
       "fullBends": 619,
+      "laneCrossings": 911,
+      "fullCrossings": 907,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3540,6 +3708,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3574,6 +3744,8 @@
       "laneBends": 508,
       "fullLength": 24643.96,
       "fullBends": 508,
+      "laneCrossings": 1,
+      "fullCrossings": 1,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3608,6 +3780,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3642,6 +3816,8 @@
       "laneBends": 508,
       "fullLength": 24643.96,
       "fullBends": 508,
+      "laneCrossings": 1,
+      "fullCrossings": 1,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3676,6 +3852,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3710,6 +3888,8 @@
       "laneBends": 508,
       "fullLength": 24643.96,
       "fullBends": 508,
+      "laneCrossings": 1,
+      "fullCrossings": 1,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3744,6 +3924,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3778,6 +3960,8 @@
       "laneBends": 522,
       "fullLength": 26555.238,
       "fullBends": 522,
+      "laneCrossings": 6,
+      "fullCrossings": 6,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3812,6 +3996,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3846,6 +4032,8 @@
       "laneBends": 546,
       "fullLength": 30076.982,
       "fullBends": 546,
+      "laneCrossings": 38,
+      "fullCrossings": 38,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3880,6 +4068,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3914,6 +4104,8 @@
       "laneBends": 546,
       "fullLength": 30076.982,
       "fullBends": 546,
+      "laneCrossings": 38,
+      "fullCrossings": 38,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3948,6 +4140,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -3982,6 +4176,8 @@
       "laneBends": 1095,
       "fullLength": 109408.185,
       "fullBends": 1095,
+      "laneCrossings": 476,
+      "fullCrossings": 476,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4016,6 +4212,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4050,6 +4248,8 @@
       "laneBends": 1095,
       "fullLength": 109408.185,
       "fullBends": 1095,
+      "laneCrossings": 476,
+      "fullCrossings": 476,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4084,6 +4284,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4118,6 +4320,8 @@
       "laneBends": 1095,
       "fullLength": 109408.185,
       "fullBends": 1095,
+      "laneCrossings": 476,
+      "fullCrossings": 476,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4152,6 +4356,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4186,6 +4392,8 @@
       "laneBends": 1878,
       "fullLength": 140798.762,
       "fullBends": 1878,
+      "laneCrossings": 1776,
+      "fullCrossings": 1760,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4220,6 +4428,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4254,6 +4464,8 @@
       "laneBends": 2266,
       "fullLength": 178185.274,
       "fullBends": 2266,
+      "laneCrossings": 3173,
+      "fullCrossings": 3173,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4288,6 +4500,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4322,6 +4536,8 @@
       "laneBends": 2266,
       "fullLength": 178185.274,
       "fullBends": 2266,
+      "laneCrossings": 3173,
+      "fullCrossings": 3173,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4356,6 +4572,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4390,6 +4608,8 @@
       "laneBends": 1559,
       "fullLength": 103538.448,
       "fullBends": 1559,
+      "laneCrossings": 669,
+      "fullCrossings": 669,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4424,6 +4644,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4458,6 +4680,8 @@
       "laneBends": 1559,
       "fullLength": 103538.448,
       "fullBends": 1559,
+      "laneCrossings": 669,
+      "fullCrossings": 669,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4492,6 +4716,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4526,6 +4752,8 @@
       "laneBends": 1562,
       "fullLength": 103599.493,
       "fullBends": 1562,
+      "laneCrossings": 675,
+      "fullCrossings": 675,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4560,6 +4788,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4594,6 +4824,8 @@
       "laneBends": 1941,
       "fullLength": 125704.75,
       "fullBends": 1941,
+      "laneCrossings": 1383,
+      "fullCrossings": 1383,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4628,6 +4860,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4662,6 +4896,8 @@
       "laneBends": 2229,
       "fullLength": 183835.684,
       "fullBends": 2229,
+      "laneCrossings": 6160,
+      "fullCrossings": 6160,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4696,6 +4932,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4730,6 +4968,8 @@
       "laneBends": 2229,
       "fullLength": 183835.684,
       "fullBends": 2229,
+      "laneCrossings": 6160,
+      "fullCrossings": 6160,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4764,6 +5004,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4798,6 +5040,8 @@
       "laneBends": 1944,
       "fullLength": 194188.083,
       "fullBends": 1944,
+      "laneCrossings": 3043,
+      "fullCrossings": 3043,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4832,6 +5076,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4866,6 +5112,8 @@
       "laneBends": 1944,
       "fullLength": 194188.083,
       "fullBends": 1944,
+      "laneCrossings": 3043,
+      "fullCrossings": 3043,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4900,6 +5148,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4934,6 +5184,8 @@
       "laneBends": 1944,
       "fullLength": 194188.083,
       "fullBends": 1944,
+      "laneCrossings": 3043,
+      "fullCrossings": 3043,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -4968,6 +5220,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5002,6 +5256,8 @@
       "laneBends": 3285,
       "fullLength": 250883.09,
       "fullBends": 3285,
+      "laneCrossings": 8453,
+      "fullCrossings": 8275,
       "classes": {
         "band": {
           "routes": 2,
@@ -5054,6 +5310,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5088,6 +5346,8 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
+      "laneCrossings": 14739,
+      "fullCrossings": 14369,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5122,6 +5382,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5156,6 +5418,8 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
+      "laneCrossings": 14739,
+      "fullCrossings": 14369,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5190,6 +5454,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5224,6 +5490,8 @@
       "laneBends": 790,
       "fullLength": 74512.94,
       "fullBends": 790,
+      "laneCrossings": 142,
+      "fullCrossings": 142,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5258,6 +5526,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5292,6 +5562,8 @@
       "laneBends": 790,
       "fullLength": 74512.94,
       "fullBends": 790,
+      "laneCrossings": 142,
+      "fullCrossings": 142,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5326,6 +5598,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5360,6 +5634,8 @@
       "laneBends": 790,
       "fullLength": 74512.94,
       "fullBends": 790,
+      "laneCrossings": 142,
+      "fullCrossings": 142,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5394,6 +5670,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5428,6 +5706,8 @@
       "laneBends": 1236,
       "fullLength": 92448.515,
       "fullBends": 1236,
+      "laneCrossings": 392,
+      "fullCrossings": 390,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5462,6 +5742,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5496,6 +5778,8 @@
       "laneBends": 1349,
       "fullLength": 107289.872,
       "fullBends": 1349,
+      "laneCrossings": 977,
+      "fullCrossings": 943,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5530,6 +5814,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -5575,6 +5861,8 @@
       "laneBends": 712,
       "fullLength": 103188.152,
       "fullBends": 712,
+      "laneCrossings": 1113,
+      "fullCrossings": 1100,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -5630,6 +5918,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5664,6 +5954,8 @@
       "laneBends": 277,
       "fullLength": 206853.652,
       "fullBends": 277,
+      "laneCrossings": 744,
+      "fullCrossings": 744,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5698,6 +5990,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5732,6 +6026,8 @@
       "laneBends": 277,
       "fullLength": 206853.652,
       "fullBends": 277,
+      "laneCrossings": 744,
+      "fullCrossings": 744,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5766,6 +6062,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5800,6 +6098,8 @@
       "laneBends": 277,
       "fullLength": 206853.652,
       "fullBends": 277,
+      "laneCrossings": 744,
+      "fullCrossings": 744,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5834,6 +6134,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5868,6 +6170,8 @@
       "laneBends": 937,
       "fullLength": 271062.656,
       "fullBends": 937,
+      "laneCrossings": 1682,
+      "fullCrossings": 1656,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5902,6 +6206,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5936,6 +6242,8 @@
       "laneBends": 987,
       "fullLength": 276823.978,
       "fullBends": 987,
+      "laneCrossings": 1914,
+      "fullCrossings": 1914,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -5970,6 +6278,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6004,6 +6314,8 @@
       "laneBends": 987,
       "fullLength": 276823.978,
       "fullBends": 987,
+      "laneCrossings": 1914,
+      "fullCrossings": 1914,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6038,6 +6350,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6072,6 +6386,8 @@
       "laneBends": 1090,
       "fullLength": 17482.867,
       "fullBends": 1090,
+      "laneCrossings": 70,
+      "fullCrossings": 70,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6106,6 +6422,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6140,6 +6458,8 @@
       "laneBends": 1090,
       "fullLength": 17482.867,
       "fullBends": 1090,
+      "laneCrossings": 70,
+      "fullCrossings": 70,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6174,6 +6494,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6208,6 +6530,8 @@
       "laneBends": 1090,
       "fullLength": 17482.867,
       "fullBends": 1090,
+      "laneCrossings": 70,
+      "fullCrossings": 70,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6242,6 +6566,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6276,6 +6602,8 @@
       "laneBends": 1094,
       "fullLength": 17581.772,
       "fullBends": 1094,
+      "laneCrossings": 72,
+      "fullCrossings": 72,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6310,6 +6638,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 27,
@@ -6355,6 +6685,8 @@
       "laneBends": 750,
       "fullLength": 85071.104,
       "fullBends": 750,
+      "laneCrossings": 3310,
+      "fullCrossings": 3310,
       "classes": {
         "wall": {
           "routes": 27,
@@ -6400,6 +6732,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "wall": {
           "routes": 27,
@@ -6445,6 +6779,8 @@
       "laneBends": 751,
       "fullLength": 85223.13,
       "fullBends": 751,
+      "laneCrossings": 3311,
+      "fullCrossings": 3311,
       "classes": {
         "wall": {
           "routes": 27,
@@ -6490,6 +6826,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6524,6 +6862,8 @@
       "laneBends": 418,
       "fullLength": 68800.642,
       "fullBends": 418,
+      "laneCrossings": 894,
+      "fullCrossings": 894,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6558,6 +6898,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6592,6 +6934,8 @@
       "laneBends": 418,
       "fullLength": 68800.642,
       "fullBends": 418,
+      "laneCrossings": 894,
+      "fullCrossings": 894,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6626,6 +6970,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6660,6 +7006,8 @@
       "laneBends": 418,
       "fullLength": 68800.642,
       "fullBends": 418,
+      "laneCrossings": 893,
+      "fullCrossings": 893,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6694,6 +7042,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6728,6 +7078,8 @@
       "laneBends": 726,
       "fullLength": 85084.499,
       "fullBends": 726,
+      "laneCrossings": 1504,
+      "fullCrossings": 1493,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6762,6 +7114,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6796,6 +7150,8 @@
       "laneBends": 873,
       "fullLength": 102903.424,
       "fullBends": 873,
+      "laneCrossings": 2517,
+      "fullCrossings": 2517,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6830,6 +7186,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6864,6 +7222,8 @@
       "laneBends": 873,
       "fullLength": 102903.424,
       "fullBends": 873,
+      "laneCrossings": 2517,
+      "fullCrossings": 2517,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6898,6 +7258,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6932,6 +7294,8 @@
       "laneBends": 844,
       "fullLength": 98939.196,
       "fullBends": 844,
+      "laneCrossings": 539,
+      "fullCrossings": 539,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -6966,6 +7330,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7000,6 +7366,8 @@
       "laneBends": 844,
       "fullLength": 98939.196,
       "fullBends": 844,
+      "laneCrossings": 539,
+      "fullCrossings": 539,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7034,6 +7402,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7068,6 +7438,8 @@
       "laneBends": 844,
       "fullLength": 98939.196,
       "fullBends": 844,
+      "laneCrossings": 539,
+      "fullCrossings": 539,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7102,6 +7474,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7136,6 +7510,8 @@
       "laneBends": 1480,
       "fullLength": 119171.368,
       "fullBends": 1480,
+      "laneCrossings": 2231,
+      "fullCrossings": 2172,
       "classes": {
         "deep": {
           "routes": 2,
@@ -7196,6 +7572,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7230,6 +7608,8 @@
       "laneBends": 1134,
       "fullLength": 250706.687,
       "fullBends": 1134,
+      "laneCrossings": 1357,
+      "fullCrossings": 1362,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7264,6 +7644,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7298,6 +7680,8 @@
       "laneBends": 1134,
       "fullLength": 250706.687,
       "fullBends": 1134,
+      "laneCrossings": 1357,
+      "fullCrossings": 1362,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7332,6 +7716,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7366,6 +7752,8 @@
       "laneBends": 1051,
       "fullLength": 111975.991,
       "fullBends": 1051,
+      "laneCrossings": 228,
+      "fullCrossings": 228,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7400,6 +7788,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7434,6 +7824,8 @@
       "laneBends": 1051,
       "fullLength": 111975.991,
       "fullBends": 1051,
+      "laneCrossings": 228,
+      "fullCrossings": 228,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7468,6 +7860,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7502,6 +7896,8 @@
       "laneBends": 1051,
       "fullLength": 111975.991,
       "fullBends": 1051,
+      "laneCrossings": 228,
+      "fullCrossings": 228,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7536,6 +7932,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7570,6 +7968,8 @@
       "laneBends": 2127,
       "fullLength": 147491.118,
       "fullBends": 2127,
+      "laneCrossings": 4469,
+      "fullCrossings": 4143,
       "classes": {
         "band": {
           "routes": 1,
@@ -7621,6 +8021,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7655,6 +8057,8 @@
       "laneBends": 2651,
       "fullLength": 193694.597,
       "fullBends": 2651,
+      "laneCrossings": 7585,
+      "fullCrossings": 7501,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7689,6 +8093,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7723,6 +8129,8 @@
       "laneBends": 2651,
       "fullLength": 193694.597,
       "fullBends": 2651,
+      "laneCrossings": 7585,
+      "fullCrossings": 7501,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7757,6 +8165,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7791,6 +8201,8 @@
       "laneBends": 348,
       "fullLength": 38197.919,
       "fullBends": 348,
+      "laneCrossings": 40,
+      "fullCrossings": 40,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7825,6 +8237,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7859,6 +8273,8 @@
       "laneBends": 348,
       "fullLength": 38197.919,
       "fullBends": 348,
+      "laneCrossings": 40,
+      "fullCrossings": 40,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7893,6 +8309,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7927,6 +8345,8 @@
       "laneBends": 347,
       "fullLength": 38198.096,
       "fullBends": 347,
+      "laneCrossings": 40,
+      "fullCrossings": 40,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7961,6 +8381,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -7995,6 +8417,8 @@
       "laneBends": 349,
       "fullLength": 38268.962,
       "fullBends": 349,
+      "laneCrossings": 46,
+      "fullCrossings": 46,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8029,6 +8453,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8063,6 +8489,8 @@
       "laneBends": 409,
       "fullLength": 43495.501,
       "fullBends": 409,
+      "laneCrossings": 107,
+      "fullCrossings": 107,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8097,6 +8525,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8131,6 +8561,8 @@
       "laneBends": 370,
       "fullLength": 40340.636,
       "fullBends": 370,
+      "laneCrossings": 91,
+      "fullCrossings": 91,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8165,6 +8597,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8199,6 +8633,8 @@
       "laneBends": 140,
       "fullLength": 27111.613,
       "fullBends": 140,
+      "laneCrossings": 299,
+      "fullCrossings": 299,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8233,6 +8669,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8267,6 +8705,8 @@
       "laneBends": 140,
       "fullLength": 27111.613,
       "fullBends": 140,
+      "laneCrossings": 299,
+      "fullCrossings": 299,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8301,6 +8741,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8335,6 +8777,8 @@
       "laneBends": 140,
       "fullLength": 27111.613,
       "fullBends": 140,
+      "laneCrossings": 299,
+      "fullCrossings": 299,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8369,6 +8813,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8403,6 +8849,8 @@
       "laneBends": 343,
       "fullLength": 37726.28,
       "fullBends": 343,
+      "laneCrossings": 245,
+      "fullCrossings": 247,
       "classes": {
         "wall": {
           "routes": 1,
@@ -8446,6 +8894,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8480,6 +8930,8 @@
       "laneBends": 151,
       "fullLength": 29492.428,
       "fullBends": 151,
+      "laneCrossings": 304,
+      "fullCrossings": 304,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8514,6 +8966,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8548,6 +9002,8 @@
       "laneBends": 151,
       "fullLength": 29492.428,
       "fullBends": 151,
+      "laneCrossings": 304,
+      "fullCrossings": 304,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8582,6 +9038,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8616,6 +9074,8 @@
       "laneBends": 495,
       "fullLength": 48224.818,
       "fullBends": 495,
+      "laneCrossings": 4,
+      "fullCrossings": 4,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8650,6 +9110,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8684,6 +9146,8 @@
       "laneBends": 495,
       "fullLength": 48224.818,
       "fullBends": 495,
+      "laneCrossings": 4,
+      "fullCrossings": 4,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8718,6 +9182,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8752,6 +9218,8 @@
       "laneBends": 495,
       "fullLength": 48224.818,
       "fullBends": 495,
+      "laneCrossings": 4,
+      "fullCrossings": 4,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8786,6 +9254,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8820,6 +9290,8 @@
       "laneBends": 495,
       "fullLength": 48224.818,
       "fullBends": 495,
+      "laneCrossings": 4,
+      "fullCrossings": 4,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8854,6 +9326,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8888,6 +9362,8 @@
       "laneBends": 522,
       "fullLength": 52798.762,
       "fullBends": 522,
+      "laneCrossings": 100,
+      "fullCrossings": 100,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -8922,6 +9398,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -8965,6 +9443,8 @@
       "laneBends": 198,
       "fullLength": 28726.175,
       "fullBends": 198,
+      "laneCrossings": 161,
+      "fullCrossings": 159,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -9008,6 +9488,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9042,6 +9524,8 @@
       "laneBends": 280,
       "fullLength": 113874.11,
       "fullBends": 280,
+      "laneCrossings": 13,
+      "fullCrossings": 13,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9076,6 +9560,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9110,6 +9596,8 @@
       "laneBends": 280,
       "fullLength": 113874.11,
       "fullBends": 280,
+      "laneCrossings": 13,
+      "fullCrossings": 13,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9144,6 +9632,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9178,6 +9668,8 @@
       "laneBends": 280,
       "fullLength": 113874.11,
       "fullBends": 280,
+      "laneCrossings": 13,
+      "fullCrossings": 13,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9212,6 +9704,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9246,6 +9740,8 @@
       "laneBends": 282,
       "fullLength": 113965.528,
       "fullBends": 282,
+      "laneCrossings": 13,
+      "fullCrossings": 13,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9280,6 +9776,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9314,6 +9812,8 @@
       "laneBends": 286,
       "fullLength": 117218.936,
       "fullBends": 286,
+      "laneCrossings": 72,
+      "fullCrossings": 72,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9348,6 +9848,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -9391,6 +9893,8 @@
       "laneBends": 263,
       "fullLength": 36720.147,
       "fullBends": 263,
+      "laneCrossings": 228,
+      "fullCrossings": 227,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -9434,6 +9938,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9468,6 +9974,8 @@
       "laneBends": 116,
       "fullLength": 14281.214,
       "fullBends": 116,
+      "laneCrossings": 56,
+      "fullCrossings": 56,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9502,6 +10010,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9536,6 +10046,8 @@
       "laneBends": 116,
       "fullLength": 14281.214,
       "fullBends": 116,
+      "laneCrossings": 56,
+      "fullCrossings": 56,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9570,6 +10082,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9604,6 +10118,8 @@
       "laneBends": 116,
       "fullLength": 14281.214,
       "fullBends": 116,
+      "laneCrossings": 56,
+      "fullCrossings": 56,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9638,6 +10154,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9672,6 +10190,8 @@
       "laneBends": 358,
       "fullLength": 21033.317,
       "fullBends": 358,
+      "laneCrossings": 193,
+      "fullCrossings": 190,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9706,6 +10226,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9740,6 +10262,8 @@
       "laneBends": 279,
       "fullLength": 20421.007,
       "fullBends": 279,
+      "laneCrossings": 143,
+      "fullCrossings": 143,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9774,6 +10298,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9808,6 +10334,8 @@
       "laneBends": 279,
       "fullLength": 20421.007,
       "fullBends": 279,
+      "laneCrossings": 143,
+      "fullCrossings": 143,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9842,6 +10370,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9876,6 +10406,8 @@
       "laneBends": 536,
       "fullLength": 30056.747,
       "fullBends": 536,
+      "laneCrossings": 256,
+      "fullCrossings": 256,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9910,6 +10442,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9944,6 +10478,8 @@
       "laneBends": 536,
       "fullLength": 30056.747,
       "fullBends": 536,
+      "laneCrossings": 256,
+      "fullCrossings": 256,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -9978,6 +10514,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10012,6 +10550,8 @@
       "laneBends": 536,
       "fullLength": 30056.678,
       "fullBends": 536,
+      "laneCrossings": 251,
+      "fullCrossings": 251,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10046,6 +10586,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10080,6 +10622,8 @@
       "laneBends": 1110,
       "fullLength": 43959.863,
       "fullBends": 1110,
+      "laneCrossings": 658,
+      "fullCrossings": 655,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10114,6 +10658,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10148,6 +10694,8 @@
       "laneBends": 565,
       "fullLength": 59649.978,
       "fullBends": 565,
+      "laneCrossings": 831,
+      "fullCrossings": 831,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10182,6 +10730,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -10227,6 +10777,8 @@
       "laneBends": 664,
       "fullLength": 51917.457,
       "fullBends": 664,
+      "laneCrossings": 538,
+      "fullCrossings": 538,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -10272,6 +10824,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10306,6 +10860,8 @@
       "laneBends": 250,
       "fullLength": 39910.111,
       "fullBends": 250,
+      "laneCrossings": 11,
+      "fullCrossings": 11,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10340,6 +10896,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10374,6 +10932,8 @@
       "laneBends": 250,
       "fullLength": 39910.111,
       "fullBends": 250,
+      "laneCrossings": 11,
+      "fullCrossings": 11,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10408,6 +10968,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10442,6 +11004,8 @@
       "laneBends": 250,
       "fullLength": 39910.111,
       "fullBends": 250,
+      "laneCrossings": 11,
+      "fullCrossings": 11,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10476,6 +11040,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10510,6 +11076,8 @@
       "laneBends": 267,
       "fullLength": 40640.38,
       "fullBends": 267,
+      "laneCrossings": 11,
+      "fullCrossings": 11,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10544,6 +11112,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10578,6 +11148,8 @@
       "laneBends": 291,
       "fullLength": 43030.801,
       "fullBends": 291,
+      "laneCrossings": 123,
+      "fullCrossings": 123,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10612,6 +11184,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10646,6 +11220,8 @@
       "laneBends": 185,
       "fullLength": 23541.217,
       "fullBends": 185,
+      "laneCrossings": 92,
+      "fullCrossings": 90,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10680,6 +11256,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10714,6 +11292,8 @@
       "laneBends": 280,
       "fullLength": 30693.844,
       "fullBends": 280,
+      "laneCrossings": 37,
+      "fullCrossings": 37,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10748,6 +11328,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10782,6 +11364,8 @@
       "laneBends": 280,
       "fullLength": 30693.844,
       "fullBends": 280,
+      "laneCrossings": 37,
+      "fullCrossings": 37,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10816,6 +11400,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10850,6 +11436,8 @@
       "laneBends": 280,
       "fullLength": 30693.844,
       "fullBends": 280,
+      "laneCrossings": 37,
+      "fullCrossings": 37,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10884,6 +11472,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10918,6 +11508,8 @@
       "laneBends": 285,
       "fullLength": 31040.189,
       "fullBends": 285,
+      "laneCrossings": 44,
+      "fullCrossings": 44,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10952,6 +11544,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -10986,6 +11580,8 @@
       "laneBends": 336,
       "fullLength": 35746.254,
       "fullBends": 336,
+      "laneCrossings": 124,
+      "fullCrossings": 124,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11020,6 +11616,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -11063,6 +11661,8 @@
       "laneBends": 308,
       "fullLength": 30180.452,
       "fullBends": 308,
+      "laneCrossings": 161,
+      "fullCrossings": 164,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {
@@ -11106,6 +11706,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11140,6 +11742,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11174,6 +11778,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11208,6 +11814,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11242,6 +11850,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11276,6 +11886,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11310,6 +11922,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11344,6 +11958,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11378,6 +11994,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11412,6 +12030,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11446,6 +12066,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11480,6 +12102,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -11516,6 +12140,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 16,
@@ -11570,6 +12196,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 16,
@@ -11623,6 +12251,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 288,
@@ -11678,6 +12308,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 289,
@@ -11733,6 +12365,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 452,
@@ -11788,6 +12422,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 457,
@@ -11843,6 +12479,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 77,
@@ -11888,6 +12526,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 77,
@@ -11933,6 +12573,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 252,
@@ -11978,6 +12620,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 261,
@@ -12031,6 +12675,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "plug-wall": {
           "routes": 53,
@@ -12086,6 +12732,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 345,
@@ -12131,6 +12779,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 44,
@@ -12176,6 +12826,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 72,
@@ -12221,6 +12873,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 17,
@@ -12266,6 +12920,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 20,
@@ -12311,6 +12967,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 193,
@@ -12364,6 +13022,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 189,
@@ -12419,6 +13079,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 274,
@@ -12474,6 +13136,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 263,
@@ -12527,6 +13191,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 326,
@@ -12581,6 +13247,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 328,
@@ -12635,6 +13303,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 118,
@@ -12690,6 +13360,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 138,
@@ -12735,6 +13407,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 49,
@@ -12788,6 +13462,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 56,
@@ -12833,6 +13509,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -12867,6 +13545,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "band": {
           "routes": 1,
@@ -12910,6 +13590,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 38,
@@ -12955,6 +13637,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 36,
@@ -13000,6 +13684,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 136,
@@ -13045,6 +13731,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 136,
@@ -13090,6 +13778,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 176,
@@ -13135,6 +13825,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 194,
@@ -13190,6 +13882,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 38,
@@ -13235,6 +13929,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 37,
@@ -13280,6 +13976,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {},
       "innerClasses": {},
       "unnamedClasses": {}
@@ -13314,6 +14012,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 54,
@@ -13359,6 +14059,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 38,
@@ -13404,6 +14106,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 38,
@@ -13449,6 +14153,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 39,
@@ -13494,6 +14200,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 39,
@@ -13539,6 +14247,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 10,
@@ -13594,6 +14304,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 18,
@@ -13639,6 +14351,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 79,
@@ -13684,6 +14398,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 83,
@@ -13729,6 +14445,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 36,
@@ -13774,6 +14492,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 36,
@@ -13819,6 +14539,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 35,
@@ -13864,6 +14586,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 36,
@@ -13909,6 +14633,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 160,
@@ -13954,6 +14680,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 242,
@@ -14007,6 +14735,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 160,
@@ -14052,6 +14782,8 @@
       "laneBends": 0,
       "fullLength": 0,
       "fullBends": 0,
+      "laneCrossings": 0,
+      "fullCrossings": 0,
       "classes": {
         "deep": {
           "routes": 242,

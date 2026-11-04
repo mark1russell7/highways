@@ -173,8 +173,11 @@ export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<stri
   return keep(lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0), least));
 }
 
-/** This function gives the offset of a lane from its segment. It tells if the lane stays outside the room of the segment. */
-function laneOffset(s: Segment, lane: number, spacing: number, least: number): { readonly offset: number; readonly out: boolean } {
+/**
+ * This function gives the offset of a lane from its segment, as one rule for the polylines and the curves of the lanes.
+ * It tells if the lane stays outside the room of the segment.
+ */
+export function laneOffset(s: Segment, lane: number, spacing: number, least: number = LANE_LEAST): { readonly offset: number; readonly out: boolean } {
   const full = ((s.count - 1) / 2 - lane) * spacing;
   if (s.room === undefined || full === 0) return { offset: full, out: false };
   const room = full > 0 ? s.room.left : s.room.right;

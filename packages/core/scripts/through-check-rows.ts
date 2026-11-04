@@ -81,6 +81,9 @@ export interface Row {
   /** The same sums with no room, as the lanes were before LANE-ROOM. */
   fullLength: number;
   fullBends: number;
+  /** The crossings of the board with these lanes, and with the same lanes with no room. Each way has its own width, so a lane can cross more near a join. */
+  laneCrossings: number;
+  fullCrossings: number;
   classes: Partial<Record<ThroughClass, ClassRow>>;
   innerClasses: Partial<Record<ThroughClass, ClassRow>>;
   unnamedClasses: Partial<Record<ThroughClass, ClassRow>>;
@@ -138,7 +141,7 @@ export function laneView(result: Result): readonly Route[] {
 }
 
 /** This function adds the marks, the length and the bends of the lanes of one board to a row of `lanes`. */
-function addLaneShape(row: Row, result: Result, view: readonly Route[], checks: readonly RouteCheck[], closed: readonly RouteCheck[]): void {
+function addLaneShape(row: Row, board: Graph, result: Result, view: readonly Route[], checks: readonly RouteCheck[], closed: readonly RouteCheck[]): void {
   const out = new Set(view.filter((r) => r.outOfRoom).map((r) => r.edge));
   const closedFlags = new Set(closed.filter(flagged).map((c) => c.edge));
   row.outOfRoom += out.size;
@@ -158,6 +161,8 @@ function addLaneShape(row: Row, result: Result, view: readonly Route[], checks: 
     row.fullLength += polylineLength(r.points);
     row.fullBends += r.points.length - 2;
   }
+  row.laneCrossings += measureQuality(board, { ...result, routes: [...view] }).crossings;
+  row.fullCrossings += measureQuality(board, { ...result, routes: full }).crossings;
   row.laneLength = Math.round(row.laneLength * 1000) / 1000;
   row.fullLength = Math.round(row.fullLength * 1000) / 1000;
 }
@@ -203,6 +208,8 @@ const blank = (router: string, family: string, view: Row["view"]): Row => ({
   laneBends: 0,
   fullLength: 0,
   fullBends: 0,
+  laneCrossings: 0,
+  fullCrossings: 0,
   classes: {},
   innerClasses: {},
   unnamedClasses: {},
@@ -243,7 +250,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
           const view = laneView(result);
           const checks = checkRoutes(graph, view);
           addChecks(lanes, seed, checks);
-          addLaneShape(lanes, result, view, checks, closed);
+          addLaneShape(lanes, graph, result, view, checks, closed);
         }
       });
       (OUTSIDE.includes(name) ? unmarkedRows : rows).push(row);

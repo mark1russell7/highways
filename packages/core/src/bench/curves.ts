@@ -4,7 +4,7 @@ import { CURVE_TYPES, curveSpace, distinctPoints, sampleCurve, type CubicSegment
 import { polylineLength, segmentsCross, type Point } from "../geom.ts";
 import { nodeIndex, type Graph, type Router } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
-import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.ts";
+import { laneOffset, laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.ts";
 import { curveStrategies } from "../strategies/builtins.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { measureLinks, type MeasuredLink } from "./links.ts";
@@ -284,6 +284,8 @@ interface Bundle {
   /** The direction of each lane along the center line: 1 forward, -1 back. */
   readonly sign: readonly number[];
   readonly spacing: number;
+  /** The distance between each lane and the next lane, after the room of the segment. */
+  readonly gaps: readonly number[];
   /** The largest distance from the center line of a point of a lane in the segment. */
   readonly band: number;
   readonly total: number;
@@ -351,7 +353,8 @@ export function measureHighways(
     if (s.count < 2 || !open.has(runKey(s.edges)) || c.length < 2) continue;
     const spacing = Math.min(laneWidth, maxWidth / (s.count - 1));
     const sign = s.edges.map((e) => signs.get(`${s.id}|${e}`) ?? 1);
-    bundles.push({ c, edges: s.edges, sign, spacing, band: ((s.count - 1) / 2) * spacing + spacing, total: polylineLength(c) });
+    const gaps = s.edges.slice(1).map((_, k) => laneOffset(s, k, spacing).offset - laneOffset(s, k + 1, spacing).offset);
+    bundles.push({ c, edges: s.edges, sign, spacing, gaps, band: ((s.count - 1) / 2) * spacing + spacing, total: polylineLength(c) });
   }
   const inBundle = new Set(bundles.flatMap((s) => s.edges));
   const lanes = curves.filter((c) => inBundle.has(c.edge));
@@ -382,7 +385,8 @@ export function measureHighways(
             let d = Infinity;
             for (const other of whole[y]!) d = Math.min(d, nearest(q, other).d);
             if (d > b.band) continue;
-            const err = Math.abs(d - sp) / sp;
+            const gap = b.gaps[Math.min(x, y)]!;
+            const err = Math.abs(d - gap) / gap;
             samples += 1;
             sum += err;
             if (err > SPACING_LIMIT) over += 1;

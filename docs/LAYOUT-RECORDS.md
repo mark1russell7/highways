@@ -270,6 +270,7 @@ A row with the view `lanes` also tells what the room of each way does. Its field
 - `silentLanes` counts the flagged lanes with no mark, on an edge that its closed route does not flag.
 - `laneLength` and `laneBends` sum the shape of the lanes.
 - `fullLength` and `fullBends` sum the same lanes with no room.
+- `laneCrossings` and `fullCrossings` count the crossings of the board with the lanes, with the room and with no room. The room adds crossings, because each way has its own width.
 
 The gate fails when `deepUnmarked` or `silentLanes` is over 0 on a row. It also compares the classes of the site settings with a stated list, and that list makes no claim. A flagged lane on a closed route that the record flags too is a contact of the route, not of the lanes.
 

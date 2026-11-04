@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { highwayCurves } from "./curves/highway/index.ts";
+import { sampleCurve } from "./curves/sample.ts";
 import { LANE_CLEAR, LANE_LEAST, LANE_ROOM_LIMIT, laneRoom } from "./lane-room.ts";
 import type { Node, Result } from "./model.ts";
 import { laneRoutes, pullApart, runKey, segmentsOf } from "./segments.ts";
@@ -119,6 +121,17 @@ describe("the lanes of a way with a room (LANE-ROOM)", () => {
   it("leaves a smaller distance of the caller as it is", () => {
     const routes = laneRoutes(runOf({ left: 40, right: 40 }), new Set([runKey(EDGES)]), 0.5);
     expect(routes[0]!.points[2]!.y).toBe(-1);
+  });
+
+  it("draws each highway curve at the offset of its lane, so a curve keeps the room too", () => {
+    const side = { left: 4, right: 20 };
+    const { ys } = lanesAt(side, 5);
+    const curves = highwayCurves(runOf(side), new Set([runKey(EDGES)]), 5);
+    const at = EDGES.map((edge) => {
+      const samples = sampleCurve(curves.find((c) => c.edge === edge)!.segments, 0.1);
+      return samples.reduce((best, q) => (Math.abs(q.x - 50) < Math.abs(best.x - 50) ? q : best)).y;
+    });
+    expect(at.map((y) => Math.round(y * 1000) / 1000)).toEqual(ys.map((y) => Math.round(y * 1000) / 1000));
   });
 
   it("gives the room to `pullApart` too", () => {
