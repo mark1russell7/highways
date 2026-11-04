@@ -9,10 +9,11 @@ import { solveRules, type SolverOptions } from "./solver.ts";
 
 export * from "./language.ts";
 export { compileRules, type CompiledTerm, type LegRef, type Sample, type TermContext, type Variable, type VariableView } from "./terms.ts";
+export { dropCauses, type BoardCounts, type DropCauses } from "./drop-causes.ts";
 export { freeVariables, solveRules, type SolverOptions, type SolverOutcome } from "./solver.ts";
 
 /** The options of the router `rules` (RULE-036: a rule language that compiles to energy). */
-export interface RulesOptions extends SolverOptions {
+export interface RulesOptions extends Omit<SolverOptions, "report"> {
   /** The rule file. The default is `elastic`. */
   readonly preset: keyof typeof RULE_PRESETS;
   /** The method. The default is `adam`. */
@@ -36,7 +37,7 @@ export const RULES_SCHEMA: OptionSchema<RulesOptions> = {
  * This function makes the router `rules` (RULE-036). It is the router `shared`, then the solver of `solveRules`.
  * The option `rules` takes a rule file as data, and it comes before the option `preset`.
  */
-export function rulesRouter(options: Partial<RulesOptions> & { readonly name: string; readonly rules?: RuleSet; readonly rule?: GroupRule; readonly maxNodes?: number }): Router {
+export function rulesRouter(options: Partial<RulesOptions> & { readonly name: string; readonly rules?: RuleSet; readonly rule?: GroupRule; readonly maxNodes?: number; readonly report?: SolverOptions["report"] }): Router {
   const o = { ...RULES_DEFAULTS, ...options };
   const set = o.rules ?? { ...RULE_PRESETS[o.preset], variable: o.variable };
   const base = sharedRouter({ name: o.name, ...(o.rule === undefined ? {} : { rule: o.rule }), ...(o.maxNodes === undefined ? {} : { maxNodes: o.maxNodes }) });
