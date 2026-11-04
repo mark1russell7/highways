@@ -1,6 +1,6 @@
 # The screenshots of the site at 1280 and 390 pixels, in light and dark (SITE-LIVE). The images are an artifact, and a session reads them.
 # A local browser job can wait for a free machine, so this workflow takes the shots on a runner. It is not a heavy workflow: one job, one core, a few minutes.
-# A dispatch on a branch runs the copy of this file on that branch. A change to this file or to its script also runs it on a pull request.
+# A dispatch on a branch runs the copy of this file on that branch.
 name: Shots
 
 on:
@@ -11,9 +11,6 @@ on:
         type: string
         default: compare.html
   pull_request:
-    paths:
-      - .github/workflows/shots.yml
-      - packages/site/scripts/shots.mjs
 
 permissions:
   contents: read
@@ -30,7 +27,7 @@ defaults:
 jobs:
   shots:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       PAGES: ${{ inputs.pages || 'compare.html' }}
       PLAYWRIGHT_DIR: /tmp/playwright
@@ -45,17 +42,17 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @highways/site run build
-      # Playwright stays out of the lockfile: only this job uses it.
-      - name: Install the browser
+      # Playwright stays out of the lockfile: only this job uses it. The runner has Chrome, so the job downloads no browser.
+      - name: Install the driver
         run: |
           mkdir -p "$PLAYWRIGHT_DIR"
-          npm install --prefix "$PLAYWRIGHT_DIR" --no-save playwright@1.49.1
-          "$PLAYWRIGHT_DIR/node_modules/.bin/playwright" install --with-deps chromium
+          npm install --prefix "$PLAYWRIGHT_DIR" --no-save playwright-core@1.49.1
+          google-chrome --version
       - name: Take the shots
         run: |
           pnpm --filter @highways/site exec vite preview --port 4188 --strictPort > preview.log 2>&1 &
           for _ in $(seq 1 30); do curl -sf http://127.0.0.1:4188/ > /dev/null && break; sleep 1; done
-          node packages/site/scripts/shots.mjs out/shots http://127.0.0.1:4188/ "$PAGES"
+          node packages/site/scripts/shots.ts out/shots http://127.0.0.1:4188/ "$PAGES"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
