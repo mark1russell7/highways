@@ -2,6 +2,8 @@ import { center, dist, type Box, type Point } from "../geom.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type InnerEdge, type Node, type Route } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { predicateSink } from "../predicate-sink.ts";
+import { markRoute } from "../through.ts";
+import { Obstacles } from "../visibility.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { gutterRoutes, type GutterEdge } from "./gutter.ts";
 
@@ -39,10 +41,20 @@ interface Room {
 /** The tiny gap between the bounds and the band of a wall, so that a way along the bounds stays clear of the wall. */
 const EPS = 1e-6;
 
+/** The start of the id of a wall of a room. A wall closes the bounds and is no box of the board, so `through` does not name it. */
+const WALL = "\u0000wall";
+
+/** This function gives the test of the boxes that the field `through` of an inner route does not name. These boxes are the ends of the route and the walls of the room. */
+const notCrossed =
+  (...ends: readonly string[]) =>
+  (id: string): boolean =>
+    ends.includes(id) || id.startsWith(WALL);
+
 /**
  * This function gives the inner routes of the inner edges (`splitFrames`). Each route stays in the bounds of its frame:
  * the box of the frame, smaller by `frameInset`. It goes around the other nodes of the frame.
  * It leaves the plug of the frame into the frame, along the normal of the wall. Each route has the id of its frame in `frame`.
+ * A route that goes through a box of its room says so in `through`. The ladder of the way finder ends at a straight line, and that line can go through a box.
  *
  * An edge without a `plug` goes from the plug of its source node to the plug of its target node, as an outer edge does.
  * A sibling edge has its two ends in the frame, and the route goes around the other children.
@@ -77,7 +89,7 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
       if (!s || !t) continue;
       const ps = placePlug(s, edge.source, center(t.box));
       const pt = placePlug(t, edge.target, center(s.box));
-      routes.push({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame });
+      routes.push(markRoute({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame }, room.ways.obstacles, notCrossed(s.id, t.id)));
       continue;
     }
     const [own, far] = plug === "source" ? [edge.source, edge.target] : [edge.target, edge.source];
@@ -91,7 +103,7 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
     const ends = new Set<Node>([end]);
     const points =
       plug === "source" ? stub(fp.point, room.ways.between(start, ep, ends)) : stub(fp.point, room.ways.between(ep, start, ends).reverse()).reverse();
-    routes.push({ edge: edge.id, points, frame });
+    routes.push(markRoute({ edge: edge.id, points, frame }, room.ways.obstacles, notCrossed(end.id)));
   }
   return routes;
 }
@@ -160,6 +172,7 @@ function gutterFrameRoutes(
     room.items.push({ at, edge: { plug: fp, end, ...(port ? { port } : {}), ...(side ? { side } : {}) } });
   });
   for (const room of rooms.values()) {
+    const obstacles = new Obstacles([...room.nodes.values()], 180);
     const found = gutterRoutes(
       room.frame,
       [...room.nodes.values()],
@@ -170,7 +183,7 @@ function gutterFrameRoutes(
       const points = found[k];
       if (!points) return;
       const { edge, frame, plug } = inner[at]!;
-      routes[at] = { edge: edge.id, points: plug === "target" ? points.reverse() : points, frame };
+      routes[at] = markRoute({ edge: edge.id, points: plug === "target" ? points.reverse() : points, frame }, obstacles, notCrossed(edge.source.node, edge.target.node));
     });
   }
   return routes.filter((r): r is Route => r !== undefined);
@@ -211,7 +224,7 @@ function makeRoom(
     { x: w.x - t, y: w.y + w.h, w: w.w + 2 * t, h: t },
     { x: w.x - t, y: w.y, w: t, h: w.h },
     { x: w.x + w.w, y: w.y, w: t, h: w.h },
-  ].map((box, i) => ({ id: `\u0000wall${i}`, box }));
+  ].map((box, i) => ({ id: `${WALL}${i}`, box }));
   return { ways: new WayFinder([...nodes.values(), ...walls], options), nodes };
 }
 

@@ -78,7 +78,7 @@ export interface Graph {
 export interface Route {
   readonly edge: string;
   readonly points: readonly Point[];
-  /** The ids of the boxes that this route goes through, sorted. A route with no way gets this field. A clean route does not have it. */
+  /** The ids of the boxes that this route goes through, sorted. A route with no way gets this field. A clean route does not have it. An inner route reads the boxes of its room. */
   readonly through?: readonly string[];
   /** This id names the frame of an inner route: the route stays inside the box of that node. An outer route has no frame. */
   readonly frame?: string;

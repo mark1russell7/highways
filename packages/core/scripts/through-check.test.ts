@@ -5,7 +5,7 @@ import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-row
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/1 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/2 is stale. Write it again with: ${REGENERATE}`;
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
 /** This function gives the keys of the rows that differ. A row in only one list differs. */
@@ -15,7 +15,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/1", () => {
+describe("the gate through-check/2", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 
@@ -49,6 +49,15 @@ describe("the gate through-check/1", () => {
   it.each(SCORED)("gives %s no name in through that the route does not meet", (router) => {
     const named = scored(router).filter((r) => r.falseThrough > 0 || r.partFalse > 0);
     expect(named.map(keyOf)).toEqual([]);
+  });
+
+  it("names no box of an inner route that the route does not meet, and each box that it goes through", () => {
+    const inner = fresh.rows.filter((r) => r.inner > 0);
+    expect(inner.map((r) => [r.router, r.family])).toEqual([
+      ["corners", "frame-rows+inner"],
+      ["corners", "frame-rows+inner12"],
+    ]);
+    for (const r of inner) expect([r.family, r.innerFalse, r.innerUnnamed]).toEqual([r.family, 0, 0]);
   });
 
   it("keeps the routers that do not mark through on their own rows", () => {
