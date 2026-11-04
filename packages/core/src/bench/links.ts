@@ -1,3 +1,4 @@
+import { overlapOf } from "@mark1russell7/layout-contract";
 import { dist, inflate, pointSegmentDistance, polylineLength, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import type { Graph, Level, Result } from "../model.ts";
@@ -146,7 +147,8 @@ export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly Me
 
 /** This function tells if two boxes overlap by more than `TOLERANCE` on each axis, as `countOverlaps` counts them. */
 export function boxesOverlap(a: Box, b: Box): boolean {
-  return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > TOLERANCE && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > TOLERANCE;
+  const { x, y } = overlapOf(a, b);
+  return x > TOLERANCE && y > TOLERANCE;
 }
 
 /** This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge. */
