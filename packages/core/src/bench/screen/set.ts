@@ -184,7 +184,7 @@ export function signTestPower(families: number, level = 0.05): number | undefine
 }
 
 /** The room of each board of `screen-v4`: the options of `makeRoom`. They have the values of the defaults of `makeRoom`. */
-export const SCREEN_V4_ROOM = Object.freeze({ gutter: 8, spacing: 4 });
+export const SCREEN_V4_ROOM: Readonly<{ gutter: number; spacing: number }> = Object.freeze({ gutter: 8, spacing: 4 });
 
 /** The member seeds of each family of `screen-v4` that the split `default` holds out. */
 export const SCREEN_V4_HELD_OUT: readonly number[] = [7, 8, 9];
