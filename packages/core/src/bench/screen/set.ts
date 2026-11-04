@@ -149,7 +149,7 @@ export const SCREEN_V3_HELD_OUT: readonly number[] = [7, 8, 9];
 const V3_FAMILIES = [...screenFamilies(10, 10), ...coverageFamilies(10)];
 
 /**
- * The screen set `screen-v3` (CORPUS-FAMILIES): the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
+ * The screen set `screen-v3` (CORPUS-FAMILIES): the first 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
  * The first 6 families are the families of `screen-v2` with their seeds. Thus their boards are the boards of `screen-v2`, under the ids of `screen-v3`.
  * The 9 new families cover frames with rows, a long chain, a wide fan-out and two hubs.
  * They also cover uneven sizes, thin bars, long edges, short edges and a complete bipartite part.

@@ -5,8 +5,8 @@ import { caseFamily, count } from "./cases.ts";
 import type { CorpusDimension } from "@mark1russell7/layout-contract";
 import type { Edge, End, Graph, Node, Port } from "../model.ts";
 
-/** A board while it grows. It adds no loop, and no second edge between the same two ends. */
-class Builder {
+/** A board while it grows. `link` adds no loop, and no second edge between the same two ends. Only `copy` adds a second edge. */
+export class Builder {
   readonly nodes: Node[] = [];
   readonly edges: Edge[] = [];
   readonly #keys = new Set<string>();
@@ -16,14 +16,25 @@ class Builder {
     return id;
   }
 
-  /** This method adds an edge. The key of an end is its node and its plug. It adds nothing for a loop or a second edge between the same two ends. */
-  link(source: End, target: End): void {
-    if (source.node === target.node) return;
+  /** This method gives the key of two ends. The key of an end is its node and its plug. The two orders of the ends have one key. */
+  #key(source: End, target: End): string {
     const a = `${source.node}:${source.port ?? ""}`;
     const b = `${target.node}:${target.port ?? ""}`;
-    const key = a < b ? `${a}|${b}` : `${b}|${a}`;
+    return a < b ? `${a}|${b}` : `${b}|${a}`;
+  }
+
+  /** This method adds an edge. It adds nothing for a loop or a second edge between the same two ends. */
+  link(source: End, target: End): void {
+    if (source.node === target.node) return;
+    const key = this.#key(source, target);
     if (this.#keys.has(key)) return;
     this.#keys.add(key);
+    this.edges.push({ id: `e${this.edges.length}`, source, target });
+  }
+
+  /** This method adds an edge with no check, so two edges can join the same two ends. A later `link` between those ends adds nothing. */
+  copy(source: End, target: End): void {
+    this.#keys.add(this.#key(source, target));
     this.edges.push({ id: `e${this.edges.length}`, source, target });
   }
 
@@ -33,10 +44,10 @@ class Builder {
 }
 
 /** This function gives a whole number from `lo` to `hi`, both included. */
-const int = (random: () => number, lo: number, hi: number): number => lo + Math.floor(random() * (hi - lo + 1));
+export const int = (random: () => number, lo: number, hi: number): number => lo + Math.floor(random() * (hi - lo + 1));
 
 /** This function gives the least whole number `s` with `s × s` equal to `v` or more. It uses no square root, so each engine gives the same value. */
-function ceilSqrt(v: number): number {
+export function ceilSqrt(v: number): number {
   let lo = 0;
   let hi = Math.max(1, v);
   while (lo < hi) {
@@ -48,7 +59,7 @@ function ceilSqrt(v: number): number {
 }
 
 /** This function gives `k` of the indices 0 to `n - 1` at random, in increasing order. It uses a part of the shuffle of Fisher and Yates. */
-function choose(random: () => number, n: number, k: number): number[] {
+export function choose(random: () => number, n: number, k: number): number[] {
   const list = Array.from({ length: n }, (_, i) => i);
   const take = Math.min(k, n);
   for (let i = 0; i < take; i++) {
@@ -59,7 +70,7 @@ function choose(random: () => number, n: number, k: number): number[] {
 }
 
 /** This function gives the indices 0 to `n - 1` in a random order, with the shuffle of Fisher and Yates. */
-function shuffle(random: () => number, n: number): number[] {
+export function shuffle(random: () => number, n: number): number[] {
   const list = Array.from({ length: n }, (_, i) => i);
   for (let i = n - 1; i > 0; i--) {
     const j = int(random, 0, i);
@@ -69,7 +80,7 @@ function shuffle(random: () => number, n: number): number[] {
 }
 
 /** The rule of the random numbers of each family of this file. */
-const SEEDING = "mulberry32 of the input seed. One stream gives the sizes and the places of the boxes, then the edges, in a fixed order.";
+export const SEEDING = "mulberry32 of the input seed. One stream gives the sizes and the places of the boxes, then the edges, in a fixed order.";
 
 /** The dimensions of `frame-rows`. */
 const FRAME_ROWS_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
