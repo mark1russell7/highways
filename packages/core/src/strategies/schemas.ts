@@ -133,7 +133,7 @@ const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
 /** The declarations of the options of the routers `corners` and `corners-smooth`. */
 export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   ...WAY_SCHEMA,
-  joinWork: { type: "integer", min: 0, max: 4096, step: 64, default: JOIN_WORK, describe: "The limit of the work that joins the parts of the corner graph. 0 turns the join off." },
+  joinWork: { type: "integer", min: 0, max: 268435456, step: 1048576, default: JOIN_WORK, describe: "The limit of the work that joins the parts of the corner graph. 0 turns the join off." },
   plugs: {
     type: "enum",
     values: ["facing", "side"],

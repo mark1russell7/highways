@@ -115,14 +115,17 @@ export interface CornerGraphOptions {
    */
   readonly cones?: boolean;
   /**
-   * The limit of the work that joins the parts of the graph, in points looked at for each corner. The default is `JOIN_WORK`, and 0 turns the join off.
+   * The limit of the work that joins the parts of the graph, in points looked at. The default is `JOIN_WORK`, and 0 turns the join off.
    * The nearest links of a corner can all stay on one side of a gap. Then one region of the plane falls into two parts.
    */
   readonly joinWork?: number;
 }
 
-/** The default limit of the join: the work of this many full looks over the points. */
-export const JOIN_WORK = 256;
+/**
+ * The default limit of the join. The work of a graph of `n` points is at most `2 * n * n`, and the worst `maze` boards needed `1.1 * n * n`.
+ * So this limit does not stop the join below 2048 points, and it keeps a margin of 3 up to 1900 points.
+ */
+export const JOIN_WORK: number = 3 * 2048 * 2048;
 
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
@@ -281,7 +284,7 @@ export class CornerGraph {
     if (work <= 0 || members.length < 2) return;
     const order = members.map((_, m) => m).sort((a, b) => members[b]!.length - members[a]!.length || a - b);
     order.shift();
-    let left = work * count;
+    let left = work;
     const far = new Float64Array(count);
     for (const m of order) {
       for (const i of members[m]!) {
