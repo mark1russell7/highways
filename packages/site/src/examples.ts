@@ -196,7 +196,7 @@ row.addEventListener("keydown", (e) => {
 
 $("zoom-in").addEventListener("click", () => view.zoomBy(1.6));
 $("zoom-out").addEventListener("click", () => view.zoomBy(1 / 1.6));
-$("zoom-fit").addEventListener("click", () => view.fit());
+$("zoom-fit").addEventListener("click", () => view.fit(0));
 $("open-all").addEventListener("click", () => {
   state.open = new Set(current()?.runs ?? []);
   render();

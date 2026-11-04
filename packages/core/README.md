@@ -746,6 +746,12 @@ The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default out
 - A capacity term raises the cost of a link when its users are more than its width holds.
 - With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
 
+### The router `seams`
+
+The router `seams` is opt-in, and it is not in `STRATEGIES`. It is for boards with boxes that touch. The plain corner graph has no way on such a board, so each edge gets a straight line through the boxes. The router `seams` gives such an edge a way along the sides of the boxes, with a second corner graph on the real corners. Many routes can share one seam, because a seam has no room for lanes. Use `makeRoom` first when the layout can move.
+
+A seam has no room for lanes. On the packed boards of the record, 84% to 92% of the length lies on a line with another route. Up to 10 routes share one line. The total length is 1.28 to 1.33 times the length of `corners`. Use this router when a pass-through is a worse fault than shared lines.
+
 ### The routers `tight`, `annealing`, `reroute`, `canals` and `adam`
 
 The routers `tight`, `annealing`, `reroute`, `canals` and `adam` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Each one starts from the router `shared`.
