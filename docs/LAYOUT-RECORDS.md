@@ -257,13 +257,15 @@ The independent check `checkRoutes` in `bench/measures/through-check.ts` has no 
 
 The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
 
-The script `packages/core/scripts/through-check.ts` writes the record `through-check/2`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+The script `packages/core/scripts/through-check.ts` writes the record `through-check/3`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
 
 The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
 
 A row with the view `lanes` opens each shared segment. The compare page draws that form. The examples page starts with no segment open, so its first drawing has the view `routes`.
 
 An inner route marks `through` against the boxes of its room: the children of its frame, except the nodes that hold an end. The walls of the room are no boxes of the board, so `through` does not name them. The boards `frame-rows+inner` and `frame-rows+inner12` hold the inner routes, with 10 seeds each, because no family has an inner route at its defaults. The fields `innerMarked`, `innerFlagged`, `innerFalse` and `innerUnnamed` count them.
+
+The class `spike` reads the shape of a route, not a contact. The first leg goes in, and the next leg comes back by more than a right angle. `spikeEnds` reads the legs, so the test holds on both axes and at each wall. A curve of small legs reads no spike, so the row of `corners-smooth` is outside that claim. The gate fails at 1 inner route with the shape. The outer routes have the shape too, from a plug that faces away from the way. That cause is separate, so the record holds those rows with no claim.
 
 The gate `packages/core/scripts/through-check.test.ts` makes the whole record again and compares it with the file. A stale file fails, and the message gives the command that writes it.
 The gate also holds each router of `scored`, on each family of the registry. Its list of contacts with no `through` is 53 routes of class `plug-seam` on `packed-grid`, and no other class or family. No route has a name in `through` that it does not meet.

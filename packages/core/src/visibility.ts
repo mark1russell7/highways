@@ -1,6 +1,6 @@
 import { TOLERANCE } from "./bench/properties.ts";
 import { freeRegions } from "./free-regions.ts";
-import { dist, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
+import { dist, inBox, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
 import { WORK } from "./work.ts";
@@ -125,6 +125,8 @@ export interface CornerGraphOptions {
    * The two settings give the same links, unless the limit stops the join without the labels. A test holds this.
    */
   readonly joinRegions?: boolean;
+  /** With a box, the graph keeps only the points in that box. A way in this graph then stays in the box. */
+  readonly bounds?: Box;
 }
 
 /**
@@ -200,6 +202,7 @@ export class CornerGraph {
     for (const n of nodes) size += (n.box.w + n.box.h) / 2;
     this.#cell = Math.max(1, size / Math.max(1, nodes.length) + 2 * options.margin);
     this.#pointGrid = new Grid<number>(this.#cell);
+    const fits = (c: Point): boolean => options.bounds === undefined || inBox(c, options.bounds);
     for (const n of nodes) {
       const b = inflate(n.box, options.margin);
       for (const c of [
@@ -208,7 +211,7 @@ export class CornerGraph {
         { x: b.x + b.w, y: b.y + b.h },
         { x: b.x, y: b.y + b.h },
       ]) {
-        if (!obstacles.inside(c, this.#pad)) this.#addPoint(c);
+        if (fits(c) && !obstacles.inside(c, this.#pad)) this.#addPoint(c);
       }
     }
     const spacing = (options.lattice ?? 3) * this.#cell;
@@ -226,7 +229,7 @@ export class CornerGraph {
       for (let x = x0 - spacing / 2; x <= x1 + spacing; x += spacing) {
         for (let y = y0 - spacing / 2; y <= y1 + spacing; y += spacing) {
           const c = { x, y };
-          if (!obstacles.inside(c, options.margin)) this.#addPoint(c);
+          if (fits(c) && !obstacles.inside(c, options.margin)) this.#addPoint(c);
         }
       }
     }

@@ -1,7 +1,8 @@
 import { mulberry32 as seeded } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
 import { graphInput, inputGraph } from "../bench/screen/forms.ts";
-import { segmentHitsBox, type Box, type Point } from "../geom.ts";
+import { spikeEnds } from "../bench/measures/through-check.ts";
+import { inBox, inflate, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { splitFrames, type Edge, type Graph, type Node, type Port, type Route, type Side } from "../model.ts";
 import { listStrategies, STRATEGIES } from "../strategies/index.ts";
 import { cornersRouter, type CornersOptions } from "./corners.ts";
@@ -496,5 +497,93 @@ describe("the field through of an inner route (INNER-THROUGH)", () => {
       expect(routes.filter((r) => r.frame !== undefined).length, mode).toBeGreaterThan(0);
       expect(routes.filter((r) => r.through !== undefined), mode).toEqual([]);
     }
+  });
+});
+
+describe("the first leg of an inner route (INNER-SPIKE)", () => {
+  /** This function gives a made-up frame with a plug on each of its four walls. The rows leave gaps of 6, and each plug has a route to a far row. */
+  const walledBy = (padding: number): Graph => ({
+    nodes: [
+      {
+        id: "P",
+        box: { x: 300, y: 100, w: 200 + 2 * padding, h: 174 + 2 * padding },
+        ports: [
+          { id: "n", side: "north", along: 0.5 },
+          { id: "e", side: "east", along: 0.3 },
+          { id: "s", side: "south", along: 0.5 },
+          { id: "w", side: "west", along: 0.7 },
+        ],
+      },
+      ...Array.from({ length: 6 }, (_, i): Node => ({ id: `row${i}`, parent: "P", box: { x: 300 + padding, y: 100 + padding + i * 30, w: 200, h: 24 } })),
+    ],
+    edges: [
+      { id: "north", source: { node: "row4" }, target: { node: "P", port: "n" } },
+      { id: "east", source: { node: "P", port: "e" }, target: { node: "row4" } },
+      { id: "south", source: { node: "row1" }, target: { node: "P", port: "s" } },
+      { id: "west", source: { node: "P", port: "w" }, target: { node: "row1" } },
+    ],
+  });
+  const walled = walledBy(10);
+
+  // The sums `inset + margin` fall below, on and above the padding of 10, so no one sum decides the test.
+  const margins = [3, 5, 8];
+  const insets = [2, 3, 4, 4.75, 5, 5.25, 6, 7, 8, 9];
+
+  it("has no spike at any wall, for each margin and inset", () => {
+    for (const margin of margins) {
+      for (const frameInset of insets) {
+        const routes = cornersRouter({ name: "c", margin, frameInset }).route(walled).routes;
+        expect(routes.length).toBe(4);
+        expect(routes.map((r) => [r.edge, spikeEnds(r.points)]).filter(([, n]) => n !== 0), `${margin}, ${frameInset}`).toEqual([]);
+      }
+    }
+  });
+
+  it("keeps each stop of a route in the bounds of its frame, and goes through no row", () => {
+    for (const margin of margins) {
+      for (const frameInset of insets) {
+        const bounds = inflate({ x: 300, y: 100, w: 220, h: 194 }, 1e-5 - frameInset);
+        for (const r of cornersRouter({ name: "c", margin, frameInset }).route(walled).routes) {
+          const out = r.points.slice(1, -1).filter((p) => !inBox(p, bounds));
+          expect(out, `${r.edge}, ${margin}, ${frameInset}`).toEqual([]);
+          expect(r.through, `${r.edge}, ${margin}, ${frameInset}`).toBeUndefined();
+        }
+      }
+    }
+  });
+
+  it("gives each wall half of a free strip that the inset does not fit, so a route stays out of the rows", () => {
+    for (const padding of [2, 3, 4, 5]) {
+      for (const margin of margins) {
+        for (const r of cornersRouter({ name: "c", margin, frameInset: 5 }).route(walledBy(padding)).routes) {
+          expect(spikeEnds(r.points), `${r.edge}, ${padding}, ${margin}`).toBe(0);
+          expect(r.through, `${r.edge}, ${padding}, ${margin}`).toBeUndefined();
+        }
+      }
+    }
+  });
+
+  it("draws one straight leg between a wall plug and the row that faces it", () => {
+    const facing: Graph = {
+      nodes: [
+        { id: "P", box: { x: 0, y: 0, w: 220, h: 44 }, ports: [{ id: "w", side: "west", along: 0.5 }] },
+        { id: "row", parent: "P", box: { x: 10, y: 10, w: 200, h: 24 } },
+      ],
+      edges: [{ id: "a", source: { node: "P", port: "w" }, target: { node: "row", port: "w" } }],
+    };
+    const nodes = facing.nodes.map((n) => (n.id === "row" ? { ...n, ports: [{ id: "w", side: "west" as const, along: 0.5 }] } : n));
+    for (const edge of facing.edges) {
+      expect(corners.route({ nodes, edges: [edge] }).routes[0]?.points).toEqual([{ x: 0, y: 22 }, { x: 10, y: 22 }]);
+      const back = { ...edge, source: edge.target, target: edge.source };
+      expect(corners.route({ nodes, edges: [back] }).routes[0]?.points).toEqual([{ x: 10, y: 22 }, { x: 0, y: 22 }]);
+    }
+  });
+
+  it("stops on the bounds on the first leg, one inset from the wall", () => {
+    const route = (edge: string): readonly Point[] => cornersRouter({ name: "c" }).route(walled).routes.find((r) => r.edge === edge)!.points;
+    expect(route("east")[1]).toEqual({ x: 515, y: 100 + 194 * 0.3 });
+    expect(route("west")[1]).toEqual({ x: 305, y: 100 + 194 * 0.7 });
+    expect(route("north").at(-2)).toEqual({ x: 410, y: 105 });
+    expect(route("south").at(-2)).toEqual({ x: 410, y: 289 });
   });
 });

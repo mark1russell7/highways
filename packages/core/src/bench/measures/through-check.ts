@@ -60,6 +60,8 @@ export interface RouteCheck {
   readonly hairline: boolean;
   /** This flag tells that an end of the edge has a frame, so the check skips that frame. */
   readonly skipsFrame: boolean;
+  /** This count is the number of ends of the route with the shape `spike`. */
+  readonly spikes: number;
 }
 
 /** What one route does to one box. */
@@ -231,9 +233,31 @@ export function checkRoutes(graph: Graph, routes: readonly Route[]): RouteCheck[
       unnamed: contacts.map((c) => c.box).filter((id) => route.through !== undefined && !names.includes(id)),
       hairline,
       skipsFrame: frames.size > 0,
+      spikes: spikeEnds(route.points),
     });
   }
   return out;
+}
+
+/** This function tells if the leg after the first leg turns back by more than a right angle. A leg of no length does not count. */
+function turnsBack(points: readonly Point[]): boolean {
+  const legs: Point[] = [];
+  for (let i = 1; i < points.length && legs.length < 2; i++) {
+    const leg = { x: points[i]!.x - points[i - 1]!.x, y: points[i]!.y - points[i - 1]!.y };
+    if (leg.x !== 0 || leg.y !== 0) legs.push(leg);
+  }
+  const [first, next] = legs;
+  return first !== undefined && next !== undefined && first.x * next.x + first.y * next.y < -HAIRLINE;
+}
+
+/**
+ * This function gives the number of ends of a route with the shape `spike`. The route goes in along its first leg, and its next leg comes back.
+ * The shape is a class of the route. A contact with a box is another fact, and a spike has none in the general case.
+ * The test reads the legs, not a plug, so it holds on both axes and on each wall of a box.
+ * The limit is a polyline. A curve of small legs has no spike by this test.
+ */
+export function spikeEnds(points: readonly Point[]): number {
+  return (turnsBack(points) ? 1 : 0) + (turnsBack([...points].reverse()) ? 1 : 0);
 }
 
 /** This function gives the contact that decides the class of a route, or `undefined` for a route with no contact. */

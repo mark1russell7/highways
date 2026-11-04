@@ -27,6 +27,11 @@ export function center(b: Box): Point {
   return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
 }
 
+/** This function tells if the point is in the box. A point on an edge of the box is in it. */
+export function inBox(p: Point, b: Box): boolean {
+  return p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h;
+}
+
 /** This function gives a box that is larger by `m` on each side. A negative `m` makes the box smaller. */
 export function inflate(b: Box, m: number): Box {
   return { x: b.x - m, y: b.y - m, w: Math.max(0, b.w + 2 * m), h: Math.max(0, b.h + 2 * m) };
