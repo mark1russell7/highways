@@ -4,6 +4,7 @@ import { placePlug, type Plug } from "../plugs.ts";
 import { spacePlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
 import type { PlugPair, Strategy } from "../strategies/model.ts";
+import { markThrough } from "../through.ts";
 import { WayFinder } from "../ways.ts";
 import { frameRoutes, type FrameOptions } from "./frames.ts";
 
@@ -51,8 +52,8 @@ export function cornersRouter(options: CornersOptions): Router {
       const routes: Route[] = [];
       // The inner routes come after the outer routes.
       const done = (): Result => {
-        if (inner.length > 0) routes.push(...frameRoutes(graph, inner, options));
-        return { routes };
+        const outer = markThrough(graph, routes, ways.obstacles);
+        return { routes: inner.length > 0 ? [...outer, ...frameRoutes(graph, inner, options)] : outer };
       };
       if (!options.plug && (options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
         for (const e of graph.edges) {

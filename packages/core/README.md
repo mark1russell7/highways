@@ -178,6 +178,15 @@ const inner = cornersRouter({ name: "corners" }).route({ nodes, edges }).routes;
 const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }).route({ nodes, edges }).routes; // only H and V legs
 ```
 
+### A route through a box
+
+A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
+
+- A router gives a straight line when it finds no way. The field tells you that the line goes through a box.
+- The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
+- A clean route does not have the field, so its bytes do not change.
+- `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
+
 ## Curve types
 
 A router gives polylines. The curve layer turns a polyline into a curve of a type. The polyline can come from any router, from a lane of `laneRoutes` or from a link of a zoom level.

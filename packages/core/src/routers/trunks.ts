@@ -2,6 +2,7 @@ import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, outerGraph, type Bundle, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
+import { markThrough } from "../through.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { balancedFan, fanPath, gilbertPoint } from "./fan.ts";
 
@@ -312,7 +313,8 @@ export function trunksRouter(options: TrunksOptions): Router {
         const pt = placePlug(t, e.target, center(s.box));
         routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
       }
-      return runs.length > 0 ? { routes, bundles, runs } : { routes, bundles };
+      const marked = markThrough(graph, routes, ways.obstacles);
+      return runs.length > 0 ? { routes: marked, bundles, runs } : { routes: marked, bundles };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };
