@@ -18,6 +18,12 @@ Select a cell to see its families. The snapshots are in [`docs/research/verdicts
 
 These verdicts are `better`, but 1 or more families are against them. On these families, the default stays better. A selector that knows the family can take the best strategy for each input.
 
+## The coverage of the space
+
+The space is each strategy, each option and each input dimension. This number tells how much of the space has a fitted model for each measure, with a held-out error and Sobol indices. A model tells what a measure does between the points of a screen.
+
+The value starts at 0 %, because no fitted model exists at this time. Each measure counts on each dimension, so the denominator also has cells where a measure does not change. The registries of the code give the denominator, so a new strategy changes it.
+
 ## The ideas
 
 The [idea catalog](https://github.com/mark1russell7/highways/blob/main/docs/research/CATALOG.md) has a record for each idea. The screen keeps an idea or drops it. A kept strategy or option is off by default, so the default routes do not change.

@@ -308,6 +308,57 @@ export interface ResultsData {
   readonly text: Readonly<Record<string, string>>;
   /** The measures of the records, in the sequence of `MEASURES` of the core. */
   readonly measures: readonly MeasureRow[];
+  /** The version of the core that the site builds on. */
+  readonly core: string;
+  /** The coverage of the space, from `docs/research/space-coverage`. */
+  readonly coverage?: CoverageView;
+}
+
+/** One point of the trend of the coverage. */
+export interface CoveragePoint {
+  readonly date: string;
+  readonly core: string;
+  readonly cells: number;
+  readonly fitted: number;
+  readonly value: number;
+  readonly reason?: string;
+}
+
+/** The record of the coverage of the space and its trend. A cell is one measure on one strategy, option or input dimension. */
+export interface CoverageView {
+  readonly measures: number;
+  readonly strategies: number;
+  readonly options: number;
+  readonly inputs: number;
+  readonly cells: number;
+  readonly fitted: number;
+  readonly value: number;
+  /** The weekly points, the oldest first. */
+  readonly trend: readonly CoveragePoint[];
+}
+
+/** This function gives the view of the coverage from the text of `record.json` and of `trend.json`. */
+export function coverageView(record: string, trend: string): CoverageView {
+  const { measures, strategies, options, inputs, cells, fitted, value } = JSON.parse(record) as Omit<CoverageView, "trend">;
+  return { measures, strategies, options, inputs, cells, fitted, value, trend: JSON.parse(trend) as CoveragePoint[] };
+}
+
+/** The age of one record against the date of the viewer, and the core of the record against the core of the site. */
+export interface RecordAge {
+  /** The number of whole days from the date of the record to `today`. */
+  readonly days: number;
+  /** The record comes from the core that the site builds on. */
+  readonly sameCore: boolean;
+}
+
+/** This function gives the age of a record of `date` on the core `core`, on the day `today` of a site on the core `siteCore`. */
+export function recordAge(date: string, core: string, siteCore: string, today: string): RecordAge {
+  return { days: Math.max(0, Math.round((Date.parse(today) - Date.parse(date)) / 86_400_000)), sameCore: core === siteCore };
+}
+
+/** This function gives an age as text, for example "2 days old". */
+export function ageText(days: number): string {
+  return days === 0 ? "from today" : `${days} ${days === 1 ? "day" : "days"} old`;
 }
 
 /** One measure of the records, as `MEASURES` of the core gives it. The page shows the definition with the name. */
@@ -334,6 +385,10 @@ export interface ResultsInput {
   readonly queue: string;
   /** The measures of the records, from `MEASURES` of the core. */
   readonly measures?: readonly MeasureRow[];
+  /** The version of the core that the site builds on. */
+  readonly core?: string;
+  /** The text of `record.json` and of `trend.json` of `docs/research/space-coverage`. */
+  readonly coverage?: { readonly record: string; readonly trend: string };
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -376,6 +431,8 @@ export function resultsData(input: ResultsInput): ResultsData {
       .map((r) => ({ ...r, item: input.inline(absoluteLinks(r.item)), link: linkHtml(r.link) })),
     text: input.text,
     measures: input.measures ?? [],
+    core: input.core ?? "",
+    ...(input.coverage ? { coverage: coverageView(input.coverage.record, input.coverage.trend) } : {}),
   };
 }
 
