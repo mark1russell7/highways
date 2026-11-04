@@ -1,3 +1,4 @@
+import { segmentsCross } from "@mark1russell7/layout-contract";
 import { center, dist, polylineLength, turns, type Point } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import { Grid } from "../../grid.ts";
@@ -150,11 +151,9 @@ export function crossingAngles(segs: readonly DrawnSegment[]): CrossingAngles {
   return { crossings, estimated: !exact, mean: count ? sum / count / 90 : 1, min: count ? min : 90 };
 }
 
-const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-
-/** This test is the test of `segmentsCross`, so the count of `crossingAngles` is the count of `countCrossings`. */
+/** This test is the test of `segmentsCross` of the home, so the count of `crossingAngles` is the count of `countCrossings`. The census has its own name here. */
 function segmentsCrossInside(a: Point, b: Point, c: Point, d: Point): boolean {
-  const answer = orient(c, d, a) * orient(c, d, b) < 0 && orient(a, b, c) * orient(a, b, d) < 0;
+  const answer = segmentsCross(a, b, c, d);
   if (predicateSink !== null) predicateSink.cross("routes.segmentsCrossInside", a, b, c, d, answer);
   return answer;
 }
