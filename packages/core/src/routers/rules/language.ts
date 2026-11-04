@@ -1,5 +1,11 @@
-/** What a rule selects: each free leg, a free leg with other legs, or a free leg with its near boxes. `leg-crossings` selects the crossings of the two legs next to a free leg. */
-export type RuleSelect = "legs" | "leg-pairs" | "leg-boxes" | "leg-crossings";
+/** What a rule selects: each variable, a variable with other legs, or a variable with its near boxes. `free-crossings` selects the crossings of the legs that a variable turns. */
+export type RuleSelect = "free" | "free-pairs" | "free-boxes" | "free-crossings";
+
+/**
+ * What a solver moves. `legs` moves each free leg along its normal, so the leg keeps its direction.
+ * `points` moves each free point in x and in y, so each leg at that point can turn.
+ */
+export type RuleVariable = "legs" | "points";
 
 /**
  * What a rule measures at each thing that it selects.
@@ -21,19 +27,22 @@ export interface Rule {
 /** A rule file: the rules that the solver adds into one energy, in this order. */
 export interface RuleSet {
   readonly rules: readonly Rule[];
+  /** What the solver moves. The default is `legs`. */
+  readonly variable?: RuleVariable;
 }
 
 /** The selections that each term can read. */
 const TERM_SELECTS: Readonly<Record<RuleTerm, readonly RuleSelect[]>> = {
-  hold: ["legs"],
-  spring: ["legs"],
-  gap: ["leg-pairs", "leg-boxes"],
-  angle: ["leg-crossings"],
+  hold: ["free"],
+  spring: ["free"],
+  gap: ["free-pairs", "free-boxes"],
+  angle: ["free-crossings"],
 };
 
 /** This function gives one text for each fault of a rule file. An empty list tells that the compiler takes the file. */
 export function checkRules(set: RuleSet): string[] {
   const faults: string[] = [];
+  if (set.variable !== undefined && set.variable !== "legs" && set.variable !== "points") faults.push(`There is no variable "${String(set.variable)}".`);
   if (set.rules.length === 0) faults.push("A rule file has at least one rule.");
   set.rules.forEach((rule, i) => {
     const selects = TERM_SELECTS[rule.term];
@@ -48,37 +57,37 @@ export function checkRules(set: RuleSet): string[] {
 /** The rule file of the router `adam`: the energy of RULE-020 as data. */
 export const ADAM_RULES: RuleSet = {
   rules: [
-    { select: "legs", term: "hold", weight: 0.05 },
-    { select: "leg-pairs", term: "gap", weight: 1 },
-    { select: "leg-boxes", term: "gap", weight: 4 },
+    { select: "free", term: "hold", weight: 0.05 },
+    { select: "free-pairs", term: "gap", weight: 1 },
+    { select: "free-boxes", term: "gap", weight: 4 },
   ],
 };
 
 /** The rule file of the elastic band (RULE-001): springs along the route and a push from the boxes. */
 export const ELASTIC_RULES: RuleSet = {
   rules: [
-    { select: "legs", term: "hold", weight: 0.05 },
-    { select: "legs", term: "spring", weight: 1 },
-    { select: "leg-boxes", term: "gap", weight: 4 },
+    { select: "free", term: "hold", weight: 0.05 },
+    { select: "free", term: "spring", weight: 1 },
+    { select: "free-boxes", term: "gap", weight: 4 },
   ],
 };
 
 /** The rule file of the route-to-route repulsion with a cutoff (RULE-003). */
 export const REPULSION_RULES: RuleSet = {
   rules: [
-    { select: "legs", term: "hold", weight: 0.05 },
-    { select: "leg-pairs", term: "gap", weight: 1 },
+    { select: "free", term: "hold", weight: 0.05 },
+    { select: "free-pairs", term: "gap", weight: 1 },
   ],
 };
 
 /** The rule file of the energy of RULE-019: length, clearance from routes and boxes, and the crossing angle. */
 export const ENERGY_RULES: RuleSet = {
   rules: [
-    { select: "legs", term: "hold", weight: 0.05 },
-    { select: "legs", term: "spring", weight: 1 },
-    { select: "leg-pairs", term: "gap", weight: 1 },
-    { select: "leg-boxes", term: "gap", weight: 4 },
-    { select: "leg-crossings", term: "angle", weight: 1 },
+    { select: "free", term: "hold", weight: 0.05 },
+    { select: "free", term: "spring", weight: 1 },
+    { select: "free-pairs", term: "gap", weight: 1 },
+    { select: "free-boxes", term: "gap", weight: 4 },
+    { select: "free-crossings", term: "angle", weight: 1 },
   ],
 };
 

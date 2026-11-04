@@ -4,12 +4,12 @@ import type { OptionSchema } from "../../strategies/options.ts";
 import { ADAM_DEFAULTS, ADAM_SCHEMA } from "../adam/index.ts";
 import { sharedRouter } from "../shared.ts";
 import { byCollection } from "../trunks.ts";
-import { RULE_PRESETS, type RuleSet } from "./language.ts";
+import { RULE_PRESETS, type RuleSet, type RuleVariable } from "./language.ts";
 import { solveRules, type SolverOptions } from "./solver.ts";
 
 export * from "./language.ts";
-export { compileRules, type CompiledTerm, type Leg, type LegRef, type LegView, type TermContext } from "./terms.ts";
-export { solveRules, type SolverOptions } from "./solver.ts";
+export { compileRules, type CompiledTerm, type LegRef, type Sample, type TermContext, type Variable, type VariableView } from "./terms.ts";
+export { freeVariables, solveRules, type SolverOptions, type SolverOutcome } from "./solver.ts";
 
 /** The options of the router `rules` (RULE-036: a rule language that compiles to energy). */
 export interface RulesOptions extends SolverOptions {
@@ -17,16 +17,19 @@ export interface RulesOptions extends SolverOptions {
   readonly preset: keyof typeof RULE_PRESETS;
   /** The method. The default is `adam`. */
   readonly descent: "adam" | "gradient";
+  /** What a preset moves. A rule file of the option `rules` names its own variable. The default is `legs`. */
+  readonly variable: RuleVariable;
 }
 
 /** The default options of the router `rules`. The solver has the defaults of the router `adam`. */
-export const RULES_DEFAULTS: Readonly<RulesOptions> = Object.freeze({ ...ADAM_DEFAULTS, preset: "elastic", descent: "adam" });
+export const RULES_DEFAULTS: Readonly<RulesOptions> = Object.freeze({ ...ADAM_DEFAULTS, preset: "elastic", descent: "adam", variable: "legs" });
 
 /** The declarations of the options of the router `rules` (RULE-036). */
 export const RULES_SCHEMA: OptionSchema<RulesOptions> = {
   ...ADAM_SCHEMA,
   preset: { type: "enum", values: ["elastic", "repulsion", "adam", "energy"], default: "elastic", describe: "The rule file. A caller of `rulesRouter` gives its own file as data." },
   descent: { type: "enum", values: ["adam", "gradient"], default: "adam", describe: "The method: `adam` with a sample of legs, or `gradient` over all near legs." },
+  variable: { type: "enum", values: ["legs", "points"], default: "legs", describe: "What the solver moves: each free leg along its normal, or each free point in x and y." },
 };
 
 /**
@@ -35,7 +38,7 @@ export const RULES_SCHEMA: OptionSchema<RulesOptions> = {
  */
 export function rulesRouter(options: Partial<RulesOptions> & { readonly name: string; readonly rules?: RuleSet; readonly rule?: GroupRule; readonly maxNodes?: number }): Router {
   const o = { ...RULES_DEFAULTS, ...options };
-  const set = o.rules ?? RULE_PRESETS[o.preset];
+  const set = o.rules ?? { ...RULE_PRESETS[o.preset], variable: o.variable };
   const base = sharedRouter({ name: o.name, ...(o.rule === undefined ? {} : { rule: o.rule }), ...(o.maxNodes === undefined ? {} : { maxNodes: o.maxNodes }) });
   return {
     name: o.name,
@@ -51,7 +54,7 @@ export function rulesRouter(options: Partial<RulesOptions> & { readonly name: st
 export const rulesStrategy: Strategy<"router", RulesOptions> = defineStrategy({
   step: "router",
   name: "rules",
-  describe: "Rules of the drawing as data (RULE-036). A rule file compiles to one energy, and the free legs of the routes of `shared` move down it.",
+  describe: "Rules of the drawing as data (RULE-036). A rule file compiles to one energy, and the free legs or points of the routes of `shared` move down it.",
   defaults: { ...RULES_DEFAULTS },
   schema: RULES_SCHEMA,
   maxNodes: 10_000,

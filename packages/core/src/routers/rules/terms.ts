@@ -1,15 +1,20 @@
 import { segmentsCross, type Box, type Point } from "../../geom.ts";
 import { checkRules, type Rule, type RuleSet } from "./language.ts";
 
-/** A free leg of a route. No end of it is an end of its route or a point of another route. No run or trunk holds it. */
-export interface Leg {
+/**
+ * One number that the solver moves: the points from `k` to `last` of a route, along one direction.
+ * No point of it is an end of its route or a point of another route. No run or trunk holds it.
+ */
+export interface Variable {
   readonly route: number;
-  /** The index of the first point of the leg in its route. */
+  /** The index of the first point that it moves. */
   readonly k: number;
-  /** The unit normal of the leg. The leg moves along it. */
+  /** The index of the last point that it moves. A leg has `k + 1`, and a point has `k`. */
+  readonly last: number;
+  /** The unit direction of the move. */
   readonly nx: number;
   readonly ny: number;
-  /** The boxes near the leg. */
+  /** The boxes near the points that it moves. */
   readonly boxes: readonly Box[];
 }
 
@@ -35,17 +40,25 @@ export interface TermContext {
   readonly nearOf: (route: number, k: number) => readonly LegRef[];
 }
 
-/** A leg at one step of the solver, with its two ends and its middle. */
-export interface LegView {
-  readonly leg: Leg;
+/** A place that a term `gap` reads near boxes, and the part of the move of the variable that it takes. */
+export interface Sample {
+  readonly point: Point;
+  readonly part: number;
+}
+
+/** A variable at one step of the solver, with its first point, its last point and their middle. */
+export interface VariableView {
+  readonly variable: Variable;
   readonly shift: number;
   readonly a: Point;
   readonly b: Point;
   readonly mid: Point;
+  /** The places of a term `gap` near boxes. */
+  readonly samples: readonly Sample[];
 }
 
-/** A compiled rule. It adds the slope of its energy against the shift of one leg to `g`. It adds one summand at a time, so the sum keeps one order of rounding. */
-export type CompiledTerm = (view: LegView, context: TermContext, g: number) => number;
+/** A compiled rule. It adds the slope of its energy against one variable to `g`. It adds one summand at a time, so the sum keeps one order of rounding. */
+export type CompiledTerm = (view: VariableView, context: TermContext, g: number) => number;
 
 /** This function gives the point of the segment `ab` nearest to `p`. */
 function nearestOn(p: Point, a: Point, b: Point): Point {
@@ -69,51 +82,51 @@ function nearestOfBox(p: Point, b: Box): Point {
   return { x: p.x, y: b.y + b.h };
 }
 
-/** This function compiles `w (shift / c)²`: the leg stays near its first place. */
+/** This function compiles `w (shift / c)²`: the variable stays near its first place. */
 function holdTerm(w: number): CompiledTerm {
   return (view, context, g) => g + (2 * w * view.shift) / (context.clearance * context.clearance);
 }
 
-/** This function compiles `w (|ab'|² + |a'b|²) / c²` for the two legs next to a leg. A free leg has both, because no end of it is an end of its route. */
+/** This function compiles `w (|ab'|² + |a'b|²) / c²` for the two legs at the ends of a variable. A variable has both, because it does not move an end of its route. */
 function springTerm(w: number): CompiledTerm {
-  return ({ leg, a, b }, context, g) => {
+  return ({ variable: v, a, b }, context, g) => {
     const c2 = context.clearance * context.clearance;
-    const before = context.pointOf(leg.route, leg.k - 1);
-    const after = context.pointOf(leg.route, leg.k + 2);
-    const out = leg.nx * (a.x - before.x) + leg.ny * (a.y - before.y) + leg.nx * (b.x - after.x) + leg.ny * (b.y - after.y);
+    const before = context.pointOf(v.route, v.k - 1);
+    const after = context.pointOf(v.route, v.last + 1);
+    const out = v.nx * (a.x - before.x) + v.ny * (a.y - before.y) + v.nx * (b.x - after.x) + v.ny * (b.y - after.y);
     return g + (2 * w * out) / c2;
   };
 }
 
 /** This function compiles `w (1 - d / D)²` over a sample of the legs of other routes, or over all near legs, for `d` under `D`. */
 function pairGapTerm(w: number, distance: number | undefined): CompiledTerm {
-  return ({ leg, mid }, context, g) => {
+  return ({ variable: v, mid }, context, g) => {
     const D = distance ?? context.clearance;
-    const near = context.samples === 0 ? context.nearOf(leg.route, leg.k) : undefined;
+    const near = context.samples === 0 ? context.nearOf(v.route, v.k) : undefined;
     const count = near?.length ?? context.samples;
     let sum = g;
     for (let s = 0; s < count; s++) {
       const other = near?.[s] ?? context.all[Math.floor(context.random() * context.all.length)]!;
-      if (other.route === leg.route) continue;
+      if (other.route === v.route) continue;
       const q = nearestOn(mid, context.pointOf(other.route, other.k), context.pointOf(other.route, other.k + 1));
       const dx = mid.x - q.x;
       const dy = mid.y - q.y;
       const d = Math.sqrt(dx * dx + dy * dy);
       if (d >= D || d <= 1e-9) continue;
       // E = (1 - d / D)², so dE/dt = -2 (1 - d / D) / D × (n · (mid - q)) / d.
-      sum += w * (((-2 * (1 - d / D)) / D) * ((leg.nx * dx + leg.ny * dy) / d));
+      sum += w * (((-2 * (1 - d / D)) / D) * ((v.nx * dx + v.ny * dy) / d));
     }
     return sum;
   };
 }
 
-/** This function compiles `w (1 - d / D)²` over the near boxes, at the two ends and the middle of the leg. A point in a box has a negative `d`. */
+/** This function compiles `w (1 - d / D)²` over the near boxes, at each sample of the variable. A point in a box has a negative `d`. */
 function boxGapTerm(w: number, distance: number | undefined): CompiledTerm {
-  return ({ leg, a, b, mid }, context, g) => {
+  return ({ variable: v, samples }, context, g) => {
     const D = distance ?? context.clearance;
     let sum = g;
-    for (const bx of leg.boxes) {
-      for (const p of [a, mid, b]) {
+    for (const bx of v.boxes) {
+      for (const { point: p, part } of samples) {
         const q = nearestOfBox(p, bx);
         const inside = p.x >= bx.x && p.x <= bx.x + bx.w && p.y >= bx.y && p.y <= bx.y + bx.h;
         const dx = (inside ? q.x - p.x : p.x - q.x) || 0;
@@ -122,7 +135,7 @@ function boxGapTerm(w: number, distance: number | undefined): CompiledTerm {
         if (d0 <= 1e-9) continue;
         const d = inside ? -d0 : d0;
         if (d >= D) continue;
-        sum += w * (((-2 * (1 - d / D)) / D) * ((leg.nx * dx + leg.ny * dy) / d0));
+        sum += w * part * (((-2 * (1 - d / D)) / D) * ((v.nx * dx + v.ny * dy) / d0));
       }
     }
     return sum;
@@ -131,16 +144,16 @@ function boxGapTerm(w: number, distance: number | undefined): CompiledTerm {
 
 /**
  * This function adds the slope of `w cos²θ` of one leg with the direction `u`, at each crossing with a leg of another route.
- * The direction `u` changes with the shift by `side` times the normal `n`.
+ * The direction `u` changes with the variable by `side` times the direction `n` of the variable.
  */
-function addAngle(sum: number, w: number, p: Point, q: Point, side: number, leg: Leg, context: TermContext, k: number): number {
+function addAngle(sum: number, w: number, p: Point, q: Point, side: number, v: Variable, context: TermContext, k: number): number {
   const ux = q.x - p.x;
   const uy = q.y - p.y;
   const uu = ux * ux + uy * uy;
   if (uu <= 1e-9) return sum;
-  const un = ux * leg.nx + uy * leg.ny;
+  const un = ux * v.nx + uy * v.ny;
   let out = sum;
-  for (const other of context.nearOf(leg.route, k)) {
+  for (const other of context.nearOf(v.route, k)) {
     const c = context.pointOf(other.route, other.k);
     const d = context.pointOf(other.route, other.k + 1);
     if (!segmentsCross(p, q, c, d)) continue;
@@ -149,19 +162,19 @@ function addAngle(sum: number, w: number, p: Point, q: Point, side: number, leg:
     const vv = vx * vx + vy * vy;
     if (vv <= 1e-9) continue;
     const uv = ux * vx + uy * vy;
-    const vn = vx * leg.nx + vy * leg.ny;
+    const vn = vx * v.nx + vy * v.ny;
     // E = (u · v)² / (|u|² |v|²), so dE/dt = 2 (u · v) (n · v) / (|u|² |v|²) - 2 (u · v)² (u · n) / (|u|⁴ |v|²), times the side.
     out += w * side * ((2 * uv * vn) / (uu * vv) - (2 * uv * uv * un) / (uu * uu * vv));
   }
   return out;
 }
 
-/** This function compiles `w cos²θ` at each crossing of the two legs next to a leg (RULE-019, RULE-049). A shift does not turn the leg, so only these two legs turn. */
+/** This function compiles `w cos²θ` at each crossing of the two legs at the ends of a variable (RULE-019, RULE-049). These two legs turn, and a leg between two moved points does not. */
 function angleTerm(w: number): CompiledTerm {
-  return ({ leg, a, b }, context, g) => {
-    const before = context.pointOf(leg.route, leg.k - 1);
-    const after = context.pointOf(leg.route, leg.k + 2);
-    return addAngle(addAngle(g, w, before, a, 1, leg, context, leg.k - 1), w, b, after, -1, leg, context, leg.k + 1);
+  return ({ variable: v, a, b }, context, g) => {
+    const before = context.pointOf(v.route, v.k - 1);
+    const after = context.pointOf(v.route, v.last + 1);
+    return addAngle(addAngle(g, w, before, a, 1, v, context, v.k - 1), w, b, after, -1, v, context, v.last);
   };
 }
 
@@ -170,7 +183,7 @@ function compileRule(rule: Rule): CompiledTerm {
   if (rule.term === "hold") return holdTerm(rule.weight);
   if (rule.term === "spring") return springTerm(rule.weight);
   if (rule.term === "angle") return angleTerm(rule.weight);
-  return rule.select === "leg-pairs" ? pairGapTerm(rule.weight, rule.distance) : boxGapTerm(rule.weight, rule.distance);
+  return rule.select === "free-pairs" ? pairGapTerm(rule.weight, rule.distance) : boxGapTerm(rule.weight, rule.distance);
 }
 
 /** This function compiles a rule file into one term for each rule, in the order of the file. It throws on a file with a fault of `checkRules`. */

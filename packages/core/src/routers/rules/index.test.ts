@@ -19,10 +19,10 @@ describe("the rule language (RULE-036)", () => {
   it("names each fault of a rule file, and the compiler refuses that file", () => {
     const bad = {
       rules: [
-        { select: "legs", term: "gap", weight: 1 },
-        { select: "legs", term: "hold", weight: 0 },
-        { select: "legs", term: "spring", weight: 1, distance: 4 },
-        { select: "legs", term: "flow", weight: 1 },
+        { select: "free", term: "gap", weight: 1 },
+        { select: "free", term: "hold", weight: 0 },
+        { select: "free", term: "spring", weight: 1, distance: 4 },
+        { select: "free", term: "flow", weight: 1 },
       ],
     } as unknown as RuleSet;
     expect(checkRules(bad)).toHaveLength(4);
@@ -64,8 +64,8 @@ describe("the router rules (RULE-036)", () => {
   }, 60_000);
 
   it("gives the boxes of a larger distance to a term `gap`", () => {
-    const wide: RuleSet = { rules: [{ select: "leg-boxes", term: "gap", weight: 4, distance: 64 }] };
-    const near: RuleSet = { rules: [{ select: "leg-boxes", term: "gap", weight: 4, distance: 2 }] };
+    const wide: RuleSet = { rules: [{ select: "free-boxes", term: "gap", weight: 4, distance: 64 }] };
+    const near: RuleSet = { rules: [{ select: "free-boxes", term: "gap", weight: 4, distance: 2 }] };
     const route = (rules: RuleSet): string => JSON.stringify(rulesRouter({ name: "x", rule: byCollection, rules }).route(clustered).routes);
     expect(route(wide)).not.toBe(route(near));
   }, 60_000);
