@@ -113,6 +113,7 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `switchbox` | `pins`, `pitch`, `nets`, `blocks` | `mulberry32` of the seed | `exact` |
 | `escape` | `cols`, `rows`, `pad`, `gap`, `nets`, `margin` | `mulberry32` of the seed | `exact` |
 | `rings` | `rings`, `corridor`, `wall`, `door`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `walled-level` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops`, `knot` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -141,6 +142,7 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `switchbox`: pins with fixed plugs on the four sides of a box. This is the switchbox routing problem of the chip literature.
   - `escape`: a dense grid of pads in a ring of terminals. This is the escape routing problem of chip packages.
   - `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
+  - `walled-level`: the board of `maze` with one knot of tiny nodes. The knot deepens the section tree at one place, so a zoom level shows each wall as one item.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.

@@ -3,6 +3,7 @@ import { documentHash } from "../bench/screen/hash.ts";
 import { SCREEN_SETS } from "../bench/screen/set.ts";
 import type { Box } from "../geom.ts";
 import type { Graph } from "../model.ts";
+import { sectionsRouter } from "../routers/index.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry, WEEKLY_FAMILIES } from "./index.ts";
 import { cutMaze } from "./weekly.ts";
 
@@ -19,6 +20,7 @@ const DIGESTS: Readonly<Record<string, readonly [string, number, number]>> = {
   switchbox: ["65fc74a2940fe92c", 44, 16],
   escape: ["8314365f93e18055", 130, 30],
   rings: ["d8e600cad6562d6b", 35, 13],
+  "walled-level": ["150c7fb2761dd0f9", 50, 13],
 };
 
 const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -59,9 +61,9 @@ function reached(table: readonly (readonly boolean[])[]): number {
 }
 
 describe("the families of FAMILIES-WEEKLY", () => {
-  it("has 9 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
+  it("has 10 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
     expect(WEEKLY_FAMILIES.map((f) => f.name)).toEqual(Object.keys(DIGESTS));
-    expect(HIGHWAYS_FAMILIES.slice(-9)).toEqual(WEEKLY_FAMILIES);
+    expect(HIGHWAYS_FAMILIES.slice(-10)).toEqual(WEEKLY_FAMILIES);
     for (const f of WEEKLY_FAMILIES) expect([f.version, f.owner, f.crossEngine], f.name).toEqual([1, "highways", "exact"]);
   });
 
@@ -293,4 +295,22 @@ describe("the families of FAMILIES-WEEKLY", () => {
       }
     }
   });
+
+  it("gives `walled-level` one knot of tiny nodes apart from each box, and edges only between the nodes of the cells", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("walled-level", seed, { knot: 4 }).graph;
+      const knot = g.nodes.filter((n) => /^k\d+$/.test(n.id));
+      expect(knot).toHaveLength(16);
+      for (const k of knot) {
+        expect(Math.max(k.box.w, k.box.h), k.id).toBeLessThanOrEqual(2);
+        for (const n of g.nodes) if (n.id !== k.id) expect(overlap(k.box, n.box), `${k.id} ${n.id}`).toBe(false);
+      }
+      for (const e of g.edges) for (const end of [e.source.node, e.target.node]) expect(end, `${seed}`).toMatch(/^n\d+$/);
+    }
+  });
+
+  it("makes the section tree of `walled-level` deeper than the tree of `maze` with the same seed", () => {
+    const depth = (g: Graph): number => Math.max(...(sectionsRouter({ name: "p", maxNodes: 100_000 }).route(g).levels ?? []).map((l) => l.depth));
+    for (const seed of [0, 1, 2]) expect(depth(reg.generate("walled-level", seed).graph), `${seed}`).toBeGreaterThan(depth(reg.generate("maze", seed).graph));
+  }, 60_000);
 });

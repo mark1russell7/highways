@@ -556,5 +556,42 @@ export const RINGS: HighwaysFamily = caseFamily({
   },
 });
 
+/** The dimensions of `walled-level`. */
+const WALLED_LEVEL_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  ...MAZE_DIMENSIONS,
+  count("knot", 3, 6, 3, "The number of tiny nodes on each side of the knot. A knot of more than one cap of nodes makes the section tree deep."),
+]);
+
+/**
+ * The family `walled-level`: the board of `maze`, with one knot of tiny nodes in a free cell. The knot makes the section tree deep at one place.
+ * The other leaves of the tree stop early, so a level between them and the knot shows each wall as one item. Thus a real level has the walls of the maze.
+ */
+export const WALLED_LEVEL: HighwaysFamily = caseFamily({
+  name: "walled-level",
+  meaning: "A maze with one tiny knot of nodes: the knot deepens the section tree, so one zoom level shows each wall.",
+  dimensions: WALLED_LEVEL_DIMENSIONS,
+  generator: "family.walled-level",
+  seeding: SEEDING,
+  make: (v, _seed, random): Graph => {
+    const b = new Builder();
+    const cols = v["cols"]!;
+    const rows = v["rows"]!;
+    const corridor = v["corridor"]!;
+    const wall = v["wall"]!;
+    addWalls(b, cutMaze(random, cols, rows, v["loops"]!), corridor, wall);
+    const nodes = Math.min(v["nodes"]!, cols * rows - 1);
+    const places = choose(random, cols * rows, nodes + 1);
+    const w = Math.floor(corridor / 2);
+    const h = Math.floor(corridor / 3);
+    const left = (c: number): number => wall + (c % cols) * (wall + corridor);
+    const top = (c: number): number => wall + Math.floor(c / cols) * (wall + corridor);
+    places.slice(0, nodes).forEach((c, i) => b.node(`n${i}`, left(c) + Math.floor((corridor - w) / 2), top(c) + Math.floor((corridor - h) / 2), w, h));
+    const knot = places[nodes]!;
+    for (let y = 0; y < v["knot"]!; y++) for (let x = 0; x < v["knot"]!; x++) b.node(`k${y * v["knot"]! + x}`, left(knot) + 2 * x, top(knot) + 2 * y, 1, 1);
+    for (let n = 0; n < v["edges"]!; n++) b.link({ node: `n${int(random, 0, nodes - 1)}` }, { node: `n${int(random, 0, nodes - 1)}` });
+    return b.graph();
+  },
+});
+
 /** The families of FAMILIES-WEEKLY, in the order of their batches. */
-export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS]);
+export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS, WALLED_LEVEL]);
