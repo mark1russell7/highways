@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import { loadIdeas, type Idea } from "../../../scripts/ideas.ts";
 import { builders, strategyIdeas } from "../../../scripts/strategy-ideas.ts";
 import { STEPS, STRATEGIES, listStrategies } from "../../strategies/index.ts";
-import { bootstrap, buildQueue, committedQueue, ENABLERS, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openIdeas, openTargets, queueText, readQueue, refillText, spearman, unblocked, type QueueSnapshot, WEEK_SLOTS } from "../../../scripts/queue.ts";
+import { type QueueRow, bootstrap, buildQueue, committedQueue, ENABLERS, gainOf, loadSnapshots, loadTaken, measuredGain, OPEN_STAGES, openIdeas, openTargets, queueText, readQueue, refillText, spearman, unblocked, type QueueSnapshot, WEEK_SLOTS } from "../../../scripts/queue.ts";
 
 const ideas = loadIdeas();
 const old = committedQueue();
 const queue = readQueue(old?.queue.date ?? "", old?.queue.commit ?? "");
 
 describe("the refill of the queue (QUEUE-REFILL)", () => {
-  const row = (id: string, status = "queued", canonical = id, blockedBy: readonly string[] = []) => ({ id, status, canonical, blockedBy });
+  const row = (id: string, status: QueueRow["status"] = "queued", canonical = id, blockedBy: readonly string[] = []) => ({ id, status, canonical, blockedBy });
 
   it("counts only the ideas that a build can take now", () => {
     expect(openIdeas([row("a"), row("b", "built"), row("c", "queued", "a"), row("d", "queued", "d", ["ENABLER"])])).toBe(1);
