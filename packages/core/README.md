@@ -784,6 +784,7 @@ The router `rules` is opt-in. It is not in `STRATEGIES`, so the default outputs 
 - The term `angle` alone raises the crossing angle on 10 of the 15 families of `screen-v3`. Inside `energy`, the other terms outweigh it, and the angle rises on 4 families and falls on 1. The record is `scripts/data/rules/energy.json`.
 - The selections are `free`, `free-pairs`, `free-boxes` and `free-crossings`. The terms are `hold`, `spring`, `gap` and `angle`.
 - The field `variable` of a rule file tells what the solver moves. `legs` moves each free leg along its normal, and `points` moves each free point in x and y. The default is `legs`.
+- The field `guard` of a rule file tells what happens when the crossings of a board rise. `board` gives back the first routes of the whole board. `routes` sends back one moved route at a time, and each step costs one count of the board for each moved route. The default is `board`.
 - `freeVariables(graph, result, set, clearance)` gives the variables of a rule file on a result.
 - `ADAM_RULES` is the energy of the router `adam`, and `adam` runs that file. `ELASTIC_RULES` is RULE-001, and `REPULSION_RULES` is RULE-003.
 - The terms are TypeScript at this time, because the solver needs the slope of each term.

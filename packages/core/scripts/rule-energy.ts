@@ -8,7 +8,7 @@ import { inputGraph } from "../src/bench/screen/forms.ts";
 import { SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
 import type { Point } from "../src/geom.ts";
 import type { Graph, Result } from "../src/model.ts";
-import { dropCauses, ENERGY_RULES, freeVariables, RULES_DEFAULTS, rulesRouter, type RulesOptions, type RuleVariable, type SolverOutcome } from "../src/routers/index.ts";
+import { dropCauses, ENERGY_RULES, freeVariables, RULES_DEFAULTS, rulesRouter, type RuleGuard, type RulesOptions, type RuleVariable, type SolverOutcome } from "../src/routers/index.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection } from "../src/routers/trunks.ts";
 
@@ -23,12 +23,12 @@ function preset(options: Partial<RulesOptions>): Run {
 }
 
 /** This function gives the arm with only the term `angle`. */
-function angleOnly(variable: RuleVariable): Run {
-  return (graph, report) => rulesRouter({ name: "rules", rule: byCollection, report, rules: { variable, rules: [{ select: "free-crossings", term: "angle", weight: 1 }] } }).route(graph);
+function angleOnly(variable: RuleVariable, guard: RuleGuard = "board"): Run {
+  return (graph, report) => rulesRouter({ name: "rules", rule: byCollection, report, rules: { variable, guard, rules: [{ select: "free-crossings", term: "angle", weight: 1 }] } }).route(graph);
 }
 
-/** One arm of the count: a name, its variable and its router. The arm `shared` moves nothing, and its variable is `none`. */
-const arms: readonly { readonly name: string; readonly variable: RuleVariable | "none"; readonly run: Run }[] = [
+/** One arm of the count: a name, its variable, its guard and its router. The arm `shared` moves nothing, and its variable is `none`. */
+const arms: readonly { readonly name: string; readonly variable: RuleVariable | "none"; readonly guard?: RuleGuard; readonly run: Run }[] = [
   { name: "shared", variable: "none", run: (graph) => sharedRouter({ name: "shared", rule: byCollection }).route(graph) },
   { name: "energy-adam", variable: "legs", run: preset({ preset: "energy" }) },
   { name: "energy-gradient", variable: "legs", run: preset({ preset: "energy", descent: "gradient" }) },
@@ -38,6 +38,14 @@ const arms: readonly { readonly name: string; readonly variable: RuleVariable | 
   { name: "energy-gradient-points", variable: "points", run: preset({ preset: "energy", descent: "gradient", variable: "points" }) },
   { name: "elastic-adam-points", variable: "points", run: preset({ variable: "points" }) },
   { name: "angle-only-points", variable: "points", run: angleOnly("points") },
+  { name: "energy-adam-guard", variable: "legs", guard: "routes", run: preset({ preset: "energy", guard: "routes" }) },
+  { name: "energy-gradient-guard", variable: "legs", guard: "routes", run: preset({ preset: "energy", descent: "gradient", guard: "routes" }) },
+  { name: "elastic-adam-guard", variable: "legs", guard: "routes", run: preset({ guard: "routes" }) },
+  { name: "angle-only-guard", variable: "legs", guard: "routes", run: angleOnly("legs", "routes") },
+  { name: "energy-adam-points-guard", variable: "points", guard: "routes", run: preset({ preset: "energy", variable: "points", guard: "routes" }) },
+  { name: "energy-gradient-points-guard", variable: "points", guard: "routes", run: preset({ preset: "energy", descent: "gradient", variable: "points", guard: "routes" }) },
+  { name: "elastic-adam-points-guard", variable: "points", guard: "routes", run: preset({ variable: "points", guard: "routes" }) },
+  { name: "angle-only-points-guard", variable: "points", guard: "routes", run: angleOnly("points", "routes") },
 ];
 
 /** The sum of one arm over one family. */
@@ -56,6 +64,10 @@ interface Row {
   /** The rise of the board count and of the count of the pass, over the boards dropped for crossings. */
   boardRise: number;
   routeRise: number;
+  /** The moved routes that the output keeps, the routes that the guard `routes` sent back, and its counts of the board. */
+  keptRoutes: number;
+  sentBack: number;
+  counts: number;
   crossed: number;
   crossings: number;
   meanSum: number;
@@ -91,13 +103,16 @@ for (const input of screenInputs(SCREEN_SETS["screen-v3"]!)) {
     });
     const angles = crossingAngles(drawnSegments(result.routes));
     const key = `${input.family}|${arm.name}`;
-    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, outside: 0 }, boardRise: 0, routeRise: 0, crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
+    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, outside: 0 }, boardRise: 0, routeRise: 0, keptRoutes: 0, sentBack: 0, counts: 0, crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
     row.boards++;
     const seen = outcome as SolverOutcome | undefined;
     if (seen !== undefined && seen.dropped !== "none") {
       row.droppedBoards++;
       row.droppedRoutes += seen.routes;
     }
+    row.sentBack += seen?.sentBack ?? 0;
+    row.counts += seen?.counts ?? 0;
+    if (seen?.dropped === "none") row.keptRoutes += seen.routes;
     if (seen?.dropped === "breaks") row.droppedBreaks++;
     if (seen?.dropped === "crossings") {
       row.droppedCrossings++;
@@ -124,7 +139,7 @@ const table = families.map((family) => {
   const of = Object.fromEntries(
     arms.map((arm) => {
       const r = rows.get(`${family}|${arm.name}`)!;
-      return [arm.name, { variable: arm.variable, boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, droppedBreaks: r.droppedBreaks, droppedCrossings: r.droppedCrossings, causes: r.causes, boardRise: r.boardRise, routeRise: r.routeRise, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
+      return [arm.name, { variable: arm.variable, guard: arm.guard ?? "board", boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, droppedBreaks: r.droppedBreaks, droppedCrossings: r.droppedCrossings, causes: r.causes, boardRise: r.boardRise, routeRise: r.routeRise, keptRoutes: r.keptRoutes, sentBack: r.sentBack, counts: r.counts, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
     }),
   );
   return { family, freeLegs: variableCount.get(family)!.legs, freePoints: variableCount.get(family)!.points, arms: of };

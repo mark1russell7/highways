@@ -8,6 +8,12 @@ export type RuleSelect = "free" | "free-pairs" | "free-boxes" | "free-crossings"
 export type RuleVariable = "legs" | "points";
 
 /**
+ * What happens when the moved routes of a board have more crossings than the first routes.
+ * `board` gives back the first routes of the whole board. `routes` sends back one moved route at a time, until the count of the board is at its first value.
+ */
+export type RuleGuard = "board" | "routes";
+
+/**
  * What a rule measures at each thing that it selects.
  * `hold` keeps a leg near its first place. `spring` shortens the two legs next to a leg. `gap` pushes a leg away from a thing nearer than a distance.
  * `angle` turns a crossing toward a right angle.
@@ -29,6 +35,8 @@ export interface RuleSet {
   readonly rules: readonly Rule[];
   /** What the solver moves. The default is `legs`. */
   readonly variable?: RuleVariable;
+  /** What the solver does when the crossings of the board rise. The default is `board`. */
+  readonly guard?: RuleGuard;
 }
 
 /** The selections that each term can read. */
@@ -43,6 +51,7 @@ const TERM_SELECTS: Readonly<Record<RuleTerm, readonly RuleSelect[]>> = {
 export function checkRules(set: RuleSet): string[] {
   const faults: string[] = [];
   if (set.variable !== undefined && set.variable !== "legs" && set.variable !== "points") faults.push(`There is no variable "${String(set.variable)}".`);
+  if (set.guard !== undefined && set.guard !== "board" && set.guard !== "routes") faults.push(`There is no guard "${String(set.guard)}".`);
   if (set.rules.length === 0) faults.push("A rule file has at least one rule.");
   set.rules.forEach((rule, i) => {
     const selects = TERM_SELECTS[rule.term];
