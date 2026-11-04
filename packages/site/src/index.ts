@@ -365,7 +365,7 @@ follow.addEventListener("change", () => {
 });
 $("zoom-in").addEventListener("click", () => view.zoomBy(1.6));
 $("zoom-out").addEventListener("click", () => view.zoomBy(1 / 1.6));
-$("zoom-fit").addEventListener("click", () => view.fit());
+$("zoom-fit").addEventListener("click", () => view.fit(0));
 $("level-field").insertAdjacentHTML("beforeend", `<div class="hint">${html(levelsText)}</div>`);
 
 let current: RouteDone | undefined;
