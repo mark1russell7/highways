@@ -41,6 +41,10 @@ export interface SolverOutcome {
   readonly afterPass: readonly (readonly Point[])[];
   /** The points of each route after the fix of hard rules. The last guard reads these points. */
   readonly final: readonly (readonly Point[])[];
+  /** The routes that the pass of crossings sent back. */
+  readonly passBack: number;
+  /** The routes that the fix of hard rules sent back. */
+  readonly fixBack: number;
   /** The routes that the guard `routes` sent back. */
   readonly sentBack: number;
   /** The counts of the board that the guard `routes` made. */
@@ -227,7 +231,7 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   const first = result.routes.map((r) => r.points);
   const variables = freeVariables(input, result, set, c);
   if (variables.length === 0) {
-    o.report?.({ variables: 0, routes: 0, dropped: "none", capped: false, first, afterPass: first, final: first, sentBack: 0, counts: 0 });
+    o.report?.({ variables: 0, routes: 0, dropped: "none", capped: false, first, afterPass: first, final: first, passBack: 0, fixBack: 0, sentBack: 0, counts: 0 });
     return result;
   }
   const shift = new Float64Array(variables.length);
@@ -314,6 +318,7 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   const points = first.map((pts, route) => (moved.has(route) ? pts.map((_, k) => pointOf(route, k)) : pts));
   // A moved route with more crossings than its first points, against the other routes as they are, goes back to its first points.
   let capped = false;
+  let passBack = 0;
   for (let round = 0; round < PASS_ROUNDS; round++) {
     let back = 0;
     for (const route of moved) {
@@ -322,16 +327,19 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
       back++;
     }
     if (back === 0) break;
+    passBack += back;
     capped = round === PASS_ROUNDS - 1;
   }
   const afterPass = [...points];
   const build = (pts: readonly (readonly Point[])[]): Result => ({ ...result, routes: result.routes.map((r, i): Route => (pts[i] === r.points ? r : { ...r, points: pts[i]! })) });
   let out = build(points);
+  let fixBack = 0;
   for (let round = 0; round < 3; round++) {
     const faulty = new Set(checkProperties(input, out, 1_000_000).map((v) => v.edge));
     const fix = result.routes.map((r, i) => (faulty.has(r.edge) && points[i] !== first[i] ? i : -1)).filter((i) => i >= 0);
     if (fix.length === 0) break;
     for (const i of fix) points[i] = first[i]!;
+    fixBack += fix.length;
     out = build(points);
   }
   const guarded = set.guard === "routes" ? sendBack(points, first) : { sent: 0, counts: 0 };
@@ -339,6 +347,6 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   // The output keeps the routes of `shared` when it has a break of a hard rule, or more crossings, after the fixes.
   const breaks = checkProperties(input, out, 1).length > checkProperties(input, result, 1).length;
   const crossings = !breaks && measureQuality(input, out).crossings > measureQuality(input, result).crossings;
-  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none", capped, first, afterPass, final: points, sentBack: guarded.sent, counts: guarded.counts });
+  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none", capped, first, afterPass, final: points, passBack, fixBack, sentBack: guarded.sent, counts: guarded.counts });
   return breaks || crossings ? result : out;
 }

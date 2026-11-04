@@ -19,11 +19,18 @@ describe("the causes of a dropped board", () => {
     expect(causes).toMatchObject({ pair: true, fix: false, cap: false, counts: false, outside: false, boardRise: 1, routeRise: 1 });
   });
 
-  it("does not name a pair when one revert clears the crossing", () => {
-    const final = [leg(0, 0, 10, 0), leg(0, 5, 10, -5)];
-    const causes = dropCauses(FIRST, [final[0]!, final[1]!], false, { first: 0, afterPass: 1, final: 1 });
-    expect(causes.pair).toBe(false);
-    expect(causes.outside).toBe(true);
+  it("does not name a pair when one revert clears the crossing, and names the fix when a route ends worse", () => {
+    const final = [FIRST[0]!, leg(0, 5, 10, -5)];
+    const causes = dropCauses(FIRST, final, false, { first: 0, afterPass: 1, final: 1 });
+    expect(causes).toMatchObject({ pair: false, fix: true, outside: false });
+  });
+
+  it("names a fall that two moved routes share, when each route also rises with a fixed route", () => {
+    // Routes 0 and 1 cross once at first and not at the end. Each moved route crosses the first shape of the other one, and one fixed route.
+    const first = [leg(0, 0, 10, 0), leg(5, -5, 5, 5), leg(4.5, 0.5, 4.5, 2), leg(7, 3, 9, 3)];
+    const final = [leg(4, 1, 6, 1), leg(8, -5, 8, 5), first[2]!, first[3]!];
+    const causes = dropCauses(first, final, false, { first: 1, afterPass: 2, final: 2 });
+    expect(causes).toMatchObject({ pair: false, fix: false, shared: true, outside: false, routeRise: 1 });
   });
 
   it("names the fix of hard rules when it raised the count", () => {

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { checkProperties } from "../../bench/properties.ts";
 import { drawnCrossings, measureQuality } from "../../bench/quality.ts";
+import { inputGraph } from "../../bench/screen/forms.ts";
+import { SCREEN_SETS, screenInputs } from "../../bench/screen/index.ts";
+import { rng } from "../../fixtures.ts";
 import type { Point } from "../../geom.ts";
 import { clustered, hub } from "../../highways/fixtures.test-util.ts";
 import { sharedRouter } from "../shared.ts";
@@ -20,6 +23,18 @@ describe("the count of the guard", () => {
       expect(drawnCrossings(result.routes.map((r) => r.points))).toBe(measureQuality(graph, result).crossings);
     }
   });
+
+  it("is the count of `measureQuality` on each board of `screen-v3`, on the routes of `shared` and on moved points", () => {
+    const inputs = screenInputs(SCREEN_SETS["screen-v3"]!);
+    expect(inputs).toHaveLength(150);
+    for (const [seed, input] of inputs.entries()) {
+      const graph = inputGraph(input);
+      const result = sharedRouter({ name: "x", rule: byCollection }).route(graph);
+      const random = rng(seed + 1);
+      const moved = { ...result, routes: result.routes.map((r) => ({ ...r, points: r.points.map((p, k) => (k === 0 || k === r.points.length - 1 ? p : { x: p.x + 8 * (random() - 0.5), y: p.y + 8 * (random() - 0.5) })) })) };
+      for (const each of [result, moved]) expect(drawnCrossings(each.routes.map((r) => r.points))).toBe(measureQuality(graph, each).crossings);
+    }
+  }, 120_000);
 });
 
 describe("the guard `routes` (RENDER-RULES)", () => {

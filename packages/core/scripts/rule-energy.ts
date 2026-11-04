@@ -1,6 +1,7 @@
 // RULE-019 and RULE-POINTS: rule files against `shared` on the 150 boards of `screen-v3`. Each family gets R2 (the mean crossing angle), crossings and hard breaks for each arm, and each arm states its variable.
-// Run from `packages/core`: `node scripts/rule-energy.ts <out.json>`. The record is local, so it has no time.
+// Run from `packages/core`: `node scripts/rule-energy.ts <out.json>`. The workflow gives the times of the record. The arm `energy-gradient-again` repeats an arm, so it states the noise of those times.
 import { writeFileSync } from "node:fs";
+import { cpus } from "node:os";
 import { crossingAngles, drawnSegments } from "../src/bench/measures/routes.ts";
 import { checkProperties } from "../src/bench/properties.ts";
 import { measureQuality } from "../src/bench/quality.ts";
@@ -38,6 +39,7 @@ const arms: readonly { readonly name: string; readonly variable: RuleVariable | 
   { name: "energy-gradient-points", variable: "points", run: preset({ preset: "energy", descent: "gradient", variable: "points" }) },
   { name: "elastic-adam-points", variable: "points", run: preset({ variable: "points" }) },
   { name: "angle-only-points", variable: "points", run: angleOnly("points") },
+  { name: "energy-gradient-again", variable: "legs", run: preset({ preset: "energy", descent: "gradient" }) },
   { name: "energy-adam-guard", variable: "legs", guard: "routes", run: preset({ preset: "energy", guard: "routes" }) },
   { name: "energy-gradient-guard", variable: "legs", guard: "routes", run: preset({ preset: "energy", descent: "gradient", guard: "routes" }) },
   { name: "elastic-adam-guard", variable: "legs", guard: "routes", run: preset({ guard: "routes" }) },
@@ -60,14 +62,20 @@ interface Row {
   droppedBreaks: number;
   droppedCrossings: number;
   /** The boards dropped for crossings where each cause applied. One board can have more than one cause. */
-  causes: { pair: number; fix: number; cap: number; counts: number; outside: number };
+  causes: { pair: number; fix: number; cap: number; counts: number; shared: number; outside: number };
   /** The rise of the board count and of the count of the pass, over the boards dropped for crossings. */
   boardRise: number;
   routeRise: number;
-  /** The moved routes that the output keeps, the routes that the guard `routes` sent back, and its counts of the board. */
+  /** The moved routes that the output keeps, the routes that the pass of crossings and the fix of hard rules sent back. */
   keptRoutes: number;
+  passBack: number;
+  fixBack: number;
+  /** The routes that the guard `routes` sent back, its counts of the board, and the largest number of moved routes on one board before the guard. */
   sentBack: number;
   counts: number;
+  worstMoved: number;
+  /** The time of each board in milliseconds. */
+  times: number[];
   crossed: number;
   crossings: number;
   meanSum: number;
@@ -88,7 +96,7 @@ function boardCount(graph: Graph, base: Result, points: readonly (readonly Point
 const rows = new Map<string, Row>();
 const variableCount = new Map<string, { legs: number; points: number }>();
 const perBoard = new Map<string, number[]>();
-for (const input of screenInputs(SCREEN_SETS["screen-v3"]!)) {
+for (const [board, input] of screenInputs(SCREEN_SETS["screen-v3"]!).entries()) {
   const graph = inputGraph(input);
   const base = arms[0]!.run(graph, () => undefined);
   const count = variableCount.get(input.family) ?? { legs: 0, points: 0 };
@@ -96,20 +104,28 @@ for (const input of screenInputs(SCREEN_SETS["screen-v3"]!)) {
   // A point has two variables, one in x and one in y.
   count.points += freeVariables(graph, base, { ...ENERGY_RULES, variable: "points" }, RULES_DEFAULTS.clearance).length / 2;
   variableCount.set(input.family, count);
-  for (const arm of arms) {
+  // The first arm changes with each board, so no arm always runs after the same arm.
+  for (const offset of arms.keys()) {
+    const arm = arms[(board + offset) % arms.length]!;
     let outcome: SolverOutcome | undefined;
+    const start = performance.now();
     const result = arm.run(graph, (o) => {
       outcome = o;
     });
+    const ms = performance.now() - start;
     const angles = crossingAngles(drawnSegments(result.routes));
     const key = `${input.family}|${arm.name}`;
-    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, outside: 0 }, boardRise: 0, routeRise: 0, keptRoutes: 0, sentBack: 0, counts: 0, crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
+    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, shared: 0, outside: 0 }, boardRise: 0, routeRise: 0, keptRoutes: 0, passBack: 0, fixBack: 0, sentBack: 0, counts: 0, worstMoved: 0, times: [], crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
     row.boards++;
     const seen = outcome as SolverOutcome | undefined;
     if (seen !== undefined && seen.dropped !== "none") {
       row.droppedBoards++;
       row.droppedRoutes += seen.routes;
     }
+    row.times.push(ms);
+    row.passBack += seen?.passBack ?? 0;
+    row.fixBack += seen?.fixBack ?? 0;
+    row.worstMoved = Math.max(row.worstMoved, (seen?.routes ?? 0) + (seen?.sentBack ?? 0));
     row.sentBack += seen?.sentBack ?? 0;
     row.counts += seen?.counts ?? 0;
     if (seen?.dropped === "none") row.keptRoutes += seen.routes;
@@ -118,7 +134,7 @@ for (const input of screenInputs(SCREEN_SETS["screen-v3"]!)) {
       row.droppedCrossings++;
       const counts = { first: boardCount(graph, base, seen.first), afterPass: boardCount(graph, base, seen.afterPass), final: boardCount(graph, base, seen.final) };
       const causes = dropCauses(seen.first, seen.final, seen.capped, counts);
-      for (const name of ["pair", "fix", "cap", "counts", "outside"] as const) if (causes[name]) row.causes[name]++;
+      for (const name of ["pair", "fix", "cap", "counts", "shared", "outside"] as const) if (causes[name]) row.causes[name]++;
       row.boardRise += causes.boardRise;
       row.routeRise += causes.routeRise;
     }
@@ -139,7 +155,7 @@ const table = families.map((family) => {
   const of = Object.fromEntries(
     arms.map((arm) => {
       const r = rows.get(`${family}|${arm.name}`)!;
-      return [arm.name, { variable: arm.variable, guard: arm.guard ?? "board", boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, droppedBreaks: r.droppedBreaks, droppedCrossings: r.droppedCrossings, causes: r.causes, boardRise: r.boardRise, routeRise: r.routeRise, keptRoutes: r.keptRoutes, sentBack: r.sentBack, counts: r.counts, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
+      return [arm.name, { variable: arm.variable, guard: arm.guard ?? "board", boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, droppedBreaks: r.droppedBreaks, droppedCrossings: r.droppedCrossings, causes: r.causes, boardRise: r.boardRise, routeRise: r.routeRise, keptRoutes: r.keptRoutes, passBack: r.passBack, fixBack: r.fixBack, sentBack: r.sentBack, counts: r.counts, worstMoved: r.worstMoved, medianMs: Math.round(median(r.times) * 100) / 100, worstMs: Math.round(Math.max(...r.times) * 100) / 100, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
     }),
   );
   return { family, freeLegs: variableCount.get(family)!.legs, freePoints: variableCount.get(family)!.points, arms: of };
@@ -148,7 +164,9 @@ const table = families.map((family) => {
 const rises = (name: string): number => table.filter((row) => (row.arms[name]?.r2Median ?? 0) > (row.arms["shared"]?.r2Median ?? 0)).length;
 const falls = (name: string): number => table.filter((row) => (row.arms[name]?.r2Median ?? 0) < (row.arms["shared"]?.r2Median ?? 0)).length;
 const moved = arms.slice(1).map((arm) => arm.name);
-const record = { set: "screen-v3", unit: "degrees, the median over the boards with a crossing of the mean crossing angle", families: table.length, rises: Object.fromEntries(moved.map((name) => [name, rises(name)])), falls: Object.fromEntries(moved.map((name) => [name, falls(name)])), table };
-if (out) writeFileSync(out, `${JSON.stringify(record, null, 2)}\n`);
+const record = { set: "screen-v3", cpu: cpus()[0]?.model ?? "unknown", unit: "degrees, the median over the boards with a crossing of the mean crossing angle", families: table.length, rises: Object.fromEntries(moved.map((name) => [name, rises(name)])), falls: Object.fromEntries(moved.map((name) => [name, falls(name)])), table };
+// Each arm of a family keeps one line, so the record stays short.
+const lines = table.map(({ arms: of, ...rest }) => `{ ${JSON.stringify(rest).slice(1, -1)}, "arms": {\n${Object.entries(of).map(([name, row]) => `  ${JSON.stringify(name)}: ${JSON.stringify(row)}`).join(",\n")}\n} }`);
+if (out) writeFileSync(out, `${JSON.stringify({ ...record, table: [] }, null, 2).replace('"table": []', `"table": [\n${lines.join(",\n")}\n]`)}\n`);
 for (const row of table) console.log(row.family, ...arms.map((arm) => `${arm.name} ${row.arms[arm.name]!.r2Median} x${row.arms[arm.name]!.crossings} b${row.arms[arm.name]!.breaks} same${row.arms[arm.name]!.sameAsShared} dropped${row.arms[arm.name]!.droppedBoards}`));
 console.log("rises", record.rises, "falls", record.falls);
