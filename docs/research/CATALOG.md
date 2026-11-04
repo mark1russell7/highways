@@ -777,6 +777,16 @@ The opt-in router `seams` takes each box smaller by 1 and gives the corner graph
 
 The test `routers/seams/index.test.ts` checks 0 pass-throughs on each of the 10 seeds. A count does not depend on the machine. These rows are a local check, not a verdict. A seam has no room for lanes, so routes can share one line, and only a screen gives the cost of that.
 
+The cost of this router is the shared length. A seam has no room for lanes, so routes on one seam lie on top of each other, and a reader cannot follow one route.
+
+| Measure on the 10 seeds | `corners` | `seams` |
+|---|---:|---:|
+| Share of the length on a line with two or more routes | 0.2% to 6.9% | 83.6% to 92.0% |
+| Most routes on one piece of a line | 2 to 3 | 7 to 10 |
+| Total length against `corners` | 1 | 1.28 to 1.33 |
+
+The record is [`seam-share.jsonl`](bench/seam-share.jsonl), from `scripts/seam-share.ts`. The screen can flatter this router. The ink measure B1 gives credit for shared length, and `crossings` counts each crossing of two shared stretches one time. Thus a verdict of this router reads its rows with this table.
+
 ## The verdict over families of the screens (SCREEN-WEIGHT)
 
 Step 1 (VERDICT, #139) made the family the unit of a verdict. This step gives the families to the manifests and scores the records of both screens again with `verdict` of `layout-contract` 0.2.11.
