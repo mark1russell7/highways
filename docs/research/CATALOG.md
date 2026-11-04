@@ -858,6 +858,8 @@ The guard is a test that refuses a promotion when a family loses beyond the tie.
 
 The queue puts each idea that is not built in the order of a score (IDEA-QUEUE). Up to 3 builds at a time take the ideas from the top. An idea leaves the catalog only after its build and its screen, with its record kept.
 
+`pnpm queue` also prints the count of the open ideas (QUEUE-REFILL). An open idea is not built, not blocked and not a duplicate. Under one week of build slots, the line asks for a literature survey and a round of hybrids. One week has 36 slots: 3 builds at a time, 6 ideas in each build, and 2 rounds.
+
 ### The files and the commands
 
 - [`queue.json`](queue.json) has one row for each record at the stage `cataloged` or `prototyped`, and one row for each taken idea that is built.
