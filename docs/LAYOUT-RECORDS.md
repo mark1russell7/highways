@@ -602,6 +602,14 @@ The screen of `exact-v1` adds the gap closed (B10) to each record of the step `r
 gh workflow run screen.yml --ref main -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
 ```
 
+### The screen set `moves-v1`
+
+The set `moves-v1` (REBUILD-SILENT) has 8 small boards, one family of one member for each board. Its files are in [`corpus/moves-v1`](../corpus/moves-v1). `MOVES_V1` of `bench/screen/moves-set.ts` makes them.
+
+- A new set changes no input hash of the other sets.
+- Each board shows the own move of its strategies. The set is for the activation report. Do not use it for a verdict.
+- [The causes of the silent strategies](research/CATALOG.md#the-causes-of-the-silent-strategies-rebuild-silent) tell the board of each strategy.
+
 ### The screen set `exact-v1-bounds`
 
 The set `exact-v1-bounds` (EXACT-BOUNDS) has the boards of `exact-v1` at 18, 24 and 40 nodes. Its files are in [`corpus/exact-v1-bounds`](../corpus/exact-v1-bounds). `EXACT_V1_BOUNDS` of `bench/screen/exact-set.ts` makes them.
