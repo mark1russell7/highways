@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { STRATEGIES } from "./builtins.ts";
-import { listStrategies, STEPS, type Step } from "./model.ts";
-import { ALL_STRATEGIES, OPT_IN_STRATEGIES, STEP_DEFAULTS } from "./opt-in.ts";
+import { listStrategies, STEPS, type AnyStrategy, type Step } from "./model.ts";
+import { ALL_STRATEGIES, KEYED_STRATEGIES, OPT_IN_STRATEGIES, STEP_DEFAULTS, keyOfStrategy, strategyOfKey } from "./opt-in.ts";
 
 const DEFAULT_ROUTERS = ["straight", "plugs", "corners", "corners-smooth", "trunks", "shared", "shared-all", "sections", "sections-tree"];
 
@@ -27,5 +27,40 @@ describe("the opt-in strategies (PHYSICAL-VISIBLE)", () => {
 
   it("names a built-in strategy of its step in each step default", () => {
     for (const [step, name] of Object.entries(STEP_DEFAULTS)) expect(listStrategies(STRATEGIES, step as Step).map((s) => s.name), step).toContain(name);
+  });
+});
+
+describe("the keys of the strategies (CATALOG-LOOKUP)", () => {
+  const every = STEPS.flatMap((step) => listStrategies(KEYED_STRATEGIES, step) as readonly AnyStrategy[]);
+
+  it("gives each strategy from its key, and no two strategies share a key", () => {
+    for (const s of every) expect(strategyOfKey(keyOfStrategy(s)), keyOfStrategy(s)).toEqual({ ok: true, strategy: s });
+    expect(new Set(every.map(keyOfStrategy)).size).toBe(every.length);
+  });
+
+  it("holds the built-in strategies and the 13 opt-in strategies", () => {
+    const builtIn = STEPS.flatMap((step) => listStrategies(STRATEGIES, step) as readonly AnyStrategy[]);
+    expect(builtIn).toHaveLength(107);
+    expect(every).toHaveLength(120);
+    const optIn = every.filter((s) => !builtIn.includes(s)).map(keyOfStrategy).sort();
+    expect(optIn).toEqual([...OPT_IN_STRATEGIES.map(keyOfStrategy), "router/seams", "highway/shared-ways-all"].sort());
+  });
+
+  it("keeps the same name in two steps apart", () => {
+    const pair = (["keys", "straight"] as const).map((name) => STEPS.filter((step) => strategyOfKey(`${step}/${name}`).ok));
+    expect(pair.map((steps) => steps.length > 1)).toEqual([true, true]);
+  });
+
+  it("gives a reason for a key with no strategy", () => {
+    expect(strategyOfKey("adam")).toEqual({ ok: false, reason: "The key adam has no step. A key has the form step/name." });
+    expect(strategyOfKey("router/no-such")).toEqual({ ok: false, reason: "The step router has no strategy no-such." });
+    expect(strategyOfKey("no-step/adam").ok).toBe(false);
+    expect(strategyOfKey("/adam").ok).toBe(false);
+    expect(strategyOfKey("router/").ok).toBe(false);
+  });
+
+  it("reads the registry of the caller", () => {
+    expect(strategyOfKey("router/adam", STRATEGIES).ok).toBe(false);
+    expect(strategyOfKey("router/seams", ALL_STRATEGIES).ok).toBe(false);
   });
 });
