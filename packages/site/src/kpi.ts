@@ -20,7 +20,7 @@ export interface SiteKpi {
   readonly project: string;
   /** The time of the data: the date of the benchmark snapshot. It is not the time of the build. */
   readonly at: string;
-  readonly measures: readonly SiteMeasure[];
+  measures: SiteMeasure[];
 }
 
 /** This function gives the major and the minor of a version, or `undefined` when the text is not a version. */
