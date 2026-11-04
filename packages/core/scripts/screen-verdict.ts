@@ -11,6 +11,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
+import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
 import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
@@ -131,9 +132,11 @@ interface SnapshotHeader {
 }
 
 /** This function gives the JSON text of a snapshot, with one row on each line. Thus a diff shows each changed verdict. */
-function snapshotText(header: SnapshotHeader, rows: readonly GuardVerdict[]): string {
+function snapshotText(header: SnapshotHeader, rows: readonly GuardVerdict[], limits: readonly OverlapLimitRow[]): string {
   const head = JSON.stringify(header, null, 2).replace(/\n}$/, ",");
-  return `${head}\n  "rows": [\n${rows.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]\n}\n`;
+  const list = (key: string, items: readonly unknown[]): string => `  "${key}": [\n${items.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]`;
+  // A snapshot with no router without lanes keeps its old form.
+  return `${head}\n${[list("rows", rows), ...(limits.length > 0 ? [list("limits", limits)] : [])].join(",\n")}\n}\n`;
 }
 
 /** This function gives the run id and the commit from the path of an artifact that `gh run download <run> -D <dir>/<run>` wrote. */
@@ -173,6 +176,7 @@ function main(): void {
   requireGrid(`screen-verdict ${file}`, records);
   const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
   const rows = screenVerdicts(records, base, measures);
+  const limits = overlapLimitRows(records, (input) => familyOfRecord({ input } as LayoutRecord));
   const step = stepOf(records);
   const set = records[0]?.set;
   const path = fromPath(file);
@@ -188,7 +192,8 @@ function main(): void {
     core: opt("--core") ?? (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version,
   };
   const snapshot = args.includes("--snapshot") ? fileURLToPath(new URL(`../../../docs/research/verdicts/${set}-${step}.json`, import.meta.url)) : undefined;
-  for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows));
+  for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows, limits));
+  for (const l of limits) console.log(`${l.strategy} ${l.guard}: ${l.label}, rise over ${l.base} ${f3(l.worst)} at most ${l.limit}, ${l.over} of ${l.of} inputs over, worst ${l.worstInput}`);
   const families = rows[0]?.families.map((f) => f.family) ?? [];
   console.log(`## The verdicts of the step \`${step}\` on \`${records[0]?.set}\` against \`${base}\`\n`);
   console.log(`The level is ${LEVEL}. The families: ${families.map((f) => `\`${f}\``).join(", ")}. A positive mean tells that the strategy is better.\n`);
