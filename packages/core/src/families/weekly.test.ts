@@ -16,6 +16,9 @@ const DIGESTS: Readonly<Record<string, readonly [string, number, number]>> = {
   channel: ["5296fc30bdd9be46", 32, 24],
   comb: ["4641bb3c97cfb4e0", 30, 15],
   spiral: ["323f37b3b4588463", 36, 13],
+  switchbox: ["65fc74a2940fe92c", 44, 16],
+  escape: ["8314365f93e18055", 130, 30],
+  rings: ["d8e600cad6562d6b", 35, 13],
 };
 
 const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -56,9 +59,9 @@ function reached(table: readonly (readonly boolean[])[]): number {
 }
 
 describe("the families of FAMILIES-WEEKLY", () => {
-  it("has 6 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
+  it("has 9 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
     expect(WEEKLY_FAMILIES.map((f) => f.name)).toEqual(Object.keys(DIGESTS));
-    expect(HIGHWAYS_FAMILIES.slice(-6)).toEqual(WEEKLY_FAMILIES);
+    expect(HIGHWAYS_FAMILIES.slice(-9)).toEqual(WEEKLY_FAMILIES);
     for (const f of WEEKLY_FAMILIES) expect([f.version, f.owner, f.crossEngine], f.name).toEqual([1, "highways", "exact"]);
   });
 
@@ -211,6 +214,83 @@ describe("the families of FAMILIES-WEEKLY", () => {
       expect(n.box.y % 100).toBeGreaterThanOrEqual(10);
       expect(n.box.x % 100 + n.box.w).toBeLessThanOrEqual(100);
       expect(n.box.y % 100 + n.box.h).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("gives `switchbox` one fixed plug into the box on each pin, and one edge for each pin at most", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("switchbox", seed, { pins: 6, nets: 80, blocks: 0 }).graph;
+      expect(g.nodes).toHaveLength(24);
+      expect(g.edges).toHaveLength(12);
+      const used = g.edges.flatMap((e) => [e.source.node, e.target.node]);
+      expect(new Set(used).size, `${seed}`).toBe(24);
+      const sideOf: Record<string, string> = { n: "south", s: "north", w: "east", e: "west" };
+      for (const n of g.nodes) expect(n.ports?.map((p) => p.side)).toEqual([sideOf[n.id[0]!]]);
+    }
+  });
+
+  it("keeps the blocks of `switchbox` inside the box and apart", () => {
+    const g = reg.generate("switchbox", 1, { pins: 8, pitch: 40, blocks: 16 }).graph;
+    const blocks = g.nodes.filter((n) => n.id.startsWith("b"));
+    expect(blocks).toHaveLength(16);
+    const pins = g.nodes.filter((n) => !n.id.startsWith("b"));
+    for (const [i, a] of blocks.entries()) {
+      for (const p of pins) expect(overlap(a.box, p.box), `${a.id} ${p.id}`).toBe(false);
+      for (const c of blocks.slice(i + 1)) expect(overlap(a.box, c.box), `${a.id} ${c.id}`).toBe(false);
+    }
+  });
+
+  it("gives each edge of `escape` one pad and its own terminal, and the terminals stay out of the pads", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("escape", seed, { cols: 5, rows: 4, nets: 400 }).graph;
+      const pads = g.nodes.filter((n) => n.id.startsWith("p"));
+      const terminals = g.nodes.filter((n) => n.id.startsWith("t"));
+      expect(pads).toHaveLength(20);
+      expect(terminals).toHaveLength(20);
+      expect(g.edges).toHaveLength(20);
+      expect(new Set(g.edges.map((e) => e.target.node)).size).toBe(20);
+      expect(new Set(g.edges.map((e) => e.source.node)).size).toBe(20);
+      for (const [i, a] of g.nodes.entries()) for (const c of g.nodes.slice(i + 1)) expect(overlap(a.box, c.box), `${a.id} ${c.id}`).toBe(false);
+    }
+  });
+
+  /** This function tells if a point of the plane is in a wall of the board. */
+  const inWall = (g: Graph, x: number, y: number): boolean => g.nodes.some((n) => n.id.startsWith("wall") && x >= n.box.x && x < n.box.x + n.box.w && y >= n.box.y && y < n.box.y + n.box.h);
+
+  it("closes each ring of `rings` but for one door, so the walls leave one way out of each corridor", () => {
+    for (const seed of [0, 1, 2, 3]) {
+      const [rings, corridor, wall] = [3, 60, 10];
+      const g = reg.generate("rings", seed, { rings, corridor, wall, door: 30, nodes: 2, edges: 0 }).graph;
+      const pitch = corridor + wall;
+      const mid = rings * pitch;
+      for (let k = 0; k < rings; k++) {
+        const outer = (k + 1) * pitch;
+        const inner = outer - wall;
+        // This is one count of free units of each ring, along the middle of its wall.
+        let free = 0;
+        const line = wall >> 1;
+        for (let t = -inner; t < inner; t++) {
+          if (!inWall(g, mid + t, mid - outer + line)) free++;
+          if (!inWall(g, mid + inner + line, mid + t)) free++;
+          if (!inWall(g, mid + t, mid + inner + line)) free++;
+          if (!inWall(g, mid - outer + line, mid + t)) free++;
+        }
+        expect(free, `${seed} ${k}`).toBe(30);
+      }
+    }
+  });
+
+  it("keeps the nodes of `rings` out of the walls and apart", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("rings", seed, { rings: 5, nodes: 120 }).graph;
+      const nodes = g.nodes.filter((n) => n.id.startsWith("n"));
+      expect(nodes).toHaveLength(60);
+      for (const [i, a] of nodes.entries()) {
+        expect(a.box.x).toBeGreaterThanOrEqual(0);
+        expect(a.box.y).toBeGreaterThanOrEqual(0);
+        for (const w of g.nodes.filter((n) => n.id.startsWith("wall"))) expect(overlap(a.box, w.box), `${a.id} ${w.id}`).toBe(false);
+        for (const c of nodes.slice(i + 1)) expect(overlap(a.box, c.box), `${a.id} ${c.id}`).toBe(false);
+      }
     }
   });
 });
