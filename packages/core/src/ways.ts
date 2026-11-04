@@ -18,6 +18,12 @@ export interface WayOptions {
  * The ways around the nodes of one graph. A way leaves a plug along its normal.
  * It goes a shortest way (A*) through the corner graph, without the needless corners. It enters the other plug along its normal.
  */
+/** The options of `WayFinder`. */
+export interface WayFinderOptions extends WayOptions {
+  /** The limit of the work that joins the parts of the corner graph. `CornerGraphOptions.joinWork` tells more. */
+  readonly joinWork?: number;
+}
+
 export class WayFinder {
   readonly obstacles: Obstacles;
   readonly corners: CornerGraph;
@@ -25,11 +31,11 @@ export class WayFinder {
   readonly #smooth: boolean;
 
   /** This constructor makes the obstacles and the corner graph of the nodes. */
-  constructor(nodes: readonly Node[], options: WayOptions = {}) {
+  constructor(nodes: readonly Node[], options: WayFinderOptions = {}) {
     this.margin = options.margin ?? 5;
     this.#smooth = options.smooth ?? false;
     this.obstacles = new Obstacles(nodes, 180);
-    this.corners = new CornerGraph(nodes, this.obstacles, { margin: this.margin, k: options.k ?? 8 });
+    this.corners = new CornerGraph(nodes, this.obstacles, { margin: this.margin, k: options.k ?? 8, ...(options.joinWork === undefined ? {} : { joinWork: options.joinWork }) });
   }
 
   /** This method gives the point at `margin` from the plug, along its normal. */

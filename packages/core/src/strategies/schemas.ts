@@ -88,6 +88,7 @@ import type { WayOptions } from "../ways.ts";
 import type { PipelineOptions } from "../whole/pipeline/index.ts";
 import type { RunOrder } from "../segments.ts";
 import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
+import { JOIN_WORK } from "../visibility.ts";
 import type { EnumOption, NumberOption, OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
@@ -132,6 +133,7 @@ const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
 /** The declarations of the options of the routers `corners` and `corners-smooth`. */
 export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   ...WAY_SCHEMA,
+  joinWork: { type: "integer", min: 0, max: 4096, step: 64, default: JOIN_WORK, describe: "The limit of the work that joins the parts of the corner graph. 0 turns the join off." },
   plugs: {
     type: "enum",
     values: ["facing", "side"],

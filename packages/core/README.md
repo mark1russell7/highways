@@ -180,6 +180,8 @@ const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }
 A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
 
 - A router gives a straight line when it finds no way. The field tells you that the line goes through a box.
+- The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
+- When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
 - A clean route does not have the field, so its bytes do not change.
 - `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.

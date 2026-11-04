@@ -1,5 +1,6 @@
 import { nodeIndex, type Graph, type Route, type Result } from "./model.ts";
 import type { Obstacles } from "./visibility.ts";
+import type { WayFinder } from "./ways.ts";
 
 /**
  * This function gives the ids of the boxes that the route goes through, sorted. The boxes at the ends of the edge do not count.
@@ -32,6 +33,11 @@ export function markThrough(graph: Graph, routes: Route[], obstacles: Obstacles)
     if (through.length > 0) (out ??= [...routes])[i] = { ...route, through };
   });
   return out ?? routes;
+}
+
+/** This function gives the field `joinStopped` of a result, when the limit of the work stopped the join of the corner graph. */
+export function joinNote(ways: WayFinder): { readonly joinStopped?: true } {
+  return ways.corners.joinStopped ? { joinStopped: true } : {};
 }
 
 /** This function gives the field `through` of each route of `source` to the route of its edge in `routes`. */

@@ -114,7 +114,15 @@ export interface CornerGraphOptions {
    * Then a path can go along a long corridor between rows or columns of boxes. The default is false.
    */
   readonly cones?: boolean;
+  /**
+   * The limit of the work that joins the parts of the graph, in points looked at for each corner. The default is `JOIN_WORK`, and 0 turns the join off.
+   * The nearest links of a corner can all stay on one side of a gap. Then one region of the plane falls into two parts.
+   */
+  readonly joinWork?: number;
 }
+
+/** The default limit of the join: the work of this many full looks over the points. */
+export const JOIN_WORK = 256;
 
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
@@ -124,6 +132,8 @@ export interface CornerGraphOptions {
  */
 export class CornerGraph {
   readonly points: Point[] = [];
+  /** This flag is true when the limit of `joinWork` stopped the join, so a link between two parts can be missing. */
+  joinStopped = false;
   readonly #adj: number[][] = [];
   // The links of #adj in flat arrays for the search. The links of corner `i` are at the indices `#start[i]` to `#start[i + 1] - 1`.
   // `#to` holds the other corner of each link and `#length` holds its length. The order of the links is the order of #adj.
@@ -216,6 +226,7 @@ export class CornerGraph {
         links[j]!.add(i);
       }
     }
+    this.#joinParts(links, options.joinWork ?? JOIN_WORK);
     const count = this.points.length;
     this.#start = new Int32Array(count + 1);
     links.forEach((s, i) => {
@@ -236,6 +247,65 @@ export class CornerGraph {
       for (let m = 0; m < adj.length; m++) {
         this.#to[s + m] = adj[m]!;
         this.#length[s + m] = dist(p, this.points[adj[m]!]!);
+      }
+    }
+  }
+
+  /**
+   * This method links the parts of the graph that can see each other (CORNER-REACH). The largest part gets no links of its own.
+   * The other parts go from large to small. Each of their corners links to the nearest corner in another part that it can see.
+   * The order comes only from the indices of the corners and the sizes of the parts, and an equal distance goes to the lower index.
+   * A graph with one part does not change. When the work reaches its limit, the method stops and sets `joinStopped`.
+   */
+  #joinParts(links: Set<number>[], work: number): void {
+    const count = this.points.length;
+    const part = new Int32Array(count).fill(-1);
+    const members: number[][] = [];
+    for (let i = 0; i < count; i++) {
+      if (part[i] !== -1) continue;
+      const m = members.length;
+      const list: number[] = [];
+      const stack = [i];
+      part[i] = m;
+      while (stack.length > 0) {
+        const a = stack.pop()!;
+        list.push(a);
+        for (const b of links[a]!) {
+          if (part[b] !== -1) continue;
+          part[b] = m;
+          stack.push(b);
+        }
+      }
+      members.push(list.sort((a, b) => a - b));
+    }
+    if (work <= 0 || members.length < 2) return;
+    const order = members.map((_, m) => m).sort((a, b) => members[b]!.length - members[a]!.length || a - b);
+    order.shift();
+    let left = work * count;
+    const far = new Float64Array(count);
+    for (const m of order) {
+      for (const i of members[m]!) {
+        if (left < count) {
+          this.joinStopped = true;
+          return;
+        }
+        left -= count;
+        const p = this.points[i]!;
+        const others: number[] = [];
+        for (let j = 0; j < count; j++) {
+          if (part[j] === m) continue;
+          const q = this.points[j]!;
+          far[j] = (p.x - q.x) ** 2 + (p.y - q.y) ** 2;
+          others.push(j);
+        }
+        others.sort((a, b) => far[a]! - far[b]! || a - b);
+        for (const j of others) {
+          left--;
+          if (!this.#obstacles.clear(p, this.points[j]!, this.#pad)) continue;
+          links[i]!.add(j);
+          links[j]!.add(i);
+          break;
+        }
       }
     }
   }
