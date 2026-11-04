@@ -43,12 +43,14 @@ interface Arm {
   endsOverlapLinks: number;
   clearWayLinks: number;
   noWayLinks: number;
+  /** The crossed links with no way between the boxes of the level, and with a way between the nodes of the board. */
+  noWayBoardWayLinks: number;
   overlapEnd: number;
   single: number;
   flatLevelLinks: number;
   flatClearWayLinks: number;
 }
-const freshArm = (): Arm => ({ crossings: 0, crossedLinks: 0, endsOverlapLinks: 0, clearWayLinks: 0, noWayLinks: 0, overlapEnd: 0, single: 0, flatLevelLinks: 0, flatClearWayLinks: 0 });
+const freshArm = (): Arm => ({ crossings: 0, crossedLinks: 0, endsOverlapLinks: 0, clearWayLinks: 0, noWayLinks: 0, noWayBoardWayLinks: 0, overlapEnd: 0, single: 0, flatLevelLinks: 0, flatClearWayLinks: 0 });
 
 /** This function adds one measured level to the counts of an arm. */
 function add(level: Level, m: LevelCrossings, arm: Arm): void {
@@ -60,7 +62,10 @@ function add(level: Level, m: LevelCrossings, arm: Arm): void {
     arm.single += c.single;
     if (c.way === "ends-overlap") arm.endsOverlapLinks++;
     else if (c.way === "clear") arm.clearWayLinks++;
-    else arm.noWayLinks++;
+    else {
+      arm.noWayLinks++;
+      if (c.boardWay) arm.noWayBoardWayLinks++;
+    }
     if (flat) arm.flatLevelLinks++;
     if (flat && c.way === "clear") arm.flatClearWayLinks++;
   }
@@ -109,9 +114,9 @@ function row(family: string, dims: Record<string, number> | undefined, seeds: nu
     const f = (arms.far.route(graph).levels ?? []) as readonly Level[];
     let crossed = 0;
     b.forEach((level, i) => {
-      const mb = levelCrossings(level);
-      const mj = levelCrossings(j[i]!);
-      const mf = levelCrossings(f[i]!);
+      const mb = levelCrossings(level, graph.nodes);
+      const mj = levelCrossings(j[i]!, graph.nodes);
+      const mf = levelCrossings(f[i]!, graph.nodes);
       links += level.links.length;
       levels++;
       overlapPairs += mb.overlaps;
