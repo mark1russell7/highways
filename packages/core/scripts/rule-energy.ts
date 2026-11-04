@@ -62,7 +62,7 @@ interface Row {
   droppedBreaks: number;
   droppedCrossings: number;
   /** The boards dropped for crossings where each cause applied. One board can have more than one cause. */
-  causes: { pair: number; fix: number; cap: number; counts: number; shared: number; outside: number };
+  causes: { pair: number; fix: number; cap: number; counts: number; shared: number; chain: number; outside: number };
   /** The rise of the board count and of the count of the pass, over the boards dropped for crossings. */
   boardRise: number;
   routeRise: number;
@@ -115,7 +115,7 @@ for (const [board, input] of screenInputs(SCREEN_SETS["screen-v3"]!).entries()) 
     const ms = performance.now() - start;
     const angles = crossingAngles(drawnSegments(result.routes));
     const key = `${input.family}|${arm.name}`;
-    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, shared: 0, outside: 0 }, boardRise: 0, routeRise: 0, keptRoutes: 0, passBack: 0, fixBack: 0, sentBack: 0, counts: 0, worstMoved: 0, times: [], crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
+    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, shared: 0, chain: 0, outside: 0 }, boardRise: 0, routeRise: 0, keptRoutes: 0, passBack: 0, fixBack: 0, sentBack: 0, counts: 0, worstMoved: 0, times: [], crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
     row.boards++;
     const seen = outcome as SolverOutcome | undefined;
     if (seen !== undefined && seen.dropped !== "none") {
@@ -134,7 +134,7 @@ for (const [board, input] of screenInputs(SCREEN_SETS["screen-v3"]!).entries()) 
       row.droppedCrossings++;
       const counts = { first: boardCount(graph, base, seen.first), afterPass: boardCount(graph, base, seen.afterPass), final: boardCount(graph, base, seen.final) };
       const causes = dropCauses(seen.first, seen.final, seen.capped, counts);
-      for (const name of ["pair", "fix", "cap", "counts", "shared", "outside"] as const) if (causes[name]) row.causes[name]++;
+      for (const name of ["pair", "fix", "cap", "counts", "shared", "chain", "outside"] as const) if (causes[name]) row.causes[name]++;
       row.boardRise += causes.boardRise;
       row.routeRise += causes.routeRise;
     }

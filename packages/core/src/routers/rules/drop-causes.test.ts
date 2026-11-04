@@ -2,6 +2,22 @@ import { describe, expect, it } from "vitest";
 import type { Point } from "../../geom.ts";
 import { dropCauses } from "./drop-causes.ts";
 
+describe("the cause `chain`", () => {
+  it("names a route that rises with a second route, when its way back crosses a third route", () => {
+    const first = [
+      [{ x: 0, y: 0 }, { x: 10, y: 0 }],
+      [{ x: 5, y: 1 }, { x: 5, y: 3 }],
+      [{ x: 8, y: 3 }, { x: 8, y: 5 }],
+    ];
+    const final = [[{ x: 0, y: 2 }, { x: 10, y: 2 }], first[1]!, [{ x: 8, y: -1 }, { x: 8, y: 1 }]];
+    const causes = dropCauses(first, final, false, { first: 0, afterPass: 1, final: 1 });
+    expect(causes.chain).toBe(true);
+    expect(causes.pair).toBe(false);
+    expect(causes.fix).toBe(false);
+    expect(causes.outside).toBe(false);
+  });
+});
+
 /** This function gives a route from two pairs of numbers. */
 const leg = (x0: number, y0: number, x1: number, y1: number): readonly Point[] => [
   { x: x0, y: y0 },
