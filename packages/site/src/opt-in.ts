@@ -5,7 +5,7 @@ export interface OptInNote {
   /** The file of the repository that has the numbers of `text`. */
   readonly source: "docs/research/CATALOG.md" | "docs/research/PORTFOLIO.md" | "docs/research/XPLAT.md";
   /** The stage of the idea in its source. */
-  readonly stage: "kept" | "screened";
+  readonly stage: "built" | "kept" | "screened";
   /** The recorded numbers. A word in backticks is code. */
   readonly text: string;
   /** The page does not run the router on a board with more nodes. The panel keeps the recorded numbers of `text`. */
@@ -58,6 +58,11 @@ export const OPT_IN_NOTES: Readonly<Record<string, OptInNote>> = {
     source: "docs/research/CATALOG.md",
     stage: "screened",
     text: "Recorded on `screen-v2`: close parallel legs (R12) are `better`, but crossings (R1) and the bundled share (B2) are `worse`. The median ink saved (B1) is 0.933 times `shared`. The time is 2.13 times `shared`.",
+  },
+  rules: {
+    source: "docs/research/CATALOG.md",
+    stage: "built",
+    text: "No screen record yet for this router. A rule file as data compiles to one energy. The file `adam` gives the routes of the router `adam`, so its time is 7.17 times `shared`.",
   },
   "shared-stretch": {
     source: "docs/research/XPLAT.md",

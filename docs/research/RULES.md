@@ -919,6 +919,8 @@ The solver part stays outside: the gradient, the projection and the step. A solv
 
 The order of work is: first the solver with hand-written terms ([RULE-022](#rule-022) or [RULE-019](#rule-019)), then the rule format, then the compiler from Vex formulas to terms.
 
+The first slice exists: the router `rules` has one solver, three hand-written terms and a rule format as data. The solver of `adam` is the first solver, so RULE-019 is not a condition. The energy of `adam` is a rule file, and that file gives the bytes of `adam` on the 150 boards of `screen-v3`. Vex has no derivative of a formula at this time, so the compiler from Vex formulas stays open.
+
 ## Learned rules
 
 A learned method takes its rules from examples. This repository uses made-up data only. So each learned idea needs a corpus first: preference pairs from a panel, or the answers of an exact solver on small boards. A learned method stays deterministic only with frozen weights and no sampling at run time.

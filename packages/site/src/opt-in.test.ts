@@ -33,7 +33,7 @@ describe("the opt-in routers on the compare page (PHYSICAL-VISIBLE)", () => {
     const defaults = listStrategies(STRATEGIES, "router").map((s) => s.name);
     expect(names.slice(0, defaults.length)).toEqual(defaults);
     expect(names.slice(defaults.length)).toEqual(OPT_IN_STRATEGIES.map((r) => r.name));
-    expect(names).toHaveLength(defaults.length + 11);
+    expect(names).toHaveLength(defaults.length + 12);
   });
 
   it("keeps each other step of the page, and the live demo, on the built-in strategies", () => {

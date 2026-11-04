@@ -22,6 +22,8 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "shared-stretch.smooth": "The router `shared` finds its ways in the corner graph itself, and it does not read `smooth`. This is a gap of the core.",
   "portfolio.hashes": "The option changes only the output hashes of the trace of the router. The page reads the routes.",
   "tight.penalty": "The slack of a way orders the ways. On these boards, no value of `penalty` changes a route.",
+  "rules.samples": "The default rule file `elastic` has no term that reads a sample of other legs.",
+  "rules.seed": "The seed draws only the samples, and the default rule file `elastic` has no term that reads them.",
   "canals.steps": "The updates of `canals` stop when the ways do not change for 3 updates. On these boards, they stop before the lowest limit of 30.",
   "levels.collapse": "No cell of these boards shrinks two times without a split.",
   "routes.lanes": "Each pair of boxes of these boards has one edge or none. So a link takes one lane with `link` and with `count`.",
