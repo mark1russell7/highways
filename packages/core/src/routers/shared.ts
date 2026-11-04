@@ -7,6 +7,7 @@ import { byText } from "../compare.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
+import { withLaneRoom } from "../lane-room.ts";
 import { joinNote, markThrough } from "../through.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { snellMerges } from "./snell.ts";
@@ -439,7 +440,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
         const edges = options.laneOrder === "run" ? laneOrderOfRun(run) : (stretch?.[i] ?? orderLanes(run.points, routesOf(run), "bundle"));
         shared.push({ id: `r${shared.length}`, key: run.key, points: run.points, edges });
       });
-      return { routes: markThrough(graph, routes, ways.obstacles), runs: shared, ...joinNote(ways) };
+      return { routes: markThrough(graph, routes, ways.obstacles), runs: withLaneRoom(shared, ways.obstacles), ...joinNote(ways) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };

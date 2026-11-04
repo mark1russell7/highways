@@ -1,5 +1,5 @@
 /**
- * This module makes the rows of the record `through-check/3`, with no side effect (THROUGH-CHECK).
+ * This module makes the rows of the record `through-check/4`, with no side effect (THROUGH-CHECK).
  * The script `through-check.ts` writes them, and the gate `through-check.test.ts` makes them again and compares them with the record.
  * It keeps the routers and the lanes out of `src/bench/measures/through-check.ts`, so the imports of that module stay types only.
  * Each family of `highwaysRegistry()` runs at its defaults, for each router of `SCORED`, `OUTSIDE` and `SITE_ROUTERS`.
@@ -69,6 +69,16 @@ export interface Row {
   innerBends: number;
   innerLength: number;
   crossings: number;
+  /** The lanes that carry the field `outOfRoom`. Only a row of `lanes` has a value over 0. */
+  outOfRoom: number;
+  /** The lanes of class `deep` with no field `outOfRoom`. */
+  deepUnmarked: number;
+  /** The summed length and bends of the lanes, with the room of each way. */
+  laneLength: number;
+  laneBends: number;
+  /** The same sums with no room, as the lanes were before LANE-ROOM. */
+  fullLength: number;
+  fullBends: number;
   classes: Partial<Record<ThroughClass, ClassRow>>;
   innerClasses: Partial<Record<ThroughClass, ClassRow>>;
   unnamedClasses: Partial<Record<ThroughClass, ClassRow>>;
@@ -125,6 +135,26 @@ export function laneView(result: Result): readonly Route[] {
   return laneRoutes(result, open, LANES.width, LANES.maxWidth);
 }
 
+/** This function adds the marks, the length and the bends of the lanes of one board to a row of `lanes`. */
+function addLaneShape(row: Row, result: Result, view: readonly Route[], checks: readonly RouteCheck[]): void {
+  const out = new Set(view.filter((r) => r.outOfRoom).map((r) => r.edge));
+  row.outOfRoom += out.size;
+  for (const c of checks) if (flagged(c) && deciding(c)!.class === "deep" && !out.has(c.edge)) row.deepUnmarked++;
+  const graph = segmentsOf(result);
+  const open = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+  const full = laneRoutes({ ...graph, segments: graph.segments.map(({ room: _room, ...s }) => s) }, open, LANES.width, LANES.maxWidth);
+  for (const r of view) {
+    row.laneLength += polylineLength(r.points);
+    row.laneBends += r.points.length - 2;
+  }
+  for (const r of full) {
+    row.fullLength += polylineLength(r.points);
+    row.fullBends += r.points.length - 2;
+  }
+  row.laneLength = Math.round(row.laneLength * 1000) / 1000;
+  row.fullLength = Math.round(row.fullLength * 1000) / 1000;
+}
+
 /** This function adds the bends and the length of the inner routes of one board to a row, and the crossings of the whole board. */
 function addInnerShape(row: Row, graph: Graph, result: Result): void {
   const inner = result.routes.filter((r) => r.frame !== undefined);
@@ -159,6 +189,12 @@ const blank = (router: string, family: string, view: Row["view"]): Row => ({
   innerBends: 0,
   innerLength: 0,
   crossings: 0,
+  outOfRoom: 0,
+  deepUnmarked: 0,
+  laneLength: 0,
+  laneBends: 0,
+  fullLength: 0,
+  fullBends: 0,
   classes: {},
   innerClasses: {},
   unnamedClasses: {},
@@ -172,7 +208,7 @@ export interface ThroughScope {
   readonly log?: (line: string) => void;
 }
 
-/** This function gives the record `through-check/3` over `seeds` seeds. The counts are deterministic, and it reads no time. */
+/** This function gives the record `through-check/4` over `seeds` seeds. The counts are deterministic, and it reads no time. */
 export function throughRecord(seeds: number, scope: ThroughScope = {}) {
   const reg = highwaysRegistry();
   const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name)]), ...OUTSIDE];
@@ -194,7 +230,12 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
         const result = router.route(graph);
         addChecks(row, seed, checkRoutes(graph, result.routes));
         addInnerShape(row, graph, result);
-        if (hasLanes) addChecks(lanes, seed, checkRoutes(graph, laneView(result)));
+        if (hasLanes) {
+          const view = laneView(result);
+          const checks = checkRoutes(graph, view);
+          addChecks(lanes, seed, checks);
+          addLaneShape(lanes, result, view, checks);
+        }
       });
       (OUTSIDE.includes(name) ? unmarkedRows : rows).push(row);
       if (hasLanes) rows.push(lanes);
@@ -202,7 +243,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     }
   }
   return {
-    schema: "through-check/3",
+    schema: "through-check/4",
     seeds,
     size: "default",
     classes: THROUGH_CLASSES,
