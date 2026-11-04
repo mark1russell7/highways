@@ -343,6 +343,19 @@ A crossing is one segment through one item box. The measure `levelCrossings` ask
 
 The last three columns divide the links through a box into three classes. A clear way is a way in the free space of the level, around the boxes of its items.
 
+**The family `walled-level`.** This table has one family, so it is not a general result. The router is `sections-tree`. The record `walled-level-sections.json` has the same counts for `sections`. Both records are in the same folder.
+
+```sh
+ROUTER=sections-tree FAMILIES=walled-level SEEDS=20 LARGE_SEEDS=4 node scripts/level-crossings.ts scripts/data/level-join/walled-level-sections-tree.json
+```
+
+| Size | Boards | Level links | Crossings at 0 | Crossings with `JOIN_WORK` | Links changed | Better | Worse | Clear way at 0 | Clear way with `JOIN_WORK` |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| default | 20 | 1208 | 339 | 319 | 14 | 14 | 0 | 16 | 2 |
+| largest | 4 | 2414 | 2545 | 2545 | 0 | 0 | 0 | 1 | 1 |
+
+On this family, the join removes crossings on the real router. The roadmap items JOIN-SHADOW and LEVEL-CROSSINGS use this family as a test.
+
 ## Sources
 
 - <a id="abello06"></a>Abello, van Ham and Krishnan, 2006. [ASK-GraphView: a large scale graph visualization system](https://doi.org/10.1109/TVCG.2006.120). IEEE TVCG 12(5).
