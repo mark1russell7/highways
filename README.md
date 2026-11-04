@@ -184,7 +184,9 @@ The benchmark also races the routers on three case boards of made-up data. Each 
 
 The examples page has a tab `Generator`. Pick a family of `HIGHWAYS_FAMILIES`, a seed and a value for each dimension of the family. A web worker generates the board and routes it with the default pipeline. The URL keeps the board, for example `#family=hub-chain&seed=12&rows=6`. The list "Named examples" sets the controls to a known board.
 
-The generator has 15 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
+The generator has 18 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
+
+The 3 families of FAMILIES-WEEKLY add worst cases. They are one narrow door in a long wall, many edges between the same two boxes, and a closed maze. These 3 families are in no screen set.
 
 The compare page and the live demo have the choice "Generated", with the same controls and the same keys of the URL. The screen sets make their boards with the same families.
 
