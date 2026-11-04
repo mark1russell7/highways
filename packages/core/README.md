@@ -183,6 +183,8 @@ const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }
 A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
 
 - A router gives a straight line when it finds no way. The field tells you that the line goes through a box.
+- The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
+- When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
 - A clean route does not have the field, so its bytes do not change.
 - `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
@@ -443,6 +445,7 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 | `tightMargin` | 1 | `levelLinks` | The margin of the second corner graph of the level links. |
 | `plugInset` | 6 | `levelLinks` | A plug of a level link stays this far from the corners of its side. |
 | `throughCost` | 8 | `levelLinks` | The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5. |
+| `levelJoinWork` | 0 | `levelLinks` | The limit of the work of the join of parts on the level graphs. A level of walled items can lose links at 0. |
 | `routesAt`, `itemAt` | 22, 120 | `pickLevel` | The far-view thresholds, in pixels on the screen. `PICK` holds them. |
 
 `SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
