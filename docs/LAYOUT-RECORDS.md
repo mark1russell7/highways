@@ -312,6 +312,7 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.clearance.mean` | R8 | `R8.clearance` | units | higher | yes |
 | `route.clearance.tight` | R8 | `R8.tight` | 0 to 1 | lower | yes |
 | `route.through` | R9 | `R9.through` | count | lower | yes |
+| `route.no-graph` | R17 | `R17.noGraph` | count | lower | yes |
 | `route.plug-angle` | R10 | `R10.plugAngle` | degrees | lower | no |
 | `route.plug-spacing.min` | R11 | `R11.min` | 0 to 1 | higher | yes |
 | `route.plug-spacing.q05` | R11 | `R11.q05` | 0 to 1 | higher | yes |
@@ -475,6 +476,9 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - By default, the screen also runs the built-in strategies of the step. The summary gives the median of each measure, the sum of each hard rule and the Pareto front over the medians.
 - The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
 - A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
+- The columns `through` and `no graph` of the summary are absolute sums over the inputs, with no floor. Thus a strategy at the floor still shows its count of pass-throughs.
+- `route.no-graph` (R17) counts the routes with two points where the corner graph has no way between the facing plugs. The screen reads the routes after the run, thus no output and no hash changes.
+- Each row of `screen-verdict.ts` has `through` and `baseThrough`: the absolute counts of the strategy and of the base. A snapshot from before PASS-GRID has no such fields, and the site reads each form.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
@@ -563,6 +567,16 @@ The set `screen-v3` (CORPUS-FAMILIES) has the first 15 families of `HIGHWAYS_FAM
 ```sh
 gh workflow run screen.yml --ref main -f step=highway -f set=screen-v3 -f minutes=120
 ```
+
+### The screen set `screen-v4`
+
+The set `screen-v4` (PASS-GRID) has the 60 boards of `screen-v2`, each after `makeRoom`. Its files are in [`corpus/screen-v4`](../corpus/screen-v4). `SCREEN_V4` of `bench/screen/set.ts` makes them.
+
+- The set keeps the 6 families, the seeds, the edges, the box sizes and the cells of `screen-v2`. Only the positions of the boxes change.
+- `SCREEN_V4_ROOM` gives the options of `makeRoom`: `gutter` 8 and `spacing` 4. The method is the default of `makeRoom`.
+- The generator of each input has the name `room`, version 1. Its `params` hold the options of `makeRoom` and the generator of the `screen-v2` board in `base`.
+- The split file [`corpus/splits/screen-v4.c439a5c1a0afcd39.json`](../corpus/splits/screen-v4.c439a5c1a0afcd39.json) holds out the seeds 7 to 9 of each family.
+- The screen of this set uses the same floor rule as the other sets.
 
 ### The screen set `exact-v1`
 

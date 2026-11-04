@@ -101,6 +101,8 @@ const ROWS: readonly Row[] = [
   // BALANCE-STABILITY. R16 is the spread of the gaps between neighbor parallel legs of two edges, also when each gap is wide.
   ["R16.cv", "R16", "route.balance.cv", "no unit", "lower", true, "The spread of the gaps between parallel routes: the standard deviation of the gaps over their mean. A value of 0 is even."],
   ["R16.low", "R16", "route.balance.low", "0 to 1", "lower", true, "The share of the parallel overlap with a gap less than half of the median gap."],
+  // PASS-GRID. R17 tells that a route went straight because the corner graph had no way. The hard rule R9 alone does not tell the reason.
+  ["R17.noGraph", "R17", "route.no-graph", "count", "lower", true, "The count of the routes that are one straight line because the corner graph of the board has no way between their plugs. A value of 0 is good."],
   // PLUG-ROW-GAP. R18 reads the `rowHeight` of the ports, so a board without rows has no value.
   ["R18.fit", "R18", "route.row.fit", "0 to 1", "higher", true, "The share of the rows of the ports that fit on their walls, with no overlap of another row or plug. More is better."],
   ["R18.gap", "R18", "route.row.gap", "no unit", "higher", true, "The least distance of two neighbor plugs of one wall, in the mean height of their rows. A value of 1 or more leaves room for each row."],
