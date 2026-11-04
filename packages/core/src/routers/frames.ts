@@ -44,7 +44,7 @@ const EPS = 1e-6;
 /** The start of the id of a wall of a room. A wall closes the bounds and is no box of the board, so `through` does not name it. */
 const WALL = "\u0000wall";
 
-/** This function tells that the box of an id is no box for the field `through` of an inner route: it is an end of the route, or a wall of the room. */
+/** This function gives the test of the boxes that the field `through` of an inner route does not name. These boxes are the ends of the route and the walls of the room. */
 const notCrossed =
   (...ends: readonly string[]) =>
   (id: string): boolean =>
