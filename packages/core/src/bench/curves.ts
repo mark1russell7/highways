@@ -1,7 +1,7 @@
 import { median } from "@mark1russell7/rigor-statistics";
 import { tracedHighwayCurves, type JogStyle, type JogTrace, type LaneCurve } from "../curves/highway/index.ts";
 import { CURVE_TYPES, curveSpace, distinctPoints, sampleCurve, type CubicSegment, type CurveSegment, type CurveSpace, type CurveType } from "../curves/index.ts";
-import { polylineLength, segmentsCross, type Point } from "../geom.ts";
+import { crossingPoint, polylineLength, segmentsCross, type Point } from "../geom.ts";
 import { nodeIndex, type Graph, type Router } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
 import { laneOffset, laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.ts";
@@ -127,6 +127,13 @@ export function formatCurves(rows: readonly CurveBenchRow<string>[]): string {
   const body = rows.map((r) => `| ${r.router} | ${r.fixture} | ${r.type} | ${r.links} | ${r.through} | ${r.free} | ${r.clamped} | ${r.length.toFixed(3)} | ${r.ms.toFixed(1)} |`);
   return [head, line, ...body].join("\n");
 }
+
+/**
+ * This value is the version of the counts `crossings` and `endCrossings` of `measureHighways`.
+ * Version 1 read the middle of a sampled piece, so a long straight piece gave the wrong place. Version 2 reads the crossing point.
+ * A record with no version holds version 1. The counts of two versions do not compare.
+ */
+export const BUNDLE_COUNTER = 2;
 
 /** The options of `measureHighways`. */
 export interface HighwayMeasureOptions {
@@ -399,7 +406,8 @@ export function measureHighways(
             for (let x = 1; x < P.length; x++)
               for (let y = 1; y < Q.length; y++) {
                 if (!segmentsCross(P[x - 1]!, P[x]!, Q[y - 1]!, Q[y]!)) continue;
-                const q = { x: (P[x - 1]!.x + P[x]!.x) / 2, y: (P[x - 1]!.y + P[x]!.y) / 2 };
+                // Two pieces that are almost parallel can give no point. The end of the piece is then the nearest known place.
+                const q = crossingPoint(P[x - 1]!, P[x]!, Q[y - 1]!, Q[y]!) ?? P[x]!;
                 const pair = [b.edges[i]!, b.edges[j]!].sort().join("|");
                 const at = nearest(q, c).s;
                 (at >= from && at <= to ? crossings : endCrossings).add(`${pair}@${Math.round(q.x)},${Math.round(q.y)}`);
