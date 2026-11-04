@@ -306,6 +306,43 @@ Each rule is a strategy of the step `group`, with its folder, its tests, its `sc
 - For `leiden`, the first sweep is `resolution` against `spatial`. For `agglomerative`, it is `alpha` against `linkage`.
 - The measures G1, G2 and G8 are `linear`. G9 needs an extra run for each change, so TUNE measures it only on the front.
 
+## Level links through boxes
+
+A level link can go through an item box of its level. This section states that limit. The roadmap item LEVEL-CROSSINGS looks for the cause.
+
+At `levelJoinWork` 0, a level link of walled items can go through a wall box, and no link is lost. `levelLinks` gives one link for each pair of items, so the join changes the way of a link and not the number of links.
+
+**The scope of the record.** The record is `packages/core/scripts/data/level-join/crossings.json`. It has 5 families with 4 seeds each, and 1 board of `maze` at the largest size. The count over all families is open, so these rows are a sample and not a total. The counts are deterministic, and one core on a local computer wrote them. The command, from `packages/core`:
+
+```sh
+FAMILIES=maze,spiral,comb,channel,bottleneck SEEDS=4 LARGE_SEEDS=1 SAMPLES=0 node scripts/level-crossings.ts scripts/data/level-join/crossings.json
+```
+
+A crossing is one segment through one item box. The measure `levelCrossings` asks `obstacles.through` for each segment. An item that is an end of its link counts too.
+
+**The flat level.** Each board of this table is one flat level, with one item for each node. The real routers do not make this level. In this record, it is the only place where the join removes a crossing.
+
+| `maze` member | Size | Level links | Links changed | Crossings at 0 | Crossings with `JOIN_WORK` |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 60599 | default | 11 | 3 | 3 | 0 |
+| 39410 | default | 14 | 8 | 18 | 0 |
+| 10 | default | 12 | 5 | 7 | 0 |
+| 3086 | largest | 116 | 22 | 61 | 0 |
+| 7122 | largest | 113 | 52 | 0 | 0 |
+
+**The real router.** This table has the router `sections` with its default options. Links through boxes occur on this path today, with or without the join. With `levelJoinWork: JOIN_WORK`, each row has the same counts and 0 changed links.
+
+| Family | Size | Boards | Level links | Links through a box | Crossings | The two ends overlap | A clear way exists | No clear way in the level |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `maze` | default | 4 | 129 | 26 | 59 | 6 | 0 | 20 |
+| `spiral` | default | 4 | 133 | 28 | 65 | 0 | 1 | 27 |
+| `comb` | default | 4 | 110 | 25 | 63 | 18 | 0 | 7 |
+| `channel` | default | 4 | 104 | 0 | 0 | 0 | 0 | 0 |
+| `bottleneck` | default | 4 | 309 | 0 | 0 | 0 | 0 | 0 |
+| `maze` | largest | 1 | 329 | 142 | 488 | 11 | 0 | 131 |
+
+The last three columns divide the links through a box into three classes. A clear way is a way in the free space of the level, around the boxes of its items.
+
 ## Sources
 
 - <a id="abello06"></a>Abello, van Ham and Krishnan, 2006. [ASK-GraphView: a large scale graph visualization system](https://doi.org/10.1109/TVCG.2006.120). IEEE TVCG 12(5).
