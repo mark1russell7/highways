@@ -127,6 +127,7 @@ export function angleCrossWays(ways: readonly Way[], search: SharedSearch, optio
       if (next && length(next.seq) + extra(next.seq) < before - 1e-9) {
         w.seq = next.seq;
         w.ids = next.ids;
+        w.held = true;
         lay(w);
         moved++;
       } else setLive(w, true);

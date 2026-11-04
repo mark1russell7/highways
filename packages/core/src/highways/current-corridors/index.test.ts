@@ -54,7 +54,8 @@ describe("the highway strategy current-corridors (NAT-037)", () => {
     const a = linkCurrents(finder.corners, pairs, { sketch: 2, seed: 1 });
     expect(linkCurrents(finder.corners, pairs, { sketch: 2, seed: 1 })).toEqual(a);
     expect(a.size).toBeGreaterThan(0);
-    expect(linkCurrents(finder.corners, pairs, { sketch: 2, seed: 5 })).not.toEqual(a);
+    // Three pairs have only four sets of signs, so one other seed can give the same set.
+    expect([2, 3, 4, 5, 6, 7, 8, 9].some((seed) => JSON.stringify([...linkCurrents(finder.corners, pairs, { sketch: 2, seed })]) !== JSON.stringify([...a]))).toBe(true);
   });
 
   it("makes highways on the corridors of a blocked board", () => {

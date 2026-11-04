@@ -15,8 +15,8 @@ import { axisPoints, burn, clearanceAt, GRASSFIRE_DEFAULTS, grassfirePlan } from
 const gate: Graph = {
   nodes: [
     ...[0, 1, 2].flatMap((i) => [
-      { id: `l${i}`, box: box(0, 30 * i) },
-      { id: `r${i}`, box: box(600, 30 * i) },
+      { id: `l${i}`, box: box(0, 30 * i - 120) },
+      { id: `r${i}`, box: box(600, 30 * i - 120) },
     ]),
     { id: "up", box: box(280, -300, 40, 300) },
     { id: "down", box: box(280, 80, 40, 300) },
@@ -54,7 +54,8 @@ describe("the highway strategy grassfire (NAT-034)", () => {
   });
 
   it("runs a highway down the middle of the gap, with more room than the ways through the corners", () => {
-    const plan = grassfirePlan({ graph: gate }, GRASSFIRE_DEFAULTS);
+    // The tall walls make the unit large, so the defaults give one axis point in the gap. This test uses a finer grid.
+    const plan = grassfirePlan({ graph: gate }, { ...GRASSFIRE_DEFAULTS, cell: 0.1, spacing: 0.4, spur: 8 });
     expect(plan.highways.length).toBeGreaterThan(0);
     expect(checkPlan(gate, plan)).toEqual([]);
     expect(checkProperties(gate, follow(gate, plan), 1_000_000)).toEqual([]);
