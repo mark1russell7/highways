@@ -620,6 +620,7 @@ export const LANES_SCHEMA: OptionSchema<LanesOptions> = {
   laneGap: { type: "number", min: 2, max: 8, step: 1, default: 4, describe: "The gap between two lanes." },
   maxWidth: { type: "number", min: 8, max: 64, step: 4, default: 32, describe: "The largest width of a highway." },
   depth: { type: "integer", min: 0, max: 5, step: 1, default: 3, describe: "The number of times that a highway can split, one half after the other." },
+  measure: { type: "enum", values: ["half", "all"], default: "half", describe: "The lanes for which the old spine counts as narrow: the half that moves, or all the lanes." },
 };
 
 /** The declarations of the options of the highway strategy `growth` (HWY-055). */

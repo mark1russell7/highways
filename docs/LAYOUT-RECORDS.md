@@ -104,13 +104,16 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `sparse-long` | `nodes`, `edges`, `spacing`, `far` | `mulberry32` of the seed | `exact` |
 | `local-mesh` | `cols`, `rows`, `degree`, `gap`, `jitter` | `mulberry32` of the seed | `exact` |
 | `bipartite` | `left`, `right`, `noise`, `extra`, `layout`, `gap` | `mulberry32` of the seed | `exact` |
+| `bottleneck` | `left`, `right`, `edges`, `door`, `wall`, `overhang`, `gap` | `mulberry32` of the seed | `exact` |
+| `parallel-edges` | `pairs`, `copies`, `back`, `others`, `extra`, `gap` | `mulberry32` of the seed | `exact` |
+| `maze` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
-- Each family has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
+- Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
 - The generator record has only the dimensions away from their defaults. `packed-grid` always has `cols`, `rows` and `long`, as the screen sets of today.
 - The 3 fixture families are separate families, not 1 family with explicit dimensions. Then the defaults of each family give the exact record of its screen boards.
 - A fixture family can choose the kind `clustered`, `hubs` or `collections`. These kinds use `Math.log`, `Math.cos` and `**`, so each fixture family is `libm-dependent`.
-- The last 9 families are `COVERAGE_FAMILIES` (CORPUS-FAMILIES) in `packages/core/src/families/coverage.ts`. Each one covers a region that the first 6 families do not cover:
+- The 9 families after the first 6 are `COVERAGE_FAMILIES` (CORPUS-FAMILIES) in `packages/core/src/families/coverage.ts`. Each one covers a region that the first 6 families do not cover:
   - `frame-rows`: cards with full-width rows and a plug on each wall for each row. The dimension `inner` adds edges from a row to a card, which only `corners` routes. Its default is 0.
   - `pipeline`: a long chain of stages in a snake, with some links that skip stages.
   - `fan-out`: one hub with links to many leaves in the rings around it.
@@ -122,6 +125,11 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `bipartite`: a complete bipartite part with noise nodes. Its crossings stay in each plan. The `layout` is `rows` or `mixed`.
 - Each new family uses only integer steps of `mulberry32`, so each one is `exact`. Its boxes do not overlap, except a row in its card.
 - The rule of the members, `base + 1009 × k`, stays in `bench/screen/set.ts`. The hash of an input is the `documentHash` of the core, with no grid.
+- The last 3 families are the first batch of `WEEKLY_FAMILIES` (FAMILIES-WEEKLY) in `packages/core/src/families/weekly.ts`. They are worst cases, in no screen set. The sliders of the site get them, and the sets keep their boards and hashes:
+  - `bottleneck`: two regions with a long wall between them and one narrow door. Each edge crosses the wall, so each edge wants the same free space. `overhang` sets the length of the way around the wall.
+  - `parallel-edges`: many edges with the same two ends and no fixed plug. It is the only family with a second edge between two ends. `back` sets the share of the edges in the other direction.
+  - `maze`: a closed maze of wall boxes with nodes in its cells. At `loops` 0, one way joins each two cells. Thus a straight line is far from the real way.
+- A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
 
@@ -545,7 +553,7 @@ gh workflow run screen.yml --ref main -f step=router -f set=screen-v2 -f minutes
 
 ### The screen set `screen-v3`
 
-The set `screen-v3` (CORPUS-FAMILIES) has the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 seeds 0 to 9: 150 boards. Its files are in [`corpus/screen-v3`](../corpus/screen-v3). `SCREEN_V3` of `bench/screen/set.ts` makes them.
+The set `screen-v3` (CORPUS-FAMILIES) has the first 15 families of `HIGHWAYS_FAMILIES`, each with the 10 seeds 0 to 9: 150 boards. Its files are in [`corpus/screen-v3`](../corpus/screen-v3). `SCREEN_V3` of `bench/screen/set.ts` makes them.
 
 - The first 6 families keep the seeds of `screen-v2`. Thus their 60 boards are the boards of `screen-v2`, under the ids of `screen-v3`.
 - The 9 new families get the base seeds 13, 17, 19, 23, 29, 31, 37, 41 and 43.
@@ -593,6 +601,14 @@ The screen of `exact-v1` adds the gap closed (B10) to each record of the step `r
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
 ```
+
+### The screen set `moves-v1`
+
+The set `moves-v1` (REBUILD-SILENT) has 8 small boards, one family of one member for each board. Its files are in [`corpus/moves-v1`](../corpus/moves-v1). `MOVES_V1` of `bench/screen/moves-set.ts` makes them.
+
+- A new set changes no input hash of the other sets.
+- Each board shows the own move of its strategies. The set is for the activation report. Do not use it for a verdict.
+- [The causes of the silent strategies](research/CATALOG.md#the-causes-of-the-silent-strategies-rebuild-silent) tell the board of each strategy.
 
 ### The screen set `exact-v1-bounds`
 

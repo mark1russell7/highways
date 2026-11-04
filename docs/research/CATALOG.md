@@ -251,6 +251,33 @@ The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/hig
 
 The screen also found 16 output groups. Each group holds strategies with the same output on each decision input. For example, `hw:cubu` and `w3d:cubu-fft` are one group, and `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` are one group.
 
+#### The causes of the silent strategies (REBUILD-SILENT)
+
+For each of the 15 strategies, a small board shows the cause. The boards are in the set `moves-v1` ([`corpus/moves-v1`](../../corpus/moves-v1)), and `moves-set.test.ts` checks each board. The list of the run above is the latest list. 14 strategies are corpus gaps, and 1 strategy has a wrong trigger.
+
+| Strategy | Class | Board | Cause |
+|---|---|---|---|
+| `hw:power` | Corpus gap | `equal-neighbours` | No two nodes of a decision input have the same neighbours. |
+| `w3e:power-near` | Corpus gap | `near-neighbours` | No two nodes of a decision input have neighbours with a Jaccard value of 0.8 or more. |
+| `w3e:power-saved1` | Corpus gap | `leaf-pair` | No two leaves of a decision input share their hub. |
+| `w3e:power+stretch` | Corpus gap | `spread-modules` | Its base `hw:power` makes no power edge on a decision input, so the gate has no edge to cut. |
+| `hw:corridors+stretch` | Corpus gap | `hidden-plug` | Each route on a decision input is in the budget. The worst ratio is 1.071. |
+| `w2a:corridors+stretch-1.1` | Corpus gap | `hidden-plug` | The worst ratio of 1.071 is also in this budget. |
+| `w2a:corridors+stretch-1.5` | Corpus gap | `hidden-plug` | The worst ratio of 1.071 is also in this budget. |
+| `w3f:consensus+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.198. |
+| `w3f:link-communities+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.185. |
+| `w3f:scale-space+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.138. |
+| `w2c:flow-field+stretch` | Corpus gap | `short-link` | The worst ratio on a decision input is 1.058. |
+| `hw:corridors+breakeven` | Corpus gap | `small-saving` | Each highway on a decision input saves more than its detours. |
+| `w2a:corridors+breakeven-a0` | Corpus gap | `small-saving` | Each highway on a decision input saves more than its detours. |
+| `w2a:corridors+stretch+breakeven` | Corpus gap | `small-saving` | Its base is `hw:corridors+stretch`, so the gate must cut a route that the budget keeps. |
+| `w3b:lanes-corridors` | Wrong trigger, fixed | `half-fits` | The split measured the old spine for the half that moves, so a spine too narrow for all the lanes passed. |
+
+- A corpus gap does not change a strategy. Only the screen of a board with that case can give a verdict.
+- 3 of 8 decision inputs have an overflow of `hw:corridors`. The option `measure: "all"` of `lanes` compares the old spine at the width of all its lanes. The input `screen-v1/dense-groups/s0` splits with this option, and its overflow goes from 1 to 0. On the other 2 inputs, the search finds no new spine.
+- `w3b:lanes-corridors` is the only variant with this option. `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` keep the old rule, and the default output does not change.
+- No strategy of the 15 is in the default set. This item changes no gate, limit or floor, and it does not change the rule that counts a firing.
+
 ### Wave 4: the other new ideas (WILD)
 
 Wave 4 holds the other ideas of the note of new ideas, in the build order of that note. It also holds `RULE-021`, `RULE-049` and `EDA-049`, because their riders are WILD ideas.
@@ -884,6 +911,8 @@ The guard is a test that refuses a promotion when a family loses beyond the tie.
 ## The build queue
 
 The queue puts each idea that is not built in the order of a score (IDEA-QUEUE). Up to 3 builds at a time take the ideas from the top. An idea leaves the catalog only after its build and its screen, with its record kept.
+
+`pnpm queue` also prints the count of the open ideas (QUEUE-REFILL). An open idea is not built, not blocked and not a duplicate. Under one week of build slots, the line asks for a literature survey and a round of hybrids. One week has 36 slots: 3 builds at a time, 6 ideas in each build, and 2 rounds.
 
 ### The files and the commands
 

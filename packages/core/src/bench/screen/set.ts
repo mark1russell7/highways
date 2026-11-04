@@ -3,6 +3,7 @@ import { highwaysRegistry, type HighwaysBoard } from "../../families/index.ts";
 import type { Graph } from "../../model.ts";
 import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
+import { MOVES_V1 } from "./moves-set.ts";
 
 /** A family of boards of a screen set. The member `k` of the family has the seed `k`. */
 export interface ScreenFamily {
@@ -147,7 +148,7 @@ export const SCREEN_V3_HELD_OUT: readonly number[] = [7, 8, 9];
 const V3_FAMILIES = [...screenFamilies(10, 10), ...coverageFamilies(10)];
 
 /**
- * The screen set `screen-v3` (CORPUS-FAMILIES): the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
+ * The screen set `screen-v3` (CORPUS-FAMILIES): the first 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
  * The first 6 families are the families of `screen-v2` with their seeds. Thus their boards are the boards of `screen-v2`, under the ids of `screen-v3`.
  * The 9 new families cover frames with rows, a long chain, a wide fan-out and two hubs.
  * They also cover uneven sizes, thin bars, long edges, short edges and a complete bipartite part.
@@ -185,6 +186,7 @@ export function signTestPower(families: number, level = 0.05): number | undefine
 /**
  * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
+ * `moves-v1` has one small board for each reason of REBUILD-SILENT.
  */
 export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
@@ -192,6 +194,7 @@ export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V3.id]: SCREEN_V3,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
+  [MOVES_V1.id]: MOVES_V1,
 };
 
 /** This function gives the id of the member `seed` of a family of a set: `<set>/<family>/s<seed>`. */
