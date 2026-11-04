@@ -304,9 +304,11 @@ export class CornerGraph {
         if (pool.length === 0) continue;
         if (this.joinLooks + pool.length > work) {
           this.joinStopped = true;
+          (WORK as unknown as Record<string, number>)["joinStops"]!++;
           return;
         }
         this.joinLooks += pool.length;
+        (WORK as unknown as Record<string, number>)["joinLooks"]! += pool.length;
         const p = this.points[i]!;
         const others: number[] = [];
         for (const j of pool) {
@@ -321,6 +323,7 @@ export class CornerGraph {
           if (!this.#obstacles.clear(p, this.points[j]!, this.#pad)) continue;
           links[i]!.add(j);
           links[j]!.add(i);
+          (WORK as unknown as Record<string, number>)["joinLinks"]!++;
           break;
         }
       }

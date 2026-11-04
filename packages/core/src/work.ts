@@ -17,7 +17,7 @@ export interface WorkCounts {
 }
 
 /** The counters. Each loop adds its count when it ends, so the cost of a count is small. */
-export const WORK: WorkCounts = { lane: 0, corner: 0, sight: 0, score: 0, route: 0 };
+export const WORK: WorkCounts = { lane: 0, corner: 0, sight: 0, score: 0, route: 0, joinLinks: 0, joinStops: 0, joinLooks: 0 } as WorkCounts;
 
 /**
  * The weight of each counter in a unit of work, in lane steps. The fit of `scripts/search-work.ts` gives them (run 40960950349).

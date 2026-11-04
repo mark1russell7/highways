@@ -161,7 +161,7 @@ function levelWays(nodes: readonly Node[], options: LevelLinkOptions): LevelWays
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
-  const joinWork = options.levelJoinWork ?? 0;
+  const joinWork = options.levelJoinWork ?? (process.env["LEVEL_JOIN"] === "on" ? 3 * 2048 * 2048 : 0);
   const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true, joinWork });
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
