@@ -22,7 +22,7 @@ export interface SolverOptions {
   /** The method: `adam` with a sample of legs (RULE-020), or `gradient`, plain steps over all near legs (RULE-019). The default is `adam`. */
   readonly descent?: "adam" | "gradient";
   /** This function gets the outcome of the guards of one board. A record uses it, and the routes do not depend on it. */
-  readonly report?: (outcome: SolverOutcome) => void;
+  readonly report?: ((outcome: SolverOutcome) => void) | undefined;
 }
 
 /** What the guards did on one board. */
@@ -33,7 +33,18 @@ export interface SolverOutcome {
   readonly routes: number;
   /** The reason that the last guard gave back the routes of the input, or `none`. */
   readonly dropped: "none" | "breaks" | "crossings";
+  /** This value is true when the pass of crossings stopped at its cap with routes still going back. */
+  readonly capped: boolean;
+  /** The first points of each route. */
+  readonly first: readonly (readonly Point[])[];
+  /** The points of each route after the pass of crossings. */
+  readonly afterPass: readonly (readonly Point[])[];
+  /** The points of each route after the fix of hard rules. The last guard reads these points. */
+  readonly final: readonly (readonly Point[])[];
 }
+
+/** The cap of the rounds of the pass of crossings. */
+const PASS_ROUNDS = 8;
 
 /** The moment factors of Adam (Kingma and Ba 2015), as the record gives them. */
 const BETA1 = 0.9;
@@ -41,7 +52,7 @@ const BETA2 = 0.999;
 const EPS = 1e-8;
 
 /** This function gives the crossings of the route `a` with itself and with the routes of `others`. It skips the route with the index `skip`. */
-function crossingsOf(a: readonly Point[], others: readonly (readonly Point[])[], skip: number): number {
+export function crossingsOf(a: readonly Point[], others: readonly (readonly Point[])[], skip: number): number {
   const [ax0, ay0, ax1, ay1] = boundsOf(a);
   let n = 0;
   for (let i = 1; i < a.length; i++) for (let k = i + 2; k < a.length; k++) if (segmentsCross(a[i - 1]!, a[i]!, a[k - 1]!, a[k]!)) n++;
@@ -176,7 +187,7 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   const first = result.routes.map((r) => r.points);
   const variables = freeVariables(input, result, set, c);
   if (variables.length === 0) {
-    o.report?.({ variables: 0, routes: 0, dropped: "none" });
+    o.report?.({ variables: 0, routes: 0, dropped: "none", capped: false, first, afterPass: first, final: first });
     return result;
   }
   const shift = new Float64Array(variables.length);
@@ -262,7 +273,8 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   const moved = new Set(variables.map((v) => v.route));
   const points = first.map((pts, route) => (moved.has(route) ? pts.map((_, k) => pointOf(route, k)) : pts));
   // A moved route with more crossings than its first points, against the other routes as they are, goes back to its first points.
-  for (let round = 0; round < 8; round++) {
+  let capped = false;
+  for (let round = 0; round < PASS_ROUNDS; round++) {
     let back = 0;
     for (const route of moved) {
       if (points[route] === first[route] || crossingsOf(points[route]!, points, route) <= crossingsOf(first[route]!, points, route)) continue;
@@ -270,7 +282,9 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
       back++;
     }
     if (back === 0) break;
+    capped = round === PASS_ROUNDS - 1;
   }
+  const afterPass = [...points];
   const build = (pts: readonly (readonly Point[])[]): Result => ({ ...result, routes: result.routes.map((r, i): Route => (pts[i] === r.points ? r : { ...r, points: pts[i]! })) });
   let out = build(points);
   for (let round = 0; round < 3; round++) {
@@ -283,6 +297,6 @@ export function solveRules(input: Graph, result: Result, set: RuleSet, o: Readon
   // The output keeps the routes of `shared` when it has a break of a hard rule, or more crossings, after the fixes.
   const breaks = checkProperties(input, out, 1).length > checkProperties(input, result, 1).length;
   const crossings = !breaks && measureQuality(input, out).crossings > measureQuality(input, result).crossings;
-  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none" });
+  o.report?.({ variables: variables.length, routes: points.filter((p, i) => p !== first[i]).length, dropped: breaks ? "breaks" : crossings ? "crossings" : "none", capped, first, afterPass, final: points });
   return breaks || crossings ? result : out;
 }

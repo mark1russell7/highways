@@ -6,8 +6,9 @@ import { checkProperties } from "../src/bench/properties.ts";
 import { measureQuality } from "../src/bench/quality.ts";
 import { inputGraph } from "../src/bench/screen/forms.ts";
 import { SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
+import type { Point } from "../src/geom.ts";
 import type { Graph, Result } from "../src/model.ts";
-import { ENERGY_RULES, freeVariables, RULES_DEFAULTS, rulesRouter, rulesStrategy, type RuleVariable, type SolverOutcome } from "../src/routers/index.ts";
+import { dropCauses, ENERGY_RULES, freeVariables, RULES_DEFAULTS, rulesRouter, type RulesOptions, type RuleVariable, type SolverOutcome } from "../src/routers/index.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection } from "../src/routers/trunks.ts";
 
@@ -15,6 +16,11 @@ const out = process.argv[2];
 
 /** This function routes a board, and gives the outcome of the guards to `report`. */
 type Run = (graph: Graph, report: (outcome: SolverOutcome) => void) => Result;
+
+/** This function gives the arm of a preset with these options. */
+function preset(options: Partial<RulesOptions>): Run {
+  return (graph, report) => rulesRouter({ ...options, name: "rules", rule: byCollection, report }).route(graph);
+}
 
 /** This function gives the arm with only the term `angle`. */
 function angleOnly(variable: RuleVariable): Run {
@@ -24,13 +30,13 @@ function angleOnly(variable: RuleVariable): Run {
 /** One arm of the count: a name, its variable and its router. The arm `shared` moves nothing, and its variable is `none`. */
 const arms: readonly { readonly name: string; readonly variable: RuleVariable | "none"; readonly run: Run }[] = [
   { name: "shared", variable: "none", run: (graph) => sharedRouter({ name: "shared", rule: byCollection }).route(graph) },
-  { name: "energy-adam", variable: "legs", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, preset: "energy", report }) },
-  { name: "energy-gradient", variable: "legs", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, preset: "energy", descent: "gradient", report }) },
-  { name: "elastic-adam", variable: "legs", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, report }) },
+  { name: "energy-adam", variable: "legs", run: preset({ preset: "energy" }) },
+  { name: "energy-gradient", variable: "legs", run: preset({ preset: "energy", descent: "gradient" }) },
+  { name: "elastic-adam", variable: "legs", run: preset({}) },
   { name: "angle-only", variable: "legs", run: angleOnly("legs") },
-  { name: "energy-adam-points", variable: "points", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, preset: "energy", variable: "points", report }) },
-  { name: "energy-gradient-points", variable: "points", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, preset: "energy", descent: "gradient", variable: "points", report }) },
-  { name: "elastic-adam-points", variable: "points", run: (graph, report) => rulesStrategy.run(graph, { ...RULES_DEFAULTS, variable: "points", report }) },
+  { name: "energy-adam-points", variable: "points", run: preset({ preset: "energy", variable: "points" }) },
+  { name: "energy-gradient-points", variable: "points", run: preset({ preset: "energy", descent: "gradient", variable: "points" }) },
+  { name: "elastic-adam-points", variable: "points", run: preset({ variable: "points" }) },
   { name: "angle-only-points", variable: "points", run: angleOnly("points") },
 ];
 
@@ -42,6 +48,14 @@ interface Row {
   /** The boards where the guard of the whole board gave back the routes of `shared`, and the moved routes that it dropped. */
   droppedBoards: number;
   droppedRoutes: number;
+  /** The dropped boards for a break of a hard rule, and for crossings. Their sum is `droppedBoards`. */
+  droppedBreaks: number;
+  droppedCrossings: number;
+  /** The boards dropped for crossings where each cause applied. One board can have more than one cause. */
+  causes: { pair: number; fix: number; cap: number; counts: number; outside: number };
+  /** The rise of the board count and of the count of the pass, over the boards dropped for crossings. */
+  boardRise: number;
+  routeRise: number;
   crossed: number;
   crossings: number;
   meanSum: number;
@@ -52,6 +66,11 @@ interface Row {
 function median(values: readonly number[]): number {
   const list = [...values].sort((a, b) => a - b);
   return list.length === 0 ? 0 : (list[Math.floor((list.length - 1) / 2)]! + list[Math.ceil((list.length - 1) / 2)]!) / 2;
+}
+
+/** This function gives the board count of a list of points on the routes of `base`. */
+function boardCount(graph: Graph, base: Result, points: readonly (readonly Point[])[]): number {
+  return measureQuality(graph, { ...base, routes: base.routes.map((route, i) => ({ ...route, points: points[i]! })) }).crossings;
 }
 
 const rows = new Map<string, Row>();
@@ -72,12 +91,21 @@ for (const input of screenInputs(SCREEN_SETS["screen-v3"]!)) {
     });
     const angles = crossingAngles(drawnSegments(result.routes));
     const key = `${input.family}|${arm.name}`;
-    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
+    const row = rows.get(key) ?? { boards: 0, sameAsShared: 0, droppedBoards: 0, droppedRoutes: 0, droppedBreaks: 0, droppedCrossings: 0, causes: { pair: 0, fix: 0, cap: 0, counts: 0, outside: 0 }, boardRise: 0, routeRise: 0, crossed: 0, crossings: 0, meanSum: 0, breaks: 0 };
     row.boards++;
     const seen = outcome as SolverOutcome | undefined;
     if (seen !== undefined && seen.dropped !== "none") {
       row.droppedBoards++;
       row.droppedRoutes += seen.routes;
+    }
+    if (seen?.dropped === "breaks") row.droppedBreaks++;
+    if (seen?.dropped === "crossings") {
+      row.droppedCrossings++;
+      const counts = { first: boardCount(graph, base, seen.first), afterPass: boardCount(graph, base, seen.afterPass), final: boardCount(graph, base, seen.final) };
+      const causes = dropCauses(seen.first, seen.final, seen.capped, counts);
+      for (const name of ["pair", "fix", "cap", "counts", "outside"] as const) if (causes[name]) row.causes[name]++;
+      row.boardRise += causes.boardRise;
+      row.routeRise += causes.routeRise;
     }
     if (JSON.stringify(result.routes) === JSON.stringify(base.routes)) row.sameAsShared++;
     row.crossings += measureQuality(graph, result).crossings;
@@ -96,7 +124,7 @@ const table = families.map((family) => {
   const of = Object.fromEntries(
     arms.map((arm) => {
       const r = rows.get(`${family}|${arm.name}`)!;
-      return [arm.name, { variable: arm.variable, boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
+      return [arm.name, { variable: arm.variable, boards: r.boards, sameAsShared: r.sameAsShared, droppedBoards: r.droppedBoards, droppedRoutes: r.droppedRoutes, droppedBreaks: r.droppedBreaks, droppedCrossings: r.droppedCrossings, causes: r.causes, boardRise: r.boardRise, routeRise: r.routeRise, crossedBoards: r.crossed, crossings: r.crossings, r2Median: Math.round(median(perBoard.get(`${family}|${arm.name}`) ?? []) * 90 * 100) / 100, breaks: r.breaks }];
     }),
   );
   return { family, freeLegs: variableCount.get(family)!.legs, freePoints: variableCount.get(family)!.points, arms: of };
