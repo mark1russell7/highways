@@ -156,7 +156,7 @@ jobs:
             cat stops/search-stops-ubuntu-latest-*/stops.jsonl
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          cmp stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
+          node packages/core/scripts/gates/same-stops.ts stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
           echo "Gate (b): the stops of Linux and Windows are byte-equal." >> "$GITHUB_STEP_SUMMARY"
 
   search-work-ok:
