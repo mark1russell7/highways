@@ -1,3 +1,4 @@
+import type { Region } from "@mark1russell7/layout-contract";
 import type { Edge, Graph, Node, Port, Side } from "../../model.ts";
 import { documentHash, round3 } from "./hash.ts";
 
@@ -20,14 +21,10 @@ export interface LayoutPort {
 export type RegionPoint = readonly [number, number];
 
 /**
- * An area of the plane. The y axis points down. A ring of a polygon closes itself: its last point joins its first point.
- * A hole of a polygon does not touch the outer ring. The router reads only the bounding box of a region.
+ * An area of the plane: the type `Region` of the contract. The y axis points down. A ring of a polygon closes itself.
+ * The router reads only the bounding box of a region. The measure `through` reads the true shape of a node.
  */
-export type Region =
-  | { readonly kind: "rect"; readonly x: number; readonly y: number; readonly w: number; readonly h: number }
-  | { readonly kind: "polygon"; readonly points: readonly RegionPoint[]; readonly holes?: readonly (readonly RegionPoint[])[] }
-  | { readonly kind: "circle"; readonly cx: number; readonly cy: number; readonly r: number }
-  | { readonly kind: "ellipse"; readonly cx: number; readonly cy: number; readonly rx: number; readonly ry: number };
+export type { Region };
 
 /** An area that the boxes and the routes must not use. The router uses the bounding box of its region as a box without edges. */
 export interface LayoutObstacle {
@@ -304,6 +301,14 @@ export function graphInput(graph: Graph, head: LayoutInputHead): LayoutInput {
   return { ...body, hash: documentHash(body) };
 }
 
+/** This function moves a region by `dx` and `dy`. The contract has no such function. */
+function shiftRegion(region: Region, dx: number, dy: number): Region {
+  if (region.kind === "rect") return { ...region, x: region.x + dx, y: region.y + dy };
+  if (region.kind === "circle" || region.kind === "ellipse") return { ...region, cx: region.cx + dx, cy: region.cy + dy };
+  const ring = (r: readonly RegionPoint[]): RegionPoint[] => r.map((p) => [p[0] + dx, p[1] + dy] as const);
+  return { kind: "polygon", points: ring(region.points), ...(region.holes !== undefined ? { holes: region.holes.map(ring) } : {}) };
+}
+
 /**
  * This function gives the bounding box of a region: the smallest box that holds it.
  */
@@ -339,9 +344,13 @@ export function inputGraph(input: RouteInput): Graph {
       ...(b.ports ? { ports: b.ports.map(portToModel) } : {}),
       ...(b.data ? { data: b.data } : {}),
       ...(b.parent !== undefined ? { parent: b.parent } : {}),
+      ...(b.shape !== undefined ? { shape: b.shape } : {}),
     };
   });
-  for (const o of input.obstacles ?? []) nodes.push({ id: o.id, box: regionBounds(o.region) });
+  for (const o of input.obstacles ?? []) {
+    const box = regionBounds(o.region);
+    nodes.push({ id: o.id, box, ...(o.region.kind === "rect" ? {} : { shape: shiftRegion(o.region, -box.x, -box.y) }) });
+  }
   const edges = (input.edges ?? []).map(
     (e): Edge => ({
       id: e.id,
