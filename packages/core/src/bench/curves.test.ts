@@ -41,11 +41,9 @@ describe("benchHighways", () => {
     const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
     const [, run] = benchHighways(sharedRouter({ name: "shared-all", laneOrder: "run" }), "case-many-groups", graph);
     const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
-    expect(run!.crossings).toBeGreaterThan(0);
-    // LANE-ROOM: each way has its own width, so two lanes can meet where the shifts of both ends of a short way meet. Before it, this value was 0.
-    // This test is a ratchet. The item LANE-WIDTH-CHAIN takes the value back toward 0, or states why it cannot.
-    expect(bundle!.crossings).toBeLessThanOrEqual(2);
-    expect(bundle!.crossings).toBeLessThan(run!.crossings);
+    // Version 2 of the bundle counter reads 0 in the body of this board. The values above 0 of version 1 were crossings at the ends, in the wrong class.
+    // So the gain of the lane order shows at the ends of the bundles.
+    expect(bundle!.crossings).toBe(0);
     expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);
   });
 });
