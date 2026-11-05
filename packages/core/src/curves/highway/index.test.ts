@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { measureHighways, measureJogs, SPACING_LIMIT } from "../../bench/curves.ts";
+import { crossingPairs } from "../../bench/measures/crossing-pairs.ts";
 import type { Point } from "../../geom.ts";
 import { pathPoints, runKey, type SegmentGraph } from "../../segments.ts";
 import { arcCurve } from "../arc/index.ts";
 import type { ArcSegment, CurveSegment } from "../model.ts";
+import { sampleCurve } from "../sample.ts";
 import { curveSpace } from "../space.ts";
 import { highwayCurve, highwayCurves, tracedHighwayCurves } from "./index.ts";
 
@@ -136,5 +138,54 @@ describe("highwayCurve", () => {
     const p = [P(0, 0), P(50, 0), P(50, 50)];
     expect(highwayCurve(p)).toEqual(arcCurve(p, { radius: 12 }));
     expect(highwayCurve(p, { radius: 5 })).toEqual(arcCurve(p, { radius: 5 }));
+  });
+});
+
+describe("the option jogSpan of highwayCurves", () => {
+  // Four lanes on two legs of one line. The room of the first leg narrows it, so the lanes shift by 4.5 and 1.5 where the second leg starts.
+  const lane = (segment: string, index: number) => ({ segment, reverse: false, lane: index });
+  const step: SegmentGraph = {
+    segments: [
+      { id: "narrow", points: [P(0, 0), P(200, 0)], edges: ["a", "b", "c", "d"], count: 4, room: { left: 4, right: 4 } },
+      { id: "wide", points: [P(200, 0), P(400, 0)], edges: ["a", "b", "c", "d"], count: 4 },
+    ],
+    paths: ["a", "b", "c", "d"].map((edge, i) => ({ edge, segments: [lane("narrow", i), lane("wide", i)] })),
+  };
+  const open = new Set([runKey(step.segments[0]!.edges)]);
+  /** This function gives the place where a lane ends its shift. */
+  const ends = (curve: readonly CurveSegment[]): number => {
+    const samples = sampleCurve([...curve], 0.001);
+    const last = samples[samples.length - 1]!;
+    return samples.find((p) => p.x > 200 && Math.abs(p.y - last.y) < 1e-6)!.x;
+  };
+
+  it("gives each lane at one step the length of the largest shift", () => {
+    const own = highwayCurves(step, open, 5, { maxWidth: 30 }).map((c) => ends(c.segments));
+    const common = highwayCurves(step, open, 5, { maxWidth: 30, jogSpan: "step" }).map((c) => ends(c.segments));
+    expect(Math.max(...own) - Math.min(...own)).toBeGreaterThan(4);
+    expect(Math.max(...common) - Math.min(...common)).toBeLessThan(0.5);
+    // The largest shift keeps its own length.
+    expect(Math.max(...common)).toBeCloseTo(Math.max(...own), 0);
+  });
+
+  it("keeps each arc at the wanted radius or more", () => {
+    for (const curve of highwayCurves(step, open, 5, { maxWidth: 30, jogSpan: "step" })) {
+      for (const s of curve.segments) if (s.kind === "arc") expect(s.radius).toBeGreaterThanOrEqual(12 - 1e-9);
+    }
+  });
+
+  it("leaves no crossing between the lanes of a step at a bend", () => {
+    const bend: SegmentGraph = {
+      segments: [step.segments[0]!, { id: "wide", points: [P(200, 0), P(200, 200)], edges: ["a", "b", "c", "d"], count: 4 }],
+      paths: step.paths,
+    };
+    const curves = highwayCurves(bend, open, 5, { maxWidth: 30, jogSpan: "step" });
+    expect(crossingPairs(curves.map((c) => ({ edge: c.edge, points: sampleCurve(c.segments, 0.02) }))).size).toBe(0);
+  });
+
+  it("changes nothing with the default, on a graph with a merge, a split and a bend", () => {
+    const keys = new Set(graph.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges)));
+    expect(highwayCurves(graph, keys, 5, { jogSpan: "lane" })).toEqual(highwayCurves(graph, keys, 5));
+    expect(highwayCurves(step, open, 5, { maxWidth: 30, jogSpan: "lane" })).toEqual(highwayCurves(step, open, 5, { maxWidth: 30 }));
   });
 });

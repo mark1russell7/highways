@@ -17,7 +17,7 @@ export { splineCurve, type SplineOptions } from "./spline/index.ts";
 export { arcCurve, type ArcOptions } from "./arc/index.ts";
 export { smoothCurve, type SmoothOptions } from "./smooth/index.ts";
 export { clothoidCurve, type ClothoidOptions } from "./clothoid/index.ts";
-export { highwayCurve, highwayCurves, type HighwayOptions, type JogStyle, type LaneCurve } from "./highway/index.ts";
+export { highwayCurve, highwayCurves, type HighwayOptions, type JogSpan, type JogStyle, type LaneCurve } from "./highway/index.ts";
 
 /** The options of `curveOf`. Each type reads only the options that it uses. */
 export interface CurveOptions {

@@ -21,7 +21,16 @@ export interface HighwayOptions {
   readonly jog?: JogStyle;
   /** The number of cubic pieces of a `quintic` S curve, from 1 to 8. The default is 4. */
   readonly jogPieces?: number;
+  /**
+   * The length of the S curves of the lanes that change their offset at one vertex, on one leg.
+   * With `lane`, the default, each S curve has the length of its own shift, so a lane with a small shift ends first.
+   * With `step`, each S curve has the length of the largest shift of those lanes. Only the curves change, and the lanes of `laneRoutes` stay.
+   */
+  readonly jogSpan?: JogSpan;
 }
+
+/** The rule for the length of the S curves at one vertex of a leg. */
+export type JogSpan = "lane" | "step";
 
 /**
  * The shape of the S curve where a lane changes its offset.
@@ -314,6 +323,25 @@ function offsetsAt(legs: readonly Leg[]): number[] {
   return at;
 }
 
+/** This function gives the key of the S curves at one end of a leg. Lanes that go the two ways along the leg have the same key. */
+const spanKey = (leg: Leg, end: Point): string => `${leg.segment}|${Math.min(leg.from, leg.to)}|${Math.max(leg.from, leg.to)}|${end.x},${end.y}`;
+
+/** This function gives the largest shift of the lanes at each end of each leg, for the option `jogSpan`. */
+function jogSpans(plans: readonly (LanePlan | undefined)[]): Map<string, number> {
+  const out = new Map<string, number>();
+  const note = (leg: Leg, end: Point, shift: number): void => {
+    const key = spanKey(leg, end);
+    if (Math.abs(shift) > SAME) out.set(key, Math.max(out.get(key) ?? 0, Math.abs(shift)));
+  };
+  for (const plan of plans) {
+    plan?.legs.forEach((leg, j) => {
+      note(leg, leg.a, leg.off - plan.at[j]!);
+      note(leg, leg.b, plan.at[j + 1]! - leg.off);
+    });
+  }
+  return out;
+}
+
 /**
  * This function gives the curve of one polyline as a lane alone: an arc at each corner, as `arcCurve` gives.
  * A lane alone has no merge and no split, so the curve strategy `highway` gives this curve for one polyline.
@@ -413,6 +441,7 @@ export function tracedHighwayCurves(
     }
   });
   const bends = bendRadii(groups, radius, minRadius, space);
+  const spans = options.jogSpan === "step" ? jogSpans(plans) : undefined;
   const jogs: JogTrace = [];
   const curves = graph.paths.map((path, i): LaneCurve => {
     const polyline = polylines[i]!.points;
@@ -421,7 +450,7 @@ export function tracedHighwayCurves(
     jogs.push(trace);
     if (!plan) return { edge: path.edge, segments: highwayCurve(polyline, { radius, ...(space ? { space } : {}) }) };
     if (plan.legs.length === 0) return { edge: path.edge, segments: [{ kind: "move", to: polyline[0]! }] };
-    return { edge: path.edge, segments: laneCurve(plan, bends, polyline, { radius, minRadius, space, style, pieces }, trace) };
+    return { edge: path.edge, segments: laneCurve(plan, bends, polyline, { radius, minRadius, space, style, pieces, spans }, trace) };
   });
   return { curves, jogs };
 }
@@ -489,11 +518,12 @@ function laneCurve(
   plan: LanePlan,
   bends: Bends,
   polyline: readonly Point[],
-  { radius, minRadius, space, style: wanted, pieces }: { radius: number; minRadius: number; space: CurveSpace | undefined; style: JogStyle; pieces: number },
+  { radius, minRadius, space, style: wanted, pieces, spans }: { radius: number; minRadius: number; space: CurveSpace | undefined; style: JogStyle; pieces: number; spans: ReadonlyMap<string, number> | undefined },
   trace?: [number, number, JogStyle][],
 ): CurveSegment[] {
   const { legs, at } = plan;
   const L = legs.length;
+  const spanOf = (leg: Leg, end: Point, shift: number): number => Math.max(shift, spans?.get(spanKey(leg, end)) ?? 0);
   // The shifts on the ends of each leg, from the offset at a vertex to the offset of the leg.
   const startJog: (Jog | undefined)[] = new Array<Jog | undefined>(L).fill(undefined);
   const endJog: (Jog | undefined)[] = new Array<Jog | undefined>(L).fill(undefined);
@@ -553,7 +583,9 @@ function laneCurve(
     // The arcs of a shift have the wanted radius too. So the radius of each arc of the lane is at least `floor`.
     const shift = (leg: Leg, jog: Jog | undefined, start: number, sign: 1 | -1): LaneVertex[] => {
       if (!jog) return [];
-      const { length, angle } = jogShape(want, jog.to - jog.from, style);
+      const d = Math.abs(jog.to - jog.from);
+      const span = spanOf(leg, sign === 1 ? leg.a : leg.b, d);
+      const { length } = jogShape(want, span, style);
       if (style !== "biarc") {
         // The S curve goes along the leg from the offset `jog.from` to the offset `jog.to`, in the order of the route.
         const s0 = sign === 1 ? start : -(start + length);
@@ -564,19 +596,22 @@ function laneCurve(
           { p: p3, r: 0, jog: { part: "end", style } },
         ];
       }
-      const k = want < Math.abs(jog.to - jog.from) / 2 ? want : want * Math.tan(angle / 2);
+      // A shift under the span keeps the length of the span, with two equal arcs of a larger radius: `r = (L² + d²) / (4 d)`. That radius is `want` or more.
+      const stretched = span > d && want >= d / 2;
+      const r = stretched ? (length * length + d * d) / (4 * d) : want;
+      const k = stretched ? (r * d) / length : want < d / 2 ? want : want * Math.tan(jogShape(want, d, style).angle / 2);
       // On the leg after the vertex, the shift goes forward from `start`. On the leg before it, it goes back from `start`.
       const p1 = along(v, leg.u, sign * (start + k), leg.n, sign === 1 ? jog.from : jog.to);
       const p2 = along(v, leg.u, sign * (start + length - k), leg.n, sign === 1 ? jog.to : jog.from);
       return sign === 1
-        ? [{ p: p1, r: want, jog: { part: "start", style } }, { p: p2, r: want, jog: { part: "end", style } }]
-        : [{ p: p2, r: want, jog: { part: "start", style } }, { p: p1, r: want, jog: { part: "end", style } }];
+        ? [{ p: p1, r, jog: { part: "start", style } }, { p: p2, r, jog: { part: "end", style } }]
+        : [{ p: p2, r, jog: { part: "start", style } }, { p: p1, r, jog: { part: "end", style } }];
     };
-    const lenOf = (jog: Jog | undefined): number => (jog ? jogShape(want, jog.to - jog.from, style).length : 0);
+    const lenOf = (leg: Leg, end: Point, jog: Jog | undefined): number => (jog ? jogShape(want, spanOf(leg, end, Math.abs(jog.to - jog.from)), style).length : 0);
     return {
       vertices: [...(A ? shift(A, endJog[j - 1], t - xA, -1) : []), ...corner, ...(B ? shift(B, startJog[j], xB + t, 1) : [])],
-      back: A ? Math.max(0, t - xA) + lenOf(endJog[j - 1]) : 0,
-      ahead: B ? Math.max(0, xB + t) + lenOf(startJog[j]) : 0,
+      back: A ? Math.max(0, t - xA) + lenOf(A, A.b, endJog[j - 1]) : 0,
+      ahead: B ? Math.max(0, xB + t) + lenOf(B, B.a, startJog[j]) : 0,
     };
   };
   // The vertices of the lane near `j`, between the middles of its two legs. The free space tests this piece.
