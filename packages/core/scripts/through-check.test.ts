@@ -15,7 +15,7 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33617, 31422, 0, 0, 0, 0],
+  "corners": [33613, 31420, 0, 0, 0, 0],
   "trunks": [34385, 31960, 0, 0, 0, 1],
   "shared": [36252, 32712, 274, 42, 1, 531],
   "sections": [54447, 40633, 816, 501, 144, 2067],

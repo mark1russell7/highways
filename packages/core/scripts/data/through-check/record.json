@@ -30689,9 +30689,9 @@
       "deepUnmarked": 0,
       "silentLanes": 0,
       "laneLength": 9957.301,
-      "laneBends": 309,
+      "laneBends": 224,
       "fullLength": 9957.301,
-      "fullBends": 309,
+      "fullBends": 224,
       "laneCrossings": 32,
       "fullCrossings": 32,
       "bySeed": [
@@ -30708,10 +30708,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 16,
-            "beforePoints": 16,
-            "pairs": 14,
-            "beforePairs": 14,
+            "points": 14,
+            "beforePoints": 14,
+            "pairs": 13,
+            "beforePairs": 13,
             "added": 0,
             "lost": 0
           },
@@ -30758,10 +30758,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 22,
-            "beforePoints": 22,
-            "pairs": 21,
-            "beforePairs": 21,
+            "points": 20,
+            "beforePoints": 20,
+            "pairs": 20,
+            "beforePairs": 20,
             "added": 0,
             "lost": 0
           },

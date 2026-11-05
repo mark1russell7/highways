@@ -676,6 +676,18 @@ describe("the edges between frames (CROSS-FRAME-ROUTE)", () => {
     expect(changes(by.get("c-solo")!, card("C"))).toBe(1);
   });
 
+  it("joins the legs with no stop on a straight line, so each stop of a route between frames is a bend", () => {
+    const g = between();
+    const by = byEdge(corners.route(g).routes);
+    for (const id of CROSS) {
+      const p = by.get(id)!.points;
+      for (let i = 1; i + 1 < p.length; i++) {
+        const [ux, uy, vx, vy] = [p[i]!.x - p[i - 1]!.x, p[i]!.y - p[i - 1]!.y, p[i + 1]!.x - p[i]!.x, p[i + 1]!.y - p[i]!.y];
+        expect(Math.abs(ux * vy - uy * vx) > 1e-9 || ux * vx + uy * vy < 0, `${id} stop ${i}`).toBe(true);
+      }
+    }
+  });
+
   it("keeps the place of each edge between frames among the outer routes, and the inner routes after them", () => {
     expect(corners.route(between()).routes.map((r) => r.edge)).toEqual([...CROSS, "in-a"]);
   });
