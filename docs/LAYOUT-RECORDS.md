@@ -257,7 +257,7 @@ The independent check `checkRoutes` in `bench/measures/through-check.ts` has no 
 
 The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
 
-The script `packages/core/scripts/through-check.ts` writes the record `through-check/5`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+The script `packages/core/scripts/through-check.ts` writes the record `through-check/6`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
 
 The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
 
@@ -274,6 +274,7 @@ A row with the view `lanes` also tells what the room of each way does. Its field
 - `bySeed` holds one entry for each board. It has `laneCrossings` and `fullCrossings`, `polyline` and `painted`, and the four counts of the bundles.
 - `polyline` and `painted` are the fields of `PairSplit`, for the polylines and for the sampled `highway` curves of the whole board. `points` and `beforePoints` are crossing points. `pairs` and `beforePairs` are pairs of edges. `added` and `lost` are the pairs that cross on one side only. A crossing point counts once for each pair of edges. So `points` can be over the count of `measureQuality`, because `measureQuality` keeps one copy of each drawn segment.
 - `bundleCounter` is the value of `BUNDLE_COUNTER`, the version of the two counts below. The schema `through-check/4` has no such field and holds version 1, so its counts do not compare with these.
+- `paintCounter` is the value of `PAINT_COUNTER`, the version of `crossingPairs`. Version 2 reads the lines on the grid of the tolerance `EPS`. The schemas before `through-check/6` have no such field and hold version 1, so their fields `polyline` and `painted` do not compare with these.
 - `bundleBody` and `bundleEnds` are `crossings` and `endCrossings` of `measureHighways`, with the room. `fullBundleBody` and `fullBundleEnds` are the same counts with no room. These counts hold only two lanes of one bundle.
 
 The gate fails when `deepUnmarked` or `silentLanes` is over 0 on a row. It also compares the classes of the site settings with a stated list, and that list makes no claim. A flagged lane on a closed route that the record flags too is a contact of the route, not of the lanes.
