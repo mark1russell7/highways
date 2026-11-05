@@ -14,6 +14,7 @@ import { routeOverlap } from "./measures/overlap.ts";
 import { STRATEGIES } from "../strategies/builtins.ts";
 import { asRouter, listStrategies, STEPS, type LaneBoard, type Registry, type Step, type Strategy } from "../strategies/model.ts";
 import { measureLevelFaults, sumFaults } from "./links.ts";
+import { routePairCrossings } from "./quality.ts";
 import { checkLevels } from "./properties.ts";
 import { ambiguity, inkSaved } from "./measures/bundles.ts";
 import { bendingEnergy, curvatureVariation, curveDeviation, curveFaults, g1Defect, g2Defect } from "./measures/curves.ts";
@@ -273,9 +274,13 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
   const detour = detourSpread(routes);
   const plugs = plugSpacing(graph, routes);
   const overlap = routeOverlap(routes);
+  const pairs = routePairCrossings(routes);
   return {
     "R1.crossings": row.quality.crossings,
     "R1.perEdge": row.quality.crossings / m,
+    "R1.estimated": row.quality.crossingsEstimated ? 1 : 0,
+    "R1.pairs": pairs.pairs,
+    "R1.pairsEstimated": pairs.estimated ? 1 : 0,
     "R2.angle": ca.mean,
     "R2.min": ca.min,
     "B1.inkSaved": inkSaved(routes),

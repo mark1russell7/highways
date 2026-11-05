@@ -97,13 +97,22 @@ The bench gives these values. The tables of these values use one seed of each fi
 | `ms`, `deterministic`, `violations` | `benchOne` | [`run.ts`](../../packages/core/src/bench/run.ts) |
 | The short list below, the counts of the proposed hard rules, the spread over the seeds and the Pareto fronts (MEAS1) | `runSuite` | [`suite.ts`](../../packages/core/src/bench/suite.ts) and [`measures/`](../../packages/core/src/bench/measures/) |
 
-### The gaps of today
+### The gaps of the list of 2026-11-05
 
-- `bends` counts each vertex of a polyline. A sampled curve thus has many bends, and the value ignores the angle of each turn.
-- `detour` is a mean, and `worstDetour` is a maximum. Neither value shows the spread, so one bad route hides in the mean.
-- `crossings` counts each crossing of two shared stretches one time. The count with open lanes is different.
-- No value gives the angle of a crossing, the space between plugs, the shape of a curve or the quality of a group.
-- No value of the bench compares two zoom levels, or two results of inputs with a small change.
+Each gap has a date or a reason. A gap with a reason has a measure in the screen, and the name of that measure is here.
+
+| Gap | State | Date or reason |
+|---|---|---|
+| `bends` counts each vertex of a polyline, and it ignores the angle of each turn. | closed | `route.turn.mean` and `route.turn.max` (R4) read the angle, and `route.inflections` (R15) reads the changes of side. `route.bends` stays as a count. |
+| `detour` is a mean, and `worstDetour` is a maximum, so one bad route hides in the mean. | closed | `route.detour.median`, `route.detour.q95` (R5) and `route.detour.max` (R6) read the spread. |
+| `crossings` counts each crossing of two shared stretches one time. | closed by ROUTE-PAIRS | `route.crossings.pairs` counts the pairs of routes that cross. R1 stays, because a bundle can want few ink crossings. Each one has a partner measure: read them together across routers that share segments. |
+| The crossing count with open lanes is different. | open | 2026-11-08, PAINT-TIE. The painted count lives only in the record `through-check`. PAINT-TIE names one count and reads `route.bundle.lane-crossings` (B5) against it. |
+| No value gives the angle of a crossing. | closed | `route.crossing-angle.mean` and `route.crossing-angle.min` (R2). |
+| No value gives the space between plugs. | closed | `route.plug-spacing.min` and `route.plug-spacing.q05` (R11). |
+| No value gives the shape of a curve. | closed | C1 to C4 and C8 of the suite read the joints, the energy and the deviation. C5 has no code, and the table above states this. |
+| No value gives the quality of a group. | open | 2026-11-11, AMBIGUITY-FLAT. `route.bundle.ambiguity` (B4) reads 0.987 to 0.992 on 10 pairs of one input. That item reads it on keyed inputs, and fixes or removes it. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
+| No value compares two zoom levels. | closed | Z6 to Z9 read the nesting, the positions, the order and the agreement of the levels. |
+| No value compares two results of inputs with a small change. | open | 2026-11-14, ROUTE-TIE. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. No value reads a shift with no meaning, and ROUTE-TIE gives the floor of each route measure. |
 
 ### The exact forms of MEAS3A
 
@@ -147,6 +156,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
 | R1 | Crossings | Few crossings | `c = count(X)`, and `c / m` for each edge | count, `↓` | `n log n`, sampled above 20 000 segments | score | yes, `crossings`, and `R1.perEdge` of the suite | [Purchase 1997][purchase97], [Purchase 2002][purchase02] |
+| R1 pairs | Pairs that cross | Routes that do not cross each other | `p = Σ over pairs of routes (crossings of the two routes)`, with a crossing at a shared vertex and on a shared stretch that the two routes leave on opposite sides | count, `↓` | `n log n` on the distinct segments, sampled above 20,000,000 walks of shared stretches | score | yes, `route.crossings.pairs` of the screen | Own (ROUTE-PAIRS) |
 | R2 | Crossing angle | Crossings near a right angle | `ca = mean_x(θ_x) / 90` and `ca_min = min_x(θ_x)` | 0..1 and degrees, `↑` | `n log n`, the same pass as R1 | score | yes, `R2.angle` and `R2.min` of the suite | [Huang 2014][huang14], [Huang 2008][huang08], [Dunne 2009][dunne09] |
 | R3 | Bends | Few real turns | `b(r) = count(i : abs(φ_i) > 1°)`, mean over routes | count for each route, `↓` | `linear` | score | part, `bends` counts each vertex | [Purchase 1997][purchase97], [Wybrow 2009][wybrow09] |
 | R4 | Total turn | Paths that go straight on | `T(r) = Σ_i abs(φ_i) / π`, and `max_i abs(φ_i)` | half turns for each route, `↓` | `linear` | score | yes, `R4.turn` and `R4.max` of the suite | [Ware 2002][ware02] |

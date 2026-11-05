@@ -77,6 +77,9 @@ const ROWS: readonly Row[] = [
   // The routes. A placement makes crossings, plugs on short sides and boxes that touch, so these measures depend on it.
   ["R1.crossings", "R1", "route.crossings", "count", "lower", true],
   ["R1.perEdge", "R1", "route.crossings.per-edge", "count for each edge", "lower", true],
+  ["R1.estimated", "R1", "route.crossings.estimated", "0 or 1", "lower", true, "This value is 1 when the crossings come from a sample and not from a full count. A ratio across routers does not compare such a row with a full count."],
+  ["R1.pairs", "R1", "route.crossings.pairs", "count", "lower", true, "The crossings between pairs of routes, including a shared vertex and a shared stretch that two routes leave on opposite sides. The partner of `route.crossings`: a bundle lowers the count of ink crossings by overlap."],
+  ["R1.pairsEstimated", "R1", "route.crossings.pairs.estimated", "0 or 1", "lower", true, "This value is 1 when `route.crossings.pairs` has an estimate from a sample of the pairs of routes."],
   ["R2.angle", "R2", "route.crossing-angle.mean", "0 to 1", "higher", true],
   ["R2.min", "R2", "route.crossing-angle.min", "degrees", "higher", true],
   ["R3.bends", "R3", "route.bends", "count for each route", "lower", false],

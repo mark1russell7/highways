@@ -1,3 +1,5 @@
+import { EPS } from "@mark1russell7/layout-contract";
+import { classifySegments, orient2dSign } from "@mark1russell7/predicates";
 import {
   bendCount,
   dist,
@@ -211,4 +213,258 @@ export function measureStability(before: Result, after: Result): Stability {
     n++;
   }
   return { mean: n ? sum / n : 0, max, moved: n ? moved / n : 0 };
+}
+
+/** The crossings between pairs of routes (ROUTE-PAIRS). */
+export interface RoutePairCrossings {
+  /** The number of crossings between two different routes. A pair that crosses twice counts two. `proper` and `contact` add up to this value. */
+  readonly pairs: number;
+  /** The crossings where the segments of two routes cross between their vertices. */
+  readonly proper: number;
+  /** The crossings at a shared vertex, and on a shared stretch that two routes leave on opposite sides. */
+  readonly contact: number;
+  /** This value is true when `contact` is an estimate from a sample of the pairs of routes. */
+  readonly estimated: boolean;
+}
+
+/** The steps of the grid of `routePairCrossings` in one unit. The grid is the tolerance `EPS` of the contract. */
+const PAIR_SNAP = Math.round(1 / EPS);
+/** A vertex that lies at most this number of grid steps from a segment is a vertex of that segment. */
+const PAIR_ON_SEGMENT = 1;
+/** The count reads each pair of routes up to this number of pairs at shared vertices. Above it, the count takes a seeded sample. */
+const PAIR_LIMIT = 20_000_000;
+
+/** The routes on the grid: the coordinates of each vertex, and the path of each route as vertex numbers. */
+interface SnappedPaths {
+  readonly xs: readonly number[];
+  readonly ys: readonly number[];
+  readonly paths: readonly (readonly number[])[];
+}
+
+function snapPaths(routes: readonly { readonly points: readonly Point[] }[]): SnappedPaths {
+  const ids = new Map<string, number>();
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const paths = routes.map((route) => {
+    const path: number[] = [];
+    for (const p of route.points) {
+      const [x, y] = [Math.round(p.x * PAIR_SNAP), Math.round(p.y * PAIR_SNAP)];
+      const k = `${x},${y}`;
+      let id = ids.get(k);
+      if (id === undefined) {
+        id = xs.length;
+        ids.set(k, id);
+        xs.push(x);
+        ys.push(y);
+      }
+      if (path[path.length - 1] !== id) path.push(id);
+    }
+    return path;
+  });
+  return { xs, ys, paths };
+}
+
+/** This function adds to each path each vertex that lies on one of its segments, so that two routes on one stretch share all vertices of the stretch. */
+function splitAtVertices({ xs, ys, paths }: SnappedPaths): SnappedPaths {
+  const count = xs.length;
+  const at = (i: number): Point => ({ x: xs[i]! / PAIR_SNAP, y: ys[i]! / PAIR_SNAP });
+  const grid = new Grid<number>(40);
+  for (let i = 0; i < count; i++) grid.add(i, { ...at(i), w: 0, h: 0 });
+  const cache = new Map<number, readonly number[]>();
+  const pad = (2 * PAIR_ON_SEGMENT) / PAIR_SNAP;
+  const inner = (u: number, v: number): readonly number[] => {
+    const key = u * count + v;
+    let out = cache.get(key);
+    if (out) return out;
+    const [dx, dy] = [xs[v]! - xs[u]!, ys[v]! - ys[u]!];
+    const square = dx * dx + dy * dy;
+    const limit = PAIR_ON_SEGMENT * Math.sqrt(square);
+    const found: [number, number][] = [];
+    grid.querySegment(at(u), at(v), pad, (w) => {
+      if (w === u || w === v) return;
+      const [ex, ey] = [xs[w]! - xs[u]!, ys[w]! - ys[u]!];
+      const along = ex * dx + ey * dy;
+      if (along > 0 && along < square && Math.abs(dx * ey - dy * ex) <= limit) found.push([along, w]);
+    });
+    out = found.sort((a, b) => a[0] - b[0]).map((f) => f[1]);
+    cache.set(key, out);
+    return out;
+  };
+  const split = paths.map((path) => {
+    const out: number[] = path.slice(0, 1);
+    for (let i = 1; i < path.length; i++) {
+      out.push(...inner(path[i - 1]!, path[i]!), path[i]!);
+    }
+    return out;
+  });
+  return { xs, ys, paths: split };
+}
+
+/** This function counts the proper crossings of two different routes: each pair of crossing segments, times the routes on each segment. */
+function properPairCrossings({ xs, ys, paths }: SnappedPaths): number {
+  const count = xs.length;
+  const index = new Map<number, number>();
+  const atoms: { readonly u: number; readonly v: number; readonly routes: number[] }[] = [];
+  paths.forEach((path, route) => {
+    for (let i = 1; i < path.length; i++) {
+      const [u, v] = path[i - 1]! < path[i]! ? [path[i - 1]!, path[i]!] : [path[i]!, path[i - 1]!];
+      const key = u * count + v;
+      let a = index.get(key);
+      if (a === undefined) {
+        a = atoms.length;
+        index.set(key, a);
+        atoms.push({ u, v, routes: [] });
+      }
+      atoms[a]!.routes.push(route);
+    }
+  });
+  if (atoms.length < 2) return 0;
+  const at = (i: number): Point => ({ x: xs[i]! / PAIR_SNAP, y: ys[i]! / PAIR_SNAP });
+  const mean = atoms.reduce((s, a) => s + dist(at(a.u), at(a.v)), 0) / atoms.length;
+  const grid = new Grid<number>(Math.max(20, mean));
+  atoms.forEach((a, i) => grid.addSegment(i, at(a.u), at(a.v)));
+  let total = 0;
+  atoms.forEach((s, i) => {
+    grid.querySegment(at(s.u), at(s.v), 0, (j) => {
+      if (j <= i) return;
+      const t = atoms[j]!;
+      if (s.u === t.u || s.u === t.v || s.v === t.u || s.v === t.v) return;
+      const relation = classifySegments(xs[s.u]!, ys[s.u]!, xs[s.v]!, ys[s.v]!, xs[t.u]!, ys[t.u]!, xs[t.v]!, ys[t.v]!).relation;
+      if (relation === "cross") total += s.routes.length * t.routes.length - shared(s.routes, t.routes);
+    });
+  });
+  return total;
+}
+
+/** This function gives the pairs of one route on both sorted lists: the number of times on the first list, times the number of times on the second list. */
+function shared(a: readonly number[], b: readonly number[]): number {
+  let [i, j, sum] = [0, 0, 0];
+  while (i < a.length && j < b.length) {
+    if (a[i]! < b[j]!) i++;
+    else if (a[i]! > b[j]!) j++;
+    else {
+      const route = a[i]!;
+      let [n, m] = [0, 0];
+      while (a[i] === route) (i++, n++);
+      while (b[j] === route) (j++, m++);
+      sum += n * m;
+    }
+  }
+  return sum;
+}
+
+/**
+ * This function counts the crossings of two different routes at the vertices that they share.
+ * Each interior vertex of a route is one pass, with the vertex before it and the vertex after it. A route does not cross at its own end.
+ */
+function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total: number; readonly estimated: boolean } {
+  const facing = (v: number, p: number, q: number): boolean => (xs[p]! - xs[v]!) * (xs[q]! - xs[v]!) + (ys[p]! - ys[v]!) * (ys[q]! - ys[v]!) > 0;
+  const turn = (v: number, p: number, q: number): number => orient2dSign(xs[v]!, ys[v]!, xs[p]!, ys[p]!, xs[q]!, ys[q]!);
+  // The side of the ray from `v` to `r`, for a path through `v`: 1 on the side from `out` to `back` in turn order, -1 on the other side, 0 on the path.
+  const side = (back: number, v: number, out: number, r: number): number => {
+    const a = turn(v, out, r);
+    const b = turn(v, r, back);
+    if ((a === 0 && facing(v, out, r)) || (b === 0 && facing(v, back, r))) return 0;
+    const c = turn(v, out, back);
+    if (c > 0) return a > 0 && b > 0 ? 1 : -1;
+    if (c < 0) return a > 0 || b > 0 ? 1 : -1;
+    if (facing(v, back, out)) return 0;
+    return a > 0 ? 1 : -1;
+  };
+  // This function walks the shared stretch from the pass `i` of the route `a` and the pass `j` of the route `b`, which goes in the direction `way`.
+  const stretch = (a: readonly number[], i: number, b: readonly number[], j: number, way: 1 | -1): number => {
+    const first = side(a[i - 1]!, a[i]!, a[i + 1]!, b[j - way]!);
+    if (first === 0) return 0;
+    let t = 1;
+    while (a[i + t + 1] !== undefined && a[i + t + 1] === b[j + way * (t + 1)]) t++;
+    const [next, other] = [a[i + t + 1], b[j + way * (t + 1)]];
+    if (next === undefined || other === undefined) return 0;
+    const last = side(a[i + t - 1]!, a[i + t]!, next, other);
+    return last !== 0 && last !== first ? 1 : 0;
+  };
+
+  interface Group {
+    readonly back: number;
+    readonly out: number;
+    readonly routes: number[];
+    readonly at: number[];
+  }
+  const count = xs.length;
+  const groups = new Map<number, Map<number, Group>>();
+  paths.forEach((path, route) => {
+    for (let i = 1; i < path.length - 1; i++) {
+      const [back, v, out] = [path[i - 1]!, path[i]!, path[i + 1]!];
+      let of = groups.get(v);
+      if (!of) groups.set(v, (of = new Map()));
+      const key = back * count + out;
+      let g = of.get(key);
+      if (!g) of.set(key, (g = { back, out, routes: [], at: [] }));
+      g.routes.push(route);
+      g.at.push(i);
+    }
+  });
+
+  const isStretch = (g: Group, h: Group): boolean => g.out === h.out || (g.back !== h.back && (g.out === h.back) !== (g.back === h.out));
+  let reads = 0;
+  for (const of of groups.values()) {
+    const list = [...of.values()];
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        if (isStretch(list[i]!, list[j]!)) reads += list[i]!.routes.length * list[j]!.routes.length;
+      }
+    }
+  }
+  const rate = reads > PAIR_LIMIT ? PAIR_LIMIT / reads : 1;
+  const random = rng(reads);
+  // This function adds the stretches of the groups `g` and `h`. The route of `g` is the route that the walk follows.
+  const walk = (g: Group, h: Group, way: 1 | -1): number => {
+    const one = (x: number, y: number): number => {
+      const [ra, rb] = [g.routes[x]!, h.routes[y]!];
+      // A stretch of two opposite routes shows at both of its ends, so the route with the lower number walks.
+      if (ra === rb || (way === -1 && ra > rb)) return 0;
+      return stretch(paths[ra]!, g.at[x]!, paths[rb]!, h.at[y]!, way);
+    };
+    const size = g.routes.length * h.routes.length;
+    let sum = 0;
+    if (rate === 1) {
+      for (let x = 0; x < g.routes.length; x++) for (let y = 0; y < h.routes.length; y++) sum += one(x, y);
+      return sum;
+    }
+    const draws = Math.ceil(size * rate);
+    for (let d = 0; d < draws; d++) sum += one(Math.floor(random() * g.routes.length), Math.floor(random() * h.routes.length));
+    return (sum * size) / draws;
+  };
+
+  let total = 0;
+  for (const [v, of] of groups) {
+    const list = [...of.values()];
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const [g, h] = [list[i]!, list[j]!];
+        if (g.back === h.back) continue;
+        if (g.out === h.out) total += walk(g, h, 1);
+        else if (g.out === h.back && g.back === h.out) continue;
+        else if (g.out === h.back) total += walk(g, h, -1);
+        else if (g.back === h.out) total += walk(h, g, -1);
+        else {
+          const first = side(g.back, v, g.out, h.back);
+          const last = side(g.back, v, g.out, h.out);
+          if (first !== 0 && last !== 0 && first !== last) total += g.routes.length * h.routes.length - shared(g.routes, h.routes);
+        }
+      }
+    }
+  }
+  return { total: rate === 1 ? total : Math.round(total), estimated: rate !== 1 };
+}
+
+/**
+ * This function counts the crossings between pairs of routes on the grid `EPS`. `measureQuality` keeps one segment for each pair of ends, so its `crossings` counts two trunks once.
+ * This count multiplies a crossing of two trunks by their routes. It also counts two routes that cross at a shared vertex, or that share a stretch and leave it on opposite sides.
+ * A crossing of a route with itself does not count.
+ */
+export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[]): RoutePairCrossings {
+  const paths = splitAtVertices(snapPaths(routes));
+  const proper = properPairCrossings(paths);
+  const contact = contactPairCrossings(paths);
+  return { pairs: proper + contact.total, proper, contact: contact.total, estimated: contact.estimated };
 }
