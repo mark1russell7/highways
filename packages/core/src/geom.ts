@@ -8,7 +8,7 @@ export interface Point {
 }
 
 /** The count of grid steps in one unit, for the grid of the tolerance `EPS` of the contract. The crossing counts read their points on this one grid. */
-export const EPS_STEPS = Math.round(1 / EPS);
+export const EPS_STEPS: number = Math.round(1 / EPS);
 
 /** This function gives the place of the grid `EPS_STEPS` that is nearest to a point. */
 export function snapToEps(p: Point): Point {
