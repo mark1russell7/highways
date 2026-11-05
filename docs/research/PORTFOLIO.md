@@ -694,6 +694,29 @@ The ratio is the time of the workspace over the time of 0.5.1. The interval is o
 - The public claim is the fresh run, because each case of a timing claim runs in fresh processes (BENCH-FRESH-CASES).
 - The two runs are separate CI runs on other jobs, so their difference does not show a cause. The separate case-order run measures the effect of the order.
 
+### The order of the arms
+
+Mode `fresh` rotates the arms by round. With 3 arms, one arm of a pair goes first in 2 of 3 rounds. The A/A copy is an arm, so each paired use here has 3 arms. The record [`arm-order/1`](../../packages/core/scripts/data/arm-order/record.json) reads run [41455276356](https://github.com/mark1russell7/highways/actions/runs/41455276356) on an AMD EPYC 7763: 5 jobs, 96 inputs and 50 rounds of each input.
+
+| Pair | Group | Inputs | Difference | Shuffle q95 | Bias | Shuffle q95 |
+|---|---|---:|---:|---:|---:|---:|
+| A/A | whole | 96 | 0.0022 | 0.0051 | -0.0002 | 0.0006 |
+| A/A | `router n100` | 12 | -0.0060 | 0.0291 | 0.0014 | 0.0036 |
+| A/A | `router n41-64` | 36 | 0.0109 | 0.0101 | -0.0005 | 0.0011 |
+| A/A | `setup n100` | 12 | 0.0015 | 0.0088 | 0.0007 | 0.0012 |
+| A/A | `setup n41-64` | 36 | 0.0006 | 0.0065 | -0.0003 | 0.0010 |
+| head | whole | 96 | 0.0037 | 0.0069 | 0 | 0.0007 |
+| head | `router n100` | 12 | 0.0196 | 0.0230 | -0.0008 | 0.0044 |
+| head | `router n41-64` | 36 | 0.0057 | 0.0086 | 0 | 0.0013 |
+| head | `setup n100` | 12 | -0.0067 | 0.0151 | -0.0007 | 0.0033 |
+| head | `setup n41-64` | 36 | 0.0029 | 0.0149 | 0 | 0.0022 |
+
+- The difference is the median log ratio where the first arm of the pair goes first, less the median where the second arm goes first. The bias is what the unequal rounds add to the median log ratio.
+- The shuffle changes the labels of the rounds inside each job and input, 200 times. It is the control.
+- The largest bias of one input is 0.0218 on the A/A pair and 0.0351 on the head pair. The limit of the gate against its parent is log(1.05), which is 0.0488.
+- 1 of the 8 groups is over its shuffle: `router n41-64` on the A/A pair. No correction applies to that count, so it is not a finding. The group reads again first when the order changes.
+- No limit moves on this record. This read is of one run.
+
 ### The predictions of PORTFOLIO-SPEED
 
 | Prediction | Result |
