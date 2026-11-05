@@ -24,6 +24,7 @@ registerHooks({
     const result = next(url, context);
     if (!url.endsWith("/src/visibility.ts")) return result;
     let s = (source === undefined ? String(result.source) : readFileSync(source, "utf8")).replace(/\r\n/g, "\n");
+    if (process.env["FLAG_PLAIN"]) return { ...result, source: s };
     s = once(s, "count: number,\n  ): Among | undefined {", "count: number,\n  ): Among | undefined {\n    floor *= (globalThis as any).__FLOOR ?? 1;");
     s = once(s, "if (heap.topKey > best + TIE) break;", "if (heap.topKey > best + TIE) break;\n      (globalThis as any).__POP?.();");
     s = once(s, "out.push(here);", "out.push(here);\n      (globalThis as any).__STEP?.();");
