@@ -1,0 +1,257 @@
+{
+ "arm": "budget form",
+ "nodes": [
+  {
+   "amp": 1e-11,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-11,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-11,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-11,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-11,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-11,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-10,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-10,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-9,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 3e-9,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "corners",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "sections",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "shared-all",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "shared",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "trunks",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  },
+  {
+   "amp": 1e-8,
+   "router": "sections-site",
+   "routes": 24260,
+   "moves": 0,
+   "where": []
+  }
+ ]
+}

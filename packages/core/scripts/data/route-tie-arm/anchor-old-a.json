@@ -1,0 +1,63 @@
+{
+ "arm": "present rule",
+ "links": [
+  {
+   "amp": 3e-10,
+   "paths": 24260,
+   "moves": 0,
+   "where": [],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 0,
+    "first": []
+   }
+  },
+  {
+   "amp": 1e-9,
+   "paths": 24260,
+   "moves": 4,
+   "where": [
+    "two-hubs/1#0 e4",
+    "two-hubs/0#1 e2",
+    "two-hubs/2#1 e2",
+    "two-hubs/2#3 e2"
+   ],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 0,
+    "first": []
+   }
+  },
+  {
+   "amp": 3e-9,
+   "paths": 24260,
+   "moves": 1,
+   "where": [
+    "two-hubs/2#1 e2"
+   ],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 0,
+    "first": []
+   }
+  }
+ ]
+}

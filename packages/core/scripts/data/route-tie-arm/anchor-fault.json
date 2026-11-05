@@ -1,0 +1,88 @@
+{
+ "arm": "budget form",
+ "zeroCost": [
+  {
+   "share": 0.1,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 1377,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 4.547473508864641e-13,
+    "first": [
+     "tiny-uniform/0 e4: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/1 e5: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/1 e12: Error: The walk of the corner search did not reach a start.",
+     "small-clustered/0 e1: Error: The walk of the corner search did not reach a start.",
+     "small-clustered/0 e4: Error: The walk of the corner search did not reach a start."
+    ]
+   }
+  },
+  {
+   "share": 0.3,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 2868,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 0,
+    "first": [
+     "tiny-uniform/0 e2: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e5: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e11: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e12: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/1 e2: Error: The walk of the corner search did not reach a start."
+    ]
+   }
+  },
+  {
+   "share": 0.6,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 2818,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 0,
+    "first": [
+     "tiny-uniform/0 e2: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e4: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e5: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e11: Error: The walk of the corner search did not reach a start.",
+     "tiny-uniform/0 e12: Error: The walk of the corner search did not reach a start."
+    ]
+   }
+  }
+ ],
+ "zeroLength": {
+  "paths": 400,
+  "moves": 0,
+  "walks": {
+   "searches": 1200,
+   "none": 0,
+   "throws": 312,
+   "repeats": 0,
+   "notLinks": 0,
+   "fallbacks": 0,
+   "zeroLinks": 0,
+   "maxOver": 5.684341886080802e-14,
+   "first": [
+    "built 2: Error: The walk of the corner search did not reach a start.",
+    "built 2: Error: The walk of the corner search did not reach a start.",
+    "built 2: Error: The walk of the corner search did not reach a start.",
+    "built 4: Error: The walk of the corner search did not reach a start.",
+    "built 4: Error: The walk of the corner search did not reach a start."
+   ]
+  },
+  "corners": 156,
+  "onOnePoint": 45
+ }
+}

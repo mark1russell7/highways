@@ -1,0 +1,62 @@
+[
+ {
+  "router": "corners",
+  "total": 841423,
+  "searchReads": 695077,
+  "pops": 69568,
+  "popsOver": 19,
+  "walkSteps": 17421,
+  "walkReads": 146346,
+  "degreeReads": 0
+ },
+ {
+  "router": "shared",
+  "total": 2804330,
+  "searchReads": 2648890,
+  "pops": 261211,
+  "popsOver": 0,
+  "walkSteps": 18295,
+  "walkReads": 155440,
+  "degreeReads": 0
+ },
+ {
+  "router": "shared-all",
+  "total": 2108003,
+  "searchReads": 1904566,
+  "pops": 187810,
+  "popsOver": 0,
+  "walkSteps": 22995,
+  "walkReads": 203437,
+  "degreeReads": 0
+ },
+ {
+  "router": "sections",
+  "total": 1355089,
+  "searchReads": 1128436,
+  "pops": 113225,
+  "popsOver": 82,
+  "walkSteps": 31766,
+  "walkReads": 226653,
+  "degreeReads": 0
+ },
+ {
+  "router": "trunks",
+  "total": 841401,
+  "searchReads": 694080,
+  "pops": 69485,
+  "popsOver": 19,
+  "walkSteps": 17611,
+  "walkReads": 147321,
+  "degreeReads": 0
+ },
+ {
+  "router": "sections-site",
+  "total": 2221309,
+  "searchReads": 1933832,
+  "pops": 189762,
+  "popsOver": 36,
+  "walkSteps": 39574,
+  "walkReads": 287477,
+  "degreeReads": 0
+ }
+]

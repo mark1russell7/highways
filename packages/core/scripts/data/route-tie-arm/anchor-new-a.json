@@ -1,0 +1,117 @@
+{
+ "arm": "budget form",
+ "links": [
+  {
+   "amp": 3e-10,
+   "paths": 24260,
+   "moves": 0,
+   "where": [],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 9.991936167352833e-10,
+    "first": []
+   }
+  },
+  {
+   "amp": 1e-9,
+   "paths": 24260,
+   "moves": 0,
+   "where": [],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 9.999894245993346e-10,
+    "first": []
+   }
+  },
+  {
+   "amp": 3e-9,
+   "paths": 24260,
+   "moves": 0,
+   "where": [],
+   "walks": {
+    "searches": 72780,
+    "none": 4836,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 0,
+    "zeroLinks": 0,
+    "maxOver": 9.99875737761613e-10,
+    "first": []
+   }
+  }
+ ],
+ "zeroCost": [
+  {
+   "share": 0.1,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 25239,
+    "zeroLinks": 0,
+    "maxOver": 4.547473508864641e-13,
+    "first": []
+   }
+  },
+  {
+   "share": 0.3,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 59513,
+    "zeroLinks": 0,
+    "maxOver": 1.1368683772161603e-13,
+    "first": []
+   }
+  },
+  {
+   "share": 0.6,
+   "walks": {
+    "searches": 6065,
+    "none": 403,
+    "throws": 0,
+    "repeats": 0,
+    "notLinks": 0,
+    "fallbacks": 43538,
+    "zeroLinks": 0,
+    "maxOver": 1.1368683772161603e-13,
+    "first": []
+   }
+  }
+ ],
+ "zeroLength": {
+  "paths": 400,
+  "moves": 0,
+  "walks": {
+   "searches": 1200,
+   "none": 0,
+   "throws": 0,
+   "repeats": 0,
+   "notLinks": 0,
+   "fallbacks": 0,
+   "zeroLinks": 0,
+   "maxOver": 5.684341886080802e-14,
+   "first": []
+  },
+  "corners": 156,
+  "onOnePoint": 45
+ }
+}
