@@ -626,6 +626,20 @@ The set `screen-v4` (PASS-GRID) has the 60 boards of `screen-v2`, each after `ma
 - The split file [`corpus/splits/screen-v4.c439a5c1a0afcd39.json`](../corpus/splits/screen-v4.c439a5c1a0afcd39.json) holds out the seeds 7 to 9 of each family.
 - The screen of this set uses the same floor rule as the other sets.
 
+### The screen set `screen-v5`
+
+The set `screen-v5` (COLLECTION-KEY) has the 150 boards of `screen-v3` under each value of the key of the edges: 450 boards in 45 families. Its files are in [`corpus/screen-v5`](../corpus/screen-v5). `SCREEN_V5` of `bench/screen/set.ts` makes them.
+
+- The base `shared` makes ways only from the key `data.collection` of an edge. In `screen-v3`, only `dense-groups`, `small-clustered` and `tiny-uniform` have that key.
+- The function `edgeKeyStep` of `layout-contract` writes the keys, with the dimension `edgeKey`. The set has no copy of that rule.
+  - `none`: no edge has a key.
+  - `random`: each edge has the key of its target box, one of 4 names.
+  - `cluster`: each edge has the key of the cluster of its target box. The clusters come from the edge stream of the contract, so they are groups of box indexes, not groups of near boxes.
+- Only the key changes. The boxes, the other fields of the edges and the seeds are those of `screen-v3`.
+- The name of a family is the name of its family of `screen-v3` and `.key-<edgeKey>`. The cell has the field `edgeKey`. A screen of one arm names its 15 families.
+- The generator of each input has the name `edge-key`, version 1. Its `params` hold `edgeKey` and the generator of the `screen-v3` board in `base`.
+- The split file [`corpus/splits/screen-v5.82066dd4b30c5449.json`](../corpus/splits/screen-v5.82066dd4b30c5449.json) holds out the seeds 7 to 9 of each family.
+
 ### The screen set `exact-v1`
 
 The set `exact-v1` (MEAS2) has small boards with a known optimum of the exact model. Its files are in [`corpus/exact-v1`](../corpus/exact-v1). `EXACT_V1` of `bench/screen/exact-set.ts` makes them.

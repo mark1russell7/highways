@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1514 names
+## . (build/index.d.ts): 1517 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -72,7 +72,7 @@ BoardPortfolioOptions: build/index.d.ts#BoardPortfolioOptions
 BoardPortfolioRun: build/index.d.ts#BoardPortfolioRun
 BooleanOption: build/index.d.ts#BooleanOption
 BootstrapMedian: build/index.d.ts#BootstrapMedian
-BorderWalkOptions: build/index.d.ts#BorderWalkOptions
+type BorderWalkOptions: build/index.d.ts#BorderWalkOptions
 BoundaryWalk: build/index.d.ts#BoundaryWalk
 Box: build/index.d.ts#Box
 type BoxField: build/index.d.ts#BoxField
@@ -612,6 +612,9 @@ SCREEN_V3_HELD_OUT: build/index.d.ts#SCREEN_V3_HELD_OUT
 SCREEN_V4: build/index.d.ts#SCREEN_V4
 SCREEN_V4_HELD_OUT: build/index.d.ts#SCREEN_V4_HELD_OUT
 SCREEN_V4_ROOM: build/index.d.ts#SCREEN_V4_ROOM
+SCREEN_V5: build/index.d.ts#SCREEN_V5
+SCREEN_V5_HELD_OUT: build/index.d.ts#SCREEN_V5_HELD_OUT
+SCREEN_V5_KEYS: build/index.d.ts#SCREEN_V5_KEYS
 SCREEN_WRAPS: build/index.d.ts#SCREEN_WRAPS
 SEAM_DEFAULTS: build/index.d.ts#SEAM_DEFAULTS
 SEARCH_DEFAULTS: build/index.d.ts#SEARCH_DEFAULTS
@@ -1863,9 +1866,9 @@ export interface BootstrapMedian {
 }
 
 ### build/index.d.ts#BorderWalkOptions
-export interface BorderWalkOptions {
-    readonly leave: number;
-    readonly k: number;
+interface BorderWalkOptions {
+  readonly leave: number;
+  readonly k: number;
 }
 
 ### build/index.d.ts#BoundaryWalk
@@ -3511,6 +3514,7 @@ export interface LayoutCell {
   readonly edgeShape?: "random" | "clustered" | "hubChain" | "longRange" | "tree" | "bundled";
   readonly groups?: "none" | "flat" | "nested";
   readonly ports?: "free" | "sides" | "fixed";
+  readonly edgeKey?: "none" | "random" | "cluster";
 }
 
 ### build/index.d.ts#LayoutChange
@@ -4895,6 +4899,15 @@ export declare const SCREEN_V4_ROOM: Readonly<{
   gutter: number;
   spacing: number;
 }>;
+
+### build/index.d.ts#SCREEN_V5
+export declare const SCREEN_V5: ScreenSet;
+
+### build/index.d.ts#SCREEN_V5_HELD_OUT
+export declare const SCREEN_V5_HELD_OUT: readonly number[];
+
+### build/index.d.ts#SCREEN_V5_KEYS
+export declare const SCREEN_V5_KEYS: readonly EdgeKey[];
 
 ### build/index.d.ts#SCREEN_WRAPS
 export declare const SCREEN_WRAPS: readonly ScreenWrap[];
@@ -6355,11 +6368,11 @@ export declare function bootstrapMedian(values: readonly number[], o?: {
 
 ### build/index.d.ts#borderWalkRouter
 export declare function borderWalkRouter(options: Partial<BorderWalkOptions> & {
-    readonly name: string;
+  readonly name: string;
 }): Router;
 
 ### build/index.d.ts#borderWalkStrategy
-export declare const borderWalkStrategy: Strategy<BorderWalkOptions>;
+export declare const borderWalkStrategy: Strategy<"router", BorderWalkOptions>;
 
 ### build/index.d.ts#boundsFamilyName
 export declare function boundsFamilyName(cls: ExactClass, nodes: number): string;
