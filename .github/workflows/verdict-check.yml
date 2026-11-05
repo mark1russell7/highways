@@ -10,7 +10,7 @@ name: Verdict check
 on:
   workflow_dispatch:
   schedule:
-    - cron: "11 4 * * 3"
+    - cron: "41 4 * * 3"
 
 permissions:
   contents: read
