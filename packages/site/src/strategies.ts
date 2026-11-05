@@ -91,7 +91,7 @@ function optionsPart(c: StrategyCard): string {
   const rows = c.options
     .map((o) => `<tr><th scope="row" title="${esc(o.describe)}"><code>${esc(o.key)}</code></th><td>${esc(o.type)}</td><td>${code(o.range)}</td><td>${code(o.default)}</td></tr>`)
     .join("");
-  return `<details class="sc-options"><summary>${c.options.length} ${c.options.length === 1 ? "option" : "options"}</summary><div class="table-wrap"><table><thead><tr><th scope="col">Option</th><th scope="col">Type</th><th scope="col">Range</th><th scope="col">Default</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+  return `<details class="sc-options"><summary>${c.options.length} ${c.options.length === 1 ? "option" : "options"}</summary><div class="table-wrap scroll-cue" tabindex="0" aria-label="The options of ${esc(c.name)}"><table><thead><tr><th scope="col">Option</th><th scope="col">Type</th><th scope="col">Range</th><th scope="col">Default</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
 }
 
 /** This function gives the verdicts part of a card: each set, with the label and the breadth of each guard. */
