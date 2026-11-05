@@ -1,5 +1,45 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.15.0
+
+This version is a MINOR before 1.0, because default routes change and the public types name `layout-contract` 0.4.0.
+
+### Read this first
+
+- The `seams` screen has not run at this version. So `seams` stays off the site, and it has no verdict.
+- The body count of `measureHighways` reads 0 on `shared-all` because of a fix of the measure. This figure is not a gain of the router.
+- The end count of `shared-all` falls from 2375 to 720 on one board only, `case-many-groups`. Do not read it as a general figure.
+- The old and new body figures come from different counters, so they do not compare. The version is in `BUNDLE_COUNTER`.
+- On 75 boards, `shared-all` reads 0.417 of `corners` on `route.crossings` and 1.033 on `route.crossings.pairs`, as medians.
+- The pair count of `shared-all` stays under `corners` on 4 families: `bottleneck`, `comb`, `maze` and `walled-level`.
+- So a lower `route.crossings` alone does not show a gain for a router that shares segments.
+
+### Routes that change
+
+- The lanes of each side of a run or trunk compress to fit its free room (LANE-ROOM). A lane can move. The closed routes do not change.
+- A margin is a preference, not a wall (PLUG-OUT-BLOCKED). A route on `escape` can change. The option `outSteps: false` is the way back.
+- The first stop of an inner route lies on the bounds of its room (INNER-SPIKE). The default digests of the 150 boards stay the same.
+
+### Measures
+
+- `route.crossings.pairs` and `routePairCrossings` count the pairs of routes that cross, at a shared vertex and on a shared stretch too (ROUTE-PAIRS).
+- `measureHighways` reads the crossing point of two pieces, not the middle of a sampled piece (BUNDLE-COUNTER). No route moves.
+- Above 20 000 segments, `route.crossings` is an estimate. On the benchmark, it reads up to 16.03% off a full count.
+
+### New
+
+- `strategyOfKey` and `KEYED_STRATEGIES` find a strategy from its key (CATALOG-LOOKUP).
+- `configOfMember` gives a member of the portfolio its point in `routeSpace` (MEMBER-POINTS).
+- `corners` marks `through` on an inner route that goes through a box of its room (INNER-THROUGH).
+- Each lane that the lanes bring to a box has the mark `outOfRoom` (LANE-ROOM).
+- The 11 opt-in routers reach the compare page, the strategy cards and the bench (PHYSICAL-VISIBLE).
+
+### Not in this version
+
+- The controls `one-trunk` and `perimeter` are not in this version.
+- The read of the sample of `route.crossings` (CROSSINGS-SAMPLE) and the exact count (CROSSINGS-LIMIT) are not in this version.
+- The grid of the painted count (PAINT-TIE) and the measure of true shapes are not in this version.
+
 ## 0.14.0
 
 This version is a MINOR before 1.0, because default routes change and callers hash them.
