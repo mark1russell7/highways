@@ -1,0 +1,8226 @@
+[
+  {
+    "router": "straight",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.03942899999998417,
+    "deterministic": true,
+    "violations": 6,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n3"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 1 goes through n2"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 1 goes through n0"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e12",
+        "detail": "segment 1 goes through n7"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e13",
+        "detail": "segment 1 goes through n3"
+      }
+    ],
+    "quality": {
+      "ink": 1885.240213945857,
+      "crossings": 4,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 18.075595993505413,
+      "tight": 0.4,
+      "detour": 1,
+      "plugAngle": 18.714001555725023
+    },
+    "faults": {
+      "links": 15,
+      "through": 6,
+      "unavoidable": 0,
+      "avoidable": 6,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.03942899999998417,
+      "baseMs": 2.4585739999999987,
+      "ratio": 0.01603734522531524
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.11010300000003781,
+    "deterministic": true,
+    "violations": 6,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 12 goes through n3"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 5 goes through n2"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 11 goes through n0"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e12",
+        "detail": "segment 9 goes through n7"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e13",
+        "detail": "segment 17 goes through n3"
+      }
+    ],
+    "quality": {
+      "ink": 1912.7438278273935,
+      "crossings": 6,
+      "crossingsEstimated": false,
+      "bends": 5.466666666666667,
+      "inflections": 1.5333333333333334,
+      "clearance": 18.58759106937436,
+      "tight": 0.4,
+      "detour": 1.0119099558046707,
+      "plugAngle": 15.798811321881722
+    },
+    "faults": {
+      "links": 15,
+      "through": 6,
+      "unavoidable": 0,
+      "avoidable": 6,
+      "backtrack": 0,
+      "worstDetour": 1.0857607433031917,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.11010300000003781,
+      "baseMs": 1.3022550000000024,
+      "ratio": 0.08454795719735199
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.5636579999999753,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.5636579999999753,
+      "baseMs": 0.9446740000000204,
+      "ratio": 0.596669327196433
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.8805289999999673,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1957.6662459605313,
+      "crossings": 11,
+      "crossingsEstimated": false,
+      "bends": 7.466666666666667,
+      "inflections": 1.3333333333333333,
+      "clearance": 20.734710990218232,
+      "tight": 0,
+      "detour": 1.0333030542676018,
+      "plugAngle": 8.738692315004462
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1162502810201353,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.8805289999999673,
+      "baseMs": 0.853588000000002,
+      "ratio": 1.0315620650711645
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.6673619999999687,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1923.1416993450782,
+      "crossings": 8,
+      "crossingsEstimated": false,
+      "bends": 2.533333333333333,
+      "inflections": 1.0666666666666667,
+      "clearance": 19.30459426423079,
+      "tight": 0,
+      "detour": 1.0515625479842032,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1617285618168554,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.6673619999999687,
+      "baseMs": 0.8106250000000159,
+      "ratio": 0.8232684656899992
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.6961350000000266,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.6961350000000266,
+      "baseMs": 0.6954339999999775,
+      "ratio": 1.0010080036352107
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.7441860000000133,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.7441860000000133,
+      "baseMs": 0.8832519999999704,
+      "ratio": 0.842552295381203
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.6597769999999628,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 2220.92498127438,
+      "crossings": 14,
+      "crossingsEstimated": false,
+      "bends": 4.333333333333333,
+      "inflections": 2,
+      "clearance": 18.336062379747545,
+      "tight": 0,
+      "detour": 1.3076370055982538,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.0195892585291877,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 1,
+        "links": 8,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4104679269230913,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 1.6597769999999628,
+      "baseMs": 1.2576589999999896,
+      "ratio": 1.319735317760996
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.0775709999999776,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 2220.92498127438,
+      "crossings": 14,
+      "crossingsEstimated": false,
+      "bends": 4.333333333333333,
+      "inflections": 2,
+      "clearance": 18.336062379747545,
+      "tight": 0,
+      "detour": 1.3076370055982538,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.0195892585291877,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 1,
+        "links": 8,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4104679269230913,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 1.0775709999999776,
+      "baseMs": 0.858756000000028,
+      "ratio": 1.2548046243635473
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "adam",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 14.88274199999995,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 14.88274199999995,
+      "baseMs": 2.17596599999996,
+      "ratio": 6.839602273197387
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "annealing",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.7969299999999748,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1953.768140451294,
+      "crossings": 6,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.035416689961111,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 1.7969299999999748,
+      "baseMs": 1.1019840000000158,
+      "ratio": 1.6306316607137208
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "attraction",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 3.30957699999999,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 3.30957699999999,
+      "baseMs": 1.8127039999999965,
+      "ratio": 1.8257680239024112
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "canals",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.2169749999999908,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 1.2169749999999908,
+      "baseMs": 0.9493669999999952,
+      "ratio": 1.2818804529755057
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "nudge",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 2.4071910000000116,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4509118613719,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273550049125195,
+      "tight": 0.06666666666666667,
+      "detour": 1.0340106723638556,
+      "plugAngle": 2.33423544564553
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 2.4071910000000116,
+      "baseMs": 1.7114329999999995,
+      "ratio": 1.4065353420204076
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "portfolio",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 27.522767000000044,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1930.8855166159965,
+      "crossings": 9,
+      "crossingsEstimated": false,
+      "bends": 2.533333333333333,
+      "inflections": 1.0666666666666667,
+      "clearance": 19.829232793890082,
+      "tight": 0,
+      "detour": 1.0477670831457877,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1608825634028266,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 27.522767000000044,
+      "baseMs": 0.9251899999999296,
+      "ratio": 29.748232254998584
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "repel",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 14.215346000000068,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1924.473396993266,
+      "crossings": 9,
+      "crossingsEstimated": false,
+      "bends": 3.8666666666666667,
+      "inflections": 0.7333333333333333,
+      "clearance": 18.62751081294705,
+      "tight": 0.3333333333333333,
+      "detour": 1.0169923596922792,
+      "plugAngle": 21.366205075310116
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.0582411963709315,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 14.215346000000068,
+      "baseMs": 1.3327780000000757,
+      "ratio": 10.665951868952863
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "reroute",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.4791770000000497,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 1.4791770000000497,
+      "baseMs": 0.9169080000000349,
+      "ratio": 1.6132229187661067
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-stretch",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 0.8711700000000064,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.8711700000000064,
+      "baseMs": 0.8447700000000395,
+      "ratio": 1.0312511097694823
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "springs",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 3.913218000000029,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1925.0835920024954,
+      "crossings": 9,
+      "crossingsEstimated": false,
+      "bends": 1.8,
+      "inflections": 0.3333333333333333,
+      "clearance": 19.780095061751005,
+      "tight": 0.2,
+      "detour": 1.0178502677516328,
+      "plugAngle": 19.903468481221626
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.0731249537227665,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 3.913218000000029,
+      "baseMs": 1.3323579999999993,
+      "ratio": 2.937061960824366
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "tight",
+    "fixture": "tiny-uniform",
+    "nodes": 10,
+    "edges": 15,
+    "ms": 1.0236169999999447,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1950.4619631612595,
+      "crossings": 7,
+      "crossingsEstimated": false,
+      "bends": 2.4,
+      "inflections": 1.0666666666666667,
+      "clearance": 20.273548889988152,
+      "tight": 0,
+      "detour": 1.0339952643514105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 15,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1310637350074773,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 1.0236169999999447,
+      "baseMs": 0.8755459999999857,
+      "ratio": 1.1691184700746293
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 0.08590700000002016,
+    "deterministic": true,
+    "violations": 104,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n64"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n93"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 1 goes through n42"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e10",
+        "detail": "segment 1 goes through n49"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e11",
+        "detail": "segment 1 goes through n98"
+      }
+    ],
+    "quality": {
+      "ink": 61904.71105018231,
+      "crossings": 1123,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 12.154703491188348,
+      "tight": 0.565,
+      "detour": 1,
+      "plugAngle": 32.30713315164
+    },
+    "faults": {
+      "links": 200,
+      "through": 103,
+      "unavoidable": 0,
+      "avoidable": 103,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.08590700000002016,
+      "baseMs": 17.218029,
+      "ratio": 0.004989363184370299
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 0.3750069999999823,
+    "deterministic": true,
+    "violations": 100,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 13 goes through n42"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 17 goes through n83"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 2 goes through n93"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 2 goes through n42"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e10",
+        "detail": "segment 19 goes through n49"
+      }
+    ],
+    "quality": {
+      "ink": 67983.99995864181,
+      "crossings": 1369,
+      "crossingsEstimated": false,
+      "bends": 9.565,
+      "inflections": 1.495,
+      "clearance": 11.790360916768943,
+      "tight": 0.535,
+      "detour": 1.0978703012764397,
+      "plugAngle": 19.87693186709625
+    },
+    "faults": {
+      "links": 200,
+      "through": 100,
+      "unavoidable": 0,
+      "avoidable": 100,
+      "backtrack": 2,
+      "worstDetour": 2.5286324533615496,
+      "outside": 1
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.3750069999999823,
+      "baseMs": 12.696729000000005,
+      "ratio": 0.029535717427691982
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 9.581960000000095,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 59039.35164893675,
+      "crossings": 1090,
+      "crossingsEstimated": false,
+      "bends": 3.32,
+      "inflections": 1.63,
+      "clearance": 15.027652813958323,
+      "tight": 0.105,
+      "detour": 1.0339167698490435,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 9.581960000000095,
+      "baseMs": 13.212685999999962,
+      "ratio": 0.7252090907178239
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 9.173663000000033,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 61381.73377659325,
+      "crossings": 1232,
+      "crossingsEstimated": false,
+      "bends": 12.555,
+      "inflections": 1.835,
+      "clearance": 14.842391837733668,
+      "tight": 0.09,
+      "detour": 1.0640423626343374,
+      "plugAngle": 8.78798137892698
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 1,
+      "worstDetour": 2.5286324533615496,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 9.173663000000033,
+      "baseMs": 12.532646,
+      "ratio": 0.7319813389766242
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 9.02587399999993,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 58266.81165796633,
+      "crossings": 1093,
+      "crossingsEstimated": false,
+      "bends": 3.47,
+      "inflections": 1.66,
+      "clearance": 14.999983230756106,
+      "tight": 0.125,
+      "detour": 1.06038448203736,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4086574287220117,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 9.02587399999993,
+      "baseMs": 12.889875999999958,
+      "ratio": 0.7002296996495513
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 13.771977000000106,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 48306.874072371,
+      "crossings": 647,
+      "crossingsEstimated": false,
+      "bends": 4.295,
+      "inflections": 2.22,
+      "clearance": 14.887161413777,
+      "tight": 0.075,
+      "detour": 1.0658507919438893,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 13.771977000000106,
+      "baseMs": 13.91087299999981,
+      "ratio": 0.9900152923544262
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 12.741025000000036,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 37070.607182921645,
+      "crossings": 315,
+      "crossingsEstimated": false,
+      "bends": 5.75,
+      "inflections": 3.32,
+      "clearance": 14.718529706671932,
+      "tight": 0.145,
+      "detour": 1.124551987484073,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7072922466717873,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 12.741025000000036,
+      "baseMs": 12.166852000000063,
+      "ratio": 1.0471915825063025
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 18.574174000000085,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 49139.51391369682,
+      "crossings": 690,
+      "crossingsEstimated": false,
+      "bends": 5.35,
+      "inflections": 2.7,
+      "clearance": 13.644810533634349,
+      "tight": 0.21,
+      "detour": 1.2393926839548555,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.105708877547809,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 4,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 1,
+        "worstDetour": 3.04546978634065,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 14,
+        "groups": 12,
+        "overlaps": 8,
+        "links": 68,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 9,
+        "worstDetour": 3.8536962075001426,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 57,
+        "groups": 17,
+        "overlaps": 10,
+        "links": 171,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 12,
+        "worstDetour": 6.547938343965704,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 18.574174000000085,
+      "baseMs": 12.257958000000144,
+      "ratio": 1.5152747300977754
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 17.300080999999864,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 50420.59882014806,
+      "crossings": 687,
+      "crossingsEstimated": false,
+      "bends": 6.08,
+      "inflections": 2.985,
+      "clearance": 12.922872745215425,
+      "tight": 0.225,
+      "detour": 1.4559943741110541,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 5.3151618252750135,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 4,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 1,
+        "worstDetour": 3.04546978634065,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 14,
+        "groups": 12,
+        "overlaps": 8,
+        "links": 68,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 9,
+        "worstDetour": 3.8536962075001426,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 57,
+        "groups": 17,
+        "overlaps": 10,
+        "links": 171,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 12,
+        "worstDetour": 6.547938343965704,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 17.300080999999864,
+      "baseMs": 11.73698300000001,
+      "ratio": 1.473980238362776
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "adam",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 113.5074860000002,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 48431.491622473775,
+      "crossings": 647,
+      "crossingsEstimated": false,
+      "bends": 4.305,
+      "inflections": 2.205,
+      "clearance": 14.971293062284305,
+      "tight": 0.075,
+      "detour": 1.0693315112766537,
+      "plugAngle": 1.8825423928576965
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999201172674736,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 113.5074860000002,
+      "baseMs": 17.428619000000026,
+      "ratio": 6.512706830070703
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "annealing",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 67.88779299999987,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 53643.10380819038,
+      "crossings": 744,
+      "crossingsEstimated": false,
+      "bends": 3.865,
+      "inflections": 1.935,
+      "clearance": 14.933810513321395,
+      "tight": 0.11,
+      "detour": 1.0542304914323604,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 67.88779299999987,
+      "baseMs": 16.897316000000046,
+      "ratio": 4.017667243720819
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "attraction",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 39.771639999999934,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 47840.7382548813,
+      "crossings": 630,
+      "crossingsEstimated": false,
+      "bends": 4.35,
+      "inflections": 2.265,
+      "clearance": 14.846834234102161,
+      "tight": 0.075,
+      "detour": 1.0674876487597205,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 39.771639999999934,
+      "baseMs": 16.99905899999976,
+      "ratio": 2.339637741124405
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "canals",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 27.897226000000046,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 46848.96756615754,
+      "crossings": 603,
+      "crossingsEstimated": false,
+      "bends": 4.465,
+      "inflections": 2.33,
+      "clearance": 14.848006531733553,
+      "tight": 0.075,
+      "detour": 1.0722486772466422,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4733751658990495,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 27.897226000000046,
+      "baseMs": 16.964216999999735,
+      "ratio": 1.6444747199355256
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "nudge",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 19.417946999999913,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 50722.2317124289,
+      "crossings": 801,
+      "crossingsEstimated": false,
+      "bends": 4.31,
+      "inflections": 2.185,
+      "clearance": 14.37557859861168,
+      "tight": 0.21,
+      "detour": 1.0675352456827785,
+      "plugAngle": 3.0282633207704173
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 19.417946999999913,
+      "baseMs": 15.837414999999964,
+      "ratio": 1.2260805819636573
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "portfolio",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 17.57094199999983,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 48306.874072371,
+      "crossings": 647,
+      "crossingsEstimated": false,
+      "bends": 4.295,
+      "inflections": 2.22,
+      "clearance": 14.887161413777,
+      "tight": 0.075,
+      "detour": 1.0658507919438893,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 17.57094199999983,
+      "baseMs": 16.747683000000052,
+      "ratio": 1.0491565907952627
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "repel",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 566.9629150000001,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 62998.09797304011,
+      "crossings": 1392,
+      "crossingsEstimated": false,
+      "bends": 10.89,
+      "inflections": 4.14,
+      "clearance": 13.303917442066904,
+      "tight": 0.45,
+      "detour": 1.0123078671801822,
+      "plugAngle": 31.982019561990477
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1439542515789005,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 566.9629150000001,
+      "baseMs": 19.931752999999844,
+      "ratio": 28.445210764954016
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "reroute",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 29.06931000000077,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 49866.61143499968,
+      "crossings": 720,
+      "crossingsEstimated": false,
+      "bends": 4.365,
+      "inflections": 2.315,
+      "clearance": 14.882552315244345,
+      "tight": 0.09,
+      "detour": 1.06693243928411,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4733751658990495,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 29.06931000000077,
+      "baseMs": 18.480602000000545,
+      "ratio": 1.5729633699161918
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-stretch",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 18.158096000000114,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 48306.874072371,
+      "crossings": 647,
+      "crossingsEstimated": false,
+      "bends": 4.295,
+      "inflections": 2.22,
+      "clearance": 14.887161413777,
+      "tight": 0.075,
+      "detour": 1.0658507919438893,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.3999200239920027,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 18.158096000000114,
+      "baseMs": 16.94315800000004,
+      "ratio": 1.0717067030833374
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "springs",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 78.59208800000033,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 65831.40002397001,
+      "crossings": 2999,
+      "crossingsEstimated": false,
+      "bends": 8.58,
+      "inflections": 1.825,
+      "clearance": 14.58811376144516,
+      "tight": 0.175,
+      "detour": 1.0408478109770858,
+      "plugAngle": 29.91408250255201
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.2531204561255662,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 78.59208800000033,
+      "baseMs": 16.138740999999754,
+      "ratio": 4.8697781320117555
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "tight",
+    "fixture": "small-clustered",
+    "nodes": 100,
+    "edges": 200,
+    "ms": 19.351580999999896,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 47042.92585806228,
+      "crossings": 636,
+      "crossingsEstimated": false,
+      "bends": 4.645,
+      "inflections": 2.45,
+      "clearance": 14.946679765411307,
+      "tight": 0.11,
+      "detour": 1.0760328101538175,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.5124995648743216,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 19.351580999999896,
+      "baseMs": 15.75888600000053,
+      "ratio": 1.2279789954695557
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 0.12144700000044395,
+    "deterministic": true,
+    "violations": 389,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n36"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n312"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 1 goes through n246"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 1 goes through n137"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e9",
+        "detail": "segment 1 goes through n305"
+      }
+    ],
+    "quality": {
+      "ink": 343387.24746094557,
+      "crossings": 13539,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 14.73863310503473,
+      "tight": 0.51,
+      "detour": 1,
+      "plugAngle": 24.55950194349075
+    },
+    "faults": {
+      "links": 800,
+      "through": 389,
+      "unavoidable": 0,
+      "avoidable": 389,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.12144700000044395,
+      "baseMs": 63.017807000000175,
+      "ratio": 0.0019271854382435685
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 0.8719950000004246,
+    "deterministic": true,
+    "violations": 400,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 2 goes through n36"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 3 goes through n311"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 8 goes through n246"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 1 goes through n118"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e9",
+        "detail": "segment 3 goes through n305"
+      }
+    ],
+    "quality": {
+      "ink": 350859.84632882796,
+      "crossings": 13969,
+      "crossingsEstimated": false,
+      "bends": 7.53625,
+      "inflections": 1.2325,
+      "clearance": 12.26395223458905,
+      "tight": 0.53125,
+      "detour": 1.0332508283071946,
+      "plugAngle": 18.549029432417864
+    },
+    "faults": {
+      "links": 800,
+      "through": 399,
+      "unavoidable": 0,
+      "avoidable": 399,
+      "backtrack": 0,
+      "worstDetour": 1.2096394006878122,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.8719950000004246,
+      "baseMs": 59.01320299999952,
+      "ratio": 0.014776269642582046
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 37.35198800000035,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 317123.2428973713,
+      "crossings": 11780,
+      "crossingsEstimated": false,
+      "bends": 3.705,
+      "inflections": 2.31,
+      "clearance": 16.164619243264607,
+      "tight": 0.11375,
+      "detour": 1.0260288633162236,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1284446136357138,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 37.35198800000035,
+      "baseMs": 62.09215399999994,
+      "ratio": 0.6015572917634712
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 35.64959100000033,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 318573.71566326864,
+      "crossings": 12364,
+      "crossingsEstimated": true,
+      "bends": 15.41,
+      "inflections": 2.50875,
+      "clearance": 14.767381454386445,
+      "tight": 0.125,
+      "detour": 1.036208507254291,
+      "plugAngle": 11.886274108684946
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.2096394006878122,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 35.64959100000033,
+      "baseMs": 63.21251399999983,
+      "ratio": 0.5639641384932171
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 27.276608000000124,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 314932.96339158656,
+      "crossings": 11880,
+      "crossingsEstimated": false,
+      "bends": 4.04125,
+      "inflections": 2.4175,
+      "clearance": 14.911570283839396,
+      "tight": 0.11875,
+      "detour": 1.0589651921895658,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 1,
+      "worstDetour": 1.891709264208931,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 27.276608000000124,
+      "baseMs": 56.12189599999965,
+      "ratio": 0.4860243495693783
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 55.64928399999917,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 179991.05741124236,
+      "crossings": 2702,
+      "crossingsEstimated": false,
+      "bends": 5.89125,
+      "inflections": 3.70375,
+      "clearance": 15.974956662850234,
+      "tight": 0.165,
+      "detour": 1.0984853638392225,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.727792217468779,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 55.64928399999917,
+      "baseMs": 55.91688199999953,
+      "ratio": 0.9952143612013209
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 49.878017,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 128184.30669249162,
+      "crossings": 1095,
+      "crossingsEstimated": false,
+      "bends": 7.34125,
+      "inflections": 4.775,
+      "clearance": 16.010402019315293,
+      "tight": 0.14125,
+      "detour": 1.1140437679842004,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7076780294156415,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 49.878017,
+      "baseMs": 55.29576900000029,
+      "ratio": 0.902022304816843
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 72.2628339999992,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 211178.38661244046,
+      "crossings": 3997,
+      "crossingsEstimated": false,
+      "bends": 5.38625,
+      "inflections": 3.01625,
+      "clearance": 15.785022901593766,
+      "tight": 0.13625,
+      "detour": 1.2004532523260105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.193813151409477,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4142121960811567,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 0,
+        "links": 182,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8271475662483545,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 0,
+        "links": 485,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.008298755186722,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 320,
+        "groups": 48,
+        "overlaps": 0,
+        "links": 768,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.6625026219941352,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 72.2628339999992,
+      "baseMs": 55.54189399999996,
+      "ratio": 1.3010509508372052
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 73.93972600000052,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 200357.2002666355,
+      "crossings": 2873,
+      "crossingsEstimated": false,
+      "bends": 6.34875,
+      "inflections": 3.43875,
+      "clearance": 14.367018240272218,
+      "tight": 0.16,
+      "detour": 1.5412979363882697,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 5.854847908839246,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4142121960811567,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 0,
+        "links": 182,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8271475662483545,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 0,
+        "links": 485,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.008298755186722,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 320,
+        "groups": 48,
+        "overlaps": 0,
+        "links": 768,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.6625026219941352,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 73.93972600000052,
+      "baseMs": 55.67834699999912,
+      "ratio": 1.3279799057253205
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "adam",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 725.7858740000001,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 179991.05741124236,
+      "crossings": 2702,
+      "crossingsEstimated": false,
+      "bends": 5.89125,
+      "inflections": 3.70375,
+      "clearance": 15.974956662850234,
+      "tight": 0.165,
+      "detour": 1.0984853638392225,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.727792217468779,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 725.7858740000001,
+      "baseMs": 76.34253200000057,
+      "ratio": 9.506966234758819
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "annealing",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 1220.1018409999997,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 255453.53770052016,
+      "crossings": 6220,
+      "crossingsEstimated": false,
+      "bends": 4.84125,
+      "inflections": 3.05,
+      "clearance": 15.99849743138326,
+      "tight": 0.15,
+      "detour": 1.0577460274146184,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.5911487249424154,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 1220.1018409999997,
+      "baseMs": 75.63030500000059,
+      "ratio": 16.132446391694312
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "attraction",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 263.1724800000011,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 178713.24063671313,
+      "crossings": 2733,
+      "crossingsEstimated": false,
+      "bends": 5.94,
+      "inflections": 3.75875,
+      "clearance": 15.979163849777915,
+      "tight": 0.16,
+      "detour": 1.1028208517908247,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7995009940432394,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 263.1724800000011,
+      "baseMs": 77.16877899999963,
+      "ratio": 3.410349151695174
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "canals",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 162.90904100000262,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 175901.29084271836,
+      "crossings": 2571,
+      "crossingsEstimated": false,
+      "bends": 5.8625,
+      "inflections": 3.6975,
+      "clearance": 15.967740637481912,
+      "tight": 0.16875,
+      "detour": 1.0987506587434048,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7341618128186058,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 162.90904100000262,
+      "baseMs": 76.07458000000042,
+      "ratio": 2.141438585661619
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "nudge",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 91.90599600000132,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 209126.89380552399,
+      "crossings": 4411,
+      "crossingsEstimated": false,
+      "bends": 6.12875,
+      "inflections": 3.63625,
+      "clearance": 15.54361865682397,
+      "tight": 0.2425,
+      "detour": 1.1242787825463942,
+      "plugAngle": 10.130931677199293
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.1004068031085286,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 91.90599600000132,
+      "baseMs": 75.26527200000055,
+      "ratio": 1.221094318240166
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "portfolio",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 79.7506280000016,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 179991.05741124236,
+      "crossings": 2702,
+      "crossingsEstimated": false,
+      "bends": 5.89125,
+      "inflections": 3.70375,
+      "clearance": 15.974956662850234,
+      "tight": 0.165,
+      "detour": 1.0984853638392225,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.727792217468779,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 79.7506280000016,
+      "baseMs": 74.78745699999854,
+      "ratio": 1.0663636818136917
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "repel",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 4776.704702000003,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 349472.6953690546,
+      "crossings": 15372,
+      "crossingsEstimated": false,
+      "bends": 20.52625,
+      "inflections": 8.5725,
+      "clearance": 15.669927039833468,
+      "tight": 0.4175,
+      "detour": 1.0168414373829162,
+      "plugAngle": 25.00770832371971
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1411638460371452,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 4776.704702000003,
+      "baseMs": 85.76909100000194,
+      "ratio": 55.692611945717076
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "reroute",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 147.79779699999926,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 187451.35215954698,
+      "crossings": 3002,
+      "crossingsEstimated": false,
+      "bends": 5.9675,
+      "inflections": 3.6975,
+      "clearance": 15.92973247243131,
+      "tight": 0.19125,
+      "detour": 1.0921373690406564,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.727792217468779,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 147.79779699999926,
+      "baseMs": 77.84898100000282,
+      "ratio": 1.898519352488299
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-stretch",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 84.77177400000073,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 179991.05741124236,
+      "crossings": 2702,
+      "crossingsEstimated": false,
+      "bends": 5.89125,
+      "inflections": 3.70375,
+      "clearance": 15.974956662850234,
+      "tight": 0.165,
+      "detour": 1.0984853638392225,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.727792217468779,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 84.77177400000073,
+      "baseMs": 78.35696099999768,
+      "ratio": 1.0818665364013191
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "springs",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 628.1652919999979,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 395939.2992271729,
+      "crossings": 53150,
+      "crossingsEstimated": false,
+      "bends": 15.73375,
+      "inflections": 3.92625,
+      "clearance": 16.087628240793823,
+      "tight": 0.09625,
+      "detour": 1.076332812490305,
+      "plugAngle": 30.91715084468874
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.66582486384382,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 628.1652919999979,
+      "baseMs": 88.30329400000483,
+      "ratio": 7.113724341925042
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "tight",
+    "fixture": "grid-400",
+    "nodes": 400,
+    "edges": 800,
+    "ms": 98.14572300000145,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 186001.5254564575,
+      "crossings": 2940,
+      "crossingsEstimated": false,
+      "bends": 5.60125,
+      "inflections": 3.55875,
+      "clearance": 16.049552738878887,
+      "tight": 0.14875,
+      "detour": 1.0806974874523987,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 800,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.6761731480224251,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 98.14572300000145,
+      "baseMs": 76.17098600000463,
+      "ratio": 1.2884922219596249
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 0.29667999999946915,
+    "deterministic": true,
+    "violations": 1198,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n859"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n941"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n314"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 1 goes through n216"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n436"
+      }
+    ],
+    "quality": {
+      "ink": 1246419.346858663,
+      "crossings": 76718,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 9.246061661216558,
+      "tight": 0.6505,
+      "detour": 1,
+      "plugAngle": 27.32895343296781
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1193,
+      "unavoidable": 0,
+      "avoidable": 1193,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.29667999999946915,
+      "baseMs": 287.2564679999996,
+      "ratio": 0.0010328052909133088
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 2.8560300000026473,
+    "deterministic": true,
+    "violations": 1216,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 5 goes through n201"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 13 goes through n941"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 4 goes through n617"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 3 goes through n165"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 17 goes through n296"
+      }
+    ],
+    "quality": {
+      "ink": 1274687.0598458648,
+      "crossings": 80616,
+      "crossingsEstimated": true,
+      "bends": 7.9945,
+      "inflections": 1.4645,
+      "clearance": 9.084492381208824,
+      "tight": 0.649,
+      "detour": 1.0327376870200773,
+      "plugAngle": 16.779874996967145
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1215,
+      "unavoidable": 0,
+      "avoidable": 1215,
+      "backtrack": 0,
+      "worstDetour": 2.52863245336155,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 2.8560300000026473,
+      "baseMs": 314.0718850000012,
+      "ratio": 0.009093555126727234
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 132.801620000002,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 946497.903566351,
+      "crossings": 40634,
+      "crossingsEstimated": false,
+      "bends": 5.643,
+      "inflections": 3.418,
+      "clearance": 12.156930180212214,
+      "tight": 0.223,
+      "detour": 1.0374754410353189,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.853550267801147,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 132.801620000002,
+      "baseMs": 296.8382700000002,
+      "ratio": 0.4473871243084725
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 164.42169300000023,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 950448.3381188515,
+      "crossings": 42431,
+      "crossingsEstimated": true,
+      "bends": 19.714,
+      "inflections": 3.579,
+      "clearance": 12.10773647067717,
+      "tight": 0.2245,
+      "detour": 1.0390519442721966,
+      "plugAngle": 6.749807332703578
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.52863245336155,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 164.42169300000023,
+      "baseMs": 306.100953000001,
+      "ratio": 0.5371485824808905
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 151.7295520000007,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 950760.6638447437,
+      "crossings": 41267,
+      "crossingsEstimated": false,
+      "bends": 5.974,
+      "inflections": 3.567,
+      "clearance": 11.761757323630631,
+      "tight": 0.2255,
+      "detour": 1.0640349313549442,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 6,
+      "worstDetour": 2.1071503613191367,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 151.7295520000007,
+      "baseMs": 293.2974979999999,
+      "ratio": 0.517323035602577
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 280.2917610000004,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 465726.98710553435,
+      "crossings": 7474,
+      "crossingsEstimated": false,
+      "bends": 9.985,
+      "inflections": 6.137,
+      "clearance": 12.102096374602366,
+      "tight": 0.208,
+      "detour": 1.1335747172287105,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.853550267801147,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 280.2917610000004,
+      "baseMs": 278.98735199999646,
+      "ratio": 1.0046755130318739
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 258.43738999999914,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 317490.7974401345,
+      "crossings": 2775,
+      "crossingsEstimated": false,
+      "bends": 11.9485,
+      "inflections": 7.803,
+      "clearance": 12.130298000447024,
+      "tight": 0.164,
+      "detour": 1.1485411029335553,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.027618260234279,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 258.43738999999914,
+      "baseMs": 274.56386299999576,
+      "ratio": 0.9412651292715937
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 304.2226179999998,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 625026.5766299359,
+      "crossings": 15008,
+      "crossingsEstimated": false,
+      "bends": 9.13,
+      "inflections": 5.322,
+      "clearance": 11.706736838788347,
+      "tight": 0.263,
+      "detour": 1.221617701364293,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.2139763666132755,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8011757495482137,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 25,
+        "links": 224,
+        "through": 18,
+        "unavoidable": 18,
+        "avoidable": 0,
+        "backtrack": 43,
+        "worstDetour": 5.163076095118599,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 58,
+        "links": 890,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 258,
+        "worstDetour": 13.715395983298478,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 259,
+        "groups": 250,
+        "overlaps": 85,
+        "links": 1547,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 126,
+        "worstDetour": 12.62723136000721,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 304.2226179999998,
+      "baseMs": 295.1626529999994,
+      "ratio": 1.030694821678542
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "mid-uniform",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 280.59423800000513,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 564986.6376585511,
+      "crossings": 10822,
+      "crossingsEstimated": false,
+      "bends": 10.5375,
+      "inflections": 6.0275,
+      "clearance": 11.026314652649308,
+      "tight": 0.287,
+      "detour": 1.4593286511765975,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 6.204489866627452,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8011757495482137,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 25,
+        "links": 224,
+        "through": 18,
+        "unavoidable": 18,
+        "avoidable": 0,
+        "backtrack": 43,
+        "worstDetour": 5.163076095118599,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 58,
+        "links": 890,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 258,
+        "worstDetour": 13.715395983298478,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 259,
+        "groups": 250,
+        "overlaps": 85,
+        "links": 1547,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 126,
+        "worstDetour": 12.62723136000721,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 280.59423800000513,
+      "baseMs": 272.498216999993,
+      "ratio": 1.0297103632058346
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 0.32378500000049826,
+    "deterministic": true,
+    "violations": 1961,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n374"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n233"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n169"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 1 goes through n313"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e9",
+        "detail": "segment 1 goes through n640"
+      }
+    ],
+    "quality": {
+      "ink": 1734830.4945682464,
+      "crossings": 172227,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 7.440723129167751,
+      "tight": 0.7063333333333334,
+      "detour": 1,
+      "plugAngle": 34.37022162419426
+    },
+    "faults": {
+      "links": 3000,
+      "through": 1947,
+      "unavoidable": 0,
+      "avoidable": 1947,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.32378500000049826,
+      "baseMs": 429.7622069999925,
+      "ratio": 0.0007534050103212168
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 3.3989870000077644,
+    "deterministic": true,
+    "violations": 2051,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 16 goes through n517"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n730"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 11 goes through n295"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e8",
+        "detail": "segment 1 goes through n607"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e9",
+        "detail": "segment 6 goes through n750"
+      }
+    ],
+    "quality": {
+      "ink": 1953556.5721926184,
+      "crossings": 193986,
+      "crossingsEstimated": true,
+      "bends": 9.801,
+      "inflections": 1.517,
+      "clearance": 6.699391169282064,
+      "tight": 0.7306666666666667,
+      "detour": 1.1315726713190275,
+      "plugAngle": 23.244633502937052
+    },
+    "faults": {
+      "links": 3000,
+      "through": 2046,
+      "unavoidable": 0,
+      "avoidable": 2046,
+      "backtrack": 52,
+      "worstDetour": 2.5286324533615527,
+      "outside": 19
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 3.3989870000077644,
+      "baseMs": 416.41662700001325,
+      "ratio": 0.008162467057319631
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 206.30548999999883,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1196343.3913493063,
+      "crossings": 71445,
+      "crossingsEstimated": false,
+      "bends": 6.254666666666667,
+      "inflections": 3.6823333333333332,
+      "clearance": 10.56093987381533,
+      "tight": 0.26,
+      "detour": 1.0527648310087454,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.9979219639118055,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 206.30548999999883,
+      "baseMs": 433.7641479999875,
+      "ratio": 0.4756167399985413
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 243.51114200000302,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1209130.6192113678,
+      "crossings": 75962,
+      "crossingsEstimated": true,
+      "bends": 22.808666666666667,
+      "inflections": 3.845666666666667,
+      "clearance": 10.395703112382996,
+      "tight": 0.26366666666666666,
+      "detour": 1.0601437609133306,
+      "plugAngle": 6.323975661799787
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615474,
+      "outside": 1
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 243.51114200000302,
+      "baseMs": 408.95298100000946,
+      "ratio": 0.5954502187624288
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 221.49093600000197,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1200574.7367102082,
+      "crossings": 73617,
+      "crossingsEstimated": false,
+      "bends": 6.723,
+      "inflections": 3.893666666666667,
+      "clearance": 10.10017707520966,
+      "tight": 0.268,
+      "detour": 1.0921176495559795,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 12,
+      "worstDetour": 2.3932681157168547,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 221.49093600000197,
+      "baseMs": 414.32334100001026,
+      "ratio": 0.5345847411478478
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 402.5498829999997,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 602384.1427697712,
+      "crossings": 12961,
+      "crossingsEstimated": false,
+      "bends": 11.199,
+      "inflections": 6.989333333333334,
+      "clearance": 10.386594551497419,
+      "tight": 0.25733333333333336,
+      "detour": 1.1656909222373566,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.018412525842124,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 402.5498829999997,
+      "baseMs": 414.83638500000234,
+      "ratio": 0.9703822942146153
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 403.4039780000021,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 418644.54161423666,
+      "crossings": 4642,
+      "crossingsEstimated": false,
+      "bends": 13.167,
+      "inflections": 8.486666666666666,
+      "clearance": 10.255311191229586,
+      "tight": 0.25133333333333335,
+      "detour": 1.1839878458057962,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.130949471783175,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 403.4039780000021,
+      "baseMs": 421.09874200000195,
+      "ratio": 0.9579795372554217
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 570.4325939999981,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 862238.2625578626,
+      "crossings": 33132,
+      "crossingsEstimated": false,
+      "bends": 9.552666666666667,
+      "inflections": 5.377,
+      "clearance": 10.122553054724314,
+      "tight": 0.27066666666666667,
+      "detour": 1.229242237022539,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.1996282398516844,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8855494057412263,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 15,
+        "groups": 15,
+        "overlaps": 25,
+        "links": 158,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 9,
+        "worstDetour": 2.884104506296647,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 55,
+        "groups": 47,
+        "overlaps": 65,
+        "links": 842,
+        "through": 208,
+        "unavoidable": 154,
+        "avoidable": 54,
+        "backtrack": 124,
+        "worstDetour": 5.879906960798427,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 199,
+        "groups": 125,
+        "overlaps": 99,
+        "links": 1785,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 405,
+        "worstDetour": 16.05224105921767,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 698,
+        "groups": 161,
+        "overlaps": 63,
+        "links": 2792,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 67,
+        "worstDetour": 11.34833385925338,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 570.4325939999981,
+      "baseMs": 418.11247999999614,
+      "ratio": 1.3643041556664448
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "mid-clustered",
+    "nodes": 1000,
+    "edges": 3000,
+    "ms": 559.9327049999993,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 750562.465705603,
+      "crossings": 20992,
+      "crossingsEstimated": false,
+      "bends": 11.438,
+      "inflections": 6.292,
+      "clearance": 9.489846755194373,
+      "tight": 0.297,
+      "detour": 1.520160584827118,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 3000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 10.3068896431109,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8855494057412263,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 15,
+        "groups": 15,
+        "overlaps": 25,
+        "links": 158,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 9,
+        "worstDetour": 2.884104506296647,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 55,
+        "groups": 47,
+        "overlaps": 65,
+        "links": 842,
+        "through": 208,
+        "unavoidable": 154,
+        "avoidable": 54,
+        "backtrack": 124,
+        "worstDetour": 5.879906960798427,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 199,
+        "groups": 125,
+        "overlaps": 99,
+        "links": 1785,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 405,
+        "worstDetour": 16.05224105921767,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 698,
+        "groups": 161,
+        "overlaps": 63,
+        "links": 2792,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 67,
+        "worstDetour": 11.34833385925338,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 559.9327049999993,
+      "baseMs": 417.3532389999891,
+      "ratio": 1.3416277931414684
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 0.35322200000518933,
+    "deterministic": true,
+    "violations": 1172,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n223"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n48"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n357"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n592"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 1 goes through n715"
+      }
+    ],
+    "quality": {
+      "ink": 1236650.229251539,
+      "crossings": 69374,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 9.572916611981642,
+      "tight": 0.6355,
+      "detour": 1,
+      "plugAngle": 27.78037812296258
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1171,
+      "unavoidable": 0,
+      "avoidable": 1171,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.35322200000518933,
+      "baseMs": 272.8898010000121,
+      "ratio": 0.0012943759668217637
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 2.3108660000143573,
+    "deterministic": true,
+    "violations": 1202,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 7 goes through n223"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 8 goes through n48"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 5 goes through n478"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 3 goes through n792"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 18 goes through n715"
+      }
+    ],
+    "quality": {
+      "ink": 1264142.273287729,
+      "crossings": 76464,
+      "crossingsEstimated": true,
+      "bends": 8.061,
+      "inflections": 1.5105,
+      "clearance": 9.4808997698388,
+      "tight": 0.6475,
+      "detour": 1.0298423272617505,
+      "plugAngle": 17.43169498792462
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1201,
+      "unavoidable": 0,
+      "avoidable": 1201,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615496,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 2.3108660000143573,
+      "baseMs": 262.13346000001184,
+      "ratio": 0.008815608659856903
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 128.04576099998667,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 888915.770099084,
+      "crossings": 34118,
+      "crossingsEstimated": false,
+      "bends": 5.7295,
+      "inflections": 3.482,
+      "clearance": 12.498706848179928,
+      "tight": 0.2135,
+      "detour": 1.035817540777749,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.604872519158839,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 128.04576099998667,
+      "baseMs": 285.3993180000107,
+      "ratio": 0.4486547546689718
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 155.05180600000313,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 892776.0697073448,
+      "crossings": 35083,
+      "crossingsEstimated": true,
+      "bends": 20.039,
+      "inflections": 3.645,
+      "clearance": 12.496780977273659,
+      "tight": 0.2195,
+      "detour": 1.0375299123462043,
+      "plugAngle": 6.294099576410981
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615496,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 155.05180600000313,
+      "baseMs": 256.50675500000943,
+      "ratio": 0.6044745527266813
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 137.34942900002352,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 890954.6684510431,
+      "crossings": 34342,
+      "crossingsEstimated": false,
+      "bends": 6.022,
+      "inflections": 3.6065,
+      "clearance": 12.01683575281352,
+      "tight": 0.213,
+      "detour": 1.0673046363165788,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 10,
+      "worstDetour": 2.5451713957474595,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 137.34942900002352,
+      "baseMs": 248.35867200000212,
+      "ratio": 0.5530285207839344
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 249.70015000001877,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 449185.2451322572,
+      "crossings": 6788,
+      "crossingsEstimated": false,
+      "bends": 9.814,
+      "inflections": 5.978,
+      "clearance": 12.451816120758677,
+      "tight": 0.188,
+      "detour": 1.129220502842685,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.9231908410635294,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 249.70015000001877,
+      "baseMs": 248.55406699999003,
+      "ratio": 1.0046110007929534
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 234.96446800002013,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 315942.40451712883,
+      "crossings": 2791,
+      "crossingsEstimated": false,
+      "bends": 12.1205,
+      "inflections": 7.534,
+      "clearance": 12.553143887816537,
+      "tight": 0.085,
+      "detour": 1.14367937368393,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7961974011646928,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 234.96446800002013,
+      "baseMs": 248.09700000000885,
+      "ratio": 0.9470669455898771
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 259.5591199999908,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 587241.7495382829,
+      "crossings": 13335,
+      "crossingsEstimated": false,
+      "bends": 8.9855,
+      "inflections": 5.3315,
+      "clearance": 11.980985243484959,
+      "tight": 0.253,
+      "detour": 1.2231223606739081,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.1549713228215595,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8107875609838238,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 24,
+        "links": 221,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 39,
+        "worstDetour": 4.720266050332672,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 62,
+        "links": 850,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 183,
+        "worstDetour": 9.22148751742218,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 256,
+        "groups": 252,
+        "overlaps": 92,
+        "links": 1506,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 92,
+        "worstDetour": 10.242020435124138,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 259.5591199999908,
+      "baseMs": 249.5340220000071,
+      "ratio": 1.0401752751774402
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "mid-hubs",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 257.6598759999906,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 544321.8618029497,
+      "crossings": 10048,
+      "crossingsEstimated": false,
+      "bends": 10.0745,
+      "inflections": 5.861,
+      "clearance": 11.188121685777961,
+      "tight": 0.266,
+      "detour": 1.4473976323409854,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 4.483743918822147,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8107875609838238,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 24,
+        "links": 221,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 39,
+        "worstDetour": 4.720266050332672,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 62,
+        "links": 850,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 183,
+        "worstDetour": 9.22148751742218,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 256,
+        "groups": 252,
+        "overlaps": 92,
+        "links": 1506,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 92,
+        "worstDetour": 10.242020435124138,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 257.6598759999906,
+      "baseMs": 250.43412200000603,
+      "ratio": 1.0288529132622926
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 0.19718899999861605,
+    "deterministic": true,
+    "violations": 1675,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n761"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 1 goes through n399"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n692"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n60"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n289"
+      }
+    ],
+    "quality": {
+      "ink": 2318447.5574703105,
+      "crossings": 280124,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 3.609340595288504,
+      "tight": 0.8585,
+      "detour": 1,
+      "plugAngle": 26.546846670654126
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1673,
+      "unavoidable": 0,
+      "avoidable": 1673,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 0.19718899999861605,
+      "baseMs": 376.711427000002,
+      "ratio": 0.0005234484166539897
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 2.171040000015637,
+    "deterministic": true,
+    "violations": 1675,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n824"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 1 goes through n824"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 3 goes through n60"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 2 goes through n824"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 13 goes through n455"
+      }
+    ],
+    "quality": {
+      "ink": 2363599.5692432523,
+      "crossings": 294084,
+      "crossingsEstimated": true,
+      "bends": 7.3675,
+      "inflections": 1.514,
+      "clearance": 3.5487035346546594,
+      "tight": 0.8635,
+      "detour": 1.0232613984913677,
+      "plugAngle": 16.60928015100367
+    },
+    "faults": {
+      "links": 2000,
+      "through": 1673,
+      "unavoidable": 0,
+      "avoidable": 1673,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615447,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 2.171040000015637,
+      "baseMs": 396.32188899998437,
+      "ratio": 0.0054779714678230215
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 193.74924899998587,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1242302.030249206,
+      "crossings": 66514,
+      "crossingsEstimated": false,
+      "bends": 9.2225,
+      "inflections": 5.8965,
+      "clearance": 7.218869608692403,
+      "tight": 0.443,
+      "detour": 1.0311957640463831,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7284851629331175,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 193.74924899998587,
+      "baseMs": 375.7778239999898,
+      "ratio": 0.5155952177741897
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 237.65174500001012,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1247220.372179923,
+      "crossings": 83607,
+      "crossingsEstimated": true,
+      "bends": 29.916,
+      "inflections": 5.9685,
+      "clearance": 7.229080383071767,
+      "tight": 0.445,
+      "detour": 1.0303118744295985,
+      "plugAngle": 2.7113328146049933
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615447,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 237.65174500001012,
+      "baseMs": 386.92016599999624,
+      "ratio": 0.6142139022033098
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 169.81672100001015,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 1137164.2313758319,
+      "crossings": 59822,
+      "crossingsEstimated": false,
+      "bends": 9.899,
+      "inflections": 6.256,
+      "clearance": 7.056661896283571,
+      "tight": 0.4595,
+      "detour": 1.0505014216300606,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 2,
+      "worstDetour": 1.9530803270669024,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 169.81672100001015,
+      "baseMs": 380.27370899997186,
+      "ratio": 0.4465644533948644
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 372.7345380000188,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 517726.5667943665,
+      "crossings": 8662,
+      "crossingsEstimated": false,
+      "bends": 16.9155,
+      "inflections": 10.796,
+      "clearance": 7.216639517316561,
+      "tight": 0.38,
+      "detour": 1.1842067187866527,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.9461579380914553,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 372.7345380000188,
+      "baseMs": 376.56709299999056,
+      "ratio": 0.989822384719177
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 422.4533159999992,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 328695.2994623562,
+      "crossings": 2271,
+      "crossingsEstimated": false,
+      "bends": 22.311,
+      "inflections": 14.5265,
+      "clearance": 7.530100747056383,
+      "tight": 0.162,
+      "detour": 1.200986028072413,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7582072738922836,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "paired": {
+      "base": "shared",
+      "ms": 422.4533159999992,
+      "baseMs": 376.1156160000246,
+      "ratio": 1.123200680930971
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 532.7202190000098,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 756178.1449530451,
+      "crossings": 22033,
+      "crossingsEstimated": false,
+      "bends": 16.366,
+      "inflections": 9.777,
+      "clearance": 6.904521722655497,
+      "tight": 0.501,
+      "detour": 1.3193578270309776,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.07509159548932,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.0191808403334353,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 24,
+        "links": 173,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 15,
+        "worstDetour": 3.932561142779952,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 62,
+        "groups": 50,
+        "overlaps": 54,
+        "links": 787,
+        "through": 63,
+        "unavoidable": 44,
+        "avoidable": 19,
+        "backtrack": 211,
+        "worstDetour": 7.830184598455551,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 226,
+        "groups": 124,
+        "overlaps": 92,
+        "links": 1573,
+        "through": 23,
+        "unavoidable": 19,
+        "avoidable": 4,
+        "backtrack": 471,
+        "worstDetour": 23.942391263863833,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 720,
+        "groups": 147,
+        "overlaps": 51,
+        "links": 1947,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 17,
+        "worstDetour": 8.799224196767643,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 532.7202190000098,
+      "baseMs": 375.2502509999904,
+      "ratio": 1.4196398738718592
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "mid-fanout",
+    "nodes": 1000,
+    "edges": 2000,
+    "ms": 513.6041289999848,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 623586.754044679,
+      "crossings": 13066,
+      "crossingsEstimated": false,
+      "bends": 18.623,
+      "inflections": 10.9505,
+      "clearance": 6.518043634693496,
+      "tight": 0.5335,
+      "detour": 1.5603437075708273,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 2000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 14.653095337861409,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.0191808403334353,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 24,
+        "links": 173,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 15,
+        "worstDetour": 3.932561142779952,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 62,
+        "groups": 50,
+        "overlaps": 54,
+        "links": 787,
+        "through": 63,
+        "unavoidable": 44,
+        "avoidable": 19,
+        "backtrack": 211,
+        "worstDetour": 7.830184598455551,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 226,
+        "groups": 124,
+        "overlaps": 92,
+        "links": 1573,
+        "through": 23,
+        "unavoidable": 19,
+        "avoidable": 4,
+        "backtrack": 471,
+        "worstDetour": 23.942391263863833,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 720,
+        "groups": 147,
+        "overlaps": 51,
+        "links": 1947,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 17,
+        "worstDetour": 8.799224196767643,
+        "outside": 0
+      }
+    ],
+    "paired": {
+      "base": "shared",
+      "ms": 513.6041289999848,
+      "baseMs": 373.1236069999868,
+      "ratio": 1.3764986169851294
+    },
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 11.483702999999991,
+    "deterministic": true,
+    "violations": 19443,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 1 goes through n7810"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n508"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n3939"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n5457"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n6334"
+      }
+    ],
+    "quality": {
+      "ink": 49527624.37410255,
+      "crossings": 15579705,
+      "crossingsEstimated": true,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 7.8975253762211235,
+      "tight": 0.6961666666666667,
+      "detour": 1,
+      "plugAngle": 27.369482254706938
+    },
+    "faults": {
+      "links": 30000,
+      "through": 19392,
+      "unavoidable": 0,
+      "avoidable": 19392,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 80.55979400000024,
+    "deterministic": true,
+    "violations": 19733,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 2 goes through n9185"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 18 goes through n508"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e3",
+        "detail": "segment 1 goes through n2661"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 3 goes through n1010"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n4360"
+      }
+    ],
+    "quality": {
+      "ink": 50544667.89725227,
+      "crossings": 16364137,
+      "crossingsEstimated": true,
+      "bends": 7.955633333333333,
+      "inflections": 1.5231666666666666,
+      "clearance": 7.761562583820925,
+      "tight": 0.7004666666666667,
+      "detour": 1.0285192719655967,
+      "plugAngle": 17.308136865586267
+    },
+    "faults": {
+      "links": 30000,
+      "through": 19684,
+      "unavoidable": 0,
+      "avoidable": 19684,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615567,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 9632.945935999996,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 15812744.41400251,
+      "crossings": 1092680,
+      "crossingsEstimated": true,
+      "bends": 13.982966666666666,
+      "inflections": 9.523733333333332,
+      "clearance": 10.826004968971676,
+      "tight": 0.3558,
+      "detour": 1.0399560836407973,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.1120578343223353,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 11058.548870999999,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 15914245.975662112,
+      "crossings": 1335226,
+      "crossingsEstimated": true,
+      "bends": 45.6151,
+      "inflections": 9.670866666666667,
+      "clearance": 10.782758848692119,
+      "tight": 0.3589,
+      "detour": 1.0391726999951147,
+      "plugAngle": 5.597268083145799
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.5286324533615567,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 9447.124330999999,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 16182560.677265055,
+      "crossings": 1203593,
+      "crossingsEstimated": true,
+      "bends": 14.481466666666666,
+      "inflections": 9.761233333333333,
+      "clearance": 10.29299044437199,
+      "tight": 0.3641333333333333,
+      "detour": 1.0843800447497343,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 279,
+      "worstDetour": 3.2521957593645103,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 35723.717271999994,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 6223449.848744499,
+      "crossings": 134908,
+      "crossingsEstimated": true,
+      "bends": 28.4044,
+      "inflections": 19.192666666666668,
+      "clearance": 10.772699450478221,
+      "tight": 0.33853333333333335,
+      "detour": 1.1411987006454993,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 1,
+      "worstDetour": 2.1120578343223353,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 38974.045524999994,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 4303228.369784187,
+      "crossings": 48224,
+      "crossingsEstimated": true,
+      "bends": 32.55246666666667,
+      "inflections": 22.5748,
+      "clearance": 10.807061934489695,
+      "tight": 0.2956666666666667,
+      "detour": 1.1477937925173045,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.1354596207358587,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 36856.04305899999,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 10653454.526491681,
+      "crossings": 466013,
+      "crossingsEstimated": true,
+      "bends": 21.026433333333333,
+      "inflections": 13.5301,
+      "clearance": 10.479374396535775,
+      "tight": 0.3702,
+      "detour": 1.2215343949848028,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.372341936422805,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.9166744207688213,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 37,
+        "links": 235,
+        "through": 22,
+        "unavoidable": 22,
+        "avoidable": 0,
+        "backtrack": 13,
+        "worstDetour": 3.146925257225725,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 60,
+        "groups": 58,
+        "overlaps": 124,
+        "links": 2043,
+        "through": 1045,
+        "unavoidable": 908,
+        "avoidable": 137,
+        "backtrack": 40,
+        "worstDetour": 3.5252442839833695,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 228,
+        "groups": 189,
+        "overlaps": 380,
+        "links": 9138,
+        "through": 6963,
+        "unavoidable": 2612,
+        "avoidable": 4351,
+        "backtrack": 177,
+        "worstDetour": 4.375145850276743,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 813,
+        "groups": 620,
+        "overlaps": 810,
+        "links": 14349,
+        "through": 8001,
+        "unavoidable": 1149,
+        "avoidable": 6852,
+        "backtrack": 569,
+        "worstDetour": 8.514552037579373,
+        "outside": 0
+      },
+      {
+        "depth": 6,
+        "items": 2813,
+        "groups": 1940,
+        "overlaps": 1045,
+        "links": 22082,
+        "through": 206,
+        "unavoidable": 95,
+        "avoidable": 111,
+        "backtrack": 1795,
+        "worstDetour": 48.28232931939301,
+        "outside": 0
+      },
+      {
+        "depth": 7,
+        "items": 9873,
+        "groups": 88,
+        "overlaps": 26,
+        "links": 29949,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 3,
+        "worstDetour": 3.6357062137748732,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "large-clustered",
+    "nodes": 10000,
+    "edges": 30000,
+    "ms": 23849.24053699999,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 9149639.946369873,
+      "crossings": 316007,
+      "crossingsEstimated": true,
+      "bends": 23.328166666666668,
+      "inflections": 14.8202,
+      "clearance": 9.775188223505435,
+      "tight": 0.3883666666666667,
+      "detour": 1.4642300094564455,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 30000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 9.587364460184121,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.9166744207688213,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 37,
+        "links": 235,
+        "through": 22,
+        "unavoidable": 22,
+        "avoidable": 0,
+        "backtrack": 13,
+        "worstDetour": 3.146925257225725,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 60,
+        "groups": 58,
+        "overlaps": 124,
+        "links": 2043,
+        "through": 1045,
+        "unavoidable": 908,
+        "avoidable": 137,
+        "backtrack": 40,
+        "worstDetour": 3.5252442839833695,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 228,
+        "groups": 189,
+        "overlaps": 380,
+        "links": 9138,
+        "through": 6963,
+        "unavoidable": 2612,
+        "avoidable": 4351,
+        "backtrack": 177,
+        "worstDetour": 4.375145850276743,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 813,
+        "groups": 620,
+        "overlaps": 810,
+        "links": 14349,
+        "through": 8001,
+        "unavoidable": 1149,
+        "avoidable": 6852,
+        "backtrack": 569,
+        "worstDetour": 8.514552037579373,
+        "outside": 0
+      },
+      {
+        "depth": 6,
+        "items": 2813,
+        "groups": 1940,
+        "overlaps": 1045,
+        "links": 22082,
+        "through": 206,
+        "unavoidable": 95,
+        "avoidable": 111,
+        "backtrack": 1795,
+        "worstDetour": 48.28232931939301,
+        "outside": 0
+      },
+      {
+        "depth": 7,
+        "items": 9873,
+        "groups": 88,
+        "overlaps": 26,
+        "links": 29949,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 3,
+        "worstDetour": 3.6357062137748732,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "huge-clustered",
+    "nodes": 100000,
+    "edges": 200000,
+    "ms": 336.99954400000024,
+    "deterministic": true,
+    "violations": 136389,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n47734"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 1 goes through n8150"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 1 goes through n38521"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 1 goes through n19633"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n40193"
+      }
+    ],
+    "quality": {
+      "ink": 953821392.891177,
+      "crossings": 590297200,
+      "crossingsEstimated": true,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 6.755438479284329,
+      "tight": 0.72978,
+      "detour": 1,
+      "plugAngle": 27.39207933137471
+    },
+    "faults": {
+      "links": 200000,
+      "through": 136033,
+      "unavoidable": 0,
+      "avoidable": 136033,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "huge-clustered",
+    "nodes": 100000,
+    "edges": 200000,
+    "ms": 1076.8537750000105,
+    "deterministic": true,
+    "violations": 137804,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e0",
+        "detail": "segment 1 goes through n57569"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e1",
+        "detail": "segment 1 goes through n41709"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e4",
+        "detail": "segment 12 goes through n38521"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e5",
+        "detail": "segment 4 goes through n19633"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e6",
+        "detail": "segment 1 goes through n8737"
+      }
+    ],
+    "quality": {
+      "ink": 973426358.0447402,
+      "crossings": 642815732,
+      "crossingsEstimated": true,
+      "bends": 7.96073,
+      "inflections": 1.508565,
+      "clearance": 6.606027996093583,
+      "tight": 0.735535,
+      "detour": 1.029699977695987,
+      "plugAngle": 17.224106524245055
+    },
+    "faults": {
+      "links": 200000,
+      "through": 137440,
+      "unavoidable": 0,
+      "avoidable": 137440,
+      "backtrack": 0,
+      "worstDetour": 2.528632453361614,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "huge-clustered",
+    "nodes": 100000,
+    "edges": 200000,
+    "ms": 1300433.2280700002,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 88366544.20500897,
+      "crossings": 3505232,
+      "crossingsEstimated": true,
+      "bends": 57.168555,
+      "inflections": 40.001215,
+      "clearance": 9.462790353482156,
+      "tight": 0.40402,
+      "detour": 1.2164423949320387,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 3.1398494851988277,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8451127543382855,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 42,
+        "links": 240,
+        "through": 84,
+        "unavoidable": 84,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.9984038228214502,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 188,
+        "links": 3414,
+        "through": 2297,
+        "unavoidable": 1795,
+        "avoidable": 502,
+        "backtrack": 9,
+        "worstDetour": 2.8842412996708626,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 252,
+        "groups": 231,
+        "overlaps": 663,
+        "links": 28111,
+        "through": 25042,
+        "unavoidable": 7366,
+        "avoidable": 17676,
+        "backtrack": 72,
+        "worstDetour": 3.831652503769079,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 908,
+        "groups": 831,
+        "overlaps": 2309,
+        "links": 69984,
+        "through": 65098,
+        "unavoidable": 7116,
+        "avoidable": 57982,
+        "backtrack": 96,
+        "worstDetour": 4.923936591507891,
+        "outside": 1
+      },
+      {
+        "depth": 6,
+        "items": 3410,
+        "groups": 3022,
+        "overlaps": 6267,
+        "links": 88026,
+        "through": 72000,
+        "unavoidable": 4526,
+        "avoidable": 67474,
+        "backtrack": 429,
+        "worstDetour": 10.792315636037772,
+        "outside": 0
+      },
+      {
+        "depth": 7,
+        "items": 12670,
+        "groups": 10729,
+        "overlaps": 11130,
+        "links": 124819,
+        "through": 53537,
+        "unavoidable": 2823,
+        "avoidable": 50714,
+        "backtrack": 6647,
+        "worstDetour": 137.56695372596957,
+        "outside": 0
+      },
+      {
+        "depth": 8,
+        "items": 52096,
+        "groups": 24164,
+        "overlaps": 9945,
+        "links": 183819,
+        "through": 26,
+        "unavoidable": 21,
+        "avoidable": 5,
+        "backtrack": 9312,
+        "worstDetour": 96.14530557750503,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "huge-clustered",
+    "nodes": 100000,
+    "edges": 200000,
+    "ms": 1662138.5395600002,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 75821093.97351909,
+      "crossings": 2305433,
+      "crossingsEstimated": true,
+      "bends": 61.81359,
+      "inflections": 42.93227,
+      "clearance": 8.835157104439437,
+      "tight": 0.414645,
+      "detour": 1.4672873013570833,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 200000,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 16.24315995503737,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.8451127543382855,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 42,
+        "links": 240,
+        "through": 84,
+        "unavoidable": 84,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.9984038228214502,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 64,
+        "groups": 64,
+        "overlaps": 188,
+        "links": 3414,
+        "through": 2297,
+        "unavoidable": 1795,
+        "avoidable": 502,
+        "backtrack": 9,
+        "worstDetour": 2.8842412996708626,
+        "outside": 0
+      },
+      {
+        "depth": 4,
+        "items": 252,
+        "groups": 231,
+        "overlaps": 663,
+        "links": 28111,
+        "through": 25042,
+        "unavoidable": 7366,
+        "avoidable": 17676,
+        "backtrack": 72,
+        "worstDetour": 3.831652503769079,
+        "outside": 0
+      },
+      {
+        "depth": 5,
+        "items": 908,
+        "groups": 831,
+        "overlaps": 2309,
+        "links": 69984,
+        "through": 65098,
+        "unavoidable": 7116,
+        "avoidable": 57982,
+        "backtrack": 96,
+        "worstDetour": 4.923936591507891,
+        "outside": 1
+      },
+      {
+        "depth": 6,
+        "items": 3410,
+        "groups": 3022,
+        "overlaps": 6267,
+        "links": 88026,
+        "through": 72000,
+        "unavoidable": 4526,
+        "avoidable": 67474,
+        "backtrack": 429,
+        "worstDetour": 10.792315636037772,
+        "outside": 0
+      },
+      {
+        "depth": 7,
+        "items": 12670,
+        "groups": 10729,
+        "overlaps": 11130,
+        "links": 124819,
+        "through": 53537,
+        "unavoidable": 2823,
+        "avoidable": 50714,
+        "backtrack": 6647,
+        "worstDetour": 137.56695372596957,
+        "outside": 0
+      },
+      {
+        "depth": 8,
+        "items": 52096,
+        "groups": 24164,
+        "overlaps": 9945,
+        "links": 183819,
+        "through": 26,
+        "unavoidable": 21,
+        "avoidable": 5,
+        "backtrack": 9312,
+        "worstDetour": 96.14530557750503,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 0.17321300000185147,
+    "deterministic": true,
+    "violations": 167,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 1 goes through n69"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 1 goes through n148"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e10",
+        "detail": "segment 1 goes through n142"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e11",
+        "detail": "segment 1 goes through n61"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e13",
+        "detail": "segment 1 goes through n54"
+      }
+    ],
+    "quality": {
+      "ink": 89723.95571141205,
+      "crossings": 2329,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 9.941397309028703,
+      "tight": 0.6333333333333333,
+      "detour": 1,
+      "plugAngle": 27.668391470034372
+    },
+    "faults": {
+      "links": 300,
+      "through": 165,
+      "unavoidable": 0,
+      "avoidable": 165,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 1.4017630000016652,
+    "deterministic": true,
+    "violations": 171,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e2",
+        "detail": "segment 6 goes through n69"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e7",
+        "detail": "segment 6 goes through n148"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e10",
+        "detail": "segment 15 goes through n142"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e11",
+        "detail": "segment 1 goes through n80"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e13",
+        "detail": "segment 11 goes through n54"
+      }
+    ],
+    "quality": {
+      "ink": 91684.33620395552,
+      "crossings": 2497,
+      "crossingsEstimated": false,
+      "bends": 8.09,
+      "inflections": 1.56,
+      "clearance": 9.894884113241757,
+      "tight": 0.6133333333333333,
+      "detour": 1.0253524907167448,
+      "plugAngle": 17.073284809153776
+    },
+    "faults": {
+      "links": 300,
+      "through": 170,
+      "unavoidable": 0,
+      "avoidable": 170,
+      "backtrack": 0,
+      "worstDetour": 1.1359726168771311,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 13.16576200001873,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 88203.3272917048,
+      "crossings": 2318,
+      "crossingsEstimated": false,
+      "bends": 3.57,
+      "inflections": 1.8466666666666667,
+      "clearance": 13.089944024488242,
+      "tight": 0.11,
+      "detour": 1.0314285490463726,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.331018419303806,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 16.134968999947887,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 88644.41147211129,
+      "crossings": 2575,
+      "crossingsEstimated": false,
+      "bends": 12.816666666666666,
+      "inflections": 2.0533333333333332,
+      "clearance": 12.973288510286794,
+      "tight": 0.12666666666666668,
+      "detour": 1.0319765586640415,
+      "plugAngle": 6.533295584941888
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.2977437695116267,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 13.966810999962036,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 87393.147408319,
+      "crossings": 2396,
+      "crossingsEstimated": false,
+      "bends": 3.9433333333333334,
+      "inflections": 1.9766666666666666,
+      "clearance": 12.111912502943396,
+      "tight": 0.12666666666666668,
+      "detour": 1.0718943615102905,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 1,
+      "worstDetour": 1.9856165995884967,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 22.434514999971725,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 68702.85191503695,
+      "crossings": 1153,
+      "crossingsEstimated": false,
+      "bends": 4.8,
+      "inflections": 2.68,
+      "clearance": 13.038887788880185,
+      "tight": 0.08333333333333333,
+      "detour": 1.0837420282022654,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.525614785912836,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 21.544911000004504,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 52612.81083340975,
+      "crossings": 509,
+      "crossingsEstimated": false,
+      "bends": 5.77,
+      "inflections": 3.33,
+      "clearance": 13.089032505978842,
+      "tight": 0.02,
+      "detour": 1.1280236174822356,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7089979610410244,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 29.303615999990143,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 76948.48586382777,
+      "crossings": 1410,
+      "crossingsEstimated": false,
+      "bends": 5.283333333333333,
+      "inflections": 2.716666666666667,
+      "clearance": 12.659983899247552,
+      "tight": 0.09,
+      "detour": 1.213078019502692,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.0670507182406497,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.0922873696488327,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 15,
+        "groups": 14,
+        "overlaps": 13,
+        "links": 91,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 27,
+        "worstDetour": 6.523065613435369,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 66,
+        "groups": 26,
+        "overlaps": 11,
+        "links": 226,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 11,
+        "worstDetour": 5.12198722001663,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "case-dense-groups",
+    "nodes": 150,
+    "edges": 300,
+    "ms": 30.551214000035543,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 73828.24933875522,
+      "crossings": 1107,
+      "crossingsEstimated": false,
+      "bends": 6.366666666666666,
+      "inflections": 3.15,
+      "clearance": 11.582702384636608,
+      "tight": 0.10666666666666667,
+      "detour": 1.4830534321987932,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 300,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 4.72781026379706,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 6,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 2.0922873696488327,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 15,
+        "groups": 14,
+        "overlaps": 13,
+        "links": 91,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 27,
+        "worstDetour": 6.523065613435369,
+        "outside": 0
+      },
+      {
+        "depth": 3,
+        "items": 66,
+        "groups": 26,
+        "overlaps": 11,
+        "links": 226,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 11,
+        "worstDetour": 5.12198722001663,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 0.024427000025752932,
+    "deterministic": true,
+    "violations": 26,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e93",
+        "detail": "segment 1 goes through c2-2"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e94",
+        "detail": "segment 1 goes through c1-6"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e95",
+        "detail": "segment 1 goes through c1-7"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e96",
+        "detail": "segment 1 goes through c2-16"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e97",
+        "detail": "segment 1 goes through c2-11"
+      }
+    ],
+    "quality": {
+      "ink": 40180.744574241166,
+      "crossings": 117,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 31.26050420168067,
+      "tight": 0.2184873949579832,
+      "detour": 1,
+      "plugAngle": 1.282269451570393
+    },
+    "faults": {
+      "links": 119,
+      "through": 26,
+      "unavoidable": 0,
+      "avoidable": 26,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 0.07546500000171363,
+    "deterministic": true,
+    "violations": 26,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e93",
+        "detail": "segment 1 goes through c2-2"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e94",
+        "detail": "segment 2 goes through c1-6"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e95",
+        "detail": "segment 3 goes through c1-7"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e96",
+        "detail": "segment 1 goes through c2-16"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e97",
+        "detail": "segment 1 goes through c2-11"
+      }
+    ],
+    "quality": {
+      "ink": 40222.4310930804,
+      "crossings": 109,
+      "crossingsEstimated": false,
+      "bends": 0.10084033613445378,
+      "inflections": 0.08403361344537816,
+      "clearance": 31.26050420168067,
+      "tight": 0.2184873949579832,
+      "detour": 1.000315542268522,
+      "plugAngle": 1.2867903304559964
+    },
+    "faults": {
+      "links": 119,
+      "through": 26,
+      "unavoidable": 0,
+      "avoidable": 26,
+      "backtrack": 0,
+      "worstDetour": 1.0056524756242158,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 2.6925269999774173,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 37578.20690271119,
+      "crossings": 68,
+      "crossingsEstimated": false,
+      "bends": 1.0084033613445378,
+      "inflections": 0.7058823529411765,
+      "clearance": 32.25823055572137,
+      "tight": 0.03361344537815126,
+      "detour": 1.0039133778233746,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.031704117749921,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 3.4048499999917112,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 37536.0647831108,
+      "crossings": 75,
+      "crossingsEstimated": false,
+      "bends": 4.7899159663865545,
+      "inflections": 0.7058823529411765,
+      "clearance": 32.25672356303534,
+      "tight": 0.03361344537815126,
+      "detour": 1.0037499400637218,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.0294274379736437,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 3.0352980000316165,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 37578.20690271119,
+      "crossings": 68,
+      "crossingsEstimated": false,
+      "bends": 1.0084033613445378,
+      "inflections": 0.7058823529411765,
+      "clearance": 32.25823055572137,
+      "tight": 0.03361344537815126,
+      "detour": 1.0039133778233746,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.031704117749921,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 5.940157999983057,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 37578.20690271119,
+      "crossings": 68,
+      "crossingsEstimated": false,
+      "bends": 1.0084033613445378,
+      "inflections": 0.7058823529411765,
+      "clearance": 32.25823055572137,
+      "tight": 0.03361344537815126,
+      "detour": 1.0039133778233746,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.031704117749921,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 6.671972000040114,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 12292.95754961089,
+      "crossings": 18,
+      "crossingsEstimated": false,
+      "bends": 1.0756302521008403,
+      "inflections": 0.7058823529411765,
+      "clearance": 32.326176701141094,
+      "tight": 0.008403361344537815,
+      "detour": 1.0146615684746956,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.1863078037403538,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 4.029561000003014,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 35046.124204129796,
+      "crossings": 49,
+      "crossingsEstimated": false,
+      "bends": 1.6050420168067228,
+      "inflections": 0.907563025210084,
+      "clearance": 32.33174238570045,
+      "tight": 0.008403361344537815,
+      "detour": 1.0515256219072204,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7811189058810846,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 8,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4079620351589157,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 12,
+        "groups": 12,
+        "overlaps": 0,
+        "links": 25,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 2,
+        "worstDetour": 8.469696969696969,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "case-hub-chain",
+    "nodes": 96,
+    "edges": 119,
+    "ms": 4.184437000018079,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 34403.75335806731,
+      "crossings": 45,
+      "crossingsEstimated": false,
+      "bends": 1.6218487394957983,
+      "inflections": 0.9159663865546218,
+      "clearance": 32.332279935436006,
+      "tight": 0.008403361344537815,
+      "detour": 1.0601936174239277,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 119,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.0490923038839592,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 8,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.4079620351589157,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 12,
+        "groups": 12,
+        "overlaps": 0,
+        "links": 25,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 2,
+        "worstDetour": 8.469696969696969,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "straight",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 0.035254000045824796,
+    "deterministic": true,
+    "violations": 84,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e96",
+        "detail": "segment 1 goes through g0-0-1"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e97",
+        "detail": "segment 1 goes through g2-1-0"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e98",
+        "detail": "segment 1 goes through g1-0-3"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e99",
+        "detail": "segment 1 goes through g3-0-1"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e100",
+        "detail": "segment 1 goes through g0-6-1"
+      }
+    ],
+    "quality": {
+      "ink": 51473.56855676126,
+      "crossings": 909,
+      "crossingsEstimated": false,
+      "bends": 0,
+      "inflections": 0,
+      "clearance": 11.390930495979998,
+      "tight": 0.45454545454545453,
+      "detour": 1,
+      "plugAngle": 19.582195829773674
+    },
+    "faults": {
+      "links": 187,
+      "through": 82,
+      "unavoidable": 0,
+      "avoidable": 82,
+      "backtrack": 0,
+      "worstDetour": 1,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "plugs",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 0.16600199998356402,
+    "deterministic": true,
+    "violations": 87,
+    "sample": [
+      {
+        "rule": "no-pass-through",
+        "edge": "e96",
+        "detail": "segment 1 goes through g0-0-1"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e97",
+        "detail": "segment 2 goes through g2-1-0"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e98",
+        "detail": "segment 16 goes through g1-0-3"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e99",
+        "detail": "segment 1 goes through g3-0-3"
+      },
+      {
+        "rule": "no-pass-through",
+        "edge": "e100",
+        "detail": "segment 2 goes through g0-7-2"
+      }
+    ],
+    "quality": {
+      "ink": 52117.96759321281,
+      "crossings": 943,
+      "crossingsEstimated": false,
+      "bends": 5.080213903743315,
+      "inflections": 0.9197860962566845,
+      "clearance": 10.712855449316303,
+      "tight": 0.46524064171123,
+      "detour": 1.0338226370581893,
+      "plugAngle": 16.49203822678006
+    },
+    "faults": {
+      "links": 187,
+      "through": 87,
+      "unavoidable": 0,
+      "avoidable": 87,
+      "backtrack": 0,
+      "worstDetour": 1.1544426905844822,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 5.286523999995552,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 50036.86020547097,
+      "crossings": 792,
+      "crossingsEstimated": false,
+      "bends": 2.9946524064171123,
+      "inflections": 2.1550802139037435,
+      "clearance": 13.344807278571245,
+      "tight": 0.026737967914438502,
+      "detour": 1.0833532890331194,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4591263373043917,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "corners-smooth",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 6.956184000009671,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 49763.482767001056,
+      "crossings": 966,
+      "crossingsEstimated": false,
+      "bends": 14.882352941176471,
+      "inflections": 2.3262032085561497,
+      "clearance": 12.980825710522288,
+      "tight": 0.026737967914438502,
+      "detour": 1.0593827711494064,
+      "plugAngle": 10.874221787841034
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4214079768325598,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "trunks",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 5.3119929999811575,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 50036.86020547097,
+      "crossings": 792,
+      "crossingsEstimated": false,
+      "bends": 2.9946524064171123,
+      "inflections": 2.1550802139037435,
+      "clearance": 13.344807278571245,
+      "tight": 0.026737967914438502,
+      "detour": 1.0833532890331194,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4591263373043917,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 10.004171999986283,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 50157.556889675376,
+      "crossings": 790,
+      "crossingsEstimated": false,
+      "bends": 3,
+      "inflections": 2.165775401069519,
+      "clearance": 13.342189838673576,
+      "tight": 0.03208556149732621,
+      "detour": 1.083179740362957,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.4591263373043917,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "shared-all",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 9.603461999970023,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 17622.49401683024,
+      "crossings": 111,
+      "crossingsEstimated": false,
+      "bends": 5.438502673796791,
+      "inflections": 3.716577540106952,
+      "clearance": 13.3799950358873,
+      "tight": 0,
+      "detour": 1.1548907977553762,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 1.7435850891674287,
+      "outside": 0
+    },
+    "levelFaults": [],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 7.401451000012457,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 33982.09986671066,
+      "crossings": 314,
+      "crossingsEstimated": false,
+      "bends": 4.0855614973262036,
+      "inflections": 2.588235294117647,
+      "clearance": 13.323395944898248,
+      "tight": 0.0427807486631016,
+      "detour": 1.2109457752147632,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 2.125795510970455,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.410047975821265,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 0,
+        "links": 68,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 3,
+        "worstDetour": 2.7395833333333335,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  },
+  {
+    "router": "sections-tree",
+    "fixture": "case-many-groups",
+    "nodes": 128,
+    "edges": 187,
+    "ms": 7.337604000000283,
+    "deterministic": true,
+    "violations": 0,
+    "sample": [],
+    "quality": {
+      "ink": 33437.05709319811,
+      "crossings": 277,
+      "crossingsEstimated": false,
+      "bends": 4.2727272727272725,
+      "inflections": 2.6310160427807485,
+      "clearance": 13.33218356051822,
+      "tight": 0.0427807486631016,
+      "detour": 1.2855710326420622,
+      "plugAngle": 0
+    },
+    "faults": {
+      "links": 187,
+      "through": 0,
+      "unavoidable": 0,
+      "avoidable": 0,
+      "backtrack": 0,
+      "worstDetour": 3.024550164674297,
+      "outside": 0
+    },
+    "levelFaults": [
+      {
+        "depth": 0,
+        "items": 1,
+        "groups": 1,
+        "overlaps": 0,
+        "links": 0,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 0,
+        "outside": 0
+      },
+      {
+        "depth": 1,
+        "items": 4,
+        "groups": 4,
+        "overlaps": 0,
+        "links": 12,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 0,
+        "worstDetour": 1.410047975821265,
+        "outside": 0
+      },
+      {
+        "depth": 2,
+        "items": 16,
+        "groups": 16,
+        "overlaps": 0,
+        "links": 68,
+        "through": 0,
+        "unavoidable": 0,
+        "avoidable": 0,
+        "backtrack": 3,
+        "worstDetour": 2.7395833333333335,
+        "outside": 0
+      }
+    ],
+    "env": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.0",
+      "mode": "process",
+      "context": "ci"
+    }
+  }
+]
