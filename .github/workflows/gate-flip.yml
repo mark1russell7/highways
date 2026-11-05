@@ -23,7 +23,7 @@ on:
         description: "The timed rounds of each arm of the sections gate."
         default: "10"
   schedule:
-    - cron: "43 3 * * 0"
+    - cron: "21 3 * * 0"
   push:
     branches: [main]
     paths:
@@ -42,9 +42,9 @@ permissions:
   contents: read
 
 concurrency:
-  # One run for each workflow and ref (RUNNER-SLOTS). A new run waits for the run before it.
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+  # Each commit of main has its own group, so a newer push does not cancel a run that waits (RUNNER-SLOTS).
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
   run:
