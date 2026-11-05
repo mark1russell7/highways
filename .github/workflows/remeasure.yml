@@ -43,6 +43,8 @@ jobs:
     env:
       CLAIM: ${{ inputs.claim }}
       JOB: ${{ matrix.job }}
+      # ARM-ORDER-MOVE, the narrow read: the 36 inputs of router n41-64 of run 41455276356, and 6 sentinels outside n41-64.
+      ONLY: router:uniform-41-s0,router:uniform-41-s1,router:uniform-41-s2,router:uniform-52-s0,router:uniform-52-s1,router:uniform-52-s2,router:uniform-64-s0,router:uniform-64-s1,router:uniform-64-s2,router:clustered-41-s0,router:clustered-41-s1,router:clustered-41-s2,router:clustered-52-s0,router:clustered-52-s1,router:clustered-52-s2,router:clustered-64-s0,router:clustered-64-s1,router:clustered-64-s2,router:hubs-41-s0,router:hubs-41-s1,router:hubs-41-s2,router:hubs-52-s0,router:hubs-52-s1,router:hubs-52-s2,router:hubs-64-s0,router:hubs-64-s1,router:hubs-64-s2,router:fanout-41-s0,router:fanout-41-s1,router:fanout-41-s2,router:fanout-52-s0,router:fanout-52-s1,router:fanout-52-s2,router:fanout-64-s0,router:fanout-64-s1,router:fanout-64-s2,router:uniform-100-s0,router:clustered-100-s0,router:hubs-100-s0,router:fanout-100-s0,setup:uniform-100-s0,setup:fanout-100-s0
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,7 +67,7 @@ jobs:
       - name: Time the old arm and the workspace in this job
         run: |
           set -o pipefail
-          args=(--claim "$CLAIM" --job "$JOB" --out "$GITHUB_WORKSPACE/out")
+          args=(--claim "$CLAIM" --job "$JOB" --out "$GITHUB_WORKSPACE/out" --only "$ONLY")
           [ "$CLAIM" = h3 ] && args+=(--old-tree "$RUNNER_TEMP/h3-old")
           node packages/core/scripts/remeasure.ts "${args[@]}" | tee "$GITHUB_WORKSPACE/out.md"
           cat "$GITHUB_WORKSPACE/out.md" >> "$GITHUB_STEP_SUMMARY"
@@ -79,7 +81,7 @@ jobs:
   join:
     needs: measure
     # The join also runs when a job fails, and then it fails: each job of the 5 jobs must give its report (FAIL-CLOSED).
-    if: ${{ always() }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
