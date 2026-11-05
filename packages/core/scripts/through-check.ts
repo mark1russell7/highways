@@ -1,5 +1,5 @@
 /**
- * This script writes the record `through-check/3`. It compares the field `through` of each route with the independent check of `src/bench/measures/through-check.ts` (THROUGH-CHECK).
+ * This script writes the record `through-check/4`. It compares the field `through` of each route with the independent check of `src/bench/measures/through-check.ts` (THROUGH-CHECK).
  * The module `through-check-rows.ts` makes the rows and tells what they hold. The gate `through-check.test.ts` fails when this record is stale.
  *
  * The first argument is the out file. The variable `SEEDS` sets the seeds, and its default is 3.

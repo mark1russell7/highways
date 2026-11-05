@@ -9,6 +9,7 @@ export * from "./curves/index.ts";
 export * from "./visibility.ts";
 export * from "./channels.ts";
 export * from "./ways.ts";
+export * from "./lane-room.ts";
 export * from "./segments.ts";
 export * from "./sections.ts";
 export * from "./groups/index.ts";

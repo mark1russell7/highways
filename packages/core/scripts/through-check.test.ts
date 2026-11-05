@@ -5,7 +5,23 @@ import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-row
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/3 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/4 is stale. Write it again with: ${REGENERATE}`;
+/** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
+const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
+const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
+/**
+ * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
+ * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
+ */
+const PAINTED: Record<string, readonly number[]> = {
+  "corners": [33271, 31144, 0, 0, 0, 0],
+  "trunks": [34056, 31696, 0, 0, 0, 1],
+  "shared": [35923, 32448, 274, 42, 10, 522],
+  "sections": [54016, 40297, 815, 501, 319, 1864],
+  "sections-site": [83802, 46980, 121, 68, 489, 2274],
+  "sections-site-no-ladder": [81724, 46226, 128, 120, 483, 2353],
+  "shared-all": [43398, 36006, 1421, 459, 79, 12027],
+};
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
 /** This function gives the keys of the rows that differ. A row in only one list differs. */
@@ -15,7 +31,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/3", () => {
+describe("the gate through-check/4", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 
@@ -68,6 +84,49 @@ describe("the gate through-check/3", () => {
 
   it("has no inner route with a contact", () => {
     expect(fresh.rows.filter((r) => r.innerFlagged > 0).map(keyOf)).toEqual([]);
+  });
+
+  it("leaves no lane in a box with no mark (LANE-ROOM)", () => {
+    const lanes = fresh.rows.filter((r) => r.view === "lanes");
+    expect(lanes.length).toBeGreaterThan(0);
+    expect(lanes.filter((r) => r.silentLanes > 0 || r.deepUnmarked > 0).map(keyOf)).toEqual([]);
+  });
+
+  it("keeps the lanes of the default routers to the marked lanes and the seams of the closed routes", () => {
+    for (const router of SCORED) {
+      const rows = fresh.rows.filter((r) => r.router === router && r.view === "lanes");
+      const added = rows.reduce((n, r) => n + r.flagged, 0) - scored(router).reduce((n, r) => n + r.flagged, 0);
+      expect([router, added <= rows.reduce((n, r) => n + r.outOfRoom, 0)]).toEqual([router, true]);
+    }
+  });
+
+  it("shows the painted crossings of the lanes, with their pairs, by family and seed", () => {
+    const lanes = fresh.rows.filter((r) => r.view === "lanes");
+    const sums: Record<string, number[]> = {};
+    for (const row of lanes) {
+      expect(row.bySeed.map((s) => s.seed)).toEqual([0, 1, 2]);
+      expect(row.bySeed.reduce((n, s) => n + s.laneCrossings, 0)).toBe(row.laneCrossings);
+      for (const s of row.bySeed) {
+        expect(s.painted.pairs - s.painted.beforePairs).toBe(s.painted.added - s.painted.lost);
+        expect(s.polyline.pairs - s.polyline.beforePairs).toBe(s.polyline.added - s.polyline.lost);
+        const sum = (sums[row.router] ??= [0, 0, 0, 0, 0, 0]);
+        [s.painted.points, s.painted.pairs, s.painted.added, s.painted.lost, s.bundleBody, s.bundleEnds].forEach((n, i) => (sum[i] = sum[i]! + n));
+      }
+    }
+    expect(sums).toEqual(PAINTED);
+  });
+
+  // This test compares the rows of the site settings and makes no claim on them. Any change shows here (MARGIN-MEANING).
+  it("shows the counts of the site settings", () => {
+    const sum = (view: Row["view"]) => {
+      const classes: Record<string, number> = {};
+      for (const r of fresh.rows.filter((row) => row.router === fresh.site && row.view === view)) {
+        for (const [id, c] of Object.entries(r.classes)) classes[id] = (classes[id] ?? 0) + c.routes;
+      }
+      return classes;
+    };
+    expect(sum("routes")).toEqual(SITE_ROUTES);
+    expect(sum("lanes")).toEqual(SITE_LANES);
   });
 
   it("keeps the routers that do not mark through on their own rows", () => {

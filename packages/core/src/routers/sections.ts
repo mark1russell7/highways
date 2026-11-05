@@ -7,6 +7,7 @@ import { placePlug } from "../plugs.ts";
 import { allSections, buildSections, checkSections, SECTION_DEFAULTS, type Section, type SectionOptions } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
 import type { Strategy } from "../strategies/model.ts";
+import { withLaneRoom } from "../lane-room.ts";
 import { joinNote, markThrough } from "../through.ts";
 import { WayFinder } from "../ways.ts";
 
@@ -221,7 +222,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         if (list.length < 2 || p.length < 2) continue;
         runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!), options.laneOrder) });
       }
-      return { routes: markThrough(graph, routes, ways.obstacles), runs, levels: makeLevels(graph, root, routes, options), ...joinNote(ways) };
+      return { routes: markThrough(graph, routes, ways.obstacles), runs: withLaneRoom(runs, ways.obstacles), levels: makeLevels(graph, root, routes, options), ...joinNote(ways) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };

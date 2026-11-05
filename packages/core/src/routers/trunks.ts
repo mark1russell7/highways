@@ -2,6 +2,7 @@ import { center, dist, type Point } from "../geom.ts";
 import { nodeIndex, outerGraph, type Bundle, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
+import { laneRoom, withLaneRoom } from "../lane-room.ts";
 import { joinNote, markThrough } from "../through.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { balancedFan, fanPath, gilbertPoint } from "./fan.ts";
@@ -314,7 +315,8 @@ export function trunksRouter(options: TrunksOptions): Router {
         routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
       }
       const marked = markThrough(graph, routes, ways.obstacles);
-      return runs.length > 0 ? { routes: marked, bundles, runs, ...joinNote(ways) } : { routes: marked, bundles, ...joinNote(ways) };
+      const roomy = bundles.map((b) => ({ ...b, room: laneRoom(b.trunk, ways.obstacles) }));
+      return runs.length > 0 ? { routes: marked, bundles: roomy, runs: withLaneRoom(runs, ways.obstacles), ...joinNote(ways) } : { routes: marked, bundles: roomy, ...joinNote(ways) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };

@@ -2,6 +2,7 @@ import { center, dist, pointBoxDistance, type Point } from "../geom.ts";
 import { fixedPortPoint, nodeIndex, outerGraph, type End, type Graph, type Node, type Result, type Route, type SharedRun } from "../model.ts";
 import { placePlug } from "../plugs.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
+import { withLaneRoom } from "../lane-room.ts";
 import { joinNote, markThrough } from "../through.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { WORK } from "../work.ts";
@@ -185,5 +186,5 @@ export function follow(input: Graph, plan: HighwayPlan, options: FollowOptions =
     }
   });
   const marked = markThrough(graph, routes, ways.obstacles);
-  return runs.length > 0 ? { routes: marked, runs, ...joinNote(ways) } : { routes: marked, ...joinNote(ways) };
+  return runs.length > 0 ? { routes: marked, runs: withLaneRoom(runs, ways.obstacles), ...joinNote(ways) } : { routes: marked, ...joinNote(ways) };
 }
