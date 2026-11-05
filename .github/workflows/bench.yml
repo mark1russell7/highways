@@ -1,7 +1,8 @@
 # The benchmark of the routers. The large fixtures run only here, not on a local machine.
 # The job `plan` divides the benchmark into parts. Each job of the matrix `part` routes some fixtures with some routers.
 # The job `join` joins the rows of the parts into one table and one bench.json, in the format of one run.
-# A push to main runs the fixtures up to 10 000 nodes. The nightly run and a run with `max` 100000 also run the fixture of 100 000 nodes.
+# A dispatch runs the fixtures up to 10 000 nodes by default. The nightly run and a run with `max` 100000 also run the fixture of 100 000 nodes.
+# A push does not start this workflow, because no gate or page reads the run of a push, and each such run took 158 job-minutes. The nightly run covers the same code.
 # Each cell has a time limit. After the routes of a cell pass the limit, the cell starts no more routes, and its row shows "over the limit".
 # The measure suite runs each fixture family over `seeds` seeds to 1 000 nodes, and over one seed above. Each part keeps its report.
 # The job `join` joins the reports into one report.json, in the same artifact as bench.json.
@@ -13,15 +14,12 @@
 name: Bench
 
 on:
-  push:
-    branches: [main]
-    paths: ["packages/core/**", ".github/workflows/bench.yml"]
   schedule:
     - cron: "53 3 * * *"
   workflow_dispatch:
     inputs:
       max:
-        description: "The largest fixture, in nodes. 10000 is the run of a push. 100000 adds the parts of the huge fixture."
+        description: "The largest fixture, in nodes. 100000 adds the parts of the huge fixture."
         default: "10000"
       repeat:
         description: "The runs of each cell up to 10 000 nodes (the time is the median). A cell of 100 000 nodes runs two times."
@@ -44,9 +42,9 @@ permissions:
   contents: read
 
 # On main, a new run does not stop the run in progress. It waits, and a newer run takes the place of a waiting run.
-# The nightly run has its own group, so it does not block the runs of a push. On other branches, a new run stops the old run.
+# The nightly run has its own group, so it does not block a dispatch. On other branches, a new run stops the old run.
 concurrency:
-  group: bench-${{ github.ref }}-${{ github.event_name }}
+  group: bench-${{ github.event_name == 'pull_request' && github.ref || github.sha }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
@@ -68,7 +66,7 @@ jobs:
           SEEDS: ${{ inputs.seeds || '5' }}
           SHARDS: ${{ inputs.shards || '10' }}
           # A dispatch can give an empty text, so the default comes from the event, not from `||`.
-          CAPS: ${{ github.event_name == 'workflow_dispatch' && inputs.caps || github.event_name == 'push' && 'mlseb=400' || '' }}
+          CAPS: ${{ github.event_name == 'workflow_dispatch' && inputs.caps || '' }}
         # Each part has the nodes of its fixtures, the options of `pnpm bench`, the cell limit in milliseconds and the time limit of its job in minutes.
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
         # Each step of the measure suite runs in one part of each size: `small` runs each step but `highway`, and the parts `rest` run the step `group`.
