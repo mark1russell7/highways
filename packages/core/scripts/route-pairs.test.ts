@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { claimRows, claimsRecord } from "./route-pairs-claims.ts";
 import { boardRows, CONTROL_MOVE, pairsRecord, REGENERATE, type BoardRow } from "./route-pairs-rows.ts";
 
 /** The record on disk. */
@@ -38,5 +39,12 @@ describe("the record route-pairs/1", () => {
   it("moves the pair count at the control shift, so the test above can fail", () => {
     const moved = record.rows.filter((r) => r.shifts.find((x) => x.move === CONTROL_MOVE)!.each.some((d) => d !== 0));
     expect(moved.length).toBeGreaterThan(record.rows.length / 3);
+  });
+});
+
+describe("the record route-pairs-claims/1", () => {
+  it("names each verdict that reads route.crossings", () => {
+    const saved = JSON.parse(readFileSync(new URL("./data/route-pairs/claims.json", import.meta.url), "utf8")) as ReturnType<typeof claimsRecord>;
+    expect(saved, `The record is stale. Write it again with: ${saved.regenerate}`).toEqual(claimsRecord(claimRows()));
   });
 });

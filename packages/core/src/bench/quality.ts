@@ -264,7 +264,7 @@ function snapPaths(routes: readonly { readonly points: readonly Point[] }[]): Sn
   return { xs, ys, paths };
 }
 
-/** This function adds to each path each vertex that lies on one of its segments, so that two routes on one stretch share all vertices of the stretch. */
+/** This function adds to each path each vertex on one of its segments. Thus two routes on one stretch share all vertices of the stretch. */
 function splitAtVertices({ xs, ys, paths }: SnappedPaths): SnappedPaths {
   const count = xs.length;
   const at = (i: number): Point => ({ x: xs[i]! / PAIR_SNAP, y: ys[i]! / PAIR_SNAP });
@@ -336,7 +336,7 @@ function properPairCrossings({ xs, ys, paths }: SnappedPaths): number {
   return total;
 }
 
-/** This function gives the pairs of one route on both sorted lists: the number of times on the first list, times the number of times on the second list. */
+/** This function gives the pairs of one route on both sorted lists. Each route adds its count on the first list times its count on the second list. */
 function shared(a: readonly number[], b: readonly number[]): number {
   let [i, j, sum] = [0, 0, 0];
   while (i < a.length && j < b.length) {
