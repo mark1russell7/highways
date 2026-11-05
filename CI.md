@@ -276,9 +276,23 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 | `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. | None at this time. |
 | `Search objective OK` | A missing set or input, or a job that stops. | The correlation, the variants and the time. The tables only report them. | None at this time. |
 | `Screen OK` | A missing input, or a job that stops. | Each measure. A screen writes records, and `promotion.ts` writes the win test as text. | None at this time. |
-| `Xplat OK` | A difference of the route hashes between the systems. | Time and quality. | None at this time. |
+| `Xplat OK` | A missing cell, a missing route, or a job that stops. | A route that differs between the cells, the time and the quality. The tables only report them. | None at this time. |
 | `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
 
-So a green `Scale OK`, `Search objective OK` or `Screen OK` shows that the run ended with all its inputs. Do not call a gain held on one of these three checks.
+Two rulesets make all 8 checks of this table necessary on `main`, so one ruleset alone does not hold the list. Read the list with `gh api repos/mark1russell7/highways/rules/branches/main`.
 
-The dates of the open rows are in `docs/ROADMAP.md`, item GATE-FLIP.
+A ruleset makes `Scale OK`, `Search objective OK` and `Screen OK` necessary, and they read inputs only. A ruleset also makes `Search work OK` necessary, and only its gate (b) judges a result.
+
+So each merge waits on these four checks, and they do not judge what they measure.
+
+A green on one of these checks is not a result. Do not count it as a pass on a measure, on a page or in a pull request.
+
+A green `Xplat OK` shows that the run ended with all its inputs. Do not call a gain held on this check.
+
+A green `Xplat OK` does not show that the routes are equal on each cell. Read the table of the run for that.
+
+No workflow starts `screen-verdict.ts`. It runs by hand on the records of a run of `Screen`, so its check of the records holds nothing in CI.
+
+The header of a verdict snapshot names the run and the commit of the records. It does not name the commit of the script.
+
+The dates of the open rows are in `docs/ROADMAP.md`, items GATE-FLIP and VERDICT-RUN.

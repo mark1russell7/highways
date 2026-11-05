@@ -166,11 +166,20 @@ function detail(t: VerdictTable): void {
   }
   const g = t.guards.find((x) => x.id === c.guard);
   const word = (sign: string): string => (sign === "+" ? "wins" : sign === "-" ? "loses" : "tie");
+  const noKey = (f: string): boolean => t.keyless?.includes(f) === true;
+  const famWord = (f: string, sign: string): string => (noKey(f) ? (c.tiedByCause === undefined ? `${word(sign)}, base has 0 ways` : "tie by cause") : word(sign));
+  const keyNote =
+    t.keyless === undefined || t.keyless.length === 0
+      ? ""
+      : c.tiedByCause === undefined
+        ? `<p class="hint">The base has 0 ways on ${t.keyless.length} of ${t.families.length} families, because they have no key. There, the base is <code>corners</code> with other tie breaks.</p>`
+        : `<p class="hint">With no key, <code>shared</code> is <code>corners</code> with other tie breaks. So each of the ${t.keyless.length} families with no key is a tie by cause. The run read a sign on ${c.tiedByCause} of them. The label reads all ${c.of} families.</p>`;
   $("detail").innerHTML = `<p class="method"><strong><code>${esc(s.name)}</code></strong> against <code>${esc(t.base)}</code></p>
     <p><span class="res-count ${CLS[c.label]}"><b aria-hidden="true">${GLYPH[c.label]}</b> ${esc(c.label)}</span> on ${esc(c.guard)} <small>(${esc(g?.measure ?? "")})</small></p>
     ${g && DEFINITION.has(g.measure) ? `<p class="hint">${esc(DEFINITION.get(g.measure)!)}</p>` : ""}
     <p>${esc(breadth(c))}. Permutation p: ${c.p}.</p>
-    <ul class="res-fams">${t.families.map((f, i) => `<li class="${word(c.signs[i] ?? "0")}"><span aria-hidden="true">${c.signs[i] === "+" ? "+" : c.signs[i] === "-" ? "−" : "·"}</span> <code>${esc(f)}</code> ${word(c.signs[i] ?? "0")}</li>`).join("")}</ul>`;
+    ${keyNote}
+    <ul class="res-fams">${t.families.map((f, i) => `<li class="${word(c.signs[i] ?? "0")}"><span aria-hidden="true">${c.signs[i] === "+" ? "+" : c.signs[i] === "-" ? "−" : "·"}</span> <code>${esc(f)}</code> ${esc(famWord(f, c.signs[i] ?? "0"))}</li>`).join("")}</ul>`;
 }
 
 // The better verdicts with families against them, by guard measure.
