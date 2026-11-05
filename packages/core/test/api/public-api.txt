@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1507 names
+## . (build/index.d.ts): 1510 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -325,6 +325,7 @@ type JogStyle: build/index.d.ts#JogStyle
 KDEEB_DEFAULTS: build/index.d.ts#KDEEB_DEFAULTS
 KD_DEFAULTS: build/index.d.ts#KD_DEFAULTS
 KENDALL_EXACT: build/index.d.ts#KENDALL_EXACT
+KEYED_FAMILIES: build/index.d.ts#KEYED_FAMILIES
 KEYED_STRATEGIES: build/index.d.ts#KEYED_STRATEGIES
 KNEE_DEFAULTS: build/index.d.ts#KNEE_DEFAULTS
 KNEE_RULES: build/index.d.ts#KNEE_RULES
@@ -494,6 +495,7 @@ PREFERENCE_PANEL: build/index.d.ts#PREFERENCE_PANEL
 PROPOSED_RULES: build/index.d.ts#PROPOSED_RULES
 P_HUB_DEFAULTS: build/index.d.ts#P_HUB_DEFAULTS
 PackedGridOptions: build/index.d.ts#PackedGridOptions
+PaintedOutsidePairs: build/index.d.ts#PaintedOutsidePairs
 type PairWeights: build/index.d.ts#PairWeights
 Paired: build/index.d.ts#Paired
 type ParamValue: @mark1russell7/layout-contract#ParamValue (external)
@@ -1263,6 +1265,7 @@ outputHash: @mark1russell7/layout-contract#outputHash (external)
 pHubPlan: build/index.d.ts#pHubPlan
 pMedian: build/index.d.ts#pMedian
 packedGridBoard: build/index.d.ts#packedGridBoard
+paintedOutsidePairs: build/index.d.ts#paintedOutsidePairs
 pairCosts: build/index.d.ts#pairCosts
 paramProblem: @mark1russell7/layout-contract#paramProblem (external)
 paretoFront: build/index.d.ts#paretoFront
@@ -3271,6 +3274,9 @@ export declare const KD_DEFAULTS: Readonly<Required<KdOptions>>;
 ### build/index.d.ts#KENDALL_EXACT
 export declare const KENDALL_EXACT = 1500;
 
+### build/index.d.ts#KEYED_FAMILIES
+export declare const KEYED_FAMILIES: readonly string[];
+
 ### build/index.d.ts#KEYED_STRATEGIES
 export declare const KEYED_STRATEGIES: Registry;
 
@@ -4216,6 +4222,13 @@ export interface PackedGridOptions {
   readonly rows?: number;
   readonly long?: number;
   readonly reach?: number;
+}
+
+### build/index.d.ts#PaintedOutsidePairs
+export interface PaintedOutsidePairs {
+  readonly crossings: number;
+  readonly self: number;
+  readonly touch: number;
 }
 
 ### build/index.d.ts#PairWeights
@@ -7625,6 +7638,11 @@ export declare function pMedian(points: readonly Point[], candidates: readonly P
 
 ### build/index.d.ts#packedGridBoard
 export declare function packedGridBoard(options?: PackedGridOptions, random?: () => number): Graph;
+
+### build/index.d.ts#paintedOutsidePairs
+export declare function paintedOutsidePairs(routes: readonly {
+  readonly points: readonly Point[];
+}[]): PaintedOutsidePairs;
 
 ### build/index.d.ts#pairCosts
 export declare function pairCosts(a: readonly Point[], b: readonly Point[]): Record<CurriculumRule, number>;
