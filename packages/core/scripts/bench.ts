@@ -109,7 +109,8 @@ console.log();
 console.log(formatLevels(rows.filter((r) => r.levelFaults.length > 0)));
 const json = opt("--json");
 if (json) writeFileSync(json, JSON.stringify(rows.map((r) => ({ ...r, env })), null, 2) + "\n");
-if (rows.some((r) => !r.deterministic)) process.exitCode = 1;
+// A row with one run has `deterministic: null`. It makes no claim, so only a false fails the script.
+if (rows.some((r) => r.deterministic === false)) process.exitCode = 1;
 // The side tables come after the tables of the rows. `--side-tables` also writes them to a file, for the join of the parts.
 const side: string[] = [];
 const show = (table: string): void => {

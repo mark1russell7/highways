@@ -176,7 +176,7 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
           values["Z12.moved"] = 0;
         }
       }
-      return { step, strategy: strategy.name, violations: row.violations + (row.deterministic ? 0 : 1), ms: row.ms, values, result };
+      return { step, strategy: strategy.name, violations: row.violations + (row.deterministic === false ? 1 : 0), ms: row.ms, values, result };
     });
   } else if (step === "curve") {
     const router = asRouter(getStrategy(registry, "router", options.curveRouter ?? "corners"));

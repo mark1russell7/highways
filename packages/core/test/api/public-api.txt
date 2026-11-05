@@ -1798,7 +1798,7 @@ export interface BenchRow {
   readonly nodes: number;
   readonly edges: number;
   readonly ms: number;
-  readonly deterministic: boolean;
+  readonly deterministic: boolean | null;
   readonly violations: number;
   readonly sample: readonly Violation[];
   readonly quality: Quality;

@@ -15,8 +15,11 @@ export interface BenchRow {
   readonly edges: number;
   /** The median time of one run, in milliseconds. */
   readonly ms: number;
-  /** This value is false when two runs on the same input gave different results. */
-  readonly deterministic: boolean;
+  /**
+   * This value is false when the first two runs on the same input gave different results, and true when they gave the same result.
+   * It is null when the cell limit stopped the cell after one run. Then no second result exists, and the row makes no claim (BENCH-ONE-RUN).
+   */
+  readonly deterministic: boolean | null;
   readonly violations: number;
   /** The first violations, for the report. */
   readonly sample: readonly Violation[];
@@ -168,6 +171,8 @@ export function benchRun(router: Router, fixture: string, graph: Graph, repeat =
     if (spent > cellLimit) break;
   }
   const runs = times.length;
+  // One run gives no second result to compare, so the row makes no claim.
+  const same = runs >= 2 ? deterministic : null;
   times.sort((a, b) => a - b);
   baseTimes.sort((a, b) => a - b);
   const result = first!;
@@ -180,7 +185,7 @@ export function benchRun(router: Router, fixture: string, graph: Graph, repeat =
     nodes: graph.nodes.length,
     edges: graph.edges.length,
     ms,
-    deterministic,
+    deterministic: same,
     violations: all.length,
     sample: all.slice(0, 5),
     quality: measureQuality(graph, result),
@@ -217,7 +222,7 @@ export function formatTable(rows: readonly BenchRow[]): string {
     const q = r.quality;
     const over = r.overLimit;
     const ms = over ? `${f(r.ms, 1)} over the limit` : f(r.ms, 1);
-    const same = over && over.runs < 2 ? "-" : r.deterministic ? "yes" : "NO";
+    const same = r.deterministic === null ? "-" : r.deterministic ? "yes" : "NO";
     return `| ${r.router} | ${r.fixture} | ${r.nodes} | ${r.edges} | ${ms} | ${same} | ${r.violations} | ${Math.round(q.ink)} | ${q.crossingsEstimated ? "≈" : ""}${q.crossings} | ${f(q.bends)} | ${f(q.inflections)} | ${f(q.clearance, 1)} | ${f(q.tight)} | ${f(q.detour)} | ${f(q.plugAngle, 1)} |`;
   });
   return [head, line, ...body].join("\n");
