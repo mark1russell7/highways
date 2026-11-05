@@ -1,0 +1,488 @@
+{
+ "schema": "through-floor/1",
+ "regenerate": "node packages/core/scripts/through-floor.ts packages/core/scripts/data/through-floor/record.json",
+ "family": "packed-grid",
+ "seen": {
+  "seeds": {
+   "from": 0,
+   "to": 3
+  },
+  "rows": [
+   {
+    "router": "straight",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 96217.775133056
+   },
+   {
+    "router": "corners",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 292,
+    "length": 96936.20461117523
+   },
+   {
+    "router": "shared",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 292,
+    "length": 96936.20461117523
+   },
+   {
+    "router": "shared-all",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 292,
+    "length": 96936.20461117523
+   },
+   {
+    "router": "sections",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 47,
+    "flagged": 292,
+    "length": 112221.18658574282
+   },
+   {
+    "router": "sections-site",
+    "links": 403,
+    "hitAndApart": 292,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 111,
+    "bentThrough": 99,
+    "flagged": 292,
+    "length": 153795.998846177
+   },
+   {
+    "router": "seams",
+    "links": 403,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 292,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 127727.18398268399
+   },
+   {
+    "router": "border-walk",
+    "links": 403,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 292,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 127727.18398268399
+   },
+   {
+    "router": "border-walk-short",
+    "links": 403,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 292,
+    "clearAndTouch": 111,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 127727.18398268399
+   }
+  ],
+  "target": {
+   "seamsThrough": 0,
+   "seamsOverShort": 1,
+   "seamsOverWalk": 1,
+   "seamsOverCorners": 1.317641685013517,
+   "shortOverCorners": 1.317641685013517
+  }
+ },
+ "fresh": {
+  "seeds": {
+   "from": 3,
+   "to": 24
+  },
+  "rows": [
+   {
+    "router": "straight",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 659102.9073616648
+   },
+   {
+    "router": "corners",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 1939,
+    "length": 663901.3548038373
+   },
+   {
+    "router": "shared",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 1939,
+    "length": 663901.3548038373
+   },
+   {
+    "router": "shared-all",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 1939,
+    "length": 663901.3548038373
+   },
+   {
+    "router": "sections",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 435,
+    "flagged": 1939,
+    "length": 800222.6198827844
+   },
+   {
+    "router": "sections-site",
+    "links": 2784,
+    "hitAndApart": 1939,
+    "hitAndTouch": 0,
+    "clearAndApart": 0,
+    "clearAndTouch": 845,
+    "bentThrough": 764,
+    "flagged": 1939,
+    "length": 1065763.9798562347
+   },
+   {
+    "router": "seams",
+    "links": 2784,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 1939,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 859220.3257575765
+   },
+   {
+    "router": "border-walk",
+    "links": 2784,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 1939,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 859220.3257575765
+   },
+   {
+    "router": "border-walk-short",
+    "links": 2784,
+    "hitAndApart": 0,
+    "hitAndTouch": 0,
+    "clearAndApart": 1939,
+    "clearAndTouch": 845,
+    "bentThrough": 0,
+    "flagged": 0,
+    "length": 859220.3257575765
+   }
+  ],
+  "target": {
+   "seamsThrough": 0,
+   "seamsOverShort": 1,
+   "seamsOverWalk": 1,
+   "seamsOverCorners": 1.294198783509713,
+   "shortOverCorners": 1.294198783509713
+  }
+ },
+ "marked": {
+  "counted": 296,
+  "onFamily": 292,
+  "onFamilyBent": 99,
+  "off": [
+   {
+    "family": "thin-bars",
+    "seed": 1,
+    "edge": "e12",
+    "points": 5,
+    "through": [
+     "t11-3"
+    ],
+    "segment": 1,
+    "segmentLength": 20,
+    "atPlug": true,
+    "betweenHubs": false,
+    "ladder": [
+     {
+      "step": 0,
+      "margin": 20,
+      "reaches": false
+     },
+     {
+      "step": 1,
+      "margin": 10,
+      "reaches": false
+     },
+     {
+      "step": 2,
+      "margin": 5,
+      "reaches": false
+     },
+     {
+      "step": 3,
+      "margin": 1.25,
+      "reaches": false
+     }
+    ]
+   },
+   {
+    "family": "thin-bars",
+    "seed": 2,
+    "edge": "e16",
+    "points": 6,
+    "through": [
+     "t2-0"
+    ],
+    "segment": 4,
+    "segmentLength": 62.14671837347356,
+    "atPlug": false,
+    "betweenHubs": true,
+    "ladder": [
+     {
+      "step": 0,
+      "margin": 20,
+      "reaches": false
+     },
+     {
+      "step": 1,
+      "margin": 10,
+      "reaches": false
+     },
+     {
+      "step": 2,
+      "margin": 5,
+      "reaches": false
+     },
+     {
+      "step": 3,
+      "margin": 1.25,
+      "reaches": false
+     }
+    ]
+   },
+   {
+    "family": "comb",
+    "seed": 0,
+    "edge": "e11",
+    "points": 34,
+    "through": [
+     "low0",
+     "up1"
+    ],
+    "segment": 1,
+    "segmentLength": 20,
+    "atPlug": true,
+    "betweenHubs": false,
+    "ladder": [
+     {
+      "step": 0,
+      "margin": 20,
+      "reaches": false
+     },
+     {
+      "step": 1,
+      "margin": 10,
+      "reaches": false
+     },
+     {
+      "step": 2,
+      "margin": 5,
+      "reaches": false
+     },
+     {
+      "step": 3,
+      "margin": 1.25,
+      "reaches": false
+     }
+    ]
+   },
+   {
+    "family": "comb",
+    "seed": 2,
+    "edge": "e1",
+    "points": 21,
+    "through": [
+     "low2",
+     "low3",
+     "low4",
+     "up2",
+     "up3",
+     "up4",
+     "up5"
+    ],
+    "segment": 1,
+    "segmentLength": 20,
+    "atPlug": true,
+    "betweenHubs": false,
+    "ladder": [
+     {
+      "step": 0,
+      "margin": 20,
+      "reaches": false
+     },
+     {
+      "step": 1,
+      "margin": 10,
+      "reaches": false
+     },
+     {
+      "step": 2,
+      "margin": 5,
+      "reaches": false
+     },
+     {
+      "step": 3,
+      "margin": 1.25,
+      "reaches": false
+     }
+    ]
+   }
+  ]
+ },
+ "slice": [
+  {
+   "router": "straight",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 0,
+   "length": 35651.769475008834
+  },
+  {
+   "router": "corners",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 95,
+   "length": 35932.89073791741
+  },
+  {
+   "router": "shared",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 95,
+   "length": 35932.89073791741
+  },
+  {
+   "router": "shared-all",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 95,
+   "length": 35932.89073791741
+  },
+  {
+   "router": "sections",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 20,
+   "flagged": 95,
+   "length": 41791.93260230475
+  },
+  {
+   "router": "sections-site",
+   "links": 131,
+   "hitAndApart": 95,
+   "hitAndTouch": 0,
+   "clearAndApart": 0,
+   "clearAndTouch": 36,
+   "bentThrough": 34,
+   "flagged": 95,
+   "length": 53156.200227139016
+  },
+  {
+   "router": "seams",
+   "links": 131,
+   "hitAndApart": 0,
+   "hitAndTouch": 0,
+   "clearAndApart": 95,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 0,
+   "length": 46085.92207792208
+  },
+  {
+   "router": "border-walk",
+   "links": 131,
+   "hitAndApart": 0,
+   "hitAndTouch": 0,
+   "clearAndApart": 95,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 0,
+   "length": 46085.92207792208
+  },
+  {
+   "router": "border-walk-short",
+   "links": 131,
+   "hitAndApart": 0,
+   "hitAndTouch": 0,
+   "clearAndApart": 95,
+   "clearAndTouch": 36,
+   "bentThrough": 0,
+   "flagged": 0,
+   "length": 46085.92207792208
+  }
+ ]
+}

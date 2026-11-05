@@ -6,6 +6,8 @@
   "one-trunk",
   "perimeter",
   "straight",
+  "border-walk",
+  "border-walk-short",
   "corners",
   "shared",
   "shared-all",
@@ -111,6 +113,13 @@
     "measure": "route.bundle.ambiguity",
     "partner": "route.through"
    }
+  ],
+  "border-walk": [],
+  "border-walk-short": [
+   {
+    "measure": "route.length",
+    "partner": null
+   }
   ]
  },
  "ties": {
@@ -129,6 +138,20 @@
    "route.crossings.pairs.estimated",
    "route.backtrack",
    "route.outside"
+  ],
+  "border-walk": [
+   "route.crossings.estimated",
+   "route.crossings.pairs.estimated",
+   "route.backtrack",
+   "route.through",
+   "route.outside"
+  ],
+  "border-walk-short": [
+   "route.crossings.estimated",
+   "route.crossings.pairs.estimated",
+   "route.backtrack",
+   "route.through",
+   "route.outside"
   ]
  },
  "throughByFamily": {
@@ -136,6 +159,8 @@
    "one-trunk": 20,
    "perimeter": 0,
    "straight": 16,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -146,6 +171,8 @@
    "one-trunk": 515,
    "perimeter": 183,
    "straight": 286,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -156,6 +183,8 @@
    "one-trunk": 761,
    "perimeter": 364,
    "straight": 448,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -166,6 +195,8 @@
    "one-trunk": 263,
    "perimeter": 139,
    "straight": 77,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -176,6 +207,8 @@
    "one-trunk": 502,
    "perimeter": 452,
    "straight": 251,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -186,6 +219,8 @@
    "one-trunk": 357,
    "perimeter": 333,
    "straight": 292,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 292,
    "shared": 292,
    "shared-all": 292,
@@ -196,6 +231,8 @@
    "one-trunk": 44,
    "perimeter": 96,
    "straight": 44,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -206,6 +243,8 @@
    "one-trunk": 154,
    "perimeter": 138,
    "straight": 17,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -216,6 +255,8 @@
    "one-trunk": 281,
    "perimeter": 302,
    "straight": 192,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -226,6 +267,8 @@
    "one-trunk": 276,
    "perimeter": 229,
    "straight": 274,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -236,6 +279,8 @@
    "one-trunk": 362,
    "perimeter": 245,
    "straight": 324,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -246,6 +291,8 @@
    "one-trunk": 164,
    "perimeter": 136,
    "straight": 118,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -256,6 +303,8 @@
    "one-trunk": 58,
    "perimeter": 3,
    "straight": 49,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -266,6 +315,8 @@
    "one-trunk": 488,
    "perimeter": 450,
    "straight": 0,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -276,6 +327,8 @@
    "one-trunk": 144,
    "perimeter": 104,
    "straight": 38,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -286,6 +339,8 @@
    "one-trunk": 136,
    "perimeter": 92,
    "straight": 136,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -296,6 +351,8 @@
    "one-trunk": 208,
    "perimeter": 172,
    "straight": 176,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -306,6 +363,8 @@
    "one-trunk": 43,
    "perimeter": 43,
    "straight": 38,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -316,6 +375,8 @@
    "one-trunk": 0,
    "perimeter": 66,
    "straight": 0,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -326,6 +387,8 @@
    "one-trunk": 39,
    "perimeter": 41,
    "straight": 38,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -336,6 +399,8 @@
    "one-trunk": 41,
    "perimeter": 36,
    "straight": 39,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -346,6 +411,8 @@
    "one-trunk": 11,
    "perimeter": 47,
    "straight": 10,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -356,6 +423,8 @@
    "one-trunk": 80,
    "perimeter": 74,
    "straight": 79,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -366,6 +435,8 @@
    "one-trunk": 37,
    "perimeter": 42,
    "straight": 36,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
@@ -376,11 +447,444 @@
    "one-trunk": 39,
    "perimeter": 39,
    "straight": 35,
+   "border-walk": 0,
+   "border-walk-short": 0,
    "corners": 0,
    "shared": 0,
    "shared-all": 0,
    "sections": 0,
    "sections-site": 0
+  }
+ },
+ "throughPartners": [
+  "route.clearance.tight",
+  "route.length"
+ ],
+ "partnersByFamily": {
+  "tiny-uniform": {
+   "corners": {
+    "through": 0,
+    "tight": 0.06666666666666667,
+    "length": 5775.4292339722615
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.4666666666666667,
+    "length": 5654.304008986937
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.4666666666666667,
+    "length": 5654.304008986937
+   }
+  },
+  "small-clustered": {
+   "corners": {
+    "through": 0,
+    "tight": 0.105,
+    "length": 180109.3932081721
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.5,
+    "length": 186258.82833490864
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.52,
+    "length": 176809.25969818968
+   }
+  },
+  "dense-groups": {
+   "corners": {
+    "through": 0,
+    "tight": 0.10666666666666667,
+    "length": 302006.94161873026
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.55,
+    "length": 315923.2356076604
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.54,
+    "length": 297319.92534779466
+   }
+  },
+  "hub-chain": {
+   "corners": {
+    "through": 0,
+    "tight": 0.05128205128205128,
+    "length": 104227.21556125622
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.20512820512820512,
+    "length": 105550.27436898946
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.20512820512820512,
+    "length": 103673.50816546085
+   }
+  },
+  "many-groups": {
+   "corners": {
+    "through": 0,
+    "tight": 0.02127659574468085,
+    "length": 165452.51593668925
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.4627659574468085,
+    "length": 184868.1598474529
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.4627659574468085,
+    "length": 159635.84082081396
+   }
+  },
+  "packed-grid": {
+   "corners": {
+    "through": 292,
+    "tight": 0.8702290076335878,
+    "length": 96936.20461117529
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.8702290076335878,
+    "length": 127727.18398268399
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.8702290076335878,
+    "length": 127727.18398268399
+   }
+  },
+  "frame-rows": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 41920.87137335168
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.3548387096774194,
+    "length": 43018.19307477298
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.3548387096774194,
+    "length": 40916.94810430517
+   }
+  },
+  "pipeline": {
+   "corners": {
+    "through": 0,
+    "tight": 0.012658227848101266,
+    "length": 24643.959973884506
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.0759493670886076,
+    "length": 24585.625075302312
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.0759493670886076,
+    "length": 24509.344586322855
+   }
+  },
+  "fan-out": {
+   "corners": {
+    "through": 0,
+    "tight": 0.07692307692307693,
+    "length": 109408.18521171837
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.6796116504854369,
+    "length": 114643.15641300872
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.6796116504854369,
+    "length": 107704.18822967664
+   }
+  },
+  "two-hubs": {
+   "corners": {
+    "through": 0,
+    "tight": 0.01652892561983471,
+    "length": 103538.44769021838
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.7933884297520661,
+    "length": 109781.43958224176
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.6776859504132231,
+    "length": 96464.01574040923
+   }
+  },
+  "uneven-sizes": {
+   "corners": {
+    "through": 0,
+    "tight": 0.10687022900763359,
+    "length": 194188.08311396322
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.8702290076335878,
+    "length": 210467.42135211168
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.8625954198473282,
+    "length": 188670.90037830744
+   }
+  },
+  "thin-bars": {
+   "corners": {
+    "through": 0,
+    "tight": 0.06666666666666667,
+    "length": 74512.94004121427
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.7666666666666667,
+    "length": 75844.10387697321
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.75,
+    "length": 72233.98283122416
+   }
+  },
+  "sparse-long": {
+   "corners": {
+    "through": 0,
+    "tight": 0.05714285714285714,
+    "length": 206853.651769666
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.5142857142857142,
+    "length": 211093.1619012787
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.45714285714285713,
+    "length": 206082.86224860066
+   }
+  },
+  "local-mesh": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 17482.867924073144
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0,
+    "length": 15851.607620186678
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0,
+    "length": 15851.607620186678
+   }
+  },
+  "bipartite": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 68800.64182058757
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.21052631578947367,
+    "length": 69378.89821901389
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.21052631578947367,
+    "length": 68344.54967423863
+   }
+  },
+  "bottleneck": {
+   "corners": {
+    "through": 0,
+    "tight": 0.15555555555555556,
+    "length": 98939.19681229217
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 1,
+    "length": 105132.38106555649
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 1,
+    "length": 96984.7701830118
+   }
+  },
+  "parallel-edges": {
+   "corners": {
+    "through": 0,
+    "tight": 0.012195121951219513,
+    "length": 111975.99140579469
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.7380952380952381,
+    "length": 121929.81750656813
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.75,
+    "length": 109681.3360341705
+   }
+  },
+  "maze": {
+   "corners": {
+    "through": 0,
+    "tight": 0.06666666666666667,
+    "length": 38197.91973529749
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.8666666666666667,
+    "length": 17311.570461752202
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.8666666666666667,
+    "length": 15519.374452684158
+   }
+  },
+  "channel": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 27111.61359069456
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.08333333333333333,
+    "length": 26659.216430606153
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.08333333333333333,
+    "length": 26659.216430606153
+   }
+  },
+  "comb": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 48224.818490542355
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 24230.485511776667
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 23215.119007773712
+   }
+  },
+  "spiral": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 113874.10996945287
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.9285714285714286,
+    "length": 37828.84695179516
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.9285714285714286,
+    "length": 36178.90631566915
+   }
+  },
+  "switchbox": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 14281.214101398797
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.75,
+    "length": 15192.148708605639
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.75,
+    "length": 13968.192559353149
+   }
+  },
+  "escape": {
+   "corners": {
+    "through": 0,
+    "tight": 0.1,
+    "length": 30056.747131191845
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.9333333333333333,
+    "length": 30241.3411831941
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.9333333333333333,
+    "length": 28053.685184962647
+   }
+  },
+  "rings": {
+   "corners": {
+    "through": 0,
+    "tight": 0,
+    "length": 39910.11074509492
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 19910.658237601776
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 18300.403336534302
+   }
+  },
+  "walled-level": {
+   "corners": {
+    "through": 0,
+    "tight": 0.4,
+    "length": 30693.84374821344
+   },
+   "border-walk": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 16653.9116712591
+   },
+   "border-walk-short": {
+    "through": 0,
+    "tight": 0.9230769230769231,
+    "length": 14623.001680353327
+   }
   }
  },
  "rows": [
@@ -392,6 +896,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 93,
+    "border-walk": 55,
+    "border-walk-short": 86,
     "corners": 83,
     "shared": 84,
     "shared-all": 21,
@@ -402,6 +908,8 @@
     "one-trunk": 0,
     "perimeter": 1485,
     "straight": 22353,
+    "border-walk": 15543,
+    "border-walk-short": 20351,
     "corners": 20493,
     "shared": 16589,
     "shared-all": 6862,
@@ -421,6 +929,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 1.396694214876033,
+    "border-walk": 1.1166666666666667,
+    "border-walk-short": 1.3333333333333333,
     "corners": 1.4423076923076923,
     "shared": 1.4423076923076923,
     "shared-all": 0.46808510638297873,
@@ -431,6 +941,8 @@
     "one-trunk": 0,
     "perimeter": 50.558711190406996,
     "straight": 215.37181230160047,
+    "border-walk": 152.4350002261174,
+    "border-walk-short": 184.2166949341833,
     "corners": 190.02965425880038,
     "shared": 174.88284325635337,
     "shared-all": 85.90415683230228,
@@ -450,6 +962,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -460,6 +974,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -470,6 +986,8 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -485,6 +1003,8 @@
     "one-trunk": 153,
     "perimeter": 229,
     "straight": 99,
+    "border-walk": 113,
+    "border-walk-short": 114,
     "corners": 120,
     "shared": 122,
     "shared-all": 152,
@@ -495,6 +1015,8 @@
     "one-trunk": 50505,
     "perimeter": 67022,
     "straight": 24707,
+    "border-walk": 28931,
+    "border-walk-short": 29581,
     "corners": 32194,
     "shared": 34191,
     "shared-all": 35608,
@@ -513,6 +1035,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -523,6 +1047,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -533,6 +1059,8 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -548,6 +1076,8 @@
     "one-trunk": 1,
     "perimeter": 1,
     "straight": 0.6091099696094169,
+    "border-walk": 0.6274697919678537,
+    "border-walk-short": 0.5868324974612255,
     "corners": 0.5311585876494493,
     "shared": 0.5317583602483311,
     "shared-all": 0.6081168171738659,
@@ -558,6 +1088,8 @@
     "one-trunk": 75,
     "perimeter": 75,
     "straight": 43.19997431141245,
+    "border-walk": 43.755067107203345,
+    "border-walk-short": 42.27312470292085,
     "corners": 37.39516434084607,
     "shared": 37.50976979258334,
     "shared-all": 44.606550690085406,
@@ -577,6 +1109,8 @@
     "one-trunk": 90,
     "perimeter": 90,
     "straight": 7.486023939891453,
+    "border-walk": 5.971947411121601,
+    "border-walk-short": 6.057182014518276,
     "corners": 2.492980851176666,
     "shared": 2.8412005902917925,
     "shared-all": 9.888033150195824,
@@ -587,6 +1121,8 @@
     "one-trunk": 6750,
     "perimeter": 6750,
     "straight": 1221.2040991016124,
+    "border-walk": 1369.2098776120251,
+    "border-walk-short": 1280.775429795178,
     "corners": 797.5926750118655,
     "shared": 800.2762196574778,
     "shared-all": 1520.5788165749907,
@@ -606,6 +1142,8 @@
     "one-trunk": 1,
     "perimeter": 1.46875,
     "straight": 0,
+    "border-walk": 0.5464402441338477,
+    "border-walk-short": 0.2263051812470585,
     "corners": 0.7585488667558007,
     "shared": 0.7979263078190162,
     "shared-all": 1.0922948317817647,
@@ -616,6 +1154,8 @@
     "one-trunk": 72.52287245327277,
     "perimeter": 109.79412887460178,
     "straight": 0,
+    "border-walk": 45.080352372241855,
+    "border-walk-short": 26.145007876191976,
     "corners": 81.44481982661245,
     "shared": 83.04323866166393,
     "shared-all": 108.5717280381175,
@@ -634,6 +1174,8 @@
     "one-trunk": 90,
     "perimeter": 90,
     "straight": 0,
+    "border-walk": 90,
+    "border-walk-short": 66.42529379808738,
     "corners": 90,
     "shared": 90,
     "shared-all": 130.03025927188972,
@@ -644,6 +1186,8 @@
     "one-trunk": 8730,
     "perimeter": 8370,
     "straight": 0,
+    "border-walk": 7162.111889176235,
+    "border-walk-short": 4424.547469006795,
     "corners": 6102.343116259022,
     "shared": 6381.812383243596,
     "shared-all": 9173.233009169127,
@@ -662,6 +1206,8 @@
     "one-trunk": 1.4098621624724825,
     "perimeter": 2.395240296995005,
     "straight": 1,
+    "border-walk": 1.0089178972557518,
+    "border-walk-short": 1.0015623176896136,
     "corners": 1.0210211789392485,
     "shared": 1.0267378199249084,
     "shared-all": 1.0750065908450006,
@@ -672,6 +1218,8 @@
     "one-trunk": 123.01981073477167,
     "perimeter": 226.510136453552,
     "straight": 75,
+    "border-walk": 82.89968542449893,
+    "border-walk-short": 80.20199024529416,
     "corners": 106.37271986401488,
     "shared": 106.44047802286507,
     "shared-all": 110.42634173435543,
@@ -690,6 +1238,8 @@
     "one-trunk": 3.3067929079085445,
     "perimeter": 6.226988361464492,
     "straight": 1,
+    "border-walk": 1.3025681573533598,
+    "border-walk-short": 1.0530847907327445,
     "corners": 1.1657983746297673,
     "shared": 1.2082173745600073,
     "shared-all": 1.3597525128194659,
@@ -700,6 +1250,8 @@
     "one-trunk": 281.6202937871977,
     "perimeter": 668.9250677898522,
     "straight": 75,
+    "border-walk": 114.47276985848319,
+    "border-walk-short": 103.69651885701727,
     "corners": 206.76386807572308,
     "shared": 207.66535147559264,
     "shared-all": 220.48081720833204,
@@ -718,6 +1270,8 @@
     "one-trunk": 1.742239660293651,
     "perimeter": 3.0678602861467343,
     "straight": 1,
+    "border-walk": 1.0791295988131053,
+    "border-walk-short": 1.0131439280504493,
     "corners": 1.0608443487633965,
     "shared": 1.073879039520361,
     "shared-all": 1.1170792131432885,
@@ -728,6 +1282,8 @@
     "one-trunk": 144.9433175457812,
     "perimeter": 294.7587157125527,
     "straight": 75,
+    "border-walk": 87.83780533037901,
+    "border-walk-short": 83.64050428338048,
     "corners": 120.61418766819436,
     "shared": 120.83413926809305,
     "shared-all": 125.77101916638351,
@@ -739,6 +1295,38 @@
    ]
   },
   {
+   "name": "route.length",
+   "key": "R5.length",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 40864,
+    "perimeter": 76256,
+    "straight": 21932.948270015106,
+    "border-walk": 22062.497351570324,
+    "border-walk-short": 20883.743316289518,
+    "corners": 24568.094292882426,
+    "shared": 24568.094292882426,
+    "shared-all": 25038.00921697744,
+    "sections": 29729.66323006657,
+    "sections-site": 35123.70383740118
+   },
+   "sums": {
+    "one-trunk": 4121593,
+    "perimeter": 8416800,
+    "straight": 2004482.3656425953,
+    "border-walk": 2215735.9709942886,
+    "border-walk-short": 2074782.4266223207,
+    "corners": 2249122.914818645,
+    "shared": 2280169.042766433,
+    "shared-all": 2443309.1200697026,
+    "sections": 2747516.3810321474,
+    "sections-site": 3538996.2921623746
+   },
+   "best": [
+    "border-walk-short"
+   ]
+  },
+  {
    "name": "route.detour.max",
    "key": "R6.worstDetour",
    "better": "lower",
@@ -746,6 +1334,8 @@
     "one-trunk": 3.828125,
     "perimeter": 9.912809459185745,
     "straight": 1,
+    "border-walk": 1.4455000742545665,
+    "border-walk-short": 1.182633151274536,
     "corners": 1.3054058751047213,
     "shared": 1.3054058751047213,
     "shared-all": 1.4739563896350552,
@@ -756,6 +1346,8 @@
     "one-trunk": 408.59619273110735,
     "perimeter": 1273.18375766166,
     "straight": 75,
+    "border-walk": 137.1088614457852,
+    "border-walk-short": 118.65255032735092,
     "corners": 244.88783667019922,
     "shared": 245.52957259821594,
     "shared-all": 262.32392471957604,
@@ -774,6 +1366,8 @@
     "one-trunk": 0.1,
     "perimeter": 0.4666666666666667,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -784,6 +1378,8 @@
     "one-trunk": 11.509517077258941,
     "perimeter": 38.826687299948965,
     "straight": 0,
+    "border-walk": 1.4260956342144075,
+    "border-walk-short": 1.1696947120675931,
     "corners": 7.029534307500409,
     "shared": 7.029534307500409,
     "shared-all": 7.269224910564952,
@@ -792,10 +1388,77 @@
    },
    "best": [
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
     "sections"
+   ]
+  },
+  {
+   "name": "route.clearance.mean",
+   "key": "R8.clearance",
+   "better": "higher",
+   "medians": {
+    "one-trunk": 2.7864583333333335,
+    "perimeter": 5.611510791366906,
+    "straight": 6.784597864404593,
+    "border-walk": 7.0366540926272965,
+    "border-walk-short": 7.842290255182908,
+    "corners": 11.232416115845563,
+    "shared": 11.232416115845563,
+    "shared-all": 10.910004274195153,
+    "sections": 9.01038123613049,
+    "sections-site": 14.315736313519334
+   },
+   "sums": {
+    "one-trunk": 336.1475945515479,
+    "perimeter": 502.84538914372837,
+    "straight": 792.8257627634438,
+    "border-walk": 800.9848487542024,
+    "border-walk-short": 806.8189943268665,
+    "corners": 1023.7027707465653,
+    "shared": 1023.3324546709126,
+    "shared-all": 1014.6348160805379,
+    "sections": 921.9463724820292,
+    "sections-site": 1255.4585525916832
+   },
+   "best": [
+    "sections-site"
+   ]
+  },
+  {
+   "name": "route.clearance.tight",
+   "key": "R8.tight",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0.895,
+    "perimeter": 0.8015267175572519,
+    "straight": 0.7019230769230769,
+    "border-walk": 0.6826923076923077,
+    "border-walk-short": 0.6776859504132231,
+    "corners": 0.034482758620689655,
+    "shared": 0.034482758620689655,
+    "shared-all": 0,
+    "sections": 0.04878048780487805,
+    "sections-site": 0
+   },
+   "sums": {
+    "one-trunk": 62.3999241412497,
+    "perimeter": 54.838564965673974,
+    "straight": 46.121858541807626,
+    "border-walk": 45.625899879499016,
+    "border-walk-short": 45.24433545324986,
+    "corners": 7.358179986208905,
+    "shared": 7.193179986208904,
+    "shared-all": 5.937610028529942,
+    "sections": 10.1011194172199,
+    "sections-site": 9.113354412662423
+   },
+   "best": [
+    "shared-all",
+    "sections-site"
    ]
   },
   {
@@ -806,6 +1469,8 @@
     "one-trunk": 48,
     "perimeter": 35,
     "straight": 18,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -816,6 +1481,8 @@
     "one-trunk": 5023,
     "perimeter": 3826,
     "straight": 3013,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 292,
     "shared": 292,
     "shared-all": 292,
@@ -823,6 +1490,8 @@
     "sections-site": 296
    },
    "best": [
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -838,6 +1507,8 @@
     "one-trunk": 1,
     "perimeter": 1,
     "straight": 0.12673611111111427,
+    "border-walk": 0.13149350649350655,
+    "border-walk-short": 0.13149350649350655,
     "corners": 0.13149350649350655,
     "shared": 0.13149350649350655,
     "shared-all": 0.13149350649350655,
@@ -848,6 +1519,8 @@
     "one-trunk": 70.19449305284678,
     "perimeter": 69.78701298701299,
     "straight": 21.712151741144215,
+    "border-walk": 20.271992687922843,
+    "border-walk-short": 20.271992687922843,
     "corners": 20.271992687922843,
     "shared": 20.271992687922843,
     "shared-all": 20.271992687922843,
@@ -867,6 +1540,8 @@
     "one-trunk": 1,
     "perimeter": 1,
     "straight": 0.1857142857142858,
+    "border-walk": 0.20228576892141759,
+    "border-walk-short": 0.20228576892141759,
     "corners": 0.20228576892141759,
     "shared": 0.20228576892141759,
     "shared-all": 0.20228576892141759,
@@ -877,6 +1552,8 @@
     "one-trunk": 70.53274172806914,
     "perimeter": 70.2030582387369,
     "straight": 24.800254209688266,
+    "border-walk": 23.82906945699138,
+    "border-walk-short": 23.82906945699138,
     "corners": 23.82906945699138,
     "shared": 23.82906945699138,
     "shared-all": 23.82906945699138,
@@ -896,6 +1573,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -906,6 +1585,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 5,
+    "border-walk-short": 0,
     "corners": 2,
     "shared": 2,
     "shared-all": 0,
@@ -916,6 +1597,8 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -931,6 +1614,8 @@
     "one-trunk": 0.7490628981691488,
     "perimeter": 0.4594784441127404,
     "straight": 0,
+    "border-walk": 0.09500721330639705,
+    "border-walk-short": 0.04210757247344554,
     "corners": 0.07351477194685252,
     "shared": 0.08519805946907977,
     "shared-all": 0.44246644941678037,
@@ -941,6 +1626,8 @@
     "one-trunk": 54.297506646643285,
     "perimeter": 33.17385825606245,
     "straight": 2.1135504052083096,
+    "border-walk": 12.675787018984959,
+    "border-walk-short": 7.007763825885624,
     "corners": 12.783750728579252,
     "shared": 14.022636950469025,
     "shared-all": 29.75562807673469,
@@ -959,6 +1646,8 @@
     "one-trunk": 0.9735602723267921,
     "perimeter": 0.9785762308303504,
     "straight": 0,
+    "border-walk": 0.15604589615875913,
+    "border-walk-short": 0.021294125248092807,
     "corners": 0.035648494516650885,
     "shared": 0.04499971401461427,
     "shared-all": 0.16137305316609282,
@@ -969,6 +1658,8 @@
     "one-trunk": 68.75990261925743,
     "perimeter": 71.50638641756984,
     "straight": 2.324212998275063,
+    "border-walk": 17.457762975242094,
+    "border-walk-short": 7.611512447839755,
     "corners": 8.80550016316364,
     "shared": 9.096721028436946,
     "shared-all": 15.889152802284539,
@@ -987,6 +1678,8 @@
     "one-trunk": 21,
     "perimeter": 16,
     "straight": 1,
+    "border-walk": 5,
+    "border-walk-short": 3,
     "corners": 4,
     "shared": 5,
     "shared-all": 8,
@@ -997,6 +1690,8 @@
     "one-trunk": 2436,
     "perimeter": 1870,
     "straight": 109,
+    "border-walk": 499,
+    "border-walk-short": 272,
     "corners": 357,
     "shared": 384,
     "shared-all": 876,
@@ -1015,6 +1710,8 @@
     "one-trunk": 0.9253058596265293,
     "perimeter": 0.6782449725776966,
     "straight": 0,
+    "border-walk": 0.44495412844036697,
+    "border-walk-short": 0.125,
     "corners": 0.3174061433447099,
     "shared": 0.39937106918238996,
     "shared-all": 0.750599520383693,
@@ -1025,6 +1722,8 @@
     "one-trunk": 64.93227515528825,
     "perimeter": 52.003001060312144,
     "straight": 0,
+    "border-walk": 30.986030729899284,
+    "border-walk-short": 17.09665569203909,
     "corners": 25.903186303197018,
     "shared": 28.51916692709858,
     "shared-all": 44.78935411292385,
@@ -1045,6 +1744,8 @@
     "one-trunk": 0,
     "perimeter": 73,
     "straight": 650,
+    "border-walk": 521.5,
+    "border-walk-short": 588.5,
     "corners": 649,
     "shared": 503.5,
     "shared-all": 153.5,
@@ -1055,6 +1756,8 @@
     "one-trunk": 0,
     "perimeter": 146,
     "straight": 1300,
+    "border-walk": 1043,
+    "border-walk-short": 1177,
     "corners": 1298,
     "shared": 1007,
     "shared-all": 307,
@@ -1073,6 +1776,8 @@
     "one-trunk": 0,
     "perimeter": 0.365,
     "straight": 6.418888888888889,
+    "border-walk": 3.881944444444444,
+    "border-walk-short": 4.277222222222223,
     "corners": 5.7508333333333335,
     "shared": 5.023333333333333,
     "shared-all": 0.7933333333333333,
@@ -1083,6 +1788,8 @@
     "one-trunk": 0,
     "perimeter": 0.73,
     "straight": 12.837777777777777,
+    "border-walk": 7.763888888888888,
+    "border-walk-short": 8.554444444444446,
     "corners": 11.501666666666667,
     "shared": 10.046666666666667,
     "shared-all": 1.5866666666666667,
@@ -1101,6 +1808,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1111,6 +1820,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1121,6 +1832,8 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -1136,6 +1849,8 @@
     "one-trunk": 1513.5,
     "perimeter": 2302.5,
     "straight": 650,
+    "border-walk": 958.5,
+    "border-walk-short": 878.5,
     "corners": 996.5,
     "shared": 1039.5,
     "shared-all": 895.5,
@@ -1146,6 +1861,8 @@
     "one-trunk": 3027,
     "perimeter": 4605,
     "straight": 1300,
+    "border-walk": 1917,
+    "border-walk-short": 1757,
     "corners": 1993,
     "shared": 2079,
     "shared-all": 1791,
@@ -1164,6 +1881,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1174,6 +1893,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1184,6 +1905,8 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -1199,6 +1922,8 @@
     "one-trunk": 1,
     "perimeter": 1,
     "straight": 0.4454112611212714,
+    "border-walk": 0.5488862014783931,
+    "border-walk-short": 0.42084831153214153,
     "corners": 0.44229908749453106,
     "shared": 0.4573223266404079,
     "shared-all": 0.6999046120545396,
@@ -1209,6 +1934,8 @@
     "one-trunk": 2,
     "perimeter": 2,
     "straight": 0.8908225222425428,
+    "border-walk": 1.0977724029567861,
+    "border-walk-short": 0.8416966230642831,
     "corners": 0.8845981749890621,
     "shared": 0.9146446532808158,
     "shared-all": 1.3998092241090792,
@@ -1228,6 +1955,8 @@
     "one-trunk": 90,
     "perimeter": 90,
     "straight": 2.670898194739488,
+    "border-walk": 1.89805382272688,
+    "border-walk-short": 1.5920470544489391,
     "corners": 0.958675327126268,
     "shared": 1.3722277265604577,
     "shared-all": 15.32208488205736,
@@ -1238,6 +1967,8 @@
     "one-trunk": 180,
     "perimeter": 180,
     "straight": 5.341796389478976,
+    "border-walk": 3.79610764545376,
+    "border-walk-short": 3.1840941088978783,
     "corners": 1.917350654252536,
     "shared": 2.7444554531209153,
     "shared-all": 30.64416976411472,
@@ -1257,6 +1988,8 @@
     "one-trunk": 1,
     "perimeter": 1.4454166666666666,
     "straight": 0,
+    "border-walk": 1.0413542962573776,
+    "border-walk-short": 0.2967524498412545,
     "corners": 0.8090922665593979,
     "shared": 0.9044259454286488,
     "shared-all": 1.6619681315204273,
@@ -1267,6 +2000,8 @@
     "one-trunk": 2,
     "perimeter": 2.890833333333333,
     "straight": 0,
+    "border-walk": 2.0827085925147553,
+    "border-walk-short": 0.593504899682509,
     "corners": 1.6181845331187958,
     "shared": 1.8088518908572977,
     "shared-all": 3.3239362630408547,
@@ -1285,6 +2020,8 @@
     "one-trunk": 90,
     "perimeter": 135,
     "straight": 0,
+    "border-walk": 128.2274334419979,
+    "border-walk-short": 82.35172634278496,
     "corners": 92.362342914538,
     "shared": 108.59674198122755,
     "shared-all": 165.2788686691913,
@@ -1295,6 +2032,8 @@
     "one-trunk": 180,
     "perimeter": 270,
     "straight": 0,
+    "border-walk": 256.4548668839958,
+    "border-walk-short": 164.7034526855699,
     "corners": 184.724685829076,
     "shared": 217.1934839624551,
     "shared-all": 330.5577373383826,
@@ -1313,6 +2052,8 @@
     "one-trunk": 1.769791123949982,
     "perimeter": 4.523558211976996,
     "straight": 1,
+    "border-walk": 1.0614199310041332,
+    "border-walk-short": 1.0191351869899186,
     "corners": 1.0395113359889967,
     "shared": 1.0433577424709664,
     "shared-all": 1.122907010817518,
@@ -1323,6 +2064,8 @@
     "one-trunk": 3.539582247899964,
     "perimeter": 9.047116423953993,
     "straight": 2,
+    "border-walk": 2.1228398620082665,
+    "border-walk-short": 2.038270373979837,
     "corners": 2.0790226719779934,
     "shared": 2.0867154849419327,
     "shared-all": 2.245814021635036,
@@ -1341,6 +2084,8 @@
     "one-trunk": 5.259043345935622,
     "perimeter": 17.27797525995843,
     "straight": 1,
+    "border-walk": 1.4200556092240113,
+    "border-walk-short": 1.2167975385338918,
     "corners": 1.3083427410764252,
     "shared": 1.361362533460488,
     "shared-all": 1.5330233466360565,
@@ -1351,6 +2096,8 @@
     "one-trunk": 10.518086691871243,
     "perimeter": 34.55595051991686,
     "straight": 2,
+    "border-walk": 2.8401112184480226,
+    "border-walk-short": 2.4335950770677837,
     "corners": 2.6166854821528505,
     "shared": 2.722725066920976,
     "shared-all": 3.066046693272113,
@@ -1369,6 +2116,8 @@
     "one-trunk": 2.2271458403462354,
     "perimeter": 6.535030143383588,
     "straight": 1,
+    "border-walk": 1.122629900116304,
+    "border-walk-short": 1.0611337409099164,
     "corners": 1.0901352183798996,
     "shared": 1.1013594809924552,
     "shared-all": 1.2004945491626884,
@@ -1379,11 +2128,45 @@
     "one-trunk": 4.454291680692471,
     "perimeter": 13.070060286767175,
     "straight": 2,
+    "border-walk": 2.245259800232608,
+    "border-walk-short": 2.122267481819833,
     "corners": 2.180270436759799,
     "shared": 2.2027189619849104,
     "shared-all": 2.4009890983253768,
     "sections": 2.568233953326483,
     "sections-site": 4.78565681238601
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.length",
+   "key": "R5.length",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 89323,
+    "perimeter": 253393.5,
+    "straight": 43120.744960376716,
+    "border-walk": 47390.89258465795,
+    "border-walk-short": 44375.613813843214,
+    "corners": 45242.318476306355,
+    "shared": 46162.32393530296,
+    "shared-all": 50165.0192469398,
+    "sections": 56557.571910737155,
+    "sections-site": 87233.70834387129
+   },
+   "sums": {
+    "one-trunk": 178646,
+    "perimeter": 506787,
+    "straight": 86241.48992075343,
+    "border-walk": 94781.7851693159,
+    "border-walk-short": 88751.22762768643,
+    "corners": 90484.63695261271,
+    "shared": 92324.64787060591,
+    "shared-all": 100330.0384938796,
+    "sections": 113115.14382147431,
+    "sections-site": 174467.41668774257
    },
    "best": [
     "straight"
@@ -1397,6 +2180,8 @@
     "one-trunk": 8.105406896440075,
     "perimeter": 40.02889786822078,
     "straight": 1,
+    "border-walk": 2.0167685245851477,
+    "border-walk-short": 1.8838907966885294,
     "corners": 2.1273925463228123,
     "shared": 2.1273925463228123,
     "shared-all": 2.414160775415189,
@@ -1407,6 +2192,8 @@
     "one-trunk": 16.21081379288015,
     "perimeter": 80.05779573644156,
     "straight": 2,
+    "border-walk": 4.033537049170295,
+    "border-walk-short": 3.767781593377059,
     "corners": 4.2547850926456245,
     "shared": 4.2547850926456245,
     "shared-all": 4.828321550830378,
@@ -1425,6 +2212,8 @@
     "one-trunk": 0.23,
     "perimeter": 0.8536111111111111,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0.011111111111111112,
@@ -1435,6 +2224,8 @@
     "one-trunk": 0.46,
     "perimeter": 1.7072222222222222,
     "straight": 0,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0.022222222222222223,
@@ -1443,9 +2234,75 @@
    },
    "best": [
     "straight",
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "sections"
+   ]
+  },
+  {
+   "name": "route.clearance.mean",
+   "key": "R8.clearance",
+   "better": "higher",
+   "medians": {
+    "one-trunk": 0.6399927316325221,
+    "perimeter": 7.998125217336828,
+    "straight": 6.259466391498635,
+    "border-walk": 6.483290059897273,
+    "border-walk-short": 6.294682021751085,
+    "corners": 9.802881958780278,
+    "shared": 9.795727196128714,
+    "shared-all": 9.790572294675524,
+    "sections": 8.921913659045876,
+    "sections-site": 15.92882831468056
+   },
+   "sums": {
+    "one-trunk": 1.2799854632650443,
+    "perimeter": 15.996250434673655,
+    "straight": 12.51893278299727,
+    "border-walk": 12.966580119794546,
+    "border-walk-short": 12.58936404350217,
+    "corners": 19.605763917560555,
+    "shared": 19.59145439225743,
+    "shared-all": 19.581144589351048,
+    "sections": 17.84382731809175,
+    "sections-site": 31.85765662936112
+   },
+   "best": [
+    "sections-site"
+   ]
+  },
+  {
+   "name": "route.clearance.tight",
+   "key": "R8.tight",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0.9475,
+    "perimeter": 0.5847222222222223,
+    "straight": 0.7625,
+    "border-walk": 0.75,
+    "border-walk-short": 0.76,
+    "corners": 0.18722222222222223,
+    "shared": 0.16722222222222222,
+    "shared-all": 0.03861111111111111,
+    "sections": 0.2738888888888889,
+    "sections-site": 0.05
+   },
+   "sums": {
+    "one-trunk": 1.895,
+    "perimeter": 1.1694444444444445,
+    "straight": 1.525,
+    "border-walk": 1.5,
+    "border-walk-short": 1.52,
+    "corners": 0.37444444444444447,
+    "shared": 0.33444444444444443,
+    "shared-all": 0.07722222222222222,
+    "sections": 0.5477777777777778,
+    "sections-site": 0.1
+   },
+   "best": [
+    "shared-all"
    ]
   },
   {
@@ -1456,6 +2313,8 @@
     "one-trunk": 111,
     "perimeter": 46,
     "straight": 70,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1466,6 +2325,8 @@
     "one-trunk": 222,
     "perimeter": 92,
     "straight": 140,
+    "border-walk": 0,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1473,6 +2334,8 @@
     "sections-site": 0
    },
    "best": [
+    "border-walk",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -1488,6 +2351,8 @@
     "one-trunk": 0.736842105263158,
     "perimeter": 0.5681818181818182,
     "straight": 0.05289762190327104,
+    "border-walk": 0.05289762190327104,
+    "border-walk-short": 0.05289762190327104,
     "corners": 0.05289762190327104,
     "shared": 0.05289762190327104,
     "shared-all": 0.05289762190327104,
@@ -1498,6 +2363,8 @@
     "one-trunk": 1.473684210526316,
     "perimeter": 1.1363636363636365,
     "straight": 0.10579524380654208,
+    "border-walk": 0.10579524380654208,
+    "border-walk-short": 0.10579524380654208,
     "corners": 0.10579524380654208,
     "shared": 0.10579524380654208,
     "shared-all": 0.10579524380654208,
@@ -1516,6 +2383,8 @@
     "one-trunk": 0.7408428165007113,
     "perimeter": 0.5898119122257053,
     "straight": 0.09974245264362014,
+    "border-walk": 0.09689209296184909,
+    "border-walk-short": 0.09689209296184909,
     "corners": 0.09689209296184909,
     "shared": 0.09689209296184909,
     "shared-all": 0.09689209296184909,
@@ -1526,6 +2395,8 @@
     "one-trunk": 1.4816856330014225,
     "perimeter": 1.1796238244514106,
     "straight": 0.19948490528724028,
+    "border-walk": 0.19378418592369817,
+    "border-walk-short": 0.19378418592369817,
     "corners": 0.19378418592369817,
     "shared": 0.19378418592369817,
     "shared-all": 0.19378418592369817,
@@ -1544,6 +2415,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 0.5,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1554,6 +2427,8 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 0,
+    "border-walk": 1,
+    "border-walk-short": 0,
     "corners": 0,
     "shared": 0,
     "shared-all": 0,
@@ -1564,6 +2439,7 @@
     "one-trunk",
     "perimeter",
     "straight",
+    "border-walk-short",
     "corners",
     "shared",
     "shared-all",
@@ -1579,6 +2455,8 @@
     "one-trunk": 0.8419931270169547,
     "perimeter": 0.5265350015255734,
     "straight": 0,
+    "border-walk": 0.27834435851406203,
+    "border-walk-short": 0.16960729798389684,
     "corners": 0.16776167359800587,
     "shared": 0.23107539509333097,
     "shared-all": 0.5788668728297794,
@@ -1589,6 +2467,8 @@
     "one-trunk": 1.6839862540339094,
     "perimeter": 1.0530700030511468,
     "straight": 0,
+    "border-walk": 0.5566887170281241,
+    "border-walk-short": 0.3392145959677937,
     "corners": 0.33552334719601173,
     "shared": 0.46215079018666194,
     "shared-all": 1.1577337456595589,
@@ -1607,6 +2487,8 @@
     "one-trunk": 0.982967810533781,
     "perimeter": 0.980238120063702,
     "straight": 0,
+    "border-walk": 0.27288709515633724,
+    "border-walk-short": 0.010768712224008905,
     "corners": 0.0616544763629852,
     "shared": 0.07740441090974576,
     "shared-all": 0.20912074189193663,
@@ -1617,6 +2499,8 @@
     "one-trunk": 1.965935621067562,
     "perimeter": 1.960476240127404,
     "straight": 0,
+    "border-walk": 0.5457741903126745,
+    "border-walk-short": 0.02153742444801781,
     "corners": 0.1233089527259704,
     "shared": 0.15480882181949152,
     "shared-all": 0.41824148378387327,
@@ -1635,6 +2519,8 @@
     "one-trunk": 53.5,
     "perimeter": 35,
     "straight": 1,
+    "border-walk": 15.5,
+    "border-walk-short": 6.5,
     "corners": 6,
     "shared": 7,
     "shared-all": 25,
@@ -1645,6 +2531,8 @@
     "one-trunk": 107,
     "perimeter": 70,
     "straight": 2,
+    "border-walk": 31,
+    "border-walk-short": 13,
     "corners": 12,
     "shared": 14,
     "shared-all": 50,
@@ -1663,6 +2551,8 @@
     "one-trunk": 0.9413631516441805,
     "perimeter": 0.8029538904899136,
     "straight": 0,
+    "border-walk": 0.7233398740059899,
+    "border-walk-short": 0.4873948534169529,
     "corners": 0.5802146589464765,
     "shared": 0.7405310498939026,
     "shared-all": 0.9001976999300818,
@@ -1673,6 +2563,8 @@
     "one-trunk": 1.882726303288361,
     "perimeter": 1.6059077809798272,
     "straight": 0,
+    "border-walk": 1.4466797480119797,
+    "border-walk-short": 0.9747897068339058,
     "corners": 1.160429317892953,
     "shared": 1.4810620997878052,
     "shared-all": 1.8003953998601636,
