@@ -17,11 +17,11 @@
 // - PORTFOLIO-SPEED: the npm alias `highways-0-5-1`, the last version before #118.
 // - ROUTE-SCALE: the npm alias `highways-0-8-0`, the last version before #132.
 // The script calls each version through the small adapter `Core`. Each arm routes the same board: the board of the old version.
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gunzipSync } from "node:zlib";
-import { measureIsolated, runChild, type Arm, type Input, type Mode, type PairedReport } from "./gates/paired.ts";
+import { cpuFacts, measureIsolated, runChild, speedProbe, type Arm, type Input, type Mode, type PairedReport } from "./gates/paired.ts";
 import { pairedTable, parseReports } from "./gates/time-gate.ts";
 import {
   CLAIM_PLANS,
@@ -276,7 +276,11 @@ if (opt("--child") === "portfolio-speed") {
   const mode = (opt("--paired-mode") ?? "fresh") as Mode;
   if (mode !== "fresh" && mode !== "process") throw new RangeError(`There is no paired mode "${String(mode)}". The modes are fresh and process.`);
   if (mode === "process" && claim !== "portfolio-speed") throw new RangeError(`The claim ${claim} has only the mode fresh.`);
-  const report = claim === "portfolio-speed" ? await measurePortfolioSpeed(opt("--only")?.split(","), mode, dir) : await measureFresh(claim, dir, opt("--old-tree"));
+  const start = speedProbe();
+  const measured = claim === "portfolio-speed" ? await measurePortfolioSpeed(opt("--only")?.split(","), mode, dir) : await measureFresh(claim, dir, opt("--old-tree"));
+  const CPU_INFO = "/proc/cpuinfo";
+  const facts = cpuFacts(existsSync(CPU_INFO) ? readFileSync(CPU_INFO, "utf8") : "");
+  const report: PairedReport = { ...measured, env: { ...measured.env, cpuFacts: facts, speed: { start, end: speedProbe() } } };
   writeFileSync(join(dir, reportFile(job)), JSON.stringify(report) + "\n");
   console.log([`# The remeasure of ${claim}, job ${job}`, "", ...pairedTable(report)].join("\n"));
 }

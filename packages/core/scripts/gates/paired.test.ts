@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { aaId, armOrder, childResult, envOf, measureIsolated, quantileOf, runChild, type Arm, type ChildResult } from "./paired.ts";
+import { aaId, armOrder, childResult, cpuFacts, envOf, measureIsolated, speedProbe, quantileOf, runChild, type Arm, type ChildResult } from "./paired.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
 
@@ -217,6 +217,27 @@ describe("runChild", () => {
     const r = runChild(() => 0, () => 0, { argv: ["--input", "x", "--warmup", "0"], write: () => {} });
     expect(r.peakRss).toBeGreaterThan(0);
     expect(() => runChild(() => 0, () => 0, { argv: [], write: () => {} })).toThrow(/--input/);
+  });
+});
+
+describe("cpuFacts", () => {
+  const block = (mhz: string, flags: string): string => `processor\t: 0\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: ${mhz}\nflags\t\t: ${flags}\n`;
+
+  it("reads the first processor, and the word hypervisor in its flags", () => {
+    expect(cpuFacts(`${block("2445.4", "fpu hypervisor avx")}\n${block("9.9", "fpu")}`)).toEqual({ stepping: "1", microcode: "0xffffffff", "cpu MHz": "2445.4", hypervisor: "true" });
+    expect(cpuFacts(block("1", "fpu hypervisor-not"))).toMatchObject({ hypervisor: "false" });
+  });
+
+  it("gives no facts on an empty text", () => {
+    expect(cpuFacts("")).toEqual({});
+  });
+});
+
+describe("speedProbe", () => {
+  it("gives a time over 0 for each fixed work", () => {
+    const read = speedProbe();
+    expect(read.cpuMs).toBeGreaterThan(0);
+    expect(read.memoryMs).toBeGreaterThan(0);
   });
 });
 

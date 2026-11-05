@@ -43,6 +43,16 @@ export interface PairedEnv {
   readonly arch: string;
   readonly node: string;
   readonly runner?: string;
+  /** The reads of the fixed work at the start and at the end of the job. A script gives this field with `speedProbe`. */
+  readonly speed?: { readonly start: SpeedProbe; readonly end: SpeedProbe };
+  /** The facts of the first processor. `cpuFacts` gives this field. */
+  readonly cpuFacts?: Readonly<Record<string, string>>;
+}
+
+/** The median time of a fixed work on this computer. One name of a CPU model can hold two speeds, so a report prints this read beside the model. */
+export interface SpeedProbe {
+  readonly cpuMs: number;
+  readonly memoryMs: number;
 }
 
 /** The options of `measureIsolated`. */
@@ -150,6 +160,53 @@ export function pairedEnv(): PairedEnv {
     arch: arch(),
     node: process.version,
     ...(runner ? { runner } : {}),
+  };
+}
+
+/** The fields of `/proc/cpuinfo` that a record keeps. */
+const CPU_FACTS = ["cpu family", "model", "stepping", "microcode", "cpu MHz", "cache size", "bogomips"] as const;
+
+/** This function gives the facts of the first processor from the text of `/proc/cpuinfo`, and if its flags name a hypervisor. An empty text gives no facts. The field names are the names that the shared bench home takes. */
+export function cpuFacts(text: string): Readonly<Record<string, string>> {
+  const first = text.split(/\r?\n\r?\n/u)[0] ?? "";
+  const fields = new Map(first.split(/\r?\n/u).map((line) => [line.slice(0, line.indexOf(":")).trim(), line.slice(line.indexOf(":") + 1).trim()] as const));
+  const flags = fields.get("flags");
+  const facts = CPU_FACTS.flatMap((name) => {
+    const value = fields.get(name);
+    return value === undefined ? [] : [[name, value] as const];
+  });
+  return Object.fromEntries(flags === undefined ? facts : [...facts, ["hypervisor", String(flags.split(" ").includes("hypervisor"))] as const]);
+}
+
+/** This function times a fixed loop and a fixed pass over 32 MB, 5 times each, and gives the median of each. It takes under 1 s on a CI runner. */
+export function speedProbe(): SpeedProbe {
+  const timed = (work: () => number): number => {
+    const times: number[] = [];
+    let sink = 0;
+    for (let i = 0; i < 5; i++) {
+      const start = performance.now();
+      sink += work();
+      times.push(performance.now() - start);
+    }
+    if (!Number.isFinite(sink)) throw new Error("The speed probe gave no number.");
+    return times.sort((a, b) => a - b)[2]!;
+  };
+  const cells = new Float64Array(4_000_000);
+  return {
+    cpuMs: timed(() => {
+      let x = 2463534242;
+      for (let i = 0; i < 20_000_000; i++) {
+        x ^= x << 13;
+        x ^= x >>> 17;
+        x ^= x << 5;
+      }
+      return x;
+    }),
+    memoryMs: timed(() => {
+      let sum = 0;
+      for (let pass = 0; pass < 4; pass++) for (let i = 0; i < cells.length; i += 8) sum += cells[i]! + i;
+      return sum;
+    }),
   };
 }
 
