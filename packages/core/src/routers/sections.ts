@@ -177,6 +177,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         const lu = leafOf[iu]!;
         const lv = leafOf[iv]!;
         if (lu === lv) {
+          if ((globalThis as any).__ways) (globalThis as any).__ways.sameLeaf++;
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
@@ -190,6 +191,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
         const start = ways.out(ps);
         const chain = forward([...side(a), ...side(b).reverse()], start, pt.point);
         if (chain.length === 0) {
+          if ((globalThis as any).__ways) (globalThis as any).__ways.noChain++;
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
@@ -204,9 +206,11 @@ export function sectionsRouter(options: SectionsOptions): Router {
         append([pt.point]);
         // A way through the hubs that is too long, or that goes out and back, gives way to the direct way.
         if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin || goesOutAndBack(out)) {
+          if ((globalThis as any).__ways) { if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin) (globalThis as any).__ways.stretch++; else (globalThis as any).__ways.outAndBack++; }
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
         }
+        if ((globalThis as any).__ways) (globalThis as any).__ways.hubs++;
         for (const key of used) {
           const list = users.get(key);
           if (list) list.push(e.id);
@@ -219,6 +223,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
       const runs: SharedRun[] = [];
       for (const [key, p] of pieces) {
         const list = users.get(key) ?? [];
+        if ((globalThis as any).__ways) (globalThis as any).__ways[list.length === 0 ? 'pieces0' : list.length === 1 ? 'pieces1' : 'pieces2']++;
         if (list.length < 2 || p.length < 2) continue;
         runs.push({ id: `r${runs.length}`, key, points: p, edges: orderLanes(p, list.map((id) => routeOf.get(id)!), options.laneOrder) });
       }

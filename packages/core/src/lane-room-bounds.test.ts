@@ -148,6 +148,7 @@ describe("the bounds test of the room read", () => {
         });
       }
     }
+    console.log("BOUNDS sides", sides, "worst", worst);
     expect(sides).toBeGreaterThan(100);
     expect(worst).toBeLessThanOrEqual(LIMIT);
   }, 60_000);
