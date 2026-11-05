@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { PAINT_COUNTER } from "../src/bench/measures/crossing-pairs.ts";
-import { kindRows, MOVES, paintRecord, REGENERATE, shiftOf, SLICE, VECTORS } from "./paint-tie-rows.ts";
+import { FLOOR_MOVE, FLOOR_UNIT, floorRows, kindRows, MOVES, paintRecord, REGENERATE, shiftOf, SLICE, VECTORS } from "./paint-tie-rows.ts";
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/paint-tie/record.json", import.meta.url), "utf8")) as ReturnType<typeof paintRecord>;
@@ -15,6 +15,17 @@ describe("the record paint-tie/1", () => {
   it("equals fresh rows on a part of the families", () => {
     expect(kindRows(SLICE.families, SLICE.seeds), STALE).toEqual(record.slice);
   }, 180_000);
+
+  it("holds the floors of its own rows, one for each router, kind and vector", () => {
+    expect(record.floorMove).toBe(FLOOR_MOVE);
+    expect(record.floors).toEqual(floorRows(record.rows));
+    expect(record.floorUnit).toBe(FLOOR_UNIT);
+    expect(record.floors).toHaveLength(record.rows.length * VECTORS.length);
+    for (const floor of record.floors) {
+      expect(floor.moved).toBeGreaterThan(0);
+      expect(floor.share).toBeLessThan(0.05);
+    }
+  });
 
   it("states the version of the counter", () => {
     expect(record.paintCounter).toBe(PAINT_COUNTER);
@@ -48,5 +59,20 @@ describe("the record paint-tie/1", () => {
 
   it("loses no crossing with a touch at the grid or over it", () => {
     for (const row of record.rows) expect(row.lost.overGrid, `${row.router} ${row.kind}`).toBe(0);
+  });
+
+  it("loses no far crossing with a real angle", () => {
+    for (const row of record.rows) expect(row.lost.farWithAngle, `${row.router} ${row.kind}`).toBe(0);
+  });
+
+  it("reads each router on one frame at the shift of the corner line", () => {
+    for (const row of record.rows) {
+      for (const shift of row.shifts.filter((s) => s.form === "corner")) expect(shift.framedMoved, `${row.router} ${row.kind}`).toBe(0);
+    }
+  });
+
+  it("holds the direct read of two routers on each board", () => {
+    expect(record.pairsOnBoard.length).toBe(6);
+    for (const row of record.pairsOnBoard) expect(row.boards).toBe(record.boards);
   });
 });

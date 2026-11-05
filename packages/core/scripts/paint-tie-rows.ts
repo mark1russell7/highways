@@ -92,6 +92,9 @@ function crossToEnd(s: LineSegment, o: LineSegment): number {
   return Math.min(dist(at, s.a), dist(at, s.b), dist(at, o.a), dist(at, o.b));
 }
 
+/** The form of a shift of the record. */
+export type ShiftForm = "lines" | "rooms" | "corner" | "frame";
+
 /** One far crossing, so that a reader can examine it by hand. */
 export interface FarCrossing {
   readonly points: readonly [Point, Point, Point, Point];
@@ -215,14 +218,19 @@ function nearPairs(lines: readonly EdgeLine[], floats: Crossings): { readonly ne
 export interface ShiftRow {
   readonly move: number;
   readonly vector: string;
-  /** The form of the shift: `lines` moves each point of the board by one vector. `rooms` moves each room, and the lines follow. `corner` moves no line and adds one line at a new low corner. */
-  readonly form: "lines" | "rooms" | "corner";
+  /**
+   * The form of the shift: `lines` moves each point of the board by one vector, and the frame of the boxes with it. `rooms` moves each room, and the lines follow.
+   * `corner` moves no line and adds one line at a new low corner. `frame` moves no line and moves the frame of the boxes, as a box that a host adds at a new low corner does.
+   */
+  readonly form: ShiftForm;
   /** The largest size of the shift on an axis, and its mean over the two axes for the form `lines`. */
   readonly meanMove: number;
   readonly floatMoved: number;
   readonly snapMoved: number;
   /** The moved pairs on a grid that starts at the low corner of the board. */
   readonly anchoredMoved: number;
+  /** The moved pairs on a grid that starts at the low corner of the input boxes. */
+  readonly framedMoved: number;
 }
 
 /** The read of one router and one kind of line over the boards. */
@@ -234,10 +242,13 @@ export interface KindRow {
   readonly exactPoints: number;
   /** The crossing points on a grid that starts at the low corner of the board. */
   readonly anchoredPoints: number;
+  /** The crossing points on a grid that starts at the low corner of the input boxes. */
+  readonly framedPoints: number;
   readonly floatPairs: number;
   readonly snapPairs: number;
   readonly exactPairs: number;
   readonly anchoredPairs: number;
+  readonly framedPairs: number;
   /** The crossings of the floats that the grid removes, and the crossings that the grid adds. */
   readonly lost: OnlyIn;
   readonly added: OnlyIn;
@@ -279,6 +290,27 @@ function anchored(lines: readonly EdgeLine[]): EdgeLine[] {
   return lines.map((line) => ({ edge: line.edge, points: line.points.map((p) => snapToEps({ x: p.x - x0, y: p.y - y0 })) }));
 }
 
+/** The origin of a grid. */
+interface Frame {
+  readonly x: number;
+  readonly y: number;
+}
+
+/** This function gives the low corner of the input boxes. Each router on one board reads this one origin. */
+function frameOf(board: Graph): Frame {
+  let [x, y] = [Infinity, Infinity];
+  for (const node of board.nodes) {
+    x = Math.min(x, node.box.x);
+    y = Math.min(y, node.box.y);
+  }
+  return { x, y };
+}
+
+/** This function rounds each point on a grid that starts at the frame. */
+function framed(lines: readonly EdgeLine[], frame: Frame): EdgeLine[] {
+  return lines.map((line) => ({ edge: line.edge, points: line.points.map((p) => snapToEps({ x: p.x - frame.x, y: p.y - frame.y })) }));
+}
+
 const exact = (a: Point, b: Point, c: Point, d: Point): boolean => classifySegments(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y).relation === "cross";
 
 /** One sum of a kind over the boards. */
@@ -289,10 +321,12 @@ const emptySum = (): Sum => ({
   snapPoints: 0,
   exactPoints: 0,
   anchoredPoints: 0,
+  framedPoints: 0,
   floatPairs: 0,
   snapPairs: 0,
   exactPairs: 0,
   anchoredPairs: 0,
+  framedPairs: 0,
   lost: NONE,
   added: NONE,
   exactAdded: NONE,
@@ -305,7 +339,7 @@ const emptySum = (): Sum => ({
 const total = (pairs: ReadonlyMap<string, number>): number => [...pairs.values()].reduce((sum, n) => sum + n, 0);
 
 /** This function adds one set of lines of a board to a sum. */
-function addLines(sum: Sum, lines: readonly EdgeLine[]): void {
+function addLines(sum: Sum, lines: readonly EdgeLine[], frame: Frame): void {
   const snapped = snapLines(lines);
   const [floats, snaps, exacts] = [crossings(lines), crossings(snapped), crossings(lines, exact)];
   const [fp, sp, ep] = [floatPairs(lines), crossingPairs(lines), new Set([...exacts.values()].map(({ s, o }) => [lines[s.line]!.edge, lines[o.line]!.edge].sort().join("|")))];
@@ -315,6 +349,9 @@ function addLines(sum: Sum, lines: readonly EdgeLine[]): void {
   const fixedLines = anchored(lines);
   sum.anchoredPoints += crossings(fixedLines).size;
   sum.anchoredPairs += floatPairs(fixedLines).size;
+  const framedLines = framed(lines, frame);
+  sum.framedPoints += crossings(framedLines).size;
+  sum.framedPairs += floatPairs(framedLines).size;
   sum.floatPairs += fp.size;
   sum.snapPairs += sp.size;
   sum.exactPairs += ep.size;
@@ -328,12 +365,13 @@ function addLines(sum: Sum, lines: readonly EdgeLine[]): void {
 }
 
 /** This function adds one shift of one board to a sum. */
-function addShift(sum: Sum, form: "lines" | "rooms" | "corner", move: number, vector: string, meanMove: number, base: readonly EdgeLine[], other: readonly EdgeLine[]): void {
+function addShift(sum: Sum, form: ShiftForm, move: number, vector: string, meanMove: number, base: readonly EdgeLine[], other: readonly EdgeLine[], frame: Frame, otherFrame: Frame): void {
   const key = `${form}/${move}/${vector}`;
-  const row = sum.shifts.get(key) ?? { move, vector, form, meanMove, floatMoved: 0, snapMoved: 0, anchoredMoved: 0 };
+  const row = sum.shifts.get(key) ?? { move, vector, form, meanMove, floatMoved: 0, snapMoved: 0, anchoredMoved: 0, framedMoved: 0 };
   row.floatMoved += moved(floatPairs(base), floatPairs(other));
   row.snapMoved += moved(crossingPairs(base), crossingPairs(other));
   row.anchoredMoved += moved(floatPairs(anchored(base)), floatPairs(anchored(other)));
+  row.framedMoved += moved(floatPairs(framed(base, frame)), floatPairs(framed(other, otherFrame)));
   sum.shifts.set(key, row);
 }
 
@@ -353,35 +391,39 @@ export function kindRows(families?: readonly string[], seeds: number = SEEDS, lo
     if (families && !families.includes(family.name)) continue;
     for (let seed = 0; seed < seeds; seed++) {
       const board = registry.generate(family.name, seed).graph;
+      const frame = frameOf(board);
+      const moveFrame = (shift: { readonly dx: number; readonly dy: number }): Frame => ({ x: frame.x + shift.dx, y: frame.y + shift.dy });
       for (const name of NAMES) {
         const result = routerOf(name).route(board);
         const base = linesOf(board, result);
-        addLines(of(name, "painted"), base.painted);
-        addLines(of(name, "polyline"), base.polyline);
+        addLines(of(name, "painted"), base.painted, frame);
+        addLines(of(name, "polyline"), base.polyline, frame);
         for (const move of MOVES) {
           for (const vector of VECTORS) {
             const shift = shiftOf(vector, move);
             const mean = (Math.abs(shift.dx) + Math.abs(shift.dy)) / 2;
-            addShift(of(name, "painted"), "lines", move, vector, mean, base.painted, shiftLines(base.painted, shift));
-            addShift(of(name, "polyline"), "lines", move, vector, mean, base.polyline, shiftLines(base.polyline, shift));
+            addShift(of(name, "painted"), "lines", move, vector, mean, base.painted, shiftLines(base.painted, shift), frame, moveFrame(shift));
+            addShift(of(name, "polyline"), "lines", move, vector, mean, base.polyline, shiftLines(base.polyline, shift), frame, moveFrame(shift));
             const rooms = linesOf(board, shiftRooms(result, vector, move));
-            addShift(of(name, "painted"), "rooms", move, vector, move, base.painted, rooms.painted);
-            addShift(of(name, "polyline"), "rooms", move, vector, move, base.polyline, rooms.polyline);
+            addShift(of(name, "painted"), "rooms", move, vector, move, base.painted, rooms.painted, frame, frame);
+            addShift(of(name, "polyline"), "rooms", move, vector, move, base.polyline, rooms.polyline, frame, frame);
           }
         }
         for (const move of TRANSLATIONS) {
           for (const vector of VECTORS) {
             const shift = translationOf(vector, move);
             const mean = (Math.abs(shift.dx) + Math.abs(shift.dy)) / 2;
-            addShift(of(name, "painted"), "lines", move, vector, mean, base.painted, shiftLines(base.painted, shift));
-            addShift(of(name, "polyline"), "lines", move, vector, mean, base.polyline, shiftLines(base.polyline, shift));
+            addShift(of(name, "painted"), "lines", move, vector, mean, base.painted, shiftLines(base.painted, shift), frame, moveFrame(shift));
+            addShift(of(name, "polyline"), "lines", move, vector, mean, base.polyline, shiftLines(base.polyline, shift), frame, moveFrame(shift));
           }
         }
         for (const vector of VECTORS) {
           const shift = shiftOf(vector, CORNER_MOVE);
           const mean = (Math.abs(shift.dx) + Math.abs(shift.dy)) / 2;
-          addShift(of(name, "painted"), "corner", CORNER_MOVE, vector, mean, base.painted, withCornerLine(base.painted, shift));
-          addShift(of(name, "polyline"), "corner", CORNER_MOVE, vector, mean, base.polyline, withCornerLine(base.polyline, shift));
+          addShift(of(name, "painted"), "corner", CORNER_MOVE, vector, mean, base.painted, withCornerLine(base.painted, shift), frame, frame);
+          addShift(of(name, "polyline"), "corner", CORNER_MOVE, vector, mean, base.polyline, withCornerLine(base.polyline, shift), frame, frame);
+          addShift(of(name, "painted"), "frame", CORNER_MOVE, vector, mean, base.painted, base.painted, frame, moveFrame(shift));
+          addShift(of(name, "polyline"), "frame", CORNER_MOVE, vector, mean, base.polyline, base.polyline, frame, moveFrame(shift));
         }
       }
     }
@@ -391,6 +433,71 @@ export function kindRows(families?: readonly string[], seeds: number = SEEDS, lo
     const [router, kind] = key.split("/") as [string, "painted" | "polyline"];
     return { router, kind, ...sum, shifts: [...sum.shifts.values()] };
   });
+}
+
+/** The direct read of two routers on one board: each router on its own low corner, and each router on the frame of the boxes. */
+export interface PairOnBoardRow {
+  readonly routers: readonly [string, string];
+  readonly kind: "painted" | "polyline";
+  readonly boards: number;
+  /** The boards where the low corners of the lines of the two routers differ. */
+  readonly cornersDiffer: number;
+  /** The moved pairs of each router, from the frame to its own corner, and the crossing pairs of each router on the frame. */
+  readonly moved: readonly [number, number];
+  readonly pairs: readonly [number, number];
+  /** The boards where the sign of the difference of the two counts changes from the frame to the own corners. */
+  readonly signFlips: number;
+  /** The sum over the boards of the change of the difference of the two counts. */
+  readonly gapChange: number;
+}
+
+/** The pairs of routers of the direct read. */
+export const BOARD_PAIRS: readonly (readonly [string, string])[] = [
+  ["shared-all", "sections"],
+  ["sections", "sections-site"],
+  ["shared-all", "sections-site"],
+];
+
+/** This function reads two routers on one board with one grid for each router, and with one grid for both. */
+export function pairOnBoardRows(families?: readonly string[], seeds: number = SEEDS): PairOnBoardRow[] {
+  const registry = highwaysRegistry();
+  const rows = new Map<string, { -readonly [K in keyof PairOnBoardRow]: PairOnBoardRow[K] }>();
+  const lowCorner = (lines: readonly EdgeLine[]): string => {
+    let [x, y] = [Infinity, Infinity];
+    for (const line of lines) {
+      for (const p of line.points) {
+        x = Math.min(x, p.x);
+        y = Math.min(y, p.y);
+      }
+    }
+    return `${x},${y}`;
+  };
+  for (const family of HIGHWAYS_FAMILIES) {
+    if (families && !families.includes(family.name)) continue;
+    for (let seed = 0; seed < seeds; seed++) {
+      const board = registry.generate(family.name, seed).graph;
+      const frame = frameOf(board);
+      const lines = new Map(NAMES.map((name) => [name as string, linesOf(board, routerOf(name).route(board))]));
+      for (const pair of BOARD_PAIRS) {
+        for (const kind of ["painted", "polyline"] as const) {
+          const [a, b] = [lines.get(pair[0])![kind], lines.get(pair[1])![kind]];
+          const [aFrame, bFrame] = [floatPairs(framed(a, frame)), floatPairs(framed(b, frame))];
+          const [aOwn, bOwn] = [floatPairs(anchored(a)), floatPairs(anchored(b))];
+          const key = `${pair.join("+")}/${kind}`;
+          const row = rows.get(key) ?? { routers: pair as readonly [string, string], kind, boards: 0, cornersDiffer: 0, moved: [0, 0] as const, pairs: [0, 0] as const, signFlips: 0, gapChange: 0 };
+          const [gapFrame, gapOwn] = [aFrame.size - bFrame.size, aOwn.size - bOwn.size];
+          row.boards++;
+          if (lowCorner(a) !== lowCorner(b)) row.cornersDiffer++;
+          row.moved = [row.moved[0] + moved(aFrame, aOwn), row.moved[1] + moved(bFrame, bOwn)];
+          row.pairs = [row.pairs[0] + aFrame.size, row.pairs[1] + bFrame.size];
+          if (Math.sign(gapFrame) !== Math.sign(gapOwn)) row.signFlips++;
+          row.gapChange += Math.abs(gapFrame - gapOwn);
+          rows.set(key, row);
+        }
+      }
+    }
+  }
+  return [...rows.values()];
 }
 
 /** The rate of flips at one size of the form `lines`, against the rate of the formula. */
@@ -453,6 +560,41 @@ export function laneOrderRows(families?: readonly string[], seeds: number = SEED
 export const SLICE = { families: ["small-clustered", "bottleneck"], seeds: 1 } as const;
 
 /** This function gives the record. */
-export function paintRecord(rows: readonly KindRow[], slice: readonly KindRow[], laneOrder: ReturnType<typeof laneOrderRows>, boards: number) {
-  return { schema: SCHEMA, regenerate: REGENERATE, paintCounter: PAINT_COUNTER, grid: EPS, boards, seeds: SEEDS, moves: MOVES, translations: TRANSLATIONS, vectors: VECTORS, rates: rateRows(rows), laneOrder, rows, slice };
+/** The unit of the floors, in the record so that a reader does not divide them into a value for `resolution`. */
+export const FLOOR_UNIT =
+  "A floor is a sum of moved pairs over the boards, and it counts both directions. The field resolution of checkMeasures reads a median net change on one board. So a floor divided by the boards is not a resolution. Read the net change of the count on each board for that.";
+
+/** The move of the floors. It is the fair control of the float count, because float addition rounds a shift of this size. */
+export const FLOOR_MOVE = 0.3;
+
+/** The floor of a claim for one router, one kind of line and one vector. */
+export interface FloorRow {
+  readonly router: string;
+  readonly kind: "painted" | "polyline";
+  readonly vector: string;
+  /** The moved pairs over the boards. A crossing gone and a crossing added both count, so this is a sum of both directions and not a change of the count. */
+  readonly moved: number;
+  /** The crossing points on the grid over the boards. */
+  readonly points: number;
+  readonly share: number;
+}
+
+/** This function reads the floors from the rows. A gain on this count that is smaller than the share of a vector is no gain. */
+export function floorRows(rows: readonly KindRow[]): FloorRow[] {
+  return rows.flatMap((row) =>
+    row.shifts
+      .filter((shift) => shift.form === "lines" && shift.move === FLOOR_MOVE)
+      .map((shift) => ({
+        router: row.router,
+        kind: row.kind,
+        vector: shift.vector,
+        moved: shift.snapMoved,
+        points: row.snapPoints,
+        share: shift.snapMoved / row.snapPoints,
+      })),
+  );
+}
+
+export function paintRecord(rows: readonly KindRow[], slice: readonly KindRow[], laneOrder: ReturnType<typeof laneOrderRows>, boards: number, pairsOnBoard: readonly PairOnBoardRow[]) {
+  return { schema: SCHEMA, regenerate: REGENERATE, paintCounter: PAINT_COUNTER, grid: EPS, boards, seeds: SEEDS, pairsOnBoard, moves: MOVES, translations: TRANSLATIONS, vectors: VECTORS, floorMove: FLOOR_MOVE, floorUnit: FLOOR_UNIT, floors: floorRows(rows), rates: rateRows(rows), laneOrder, rows, slice };
 }
