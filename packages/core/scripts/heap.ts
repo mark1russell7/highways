@@ -8,7 +8,7 @@
 // After the route, the process writes its peak RSS, its heap and its route hash.
 // The gate fails when a process stops with an error, or when a peak RSS is more than its budget (HEAP-BUDGET).
 // The budget is the larger of the measured peak RSS times `margin` and the measured peak RSS plus `slackMb`. It has no floor, so a router with a small peak keeps a tight budget.
-// A router with no measure in the budget file runs with the cap `measureCapMb` and does not fail the gate. Thus its first run gives the measure.
+// A router with no measure in the budget file runs with the cap `measureCapMb` and fails the gate as a no read. Its row in the artifact gives the first measure.
 //
 // One process: `node --max-old-space-size=<MB> scripts/heap.ts --router <name> [--fixture <file>] [--out <file>]` routes once and appends one row to `--out`.
 import { execFileSync } from "node:child_process";
@@ -101,7 +101,7 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
     if (row !== undefined) appendFileSync(out, JSON.stringify({ ...row, cap }) + "\n");
     const budgetRss = measure === null ? undefined : rssBudget(budgets, measure.rssMb);
     let result = "pass";
-    if (measure === null) result = error === "" ? "measured" : `measure ${error}`;
+    if (measure === null) result = `fail: no read, the budget file has no measure${error === "" ? "" : `, and the run ${error}`}`;
     else if (error !== "" || row === undefined) result = `fail: ${error || "no row"}`;
     else if (row.rssMb > budgetRss!) result = `fail: the peak RSS is above the budget`;
     if (result.startsWith("fail")) breaks++;
