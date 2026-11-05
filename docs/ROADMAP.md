@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| ROUTE-PAIRS | The measure `route.crossings.pairs` counts the pairs of routes that cross, at a shared vertex and on a shared stretch too. `route.crossings` stays beside it. On 75 boards, `shared-all` reads 0.417 of `corners` on `route.crossings` and 1.033 on pairs. `docs/research/MEASURES.md` names each verdict and page line that rests on `route.crossings`. | 2026-11-05 | [#328](https://github.com/mark1russell7/highways/pull/328) |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
 | H2 | Bundles: the router `trunks` (bundles by a rule), the router `shared` (shared ways in lane order) and the segments with a count. | 2026-10-25 | `c910fb7` |
