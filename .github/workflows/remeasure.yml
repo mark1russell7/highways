@@ -16,6 +16,11 @@ on:
         type: choice
         options: [h3, portfolio-speed, route-scale]
         default: h3
+      sentinels:
+        description: "run reads the jobs of this run. stored and stored-fault skip those jobs, and the job sentinels reads stored rows, plain or with a fault. The claim must be portfolio-speed."
+        type: choice
+        options: [run, stored, stored-fault]
+        default: run
 
 permissions:
   contents: read
@@ -31,6 +36,7 @@ defaults:
 
 jobs:
   measure:
+    if: ${{ inputs.sentinels == 'run' }}
     runs-on: ubuntu-latest
     # One old route of shared-all on the dense board takes more than 13 min. Each round routes it two times: the old arm and the A/A arm.
     timeout-minutes: 330
@@ -79,7 +85,7 @@ jobs:
   join:
     needs: measure
     # The join also runs when a job fails, and then it fails: each job of the 5 jobs must give its report (FAIL-CLOSED).
-    if: ${{ always() }}
+    if: ${{ always() && inputs.sentinels == 'run' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -108,4 +114,50 @@ jobs:
           path: |
             remeasure.md
             remeasure.json
+          if-no-files-found: warn
+
+  # The sentinels of the claim portfolio-speed: a job whose sentinels moved apart, or too many jobs with no read, turn this job red.
+  # An even slowdown passes, so no compare of ms across runs rests on this job.
+  # The flip reads the exit code of the script on stored rows, with no clock, before the read. The input sentinels shows this job red and green with no jobs of a run.
+  sentinels:
+    needs: measure
+    if: ${{ always() && inputs.claim == 'portfolio-speed' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: The flip of the sentinel check
+        run: node packages/core/scripts/gates/flip.ts --check sentinels --out out/gate-flip
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        if: ${{ !cancelled() && inputs.sentinels == 'run' }}
+        with:
+          pattern: remeasure-portfolio-speed-job*
+          path: jobs
+      - name: Read the sentinels and the arm order
+        if: ${{ !cancelled() }}
+        env:
+          SENTINELS: ${{ inputs.sentinels }}
+        run: |
+          stored=packages/core/scripts/data/arm-order/narrow-42055478555
+          case "$SENTINELS" in
+            run) node packages/core/scripts/arm-order.ts jobs out/arm-order.json ;;
+            stored) node packages/core/scripts/arm-order.ts "$stored" out/arm-order.json ;;
+            stored-fault) node packages/core/scripts/arm-order.ts "$stored" out/arm-order.json --fault 1.2 ;;
+            *) echo "The input sentinels is run, stored or stored-fault, not $SENTINELS." >&2; exit 1 ;;
+          esac
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: remeasure-arm-order-${{ inputs.sentinels }}-${{ github.sha }}
+          path: |
+            out/arm-order.json
+            out/gate-flip/
           if-no-files-found: warn

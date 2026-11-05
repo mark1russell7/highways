@@ -69,13 +69,31 @@ describe("the records of the home", () => {
     const times = pairedTimes(reportOf(QUIET_RUN), GATE_ROUTER, COMMIT_ARM);
     expect(times).toHaveLength(10);
     expect(times[0]).toEqual({ case: `${GATE_ROUTER} #0`, round: 0, first: "a", a: QUIET_RUN.parent[0], b: QUIET_RUN.commit[0] });
-    // The order of the 4 arms rotates by the round. In round 1 the order is commit, fixed, A/A, parent, so the commit runs first.
+    // This report has no field `order`, so the order of the 4 arms rotates by the round. In round 1 the order is commit, fixed, A/A, parent, so the commit runs first.
     expect(times[1]!.first).toBe("b");
     // In round 1 the A/A arm runs before the parent too. In round 2 the order is fixed, A/A, parent, commit.
     const aa = pairedTimes(reportOf(QUIET_RUN), GATE_ROUTER, aaId(PARENT_ARM));
     expect(aa.map((t) => t.first).slice(0, 4)).toEqual(["a", "b", "b", "b"]);
     expect(pairedTimes(reportOf(QUIET_RUN), "nope", COMMIT_ARM)).toEqual([]);
     expect(pairedTimes(reportOf(QUIET_RUN), GATE_ROUTER, "nope")).toEqual([]);
+  });
+
+  it("reads a report with no field order as rotated, so an old report keeps its meaning", () => {
+    const old = reportOf(QUIET_RUN);
+    expect(old.order).toBeUndefined();
+    const rotated = pairedTimes(old, GATE_ROUTER, aaId(PARENT_ARM)).map((t) => t.first);
+    expect(rotated.slice(0, 4)).toEqual(["a", "b", "b", "b"]);
+    const mirrored = pairedTimes({ ...old, order: "mirrored" }, GATE_ROUTER, aaId(PARENT_ARM)).map((t) => t.first);
+    expect(mirrored).not.toEqual(rotated);
+  });
+
+  it("reads the arm that ran first by the order that the report states, and each pair then has each order evenly", () => {
+    const report = { ...reportOf(QUIET_RUN), order: "mirrored" as const };
+    for (const arm of [COMMIT_ARM, aaId(PARENT_ARM)]) {
+      const firsts = pairedTimes(report, GATE_ROUTER, arm).map((t) => t.first);
+      expect(firsts, arm).toHaveLength(10);
+      expect(firsts.filter((f) => f === "a"), arm).toHaveLength(5);
+    }
   });
 });
 

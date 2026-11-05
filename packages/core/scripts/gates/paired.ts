@@ -1,9 +1,9 @@
 // The paired time test of two or more arms, to the shared interface paired-time/1 (MEASURE-ISOLATE).
 // The rule: a comparison runs its arms in one job, in turn on each input, and an A/A arm (the base against itself) gives the noise floor.
-// This module imports only node modules and knows no type of highways. Two other repos keep a copy to the same interface, and the copies merge with no rewrite.
+// The static imports of this module are node modules, so a child loads no package. It knows no type of highways. Mode `fresh` imports the order of the bench home with `import()`. Two other repos keep a copy to the same interface, and the copies merge with no rewrite.
 //
 // - Mode `process`: one process. In each round, the arms run in turn on each input. Odd rounds reverse the order (ABBA).
-// - Mode `fresh`: a fresh process for each arm, each input and each round. Each input takes the arms in turn. The order rotates by the round.
+// - Mode `fresh`: a fresh process for each arm, each input and each round. Each input takes the arms in turn. The order is `armOrder` of `@mark1russell7/rigor-bench`: each pair of arms has each order one time in each two rounds.
 //
 // The child protocol of mode `fresh`: the helper appends `--input <id> --warmup <n>` to the command of the arm.
 // The child runs the warm-up untimed, times one run itself, and prints one JSON line `{"ms": n, "peakRss"?: bytes}`. `runChild` does this for a script.
@@ -43,6 +43,16 @@ export interface PairedEnv {
   readonly arch: string;
   readonly node: string;
   readonly runner?: string;
+  /** The reads of the fixed work at the start and at the end of the job. A script gives this field with `speedProbe`. */
+  readonly speed?: { readonly start: SpeedProbe; readonly end: SpeedProbe };
+  /** The facts of the first processor. `cpuFacts` gives this field. */
+  readonly cpuFacts?: Readonly<Record<string, string>>;
+}
+
+/** The median time of a fixed work on this computer. One name of a CPU model can hold two speeds, so a report prints this read beside the model. */
+export interface SpeedProbe {
+  readonly cpuMs: number;
+  readonly memoryMs: number;
 }
 
 /** The options of `measureIsolated`. */
@@ -101,6 +111,11 @@ export interface PairedInput {
 export interface PairedReport {
   readonly schema: "paired-time/1";
   readonly mode: Mode;
+  /**
+   * The order of the arms in mode `fresh`. The value `mirrored` is `armOrder` of the bench home.
+   * A report without this field ran with the arms rotated by the round, and `armOrder` of this module gives that order.
+   */
+  readonly order?: "mirrored";
   /** The context of the run: `BENCH_MODE`, else `ci` or `local`, then the flags of Node.js. */
   readonly context?: string;
   readonly env: PairedEnv;
@@ -148,6 +163,53 @@ export function pairedEnv(): PairedEnv {
   };
 }
 
+/** The fields of `/proc/cpuinfo` that a record keeps. */
+const CPU_FACTS = ["cpu family", "model", "stepping", "microcode", "cpu MHz", "cache size", "bogomips"] as const;
+
+/** This function gives the facts of the first processor from the text of `/proc/cpuinfo`, and if its flags name a hypervisor. An empty text gives no facts. The field names are the names that the shared bench home takes. */
+export function cpuFacts(text: string): Readonly<Record<string, string>> {
+  const first = text.split(/\r?\n\r?\n/u)[0] ?? "";
+  const fields = new Map(first.split(/\r?\n/u).map((line) => [line.slice(0, line.indexOf(":")).trim(), line.slice(line.indexOf(":") + 1).trim()] as const));
+  const flags = fields.get("flags");
+  const facts = CPU_FACTS.flatMap((name) => {
+    const value = fields.get(name);
+    return value === undefined ? [] : [[name, value] as const];
+  });
+  return Object.fromEntries(flags === undefined ? facts : [...facts, ["hypervisor", String(flags.split(" ").includes("hypervisor"))] as const]);
+}
+
+/** This function times a fixed loop and a fixed pass over 32 MB, 5 times each, and gives the median of each. It takes under 1 s on a CI runner. */
+export function speedProbe(): SpeedProbe {
+  const timed = (work: () => number): number => {
+    const times: number[] = [];
+    let sink = 0;
+    for (let i = 0; i < 5; i++) {
+      const start = performance.now();
+      sink += work();
+      times.push(performance.now() - start);
+    }
+    if (!Number.isFinite(sink)) throw new Error("The speed probe gave no number.");
+    return times.sort((a, b) => a - b)[2]!;
+  };
+  const cells = new Float64Array(4_000_000);
+  return {
+    cpuMs: timed(() => {
+      let x = 2463534242;
+      for (let i = 0; i < 20_000_000; i++) {
+        x ^= x << 13;
+        x ^= x >>> 17;
+        x ^= x << 5;
+      }
+      return x;
+    }),
+    memoryMs: timed(() => {
+      let sum = 0;
+      for (let pass = 0; pass < 4; pass++) for (let i = 0; i < cells.length; i += 8) sum += cells[i]! + i;
+      return sum;
+    }),
+  };
+}
+
 /** This function gives the context of this process: `BENCH_MODE`, else `ci` in CI and `local` on other computers, then the flags of Node.js. */
 export function pairedContext(): string {
   const where = process.env["BENCH_MODE"] || (process.env["CI"] ? "ci" : "local");
@@ -161,10 +223,10 @@ export function envOf(mode: Mode): RecordEnv {
 }
 
 /**
- * This function gives the order of the arms in one round, as indexes into the arms.
+ * This function gives the order of the arms in one round of a report with no field `order`, as indexes into the arms.
  *
  * - Mode `process`: the order of the arms, reversed in each odd round (ABBA).
- * - Mode `fresh`: the order of the arms, rotated by the index of the round.
+ * - Mode `fresh`: the order of the arms, rotated by the index of the round. A new run does not use it: with 3 or more arms, one arm of a pair runs first in most rounds.
  */
 export function armOrder(arms: number, round: number, mode: Mode): number[] {
   const at = Array.from({ length: arms }, (_, i) => i);
@@ -357,16 +419,16 @@ function measureProcess<I>(o: PairedOptions<I>, arms: readonly Arm<I>[]): Paired
   return pairedReport("process", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
 }
 
-/** This function times the arms with a fresh process for each arm, each input and each round. In round r, each input takes the arms rotated by r. */
+/** This function times the arms with a fresh process for each arm, each input and each round. In each round, each input takes the arms in the order of the bench home. */
 async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
   const arms = armsOf(o);
+  const { armOrder: mirrored } = await import("@mark1russell7/rigor-bench");
   const start = o.startChild ?? startProcess;
   const warmup = o.warmup ?? 1;
   const raw = rawOf(o.inputs, arms);
   for (let round = 0; round < o.repeats; round++) {
     for (const input of o.inputs) {
-      for (const at of armOrder(arms.length, round, "fresh")) {
-        const arm = arms[at]!;
+      for (const arm of mirrored(arms, round)) {
         // The children run one at a time, because two children at one time change the times of each other.
         const result = await start(arm.command!, input.id, warmup);
         if (typeof result?.ms !== "number" || !Number.isFinite(result.ms)) throw new Error(`The child of the arm ${arm.id} on ${input.id} gave no time.`);
@@ -378,7 +440,7 @@ async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
       }
     }
   }
-  return pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
+  return { ...pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw), order: "mirrored" };
 }
 
 /**

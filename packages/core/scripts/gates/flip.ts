@@ -1,14 +1,16 @@
 // The flip tests of the gate checks (GATE-FLIP): an injected fault of a stated size turns a check red, and a copy with no fault stays green in the same job.
-// `node packages/core/scripts/gates/flip.ts --check <heap|work|sections> --out <dir> [--rounds <n>] [--trees <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
+// `node packages/core/scripts/gates/flip.ts --check <heap|work|sentinels|sections> --out <dir> [--rounds <n>] [--trees <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
 // The exit code is 0 only when each arm gives its stated exit code and its stated reason. So a crash is not a red, and a run that cannot decide is not a green.
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
+// - `sentinels` runs `arm-order.ts` on the stored rows of a narrow read: plain, with a factor of `SENTINEL_FAULT` on one sentinel, with an A/A pair over its limit, with 3 of 5 jobs on a model outside the reference, with 3 of 5 jobs on a reference of one job, and with a fault on a job of such a reference. No arm reads a clock.
 // - `sections` runs `sections-bisect.ts --gate` on two commits on top of the checkout: an empty commit, and a commit that spins `SECTIONS_FAULT_SHARE` of the route time.
 //
 // The commits of `sections` are made with the plumbing of git, so the checkout does not change. An arm that cannot decide takes the second attempt, as the job `retry` does.
 import { spawnSync } from "node:child_process";
-import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { SENTINELS, type OrderJob } from "../arm-order-rows.ts";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -26,6 +28,9 @@ export const HEAP_FAULT_MB = 150;
 export const SECTIONS_FAULT_SHARE = 0.2;
 /** The file that the fault of the sections gate changes. */
 export const SECTIONS_FILE = "packages/core/src/routers/sections.ts";
+
+/** The fault of the sentinel check: a factor on one sentinel of one job. */
+export const SENTINEL_FAULT = 1.2;
 
 /** What an arm gave. */
 export interface ArmRead {
@@ -126,6 +131,35 @@ function heapFlip(dir: string): FlipArm[] {
   ];
 }
 
+/** This function gives the flip of the sentinel check, through the exit code of `arm-order.ts`. */
+function sentinelsFlip(dir: string): FlipArm[] {
+  const stored = here("../data/arm-order/narrow-42055478555");
+  const copy = (id: string, change: (job: OrderJob, at: number) => OrderJob): string => {
+    const folder = join(dir, `sentinels-${id}`);
+    mkdirSync(folder, { recursive: true });
+    readdirSync(stored)
+      .sort()
+      .forEach((name, at) => writeFileSync(join(folder, name), JSON.stringify(change(JSON.parse(readFileSync(join(stored, name), "utf8")) as OrderJob, at))));
+    return folder;
+  };
+  const read = (id: string, folder: string, ...option: readonly string[]): { exit: number | null; text: string } => runNode([here("../arm-order.ts"), folder, join(dir, `sentinels-${id}.json`), ...option]);
+  const aaFault = (job: OrderJob, at: number): OrderJob =>
+    at !== 0 ? job : { ...job, inputs: job.inputs.map((input) => (input.id !== SENTINELS[0] ? input : { ...input, ms: { ...input.ms, "old~aa": input.ms["old~aa"]!.map((ms) => ms * SENTINEL_FAULT) } })) };
+  const outside = (job: OrderJob, at: number): OrderJob => (at >= 3 ? job : { ...job, env: { ...job.env, cpu: "a model outside the reference" } });
+  const reference = JSON.parse(readFileSync(here("../data/arm-order/sentinel-reference.json"), "utf8")) as { jobs: readonly { cpu: string }[] };
+  const thinModel = reference.jobs.map((job) => job.cpu).find((cpu, _, all) => all.filter((other) => other === cpu).length === 1);
+  if (thinModel === undefined) throw new Error("The reference has no model with one job, so the thin arms have no input.");
+  const onThin = (jobs: number) => (job: OrderJob, at: number): OrderJob => (at >= jobs ? job : { ...job, env: { ...job.env, cpu: thinModel } });
+  return [
+    judge({ id: "clean", fault: null, ...read("clean", stored) }, { exit: 0, reason: "Sentinels: holds." }),
+    judge({ id: "shape", fault: `a factor of ${SENTINEL_FAULT} on one sentinel of job 1`, ...read("shape", stored, "--fault", String(SENTINEL_FAULT)) }, { exit: 1, reason: "The shape or the A/A pair of job 1 is over its limit." }),
+    judge({ id: "aa", fault: `a factor of ${SENTINEL_FAULT} on the A/A arm of one sentinel of job 1`, ...read("aa", copy("aa", aaFault)) }, { exit: 1, reason: "The shape or the A/A pair of job 1 is over its limit." }),
+    judge({ id: "no-read", fault: "3 of 5 jobs on a model outside the reference", ...read("no-read", copy("no-read", outside)) }, { exit: 1, reason: "3 of 5 jobs have no read" }),
+    judge({ id: "thin-no-read", fault: "3 of 5 jobs on a reference of one job", ...read("thin-no-read", copy("thin-no-read", onThin(3))) }, { exit: 1, reason: "3 of 5 jobs have no read" }),
+    judge({ id: "thin-not-judged", fault: `a factor of ${SENTINEL_FAULT} on one sentinel of a job on a reference of one job, which the check does not judge`, ...read("thin-not-judged", copy("thin-not-judged", onThin(2)), "--fault", String(SENTINEL_FAULT)) }, { exit: 0, reason: "thin: not judged" }),
+  ];
+}
+
 /** This function gives the flip of gate (b) of `Search work`. */
 function workFlip(dir: string): FlipArm[] {
   const stops = join(dir, "stops.jsonl");
@@ -200,10 +234,11 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   const flips: Readonly<Record<string, () => FlipArm[]>> = {
     heap: () => heapFlip(dir),
     work: () => workFlip(dir),
+    sentinels: () => sentinelsFlip(dir),
     sections: () => sectionsFlip(join(out, "sections"), resolve(values.trees ?? join(dir, "trees")), values.rounds),
   };
   const flip = flips[values.check ?? ""];
-  if (flip === undefined) throw new Error(`The check is heap, work or sections, not "${values.check}".`);
+  if (flip === undefined) throw new Error(`The check is heap, work, sentinels or sections, not "${values.check}".`);
   const arms = flip();
   const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), env: envOf("fresh") };
   writeFileSync(join(out, `gate-flip-${record.check}.json`), JSON.stringify(record, null, 1) + "\n");

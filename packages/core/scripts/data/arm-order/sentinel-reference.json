@@ -1,0 +1,126 @@
+{
+ "schema": "sentinel-reference/2",
+ "arm": "old",
+ "jobs": [
+  {
+   "run": "41455276356",
+   "cpu": "AMD EPYC 7763 64-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 34.398769,
+    "router:clustered-100-s0": 40.0306135,
+    "router:hubs-100-s0": 34.1047475,
+    "router:fanout-100-s0": 52.218467000000004,
+    "setup:uniform-100-s0": 217.0581355,
+    "setup:fanout-100-s0": 195.10501549999998
+   }
+  },
+  {
+   "run": "41455276356",
+   "cpu": "AMD EPYC 9V45 96-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 20.804145500000004,
+    "router:clustered-100-s0": 27.01752000000001,
+    "router:hubs-100-s0": 20.536002500000002,
+    "router:fanout-100-s0": 32.580816000000006,
+    "setup:uniform-100-s0": 123.81882800000001,
+    "setup:fanout-100-s0": 110.70846350000001
+   }
+  },
+  {
+   "run": "41455276356",
+   "cpu": "AMD EPYC 7763 64-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 33.18814499999999,
+    "router:clustered-100-s0": 37.5085545,
+    "router:hubs-100-s0": 33.70951049999999,
+    "router:fanout-100-s0": 51.7143025,
+    "setup:uniform-100-s0": 213.78802300000004,
+    "setup:fanout-100-s0": 196.8530595
+   }
+  },
+  {
+   "run": "41455276356",
+   "cpu": "AMD EPYC 9V74 80-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 26.90151850000001,
+    "router:clustered-100-s0": 30.221000500000002,
+    "router:hubs-100-s0": 25.965825499999994,
+    "router:fanout-100-s0": 40.2361715,
+    "setup:uniform-100-s0": 162.5553645,
+    "setup:fanout-100-s0": 149.527564
+   }
+  },
+  {
+   "run": "41455276356",
+   "cpu": "AMD EPYC 7763 64-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 33.940064500000005,
+    "router:clustered-100-s0": 42.131851499999996,
+    "router:hubs-100-s0": 34.46456300000001,
+    "router:fanout-100-s0": 53.920789499999984,
+    "setup:uniform-100-s0": 209.759591,
+    "setup:fanout-100-s0": 197.62291899999997
+   }
+  },
+  {
+   "run": "42055478555",
+   "cpu": "AMD EPYC 9V74 80-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 34.20573599999999,
+    "router:clustered-100-s0": 37.44436300000001,
+    "router:hubs-100-s0": 32.249159000000006,
+    "router:fanout-100-s0": 50.46939450000001,
+    "setup:uniform-100-s0": 206.73266950000004,
+    "setup:fanout-100-s0": 192.1045815
+   }
+  },
+  {
+   "run": "42055478555",
+   "cpu": "AMD EPYC 9V74 80-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 25.511047000000005,
+    "router:clustered-100-s0": 32.48292500000001,
+    "router:hubs-100-s0": 25.479762500000007,
+    "router:fanout-100-s0": 39.701400500000005,
+    "setup:uniform-100-s0": 163.107351,
+    "setup:fanout-100-s0": 150.2438065
+   }
+  },
+  {
+   "run": "42055478555",
+   "cpu": "AMD EPYC 9V74 80-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 27.025140500000006,
+    "router:clustered-100-s0": 29.557080499999998,
+    "router:hubs-100-s0": 24.604017999999996,
+    "router:fanout-100-s0": 38.495926,
+    "setup:uniform-100-s0": 161.139818,
+    "setup:fanout-100-s0": 148.83363950000003
+   }
+  },
+  {
+   "run": "42055478555",
+   "cpu": "AMD EPYC 7763 64-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 33.2111115,
+    "router:clustered-100-s0": 38.30117849999999,
+    "router:hubs-100-s0": 34.87660550000001,
+    "router:fanout-100-s0": 53.726821000000015,
+    "setup:uniform-100-s0": 214.336134,
+    "setup:fanout-100-s0": 197.94918050000004
+   }
+  },
+  {
+   "run": "42055478555",
+   "cpu": "AMD EPYC 9V74 80-Core Processor",
+   "medians": {
+    "router:uniform-100-s0": 34.5193125,
+    "router:clustered-100-s0": 37.27448150000001,
+    "router:hubs-100-s0": 33.718140000000005,
+    "router:fanout-100-s0": 53.105161499999994,
+    "setup:uniform-100-s0": 208.73217449999999,
+    "setup:fanout-100-s0": 192.866961
+   }
+  }
+ ]
+}

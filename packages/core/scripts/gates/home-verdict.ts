@@ -1,14 +1,14 @@
 // The time verdict of the shared bench home `@mark1russell7/rigor-bench` on a report of schema paired-time/1 (GATE-LIMITS slice 2).
 // The home has the four outcomes faster, slower, same and cannot decide. This module maps the rounds of a report to its `PairedTime` records.
 // Only the scripts that have the installed packages import this module. The sections gate imports it with `import()` in its job.
-import { timeVerdict, type PairedTime, type TimeVerdict, type VerdictOptions } from "@mark1russell7/rigor-bench";
+import { armOrder as mirrored, timeVerdict, type PairedTime, type TimeVerdict, type VerdictOptions } from "@mark1russell7/rigor-bench";
 import { aaId, armOrder, type PairedReport } from "./paired.ts";
 
 /**
  * This function gives the records of the home for one arm against the base of a report on one input.
  *
  * - Each round is one case of the home, with the name `<input> #<round>`. Each round is a pair of fresh processes, so the rounds are the samples.
- * - The arm `a` is the base, and the arm `b` is the other arm. The field `first` tells which of the two ran first in the round.
+ * - The arm `a` is the base, and the arm `b` is the other arm. The field `first` tells which of the two ran first in the round, by the order that the report states.
  * - A round with a time that is not a finite number above 0 is not in the list. An unknown input or arm gives an empty list.
  */
 export function pairedTimes(report: PairedReport, input: string, arm: string): PairedTime[] {
@@ -24,7 +24,7 @@ export function pairedTimes(report: PairedReport, input: string, arm: string): P
     const a = base[k];
     const b = other[k];
     if (!ok(a) || !ok(b)) continue;
-    const order = armOrder(report.arms.length, k, report.mode);
+    const order = report.order === "mirrored" ? mirrored(report.arms.map((_, i) => i), k) : armOrder(report.arms.length, k, report.mode);
     out.push({ case: `${input} #${k}`, round: k, first: order.indexOf(baseAt) < order.indexOf(at) ? "a" : "b", a, b });
   }
   return out;

@@ -27,10 +27,11 @@ describe("the timing of a pair", () => {
     expect(report.arms).toEqual([PARENT_ARM, COMMIT_ARM, aaId(PARENT_ARM)]);
     expect(report.env.cpu).toBe("Made-up CPU");
     // 3 rounds x 2 inputs x 3 arms, one child at a time. The A/A arm starts the command of the parent.
+    // The second round of the input `a` is the mirror of the first round. The arm `commit` stays in the middle.
     expect(calls).toHaveLength(18);
     expect(calls.every((c) => c.warmup === 0)).toBe(true);
     expect(calls.slice(0, 3).map((c) => c.command)).toEqual(["old", "new", "old"]);
-    expect(calls.slice(6, 9).map((c) => c.command)).toEqual(["new", "old", "old"]);
+    expect(calls.slice(6, 9).map((c) => c.command)).toEqual(["old", "new", "old"]);
     expect(report.inputs.map((i) => i.id)).toEqual(["a", "b"]);
     expect(report.inputs[0]!.ratio[COMMIT_ARM]).toBeCloseTo(3, 10);
     expect(report.inputs[1]!.median[PARENT_ARM]).toBe(50);
@@ -40,10 +41,10 @@ describe("the timing of a pair", () => {
     const { start, calls } = fakeStart({ old: 1, new: 2, fix: 4 }, { a: 100 });
     const report = await confirmPair({ parent: ["old"], commit: ["new"], others: [{ id: "fixed", command: ["fix"] }], inputs: ["a"], rounds: 4, startChild: start, env: ENV, context: "test" });
     expect(report.arms).toEqual([PARENT_ARM, COMMIT_ARM, "fixed", aaId(PARENT_ARM)]);
-    // 4 rounds x 1 input x 4 arms. The order rotates by one arm in each round.
+    // 4 rounds x 1 input x 4 arms. An odd round is the reverse of the round before it, and the last arm of the first round is the A/A arm.
     expect(calls).toHaveLength(16);
     expect(calls.slice(0, 4).map((c) => c.command)).toEqual(["old", "new", "fix", "old"]);
-    expect(calls.slice(4, 8).map((c) => c.command)).toEqual(["new", "fix", "old", "old"]);
+    expect(calls.slice(4, 8).map((c) => c.command)).toEqual(["old", "fix", "new", "old"]);
     expect(report.inputs[0]!.ratio["fixed"]).toBeCloseTo(4, 10);
   });
 

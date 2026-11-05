@@ -109,7 +109,7 @@ The A/A arm of the same jobs gives the resolution of the time test, not a fixed 
 - An empty tail set in only some jobs makes the tail decision not valid.
 - The record keeps the 5 medians and tails, the worst A/A values with their spreads, and the CI run. It keeps the CPU model of each job.
 
-CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default in one job, with a fresh process for each arm, each input and each round. The order of the arms rotates by the round.
+CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default in one job, with a fresh process for each arm, each input and each round. The order of the arms is `armOrder` of `@mark1russell7/rigor-bench`.
 <!-- /shared:win-test -->
 
 <!-- shared:noise-guard -->

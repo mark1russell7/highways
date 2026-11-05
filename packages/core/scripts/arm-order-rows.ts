@@ -2,7 +2,9 @@
  * This module makes the record `arm-order/1` (ARM-ORDER).
  * Mode `fresh` of `gates/paired.ts` rotates the arms by round. With 3 arms, one arm of a pair goes first in 2 of 3 rounds.
  * This read asks if the order moves a ratio. It compares the rounds where each arm of a pair goes first, with a shuffle of those labels as the control.
+ * A paired record with the field `order` states the mirrored order of the bench home, and this read takes the order of a record from that field.
  */
+import { armOrder as mirrored } from "@mark1russell7/rigor-bench";
 import { median, quantile } from "@mark1russell7/rigor-statistics";
 import { mulberry32 } from "@mark1russell7/rigor-generators";
 
@@ -27,8 +29,10 @@ export interface OrderInput {
 export interface OrderJob {
   readonly schema: string;
   readonly mode: string;
+  /** The value `mirrored` states `armOrder` of the bench home. A record without this field rotated the arms by the round. */
+  readonly order?: "mirrored";
   readonly arms: readonly string[];
-  readonly env?: { readonly cpu?: string };
+  readonly env?: { readonly cpu?: string; readonly speed?: unknown };
   readonly inputs: readonly OrderInput[];
 }
 
@@ -78,6 +82,13 @@ export function rotatedOrder(
   return [...arms.slice(shift), ...arms.slice(0, shift)];
 }
 
+/** This function gives the arms of a round of one job, by the order that the job states. */
+export function orderOf(job: OrderJob, round: number): readonly string[] {
+  return job.order === "mirrored"
+    ? mirrored(job.arms, round)
+    : rotatedOrder(job.arms, round);
+}
+
 function shuffled(labels: readonly boolean[], next: () => number): boolean[] {
   const items = [...labels];
   for (let at = items.length - 1; at > 0; at -= 1) {
@@ -112,7 +123,7 @@ function readInputs(
         if (a > 0 && b > 0) logs.push({ round, log: Math.log(b / a) });
       }
       const stated = logs.map(({ round }) => {
-        const order = rotatedOrder(job.arms, round);
+        const order = orderOf(job, round);
         return order.indexOf(base) < order.indexOf(other);
       });
       const labels = next ? shuffled(stated, next) : stated;
@@ -247,8 +258,136 @@ export function orderSlice(jobs: readonly OrderJob[]) {
   };
 }
 
+/** The inputs that the sentinel check reads. Each one is outside the group of the claim. */
+export const SENTINELS = [
+  "router:uniform-100-s0",
+  "router:clustered-100-s0",
+  "router:hubs-100-s0",
+  "router:fanout-100-s0",
+  "setup:uniform-100-s0",
+  "setup:fanout-100-s0",
+] as const;
+
+/** The largest absolute log of a sentinel after the check takes off the median of its job. */
+export const SHAPE_LIMIT = 0.12;
+
+/** The largest absolute median log of the A/A pair on a sentinel. */
+export const SENTINEL_AA_LIMIT = 0.16;
+
+/** The fewest jobs on a model of the reference that give a read. */
+export const SENTINEL_JOBS = 3;
+
+/** The old arm of one job of a reference run: the median time of each sentinel. */
+export interface SentinelReference {
+  readonly run?: string;
+  readonly cpu: string;
+  readonly medians: Readonly<Record<string, number>>;
+}
+
+/** The words of the sentinel check on what it gives up. */
+export const SENTINEL_LIMIT = "An even slowdown passes, so no compare of ms across runs rests on this check.";
+
+/** The words of the sentinel check on a reference of one job. A replay on stored rows gives these counts, against one job of each model. */
+export const SENTINEL_THIN =
+  "A job on a reference of one job is not judged, because a job with no fault read .1274 against one job, over the limit .12. So the check gives up these reads of a fault of 1.2 on one sentinel: red on 113 of 120 on 9V74, and on 69 of 72 on 7763.";
+
+/** The sentinel check of one job. The field `holds` is null, a no read, when the reference has one job or no job on the model of this job. */
+export interface SentinelRead {
+  readonly job: number;
+  readonly cpu: string;
+  /** The number of jobs of the reference on this model. */
+  readonly referenceJobs: number;
+  /** The text `thin: not judged` marks a job on a reference of one job, and the text `no read` marks a job with no reference. */
+  readonly note?: string;
+  /** The median log of the sentinels against the reference. The check prints this value and does not judge it. */
+  readonly level: number | null;
+  readonly shape: number | null;
+  readonly aa: number;
+  readonly holds: boolean | null;
+  readonly speed?: unknown;
+}
+
+/**
+ * This function reads the sentinels of each job as a shape.
+ * It takes the logs of a job less their own median, and the same logs of each reference job on the model. The shape is the largest distance between the job and the mean of the reference.
+ * So the level of a reference job does not count, and jobs of two speeds of one model can both be in the reference.
+ * An even factor on all the sentinels of a job passes, because one name of a CPU model can hold two speeds.
+ * The check cannot find an even shift, so a read of times across two runs cannot rest on it.
+ */
+export function sentinelReads(reference: readonly SentinelReference[], jobs: readonly OrderJob[]): readonly SentinelRead[] {
+  return jobs.map((job, at) => {
+    const cpu = job.env?.cpu ?? "unknown";
+    const known = reference.filter((r) => r.cpu === cpu);
+    const inputs = SENTINELS.map((id) => {
+      const input = job.inputs.find((i) => i.id === id);
+      if (!input) throw new Error(`The job ${at + 1} has no sentinel ${id}.`);
+      return input;
+    });
+    const [base, ...others] = job.arms;
+    const twin = others.find((arm) => arm === `${base}~aa`);
+    if (!base || !twin) throw new Error(`The job ${at + 1} has no A/A pair.`);
+    const aa = Math.max(
+      ...inputs.map((input) => {
+        const old = input.ms[base]!;
+        return Math.abs(median(input.ms[twin]!.map((ms, round) => Math.log(ms / old[round]!))));
+      }),
+    );
+    const speed = job.env?.speed === undefined ? {} : { speed: job.env.speed };
+    if (known.length === 0) return { job: at + 1, cpu, referenceJobs: 0, note: "no read", level: null, shape: null, aa, holds: null, ...speed };
+    const refs = known.map((r) => {
+      const logs = SENTINELS.map((id) => Math.log(r.medians[id]!));
+      const own = median(logs);
+      return { own, shape: logs.map((log) => log - own) };
+    });
+    const mean = (values: readonly number[]): number => values.reduce((sum, value) => sum + value, 0) / values.length;
+    const logs = inputs.map((input) => Math.log(median(input.ms[base]!)));
+    const own = median(logs);
+    const apart = logs.map((log, at) => log - own - mean(refs.map((r) => r.shape[at]!)));
+    const centre = median(apart);
+    const level = own - mean(refs.map((r) => r.own));
+    const shape = Math.max(...apart.map((value) => Math.abs(value - centre)));
+    if (known.length === 1) return { job: at + 1, cpu, referenceJobs: 1, note: "thin: not judged", level, shape, aa, holds: null, ...speed };
+    return { job: at + 1, cpu, referenceJobs: known.length, level, shape, aa, holds: shape <= SHAPE_LIMIT && aa <= SENTINEL_AA_LIMIT, ...speed };
+  });
+}
+
+/** This function gives a copy of a job with a factor on each arm of one sentinel. It is the fault of the flip of the check. */
+export function sentinelFault(job: OrderJob, id: string, factor: number): OrderJob {
+  return {
+    ...job,
+    inputs: job.inputs.map((input) =>
+      input.id === id ? { ...input, ms: Object.fromEntries(Object.entries(input.ms).map(([arm, ms]) => [arm, ms.map((value) => value * factor)])) } : input,
+    ),
+  };
+}
+
+/** The verdict of the sentinel check over the jobs of one run. */
+export interface SentinelVerdict {
+  readonly verdict: "holds" | "fails";
+  /** The text of the verdict. A failed run names its reason here. */
+  readonly reason: string;
+  readonly jobs: number;
+  /** The jobs on a model with one job in the reference. */
+  readonly oneJobReference: number;
+  /** The jobs on a model with one job or no job in the reference. A no read is not a hold. */
+  readonly noRead: number;
+  readonly limit: string;
+  /** What the check gives up on a reference of one job. */
+  readonly thin: string;
+}
+
+/** This function gives the verdict over the jobs: it fails on one job that fails, and on fewer than `SENTINEL_JOBS` jobs with a read. */
+export function sentinelVerdict(reads: readonly SentinelRead[]): SentinelVerdict {
+  const failed = reads.filter((r) => r.holds === false).map((r) => r.job);
+  const noRead = reads.filter((r) => r.holds === null).length;
+  const counts = { jobs: reads.length, oneJobReference: reads.filter((r) => r.referenceJobs === 1).length, noRead, limit: SENTINEL_LIMIT, thin: SENTINEL_THIN };
+  if (failed.length > 0) return { verdict: "fails", reason: `The shape or the A/A pair of job ${failed.join(", ")} is over its limit.`, ...counts };
+  if (reads.length - noRead < SENTINEL_JOBS) return { verdict: "fails", reason: `${noRead} of ${reads.length} jobs have no read, because the reference has one job or no job on their model.`, ...counts };
+  return { verdict: "holds", reason: `${reads.length - noRead} of ${reads.length} jobs hold the shape.`, ...counts };
+}
+
 /** This function makes the record from the paired records of one run. */
-export function orderRecord(all: readonly OrderJob[], run: string) {
+export function orderRecord(all: readonly OrderJob[], run: string, reference: readonly SentinelReference[] = []) {
   const jobs = freshJobs(all);
   const first = jobs[0];
   if (!first) throw new Error("No job of mode fresh.");
@@ -256,7 +395,7 @@ export function orderRecord(all: readonly OrderJob[], run: string) {
     schema: SCHEMA,
     regenerate: REGENERATE,
     run,
-    order: "rotated",
+    order: first.order ?? "rotated",
     arms: first.arms,
     cpu: first.env?.cpu,
     jobs: jobs.length,
@@ -267,5 +406,6 @@ export function orderRecord(all: readonly OrderJob[], run: string) {
       readPair(jobs, base, other),
     ),
     slice: orderSlice(jobs),
+    sentinels: { reads: sentinelReads(reference, jobs), ...sentinelVerdict(sentinelReads(reference, jobs)) },
   };
 }
