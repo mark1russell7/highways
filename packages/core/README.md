@@ -284,12 +284,14 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 
 | Router | Board | Body crossings, `run` → `bundle` | End crossings, `run` → `bundle` |
 |---|---|---:|---:|
-| `shared` | `case-dense-groups` | 10 → 0 | 366 → 162 |
-| `shared-all` | `case-dense-groups` | 0 → 0 | 1586 → 838 |
-| `shared-all` | `case-hub-chain` | 2 → 3 | 603 → 73 |
-| `shared-all` | `case-many-groups` | 12 → 0 | 2301 → 687 |
+| `shared` | `case-dense-groups` | 1 → 1 | 392 → 172 |
+| `shared-all` | `case-dense-groups` | 0 → 0 | 1663 → 884 |
+| `shared-all` | `case-hub-chain` | 0 → 0 | 627 → 91 |
+| `shared-all` | `case-many-groups` | 0 → 0 | 2375 → 720 |
 
-With `bundle`, 90% or more of the end crossings that stay are necessary. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
+This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
+
+With `bundle`, 90% or more of the end crossings that stay are necessary, by a read on version 1. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
 
 ### Where the lanes leave a trunk
 
@@ -307,8 +309,10 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 | Router | Board | Worst lane spacing error, `split` → `part` | Body crossings, `split` → `part` |
 |---|---|---:|---:|
 | `trunks` | `case-dense-groups` | 45.6% → 0.6% | 0 → 0 |
-| `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 3 → 0 |
-| `trunks-all` | `case-many-groups` | 68.2% → 47.6% | 1 → 0 |
+| `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 2 → 0 |
+| `trunks-all` | `case-many-groups` | 102.8% → 47.6% | 0 → 0 |
+
+This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
 
 The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
 
