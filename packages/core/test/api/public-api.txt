@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1513 names
+## . (build/index.d.ts): 1516 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -613,6 +613,9 @@ SCREEN_V4_ROOM: build/index.d.ts#SCREEN_V4_ROOM
 SCREEN_V5: build/index.d.ts#SCREEN_V5
 SCREEN_V5_HELD_OUT: build/index.d.ts#SCREEN_V5_HELD_OUT
 SCREEN_V5_KEYS: build/index.d.ts#SCREEN_V5_KEYS
+SCREEN_V6: build/index.d.ts#SCREEN_V6
+SCREEN_V6_HELD_OUT: build/index.d.ts#SCREEN_V6_HELD_OUT
+SCREEN_V6_INNER: build/index.d.ts#SCREEN_V6_INNER
 SCREEN_WRAPS: build/index.d.ts#SCREEN_WRAPS
 SEAM_DEFAULTS: build/index.d.ts#SEAM_DEFAULTS
 SEARCH_DEFAULTS: build/index.d.ts#SEARCH_DEFAULTS
@@ -4892,6 +4895,15 @@ export declare const SCREEN_V5_HELD_OUT: readonly number[];
 
 ### build/index.d.ts#SCREEN_V5_KEYS
 export declare const SCREEN_V5_KEYS: readonly EdgeKey[];
+
+### build/index.d.ts#SCREEN_V6
+export declare const SCREEN_V6: ScreenSet;
+
+### build/index.d.ts#SCREEN_V6_HELD_OUT
+export declare const SCREEN_V6_HELD_OUT: readonly number[];
+
+### build/index.d.ts#SCREEN_V6_INNER
+export declare const SCREEN_V6_INNER: readonly number[];
 
 ### build/index.d.ts#SCREEN_WRAPS
 export declare const SCREEN_WRAPS: readonly ScreenWrap[];
