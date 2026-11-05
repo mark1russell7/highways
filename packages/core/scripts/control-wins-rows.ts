@@ -55,7 +55,8 @@ export const CONTROL_PARTNERS: Readonly<Record<(typeof CONTROLS)[number], Readon
     ].map((name) => [name, "route.through"]),
   ),
   "border-walk": {},
-  "border-walk-short": {},
+  // The short walker cuts the corners of the boxes. So it wins the length, and it keeps close to the boxes.
+  "border-walk-short": { "route.length": "route.clearance.tight" },
 };
 
 /**

@@ -55,10 +55,9 @@ describe("the control border-walk", () => {
   });
 
   it("does not mark through and gives no shared run", () => {
-    for (const route of WALK.route(PACKED).routes) {
-      expect(route.through).toBeUndefined();
-      expect(route.runs).toBeUndefined();
-    }
+    const result = WALK.route(PACKED);
+    for (const route of result.routes) expect(route.through).toBeUndefined();
+    expect(result.runs).toBeUndefined();
   });
 
   it("gives no route for an edge with an unknown box", () => {
@@ -67,7 +66,7 @@ describe("the control border-walk", () => {
   });
 
   it("has a strategy with valid defaults, which the router reads", () => {
-    expect(checkOptions(borderWalkStrategy.schema, BORDER_WALK_DEFAULTS)).toEqual([]);
+    expect(checkOptions(borderWalkStrategy, BORDER_WALK_DEFAULTS)).toEqual([]);
     expect(borderWalkStrategy.run(PACKED, BORDER_WALK_DEFAULTS)).toEqual(WALK.route(PACKED));
   });
 });
