@@ -13,9 +13,11 @@ import { RESULT_FILES, snapshotFiles } from "./results-files.ts";
  */
 export function kpiFacts(root: string): KpiFacts {
   const text = (file: string): string => readFileSync(join(root, file), "utf8");
+  const verdicts = snapshotFiles(root).map((file) => JSON.parse(file.text) as { readonly core?: string; readonly verified?: { readonly core?: string } });
   return {
     demoComplete: demoComplete(pageCoverage()),
     coverageCells: coverageView(text(RESULT_FILES.coverage), text(RESULT_FILES.coverageTrend)).cells,
-    verdictCores: snapshotFiles(root).map((file) => (JSON.parse(file.text) as { readonly core?: string }).core),
+    verdictCores: verdicts.map((s) => s.core),
+    verdictReads: verdicts.map((s) => s.verified?.core ?? s.core),
   };
 }
