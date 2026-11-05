@@ -279,7 +279,11 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 | `Xplat OK` | A missing cell, a missing route, or a job that stops. | A route that differs between the cells, the time and the quality. The tables only report them. | None at this time. |
 | `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
 
-`Scale OK`, `Search objective OK`, `Screen OK` and gate (a) of `Search work OK` check that their inputs exist. They do not judge what they measure.
+Two rulesets require all 8 checks of this table on `main`, so one ruleset alone does not hold the list. Read the list with `gh api repos/mark1russell7/highways/rules/branches/main`.
+
+`Scale OK`, `Search objective OK` and `Screen OK` are required by a ruleset, and they read inputs only. `Search work OK` is also required, and only its gate (b) judges a result.
+
+So each merge waits on these four checks, and they do not judge what they measure.
 
 A green on one of these checks is not a result. Do not count it as a pass on a measure, on a page or in a pull request.
 
