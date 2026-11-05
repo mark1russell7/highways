@@ -141,7 +141,7 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 
 **Lines of the pages that compare routers that share segments.**
 
-| Place | Claim | State on the record `route-pairs/1` |
+| Place | Claim | State on the record `route-pairs/2` |
 |---|---|---|
 | `README.md:61` | `shared` and `shared-all`: the crossings go down by 4 to 30 times. | The line states the limit of the count. `shared-all` reads 1.033 of `corners` in pairs. |
 | `README.md:71` | `sections-tree`: 3.4 to 5.1 times fewer crossings. | The line states no limit. This router is not in the record. |
@@ -156,6 +156,27 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 | `docs/research/CATALOG.md:1730` | `crossingWeight` 0.3 gains on R1. | Not read. |
 | `docs/research/CATALOG.md:1876` | `approval`: 1.288 crossings for each edge, against 2.079 of `shared`. | Not read. |
 | `packages/site/src/compare-data.ts:119` | The row `R1.crossings` of the compare page. | A measure with no claim. It needs a partner row. |
+
+### The relation of the two crossing counts
+
+`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The exact relation is this one, for one result with no sample:
+
+`crossings - self - touch <= pairs`
+
+- `self` counts the crossings of two segments that one route alone draws. The pair count leaves out a route that crosses itself.
+- `touch` counts the other crossings that are not strict on the grid `EPS`: the segments touch, or an end of one lies on the other. The float test can read such a place as a strict crossing.
+
+The function `paintedOutsidePairs` reads the two classes, and the record `route-pairs/2` holds them on each of its 375 rows. A test holds the relation on each row. A later row outside the relation is a finding, and it is not noise.
+
+The pair count is under the painted count on 5 of the 375 rows:
+
+| Board | Router | `crossings` | `pairs` | Class |
+|---|---|---:|---:|---|
+| `local-mesh`, seed 0 | `sections-site` | 910 | 908 | `self` 73 |
+| `local-mesh`, seed 1 | `sections-site` | 845 | 824 | `self` 82 |
+| `packed-grid`, seed 1 | `corners` | 298 | 297 | `touch` 1 |
+| `packed-grid`, seed 1 | `shared` | 298 | 297 | `touch` 1 |
+| `packed-grid`, seed 1 | `shared-all` | 298 | 297 | `touch` 1 |
 
 ### The exact forms of MEAS3A
 
