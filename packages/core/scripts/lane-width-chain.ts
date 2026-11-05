@@ -215,7 +215,7 @@ const registry = highwaysRegistry();
 const boards = HIGHWAYS_FAMILIES.flatMap((f) => SEEDS.map((seed) => ({ family: f.name, seed })));
 const rows: unknown[] = [];
 for (const router of routers) {
-  const totals = ARMS.map(() => ({ points: 0, pairs: 0, body: 0, ends: 0, length: 0, boardsFall: 0, against: noRise(), jog: noRise(), byBoard: [] as (readonly [number, number])[] }));
+  const totals = ARMS.map(() => ({ points: 0, pairs: 0, body: 0, ends: 0, length: 0, boardsFall: 0, against: noRise(), againstLane: noRise(), byBoard: [] as (readonly [number, number])[] }));
   for (const { family, seed } of boards) {
     const board = registry.generate(family, seed).graph;
     const g = segmentsOf(router.route(board));
@@ -236,7 +236,7 @@ for (const router of routers) {
       for (const r of laneRoutes(c, open, LANES.width, LANES.maxWidth)) t.length += polylineLength(r.points);
       const steps = stepsOf(c);
       addRise(t.against, base, p, steps);
-      if (arm.jog === "step") addRise(t.jog, painted[ARMS.findIndex((o) => o.width === arm.width && o.jog === "lane")]!, p, steps);
+      if (arm.jog === "step") addRise(t.againstLane, painted[ARMS.findIndex((o) => o.width === arm.width && o.jog === "lane")]!, p, steps);
     });
     console.log(router.name, family, seed);
   }

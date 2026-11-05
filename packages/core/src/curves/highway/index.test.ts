@@ -152,11 +152,11 @@ describe("the option jogSpan of highwayCurves", () => {
     paths: ["a", "b", "c", "d"].map((edge, i) => ({ edge, segments: [lane("narrow", i), lane("wide", i)] })),
   };
   const open = new Set([runKey(step.segments[0]!.edges)]);
-  /** This function gives the place where a lane ends its shift. */
+  /** This function gives the place where a lane comes to its widest offset, after the step. */
   const ends = (curve: readonly CurveSegment[]): number => {
     const samples = sampleCurve([...curve], 0.001);
-    const last = samples[samples.length - 1]!;
-    return samples.find((p) => p.x > 200 && Math.abs(p.y - last.y) < 1e-6)!.x;
+    const widest = Math.max(...samples.map((p) => Math.abs(p.y)));
+    return samples.find((p) => Math.abs(p.y) > widest - 1e-6)!.x;
   };
 
   it("gives each lane at one step the length of the largest shift", () => {
