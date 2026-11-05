@@ -4,7 +4,7 @@
  * The row does not tell if the verdict moves. A Screen with `route.crossings.pairs` tells that.
  * Usage: `node packages/core/scripts/route-pairs-claims.ts <out.json>`.
  */
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -76,7 +76,7 @@ export function claimsRecord(rows: readonly ClaimRow[]) {
   };
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const out = process.argv[2];
   if (!out) throw new Error("Usage: node packages/core/scripts/route-pairs-claims.ts <out.json>");
   mkdirSync(dirname(out), { recursive: true });
