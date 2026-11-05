@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| RESULTS-READ | A read on a later core stamps a verdict snapshot when its rows are the same. The Results page tells "measured on" and "verified on". `kpi.json` counts the snapshots with no read on the minor of the engine (`results-unread`). `router` `screen-v1` on 0.15.0 gives the same 40 rows as on 0.9.2. | 2026-11-05 | [#356](https://github.com/mark1russell7/highways/pull/356) |
 | CROSSINGS-SAMPLE | The record `crossings-sample/1` reads each estimate of `route.crossings` on the benchmark against a full count. The error reaches 16.03%. 18 of 132 rows hold an estimate. The verdict sets stay under the limit by size, and the next Screen confirms it. | 2026-11-05 | [#334](https://github.com/mark1russell7/highways/pull/334) |
 | BENCH-NO-PUSH | The workflow `Bench` does not start on a push. No gate or page read the run of a push, and each one took 158 job-minutes. The nightly run and a dispatch stay. | 2026-11-05 | #338 |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
