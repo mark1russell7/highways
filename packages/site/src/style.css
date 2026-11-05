@@ -205,6 +205,16 @@ main {
   filter: brightness(1.12);
 }
 
+.exit.opt-in {
+  border-style: dashed;
+}
+
+.router-tag {
+  flex: none;
+  align-self: center;
+  margin-left: 8px;
+}
+
 .exit[aria-checked="true"] {
   color: var(--yellow-ink);
   background: var(--yellow);

@@ -36,12 +36,12 @@ describe("the opt-in routers on the compare page (PHYSICAL-VISIBLE)", () => {
     expect(names).toHaveLength(defaults.length + 11);
   });
 
-  it("keeps each other step of the page, and the live demo, on the built-in strategies", () => {
+  it("keeps each other step of the page on the built-in strategies, and gives the demo the same registry", () => {
     for (const step of ["group", "plugs", "highway", "levels", "curve", "room", "whole"] as const) {
       expect(listStrategies(COMPARE_STRATEGIES, step)).toEqual(listStrategies(STRATEGIES, step));
     }
     expect(BUILT_IN_STRATEGIES.some((s) => OPT_IN_NOTES[s.name] !== undefined && s.step === "router")).toBe(false);
-    expect(demoPickers().find((p) => p.step === "router")?.names).toEqual(listStrategies(STRATEGIES, "router").map((s) => s.name));
+    expect(demoPickers().find((p) => p.step === "router")?.names).toEqual(listStrategies(COMPARE_STRATEGIES, "router").map((s) => s.name));
   });
 
   it("runs each opt-in router live on the first board, with no hard-rule fault", () => {

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { siteKpi } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
 import type { BenchMeta } from "./src/bench-label.ts";
+import { kpiFacts } from "./src/kpi-files.ts";
 import { siteKpiInput } from "./src/kpi.ts";
 import { buildInfo, dataLineHtml, readResults, RESULT_FILES } from "./src/results-files.ts";
 import { BUILT_FILE, readStrategies } from "./src/strategies-files.ts";
@@ -18,7 +19,7 @@ const root = fileURLToPath(new URL("../../", import.meta.url));
 function kpiInput(): NonNullable<ReturnType<typeof siteKpiInput>> {
   const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
   const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
-  const input = siteKpiInput(meta, core, (file) => existsSync(page(file)));
+  const input = siteKpiInput(meta, core, (file) => existsSync(page(file)), kpiFacts(root));
   if (input === undefined) throw new Error("bench-meta.json has no date, so kpi.json has no time of the data.");
   return input;
 }

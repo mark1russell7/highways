@@ -1,5 +1,8 @@
 import { OPT_IN_STRATEGIES, register, STRATEGIES, type AnyStrategy, type Registry } from "@mark1russell7/highways";
 
+/** The tag of an opt-in router on the demo and on the compare page. */
+export const OPT_IN_TAG = "Opt-in, not promoted";
+
 /** The note of one opt-in router on the compare page. Its numbers are recorded numbers, so they stay the same on each board. */
 export interface OptInNote {
   /** The file of the repository that has the numbers of `text`. */
@@ -84,7 +87,7 @@ function limited(router: AnyStrategy): AnyStrategy {
 }
 
 /**
- * The registry of the compare page: `STRATEGIES` and the opt-in routers.
- * The live demo stays on `STRATEGIES`, so its first drawing does not change.
+ * The registry of the demo and of the compare page: `STRATEGIES`, then the opt-in routers with the limits of their notes.
+ * The built-in strategies come first and the picks of the demo stay the same, so its first drawing does not change.
  */
 export const COMPARE_STRATEGIES: Registry = register(STRATEGIES, ...OPT_IN_STRATEGIES.map(limited));
