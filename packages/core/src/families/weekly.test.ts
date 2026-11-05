@@ -21,6 +21,9 @@ const DIGESTS: Readonly<Record<string, readonly [string, number, number]>> = {
   escape: ["8314365f93e18055", 130, 30],
   rings: ["d8e600cad6562d6b", 35, 13],
   "walled-level": ["150c7fb2761dd0f9", 50, 13],
+  layered: ["e0505a42708137f6", 24, 29],
+  "lattice-x": ["85b850f156c7175e", 35, 33],
+  "arc-row": ["7bd05f341217b6fd", 24, 23],
 };
 
 const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -61,9 +64,9 @@ function reached(table: readonly (readonly boolean[])[]): number {
 }
 
 describe("the families of FAMILIES-WEEKLY", () => {
-  it("has 10 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
+  it("has 13 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
     expect(WEEKLY_FAMILIES.map((f) => f.name)).toEqual(Object.keys(DIGESTS));
-    expect(HIGHWAYS_FAMILIES.slice(-10)).toEqual(WEEKLY_FAMILIES);
+    expect(HIGHWAYS_FAMILIES.slice(-13)).toEqual(WEEKLY_FAMILIES);
     for (const f of WEEKLY_FAMILIES) expect([f.version, f.owner, f.crossEngine], f.name).toEqual([1, "highways", "exact"]);
   });
 
@@ -313,4 +316,51 @@ describe("the families of FAMILIES-WEEKLY", () => {
     const depth = (g: Graph): number => Math.max(...(sectionsRouter({ name: "p", maxNodes: 100_000 }).route(g).levels ?? []).map((l) => l.depth));
     for (const seed of [0, 1, 2]) expect(depth(reg.generate("walled-level", seed).graph), `${seed}`).toBeGreaterThan(depth(reg.generate("maze", seed).graph));
   }, 60_000);
+
+  it("gives each edge of `layered` a way down, no longer than `span`, and only one layer down with `long` 0", () => {
+    const layerOf = (id: string): number => Number(id.slice(1, id.indexOf("n")));
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("layered", seed, { layers: 8, span: 4, long: 0.5, edges: 120 }).graph;
+      const downs = g.edges.map((e) => layerOf(e.target.node) - layerOf(e.source.node));
+      expect(Math.min(...downs), `${seed}`).toBe(1);
+      expect(Math.max(...downs), `${seed}`).toBeLessThanOrEqual(4);
+      expect(downs.some((d) => d >= 2), `${seed}`).toBe(true);
+      for (const n of g.nodes) expect(n.box.y, n.id).toBe(layerOf(n.id) * (36 + 80));
+      const flat = reg.generate("layered", seed, { layers: 8, span: 4, long: 0, edges: 120 }).graph;
+      for (const e of flat.edges) expect(layerOf(e.target.node) - layerOf(e.source.node)).toBe(1);
+    }
+  });
+
+  it("gives `lattice-x` both diagonals of each cell with `diagonal` 1, and only the sides with `diagonal` 0 and `side` 1", () => {
+    const cell = (id: string): readonly [number, number] => id.slice(1).split("_").map(Number) as unknown as readonly [number, number];
+    const full = reg.generate("lattice-x", 0, { cols: 5, rows: 3, diagonal: 1, side: 0 }).graph;
+    expect(full.nodes).toHaveLength(6 * 4);
+    expect(full.edges).toHaveLength(2 * 5 * 3);
+    for (const e of full.edges) {
+      const [r1, c1] = cell(e.source.node);
+      const [r2, c2] = cell(e.target.node);
+      expect([Math.abs(r1 - r2), Math.abs(c1 - c2)]).toEqual([1, 1]);
+    }
+    const sides = reg.generate("lattice-x", 0, { cols: 5, rows: 3, diagonal: 0, side: 1 }).graph;
+    expect(sides.edges).toHaveLength(5 * 4 + 3 * 6);
+    for (const e of sides.edges) {
+      const [r1, c1] = cell(e.source.node);
+      const [r2, c2] = cell(e.target.node);
+      expect(Math.abs(r1 - r2) + Math.abs(c1 - c2)).toBe(1);
+    }
+    expect(boxOf(full, "n1_1")).toEqual({ x: 120, y: 120, w: 24, h: 24 });
+  });
+
+  it("puts the nodes of `arc-row` in one row of one height, and keeps each edge within `reach`", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("arc-row", seed, { nodes: 40, edges: 80, reach: 5, gap: 10 }).graph;
+      expect(new Set(g.nodes.map((n) => `${n.box.y} ${n.box.h}`))).toEqual(new Set(["0 32"]));
+      for (let i = 1; i < g.nodes.length; i++) expect(g.nodes[i]!.box.x - (g.nodes[i - 1]!.box.x + g.nodes[i - 1]!.box.w)).toBe(10);
+      const spans = g.edges.map((e) => Math.abs(Number(e.source.node.slice(1)) - Number(e.target.node.slice(1))));
+      expect(Math.max(...spans), `${seed}`).toBeLessThanOrEqual(5);
+      expect(Math.min(...spans), `${seed}`).toBeGreaterThanOrEqual(1);
+    }
+    const near = reg.generate("arc-row", 0, { nodes: 40, edges: 80, reach: 1 }).graph;
+    for (const e of near.edges) expect(Math.abs(Number(e.source.node.slice(1)) - Number(e.target.node.slice(1)))).toBe(1);
+  });
 });
