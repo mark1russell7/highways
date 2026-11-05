@@ -10,7 +10,9 @@ import {
   SCHEMA,
   SENTINELS,
   sentinelFault,
+  type SentinelRead,
   sentinelReads,
+  SENTINEL_THIN,
   sentinelVerdict,
   type OrderJob,
   type SentinelReference,
@@ -127,7 +129,8 @@ describe("the read of the arm order", () => {
 
 describe("the sentinel check", () => {
   const CPU = "a model";
-  const reference: readonly SentinelReference[] = [{ cpu: CPU, medians: Object.fromEntries(SENTINELS.map((id, at) => [id, 100 + 10 * at])) }];
+  const one: SentinelReference = { cpu: CPU, medians: Object.fromEntries(SENTINELS.map((id, at) => [id, 100 + 10 * at])) };
+  const reference: readonly SentinelReference[] = [one, one];
   /** This function makes a job on a model, with a factor on the old arm of each sentinel. */
   const job = (factor: (id: string) => number, cpu = CPU, aa = 1): OrderJob => ({
     schema: "paired-time/1",
@@ -173,19 +176,28 @@ describe("the sentinel check", () => {
     expect(verdict(fine, fine, fine, outside, outside)).toMatchObject({ verdict: "holds", noRead: 2 });
     const thin = verdict(fine, fine, outside, outside, outside);
     expect(thin).toMatchObject({ verdict: "fails", noRead: 3 });
-    expect(thin.reason).toBe("3 of 5 jobs have no read, because the reference has no job on their model.");
+    expect(thin.reason).toBe("3 of 5 jobs have no read, because the reference has one job or no job on their model.");
     expect(verdict(fine, fine, fine, job(() => 1, CPU, 1.2)).verdict).toBe("fails");
   });
 
-  it("marks a reference of one job, and fails the fault of 1.2 on it", () => {
-    const two = [...reference, ...reference];
-    const clean = sentinelReads(two, [job(() => 1)])[0]!;
+  it("does not judge a job on a reference of one job, prints its shape, and counts it as a no read", () => {
+    const clean = sentinelReads(reference, [job(() => 1)])[0]!;
     expect(clean.referenceJobs).toBe(2);
     expect(clean.note).toBeUndefined();
-    const one = sentinelReads(reference, [job(() => 1)]);
-    expect(one[0]).toMatchObject({ note: "reference: one job", referenceJobs: 1, holds: true });
-    expect(sentinelVerdict(one)).toMatchObject({ oneJobReference: 1 });
-    expect(sentinelReads(reference, [job((id) => (id === SENTINELS[0] ? 1.2 : 1))])[0]).toMatchObject({ note: "reference: one job", holds: false });
+    const fine = job(() => 1);
+    const faulted = sentinelReads([one], [job((id) => (id === SENTINELS[0] ? 1.2 : 1))])[0]!;
+    expect(faulted).toMatchObject({ note: "thin: not judged", referenceJobs: 1, holds: null });
+    expect(faulted.shape).toBeCloseTo(Math.log(1.2), 12);
+    const mixed = (thin: number): readonly SentinelRead[] => {
+      const known = sentinelReads(reference, [fine, fine, fine, fine, fine].slice(thin));
+      const reads = sentinelReads([one], [fine, fine, fine, fine, fine].slice(0, thin));
+      return [...known, ...reads];
+    };
+    expect(sentinelVerdict(mixed(2))).toMatchObject({ verdict: "holds", oneJobReference: 2, noRead: 2 });
+    const over = sentinelVerdict(mixed(3));
+    expect(over).toMatchObject({ verdict: "fails", oneJobReference: 3, noRead: 3 });
+    expect(over.reason).toBe("3 of 5 jobs have no read, because the reference has one job or no job on their model.");
+    expect(over.thin).toBe(SENTINEL_THIN);
   });
 
   it("states what the check gives up", () => {
@@ -196,7 +208,7 @@ describe("the sentinel check", () => {
     const faster: SentinelReference = { cpu: CPU, medians: Object.fromEntries(Object.entries(reference[0]!.medians).map(([id, ms]) => [id, ms / 1.28])) };
     const read = sentinelReads([...reference, faster], [job((id) => (id === SENTINELS[0] ? 1.2 : 1))])[0]!;
     expect(read.shape).toBeCloseTo(Math.log(1.2), 12);
-    expect(read.referenceJobs).toBe(2);
+    expect(read.referenceJobs).toBe(3);
     expect(sentinelReads([...reference, faster], [job(() => 1)])[0]!.shape).toBeCloseTo(0, 12);
   });
 

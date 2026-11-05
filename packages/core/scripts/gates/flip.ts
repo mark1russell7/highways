@@ -4,7 +4,7 @@
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
-// - `sentinels` runs `arm-order.ts` on the stored rows of a narrow read: plain, with a factor of `SENTINEL_FAULT` on one sentinel, with an A/A pair over its limit, and with 3 of 5 jobs on a model outside the reference. No arm reads a clock.
+// - `sentinels` runs `arm-order.ts` on the stored rows of a narrow read: plain, with a factor of `SENTINEL_FAULT` on one sentinel, with an A/A pair over its limit, with 3 of 5 jobs on a model outside the reference, with 3 of 5 jobs on a reference of one job, and with a fault on a job of such a reference. No arm reads a clock.
 // - `sections` runs `sections-bisect.ts --gate` on two commits on top of the checkout: an empty commit, and a commit that spins `SECTIONS_FAULT_SHARE` of the route time.
 //
 // The commits of `sections` are made with the plumbing of git, so the checkout does not change. An arm that cannot decide takes the second attempt, as the job `retry` does.
@@ -146,11 +146,17 @@ function sentinelsFlip(dir: string): FlipArm[] {
   const aaFault = (job: OrderJob, at: number): OrderJob =>
     at !== 0 ? job : { ...job, inputs: job.inputs.map((input) => (input.id !== SENTINELS[0] ? input : { ...input, ms: { ...input.ms, "old~aa": input.ms["old~aa"]!.map((ms) => ms * SENTINEL_FAULT) } })) };
   const outside = (job: OrderJob, at: number): OrderJob => (at >= 3 ? job : { ...job, env: { ...job.env, cpu: "a model outside the reference" } });
+  const reference = JSON.parse(readFileSync(here("../data/arm-order/sentinel-reference.json"), "utf8")) as { jobs: readonly { cpu: string }[] };
+  const thinModel = reference.jobs.map((job) => job.cpu).find((cpu, _, all) => all.filter((other) => other === cpu).length === 1);
+  if (thinModel === undefined) throw new Error("The reference has no model with one job, so the thin arms have no input.");
+  const onThin = (jobs: number) => (job: OrderJob, at: number): OrderJob => (at >= jobs ? job : { ...job, env: { ...job.env, cpu: thinModel } });
   return [
     judge({ id: "clean", fault: null, ...read("clean", stored) }, { exit: 0, reason: "Sentinels: holds." }),
     judge({ id: "shape", fault: `a factor of ${SENTINEL_FAULT} on one sentinel of job 1`, ...read("shape", stored, "--fault", String(SENTINEL_FAULT)) }, { exit: 1, reason: "The shape or the A/A pair of job 1 is over its limit." }),
     judge({ id: "aa", fault: `a factor of ${SENTINEL_FAULT} on the A/A arm of one sentinel of job 1`, ...read("aa", copy("aa", aaFault)) }, { exit: 1, reason: "The shape or the A/A pair of job 1 is over its limit." }),
     judge({ id: "no-read", fault: "3 of 5 jobs on a model outside the reference", ...read("no-read", copy("no-read", outside)) }, { exit: 1, reason: "3 of 5 jobs have no read" }),
+    judge({ id: "thin-no-read", fault: "3 of 5 jobs on a reference of one job", ...read("thin-no-read", copy("thin-no-read", onThin(3))) }, { exit: 1, reason: "3 of 5 jobs have no read" }),
+    judge({ id: "thin-not-judged", fault: `a factor of ${SENTINEL_FAULT} on one sentinel of a job on a reference of one job, which the check does not judge`, ...read("thin-not-judged", copy("thin-not-judged", onThin(2)), "--fault", String(SENTINEL_FAULT)) }, { exit: 0, reason: "thin: not judged" }),
   ];
 }
 

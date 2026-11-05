@@ -287,13 +287,17 @@ export interface SentinelReference {
 /** The words of the sentinel check on what it gives up. */
 export const SENTINEL_LIMIT = "An even slowdown passes, so no compare of ms across runs rests on this check.";
 
-/** The sentinel check of one job. The field `holds` is null, a no read, when the reference has no job on the model of this job. */
+/** The words of the sentinel check on a reference of one job. A replay on stored rows gives these counts, against one job of each model. */
+export const SENTINEL_THIN =
+  "A job on a reference of one job is not judged, because a job with no fault read .1274 against one job, over the limit .12. So the check gives up these reads of a fault of 1.2 on one sentinel: red on 113 of 120 on 9V74, and on 69 of 72 on 7763.";
+
+/** The sentinel check of one job. The field `holds` is null, a no read, when the reference has one job or no job on the model of this job. */
 export interface SentinelRead {
   readonly job: number;
   readonly cpu: string;
   /** The number of jobs of the reference on this model. */
   readonly referenceJobs: number;
-  /** The text `reference: one job` marks a job with a thin margin, and the text `no read` marks a job with no reference. */
+  /** The text `thin: not judged` marks a job on a reference of one job, and the text `no read` marks a job with no reference. */
   readonly note?: string;
   /** The median log of the sentinels against the reference. The check prints this value and does not judge it. */
   readonly level: number | null;
@@ -342,8 +346,8 @@ export function sentinelReads(reference: readonly SentinelReference[], jobs: rea
     const centre = median(apart);
     const level = own - mean(refs.map((r) => r.own));
     const shape = Math.max(...apart.map((value) => Math.abs(value - centre)));
-    const note = known.length === 1 ? { note: "reference: one job" } : {};
-    return { job: at + 1, cpu, referenceJobs: known.length, ...note, level, shape, aa, holds: shape <= SHAPE_LIMIT && aa <= SENTINEL_AA_LIMIT, ...speed };
+    if (known.length === 1) return { job: at + 1, cpu, referenceJobs: 1, note: "thin: not judged", level, shape, aa, holds: null, ...speed };
+    return { job: at + 1, cpu, referenceJobs: known.length, level, shape, aa, holds: shape <= SHAPE_LIMIT && aa <= SENTINEL_AA_LIMIT, ...speed };
   });
 }
 
@@ -365,18 +369,20 @@ export interface SentinelVerdict {
   readonly jobs: number;
   /** The jobs on a model with one job in the reference. */
   readonly oneJobReference: number;
-  /** The jobs on a model with no job in the reference. A no read is not a hold. */
+  /** The jobs on a model with one job or no job in the reference. A no read is not a hold. */
   readonly noRead: number;
   readonly limit: string;
+  /** What the check gives up on a reference of one job. */
+  readonly thin: string;
 }
 
 /** This function gives the verdict over the jobs: it fails on one job that fails, and on fewer than `SENTINEL_JOBS` jobs with a read. */
 export function sentinelVerdict(reads: readonly SentinelRead[]): SentinelVerdict {
   const failed = reads.filter((r) => r.holds === false).map((r) => r.job);
   const noRead = reads.filter((r) => r.holds === null).length;
-  const counts = { jobs: reads.length, oneJobReference: reads.filter((r) => r.referenceJobs === 1).length, noRead, limit: SENTINEL_LIMIT };
+  const counts = { jobs: reads.length, oneJobReference: reads.filter((r) => r.referenceJobs === 1).length, noRead, limit: SENTINEL_LIMIT, thin: SENTINEL_THIN };
   if (failed.length > 0) return { verdict: "fails", reason: `The shape or the A/A pair of job ${failed.join(", ")} is over its limit.`, ...counts };
-  if (reads.length - noRead < SENTINEL_JOBS) return { verdict: "fails", reason: `${noRead} of ${reads.length} jobs have no read, because the reference has no job on their model.`, ...counts };
+  if (reads.length - noRead < SENTINEL_JOBS) return { verdict: "fails", reason: `${noRead} of ${reads.length} jobs have no read, because the reference has one job or no job on their model.`, ...counts };
   return { verdict: "holds", reason: `${reads.length - noRead} of ${reads.length} jobs hold the shape.`, ...counts };
 }
 

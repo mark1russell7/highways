@@ -32,7 +32,7 @@ const reference = JSON.parse(
 const record = orderRecord(jobs, basename(resolve(directory)), reference.jobs);
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(record, null, 1)}\n`);
-const { reads, verdict, reason, oneJobReference, noRead, limit } = record.sentinels;
+const { reads, verdict, reason, oneJobReference, noRead, limit, thin } = record.sentinels;
 for (const r of reads) console.log(`job ${r.job} ${r.cpu}: level ${r.level?.toFixed(4)}, shape ${r.shape?.toFixed(4)}, A/A ${r.aa.toFixed(4)}, ${r.holds === null ? "no read" : r.holds ? "holds" : "fails"}${r.note ? ` (${r.note})` : ""}`);
-console.log(`Sentinels: ${verdict}. ${reason} Jobs on a reference of one job: ${oneJobReference}. Jobs with no read: ${noRead}. ${limit}`);
+console.log(`Sentinels: ${verdict}. ${reason} Jobs on a reference of one job: ${oneJobReference}. Jobs with no read: ${noRead}. ${limit} ${thin}`);
 if (verdict === "fails") process.exitCode = 1;
