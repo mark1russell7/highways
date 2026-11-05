@@ -30,6 +30,8 @@ export interface MethodRead {
   readonly mean: number;
   readonly overWide: number;
   readonly overWidePairs: number;
+  /** The samples with an error over 100%: the lanes are more than two denominators apart. */
+  readonly overDouble: number;
 }
 
 /** One row of the record. */
@@ -69,6 +71,7 @@ function read(samples: readonly SpacingSample[], method: string, denominator: (s
     mean: round(errors.reduce((a, b) => a + b, 0) / Math.max(samples.length, 1)),
     overWide: wide.length,
     overWidePairs: new Set(wide.map((s) => [...s.edges].sort().join("|"))).size,
+    overDouble: errors.filter((e) => e > 1).length,
   };
 }
 

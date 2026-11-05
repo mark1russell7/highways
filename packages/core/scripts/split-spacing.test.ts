@@ -27,15 +27,17 @@ describe("the record split-spacing/1", () => {
     const worst = cell("split").worstSample!;
     expect(worst.gap).toBeLessThan(worst.spacing);
     expect(worst.errorOnSpacing).toBeLessThan(worst.errorOnGap);
+    expect(cell("split").pairGap.overDouble).toBe(1);
+    expect(cell("split").fixed.overDouble).toBe(0);
   });
 
   it("holds the bisect: 5 commits on the fixed spacing, then the change of method at LANE-ROOM", () => {
     const before = ["c5ed085", "41f402b", "ff3007b", "8f4429f", "90ceb19"];
     for (const commit of before) {
-      expect(atCommit(commit, "split")).toMatchObject({ method: FIXED_METHOD, worst: 0.68213 });
+      expect(atCommit(commit, "split")).toMatchObject({ method: FIXED_METHOD, worst: 0.682129 });
       expect(atCommit(commit, "split").worstSample.denominator).toBe(4);
     }
-    expect(atCommit("dd6e001", "split")).toMatchObject({ method: "pair-gap", worst: 1.0275 });
+    expect(atCommit("dd6e001", "split")).toMatchObject({ method: "pair-gap", worst: 1.027499 });
     expect(atCommit("dd6e001", "split").worstSample.denominator).toBeLessThan(4);
   });
 
@@ -45,7 +47,7 @@ describe("the record split-spacing/1", () => {
   });
 
   it("does not move the default `part` at any commit", () => {
-    for (const r of record.bisect.filter((row) => row.leave === "part")) expect(r.worst, r.commit).toBe(0.47551);
+    for (const r of record.bisect.filter((row) => row.leave === "part")) expect(r.worst, r.commit).toBe(0.475513);
   });
 
   it("gives the finding mixed-method of `checkMeasures` when a table holds rows of the two methods", () => {

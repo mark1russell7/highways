@@ -11,14 +11,16 @@
     "worst": 0.455907,
     "mean": 0.001272,
     "overWide": 2,
-    "overWidePairs": 1
+    "overWidePairs": 1,
+    "overDouble": 0
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.455907,
     "mean": 0.001272,
     "overWide": 2,
-    "overWidePairs": 1
+    "overWidePairs": 1,
+    "overDouble": 0
    },
    "worstSample": {
     "lanes": [
@@ -48,14 +50,16 @@
     "worst": 0.006441,
     "mean": 0.000399,
     "overWide": 0,
-    "overWidePairs": 0
+    "overWidePairs": 0,
+    "overDouble": 0
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.006441,
     "mean": 0.000399,
     "overWide": 0,
-    "overWidePairs": 0
+    "overWidePairs": 0,
+    "overDouble": 0
    },
    "worstSample": {
     "lanes": [
@@ -85,14 +89,16 @@
     "worst": 1.331527,
     "mean": 0.014108,
     "overWide": 6,
-    "overWidePairs": 1
+    "overWidePairs": 1,
+    "overDouble": 2
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 1.331527,
     "mean": 0.084157,
     "overWide": 99,
-    "overWidePairs": 8
+    "overWidePairs": 8,
+    "overDouble": 2
    },
    "worstSample": {
     "lanes": [
@@ -122,14 +128,16 @@
     "worst": 0.007961,
     "mean": 0.001626,
     "overWide": 0,
-    "overWidePairs": 0
+    "overWidePairs": 0,
+    "overDouble": 0
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.334848,
     "mean": 0.049205,
     "overWide": 40,
-    "overWidePairs": 2
+    "overWidePairs": 2,
+    "overDouble": 0
    },
    "worstSample": {
     "lanes": [
@@ -159,14 +167,16 @@
     "worst": 1.027499,
     "mean": 0.004482,
     "overWide": 6,
-    "overWidePairs": 3
+    "overWidePairs": 3,
+    "overDouble": 1
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.626655,
     "mean": 0.004234,
     "overWide": 4,
-    "overWidePairs": 2
+    "overWidePairs": 2,
+    "overDouble": 0
    },
    "worstSample": {
     "lanes": [
@@ -196,14 +206,16 @@
     "worst": 0.475513,
     "mean": 0.001528,
     "overWide": 4,
-    "overWidePairs": 1
+    "overWidePairs": 1,
+    "overDouble": 0
    },
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.475513,
     "mean": 0.001528,
     "overWide": 4,
-    "overWidePairs": 1
+    "overWidePairs": 1,
+    "overDouble": 0
    },
    "worstSample": {
     "lanes": [
@@ -224,5 +236,278 @@
    }
   }
  ],
- "bisect": []
+ "bisect": [
+  {
+   "commit": "c5ed085",
+   "leave": "split",
+   "method": "fixed-spacing",
+   "samples": 1008,
+   "worst": 0.682129,
+   "mean": 0.003735,
+   "overWide": 5,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.728517,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "c5ed085",
+   "leave": "part",
+   "method": "fixed-spacing",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "41f402b",
+   "leave": "split",
+   "method": "fixed-spacing",
+   "samples": 1008,
+   "worst": 0.682129,
+   "mean": 0.003735,
+   "overWide": 5,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.728517,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "41f402b",
+   "leave": "part",
+   "method": "fixed-spacing",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "ff3007b",
+   "leave": "split",
+   "method": "fixed-spacing",
+   "samples": 1008,
+   "worst": 0.682129,
+   "mean": 0.003735,
+   "overWide": 5,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.728517,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "ff3007b",
+   "leave": "part",
+   "method": "fixed-spacing",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "8f4429f",
+   "leave": "split",
+   "method": "fixed-spacing",
+   "samples": 1008,
+   "worst": 0.682129,
+   "mean": 0.003735,
+   "overWide": 5,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.728517,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "8f4429f",
+   "leave": "part",
+   "method": "fixed-spacing",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "90ceb19",
+   "leave": "split",
+   "method": "fixed-spacing",
+   "samples": 1008,
+   "worst": 0.682129,
+   "mean": 0.003735,
+   "overWide": 5,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.728517,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "90ceb19",
+   "leave": "part",
+   "method": "fixed-spacing",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "dd6e001",
+   "leave": "split",
+   "method": "pair-gap",
+   "samples": 1008,
+   "worst": 1.027499,
+   "mean": 0.004482,
+   "overWide": 6,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.506619,
+    "denominator": 3.209184
+   }
+  },
+  {
+   "commit": "dd6e001",
+   "leave": "part",
+   "method": "pair-gap",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "ecfc238",
+   "leave": "split",
+   "method": "pair-gap",
+   "samples": 1008,
+   "worst": 1.027499,
+   "mean": 0.004482,
+   "overWide": 6,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.506619,
+    "denominator": 3.209184
+   }
+  },
+  {
+   "commit": "ecfc238",
+   "leave": "part",
+   "method": "pair-gap",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  },
+  {
+   "commit": "5e8b15d",
+   "leave": "split",
+   "method": "pair-gap",
+   "samples": 1008,
+   "worst": 1.027499,
+   "mean": 0.004482,
+   "overWide": 6,
+   "worstSample": {
+    "lanes": [
+     "e162",
+     "e78"
+    ],
+    "distance": 6.506619,
+    "denominator": 3.209184
+   }
+  },
+  {
+   "commit": "5e8b15d",
+   "leave": "part",
+   "method": "pair-gap",
+   "samples": 2071,
+   "worst": 0.475513,
+   "mean": 0.001528,
+   "overWide": 4,
+   "worstSample": {
+    "lanes": [
+     "e124",
+     "e174"
+    ],
+    "distance": 5.902053,
+    "denominator": 4
+   }
+  }
+ ]
 }
