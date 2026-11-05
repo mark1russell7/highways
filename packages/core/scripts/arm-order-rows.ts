@@ -2,7 +2,9 @@
  * This module makes the record `arm-order/1` (ARM-ORDER).
  * Mode `fresh` of `gates/paired.ts` rotates the arms by round. With 3 arms, one arm of a pair goes first in 2 of 3 rounds.
  * This read asks if the order moves a ratio. It compares the rounds where each arm of a pair goes first, with a shuffle of those labels as the control.
+ * A paired record with the field `order` states the mirrored order of the bench home, and this read takes the order of a record from that field.
  */
+import { armOrder as mirrored } from "@mark1russell7/rigor-bench";
 import { median, quantile } from "@mark1russell7/rigor-statistics";
 import { mulberry32 } from "@mark1russell7/rigor-generators";
 
@@ -27,6 +29,8 @@ export interface OrderInput {
 export interface OrderJob {
   readonly schema: string;
   readonly mode: string;
+  /** The value `mirrored` states `armOrder` of the bench home. A record without this field rotated the arms by the round. */
+  readonly order?: "mirrored";
   readonly arms: readonly string[];
   readonly env?: { readonly cpu?: string };
   readonly inputs: readonly OrderInput[];
@@ -78,6 +82,13 @@ export function rotatedOrder(
   return [...arms.slice(shift), ...arms.slice(0, shift)];
 }
 
+/** This function gives the arms of a round of one job, by the order that the job states. */
+export function orderOf(job: OrderJob, round: number): readonly string[] {
+  return job.order === "mirrored"
+    ? mirrored(job.arms, round)
+    : rotatedOrder(job.arms, round);
+}
+
 function shuffled(labels: readonly boolean[], next: () => number): boolean[] {
   const items = [...labels];
   for (let at = items.length - 1; at > 0; at -= 1) {
@@ -112,7 +123,7 @@ function readInputs(
         if (a > 0 && b > 0) logs.push({ round, log: Math.log(b / a) });
       }
       const stated = logs.map(({ round }) => {
-        const order = rotatedOrder(job.arms, round);
+        const order = orderOf(job, round);
         return order.indexOf(base) < order.indexOf(other);
       });
       const labels = next ? shuffled(stated, next) : stated;
@@ -256,7 +267,7 @@ export function orderRecord(all: readonly OrderJob[], run: string) {
     schema: SCHEMA,
     regenerate: REGENERATE,
     run,
-    order: "rotated",
+    order: first.order ?? "rotated",
     arms: first.arms,
     cpu: first.env?.cpu,
     jobs: jobs.length,

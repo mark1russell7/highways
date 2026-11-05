@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   freshJobs,
+  orderOf,
   orderSlice,
   pairsOf,
   readPair,
@@ -63,6 +64,15 @@ describe("the read of the arm order", () => {
       0.2,
       10,
     );
+  });
+
+  it("takes the order of a job from its field, and the rotated order when the field is absent", () => {
+    const job = jobWith(0);
+    expect(orderOf(job, 1)).toEqual(["b", "c", "a"]);
+    const stated: OrderJob = { ...job, order: "mirrored" };
+    expect(orderOf(stated, 1)).toEqual(["c", "b", "a"]);
+    const rounds = Array.from({ length: 10 }, (_, round) => orderOf(stated, round));
+    expect(rounds.filter((order) => order.indexOf("a") < order.indexOf("c"))).toHaveLength(5);
   });
 
   it("keeps only the jobs of mode fresh with the arms of the first job", () => {
