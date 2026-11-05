@@ -1,0 +1,1991 @@
+{
+ "schema": "route-tie/1",
+ "regenerate": "node packages/core/scripts/route-tie.ts packages/core/scripts/data/route-tie/record.json",
+ "before": "0896104fb0ebceab108d069218c56f72b7917f84",
+ "chosen": 1e-9,
+ "shift": 1e-12,
+ "vectors": [
+  "shift-a",
+  "shift-b",
+  "shift-c",
+  "shift-d",
+  "shift-e"
+ ],
+ "boards": 75,
+ "choice": "The distance 1e-9 is a choice from the table. It stands far above the rounding of a sum of lengths, and each row of the table on each side of it reads the law.",
+ "predictionNote": "The outcome routes-moved-under-8pct-of-routes named no router, so it reads against the widest row and misses on shared-all. It should have named a router. The rows of this record give the moves of each router.",
+ "tolerances": [
+  {
+   "tie": 0,
+   "movedFromChosen": 46,
+   "law": 9,
+   "work": 845035,
+   "length": 2248989.603558433,
+   "pairs": 32181,
+   "shiftMoves": 275
+  },
+  {
+   "tie": 1e-13,
+   "movedFromChosen": 18,
+   "law": 0,
+   "work": 842037,
+   "length": 2249003.707899162,
+   "pairs": 32165,
+   "shiftMoves": 147
+  },
+  {
+   "tie": 1e-12,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 1e-11,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 1e-10,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 1e-9,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 1e-8,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 1e-7,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 0.000001,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 0.00001,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 841423,
+   "length": 2249002.3593876027,
+   "pairs": 32149,
+   "shiftMoves": 70
+  },
+  {
+   "tie": 0.001,
+   "movedFromChosen": 1,
+   "law": 0,
+   "work": 841716,
+   "length": 2248996.6738462294,
+   "pairs": 32149,
+   "shiftMoves": 70
+  }
+ ],
+ "routers": [
+  {
+   "router": "corners",
+   "routes": 6065,
+   "moved": 102,
+   "lawBefore": [
+    37,
+    48
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 693135,
+   "workAfter": 841423,
+   "lengthBefore": 2249122.9148186455,
+   "lengthAfter": 2249002.3593876027,
+   "pairsBefore": 32194,
+   "pairsAfter": 32149,
+   "shiftBefore": [
+    59,
+    35,
+    48,
+    33,
+    47
+   ],
+   "shiftAfter": [
+    15,
+    10,
+    14,
+    13,
+    18
+   ]
+  },
+  {
+   "router": "shared",
+   "routes": 6065,
+   "moved": 95,
+   "lawBefore": [
+    16,
+    19
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 2648713,
+   "workAfter": 2804330,
+   "lengthBefore": 2280169.0427664327,
+   "lengthAfter": 2280040.972455026,
+   "pairsBefore": 34191,
+   "pairsAfter": 34123,
+   "shiftBefore": [
+    75,
+    62,
+    74,
+    44,
+    69
+   ],
+   "shiftAfter": [
+    30,
+    40,
+    44,
+    28,
+    38
+   ]
+  },
+  {
+   "router": "shared-all",
+   "routes": 6065,
+   "moved": 513,
+   "lawBefore": [
+    108,
+    117
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1911695,
+   "workAfter": 2108003,
+   "lengthBefore": 2443309.1200697026,
+   "lengthAfter": 2444436.4939732477,
+   "pairsBefore": 35608,
+   "pairsAfter": 35624,
+   "shiftBefore": [
+    186,
+    204,
+    220,
+    158,
+    230
+   ],
+   "shiftAfter": [
+    42,
+    129,
+    129,
+    107,
+    170
+   ]
+  },
+  {
+   "router": "sections",
+   "routes": 6065,
+   "moved": 60,
+   "lawBefore": [
+    54,
+    55
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1070221,
+   "workAfter": 1355089,
+   "lengthBefore": 2747516.3810321484,
+   "lengthAfter": 2747423.8098549764,
+   "pairsBefore": 44032,
+   "pairsAfter": 44060,
+   "shiftBefore": [
+    566,
+    465,
+    573,
+    418,
+    327
+   ],
+   "shiftAfter": [
+    551,
+    450,
+    563,
+    404,
+    304
+   ]
+  },
+  {
+   "router": "trunks",
+   "routes": 6065,
+   "moved": 102,
+   "lawBefore": [
+    37,
+    48
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 692138,
+   "workAfter": 841401,
+   "lengthBefore": 2260264.930038932,
+   "lengthAfter": 2260144.3746078885,
+   "pairsBefore": 32923,
+   "pairsAfter": 32878,
+   "shiftBefore": [
+    59,
+    35,
+    48,
+    37,
+    51
+   ],
+   "shiftAfter": [
+    15,
+    10,
+    14,
+    17,
+    22
+   ]
+  },
+  {
+   "router": "sections-site",
+   "routes": 6065,
+   "moved": 47,
+   "lawBefore": [
+    61,
+    65
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1860129,
+   "workAfter": 2221309,
+   "lengthBefore": 3538996.2921623727,
+   "lengthAfter": 3535019.5211604824,
+   "pairsBefore": 69817,
+   "pairsAfter": 69685,
+   "shiftBefore": [
+    643,
+    609,
+    621,
+    443,
+    499
+   ],
+   "shiftAfter": [
+    642,
+    610,
+    619,
+    439,
+    488
+   ]
+  }
+ ],
+ "shiftKinds": {
+  "graph": 64,
+  "search": 6,
+  "other": 0
+ },
+ "floors": [
+  {
+   "router": "corners",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.022869045496557106,
+   "boardsMoved": 31
+  },
+  {
+   "router": "corners",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    6.938893903907228e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 33
+  },
+  {
+   "router": "corners",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00919318325461671,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 30,
+   "boardsMoved": 14
+  },
+  {
+   "router": "corners",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15384615384615374,
+   "boardsMoved": 14
+  },
+  {
+   "router": "corners",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "corners",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "corners",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R2.angle",
+   "floor": 8.326672684688674e-17,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 42
+  },
+  {
+   "router": "corners",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 17
+  },
+  {
+   "router": "corners",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 12
+  },
+  {
+   "router": "corners",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.008053983914378282,
+   "boardsMoved": 35
+  },
+  {
+   "router": "corners",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734594877,
+   "boardsMoved": 10
+  },
+  {
+   "router": "corners",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00022680100098249056,
+   "boardsMoved": 15
+  },
+  {
+   "router": "corners",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0031112877813319617,
+   "boardsMoved": 18
+  },
+  {
+   "router": "corners",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 12
+  },
+  {
+   "router": "corners",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.022869045496557106,
+   "boardsMoved": 30
+  },
+  {
+   "router": "shared",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 3,
+   "boardsMoved": 3
+  },
+  {
+   "router": "shared",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    6.938893903907228e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 34
+  },
+  {
+   "router": "shared",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.002722060599874121,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 46,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15384615384615374,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R2.angle",
+   "floor": 1.1102230246251565e-16,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 43
+  },
+  {
+   "router": "shared",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 15
+  },
+  {
+   "router": "shared",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 11
+  },
+  {
+   "router": "shared",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.013151591287649644,
+   "boardsMoved": 34
+  },
+  {
+   "router": "shared",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734594877,
+   "boardsMoved": 10
+  },
+  {
+   "router": "shared",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.002507952489858578,
+   "boardsMoved": 16
+  },
+  {
+   "router": "shared",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006625192696611215,
+   "boardsMoved": 20
+  },
+  {
+   "router": "shared",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 14
+  },
+  {
+   "router": "shared",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.023968092265133523,
+   "boardsMoved": 29
+  },
+  {
+   "router": "shared-all",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 3,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared-all",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    2.7755575615628914e-17
+   ],
+   "largest": 0.1842062471689504,
+   "boardsMoved": 37
+  },
+  {
+   "router": "shared-all",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.01449275362318836,
+   "boardsMoved": 4
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 22,
+   "boardsMoved": 12
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 95,
+   "boardsMoved": 4
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15625,
+   "boardsMoved": 12
+  },
+  {
+   "router": "shared-all",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared-all",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared-all",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R2.angle",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.22338041968464445,
+   "boardsMoved": 37
+  },
+  {
+   "router": "shared-all",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16.244661624410405,
+   "boardsMoved": 15
+  },
+  {
+   "router": "shared-all",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 32.59982017524813,
+   "boardsMoved": 14
+  },
+  {
+   "router": "shared-all",
+   "measure": "R4.turn",
+   "floor": 5.551115123125783e-17,
+   "interval": [
+    0,
+    2.220446049250313e-16
+   ],
+   "largest": 0.07343698559068113,
+   "boardsMoved": 42
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.016348929168666926,
+   "boardsMoved": 15
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.018296292675402226,
+   "boardsMoved": 20
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.016727819664097643,
+   "boardsMoved": 26
+  },
+  {
+   "router": "shared-all",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.299209049864666,
+   "boardsMoved": 25
+  },
+  {
+   "router": "shared-all",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "B1.inkSaved",
+   "floor": 1.1102230246251565e-16,
+   "interval": [
+    1.1102230246251565e-16,
+    0.0001617256534217626
+   ],
+   "largest": 0.04492550948976348,
+   "boardsMoved": 51
+  },
+  {
+   "router": "sections",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 9
+  },
+  {
+   "router": "sections",
+   "measure": "B11.share",
+   "floor": 0.0000036405354358840653,
+   "interval": [
+    2.7755575615628914e-17,
+    0.0026110424182313186
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 57
+  },
+  {
+   "router": "sections",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.04537815126050421,
+   "boardsMoved": 17
+  },
+  {
+   "router": "sections",
+   "measure": "G1.modularity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0021856430571682243,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "G2.cut",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "G6.balance",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.008478496230469701,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "G8.treeCost",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0017869108778199028,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 61,
+   "boardsMoved": 25
+  },
+  {
+   "router": "sections",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 126,
+   "boardsMoved": 25
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.5757575757575757,
+   "boardsMoved": 25
+  },
+  {
+   "router": "sections",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "sections",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R2.angle",
+   "floor": 1.1102230246251565e-16,
+   "interval": [
+    1.1102230246251565e-16,
+    0.0006217409640716931
+   ],
+   "largest": 0.08333333333333337,
+   "boardsMoved": 53
+  },
+  {
+   "router": "sections",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20.100514059371662,
+   "boardsMoved": 23
+  },
+  {
+   "router": "sections",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.61016472782734,
+   "boardsMoved": 6
+  },
+  {
+   "router": "sections",
+   "measure": "R4.turn",
+   "floor": 4.440892098500626e-16,
+   "interval": [
+    5.551115123125783e-17,
+    0.0032826871359414866
+   ],
+   "largest": 0.19826333968113774,
+   "boardsMoved": 49
+  },
+  {
+   "router": "sections",
+   "measure": "R5.mean",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    0,
+    0.0006083224940962584
+   ],
+   "largest": 0.03920354519395586,
+   "boardsMoved": 40
+  },
+  {
+   "router": "sections",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    2.220446049250313e-16
+   ],
+   "largest": 0.2701561317290424,
+   "boardsMoved": 31
+  },
+  {
+   "router": "sections",
+   "measure": "R5.q95",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    2.220446049250313e-16,
+    8.881784197001252e-16
+   ],
+   "largest": 0.1146454100864982,
+   "boardsMoved": 52
+  },
+  {
+   "router": "sections",
+   "measure": "R6.worstDetour",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    0,
+    4.440892098500626e-16
+   ],
+   "largest": 0.2871521814079021,
+   "boardsMoved": 39
+  },
+  {
+   "router": "sections",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "Z4.farItems",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "Z7.position",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.07070465845285961,
+   "boardsMoved": 26
+  },
+  {
+   "router": "sections",
+   "measure": "Z8.order",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.05278640450004213,
+   "boardsMoved": 28
+  },
+  {
+   "router": "sections",
+   "measure": "level-nesting",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.022869045496557106,
+   "boardsMoved": 32
+  },
+  {
+   "router": "trunks",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    6.938893903907228e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 33
+  },
+  {
+   "router": "trunks",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.007086418878219869,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 32,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 5
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.16000000000000014,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 4.85722573273506e-16,
+   "boardsMoved": 2
+  },
+  {
+   "router": "trunks",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "trunks",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R2.angle",
+   "floor": 8.326672684688674e-17,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 41
+  },
+  {
+   "router": "trunks",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 17
+  },
+  {
+   "router": "trunks",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 12
+  },
+  {
+   "router": "trunks",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.008053983914378282,
+   "boardsMoved": 35
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734594877,
+   "boardsMoved": 11
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00014325538592752096,
+   "boardsMoved": 15
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0031112877813319617,
+   "boardsMoved": 19
+  },
+  {
+   "router": "trunks",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 13
+  },
+  {
+   "router": "trunks",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "B1.inkSaved",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    1.1102230246251565e-16,
+    0.0004757187297862453
+   ],
+   "largest": 0.06797739944690351,
+   "boardsMoved": 49
+  },
+  {
+   "router": "sections-site",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 6,
+   "boardsMoved": 11
+  },
+  {
+   "router": "sections-site",
+   "measure": "B11.share",
+   "floor": 0.001084148937108509,
+   "interval": [
+    0.0003073822369796253,
+    0.0035717480585742423
+   ],
+   "largest": 0.16813043334132438,
+   "boardsMoved": 56
+  },
+  {
+   "router": "sections-site",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.08087557603686635,
+   "boardsMoved": 21
+  },
+  {
+   "router": "sections-site",
+   "measure": "G1.modularity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0021856430571682243,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "G2.cut",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "G6.balance",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.008478496230469701,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "G8.treeCost",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0017869108778199028,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    1
+   ],
+   "largest": 347,
+   "boardsMoved": 36
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    2
+   ],
+   "largest": 371,
+   "boardsMoved": 32
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0.033333333333333215
+   ],
+   "largest": 1.9715909090909092,
+   "boardsMoved": 36
+  },
+  {
+   "router": "sections-site",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections-site",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "sections-site",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R2.angle",
+   "floor": 0.0003210003206621792,
+   "interval": [
+    1.1102230246251565e-16,
+    0.0037131576671968203
+   ],
+   "largest": 0.05348804755077907,
+   "boardsMoved": 55
+  },
+  {
+   "router": "sections-site",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    1.4210854715202004e-14
+   ],
+   "largest": 8.094745631380533,
+   "boardsMoved": 29
+  },
+  {
+   "router": "sections-site",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 48.012787504183336,
+   "boardsMoved": 6
+  },
+  {
+   "router": "sections-site",
+   "measure": "R4.turn",
+   "floor": 0.0002651310428916087,
+   "interval": [
+    4.440892098500626e-16,
+    0.01281195877315211
+   ],
+   "largest": 0.3120093760241627,
+   "boardsMoved": 49
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.mean",
+   "floor": 0.0007560008547740082,
+   "interval": [
+    4.440892098500626e-16,
+    0.004299202185803486
+   ],
+   "largest": 1.151220051539755,
+   "boardsMoved": 54
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    2.220446049250313e-16
+   ],
+   "largest": 0.13593621262517463,
+   "boardsMoved": 30
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.q95",
+   "floor": 8.881784197001252e-16,
+   "interval": [
+    4.440892098500626e-16,
+    2.6645352591003757e-15
+   ],
+   "largest": 7.3065601610199415,
+   "boardsMoved": 49
+  },
+  {
+   "router": "sections-site",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    8.881784197001252e-16
+   ],
+   "largest": 0.4706896742245248,
+   "boardsMoved": 36
+  },
+  {
+   "router": "sections-site",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.034090909090909116,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections-site",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z4.farItems",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z7.position",
+   "floor": 0,
+   "interval": [
+    0,
+    2.7755575615628914e-17
+   ],
+   "largest": 0.015210274323835427,
+   "boardsMoved": 31
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z8.order",
+   "floor": 0,
+   "interval": [
+    0,
+    0.000027393676125919697
+   ],
+   "largest": 0.05278640450004213,
+   "boardsMoved": 30
+  },
+  {
+   "router": "sections-site",
+   "measure": "level-nesting",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  }
+ ],
+ "slice": [
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "corners",
+   "digest": 3723009865
+  },
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "shared",
+   "digest": 3723009865
+  },
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "sections",
+   "digest": 1113670094
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "corners",
+   "digest": 3601317167
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "shared",
+   "digest": 3601317167
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "sections",
+   "digest": 3601317167
+  }
+ ]
+}
