@@ -7,7 +7,7 @@ import { graphInput } from "../bench/screen/forms.ts";
 import { caseSeed, inputId, manifestHash, SCREEN_V1, SCREEN_V2, SCREEN_V3, screenInputs, setManifest, type ScreenSet } from "../bench/screen/set.ts";
 import { wholeStrategies } from "../strategies/builtins.ts";
 import type { Graph } from "../model.ts";
-import { HIGHWAYS_FAMILIES, highwaysRegistry, WEEKLY_FAMILIES } from "./index.ts";
+import { HIGHWAYS_FAMILIES, highwaysRegistry, KEYED_FAMILIES, WEEKLY_FAMILIES } from "./index.ts";
 
 const reg = highwaysRegistry();
 
@@ -51,6 +51,11 @@ function expectRouted(graph: Graph, where: string): void {
 }
 
 describe("the corpus families of highways (CORPUS-GEN)", () => {
+  it("lists each family whose edges carry a key", () => {
+    const keyed = HIGHWAYS_FAMILIES.filter((f) => [0, 1, 2].some((seed) => reg.generate(f.name, seed).graph.edges.some((e) => e.data?.["collection"] !== undefined)));
+    expect(keyed.map((f) => f.name)).toEqual([...KEYED_FAMILIES]);
+  });
+
   it("has the 15 families of screen-v3 first, in their order, then the weekly families, and the 6 families of screen-v2 come first", () => {
     const names = [...SCREEN_V3.families, ...WEEKLY_FAMILIES].map((f) => f.name);
     expect(HIGHWAYS_FAMILIES.map((f) => f.name)).toEqual(names);
