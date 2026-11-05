@@ -175,7 +175,7 @@ describe("the inner routes of the mode gutter (INTERIOR-GUTTER)", () => {
     for (const r of routes) expect(r.points[0]).toEqual(r.points[1]);
   });
 
-  it("keeps the inner routes of version 0.9.2 by default and with inner: corners", () => {
+  it("keeps one result by default and with inner: corners, and pins the digests of the inner routes", () => {
     const g = sixRows(20);
     const boards = [g, twentyRows(), sixRows(4, [toPlug("far1", "r1", "e3")])];
     for (const options of [{}, { smooth: true }, { frameInset: 8 }] satisfies Partial<CornersOptions>[]) {
@@ -184,10 +184,17 @@ describe("the inner routes of the mode gutter (INTERIOR-GUTTER)", () => {
       expect(same).toEqual(base);
     }
     const digest = createHash("sha256")
-      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes)))
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes.map(({ through: _through, ...route }) => route))))
       .digest("hex");
-    // The digest of the routes of version 0.9.2, before the mode gutter.
-    expect(digest).toBe("bddc6d12c64fda12e9f0d3edb083f662c061675f7cfff3861140424828c23a83");
+    // The digest of the routes with `outSteps: false`. The field `through` does not count. INNER-SPIKE moved the first stop of each route that leaves a wall plug, so this digest is not the digest of version 0.9.2.
+    expect(digest).toBe("efe7c2ccbad0d88e558c454a598785d82d9079c3ce0d9c40604b29353a23c907");
+    const ladder = createHash("sha256")
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.map(({ through: _through, ...route }) => route))))
+      .digest("hex");
+    // INNER-SPIKE: a strip of 4 takes the lower steps, so the ladder gives the ways along the strip.
+    expect(ladder).toBe("460f62926fe5620f20407cc407715e366c7ceb3ca75846d18faffde35274dc81");
+    // INNER-THROUGH: no digest reads the field `through`, so this list counts the routes that say they go through a box. INNER-SPIKE took the 11 routes of the strip of 4 out of the rows.
+    expect(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.filter((r) => r.through !== undefined).length)).toEqual([0, 0, 0]);
   });
 
   it("gives fewer bends or the same with a larger bend cost", () => {

@@ -4,6 +4,7 @@
 // `--shard 2/6` runs the second of six shards of the cells of the steps `router` and `highway` (BENCH-GREEN). `SuiteOptions.shard` tells which cells.
 // `--caps mlseb=400` stops a strategy above a fixture size. The report lists the capped cells. `--pair shared` adds the paired baseline arm.
 // `--opt-in` adds opt-in routers to the race, for example `portfolio` (PORTFOLIO-API). The default race does not have them.
+// `--opt-in all` adds each router of `OPT_IN_STRATEGIES`, and the name `opt-in` in `--routers` stands for the routers of `--opt-in`.
 // The workflow `Bench` starts one part of the benchmark in each job, with `--min`, `--max`, `--routers` and `--rows-only`.
 // The script `bench-join.ts` joins the parts.
 import { writeFileSync } from "node:fs";
@@ -20,9 +21,8 @@ import type { Graph, Node } from "../src/model.ts";
 import { sectionsRouter } from "../src/routers/sections.ts";
 import { sharedRouter } from "../src/routers/shared.ts";
 import { byCollection, trunksRouter } from "../src/routers/trunks.ts";
-import { sharedStretchStrategy } from "../src/lane-orders/stretch/router.ts";
-import { portfolioStrategy } from "../src/portfolio/router.ts";
 import { STRATEGIES as BUILT_IN } from "../src/strategies/builtins.ts";
+import { OPT_IN_STRATEGIES } from "../src/strategies/opt-in.ts";
 import { listStrategies, register, routersOf, STEPS, type AnyStrategy, type Step } from "../src/strategies/model.ts";
 import { formatCapped, formatFronts, formatMeasureTime, formatPaired, formatRules, formatSummaries, runSuite } from "../src/bench/suite.ts";
 import { envOf } from "./gates/paired.ts";
@@ -41,11 +41,13 @@ const number = (name: string, fallback: number): number => {
   return value;
 };
 // The opt-in routers that `--opt-in` can add to the registry of the race.
-const OPT_IN: Readonly<Record<string, AnyStrategy>> = { portfolio: portfolioStrategy, "shared-stretch": sharedStretchStrategy };
-for (const name of list("--opt-in") ?? []) if (OPT_IN[name] === undefined) throw new Error(`There is no opt-in router "${name}". The opt-in routers are ${Object.keys(OPT_IN).join(", ")}.`);
-const STRATEGIES = register(BUILT_IN, ...(list("--opt-in") ?? []).map((name) => OPT_IN[name]!));
+const OPT_IN: Readonly<Record<string, AnyStrategy>> = Object.fromEntries(OPT_IN_STRATEGIES.map((s) => [s.name, s]));
+const optInList = list("--opt-in") ?? [];
+const OPT_IN_RACE = optInList.includes("all") ? Object.keys(OPT_IN) : optInList;
+for (const name of OPT_IN_RACE) if (OPT_IN[name] === undefined) throw new Error(`There is no opt-in router "${name}". The opt-in routers are ${Object.keys(OPT_IN).join(", ")}.`);
+const STRATEGIES = register(BUILT_IN, ...OPT_IN_RACE.map((name) => OPT_IN[name]!));
 // The registry gives each list, so a new strategy gets its rows with no edit here.
-const only = list("--routers");
+const only = list("--routers")?.flatMap((name) => (name === "opt-in" ? OPT_IN_RACE : [name]));
 const skip = list("--skip-routers") ?? [];
 for (const name of [...(only ?? []), ...skip]) if (!routersOf(STRATEGIES).some((r) => r.name === name)) throw new Error(`There is no router "${name}"`);
 const ROUTERS = routersOf(STRATEGIES).filter((r) => (only ? only.includes(r.name) : true) && !skip.includes(r.name));

@@ -1,5 +1,6 @@
 // The data of the strategy cards (STRATEGY-CARDS). The build gives the registry and the committed files to these functions.
 // This module has no access to the file system and to the network, so the page and the tests use the same rules.
+import { STEP_DEFAULTS, type Step } from "@mark1russell7/highways";
 import { median } from "@mark1russell7/rigor-statistics";
 import type { Snapshot, VerdictLabel } from "./results-data.ts";
 
@@ -106,11 +107,6 @@ export const STATUSES: readonly { readonly id: CardStatus; readonly text: string
   { id: "built", text: "built, not screened" },
 ];
 
-/**
- * The default strategy of each step. The steps `highway` and `curve` have no default: a caller picks one.
- * The defaults of `plugs`, `levels` and `whole` come from STEP-SLOTS: they give the output of the steps before the slots.
- */
-export const STEP_DEFAULTS: Readonly<Record<string, string>> = { group: "quadtree", plugs: "facing", router: "shared", levels: "depths", room: "routes", whole: "pipeline" };
 
 /** The place of part 2 of the cards: the curves of one option at a time and the Sobol indices. */
 export const SWEEPS_LINE = "Sweeps: waits for STAGE-DATA and PASS-GRID.";
@@ -222,7 +218,7 @@ const STAGE_STATUS: readonly [string, CardStatus][] = [
 
 /** This function gives the status of a strategy from its step default, the stages of its ideas and its verdicts. */
 export function statusOf(step: string, name: string, stages: readonly string[], hasVerdicts: boolean): CardStatus {
-  if (STEP_DEFAULTS[step] === name) return "default";
+  if (STEP_DEFAULTS[step as Step] === name) return "default";
   for (const [stage, status] of STAGE_STATUS) if (stages.includes(stage)) return status;
   return hasVerdicts ? "screened" : "built";
 }

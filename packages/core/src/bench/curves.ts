@@ -1,10 +1,10 @@
 import { median } from "@mark1russell7/rigor-statistics";
 import { tracedHighwayCurves, type JogStyle, type JogTrace, type LaneCurve } from "../curves/highway/index.ts";
 import { CURVE_TYPES, curveSpace, distinctPoints, sampleCurve, type CubicSegment, type CurveSegment, type CurveSpace, type CurveType } from "../curves/index.ts";
-import { polylineLength, segmentsCross, type Point } from "../geom.ts";
+import { crossingPoint, polylineLength, segmentsCross, type Point } from "../geom.ts";
 import { nodeIndex, type Graph, type Router } from "../model.ts";
 import { nearestSide, SIDE_NORMAL } from "../plugs.ts";
-import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.ts";
+import { laneOffset, laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../segments.ts";
 import { curveStrategies } from "../strategies/builtins.ts";
 import type { Strategy } from "../strategies/model.ts";
 import { measureLinks, type MeasuredLink } from "./links.ts";
@@ -128,6 +128,40 @@ export function formatCurves(rows: readonly CurveBenchRow<string>[]): string {
   return [head, line, ...body].join("\n");
 }
 
+/**
+ * This value is the version of the counts `crossings` and `endCrossings` of `measureHighways`.
+ * Version 1 read the middle of a sampled piece, so a long straight piece gave the wrong place. Version 2 reads the crossing point.
+ * A record with no version holds version 1. The counts of two versions do not compare.
+ */
+export const BUNDLE_COUNTER = 2;
+
+/**
+ * This name states the method of the spacing errors of `measureHighways`: each pair of lanes reads against the gap of that pair.
+ * Before LANE-ROOM, each pair read against the fixed `spacing` of its segment, the method `fixed-spacing`. Errors of two methods do not compare.
+ */
+export const SPACING_METHOD = "pair-gap";
+
+/** A spacing error over this share of the gap counts in `overWide` and `overWidePairs`. */
+export const SPACING_WIDE = 0.25;
+
+/** One sample of the spacing of `measureHighways`. */
+export interface SpacingSample {
+  /** The two lanes of the sample. The sample is on the first lane. */
+  readonly edges: readonly [string, string];
+  /** The place of the sample. */
+  readonly at: Point;
+  /** The distance to the other lane. */
+  readonly distance: number;
+  /** The gap of the pair of lanes, the denominator of the method `pair-gap`. */
+  readonly gap: number;
+  /** The fixed spacing of the segment, the denominator of the method `fixed-spacing`. */
+  readonly spacing: number;
+  /** The number of lanes of the segment. */
+  readonly lanes: number;
+  /** The length of the segment. */
+  readonly length: number;
+}
+
 /** The options of `measureHighways`. */
 export interface HighwayMeasureOptions {
   /** The largest width of an open segment, as in `laneRoutes`. The default is 16. */
@@ -138,11 +172,13 @@ export interface HighwayMeasureOptions {
   readonly ends?: number;
   /** The free space of the board. With it, the measure counts the lanes that go through a box that their polyline avoids. */
   readonly space?: CurveSpace;
+  /** This function gets each sample of the spacing. A script reads the samples with it. */
+  readonly onSample?: (sample: SpacingSample) => void;
 }
 
 /**
  * The measures of the lanes of the open segments of a board, after a curve.
- * The spacing errors are shares of the spacing of the segment: 0.05 is 5% of the spacing.
+ * The spacing errors are shares of the gap of each pair of lanes: 0.05 is 5% of the gap.
  */
 export interface HighwayMeasures {
   /** The number of open segments with two lanes or more. */
@@ -151,7 +187,13 @@ export interface HighwayMeasures {
   readonly lanes: number;
   /** The number of sample points of the spacing. */
   readonly samples: number;
-  /** The largest spacing error at a sample point. */
+  /** The method of the spacing errors. Errors of two methods do not compare. */
+  readonly spacingMethod: typeof SPACING_METHOD;
+  /** The number of sample points with a spacing error over `SPACING_WIDE`. Read this count beside `meanSpacing`. */
+  readonly overWide: number;
+  /** The number of pairs of lanes with a sample point in `overWide`. */
+  readonly overWidePairs: number;
+  /** The largest spacing error at one sample point. One sample decides it, so it is a detail and not a headline. */
   readonly worstSpacing: number;
   /** The mean spacing error of the sample points. */
   readonly meanSpacing: number;
@@ -284,6 +326,8 @@ interface Bundle {
   /** The direction of each lane along the center line: 1 forward, -1 back. */
   readonly sign: readonly number[];
   readonly spacing: number;
+  /** The distance between each lane and the next lane, after the room of the segment. */
+  readonly gaps: readonly number[];
   /** The largest distance from the center line of a point of a lane in the segment. */
   readonly band: number;
   readonly total: number;
@@ -330,7 +374,7 @@ function partsAlong(p: readonly Point[], b: Bundle, sign: number, from: number, 
  * The spacing samples each lane `spacing / 4` apart, from the middle of the first leg to the middle of the last leg.
  * It does not sample the lane in the option `ends`. The ends of a segment are for the merges and the splits.
  *
- * A sample compares the distance to the next lane with the spacing. It counts when the next lane is in the band of the segment.
+ * A sample compares the distance to the next lane with the gap of that pair of lanes. It counts when the next lane is in the band of the segment.
  * The crossings, the breaks and the radii count along the full segment, and `ends` past each end of it.
  */
 export function measureHighways(
@@ -351,7 +395,8 @@ export function measureHighways(
     if (s.count < 2 || !open.has(runKey(s.edges)) || c.length < 2) continue;
     const spacing = Math.min(laneWidth, maxWidth / (s.count - 1));
     const sign = s.edges.map((e) => signs.get(`${s.id}|${e}`) ?? 1);
-    bundles.push({ c, edges: s.edges, sign, spacing, band: ((s.count - 1) / 2) * spacing + spacing, total: polylineLength(c) });
+    const gaps = s.edges.slice(1).map((_, k) => laneOffset(s, k, spacing).offset - laneOffset(s, k + 1, spacing).offset);
+    bundles.push({ c, edges: s.edges, sign, spacing, gaps, band: ((s.count - 1) / 2) * spacing + spacing, total: polylineLength(c) });
   }
   const inBundle = new Set(bundles.flatMap((s) => s.edges));
   const lanes = curves.filter((c) => inBundle.has(c.edge));
@@ -362,6 +407,8 @@ export function measureHighways(
   let worst = 0;
   let sum = 0;
   let over = 0;
+  let wide = 0;
+  const widePairs = new Set<string>();
   const crossings = new Set<string>();
   const endCrossings = new Set<string>();
   for (const b of bundles) {
@@ -382,11 +429,17 @@ export function measureHighways(
             let d = Infinity;
             for (const other of whole[y]!) d = Math.min(d, nearest(q, other).d);
             if (d > b.band) continue;
-            const err = Math.abs(d - sp) / sp;
+            const gap = b.gaps[Math.min(x, y)]!;
+            const err = Math.abs(d - gap) / gap;
             samples += 1;
             sum += err;
             if (err > SPACING_LIMIT) over += 1;
+            if (err > SPACING_WIDE) {
+              wide += 1;
+              widePairs.add([b.edges[x]!, b.edges[y]!].sort().join("|"));
+            }
             worst = Math.max(worst, err);
+            options.onSample?.({ edges: [b.edges[x]!, b.edges[y]!], at: q, distance: d, gap, spacing: sp, lanes: b.edges.length, length: b.total });
           }
     for (let i = 0; i < b.edges.length; i++)
       for (let j = i + 1; j < b.edges.length; j++)
@@ -395,7 +448,8 @@ export function measureHighways(
             for (let x = 1; x < P.length; x++)
               for (let y = 1; y < Q.length; y++) {
                 if (!segmentsCross(P[x - 1]!, P[x]!, Q[y - 1]!, Q[y]!)) continue;
-                const q = { x: (P[x - 1]!.x + P[x]!.x) / 2, y: (P[x - 1]!.y + P[x]!.y) / 2 };
+                // Two pieces that are almost parallel can give no point. The end of the piece is then the nearest known place.
+                const q = crossingPoint(P[x - 1]!, P[x]!, Q[y - 1]!, Q[y]!) ?? P[x]!;
                 const pair = [b.edges[i]!, b.edges[j]!].sort().join("|");
                 const at = nearest(q, c).s;
                 (at >= from && at <= to ? crossings : endCrossings).add(`${pair}@${Math.round(q.x)},${Math.round(q.y)}`);
@@ -437,6 +491,9 @@ export function measureHighways(
     bundles: bundles.length,
     lanes: lanes.length,
     samples,
+    spacingMethod: SPACING_METHOD,
+    overWide: wide,
+    overWidePairs: widePairs.size,
     worstSpacing: worst,
     meanSpacing: samples > 0 ? sum / samples : 0,
     overLimit: samples > 0 ? over / samples : 0,
@@ -577,6 +634,8 @@ export interface HighwayBenchOptions {
   readonly radius?: number;
   /** The smallest radius of `highwayCurves`, and the limit of `underMin`. The default is 4. */
   readonly minRadius?: number;
+  /** This function gets each sample of the spacing of the rows `highway`. */
+  readonly onSample?: (sample: SpacingSample) => void;
   /** The shapes of the S curves. Each shape gives one row `highway`. The default is `["biarc"]`. */
   readonly jogs?: readonly JogStyle[];
   /** The number of cubic pieces of a `quintic` S curve. The default is 4. */
@@ -614,23 +673,23 @@ export function benchHighways(router: Router, fixture: string, graph: Graph, opt
       curve: "highway",
       jog,
       jogs: measureJogs(together.curves, together.jogs, jog, jog === "biarc" ? undefined : biarcPeaks),
-      ...measureHighways(segments, open, spacing, together.curves, measure),
+      ...measureHighways(segments, open, spacing, together.curves, options.onSample ? { ...measure, onSample: options.onSample } : measure),
       ms: t3 - t2,
     });
   }
   return rows;
 }
 
-/** This function writes the rows of `benchHighways` as a Markdown table. The spacing errors are percents of the spacing. */
+/** This function writes the rows of `benchHighways` as a Markdown table. The spacing errors are percents of the gap of each pair of lanes. */
 export function formatHighways(rows: readonly HighwayBenchRow[]): string {
   const head =
-    "| router | fixture | curve | jog | bundles | lanes | worst spacing | mean spacing | over 5% | crossings | end crossings | tangent breaks | min radius | under min | through | S curves | S biarcs | S peak κ median | S peak κ max | S peak ratio | S end κ | S inner jump | ms |";
-  const line = "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
+    "| router | fixture | curve | jog | bundles | lanes | method | samples over 25% | lane pairs over 25% | mean spacing | over 5% | worst spacing | crossings | end crossings | tangent breaks | min radius | under min | through | S curves | S biarcs | S peak κ median | S peak κ max | S peak ratio | S end κ | S inner jump | ms |";
+  const line = "|---|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|";
   const pct = (v: number): string => `${(v * 100).toFixed(1)}%`;
   const k = (v: number | undefined): string => (v === undefined ? "-" : v.toFixed(4));
   const body = rows.map(
     (r) =>
-      `| ${r.router} | ${r.fixture} | ${r.curve} | ${r.jog ?? "-"} | ${r.bundles} | ${r.lanes} | ${pct(r.worstSpacing)} | ${pct(r.meanSpacing)} | ${pct(r.overLimit)} | ${r.crossings} | ${r.endCrossings} | ${r.breaks} | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} | ${r.jogs?.count ?? "-"} | ${r.jogs?.biarcs ?? "-"} | ${k(r.jogs?.peakMedian)} | ${k(r.jogs?.peakMax)} | ${k(r.jogs?.peakRatio)} | ${k(r.jogs?.endJump)} | ${k(r.jogs?.innerJump)} | ${r.ms.toFixed(1)} |`,
+      `| ${r.router} | ${r.fixture} | ${r.curve} | ${r.jog ?? "-"} | ${r.bundles} | ${r.lanes} | ${r.spacingMethod} | ${r.overWide} | ${r.overWidePairs} | ${pct(r.meanSpacing)} | ${pct(r.overLimit)} | ${pct(r.worstSpacing)} | ${r.crossings} | ${r.endCrossings} | ${r.breaks} | ${r.minRadius === Infinity ? "-" : r.minRadius.toFixed(2)} | ${r.underMin} | ${r.through} | ${r.jogs?.count ?? "-"} | ${r.jogs?.biarcs ?? "-"} | ${k(r.jogs?.peakMedian)} | ${k(r.jogs?.peakMax)} | ${k(r.jogs?.peakRatio)} | ${k(r.jogs?.endJump)} | ${k(r.jogs?.innerJump)} | ${r.ms.toFixed(1)} |`,
   );
   return [head, line, ...body].join("\n");
 }

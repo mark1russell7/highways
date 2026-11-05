@@ -7,7 +7,7 @@ import { graphInput } from "../bench/screen/forms.ts";
 import { caseSeed, inputId, manifestHash, SCREEN_V1, SCREEN_V2, SCREEN_V3, screenInputs, setManifest, type ScreenSet } from "../bench/screen/set.ts";
 import { wholeStrategies } from "../strategies/builtins.ts";
 import type { Graph } from "../model.ts";
-import { HIGHWAYS_FAMILIES, highwaysRegistry } from "./index.ts";
+import { HIGHWAYS_FAMILIES, highwaysRegistry, KEYED_FAMILIES, WEEKLY_FAMILIES } from "./index.ts";
 
 const reg = highwaysRegistry();
 
@@ -51,9 +51,15 @@ function expectRouted(graph: Graph, where: string): void {
 }
 
 describe("the corpus families of highways (CORPUS-GEN)", () => {
-  it("has the 15 families of screen-v3, in their order, and the 6 families of screen-v2 come first", () => {
-    expect(HIGHWAYS_FAMILIES.map((f) => f.name)).toEqual(SCREEN_V3.families.map((f) => f.name));
-    expect(reg.families().map((f) => f.name)).toEqual(SCREEN_V3.families.map((f) => f.name));
+  it("lists each family whose edges carry a key", () => {
+    const keyed = HIGHWAYS_FAMILIES.filter((f) => [0, 1, 2].some((seed) => reg.generate(f.name, seed).graph.edges.some((e) => e.data?.["collection"] !== undefined)));
+    expect(keyed.map((f) => f.name)).toEqual([...KEYED_FAMILIES]);
+  });
+
+  it("has the 15 families of screen-v3 first, in their order, then the weekly families, and the 6 families of screen-v2 come first", () => {
+    const names = [...SCREEN_V3.families, ...WEEKLY_FAMILIES].map((f) => f.name);
+    expect(HIGHWAYS_FAMILIES.map((f) => f.name)).toEqual(names);
+    expect(reg.families().map((f) => f.name)).toEqual(names);
     expect(HIGHWAYS_FAMILIES.slice(0, 6).map((f) => f.name)).toEqual(SCREEN_V2.families.map((f) => f.name));
   });
 
@@ -101,7 +107,8 @@ describe("the corpus families of highways (CORPUS-GEN)", () => {
         const board = reg.generate(f.name, 4, dims);
         expectRouted(board.graph, `${f.name} ${JSON.stringify(dims)}`);
       }
-  });
+    // This test checks routes, not speed. It took 2.8 s to 4.9 s on the runners, so the default limit of 5 s failed under load.
+  }, 60_000);
 
   it("gives levels for each numeric dimension, so a host can sweep it", () => {
     for (const f of HIGHWAYS_FAMILIES) for (const d of f.dimensions) expect(levelsOf(d, 3).length, `${f.name}.${d.name}`).toBeGreaterThan(0);

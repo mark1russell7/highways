@@ -11,7 +11,8 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
-import { parseLines, type LayoutRecord } from "../src/bench/screen/forms.ts";
+import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
+import { parseLines, passThroughs, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 import { requireGrid } from "./gates/inputs.ts";
@@ -66,6 +67,10 @@ interface GuardVerdict {
   readonly p: number;
   readonly families: readonly FamilyVerdict[];
   readonly breadth: Breadth;
+  /** The absolute count of the pass-throughs of the strategy over its records. A snapshot from before PASS-GRID has no such field. */
+  readonly through: number;
+  /** The absolute count of the pass-throughs of the base over its records. */
+  readonly baseThrough: number;
 }
 
 /** This function gives the breadth of a verdict from its families, with the rule of `docs/VERDICT.md` of the contract. */
@@ -108,7 +113,7 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string, measures
       const v = verdict(pair, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
       const values = (s: string): number[] => pair.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
       const old = compareMeasure(mean(values(strategy)), mean(values(base)), { direction: info.better, minEffect: tie });
-      out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v) });
+      out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v), through: passThroughs(pair, strategy), baseThrough: passThroughs(pair, base) });
     }
   }
   return out;
@@ -131,9 +136,11 @@ interface SnapshotHeader {
 }
 
 /** This function gives the JSON text of a snapshot, with one row on each line. Thus a diff shows each changed verdict. */
-function snapshotText(header: SnapshotHeader, rows: readonly GuardVerdict[]): string {
+function snapshotText(header: SnapshotHeader, rows: readonly GuardVerdict[], limits: readonly OverlapLimitRow[]): string {
   const head = JSON.stringify(header, null, 2).replace(/\n}$/, ",");
-  return `${head}\n  "rows": [\n${rows.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]\n}\n`;
+  const list = (key: string, items: readonly unknown[]): string => `  "${key}": [\n${items.map((r) => `    ${JSON.stringify(r)}`).join(",\n")}\n  ]`;
+  // A snapshot with no router without lanes keeps its old form.
+  return `${head}\n${[list("rows", rows), ...(limits.length > 0 ? [list("limits", limits)] : [])].join(",\n")}\n}\n`;
 }
 
 /** This function gives the run id and the commit from the path of an artifact that `gh run download <run> -D <dir>/<run>` wrote. */
@@ -173,6 +180,7 @@ function main(): void {
   requireGrid(`screen-verdict ${file}`, records);
   const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
   const rows = screenVerdicts(records, base, measures);
+  const limits = overlapLimitRows(records, (input) => familyOfRecord({ input } as LayoutRecord));
   const step = stepOf(records);
   const set = records[0]?.set;
   const path = fromPath(file);
@@ -188,7 +196,8 @@ function main(): void {
     core: opt("--core") ?? (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version,
   };
   const snapshot = args.includes("--snapshot") ? fileURLToPath(new URL(`../../../docs/research/verdicts/${set}-${step}.json`, import.meta.url)) : undefined;
-  for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows));
+  for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows, limits));
+  for (const l of limits) console.log(`${l.strategy} ${l.guard}: ${l.label}, rise over ${l.base} ${f3(l.worst)} at most ${l.limit}, ${l.over} of ${l.of} inputs over, worst ${l.worstInput}`);
   const families = rows[0]?.families.map((f) => f.family) ?? [];
   console.log(`## The verdicts of the step \`${step}\` on \`${records[0]?.set}\` against \`${base}\`\n`);
   console.log(`The level is ${LEVEL}. The families: ${families.map((f) => `\`${f}\``).join(", ")}. A positive mean tells that the strategy is better.\n`);
@@ -198,12 +207,13 @@ function main(): void {
       ? `The sign test over ${families.length} families passes at no count. It needs 6 families or more at the level ${LEVEL}.\n`
       : `The sign test over ${families.length} families passes at ${power} of ${families.length} families or more on one side, with no ties, at the level ${LEVEL}.\n`,
   );
-  console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against |");
-  console.log("|---|---|---|---|---:|---:|---:|---|---:|");
+  console.log("The columns `through` and `base through` are absolute counts of the breaks of `no-pass-through` over the records. A verdict does not show them.\n");
+  console.log("| strategy | guard | label | old | stratified | pooled | p | family signs | against | through | base through |");
+  console.log("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|");
   for (const r of rows) {
     const signs = r.families.map((f) => SIGN[f.sign]).join(" ");
     const against = `${r.breadth.against} of ${r.breadth.of}${r.breadth.ties > 0 ? ` (${r.breadth.ties} ${r.breadth.ties === 1 ? "tie" : "ties"})` : ""}`;
-    console.log(`| ${r.strategy} | ${r.guard} | ${r.label} | ${r.old} | ${f3(r.stratified)} | ${f3(r.pooled)} | ${r.p.toFixed(4)} | ${signs} | ${against} |`);
+    console.log(`| ${r.strategy} | ${r.guard} | ${r.label} | ${r.old} | ${f3(r.stratified)} | ${f3(r.pooled)} | ${r.p.toFixed(4)} | ${signs} | ${against} | ${r.through} | ${r.baseThrough} |`);
   }
 }
 

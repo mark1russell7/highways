@@ -93,6 +93,7 @@ import type { WayOptions } from "../ways.ts";
 import type { PipelineOptions } from "../whole/pipeline/index.ts";
 import type { RunOrder } from "../segments.ts";
 import type { ClothoidStrategyOptions, HighwayStrategyOptions, LevelRoomPreset, RadiusOptions, RoomPreset, RouterPreset, SmoothStrategyOptions, TensionOptions } from "./builtins.ts";
+import { JOIN_WORK } from "../visibility.ts";
 import type { EnumOption, NumberOption, OptionSchema } from "./options.ts";
 
 // The declarations of the options of the built-in strategies. Each `default` is the value that the function uses without the option.
@@ -103,6 +104,7 @@ const WAY_SCHEMA: OptionSchema<WayOptions> = {
   margin: { type: "number", min: 1, max: 20, step: 1, default: 5, describe: "The distance from a box to the corners of the graph." },
   k: { type: "integer", min: 2, max: 16, step: 1, default: 8, describe: "The number of visible neighbours of each corner." },
   smooth: { type: "boolean", default: false, describe: "With `true`, a way in clear view uses the inflection rule, and the other ways get round corners." },
+  outSteps: { type: "boolean", default: true, describe: "With `false`, a way keeps the whole margin, so a closed gap gives the straight line." },
 };
 
 /** The declarations of the options of the stretch order (LANE-STRETCH): the method and the passes of `sifting`. A generator can list each value. */
@@ -137,6 +139,8 @@ const RUN_LANE_ORDER: EnumOption<RunOrder> = { ...LANE_ORDER, default: "run" };
 /** The declarations of the options of the routers `corners` and `corners-smooth`. */
 export const CORNERS_SCHEMA: OptionSchema<RouterPreset<CornersOptions>> = {
   ...WAY_SCHEMA,
+  joinWork: { type: "integer", min: 0, max: 268435456, step: 1048576, default: JOIN_WORK, describe: "The limit of the work that joins the parts of the corner graph. 0 turns the join off." },
+  joinRegions: { type: "boolean", default: true, describe: "With `true`, the join looks only at the free region of a corner. The links stay the same." },
   plugs: {
     type: "enum",
     values: ["facing", "side"],
@@ -340,6 +344,7 @@ export const SECTIONS_SCHEMA: OptionSchema<RouterPreset<SectionsOptions>> = {
     default: 8,
     describe: "The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5.",
   },
+  levelJoinWork: { type: "integer", min: 0, max: 268435456, step: 1048576, default: 0, describe: "The limit of the work of the join of parts on the level graphs. The value 0 turns that join off." },
   group: { type: "strategy", step: "group", describe: "The grouping rule: a strategy of the step `group`. Without it, the router uses the quadtree." },
   groupOptions: { type: "object", describe: "The options of the strategy `group`." },
   levels: { type: "list", describe: "The depths of the tree that get a level with groups. Without it, each depth gets a level." },
@@ -625,6 +630,7 @@ export const LANES_SCHEMA: OptionSchema<LanesOptions> = {
   laneGap: { type: "number", min: 2, max: 8, step: 1, default: 4, describe: "The gap between two lanes." },
   maxWidth: { type: "number", min: 8, max: 64, step: 4, default: 32, describe: "The largest width of a highway." },
   depth: { type: "integer", min: 0, max: 5, step: 1, default: 3, describe: "The number of times that a highway can split, one half after the other." },
+  measure: { type: "enum", values: ["half", "all"], default: "half", describe: "The lanes for which the old spine counts as narrow: the half that moves, or all the lanes." },
 };
 
 /** The declarations of the options of the highway strategy `growth` (HWY-055). */
@@ -964,9 +970,11 @@ export const SCALE_SPACE_SCHEMA: OptionSchema<ScaleSpaceOptions> = {
 export const DEPTHS_SCHEMA: OptionSchema<DepthLevelOptions> = {
   margin: WAY_SCHEMA.margin,
   k: WAY_SCHEMA.k,
+  outSteps: WAY_SCHEMA.outSteps,
   tightMargin: SECTIONS_SCHEMA.tightMargin,
   plugInset: SECTIONS_SCHEMA.plugInset,
   throughCost: SECTIONS_SCHEMA.throughCost,
+  levelJoinWork: SECTIONS_SCHEMA.levelJoinWork,
   levels: SECTIONS_SCHEMA.levels,
 };
 
@@ -993,6 +1001,7 @@ export const SPREAD_SCHEMA: OptionSchema<SpreadOptions> = {
 export const ASSIGN_SCHEMA: OptionSchema<AssignOptions> = {
   plugGap: { type: "number", min: 0, max: 24, step: 1, default: 8, describe: "The least gap between two plugs of one wall. On a short wall, the gap shrinks evenly." },
   inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its wall." },
+  rangeShrink: { type: "number", min: 0, max: 1, step: 0.05, default: 1, describe: "The least share of `plugGap` that a wall can use to put more ends in their ranges. The value 1 keeps the gap." },
 };
 
 /** The declarations of the options of the whole strategy `pipeline`. */

@@ -6,6 +6,8 @@ import { clampToRange } from "./plugs/range.ts";
 export interface Plug {
   readonly point: Point;
   readonly normal: Point;
+  /** With `true`, the point of this plug is the first stop of a way, and a way takes no step along the normal. The start of an inner route lies on the bounds of its room, so it has no step left. */
+  readonly noStep?: true;
 }
 
 /** The outward normal of each side, in a frame with the y axis down. */

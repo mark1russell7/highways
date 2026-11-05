@@ -44,7 +44,7 @@ describe("the generated boards of the site (CORPUS-GEN)", () => {
   it("gives the screen board of each family at its defaults: the member 0 of `screen-v3`", () => {
     const inputs = screenInputs(SCREEN_V3);
     expect(NAMED_GENS.slice(0, GEN_FAMILIES.length).map((n) => n.spec.family)).toEqual(GEN_FAMILIES.map((f) => f.name));
-    for (const n of NAMED_GENS.slice(0, GEN_FAMILIES.length)) {
+    for (const n of NAMED_GENS.slice(0, SCREEN_V3.families.length)) {
       const member = inputs.find((i) => i.id === `screen-v3/${n.spec.family}/s0`)!;
       const graph = genGraph(n.spec);
       expect(graph.nodes.map((x) => x.id), n.name).toEqual(member.boxes.map((b) => b.id));

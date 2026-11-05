@@ -3,7 +3,7 @@
 // They read the repository on disk. They never use the network.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { listStrategies, STEPS, STRATEGIES, type Registry } from "@mark1russell7/highways";
+import { ALL_STRATEGIES, listStrategies, STEPS, type Registry } from "@mark1russell7/highways";
 import { strategyIdeas } from "../../core/scripts/strategy-ideas.ts";
 import { parseSnapshot } from "./results-data.ts";
 import { ideaRecords, RESULT_FILES, snapshotFiles } from "./results-files.ts";
@@ -22,7 +22,7 @@ export function builtMap(strategies: readonly StrategyInput[]): BuiltMap {
 }
 
 /** This function gives the strategies of each step of a registry as plain data, in the order of the steps. */
-export function strategyInputs(registry: Registry = STRATEGIES): StrategyInput[] {
+export function strategyInputs(registry: Registry = ALL_STRATEGIES): StrategyInput[] {
   return STEPS.flatMap((step) =>
     listStrategies(registry, step).map((s) => ({
       step,
@@ -35,7 +35,7 @@ export function strategyInputs(registry: Registry = STRATEGIES): StrategyInput[]
 }
 
 /** This function makes the data of the strategies page from the registry and the files of the repository at `root`. */
-export function readStrategies(root: string, registry: Registry = STRATEGIES): StrategiesData {
+export function readStrategies(root: string, registry: Registry = ALL_STRATEGIES): StrategiesData {
   const bench = join(root, RESULT_FILES.bench);
   const strategies = strategyInputs(registry);
   return strategiesData({

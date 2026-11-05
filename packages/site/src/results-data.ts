@@ -73,6 +73,8 @@ export interface VerdictCell {
   /** The sign of each family, in the sequence of `families` of the table. */
   readonly signs: string;
   readonly p: number;
+  /** The count of family marks of the run that `keylessTies` changed to a tie. A cell of another strategy does not have this field. */
+  readonly tiedByCause?: number;
 }
 
 /** The verdict grid of one set and one step: the strategy rows and the guard columns. */
@@ -80,6 +82,8 @@ export interface VerdictTable extends SnapshotHeader {
   readonly families: readonly string[];
   readonly guards: readonly { readonly id: string; readonly measure: string }[];
   readonly strategies: readonly { readonly name: string; readonly cells: readonly VerdictCell[] }[];
+  /** The families with no key, where the base `shared` has 0 ways. Only a table with that base has this field. */
+  readonly keyless?: readonly string[];
 }
 
 /** This function gives the verdict grid of a snapshot. It keeps only the fields that the page shows. */
@@ -308,6 +312,57 @@ export interface ResultsData {
   readonly text: Readonly<Record<string, string>>;
   /** The measures of the records, in the sequence of `MEASURES` of the core. */
   readonly measures: readonly MeasureRow[];
+  /** The version of the core that the site builds on. */
+  readonly core: string;
+  /** The coverage of the space, from `docs/research/space-coverage`. */
+  readonly coverage?: CoverageView;
+}
+
+/** One point of the trend of the coverage. */
+export interface CoveragePoint {
+  readonly date: string;
+  readonly core: string;
+  readonly cells: number;
+  readonly fitted: number;
+  readonly value: number;
+  readonly reason?: string;
+}
+
+/** The record of the coverage of the space and its trend. A cell is one measure on one strategy, option or input dimension. */
+export interface CoverageView {
+  readonly measures: number;
+  readonly strategies: number;
+  readonly options: number;
+  readonly inputs: number;
+  readonly cells: number;
+  readonly fitted: number;
+  readonly value: number;
+  /** The weekly points, the oldest first. */
+  readonly trend: readonly CoveragePoint[];
+}
+
+/** This function gives the view of the coverage from the text of `record.json` and of `trend.json`. */
+export function coverageView(record: string, trend: string): CoverageView {
+  const { measures, strategies, options, inputs, cells, fitted, value } = JSON.parse(record) as Omit<CoverageView, "trend">;
+  return { measures, strategies, options, inputs, cells, fitted, value, trend: JSON.parse(trend) as CoveragePoint[] };
+}
+
+/** The age of one record against the date of the viewer, and the core of the record against the core of the site. */
+export interface RecordAge {
+  /** The number of whole days from the date of the record to `today`. */
+  readonly days: number;
+  /** The record comes from the core that the site builds on. */
+  readonly sameCore: boolean;
+}
+
+/** This function gives the age of a record of `date` on the core `core`, on the day `today` of a site on the core `siteCore`. */
+export function recordAge(date: string, core: string, siteCore: string, today: string): RecordAge {
+  return { days: Math.max(0, Math.round((Date.parse(today) - Date.parse(date)) / 86_400_000)), sameCore: core === siteCore };
+}
+
+/** This function gives an age as text, for example "2 days old". */
+export function ageText(days: number): string {
+  return days === 0 ? "from today" : `${days} ${days === 1 ? "day" : "days"} old`;
 }
 
 /** One measure of the records, as `MEASURES` of the core gives it. The page shows the definition with the name. */
@@ -322,6 +377,31 @@ export interface MeasureRow {
   readonly definition: string;
 }
 
+/** The base that makes ways only from a key. */
+const KEY_BASE = "shared";
+/** The strategy that the base `shared` equals on a board with no key, but for its tie breaks. */
+const KEY_TWIN = "corners";
+
+/**
+ * This function marks the families with no key on a table with the base `shared`.
+ * With no key, `shared` is `corners` with other tie breaks. So each mark of the row `corners` on such a family is a tie by cause.
+ * The label of a cell does not change, because the run read it over all the families.
+ */
+export function keylessTies(t: VerdictTable, keyed: readonly string[]): VerdictTable {
+  if (t.base !== KEY_BASE) return t;
+  const tieCell = (c: VerdictCell): VerdictCell => {
+    const signs = [...c.signs].map((sign, i) => (keyed.includes(t.families[i] ?? "") ? sign : SIGN_CHAR[0]));
+    const count = (sign: string): number => signs.filter((s) => s === sign).length;
+    const against = c.label === "better" ? count(SIGN_CHAR[-1]) : c.label === "worse" ? count(SIGN_CHAR[1]) : c.against;
+    return { ...c, signs: signs.join(""), against, ties: count(SIGN_CHAR[0]), tiedByCause: signs.filter((s, i) => s !== c.signs[i]).length };
+  };
+  return {
+    ...t,
+    keyless: t.families.filter((f) => !keyed.includes(f)),
+    strategies: t.strategies.map((s) => (s.name === KEY_TWIN ? { name: s.name, cells: s.cells.map(tieCell) } : s)),
+  };
+}
+
 /** The inputs of `resultsData`: the texts of the committed files. */
 export interface ResultsInput {
   readonly snapshots: readonly { readonly name: string; readonly text: string }[];
@@ -334,6 +414,12 @@ export interface ResultsInput {
   readonly queue: string;
   /** The measures of the records, from `MEASURES` of the core. */
   readonly measures?: readonly MeasureRow[];
+  /** The version of the core that the site builds on. */
+  readonly core?: string;
+  /** The text of `record.json` and of `trend.json` of `docs/research/space-coverage`. */
+  readonly coverage?: { readonly record: string; readonly trend: string };
+  /** The families whose edges carry a key, from `KEYED_FAMILIES` of the core. With no list, the page marks no family. */
+  readonly keyed?: readonly string[];
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -364,7 +450,7 @@ export function resultsData(input: ResultsInput): ResultsData {
   const betterCount = snapshots.filter((s) => s.set === splitSet).reduce((n, s) => n + s.rows.filter((r) => r.label === "better").length, 0);
   const shipped = shippedRows(input.roadmap);
   return {
-    tables: snapshots.map(verdictTable),
+    tables: snapshots.map(verdictTable).map((t) => (input.keyed ? keylessTies(t, input.keyed) : t)),
     splitSet,
     split,
     betterCount,
@@ -376,6 +462,8 @@ export function resultsData(input: ResultsInput): ResultsData {
       .map((r) => ({ ...r, item: input.inline(absoluteLinks(r.item)), link: linkHtml(r.link) })),
     text: input.text,
     measures: input.measures ?? [],
+    core: input.core ?? "",
+    ...(input.coverage ? { coverage: coverageView(input.coverage.record, input.coverage.trend) } : {}),
   };
 }
 

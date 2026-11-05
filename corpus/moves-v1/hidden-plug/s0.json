@@ -1,0 +1,21 @@
+{
+  "boxes": [
+    {"h": 370, "id": "tall", "w": 90, "x": 40, "y": 130},
+    {"h": 80, "id": "low", "w": 170, "x": 70, "y": 570},
+    {"h": 340, "id": "far", "w": 80, "x": 250, "y": 480},
+    {"h": 60, "id": "near", "w": 100, "x": 140, "y": 500}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "sparse", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"id": "e0", "source": "tall", "target": "far"},
+    {"id": "e1", "source": "near", "target": "tall"}
+  ],
+  "family": "hidden-plug",
+  "generator": {"name": "move-board", "params": {"board": "hidden-plug"}, "seed": 0, "version": 1},
+  "hash": "6283e69323a860b4",
+  "id": "moves-v1/hidden-plug/s0",
+  "schema": "layout-input/1",
+  "seed": 0,
+  "set": "moves-v1",
+  "source": "made-up"
+}

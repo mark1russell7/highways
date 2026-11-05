@@ -1,0 +1,191 @@
+{
+  "schema": "level-crossings/2",
+  "router": "sections",
+  "seeds": 20,
+  "largeSeeds": 4,
+  "flat": [],
+  "rows": [
+    {
+      "family": "walled-level",
+      "size": "default",
+      "boards": 20,
+      "cleanBoards": 0,
+      "levels": 125,
+      "overlapLevels": 44,
+      "overlapPairs": 545,
+      "links": 1208,
+      "change": {
+        "join": {
+          "changed": 14,
+          "better": 14,
+          "worse": 0,
+          "added": 0,
+          "removed": 20
+        },
+        "far": {
+          "changed": 60,
+          "better": 0,
+          "worse": 55,
+          "added": 131,
+          "removed": 0
+        }
+      },
+      "base": {
+        "crossings": 339,
+        "crossedLinks": 188,
+        "endsOverlapLinks": 21,
+        "clearWayLinks": 16,
+        "noWayLinks": 151,
+        "noWayBoardWayLinks": 151,
+        "overlapEnd": 233,
+        "single": 103,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 319,
+        "crossedLinks": 174,
+        "endsOverlapLinks": 21,
+        "clearWayLinks": 2,
+        "noWayLinks": 151,
+        "noWayBoardWayLinks": 151,
+        "overlapEnd": 233,
+        "single": 83,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 470,
+        "crossedLinks": 189,
+        "endsOverlapLinks": 21,
+        "clearWayLinks": 17,
+        "noWayLinks": 151,
+        "noWayBoardWayLinks": 151,
+        "overlapEnd": 238,
+        "single": 193,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": [
+        {
+          "seed": 9,
+          "depth": 2,
+          "items": 16,
+          "source": "s12",
+          "target": "s31",
+          "crossed": [
+            "s13"
+          ],
+          "single": 1,
+          "overlapEnd": 1,
+          "points": 2
+        },
+        {
+          "seed": 10,
+          "depth": 3,
+          "items": 42,
+          "source": "n0",
+          "target": "n10",
+          "crossed": [
+            "w10"
+          ],
+          "single": 1,
+          "overlapEnd": 0,
+          "points": 4
+        },
+        {
+          "seed": 10,
+          "depth": 3,
+          "items": 42,
+          "source": "n1",
+          "target": "n10",
+          "crossed": [
+            "w16",
+            "w10"
+          ],
+          "single": 2,
+          "overlapEnd": 0,
+          "points": 5
+        }
+      ]
+    },
+    {
+      "family": "walled-level",
+      "size": "largest",
+      "boards": 4,
+      "cleanBoards": 0,
+      "levels": 30,
+      "overlapLevels": 16,
+      "overlapPairs": 648,
+      "links": 2414,
+      "change": {
+        "join": {
+          "changed": 0,
+          "better": 0,
+          "worse": 0,
+          "added": 0,
+          "removed": 0
+        },
+        "far": {
+          "changed": 399,
+          "better": 2,
+          "worse": 383,
+          "added": 1679,
+          "removed": 2
+        }
+      },
+      "base": {
+        "crossings": 2545,
+        "crossedLinks": 741,
+        "endsOverlapLinks": 53,
+        "clearWayLinks": 1,
+        "noWayLinks": 687,
+        "noWayBoardWayLinks": 687,
+        "overlapEnd": 1210,
+        "single": 630,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "join": {
+        "crossings": 2545,
+        "crossedLinks": 741,
+        "endsOverlapLinks": 53,
+        "clearWayLinks": 1,
+        "noWayLinks": 687,
+        "noWayBoardWayLinks": 687,
+        "overlapEnd": 1210,
+        "single": 630,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "far": {
+        "crossings": 4222,
+        "crossedLinks": 741,
+        "endsOverlapLinks": 53,
+        "clearWayLinks": 1,
+        "noWayLinks": 687,
+        "noWayBoardWayLinks": 687,
+        "overlapEnd": 1291,
+        "single": 1463,
+        "flatLevelLinks": 0,
+        "flatClearWayLinks": 0
+      },
+      "samples": [
+        {
+          "seed": 1,
+          "depth": 3,
+          "items": 63,
+          "source": "s231",
+          "target": "s300",
+          "crossed": [
+            "s213",
+            "s302"
+          ],
+          "single": 0,
+          "overlapEnd": 2,
+          "points": 2
+        }
+      ]
+    }
+  ]
+}

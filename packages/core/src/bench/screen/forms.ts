@@ -99,6 +99,8 @@ export interface LayoutCell {
   readonly edgeShape?: "random" | "clustered" | "hubChain" | "longRange" | "tree" | "bundled";
   readonly groups?: "none" | "flat" | "nested";
   readonly ports?: "free" | "sides" | "fixed";
+  /** The key of each edge in `data.collection`, as the dimension `edgeKey` of the contract gives it. */
+  readonly edgeKey?: "none" | "random" | "cluster";
 }
 
 /** The outer rectangle of a packing. The router ignores it. */
@@ -195,6 +197,14 @@ export interface LayoutRecord {
   readonly outputHash?: string;
   /** The facts of the stages of the run. The trace measures `move.<name>` count the own move of the strategy (ACTIVATION). */
   readonly trace?: readonly RecordTrace[];
+}
+
+/**
+ * This function gives the sum of the breaks of the hard rule `no-pass-through` of a strategy over its records.
+ * The value is an absolute count. It has no floor and no base, so a verdict "not worse than the base" does not hide it.
+ */
+export function passThroughs(records: readonly LayoutRecord[], strategy: string): number {
+  return records.reduce((n, r) => n + (r.strategy === strategy ? (r.hard["no-pass-through"] ?? 0) : 0), 0);
 }
 
 /** The facts of one stage of a run, as the `StageTrace` of the contract: its id, its time and its trace measures. */

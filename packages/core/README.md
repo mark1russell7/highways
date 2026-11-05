@@ -60,7 +60,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `justify` | The plugs of `facing`, then the plugs of each side keep their order and the gap `plugGap` (WILD-002). |
 | `spread` | The plugs of each wall share the room of the wall, with the gap `plugGap`, in the order of their far ends. |
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
-| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. |
+| `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. The option `rangeShrink` lets a wall take a smaller gap for more plugs in their ranges. |
 | `escape` | The ordered escape of EDA-022. The plugs of each wall take the order of the first legs of their ways, with the gap `slotSpacing`. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
@@ -85,7 +85,15 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - A port without a range gives the same plugs as before.
 - `resolvePorts` throws a `RangeError` for a range with a start after its end, or with a value out of 0 to 1.
 
-`assign` (PLUG-ASSIGN) solves each wall exactly. It has three goals, in this order:
+A port can have a `rowHeight`: the height of its row on the card, along the wall (PLUG-ROW-GAP). The row is centered on the plug.
+
+- `spread` and `leaders` read it. Two neighbor plugs stay as far apart as the mean of their rows, or `plugGap` when that is more.
+- A free plug leaves the row of a fixed plug when the wall has the room. It goes past the fixed plug when the near part of the wall has no room.
+- When the wall has too little room, the distances shrink evenly. No plug drops.
+- A port without a `rowHeight` gives the same plugs as before. The other plug rules do not read it.
+- `resolvePorts` throws a `RangeError` for a height that is negative or not finite.
+
+`assign` (PLUG-ASSIGN) solves each wall exactly, up to a limit of work (ASSIGN-BOUND). It has three goals, in this order:
 
 1. The most ends get a plug in their range, with the gap `plugGap` between two plugs.
 2. The plugs keep the order of the far ends, so they do not cross at the wall, when goal 1 lets them.
@@ -94,6 +102,9 @@ A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT
 - An end without a range has the room of the wall as its range.
 - An end that cannot get a plug in its range gets a plug in the room of the wall. No plug drops.
 - A test compares `assign` with a search over each order, on 300 seeded walls of up to 8 ends.
+- Each wall of up to 8 ends gets the exact plan. Over the limit of work, a greedy sweep gives the plan, and the count of goal 1 is not always the best.
+- The record [`assign-gap.jsonl`](../../docs/research/bench/assign-gap.jsonl) compares the sweep with the exact plan on 720 seeded walls of 4 families. The sweep has fewer ends in their ranges on 12 walls. The worst wall loses 3 of 25 ends, on a tight wall of 32 ends.
+- The record compares the two plans up to 32 to 64 ends, by family. A family stops at the first size with a wall over 5 s of exact plan. Over that size, the record has only an upper bound, and a plan cannot always reach the bound.
 
 `fixPorts(graph, rule, options?)` runs a plug rule, and gives each free port a fixed `at` and a `side` from the plugs of the rule. Then each router keeps those plugs.
 
@@ -132,7 +143,16 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - With your outer router and `corners`, a sibling edge gets two routes. Keep the inner route of `corners`.
   - A self-loop of a child is a sibling edge. In the mode `corners`, it gets the short stub out and back at one plug, as an outer self-loop does.
   - In the mode `gutter`, a self-loop goes out of one side of the node and comes back into a different side.
+- An edge at two depths is an inner edge too (INTERIOR-ROUTE slice 2). It joins two nodes with different `parent` values, and a frame holds the two nodes.
+  - The `InnerEdge` of such an edge has no `plug`. Its `frame` is the nearest common frame of the two nodes.
+  - The router `corners` routes it in that frame, in the modes `corners` and `gutter`. The two ends use the plugs of their nodes.
+  - The route enters each nested frame that holds an end. It goes around the other nodes and around each nested frame that holds no end.
+  - A port of a frame that does not hold the other end is a port of a node. The route uses that port.
+  - In a room with such an edge, the option `outside` also applies to a box out of the common frame.
+  - Each other router gives such an edge an outer route, as before. With your outer router and `corners`, the edge gets two routes. Keep the inner route of `corners`.
+  - An edge with no common frame stays an outer edge. An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
 - The default of `frameInset` is the margin of the router.
+- A route takes its first stop on the bounds, and each other stop stays in them. A child closer to a wall than `frameInset` gives that wall half of its free strip.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
 - The option `outside` sets the rule for a node box outside the box of its frame:
   - `throw` (the default) throws a `RangeError`.
@@ -147,6 +167,8 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
 - The option `bendCost` is the cost of one bend in units of length. A larger cost gives fewer bends. The default is 16.
 - Each gap that two or more routes share gets one lane for each route. The lanes are evenly spaced, in an order with few crossings.
 - The space between two lanes is the margin of the router. In a narrow gap, the space becomes smaller.
+- Each way has the field `room`: the distance to the nearest box on each side. `laneRoutes` and `pullApart` keep the lanes of each side in it, in their order, and 1 unit from the box.
+- Two lanes of a side stay at least `LANE_LEAST` apart. A lane that then reaches a box gets the field `outOfRoom`. So a renderer can show that lane, and a count can read it.
 - An edge with no way through the free room gets no route, as with `skip`. Rows that touch each other with gap 0 can block a way.
 
 ```ts
@@ -158,6 +180,21 @@ const edges = [{ id: "inner", source: { node: "row" }, target: { node: "card", p
 const inner = cornersRouter({ name: "corners" }).route({ nodes, edges }).routes; // inner[0].frame is "card"
 const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }).route({ nodes, edges }).routes; // only H and V legs
 ```
+
+### A route through a box
+
+A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
+
+- A margin is a preference, not a wall. When the whole margin gives no way, a router tries the steps of `OUT_STEPS`: one half, one quarter and one sixteenth of the margin (PLUG-OUT-BLOCKED).
+- The lowest step is above 0. Boxes that touch stay closed, so a route does not run along their seam. A route with no way says so in `through`.
+- A route of these steps can pass closer to a box than the margin. A route with a way at the whole margin keeps its bytes.
+- The option `outSteps: false` keeps the whole margin, so a closed gap gives the straight line.
+- A router gives a straight line when it finds no way at any step. The field tells you that the line goes through a box.
+- The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
+- When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
+- The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
+- A clean route does not have the field, so its bytes do not change.
+- `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
 
 ## Curve types
 
@@ -247,12 +284,14 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 
 | Router | Board | Body crossings, `run` → `bundle` | End crossings, `run` → `bundle` |
 |---|---|---:|---:|
-| `shared` | `case-dense-groups` | 10 → 0 | 366 → 162 |
-| `shared-all` | `case-dense-groups` | 0 → 0 | 1586 → 838 |
-| `shared-all` | `case-hub-chain` | 2 → 3 | 603 → 73 |
-| `shared-all` | `case-many-groups` | 12 → 0 | 2301 → 687 |
+| `shared` | `case-dense-groups` | 1 → 1 | 392 → 172 |
+| `shared-all` | `case-dense-groups` | 0 → 0 | 1663 → 884 |
+| `shared-all` | `case-hub-chain` | 0 → 0 | 627 → 91 |
+| `shared-all` | `case-many-groups` | 0 → 0 | 2375 → 720 |
 
-With `bundle`, 90% or more of the end crossings that stay are necessary. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
+This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
+
+With `bundle`, 90% or more of the end crossings that stay are necessary, by a read on version 1. Each comes from two edges that part on opposite sides at the two ends of their stretch. The order changes no crossing of the routes. The rows of `trunks` change by one end crossing at most. On the 9 rows of `sections`, 12 of the 18 crossing counts fall and 5 rise. Thus `run` stays the default of `sections`.
 
 ### Where the lanes leave a trunk
 
@@ -267,11 +306,24 @@ The router `trunks` gives each group one trunk from the plug to a split point. T
 
 The benchmark measures the lanes of `highwayCurves` on the case boards, with each value of `leave`.
 
-| Router | Board | Worst lane spacing error, `split` → `part` | Body crossings, `split` → `part` |
-|---|---|---:|---:|
-| `trunks` | `case-dense-groups` | 45.6% → 0.6% | 0 → 0 |
-| `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 3 → 0 |
-| `trunks-all` | `case-many-groups` | 68.2% → 47.6% | 1 → 0 |
+| Router | Board | Samples with an error over 25%, `split` → `part` | Lane pairs in those samples, `split` → `part` | Mean error, `split` → `part` | Body crossings, `split` → `part` |
+|---|---|---:|---:|---:|---:|
+| `trunks` | `case-dense-groups` | 2 → 0 | 1 → 0 | 0.13% → 0.04% | 0 → 0 |
+| `trunks-all` | `case-dense-groups` | 6 → 0 | 1 → 0 | 1.41% → 0.16% | 2 → 0 |
+| `trunks-all` | `case-many-groups` | 6 → 4 | 3 → 1 | 0.45% → 0.15% | 0 → 0 |
+
+The worst error is one sample, so this table does not show it as a headline. The worst errors, `split` → `part`, in the order of the rows, are 45.6% → 0.6%, 133.2% → 0.8% and 102.7% → 47.6%.
+
+This table reads each pair of lanes against the gap of that pair, the method `pair-gap` (`SPACING_METHOD`). Before LANE-ROOM, each pair read against the fixed spacing of its segment, the method `fixed-spacing`. Errors of two methods do not compare, and each row states its method.
+
+Each method answers a different question. The gap of the pair tells if a lane holds its assigned room. The fixed spacing tells what a reader sees between the lanes. Neither method alone is the claim:
+
+- `trunks-all` with `part` on `case-dense-groups` reads 0.8% on the gap and 33.5% on the fixed spacing 3.2, with 0 and 40 samples over 25%. The lanes hold their gap of 2.15, and that gap is narrower than the fixed spacing.
+- `trunks-all` with `split` on `case-many-groups` reads 102.7% on the gap and 62.7% on the fixed spacing 4. The table of 2026-10-27 read 68.2% in this cell, on the fixed spacing. The worst sample is on the same two lanes at each commit. Their distance fell from 6.73 to 6.51, and the denominator fell from 4 to 3.21. So the rise comes from the method. That sample is the only one of the 1,008 samples over 100% on the gap, and the fixed spacing reads none. Those lanes are too far apart at one sample, and they do not touch. This opening is older than LANE-ROOM.
+
+Each figure reads one board. The record `scripts/data/split-spacing/record.json` holds both methods on each row and the rows of the bisect. `scripts/split-spacing-bisect.ts` repeats the bisect.
+
+This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
 
 The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
 
@@ -415,6 +467,7 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 | `tightMargin` | 1 | `levelLinks` | The margin of the second corner graph of the level links. |
 | `plugInset` | 6 | `levelLinks` | A plug of a level link stays this far from the corners of its side. |
 | `throughCost` | 8 | `levelLinks` | The cost of a level link through a far box, in mean box sizes. The value 0 gives the links of version 0.1.5. |
+| `levelJoinWork` | 0 | `levelLinks` | The limit of the work of the join of parts on the level graphs. At 0, a level link of walled items can go through a wall box, and no link is lost. |
 | `routesAt`, `itemAt` | 22, 120 | `pickLevel` | The far-view thresholds, in pixels on the screen. `PICK` holds them. |
 
 `SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
@@ -502,7 +555,11 @@ A strategy has a `step`, a `name`, a `describe` text, its `defaults` and the met
 - `createRegistry(strategies)` makes a registry. Two strategies with one step and one name are an error.
 - `register(registry, ...strategies)` gives a new registry. It does not change the registry before it.
 - `listStrategies(registry, step)` gives the strategies of a step, in order. `findStrategy` and `getStrategy` give one strategy by its name.
+- `keyOfStrategy(strategy)` gives the key of a strategy: its step, a slash and its name, for example `router/adam`. `strategyOfKey(key)` gives the strategy of a key, or a reason. It reads `KEYED_STRATEGIES`, which holds each built-in and each opt-in strategy. `BASELINE_STRATEGIES` gives the strategies of that registry that no chooser offers. `UNSCREENED_STRATEGIES` gives the opt-in strategies that wait for their screen.
 - `asRouter(strategy, options?)` gives a `Router`, and `routersOf(registry)` gives the routers of a registry.
+- `OPT_IN_STRATEGIES` lists the 11 opt-in routers. `STRATEGIES` does not hold them, so the default race and the screens do not change.
+- `ALL_STRATEGIES` is the registry of `STRATEGIES` and `OPT_IN_STRATEGIES`. A page that shows each strategy reads it.
+- `STEP_DEFAULTS` gives the default strategy of each step. The steps `highway` and `curve` have no default.
 - `STRATEGIES` is the registry of `BUILT_IN_STRATEGIES`. The records `groupStrategies`, `plugStrategies`, `routerStrategies`, `highwayStrategies`, `levelStrategies`, `curveStrategies`, `roomStrategies` and `wholeStrategies` give each built-in strategy with its typed options.
 
 ### The steps `plugs`, `levels` and `whole`
@@ -723,6 +780,12 @@ The router `attraction` is opt-in. It is not in `STRATEGIES`, so the default out
 - A capacity term raises the cost of a link when its users are more than its width holds.
 - With 1 pass, `attraction: 0` and `capacityWeight: 0`, the routes are the routes of `shared`.
 
+### The router `seams`
+
+The router `seams` is opt-in, and it is not in `STRATEGIES`. It is for boards with boxes that touch. The plain corner graph has no way on such a board, so each edge gets a straight line through the boxes. The router `seams` gives such an edge a way along the sides of the boxes, with a second corner graph on the real corners. Many routes can share one seam, because a seam has no room for lanes. Use `makeRoom` first when the layout can move.
+
+A seam has no room for lanes. On the packed boards of the record, 84% to 92% of the length lies on a line with another route. Up to 10 routes share one line. The total length is 1.28 to 1.33 times the length of `corners`. Use this router when a pass-through is a worse fault than shared lines.
+
 ### The routers `tight`, `annealing`, `reroute`, `canals`, `adam` and `angle-cross`
 
 The routers `tight`, `annealing`, `reroute`, `canals`, `adam` and `angle-cross` are opt-in. They are not in `STRATEGIES`, so the default outputs do not change. Each one starts from the router `shared`.
@@ -873,6 +936,8 @@ The step `plugs` gives the plugs of the router `corners`. The step `group` gives
 - A list of other plans, for example the `generators` of `select`, is one `bool` param `<key>:<source>` for each source.
 - `ROUTE_SPACE_LEFT_OUT` gives each option that the space does not hold, with its reason. The router gets the default of that option.
 - `ROUTE_SPACE_MISFITS` gives each router of the table that is not a named point. The list is empty.
+- `configOfMember(name)` gives the point of a member of `MEMBER_FORMS`, or a reason. `routeConfig` of the point gives the routes of the member.
+- `MEMBER_MISFITS` gives each name with no point, with its reason.
 - The portfolio router is not in the space. It is a selector over the routers.
 
 ```ts
@@ -954,11 +1019,13 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 ## The corpus families
 
-`HIGHWAYS_FAMILIES` lists the 15 generators of the boards of the screen and the site. Each one is a family of `@mark1russell7/layout-contract`, with its dimensions as data. `highwaysRegistry()` makes a registry of them.
+`HIGHWAYS_FAMILIES` lists the 18 generators of the boards of the screen and the site. Each one is a family of `@mark1russell7/layout-contract`, with its dimensions as data. `highwaysRegistry()` makes a registry of them.
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- The screen set `screen-v3` has the 15 families, each with 10 seeds.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape`, `rings` and `walled-level`. They are in no screen set.
+- The screen set `screen-v3` has the first 15 families, each with 10 seeds.
+- The screen set `screen-v4` has the 60 boards of `screen-v2`, each after `makeRoom`.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.
 
 ```ts
@@ -978,7 +1045,8 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
-- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run. Thus the 4 cells of `Xplat` agree.
+- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run.
+- The workflow `Xplat` compares the routes of 4 cells. Its check `Xplat OK` fails on a route that differs. This claim holds for `corners`, `shared`, `shared-stretch` and `sections`, on 75 rows, and for no other router.
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 

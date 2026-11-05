@@ -104,13 +104,23 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `sparse-long` | `nodes`, `edges`, `spacing`, `far` | `mulberry32` of the seed | `exact` |
 | `local-mesh` | `cols`, `rows`, `degree`, `gap`, `jitter` | `mulberry32` of the seed | `exact` |
 | `bipartite` | `left`, `right`, `noise`, `extra`, `layout`, `gap` | `mulberry32` of the seed | `exact` |
+| `bottleneck` | `left`, `right`, `edges`, `door`, `wall`, `overhang`, `gap` | `mulberry32` of the seed | `exact` |
+| `parallel-edges` | `pairs`, `copies`, `back`, `others`, `extra`, `gap` | `mulberry32` of the seed | `exact` |
+| `maze` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops` | `mulberry32` of the seed | `exact` |
+| `channel` | `cols`, `nets`, `pins`, `span`, `height`, `gap` | `mulberry32` of the seed | `exact` |
+| `comb` | `teeth`, `depth`, `slot`, `tooth`, `clear`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `spiral` | `turns`, `corridor`, `wall`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `switchbox` | `pins`, `pitch`, `nets`, `blocks` | `mulberry32` of the seed | `exact` |
+| `escape` | `cols`, `rows`, `pad`, `gap`, `nets`, `margin` | `mulberry32` of the seed | `exact` |
+| `rings` | `rings`, `corridor`, `wall`, `door`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
+| `walled-level` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops`, `knot` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
-- Each family has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
+- Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
 - The generator record has only the dimensions away from their defaults. `packed-grid` always has `cols`, `rows` and `long`, as the screen sets of today.
 - The 3 fixture families are separate families, not 1 family with explicit dimensions. Then the defaults of each family give the exact record of its screen boards.
 - A fixture family can choose the kind `clustered`, `hubs` or `collections`. These kinds use `Math.log`, `Math.cos` and `**`, so each fixture family is `libm-dependent`.
-- The last 9 families are `COVERAGE_FAMILIES` (CORPUS-FAMILIES) in `packages/core/src/families/coverage.ts`. Each one covers a region that the first 6 families do not cover:
+- The 9 families after the first 6 are `COVERAGE_FAMILIES` (CORPUS-FAMILIES) in `packages/core/src/families/coverage.ts`. Each one covers a region that the first 6 families do not cover:
   - `frame-rows`: cards with full-width rows and a plug on each wall for each row. The dimension `inner` adds edges from a row to a card, which only `corners` routes. Its default is 0.
   - `pipeline`: a long chain of stages in a snake, with some links that skip stages.
   - `fan-out`: one hub with links to many leaves in the rings around it.
@@ -122,6 +132,18 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `bipartite`: a complete bipartite part with noise nodes. Its crossings stay in each plan. The `layout` is `rows` or `mixed`.
 - Each new family uses only integer steps of `mulberry32`, so each one is `exact`. Its boxes do not overlap, except a row in its card.
 - The rule of the members, `base + 1009 × k`, stays in `bench/screen/set.ts`. The hash of an input is the `documentHash` of the core, with no grid.
+- The last 3 families are the first batch of `WEEKLY_FAMILIES` (FAMILIES-WEEKLY) in `packages/core/src/families/weekly.ts`. They are worst cases, in no screen set. The sliders of the site get them, and the sets keep their boards and hashes:
+  - `bottleneck`: two regions with a long wall between them and one narrow door. Each edge crosses the wall, so each edge wants the same free space. `overhang` sets the length of the way around the wall.
+  - `parallel-edges`: many edges with the same two ends and no fixed plug. It is the only family with a second edge between two ends. `back` sets the share of the edges in the other direction.
+  - `maze`: a closed maze of wall boxes with nodes in its cells. At `loops` 0, one way joins each two cells. Thus a straight line is far from the real way.
+  - `channel`: two rows of nodes across a channel, with fixed plugs on the channel side. This is the channel routing problem of the chip literature.
+  - `comb`: two combs that reach into each other. One corridor goes up and down between the teeth, so a way turns at each tooth.
+  - `spiral`: one wall in a square spiral, with nodes in the corridor. A node on the next arm is near, and the way to it is a full turn.
+  - `switchbox`: pins with fixed plugs on the four sides of a box. This is the switchbox routing problem of the chip literature.
+  - `escape`: a dense grid of pads in a ring of terminals. This is the escape routing problem of chip packages.
+  - `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
+  - `walled-level`: the board of `maze` with one knot of tiny nodes. The knot deepens the section tree at one place, so a zoom level shows each wall as one item.
+- A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
 
@@ -229,6 +251,40 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
+This tolerance lies on the same defect that the rule measures. A route up to 0.5 inside a box reads clear under `no-pass-through`, and the field `through` uses the same test. So the band hid the route `e284` of `case-dense-groups`, on `sections` with the margin of the site and with `outSteps: false`. A stop of that route is 0.42 inside `n138`, and the route has no `through`. The site keeps `outSteps` on, and then that route is out of the band.
+
+The independent check `checkRoutes` in `bench/measures/through-check.ts` has no such band. It takes each route and each box as closed shapes, and it shares no code with the rule. A touch is a contact, and two boxes that touch make a wall.
+
+The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
+
+The script `packages/core/scripts/through-check.ts` writes the record `through-check/5`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+
+The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
+
+A row with the view `lanes` opens each shared segment. The compare page draws that form. The examples page starts with no segment open, so its first drawing has the view `routes`.
+
+A row with the view `lanes` also tells what the room of each way does. Its fields:
+
+- `outOfRoom` counts the lanes with that mark.
+- `deepUnmarked` counts the lanes of class `deep` with no mark.
+- `silentLanes` counts the flagged lanes with no mark, on an edge that its closed route does not flag.
+- `laneLength` and `laneBends` sum the shape of the lanes.
+- `fullLength` and `fullBends` sum the same lanes with no room.
+- `laneCrossings` and `fullCrossings` count the crossings of the board with the lanes, with the room and with no room. The room adds crossings, because each way has its own width.
+- `bySeed` holds one entry for each board. It has `laneCrossings` and `fullCrossings`, `polyline` and `painted`, and the four counts of the bundles.
+- `polyline` and `painted` are the fields of `PairSplit`, for the polylines and for the sampled `highway` curves of the whole board. `points` and `beforePoints` are crossing points. `pairs` and `beforePairs` are pairs of edges. `added` and `lost` are the pairs that cross on one side only. A crossing point counts once for each pair of edges. So `points` can be over the count of `measureQuality`, because `measureQuality` keeps one copy of each drawn segment.
+- `bundleCounter` is the value of `BUNDLE_COUNTER`, the version of the two counts below. The schema `through-check/4` has no such field and holds version 1, so its counts do not compare with these.
+- `bundleBody` and `bundleEnds` are `crossings` and `endCrossings` of `measureHighways`, with the room. `fullBundleBody` and `fullBundleEnds` are the same counts with no room. These counts hold only two lanes of one bundle.
+
+The gate fails when `deepUnmarked` or `silentLanes` is over 0 on a row. It also compares the classes of the site settings with a stated list, and that list makes no claim. A flagged lane on a closed route that the record flags too is a contact of the route, not of the lanes.
+
+An inner route marks `through` against the boxes of its room: the children of its frame, except the nodes that hold an end. The walls of the room are no boxes of the board, so `through` does not name them. The boards `frame-rows+inner` and `frame-rows+inner12` hold the inner routes, with 10 seeds each, because no family has an inner route at its defaults. The fields `innerMarked`, `innerFlagged`, `innerFalse` and `innerUnnamed` count them.
+
+The class `spike` reads the shape of a route, not a contact. The first leg goes in, and the next leg comes back by more than a right angle. `spikeEnds` reads the legs, so the test holds on both axes and at each wall. A curve of small legs reads no spike, so the row of `corners-smooth` is outside that claim. The gate fails at 1 inner route with the shape. The outer routes have the shape too, from a plug that faces away from the way. That cause is separate, so the record holds those rows with no claim.
+
+The gate `packages/core/scripts/through-check.test.ts` makes the whole record again and compares it with the file. A stale file fails, and the message gives the command that writes it.
+The gate also holds each router of `scored`, on each family of the registry. Its list of contacts with no `through` is 53 routes of class `plug-seam` on `packed-grid`, and no other class or family. No route has a name in `through` that it does not meet.
+
 The packer is exact, so the shared rule `no-overlap` uses the smaller tolerance 0.001. A route is a curve on the line of the margin, so the rule `through` uses 0.5. A route in the margin of a box, outside the box, is a soft measure, not a break. The joint corpus keeps the packed inputs with a gap of 0 and no margin as a stress cell. On them, the rule `through` is expected to break. Each other joint input has a margin and a gap larger than 0.
 
 The [measure note](research/MEASURES.md) tells each rule. The rule `sections` counts a tree that the router refuses. The proposed rules of MEAS0 are measures: `route.curve.rule.*` and `route.level.nesting`.
@@ -304,6 +360,7 @@ The column "Placement" tells if the positions of the boxes alone move the value,
 | `route.clearance.mean` | R8 | `R8.clearance` | units | higher | yes |
 | `route.clearance.tight` | R8 | `R8.tight` | 0 to 1 | lower | yes |
 | `route.through` | R9 | `R9.through` | count | lower | yes |
+| `route.no-graph` | R17 | `R17.noGraph` | count | lower | yes |
 | `route.plug-angle` | R10 | `R10.plugAngle` | degrees | lower | no |
 | `route.plug-spacing.min` | R11 | `R11.min` | 0 to 1 | higher | yes |
 | `route.plug-spacing.q05` | R11 | `R11.q05` | 0 to 1 | higher | yes |
@@ -467,6 +524,9 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - By default, the screen also runs the built-in strategies of the step. The summary gives the median of each measure, the sum of each hard rule and the Pareto front over the medians.
 - The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input. On `packed-grid`, the boxes touch, thus each router goes through boxes.
 - A strategy with a break over the floor, or with two different outputs of one input, does not enter the front.
+- The columns `through` and `no graph` of the summary are absolute sums over the inputs, with no floor. Thus a strategy at the floor still shows its count of pass-throughs.
+- `route.no-graph` (R17) counts the routes with two points where the corner graph has no way between the facing plugs. The screen reads the routes after the run, thus no output and no hash changes.
+- Each row of `screen-verdict.ts` has `through` and `baseThrough`: the absolute counts of the strategy and of the base. A snapshot from before PASS-GRID has no such fields, and the site reads each form.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
@@ -545,7 +605,7 @@ gh workflow run screen.yml --ref main -f step=router -f set=screen-v2 -f minutes
 
 ### The screen set `screen-v3`
 
-The set `screen-v3` (CORPUS-FAMILIES) has the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 seeds 0 to 9: 150 boards. Its files are in [`corpus/screen-v3`](../corpus/screen-v3). `SCREEN_V3` of `bench/screen/set.ts` makes them.
+The set `screen-v3` (CORPUS-FAMILIES) has the first 15 families of `HIGHWAYS_FAMILIES`, each with the 10 seeds 0 to 9: 150 boards. Its files are in [`corpus/screen-v3`](../corpus/screen-v3). `SCREEN_V3` of `bench/screen/set.ts` makes them.
 
 - The first 6 families keep the seeds of `screen-v2`. Thus their 60 boards are the boards of `screen-v2`, under the ids of `screen-v3`.
 - The 9 new families get the base seeds 13, 17, 19, 23, 29, 31, 37, 41 and 43.
@@ -555,6 +615,30 @@ The set `screen-v3` (CORPUS-FAMILIES) has the 15 families of `HIGHWAYS_FAMILIES`
 ```sh
 gh workflow run screen.yml --ref main -f step=highway -f set=screen-v3 -f minutes=120
 ```
+
+### The screen set `screen-v4`
+
+The set `screen-v4` (PASS-GRID) has the 60 boards of `screen-v2`, each after `makeRoom`. Its files are in [`corpus/screen-v4`](../corpus/screen-v4). `SCREEN_V4` of `bench/screen/set.ts` makes them.
+
+- The set keeps the 6 families, the seeds, the edges, the box sizes and the cells of `screen-v2`. Only the positions of the boxes change.
+- `SCREEN_V4_ROOM` gives the options of `makeRoom`: `gutter` 8 and `spacing` 4. The method is the default of `makeRoom`.
+- The generator of each input has the name `room`, version 1. Its `params` hold the options of `makeRoom` and the generator of the `screen-v2` board in `base`.
+- The split file [`corpus/splits/screen-v4.c439a5c1a0afcd39.json`](../corpus/splits/screen-v4.c439a5c1a0afcd39.json) holds out the seeds 7 to 9 of each family.
+- The screen of this set uses the same floor rule as the other sets.
+
+### The screen set `screen-v5`
+
+The set `screen-v5` (COLLECTION-KEY) has the 150 boards of `screen-v3` under each value of the key of the edges: 450 boards in 45 families. Its files are in [`corpus/screen-v5`](../corpus/screen-v5). `SCREEN_V5` of `bench/screen/set.ts` makes them.
+
+- The base `shared` makes ways only from the key `data.collection` of an edge. In `screen-v3`, only `dense-groups`, `small-clustered` and `tiny-uniform` have that key.
+- The function `edgeKeyStep` of `layout-contract` writes the keys, with the dimension `edgeKey`. The set has no copy of that rule.
+  - `none`: no edge has a key.
+  - `random`: each edge has the key of its target box, one of 4 names.
+  - `cluster`: each edge has the key of the cluster of its target box. The clusters come from the edge stream of the contract, so they are groups of box indexes, not groups of near boxes.
+- Only the key changes. The boxes, the other fields of the edges and the seeds are those of `screen-v3`.
+- The name of a family is the name of its family of `screen-v3` and `.key-<edgeKey>`. The cell has the field `edgeKey`. A screen of one arm names its 15 families.
+- The generator of each input has the name `edge-key`, version 1. Its `params` hold `edgeKey` and the generator of the `screen-v3` board in `base`.
+- The split file [`corpus/splits/screen-v5.82066dd4b30c5449.json`](../corpus/splits/screen-v5.82066dd4b30c5449.json) holds out the seeds 7 to 9 of each family.
 
 ### The screen set `exact-v1`
 
@@ -593,6 +677,14 @@ The screen of `exact-v1` adds the gap closed (B10) to each record of the step `r
 ```sh
 gh workflow run screen.yml --ref main -f step=router -f set=exact-v1 -f module=packages/core/scripts/screens/meas2.ts
 ```
+
+### The screen set `moves-v1`
+
+The set `moves-v1` (REBUILD-SILENT) has 8 small boards, one family of one member for each board. Its files are in [`corpus/moves-v1`](../corpus/moves-v1). `MOVES_V1` of `bench/screen/moves-set.ts` makes them.
+
+- A new set changes no input hash of the other sets.
+- Each board shows the own move of its strategies. The set is for the activation report. Do not use it for a verdict.
+- [The causes of the silent strategies](research/CATALOG.md#the-causes-of-the-silent-strategies-rebuild-silent) tell the board of each strategy.
 
 ### The screen set `exact-v1-bounds`
 

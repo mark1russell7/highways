@@ -97,13 +97,136 @@ The bench gives these values. The tables of these values use one seed of each fi
 | `ms`, `deterministic`, `violations` | `benchOne` | [`run.ts`](../../packages/core/src/bench/run.ts) |
 | The short list below, the counts of the proposed hard rules, the spread over the seeds and the Pareto fronts (MEAS1) | `runSuite` | [`suite.ts`](../../packages/core/src/bench/suite.ts) and [`measures/`](../../packages/core/src/bench/measures/) |
 
-### The gaps of today
+### The gaps of the list of 2026-11-05
 
-- `bends` counts each vertex of a polyline. A sampled curve thus has many bends, and the value ignores the angle of each turn.
-- `detour` is a mean, and `worstDetour` is a maximum. Neither value shows the spread, so one bad route hides in the mean.
-- `crossings` counts each crossing of two shared stretches one time. The count with open lanes is different.
-- No value gives the angle of a crossing, the space between plugs, the shape of a curve or the quality of a group.
-- No value of the bench compares two zoom levels, or two results of inputs with a small change.
+Each gap has a date or a reason. A gap with a reason has a measure in the screen, and the name of that measure is here.
+
+| Gap | State | Date or reason |
+|---|---|---|
+| `bends` counts each vertex of a polyline, and it ignores the angle of each turn. | closed | `route.turn.mean` and `route.turn.max` (R4) read the angle, and `route.inflections` (R15) reads the changes of side. `route.bends` stays as a count. |
+| `detour` is a mean, and `worstDetour` is a maximum, so one bad route hides in the mean. | closed | `route.detour.median`, `route.detour.q95` (R5) and `route.detour.max` (R6) read the spread. |
+| `crossings` counts each crossing of two shared stretches one time. | closed by ROUTE-PAIRS | `route.crossings.pairs` counts the pairs of routes that cross. R1 stays, because a bundle can want few ink crossings. Each one has a partner measure: read them together across routers that share segments. |
+| The crossing count with open lanes is different. | open | 2026-11-08, PAINT-TIE. The painted count lives only in the record `through-check`. PAINT-TIE names one count and reads `route.bundle.lane-crossings` (B5) against it. |
+| No value gives the angle of a crossing. | closed | `route.crossing-angle.mean` and `route.crossing-angle.min` (R2). |
+| No value gives the space between plugs. | closed | `route.plug-spacing.min` and `route.plug-spacing.q05` (R11). |
+| No value gives the shape of a curve. | closed | C1 to C4 and C8 of the suite read the joints, the energy and the deviation. C5 has no code, and the table below states this. |
+| No value gives the quality of a group. | open | 2026-11-11, COLLECTION-KEY. AMBIGUITY-FLAT read `route.bundle.ambiguity` (B4) on keyed inputs: it keeps a range over routers, and it hides a large change at its top. `route.bundle.reach` (B4) joins it. Neither reads if a group has a meaning. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
+| No value compares two zoom levels. | closed | Z6 to Z9 read the nesting, the positions, the order and the agreement of the levels. |
+| No value compares two results of inputs with a small change. | open | 2026-11-14, ROUTE-TIE. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. No value reads a shift with no meaning, and ROUTE-TIE gives the floor of each route measure. |
+
+### What rests on `route.crossings`
+
+`route.crossings` keeps one segment for each pair of ends, and a touch at an end does not count. So a router that shares more segments can lower it with no fewer crossings between routes. This list names each use of the measure. The words of a page change only by the rule of PAINT-TIE and of the Results refresh.
+
+**Verdicts.** The record `packages/core/scripts/data/route-pairs/claims.json` names each verdict row.
+
+- 282 verdict rows read `route.crossings`: 113 `better`, 99 `worse`, 67 with no verdict and 3 that depend on the mix.
+- In 111 of the 113 `better` rows, the strategy also saves more ink than its base. These rows cover 45 strategies. The 2 other rows are `adam` on `screen-v2` and `screen-v3`.
+- 70 of the 99 `worse` rows have no more ink saved. A router that shares less can read `worse` by the same count.
+- These counts show a risk and do not show a cause. A Screen with `route.crossings.pairs` tells which verdicts move.
+
+**Code that chooses by the measure.**
+
+| Place | Use | State |
+|---|---|---|
+| `src/whole/portfolio/index.ts:93` | The rank share of the measure, with the detour and the ink, chooses a setting of `board-portfolio`. | On, weight 1. |
+| `src/whole/crops/index.ts:146` | The same three rank shares choose a setting of `crops`. | On. |
+| `src/whole/fireflies/index.ts:95` | `swarmScore` adds the measure for each edge. | On. |
+| `src/routers/adam/index.ts:265` | `adam` keeps the routes of `shared` when its own routes read more. | On. |
+| `src/highways/search/index.ts:147` | The term `crossingWeight` of `search`. | Off by default. The value 0.3 is a variant. |
+| `scripts/promotion.ts:50` | A floor of 0, and a guard on the steps `router`, `highway` and `whole`. | A gate. |
+| `scripts/screen-verdict.ts:25` | A guard of the verdicts of the steps `router` and `highway`. | A gate. |
+
+`scripts/portfolio.ts` does not read the measure: its values are B10 and B1. `tracing` and `curriculum` count `segmentsCross` for each pair of routes, so a shared stretch does not hide a pair. A touch at a shared vertex stays out of those two counts.
+
+**Lines of the pages that compare routers that share segments.**
+
+| Place | Claim | State on the record `route-pairs/2` |
+|---|---|---|
+| `README.md:61` | `shared` and `shared-all`: the crossings go down by 4 to 30 times. | The line states the limit of the count. `shared-all` reads 1.033 of `corners` in pairs. |
+| `README.md:71` | `sections-tree`: 3.4 to 5.1 times fewer crossings. | The line states no limit. This router is not in the record. |
+| `README.md:73` | `sections`: 2.2 to 3 times fewer crossings. | The line states no limit. `sections` reads 1.183 of `corners` in pairs. |
+| `README.md:57` | `trunks`: 10% fewer crossings on `mid-fanout`. | The line states no limit. This router is not in the record. |
+| `packages/core/README.md:334` | `passes: 3`: crossings fall up to 28%. | The two arms share segments. Not read. |
+| `packages/site/src/opt-in.ts:26` | `adam`: R1 `better`. | Not read. |
+| `packages/site/src/opt-in.ts:36` | `attraction`: B1 and R1 `better`. | Not read. |
+| `packages/site/src/opt-in.ts:41` | `canals`: R1 and B1 `better`. | Not read. |
+| `docs/research/CATALOG.md:1537` | `canals` removes 6% of the crossings. | Not read. |
+| `docs/research/CATALOG.md:1539` | `preferences` removes 2% to 3% of the crossings. | Not read. |
+| `docs/research/CATALOG.md:1730` | `crossingWeight` 0.3 gains on R1. | Not read. |
+| `docs/research/CATALOG.md:1876` | `approval`: 1.288 crossings for each edge, against 2.079 of `shared`. | Not read. |
+| `packages/site/src/compare-data.ts:119` | The row `R1.crossings` of the compare page. | A measure with no claim. It needs a partner row. |
+
+### The relation of the two crossing counts
+
+`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The exact relation is this one, for one result with no sample:
+
+`crossings - self - touch <= pairs`
+
+- `self` counts the crossings of two segments that one route alone draws. The pair count leaves out a route that crosses itself.
+- `touch` counts the other crossings that are not strict on the grid `EPS`: the segments touch, or an end of one lies on the other. The float test can read such a place as a strict crossing.
+
+The function `paintedOutsidePairs` reads the two classes, and the record `route-pairs/2` holds them on each of its 375 rows. A test holds the relation on each row. A later row outside the relation is a finding, and it is not noise.
+
+The pair count is under the painted count on 5 of the 375 rows:
+
+| Board | Router | `crossings` | `pairs` | Class |
+|---|---|---:|---:|---|
+| `local-mesh`, seed 0 | `sections-site` | 910 | 908 | `self` 73 |
+| `local-mesh`, seed 1 | `sections-site` | 845 | 824 | `self` 82 |
+| `packed-grid`, seed 1 | `corners` | 298 | 297 | `touch` 1 |
+| `packed-grid`, seed 1 | `shared` | 298 | 297 | `touch` 1 |
+| `packed-grid`, seed 1 | `shared-all` | 298 | 297 | `touch` 1 |
+
+### The sample above 20,000 segments
+
+Above 20,000 segments, `route.crossings` reads a sample of 2,000 segments and gives an estimate. The record `packages/core/scripts/data/crossings-sample/record.json` reads each estimate against the full count of the same segments.
+
+| Board | Router | Segments | Full count | Estimate | Error | 5 other draws | Worst draw | Full count in the range |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `grid-400` | `corners-smooth` | 20,789 | 12,614 | 12,364 | 1.98% | 10,997 to 12,551 | 12.82% | no |
+| `mid-uniform` | `plugs` | 48,000 | 80,360 | 80,616 | 0.32% | 77,712 to 81,804 | 3.30% | yes |
+| `mid-uniform` | `corners-smooth` | 56,182 | 44,087 | 42,431 | 3.76% | 41,181 to 50,451 | 14.44% | yes |
+| `mid-clustered` | `plugs` | 72,000 | 198,801 | 193,986 | 2.42% | 192,114 to 209,034 | 5.15% | yes |
+| `mid-clustered` | `corners-smooth` | 79,750 | 79,788 | 75,962 | 4.80% | 69,442 to 89,041 | 12.97% | yes |
+| `mid-hubs` | `plugs` | 48,000 | 74,680 | 76,464 | 2.39% | 72,840 to 76,200 | 2.46% | yes |
+| `mid-hubs` | `corners-smooth` | 54,946 | 37,090 | 35,083 | 5.41% | 35,770 to 40,385 | 8.88% | yes |
+| `mid-fanout` | `plugs` | 48,000 | 293,383 | 294,084 | 0.24% | 292,356 to 296,652 | 1.11% | yes |
+| `mid-fanout` | `corners-smooth` | 56,396 | 72,057 | 83,607 | 16.03% | 67,436 to 72,441 | 6.41% | yes |
+| `large-clustered` | `straight` | 30,000 | 14,975,599 | 15,579,705 | 4.03% | 14,048,933 to 15,634,478 | 6.19% | yes |
+| `large-clustered` | `plugs` | 719,999 | 15,471,129 | 16,364,137 | 5.77% | 14,987,499 to 16,128,338 | 4.25% | yes |
+
+- **The error reaches 16.03%.** So a ratio that mixes an estimate with a full count can move by more than 5%. Do not read such a ratio as a difference of routers.
+- **The error of one draw is not stable.** On `mid-fanout`, `corners-smooth` reads 16.03% off with the seed of the measure, and at most 6.41% off with the 5 other draws.
+- **The curves read worse.** On each mid board, `corners-smooth` has a larger worst draw than `plugs`. This is a read of 4 boards, and the cause is a hypothesis: short segments put the crossings on few segments.
+- **The benchmark holds estimates.** 18 of 132 rows of `docs/research/bench/bench.json` read `quality.crossingsEstimated`. They are `corners-smooth` on `grid-400`, `plugs` and `corners-smooth` on the 4 mid boards, and the 9 routers on `large-clustered`. This record reads 11 of them. It does not read the other 7 routers on `large-clustered`.
+- **A mid row can compare the two methods.** On the 4 mid boards, `plugs` and `corners-smooth` read an estimate, and the other 7 routers read a full count.
+- **The page marks an estimate.** The benchmark table and the playground show `≈` on the value. The percent against straight lines on the playground says `near` when either side is an estimate.
+- **The verdicts read no estimate, by size.** The largest board of `screen-v1`, `screen-v2` and `screen-v3` has 300 edges, so a route needs a mean of 66.7 segments to reach the limit. The largest size on the router and highway records of `screen-v3` is 4,753 and 7,233 segments, by `edges × (route.bends + 1)`.
+- **The limit of that read.** The records of `screen-v3` hold no `route.crossings.estimated`, and the read leaves out the sets `screen-v1` and `screen-v2` and the steps `levels`, `plugs` and `whole`. The next Screen records the field, and it confirms or corrects this line.
+- **Choosers can read an estimate.** `portfolio`, `crops`, `fireflies`, `adam` and `search` choose by `measureQuality`. Above the limit they choose on estimates. The item CHOOSER-OBJECTIVE holds this.
+- **No win across the two methods.** Until CROSSINGS-LIMIT lands, no text calls a win on a row that compares an estimate with a full count, and `≈` stays on each estimate.
+
+### What each control buys
+
+A control reads no route quality. So a measure that a control wins cannot call a win alone. Three routers are controls: `straight`, `one-trunk` and `perimeter`. The record `packages/core/scripts/data/control-wins/record.json` reads each measure of `routeMeasures` on 75 boards of 25 families. It reads the controls and 5 routers. A win is the best median, with no router that is not a control at that median. The test `control-wins.test.ts` holds that each win has a partner, and that the control reads worse than `corners` on that partner.
+
+| Measure | Control that wins it, median | `corners`, median | Partner | Control, median | `corners`, median |
+|---|---|---|---|---|---|
+| `route.crossings` | `one-trunk` 0, `perimeter` 0 | 83 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.crossing-angle.mean` | `one-trunk` 1, `perimeter` 1 | 0.531 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.crossing-angle.min` | `one-trunk` 90, `perimeter` 90 | 2.493 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.plug-spacing.min` | `one-trunk` 1, `perimeter` 1 | 0.131 | `route.overlap.peak` | 21, 16 | 4 |
+| `route.bundle.ink-saved` | `one-trunk` 0.749 | 0.074 | `route.detour.median` | 1.41 | 1.021 |
+| `route.crossings.pairs` | `straight` 99 | 120 | `route.through` | 18 | 0 |
+| `route.detour.median` | `straight` 1 | 1.021 | `route.through` | 18 | 0 |
+| `route.overlap.share` | `straight` 0 | 0.036 | `route.through` | 18 | 0 |
+
+The record lists each win. These results are the ones to keep in mind:
+
+- `route.crossings.pairs` needs `route.through` beside it. In sum, `straight` reads 24,707 pairs, and `corners` reads 32,194. For that count, 3,013 of the routes of `straight` go through a box.
+- The crossing angle reads its best value when a router has no crossing of ink. The plug spacing reads its best value with one plug on each side of a box. So these values tell nothing on a router that shares much.
+- No control buys `route.through`. This measure counts routes that go through a box. Of 6,065 routes, `perimeter` reads 3,826 and `straight` reads 3,013. `perimeter` reads less than `straight` in 10 of the 25 families, and it reads 0 only on `tiny-uniform`. On these boards, a straight way out of a box usually crosses another box. `corners` reads a median of 0 at a median detour of 1.021, and all of its 292 are on `packed-grid`.
 
 ### The exact forms of MEAS3A
 
@@ -146,7 +269,8 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 
 | Id | Measure | Rewards | Formula | Scale | Cost | Kind | Today | Source |
 |---|---|---|---|---|---|---|---|---|
-| R1 | Crossings | Few crossings | `c = count(X)`, and `c / m` for each edge | count, `↓` | `n log n`, sampled above 20 000 segments | score | yes, `crossings`, and `R1.perEdge` of the suite | [Purchase 1997][purchase97], [Purchase 2002][purchase02] |
+| R1 | Crossings | Few crossings | `c = count(X)`, and `c / m` for each edge | count, `↓` | `n log n`, sampled above 20 000 segments, with an error up to 16.03% on the benchmark | score | yes, `crossings`, and `R1.perEdge` of the suite | [Purchase 1997][purchase97], [Purchase 2002][purchase02] |
+| R1 pairs | Pairs that cross | Routes that do not cross each other | `p = Σ over pairs of routes (crossings of the two routes)`, with a crossing at a shared vertex and on a shared stretch that the two routes leave on opposite sides | count, `↓` | `n log n` on the distinct segments, sampled above 20,000,000 walks of shared stretches | score | yes, `route.crossings.pairs` of the screen | Own (ROUTE-PAIRS) |
 | R2 | Crossing angle | Crossings near a right angle | `ca = mean_x(θ_x) / 90` and `ca_min = min_x(θ_x)` | 0..1 and degrees, `↑` | `n log n`, the same pass as R1 | score | yes, `R2.angle` and `R2.min` of the suite | [Huang 2014][huang14], [Huang 2008][huang08], [Dunne 2009][dunne09] |
 | R3 | Bends | Few real turns | `b(r) = count(i : abs(φ_i) > 1°)`, mean over routes | count for each route, `↓` | `linear` | score | part, `bends` counts each vertex | [Purchase 1997][purchase97], [Wybrow 2009][wybrow09] |
 | R4 | Total turn | Paths that go straight on | `T(r) = Σ_i abs(φ_i) / π`, and `max_i abs(φ_i)` | half turns for each route, `↓` | `linear` | score | yes, `R4.turn` and `R4.max` of the suite | [Ware 2002][ware02] |
@@ -162,6 +286,8 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R14 | Orthogonality | Legs parallel to the axes, for an orthogonal style | `orth = Σ L(legs within 1° of an axis) / Σ_e L(r_e)` | 0..1, `↑` for the orthogonal style | `linear` | score | yes, `R14.share` of the screen | [Purchase 2002][purchase02], [Kieffer 2016][kieffer16] |
 | R15 | Inflections | Turns in one direction | `count(i : sign(φ_i) ≠ sign(φ_(i-1)))` for each route | count, `↓` | `linear` | score | yes, `inflections` | Own (H1), [Levien 2009][levien09] |
 | R16 | Lane balance | Even gaps between parallel routes, also when each gap is wide | For each leg, the nearest leg of other edges at each side within 5° of parallel and 8 lane widths, with the overlap `w` and the gap `g`: `cv = sd_w(g) / mean_w(g)`, and `low` is the share of `w` with `g < median_w(g) / 2` | `cv` no unit and share 0..1, `↓` | `n log n` | score | yes, `R16.cv` and `R16.low` of the screen | [Wybrow 2009][wybrow09] (nudge), [Pupyrev 2016][pupyrev16] |
+| R17 | Routes with no graph | Each route has a way to use | The routes with two points whose facing plugs have no way through the corner graph (`noGraphRoutes`) | count, `↓` | `extra run` | score | yes, `route.no-graph` of the screen | Own (PASS-GRID) |
+| R18 | Row room | Room on the wall for the row of each port | For the plugs of each wall with `rowHeight` `h_i`, centered on the plug: `fit = count(row in its wall, with no overlap of a row or a plug) / count(rows)`, and `gap = min (a_(i+1) - a_i) / mean(h_i, h_(i+1))` | `fit` 0..1, `↑`, `gap` no unit, `↑` | `n log n` | score | yes, `R18.fit` and `R18.gap` of the screen, only on a board with rows | Own (PLUG-ROW-GAP) |
 
 ### Notes on the routes
 
@@ -170,6 +296,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 - [Purchase 1997][purchase97] found no significant effect of the angular resolution or of the orthogonality. Thus R11 and R14 get low weights, but MEAS1 still reports them.
 - R14 is a style, not a quality. A host app with an orthogonal style sets a high weight. A host app with curves sets a weight of 0.
 - R12 counts the parallel ink that is too near. R16 counts uneven gaps, also when each gap is wide. On `screen-v3`, their Spearman correlation is 0.64, so they are not independent. `R16.low` against R12 is 0.22.
+- R18 has no value on a board without `rowHeight`. So the corpus of today has no R18, and no gate reads it.
 
 ## Bundles
 
@@ -181,12 +308,36 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B2 | Bundled share | Edges that share their ways | `count(e : e is in a run or a bundle) / m` | 0..1, `↑` in context | `linear` | score | yes, `B2.share` of the screen | [Holten 2006][holten06] |
 | B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | yes, `B3.median` and `B3.q95` of the screen. MEAS2 adds `B3.max`, the largest stretch | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
 | B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.ambiguity` of the suite, sampled above 1000 nodes | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
+| B4 | Reach of a false neighbour | No false neighbours | `reach = (Σ_v count(w in N(v) : no edge v-w) / count(v)) / n`, with `N(v)` as in the row above | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.reach` of the suite, sampled above 1000 nodes | this project |
 | B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | yes, `B5.crossings` of the screen. ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
 | B6 | Merge angle | Smooth merges and splits | `ma = max angle of the turn of a lane where it joins or leaves a run` | degrees, `↓` | `linear` | score | yes, `B6.max` of the screen | [Gansner 2011][gansner11] (a limit of 40° on the turn) |
 | B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | yes, `B7.ratio` of the screen | [Saga 2016][saga16] |
 | B8 | Run profile | Bundles of a useful size | `runs`, `q_0.5` and `max` of the edges of each run | counts, in context | `linear` | score | yes, `B8.runs`, `B8.median` and `B8.max` of the screen | [Holten 2006][holten06], [Lhuillier 2017][lhuillier17] |
 | B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
 | B10 | Gap closed | Ink saved near the optimum | `gc = (B1(s) - B1(b)) / (B1* - B1(b))`. `b` is the baseline, and `B1*` is the optimum at the smallest cap at or above the largest stretch of `s`. | share of the gap, `↑`. 0 is the baseline, and 1 is the optimum | an exact solve for each input, kept in a file | score | yes, `gap` of the screen on `exact-v1`, with `gap.cap` and the views `gap.collection` and `gap.all` | [Magnanti and Wong 1984][magnanti84] |
+| B11 | Route overlap | Routes that a reader can follow | `share`: length on a line with two routes or more, over all length. `peak`: the most routes on one piece of a line. | 0..1 and count, `↓` | `n log n` | score | yes, `B11.share` and `B11.peak` of the suite | [Holten 2006][holten06] |
+
+### The read of `route.bundle.ambiguity`
+
+The first report read `route.bundle.ambiguity` at 0.987 to 0.992 on 10 pairs of one input. That input has 1000 nodes, 4 edges for each node and two tight packs. The hypothesis was that the share stays near 1 at this size, whatever the router or the key. The record `packages/core/scripts/data/ambiguity-read/record.json` tests it on 9 boards, with the 3 values of the key on 2 of them.
+
+**The rule of the read did not fire.** The rule calls a board flat when the 5 real routers (`corners`, `trunks`, `shared`, `shared-all`, `sections`) have a range under 0.05 at 1000 nodes. No board has it. The hypothesis is a miss, and the measure stays.
+
+**The share does hide a change at its top.** The share is `false / (false + true)`. A node has few true neighbours, so each new false neighbour moves the share less. The row `route.bundle.reach` divides the false neighbours of a node by the count of the nodes, so it keeps its size.
+
+| Board, 1000 nodes | Share, 5 routers | Range | Share, `shared`, `shared-all`, `sections` | Reach, the same 3 routers |
+|---|---|---|---|---|
+| `mid-uniform` | 0.8133 to 0.9871 | 0.1739 | 0.9739, 0.9871, 0.9702 | 0.1490, 0.3064, 0.1301 |
+| `mid-hubs` | 0.8068 to 0.9848 | 0.1780 | 0.9692, 0.9848, 0.9643 | 0.1257, 0.2593, 0.1080 |
+| `mid-fanout` | 0.9140 to 0.9915 | 0.0774 | 0.9787, 0.9915, 0.9819 | 0.1837, 0.4655, 0.2168 |
+| `dense-hubs` | 0.8833 to 0.9863 | 0.1030 | 0.9798, 0.9863, 0.9755 | 0.3876, 0.5755, 0.3189 |
+| `dense-clustered` | 0.9345 to 0.9888 | 0.0543 | 0.9818, 0.9888, 0.9807 | 0.4327, 0.7054, 0.4055 |
+
+The key shows the same fault. On `mid-clustered`, `shared` with a random key reaches 0.2824 of the board, and `shared` with a cluster key reaches 0.1394. That is 2 times, and the share reads 0.9792 and 0.9587, a difference of 0.0205. With no key, `shared` reads 0.8801 and 0.0441. These are the values of `corners`, and that tie has a known cause.
+
+**A control wins both values.** `straight` shares no segment, so it reads 0 on the share and on the reach. Neither value calls a win alone. The partner of `straight` on both values is `route.through`. `one-trunk` reads the highest values on each board, with reach 0.6183 to 0.9152 at 1000 nodes.
+
+**Limits.** The record has no tight pack, so it does not repeat 0.987 to 0.992, and it does not say what those packs read. The 2 dense boards joined after the first read of the record, because they are nearer to that input. The key `cluster` is a grid over the corners of the boxes, by target. No value here is an estimate: the sample starts above 1000 nodes. Neither value reads if a group has a meaning.
 
 ### Notes on the bundles
 

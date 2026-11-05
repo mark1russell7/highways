@@ -31,6 +31,12 @@ export interface Ambiguity {
   readonly value: number;
   /** This value is true when the value comes from a sample of the nodes. */
   readonly estimated: boolean;
+  /** The mean count of near nodes of a node. A near node shares a drawn segment with a route of the node. */
+  readonly nearPerNode: number;
+  /** The mean count of false neighbours of a node. */
+  readonly falsePerNode: number;
+  /** The value `falsePerNode` over the count of the nodes, from 0 to 1. Lower is better. */
+  readonly reach: number;
 }
 
 /** The options of `ambiguity`. */
@@ -128,7 +134,8 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
       }
   });
   WORK.score += visits;
-  return { value: all ? wrong / all : 0, estimated: !exact };
+  const count = Math.max(1, pick.length);
+  return { value: all ? wrong / all : 0, estimated: !exact, nearPerNode: all / count, falsePerNode: wrong / count, reach: n ? wrong / count / n : 0 };
 }
 
 /** The drawn segments of each route, as keys, in the order of its points. A segment shorter than the grain of `segmentKey` has no key. */

@@ -8,6 +8,7 @@ Each file `<set>-<step>.json` holds the verdicts of one screen against the defau
 - `run` is the id of the run of the workflow `Screen` that gave the records. `commit` is the commit of the records.
 - `core` is the version of `@mark1russell7/highways` at that commit.
 - Each line of `rows` is one verdict: a strategy on a guard measure, with its label, its families and its breadth.
+- A snapshot with a router that has no lanes also has `limits`. Each line gives the rise of B11 over `corners` on one input, the limit and the label.
 
 ## How to make a snapshot
 

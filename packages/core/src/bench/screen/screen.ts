@@ -11,7 +11,8 @@ import { farLevel, groupFill, itemOverlaps, silhouette } from "../measures/group
 import { levelRatio, linkAgreement } from "../measures/levels.ts";
 import { orderFragility } from "../measures/order.ts";
 import { paretoFront, type Objective } from "../measures/pareto.ts";
-import { boardUnit } from "../measures/routes.ts";
+import { boardUnit, noGraphRoutes } from "../measures/routes.ts";
+import { rowFit } from "../measures/rows.ts";
 import { boxDisplacement, distanceDistortion, roomOrderFaults } from "../measures/room.ts";
 import { routeStability } from "../measures/stability.ts";
 import { routeSymmetry } from "../measures/symmetry.ts";
@@ -20,7 +21,7 @@ import { checkLevels, checkProperties, TOLERANCE } from "../properties.ts";
 import { measureQuality } from "../quality.ts";
 import { sameData, type TimingEnv } from "../run.ts";
 import { FRONT_OBJECTIVES } from "../suite.ts";
-import { inputGraph, jsonSafe, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
+import { inputGraph, jsonSafe, passThroughs, type LayoutInput, type LayoutPrediction, type LayoutRecord, type PredictionOp } from "./forms.ts";
 import { curvesHash, resultHash, type MoveCounter } from "./exercise.ts";
 import { outputHash } from "./activation.ts";
 import { RECORD_EPS } from "./hash.ts";
@@ -144,6 +145,10 @@ export interface ScreenStrategySummary {
    * Each built-in breaks a rule on some boards, for example on a board where the boxes touch. Without built-ins, the floor is 0.
    */
   readonly hardOverFloor: number;
+  /** The sum of the breaks of the rule `no-pass-through` over the runs (`passThroughs`). This absolute count has no floor. A strategy with `hardOverFloor` 0 can have a high count. */
+  readonly through: number;
+  /** The sum of the measure `route.no-graph` over the runs: the routes that went straight because the corner graph had no way. */
+  readonly noGraph: number;
   /** The median of each measure over the runs, by the names of a record. */
   readonly medians: Readonly<Record<string, number>>;
   /** The median time of a run, in milliseconds. */
@@ -261,7 +266,7 @@ function groupShapeValues(graph: Graph, levels: readonly Level[]): Record<string
 /**
  * This function gives the values of a row of `compareStep`, with the measures of `measureQuality` for a router.
  * A router also gets the bundled share (B2), the merge angle (B6) and the bundle stretch (B3) against the routes `base` of `corners`.
- * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
+ * It also gets the measures of MEAS3A: R12, R14, B5, B7, B8, B9, M1 and M4, and R18 of a board with rows. The lane measures open each shared segment at `MEASURE_LANE_WIDTH`.
  * A result with zoom levels also gets the link agreement (Z9) and `groupShapeValues`, for a router and for a grouping rule.
  * A router also gets the symmetry of its routes (H3). A whole strategy also gets M2, M3 and M5 of the board of its output.
  */
@@ -287,6 +292,7 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     const balance = routeBalance(routes);
     values["R16.cv"] = balance.cv;
     values["R16.low"] = balance.low;
+    values["R17.noGraph"] = noGraphRoutes(graph, routes);
     values["B5.crossings"] = laneCrossings(open.graph);
     values["B7.ratio"] = occupiedArea(routes, boardUnit(graph));
     const runs = runProfile(open.graph);
@@ -302,6 +308,11 @@ function rowValues(step: ScreenStep, graph: Graph, row: CompareRow, base: () => 
     values["M4.laneThrough"] = lanesThrough(graph, open);
     const h3 = routeSymmetry(graph, routes);
     if (h3 !== undefined) values["H3.share"] = h3;
+    const rows = rowFit(graph, routes);
+    if (rows) {
+      values["R18.fit"] = rows.fit;
+      if (rows.gap !== undefined) values["R18.gap"] = rows.gap;
+    }
   }
   if ((givesRoutes(step) || step === "group") && row.result?.levels) {
     const levels = row.result.levels;
@@ -542,6 +553,8 @@ function summarizeScreen(
       hard,
       hardTotal: Object.values(hard).reduce((s, v) => s + v, 0),
       hardOverFloor: ran.reduce((n, r) => n + overFloor(r), 0),
+      through: passThroughs(ran, strategy),
+      noGraph: ran.reduce((n, r) => n + (r.measures["route.no-graph"] ?? 0), 0),
       medians,
       ms: median(ran.map((r) => r.ms)),
       onFront: comparisons.filter((c) => c.front.includes(strategy)).length,
@@ -579,13 +592,14 @@ export function formatScreen(summary: ScreenSummary): string {
     "",
     `${summary.inputs} inputs, ${summary.strategies.length} strategies. Each cell of a measure is the median over the inputs.`,
     "The floor of an input is the counts of the hard rules of the built-in strategy with the fewest breaks on that input.",
+    "The columns `through` and `no graph` are absolute sums over the inputs, with no floor. `through` counts the breaks of `no-pass-through`. `no graph` counts the routes that went straight because the corner graph had no way.",
     ...(summary.env ? [`The times come from ${summary.env.cores} x ${summary.env.cpu} (${summary.env.os} ${summary.env.arch}, Node.js ${summary.env.node}), mode \`${summary.env.mode}\`${summary.env.context ? `, context \`${summary.env.context}\`` : ""}.`] : []),
     "",
-    `| strategy | new | runs | skipped | hard | over the floor | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
-    `|---|---|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
+    `| strategy | new | runs | skipped | hard | over the floor | through | no graph | same twice | on the front of an input | ms | ${axes.join(" | ")} |`,
+    `|---|---|---:|---:|---:|---:|---:|---:|---|---:|---:|${axes.map(() => "---:").join("|")}|`,
     ...summary.strategies.map(
       (s) =>
-        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.deterministic === null ? "no run" : s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
+        `| ${s.strategy} | ${s.candidate ? "yes" : ""} | ${s.runs} | ${s.skipped} | ${s.hardTotal} | ${s.hardOverFloor} | ${s.through} | ${s.noGraph} | ${s.deterministic === null ? "no run" : s.deterministic ? "yes" : "no"} | ${s.onFront} | ${fmt(s.ms)} | ${summary.objectives.map((o) => fmt(s.medians[o.key])).join(" | ")} |`,
     ),
     "",
     `Pareto front over the medians: ${summary.front.join(", ") || "-"}.`,

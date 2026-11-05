@@ -26,9 +26,9 @@ const root = new URL("../../../../../corpus/", import.meta.url);
 const readJson = (path: string): unknown => JSON.parse(readFileSync(new URL(path, root), "utf8"));
 
 describe("the screen set screen-v3 (CORPUS-FAMILIES)", () => {
-  it("has the 15 families of HIGHWAYS_FAMILIES, each with the 10 seeds 0 to 9", () => {
+  it("has the first 15 families of HIGHWAYS_FAMILIES, each with the 10 seeds 0 to 9", () => {
     expect(SCREEN_SETS["screen-v3"]).toBe(SCREEN_V3);
-    expect(SCREEN_V3.families.map((f) => f.name)).toEqual(HIGHWAYS_FAMILIES.map((f) => f.name));
+    expect(SCREEN_V3.families.map((f) => f.name)).toEqual(HIGHWAYS_FAMILIES.slice(0, 15).map((f) => f.name));
     expect(v3).toHaveLength(150);
     expect(v3.map((i) => i.id)).toEqual(SCREEN_V3.families.flatMap((f) => Array.from({ length: 10 }, (_, k) => `screen-v3/${f.name}/s${k}`)));
     for (const i of v3) expect(i.hash).toBe(documentHash(i));
@@ -66,7 +66,7 @@ describe("the screen set screen-v3 (CORPUS-FAMILIES)", () => {
 
   it("passes the claim declared of its manifest, and gives each input the key of its family", () => {
     const manifest = readJson("screen-v3/corpus.json") as LayoutCorpus;
-    expect(declaredClaimOf(manifest)).toEqual({ minCount: 10, thin: [], counts: Object.fromEntries(HIGHWAYS_FAMILIES.map((f) => [f.name, 10])), familyBy: { "*": [] }, familyMin: 10 });
+    expect(declaredClaimOf(manifest)).toEqual({ minCount: 10, thin: [], counts: Object.fromEntries(HIGHWAYS_FAMILIES.slice(0, 15).map((f) => [f.name, 10])), familyBy: { "*": [] }, familyMin: 10 });
     expect(checkFamilies(manifest, v3)).toEqual([]);
     for (const input of v3) expect(familyOf(familyCell(input), SCREEN_FAMILY_BY), input.id).toBe(input.family);
   });

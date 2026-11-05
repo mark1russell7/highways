@@ -251,6 +251,33 @@ The screen of 2026-10-28 ([run 40628435755](https://github.com/mark1russell7/hig
 
 The screen also found 16 output groups. Each group holds strategies with the same output on each decision input. For example, `hw:cubu` and `w3d:cubu-fft` are one group, and `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` are one group.
 
+#### The causes of the silent strategies (REBUILD-SILENT)
+
+For each of the 15 strategies, a small board shows the cause. The boards are in the set `moves-v1` ([`corpus/moves-v1`](../../corpus/moves-v1)), and `moves-set.test.ts` checks each board. The list of the run above is the latest list. 14 strategies are corpus gaps, and 1 strategy has a wrong trigger.
+
+| Strategy | Class | Board | Cause |
+|---|---|---|---|
+| `hw:power` | Corpus gap | `equal-neighbours` | No two nodes of a decision input have the same neighbours. |
+| `w3e:power-near` | Corpus gap | `near-neighbours` | No two nodes of a decision input have neighbours with a Jaccard value of 0.8 or more. |
+| `w3e:power-saved1` | Corpus gap | `leaf-pair` | No two leaves of a decision input share their hub. |
+| `w3e:power+stretch` | Corpus gap | `spread-modules` | Its base `hw:power` makes no power edge on a decision input, so the gate has no edge to cut. |
+| `hw:corridors+stretch` | Corpus gap | `hidden-plug` | Each route on a decision input is in the budget. The worst ratio is 1.071. |
+| `w2a:corridors+stretch-1.1` | Corpus gap | `hidden-plug` | The worst ratio of 1.071 is also in this budget. |
+| `w2a:corridors+stretch-1.5` | Corpus gap | `hidden-plug` | The worst ratio of 1.071 is also in this budget. |
+| `w3f:consensus+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.198. |
+| `w3f:link-communities+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.185. |
+| `w3f:scale-space+stretch` | Corpus gap | `hidden-plug` | The worst ratio on a decision input is 1.138. |
+| `w2c:flow-field+stretch` | Corpus gap | `short-link` | The worst ratio on a decision input is 1.058. |
+| `hw:corridors+breakeven` | Corpus gap | `small-saving` | Each highway on a decision input saves more than its detours. |
+| `w2a:corridors+breakeven-a0` | Corpus gap | `small-saving` | Each highway on a decision input saves more than its detours. |
+| `w2a:corridors+stretch+breakeven` | Corpus gap | `small-saving` | Its base is `hw:corridors+stretch`, so the gate must cut a route that the budget keeps. |
+| `w3b:lanes-corridors` | Wrong trigger, fixed | `half-fits` | The split measured the old spine for the half that moves, so a spine too narrow for all the lanes passed. |
+
+- A corpus gap does not change a strategy. Only the screen of a board with that case can give a verdict.
+- 3 of 8 decision inputs have an overflow of `hw:corridors`. The option `measure: "all"` of `lanes` compares the old spine at the width of all its lanes. The input `screen-v1/dense-groups/s0` splits with this option, and its overflow goes from 1 to 0. On the other 2 inputs, the search finds no new spine.
+- `w3b:lanes-corridors` is the only variant with this option. `hw:lanes`, `w3b:lanes-shared-ways` and `w3b:lanes-w16` keep the old rule, and the default output does not change.
+- No strategy of the 15 is in the default set. This item changes no gate, limit or floor, and it does not change the rule that counts a firing.
+
 ### Wave 4: the other new ideas (WILD)
 
 Wave 4 holds the other ideas of the note of new ideas, in the build order of that note. It also holds `RULE-021`, `RULE-049` and `EDA-049`, because their riders are WILD ideas.
@@ -764,6 +791,33 @@ In the replay, `territories` is out of the front on `screen-v2` and `screen-v3`.
 
 On `packed-grid`, most routes of each strategy go through boxes. The next step is a screen set of the boards after `makeRoom`. Ways along the seams come later, as an opt-in strategy.
 
+### Ways along the seams (PASS-SEAMS)
+
+The opt-in router `seams` takes each box smaller by 1 and gives the corner graph the margin 1. Thus the corners of the graph are on the real corners, and two boxes that touch have a free line between them. An edge with a way in the plain corner graph keeps it. The other edges go from plug to plug along the sides of the boxes.
+
+| Seed | Edges | Pass-throughs of `corners` | Pass-throughs of `seams` | Other breaks of `seams` | Length against `corners` | Bends for each route |
+|---|---:|---:|---:|---:|---:|---:|
+| `s0` | 132 | 94 | 0 | 0 | 1.29 | 1.62 |
+| `s4` | 132 | 92 | 0 | 0 | 1.30 | 1.59 |
+| `s6` | 128 | 87 | 0 | 0 | 1.32 | 1.55 |
+| `s8` | 133 | 97 | 0 | 0 | 1.29 | 1.83 |
+
+The test `routers/seams/index.test.ts` checks 0 pass-throughs on each of the 10 seeds. A count does not depend on the machine. These rows are a local check, not a verdict. A seam has no room for lanes, so routes can share one line, and only a screen gives the cost of that.
+
+The cost of this router is the shared length. A seam has no room for lanes, so routes on one seam lie on top of each other, and a reader cannot follow one route.
+
+| Measure on the 10 seeds | `corners` | `seams` |
+|---|---:|---:|
+| Share of the length on a line with two or more routes | 0.2% to 6.9% | 83.6% to 92.0% |
+| Most routes on one piece of a line | 2 to 3 | 7 to 10 |
+| Total length against `corners` | 1 | 1.28 to 1.33 |
+
+The record is [`seam-share.jsonl`](bench/seam-share.jsonl), from `scripts/seam-share.ts`. The screen can flatter this router. The ink measure B1 gives credit for shared length, and `crossings` counts each crossing of two shared stretches one time. Thus the verdict of this router has the limits of B11 in `limits`.
+
+- Each limit is a rise over `corners` on one input: 0.10 of the share, and 2 routes of the peak.
+- An absolute limit does not work. On `hub-chain`, `corners` has a share of 60% and a peak of 10. On that board `seams` gives the same routes.
+- The limits apply only to a router with no lanes. The verdicts of the other strategies and the measure B1 do not change.
+
 ## The verdict over families of the screens (SCREEN-WEIGHT)
 
 Step 1 (VERDICT, #139) made the family the unit of a verdict. This step gives the families to the manifests and scores the records of both screens again with `verdict` of `layout-contract` 0.2.11.
@@ -857,6 +911,8 @@ The guard is a test that refuses a promotion when a family loses beyond the tie.
 ## The build queue
 
 The queue puts each idea that is not built in the order of a score (IDEA-QUEUE). Up to 3 builds at a time take the ideas from the top. An idea leaves the catalog only after its build and its screen, with its record kept.
+
+`pnpm queue` also prints the count of the open ideas (QUEUE-REFILL). An open idea is not built, not blocked and not a duplicate. Under one week of build slots, the line asks for a literature survey and a round of hybrids. One week has 36 slots: 3 builds at a time, 6 ideas in each build, and 2 rounds.
 
 ### The files and the commands
 
@@ -1094,7 +1150,7 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 | 3. HWY-044 takes 2 times or more the warm median time of `shared` on the router screen of `screen-v1`. | 0.5 | Met: 2.63 times. |
 | 4. HWY-036 has a median B1 ratio over `shared` of 1.05 or more on `screen-v2`. | 0.35 | Met: 2.108. |
 | 5. HWY-057 and HWY-058 add 0 new hard-rule breaks on both sets. | medium | Met: 0 on each input of both sets. |
-| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass, and `xplat` passes at `a32522f`. The router screen of `Scale` gives 126 of 126 equal records against `main`. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass at `a32522f`. The job `xplat` does not fail on a route that differs, so it adds nothing here. The router screen of `Scale` gives 126 of 126 equal records against `main`. |
 
 ### The queue after wave 3G
 
@@ -1199,7 +1255,7 @@ The ratios are the paired ratios of the candidate over the baseline on `screen-v
 | 3. WILD-045 gets `better` on R1 or B1 on `screen-v2` with 0 families against. | 0.35 | Met: R1 and B1 are `better` with 0 of 6 against. |
 | 4. NAT-016 changes Z3 by more than the tie on `screen-v2`. | 0.45 | Met: Z3 length is `worse`, with a median ratio of 1.053. The change is a loss. |
 | 5. The 6 strategies add 0 new hard-rule breaks on both sets. | medium | Partly met: `venation` added 61 `link-ends` breaks before the fix of `577bb94`. After the fix, each strategy adds 0. |
-| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #168. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass on #168. The job `xplat` does not fail on a route that differs, so it adds nothing here. |
 
 ### The queue after wave 4A
 
@@ -1304,7 +1360,7 @@ The ratios are the paired ratios of the candidate over the baseline on `screen-v
 | 2. At least 1 idea gets `better` on one of its named wins on `screen-v3` with 12 or more of 15 families for it. | 0.35 | Met: `manifolds` gets B1 with 14 of 15 families for it, and R14 with 13 of 15. |
 | 3. EDA-041 changes the plugs on at least half of the inputs of `screen-v2` and adds 0 hard-rule breaks. | 0.5 | Met: 60 of 60 inputs, and 0 breaks. |
 | 4. The 6 strategies add 0 new hard-rule breaks on all sets. | medium | Met: 0 on `screen-v1`, `screen-v2` and `screen-v3`. |
-| 5. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #176. |
+| 5. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass on #176. The job `xplat` does not fail on a route that differs, so it adds nothing here. |
 
 ### The queue after wave 4B
 

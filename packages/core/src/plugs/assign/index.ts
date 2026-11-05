@@ -1,6 +1,7 @@
 /**
  * The plug strategy `assign` (PLUG-ASSIGN): the plugs of each wall go to the intervals of their ends, with a least gap.
- * An interval is the range of the port (PORT-RANGE), or the room of the wall. The assignment is exact for the count of the ends in their intervals.
+ * An interval is the range of the port (PORT-RANGE), or the room of the wall. The assignment is exact for the count of the ends in their intervals,
+ * up to a limit of work for each wall (ASSIGN-BOUND). Over the limit, a greedy sweep gives the plan.
  */
 import { center } from "../../geom.ts";
 import { nodeIndex, portOffset, type End, type Node, type Side } from "../../model.ts";
@@ -15,10 +16,15 @@ export interface AssignOptions {
   readonly plugGap?: number;
   /** The distance from a plug to a corner of its box, or a quarter of the wall when the wall is short. The default is 6. */
   readonly inset?: number;
+  /**
+   * The least share of `plugGap` that a wall can use to put more ends in their ranges (ASSIGN-BOUND). The whole wall takes the largest gap that keeps those ends.
+   * The default 1 keeps `plugGap`. The value 0 lets the gap go to 0.
+   */
+  readonly rangeShrink?: number;
 }
 
 /** The defaults of the plug strategy `assign`. */
-export const ASSIGN_DEFAULTS: Required<AssignOptions> = Object.freeze({ plugGap: 8, inset: 6 });
+export const ASSIGN_DEFAULTS: Required<AssignOptions> = Object.freeze({ plugGap: 8, inset: 6, rangeShrink: 1 });
 
 /** One end of a wall for `assignWall`. The places are on the axis along the wall. */
 export interface WallEnd {
@@ -38,12 +44,27 @@ export interface WallPlan {
   readonly at: number[];
   /** For each end, `true` when its plug is in its interval. */
   readonly anchored: boolean[];
-  /** The gap of the wall: the option `gap`, or less when the room of the wall is too short for all its plugs. */
+  /** The gap of the wall: the option `gap`, or less on a short room. With `leastGap`, the gap can also shrink for more ends in a short range. */
   readonly gap: number;
 }
 
 /** The tolerance of the comparisons of places along a wall. */
 const EPS = 1e-9;
+
+/** Each wall with this count of ends or fewer gets the exact plan (ASSIGN-BOUND), for each count of places. */
+const PLAN_EXACT_ENDS = 8;
+
+/** The limit of work of the exact plan of a larger wall (ASSIGN-BOUND). The work is the count of the jobs times the cube of the count of places. */
+const PLAN_WORK_LIMIT = 3e7;
+
+/** The most free places for each end that a sweep places out of its interval. */
+const SWEEP_PLACES = 8;
+
+/** The most ends of a wall for the exact plan. A wall with more ends does not count its places, because that count alone has a high cost. */
+const PLAN_ENDS_LIMIT = 64;
+
+/** The steps of the bisection of a gap in a short range. The result is within 1/4096 of the span of the search. */
+const SHRINK_STEPS = 12;
 
 /** This function gives the index of the first value of the sorted list `list` that is `v` or more. */
 function lowerBound(list: readonly number[], v: number): number {
@@ -165,22 +186,9 @@ function keyOrderPlan(order: readonly number[], win: readonly ([number, number] 
  */
 function bestPlan(order: readonly number[], win: readonly ([number, number] | undefined)[], ideals: readonly number[], fixed: readonly number[], lo: number, hi: number, s: number): Item[] {
   const n = order.length;
-  const jobs = order.filter((e) => win[e] !== undefined).sort((a, b) => win[a]![1] - win[b]![1] || win[a]![0] - win[b]![0] || a - b);
+  const jobs = jobsOf(order, win);
   const r = jobs.length;
-  const allowed = (t: number): boolean => t >= lo - EPS && t <= hi + EPS && fixed.every((f) => t <= f - s + EPS || t >= f + s - EPS);
-  // The places that a plan needs: a start place plus a whole number of gaps.
-  const starts = [lo, ...jobs.map((e) => win[e]![0]), ...fixed.map((f) => f + s)];
-  const raw: number[] = [];
-  for (const b of starts)
-    for (let q = 0; q <= n; q++) {
-      const t = b + q * s;
-      if (t > hi + EPS) break;
-      if (allowed(t)) raw.push(t);
-      if (s === 0) break;
-    }
-  raw.sort((a, b) => a - b);
-  const T: number[] = [];
-  for (const t of raw) if (T.length === 0 || t - T[T.length - 1]! > EPS) T.push(t);
+  const T = planPlaces(n, jobs, win, fixed, lo, hi, s);
   const m = T.length;
   const id = (k: number, ui: number, vi: number): number => (k * (m + 2) + ui + 1) * (m + 2) + vi + 1;
   const memo = new Map<number, number>();
@@ -273,43 +281,174 @@ function bestPlan(order: readonly number[], win: readonly ([number, number] | un
   free.reverse();
   // The ends out of their intervals take free places in the order of their keys, with the least sum of the squares of the moves.
   const rest = order.filter((e) => !placed.has(e));
-  const slots = assignInOrder(rest, free);
+  const slots = assignInOrder(rest, free, ideals);
   const items: Item[] = [];
   for (const [e, p] of placed) items.push({ end: e, anchored: true, at: p });
   rest.forEach((e, i) => items.push({ end: e, anchored: false, at: slots[i]! }));
   for (const f of fixed) items.push({ end: -1, anchored: true, at: f });
-  return items.sort((a, b) => a.at - b.at || (a.end < 0 ? -1 : b.end < 0 ? 1 : order.indexOf(a.end) - order.indexOf(b.end)));
+  return sortItems(items, order);
+}
 
-  /** This function gives each end of `list` one of the sorted places `free`, in order. The sum of the squares of the moves from the ideal places is the least. */
-  function assignInOrder(list: readonly number[], places: readonly number[]): number[] {
-    const a = list.length;
-    const b = places.length;
-    const cost = (i: number, j: number): number => (places[j]! - ideals[list[i]!]!) ** 2;
-    const g = Array.from({ length: a + 1 }, () => new Float64Array(b + 1).fill(Infinity));
-    for (let j = 0; j <= b; j++) g[0]![j] = 0;
-    for (let i = 1; i <= a; i++) for (let j = i; j <= b; j++) g[i]![j] = Math.min(g[i]![j - 1]!, g[i - 1]![j - 1]! + cost(i - 1, j - 1));
-    const out = new Array<number>(a);
-    let j = b;
-    for (let i = a; i >= 1; i--) {
-      while (j > i && g[i]![j - 1] === g[i]![j]) j--;
-      out[i - 1] = places[j - 1]!;
-      j--;
+/** This function gives the ends with an interval, sorted by the end of the interval, then its start. */
+function jobsOf(order: readonly number[], win: readonly ([number, number] | undefined)[]): number[] {
+  return order.filter((e) => win[e] !== undefined).sort((a, b) => win[a]![1] - win[b]![1] || win[a]![0] - win[b]![0] || a - b);
+}
+
+/** The planner of a wall (ASSIGN-BOUND). `auto` applies the limits of work. `exact` and `sweep` ignore those limits: the measure of the sweep compares the two. */
+export type WallPlanner = "auto" | "exact" | "sweep";
+
+/** This function gives the sorted places that an exact plan needs: a start place plus a whole number of gaps. */
+function planPlaces(n: number, jobs: readonly number[], win: readonly ([number, number] | undefined)[], fixed: readonly number[], lo: number, hi: number, s: number): number[] {
+  const allowed = (t: number): boolean => t >= lo - EPS && t <= hi + EPS && fixed.every((f) => t <= f - s + EPS || t >= f + s - EPS);
+  const starts = [lo, ...jobs.map((e) => win[e]![0]), ...fixed.map((f) => f + s)];
+  const raw: number[] = [];
+  for (const b of starts)
+    for (let q = 0; q <= n; q++) {
+      const t = b + q * s;
+      if (t > hi + EPS) break;
+      if (allowed(t)) raw.push(t);
+      if (s === 0) break;
     }
-    return out;
+  raw.sort((a, b) => a - b);
+  const T: number[] = [];
+  for (const t of raw) if (T.length === 0 || t - T[T.length - 1]! > EPS) T.push(t);
+  return T;
+}
+
+/** This function tells if the exact plan of a wall is under the limits of work (ASSIGN-BOUND). */
+function exactFits(order: readonly number[], win: readonly ([number, number] | undefined)[], fixed: readonly number[], lo: number, hi: number, s: number): boolean {
+  const n = order.length;
+  if (n <= PLAN_EXACT_ENDS) return true;
+  if (n > PLAN_ENDS_LIMIT) return false;
+  const jobs = jobsOf(order, win);
+  return jobs.length * planPlaces(n, jobs, win, fixed, lo, hi, s).length ** 3 <= PLAN_WORK_LIMIT;
+}
+
+/** This function sorts the items of a plan by their places. In a tie, a fixed plug comes first, and then the order of the keys. */
+function sortItems(items: Item[], order: readonly number[]): Item[] {
+  return items.sort((a, b) => a.at - b.at || (a.end < 0 ? -1 : b.end < 0 ? 1 : order.indexOf(a.end) - order.indexOf(b.end)));
+}
+
+/** This function gives each end of `list` one of the sorted places `places`, in order. The sum of the squares of the moves from the ideal places is the least. */
+function assignInOrder(list: readonly number[], places: readonly number[], ideals: readonly number[]): number[] {
+  const a = list.length;
+  const b = places.length;
+  const cost = (i: number, j: number): number => (places[j]! - ideals[list[i]!]!) ** 2;
+  const g = Array.from({ length: a + 1 }, () => new Float64Array(b + 1).fill(Infinity));
+  for (let j = 0; j <= b; j++) g[0]![j] = 0;
+  for (let i = 1; i <= a; i++) for (let j = i; j <= b; j++) g[i]![j] = Math.min(g[i]![j - 1]!, g[i - 1]![j - 1]! + cost(i - 1, j - 1));
+  const out = new Array<number>(a);
+  let j = b;
+  for (let i = a; i >= 1; i--) {
+    while (j > i && g[i]![j - 1] === g[i]![j]) j--;
+    out[i - 1] = places[j - 1]!;
+    j--;
+  }
+  return out;
+}
+
+/**
+ * This function gives a plan of one wall with a sweep (ASSIGN-BOUND). The cost is near `n²`. The plan is not always the best.
+ * The other ends take the free places in the order of their keys. When the free places are too few, `packedPlan` moves the plugs to open more places.
+ * All the plugs of the plan keep the gap `s`.
+ */
+function sweepPlan(order: readonly number[], win: readonly ([number, number] | undefined)[], ideals: readonly number[], fixed: readonly number[], lo: number, hi: number, s: number): Item[] {
+  const { at: placed } = sweepPlaces(order.filter((e) => win[e] !== undefined), (e) => win[e]!, fixed, lo, hi, s);
+  const items: Item[] = [];
+  for (const [e, p] of placed) items.push({ end: e, anchored: true, at: p });
+  for (const f of fixed) items.push({ end: -1, anchored: true, at: f });
+  sortItems(items, order);
+  // The free places: each place of the room with the gap to the items on both sides.
+  const rest = order.filter((e) => !placed.has(e));
+  const free: number[] = [];
+  if (s > 0) {
+    let cursor = lo;
+    for (const x of [...items, { at: Infinity }]) {
+      const end = Math.min(hi, x.at - s);
+      for (; cursor <= end + EPS; cursor += s) free.push(cursor);
+      if (x.at !== Infinity) cursor = Math.max(cursor, x.at + s);
+    }
+  } else {
+    free.push(...rest.map((e) => Math.min(hi, Math.max(lo, ideals[e]!))).sort((a, b) => a - b));
+  }
+  if (free.length < rest.length) return packedPlan(order, rest, win, ideals, fixed, lo, hi, s);
+  const stride = Math.max(1, Math.floor(free.length / (SWEEP_PLACES * Math.max(1, rest.length))));
+  const slots = assignInOrder(rest, free.filter((_, i) => i % stride === 0), ideals);
+  rest.forEach((e, i) => items.push({ end: e, anchored: false, at: slots[i]! }));
+  return sortItems(items, order);
+}
+
+/**
+ * This function sweeps the wall with one place for each `s` (ASSIGN-BOUND). At each place, it takes the open end with the earliest end of its span.
+ * An end that the sweep cannot place is in `missed`.
+ */
+function sweepPlaces(list: readonly number[], span: (e: number) => readonly [number, number], fixed: readonly number[], lo: number, hi: number, s: number): { at: Map<number, number>; missed: number[] } {
+  const jobs = [...list].sort((a, b) => span(a)[0] - span(b)[0]);
+  const at = new Map<number, number>();
+  const missed: number[] = [];
+  const open: number[] = [];
+  let next = 0;
+  let t = pushOut(lo, fixed, s);
+  while (t <= hi + EPS) {
+    while (next < jobs.length && span(jobs[next]!)[0] <= t + EPS) open.push(jobs[next++]!);
+    for (let i = open.length - 1; i >= 0; i--) if (span(open[i]!)[1] < t - EPS) missed.push(...open.splice(i, 1));
+    if (open.length === 0) {
+      if (next >= jobs.length) break;
+      t = pushOut(Math.max(t, span(jobs[next]!)[0]), fixed, s);
+      continue;
+    }
+    let pick = 0;
+    for (let i = 1; i < open.length; i++) if (span(open[i]!)[1] < span(open[pick]!)[1]) pick = i;
+    at.set(open[pick]!, t);
+    open.splice(pick, 1);
+    t = pushOut(t + s, fixed, s);
+  }
+  missed.push(...open, ...jobs.slice(next));
+  return { at, missed };
+}
+
+/**
+ * This function gives a plan when the first sweep leaves too few free places. The ends of `first` have the whole room as their span.
+ * They fill each hole before the next interval opens, and the ends with intervals move up. An end that then misses its interval joins them.
+ */
+function packedPlan(order: readonly number[], first: readonly number[], win: readonly ([number, number] | undefined)[], ideals: readonly number[], fixed: readonly number[], lo: number, hi: number, s: number): Item[] {
+  const free = new Set(first);
+  for (;;) {
+    const { at, missed } = sweepPlaces(order, (e) => (free.has(e) ? [lo, hi] : win[e]!), fixed, lo, hi, s);
+    const fresh = missed.filter((e) => !free.has(e));
+    if (fresh.length > 0) {
+      for (const e of fresh) free.add(e);
+      continue;
+    }
+    const items: Item[] = fixed.map((f) => ({ end: -1, anchored: true, at: f }));
+    const places: number[] = [];
+    for (const [e, p] of at) {
+      if (free.has(e)) places.push(p);
+      else items.push({ end: e, anchored: true, at: p });
+    }
+    // A bisection of the gap can leave a rounding error. Then the last ends share the end of the room.
+    while (places.length < free.size) places.push(hi);
+    const rest = order.filter((e) => free.has(e));
+    const slots = assignInOrder(rest, places.sort((a, b) => a - b), ideals);
+    rest.forEach((e, i) => items.push({ end: e, anchored: false, at: slots[i]! }));
+    return sortItems(items, order);
   }
 }
 
 /**
  * This function gives the plan of one wall (PLUG-ASSIGN). Each end has an interval on the axis along the wall. The plugs keep at least `gap` between two of them,
  * and between a plug and a fixed plug at a place of `fixed`. When the room is too short for all the plugs, the gap shrinks evenly. The plan has three goals, in this order:
- * 1. the most ends with their plug in their interval (exact).
+ * 1. the most ends with their plug in their interval: exact up to the limit of work, and the count of a sweep over the limit.
  * 2. no crossing at the wall: the order of the keys, when that order lets the count of goal 1.
  * 3. the least sum of the squares of the moves from the ideal places, for the order and the ends of goals 1 and 2.
  *
  * An end that cannot get a plug in its interval still gets a plug in the room. When the order of the keys loses ends, the plugs swap their places
  * to come nearer to that order, while each end keeps its interval.
+ *
+ * With `leastGap` under `gap`, the gap of the wall can shrink as far as `leastGap`, for more ends in their intervals (ASSIGN-BOUND).
+ * The wall takes the largest gap with the count of `leastGap`. A wall over the exact limit searches the gap with the sweep.
  */
-export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = []): WallPlan {
+export function assignWall(ends: readonly WallEnd[], room: readonly [number, number], gap: number, fixed: readonly number[] = [], plan: WallPlanner = "auto", leastGap: number = gap): WallPlan {
   const n = ends.length;
   if (n === 0) return { at: [], anchored: [], gap };
   const [lo, hi] = room;
@@ -321,25 +460,32 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
     return a <= b + EPS ? [a, Math.max(a, b)] : undefined;
   });
   const order = ends.map((_, i) => i).sort((a, b) => ends[a]!.key - ends[b]!.key || a - b);
-  let items = keyOrderPlan(order, win, pins, lo, hi, s);
-  if (!items) {
-    // The bisection of the gap can miss by a rounding error. A gap of 0 always fits.
-    s = 0;
-    items = keyOrderPlan(order, win, pins, lo, hi, s)!;
-  }
-  const inKey = items.filter((x) => x.end >= 0 && x.anchored).length;
   const can = win.filter((w) => w !== undefined).length;
-  if (inKey < can && inKey < unionCap(win, pins, lo, hi, s, n)) {
-    const best = bestPlan(
-      order,
-      win,
-      ends.map((e) => e.ideal),
-      pins,
-      lo,
-      hi,
-      s,
-    );
-    if (best.filter((x) => x.end >= 0 && x.anchored).length > inKey) items = untangle(best, ends, win);
+  const ideals = ends.map((e) => e.ideal);
+  const itemsAt = (g: number, mode: WallPlanner): { items: Item[]; g: number } => {
+    let items = keyOrderPlan(order, win, pins, lo, hi, g);
+    if (!items) {
+      // The bisection of the gap can miss by a rounding error. A gap of 0 always fits.
+      g = 0;
+      items = keyOrderPlan(order, win, pins, lo, hi, g)!;
+    }
+    const inKey = countAnchored(items);
+    if (inKey < can && inKey < unionCap(win, pins, lo, hi, g, n)) {
+      const planner = mode === "exact" || (mode === "auto" && exactFits(order, win, pins, lo, hi, g)) ? bestPlan : sweepPlan;
+      const best = planner(order, win, ideals, pins, lo, hi, g);
+      if (countAnchored(best) > inKey) items = untangle(best, ends, win);
+    }
+    return { items, g };
+  };
+  const first = itemsAt(s, plan);
+  let items = first.items;
+  s = first.g;
+  const floor = Math.max(0, Math.min(leastGap, s));
+  if (floor < s && countAnchored(items) < can) {
+    const search: WallPlanner = plan === "auto" && n > PLAN_EXACT_ENDS ? "sweep" : plan;
+    const count = (g: number): number => countAnchored(itemsAt(g, search).items);
+    const shrunk = shrinkGap(s, floor, countAnchored(items), count);
+    if (shrunk < s) ({ items, g: s } = itemsAt(shrunk, plan));
   }
   // The places of the order: each end in its interval, or in the room. A fixed plug stays at its place.
   const span = items.map((x): [number, number] => (x.end < 0 ? [x.at, x.at] : x.anchored ? win[x.end]! : [lo, hi]));
@@ -355,6 +501,40 @@ export function assignWall(ends: readonly WallEnd[], room: readonly [number, num
   });
   const anchored = ends.map((e, i) => at[i]! >= e.lo - 1e-7 && at[i]! <= e.hi + 1e-7 && win[i] !== undefined);
   return { at, anchored, gap: s };
+}
+
+/** This function gives the count of the ends in their intervals of a plan. */
+function countAnchored(items: readonly Item[]): number {
+  return items.filter((x) => x.end >= 0 && x.anchored).length;
+}
+
+/**
+ * This function gives the largest gap from `floor` up to `s` with the count of `floor`.
+ * The result is `s` when `floor` gains nothing over the count `atTop` of `s`.
+ * A smaller gap keeps each plan valid, so the count only goes up when the gap goes down. The sweep can break this rule. The bisection still ends at a gap with that count.
+ */
+function shrinkGap(s: number, floor: number, atTop: number, count: (g: number) => number): number {
+  const most = count(floor);
+  if (most <= atTop) return s;
+  let good = floor;
+  let bad = s;
+  for (let i = 0; i < SHRINK_STEPS; i++) {
+    const mid = (good + bad) / 2;
+    if (count(mid) >= most) good = mid;
+    else bad = mid;
+  }
+  return good;
+}
+
+/** This function gives a bound of goal 1 for a wall with the gap `s`: no plan puts more ends in their intervals. The measure of the sweep reads it on walls that the exact plan cannot reach. */
+export function anchorBound(ends: readonly WallEnd[], room: readonly [number, number], s: number, fixed: readonly number[] = []): number {
+  const [lo, hi] = room;
+  const win = ends.map((e): [number, number] | undefined => {
+    const a = Math.max(lo, e.lo);
+    const b = Math.min(hi, e.hi);
+    return a <= b + EPS ? [a, Math.max(a, b)] : undefined;
+  });
+  return unionCap(win, [...fixed].sort((x, y) => x - y), lo, hi, s, ends.length);
 }
 
 /** This function gives the most plugs with the gap `s` in the union of the intervals, out of the fixed zones, and at most `n`. It is a bound of goal 1. */
@@ -422,6 +602,7 @@ export function assignEnds(input: PlugInput, options: AssignOptions = {}): PlugP
   const { graph } = input;
   const gap = options.plugGap ?? ASSIGN_DEFAULTS.plugGap;
   const inset = options.inset ?? ASSIGN_DEFAULTS.inset;
+  const leastGap = gap * (options.rangeShrink ?? ASSIGN_DEFAULTS.rangeShrink);
   const byId = nodeIndex(graph);
   const slots = new Map<string, Slot>();
   const walls = new Map<string, { node: Node; side: Side; slots: Slot[]; fixed: number[] }>();
@@ -480,7 +661,7 @@ export function assignEnds(input: PlugInput, options: AssignOptions = {}): PlugP
   for (const wall of walls.values()) {
     const room = roomOf(wall.node.box, wall.side, inset);
     const list = wall.slots.map((s) => ({ lo: s.range?.[0] ?? room[0], hi: s.range?.[1] ?? room[1], ideal: s.ideal, key: keyOf(wall.node.box, wall.side, farPoint(s)) }));
-    const plan = assignWall(list, room, gap, wall.fixed);
+    const plan = assignWall(list, room, gap, wall.fixed, "auto", leastGap);
     wall.slots.forEach((s, i) => {
       s.at = plan.at[i]!;
     });

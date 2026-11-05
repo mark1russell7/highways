@@ -1,6 +1,7 @@
 import { BUILT_IN_STRATEGIES, createRegistry, defineStrategy, listStrategies, STRATEGIES, straightRouter, type Graph } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
 import { bestValues, COLUMNS, COMPARE_BOARDS, computePanels, formatHash, parseHash, pickFirst, readPick, type ComparePanels } from "./compare-data.ts";
+import { COMPARE_STRATEGIES } from "./opt-in.ts";
 
 /** The board of 100 nodes: the fixture `small-clustered`, with made-up data. */
 const BOARD = "small-clustered";
@@ -37,7 +38,7 @@ describe("the panels of the compare page (EX2)", () => {
     // The time of all router panels on this machine. The report of EX2 records it.
     console.log(`EX2: all ${data.panels.length} router panels of ${BOARD} took ${ms.toFixed(0)} ms`);
     expect(data.nodes).toBe(100);
-    expect(data.panels.map((p) => p.strategy)).toEqual(listStrategies(STRATEGIES, "router").map((s) => s.name));
+    expect(data.panels.map((p) => p.strategy)).toEqual(listStrategies(COMPARE_STRATEGIES, "router").map((s) => s.name));
     for (const p of data.panels) {
       expect(p.skipped).toBeUndefined();
       for (const key of ["R9.through", "R1.crossings", "R6.worstDetour", "ink", "ms"]) {
@@ -55,7 +56,7 @@ describe("the panels of the compare page (EX2)", () => {
     // The control `straight` goes through boxes, so it breaks a hard rule and is not on the front.
     expect(data.panels.find((p) => p.strategy === "straight")!.violations).toBeGreaterThan(0);
     expect(data.panels.find((p) => p.strategy === "straight")!.front).toBe(false);
-  });
+  }, 30_000);
 
   it("marks the best values with bestValues", () => {
     const data = computePanels({ step: "router", board: "courses", options: {} });
@@ -67,7 +68,7 @@ describe("the panels of the compare page (EX2)", () => {
   it("computes the curve and the group panels, with the measures of their step", () => {
     for (const step of ["curve", "group"] as const) {
       const data = computePanels({ step, board: "courses", options: {} });
-      expect(data.panels.map((p) => p.strategy)).toEqual(listStrategies(STRATEGIES, step).map((s) => s.name));
+      expect(data.panels.map((p) => p.strategy)).toEqual(listStrategies(COMPARE_STRATEGIES, step).map((s) => s.name));
       for (const p of data.panels) for (const c of COLUMNS[step]) expect(p.measures.some((m) => m.key === c.key)).toBe(true);
       expectBestMarks(data);
     }

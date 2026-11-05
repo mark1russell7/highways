@@ -1,0 +1,44 @@
+{
+  "schema": "sections-gate-noise/1",
+  "note": "One read of the gate runs that have a record. It is not a rate for later runs.",
+  "cap": 0.058268908123975824,
+  "level": 0.9,
+  "median": 0.03296643461491279,
+  "max": 0.06260307300179002,
+  "counts": {
+    "records": {
+      "over": 3,
+      "of": 20
+    },
+    "firstAttempts": {
+      "over": 2,
+      "of": 18
+    },
+    "runsOverTwice": {
+      "over": 1,
+      "of": 18
+    }
+  },
+  "rows": [
+  {"run":"41773260682","date":"2026-11-04T04:26:52Z","attempt":1,"spread":0.028002151552214673,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41773330219","date":"2026-11-04T04:27:36Z","attempt":1,"spread":0.024066115193862137,"cpu":"AMD EPYC 9V74 80-Core Processor"},
+  {"run":"41775087250","date":"2026-11-04T04:45:14Z","attempt":1,"spread":0.019288367069655008,"cpu":"Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"},
+  {"run":"41776416792","date":"2026-11-04T04:58:55Z","attempt":1,"spread":0.024065810537224928,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41779342239","date":"2026-11-04T05:27:18Z","attempt":1,"spread":0.04572738069473737,"cpu":"Intel(R) Xeon(R) 6973P-C"},
+  {"run":"41779760743","date":"2026-11-04T05:31:25Z","attempt":1,"spread":0.013711608285734889,"cpu":"AMD EPYC 9V74 80-Core Processor"},
+  {"run":"41784680518","date":"2026-11-04T06:18:48Z","attempt":1,"spread":0.0283287984009733,"cpu":"Intel(R) Xeon(R) 6975P-C"},
+  {"run":"41788347005","date":"2026-11-04T06:51:52Z","attempt":1,"spread":0.020191588296963502,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41789843574","date":"2026-11-04T07:05:28Z","attempt":1,"spread":0.06260307300179002,"cpu":"AMD EPYC 9V45 96-Core Processor"},
+  {"run":"41789843574","date":"2026-11-04T07:05:28Z","attempt":2,"spread":0.041133574589718724,"cpu":"AMD EPYC 9V74 80-Core Processor"},
+  {"run":"41794963588","date":"2026-11-04T07:49:42Z","attempt":1,"spread":0.048898855457404626,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41807079641","date":"2026-11-04T09:23:25Z","attempt":1,"spread":0.012021754694169965,"cpu":"Intel(R) Xeon(R) 6975P-C"},
+  {"run":"41807229681","date":"2026-11-04T09:24:28Z","attempt":1,"spread":0.05969704510450669,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41807229681","date":"2026-11-04T09:24:28Z","attempt":2,"spread":0.05890512861119115,"cpu":"AMD EPYC 9V74 80-Core Processor"},
+  {"run":"41807706950","date":"2026-11-04T09:27:53Z","attempt":1,"spread":0.008290521697036543,"cpu":"Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"},
+  {"run":"41812703685","date":"2026-11-04T10:13:07Z","attempt":1,"spread":0.046614385145473974,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41817187727","date":"2026-11-04T10:53:26Z","attempt":1,"spread":0.03296643461491279,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41817438009","date":"2026-11-04T10:55:37Z","attempt":1,"spread":0.041770538347890025,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41820175255","date":"2026-11-04T11:21:10Z","attempt":1,"spread":0.015084901885083957,"cpu":"AMD EPYC 7763 64-Core Processor"},
+  {"run":"41825826636","date":"2026-11-04T12:02:22Z","attempt":1,"spread":0.03846694665243925,"cpu":"AMD EPYC 7763 64-Core Processor"}
+]
+}

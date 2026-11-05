@@ -2,6 +2,7 @@ import {
   curveSpace,
   findStrategy,
   highwayCurves,
+  laneOffset,
   laneRoutes,
   polylineLength,
   runKey,
@@ -552,7 +553,11 @@ export class MapView {
     const lanes = this.lanes.routes.filter((r) => inOpen.has(r.edge)).map((r) => r.points);
     // The narrowest space between two lanes on the screen sets the width of the lines, so the lanes stay apart.
     let space = LANE_PX;
-    for (const s of graph.segments) if (s.count >= 2 && open.has(runKey(s.edges))) space = Math.min(space, Math.min(width, LANE_MAX / (s.count - 1)) * this.s);
+    for (const s of graph.segments) {
+      if (s.count < 2 || !open.has(runKey(s.edges))) continue;
+      const full = Math.min(width, LANE_MAX / (s.count - 1));
+      for (let k = 0; k + 1 < s.count; k++) space = Math.min(space, (laneOffset(s, k, full).offset - laneOffset(s, k + 1, full).offset) * this.s);
+    }
     const line = Math.max(0.8, Math.min(1.8, space * 0.5));
     if (space >= 4) this.strokeAll(lanes, c.halo, line + 2, 0.85);
     this.strokeAll(lanes, c.sign, line, 1);

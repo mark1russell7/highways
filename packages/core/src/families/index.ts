@@ -3,12 +3,14 @@ import { createFamilyRegistry, type FamilyRegistry } from "@mark1russell7/layout
 import { HUB_CHAIN, MANY_GROUPS, PACKED_GRID } from "./cases.ts";
 import { COVERAGE_FAMILIES } from "./coverage.ts";
 import { DENSE_GROUPS, SMALL_CLUSTERED, TINY_UNIFORM } from "./fixtures.ts";
+import { WEEKLY_FAMILIES } from "./weekly.ts";
 import type { HighwaysBoard, HighwaysFamily } from "./model.ts";
 
 export * from "./model.ts";
 export { DENSE_GROUPS, FIXTURE_LAYOUTS, FIXTURE_LOCALITY, fixtureParams, fixtureSpecOf, SMALL_CLUSTERED, TINY_UNIFORM } from "./fixtures.ts";
 export { HUB_CHAIN, MANY_GROUPS, PACKED_GRID } from "./cases.ts";
 export { BIPARTITE, BIPARTITE_LAYOUTS, COVERAGE_FAMILIES, FAN_OUT, FRAME_ROWS, LOCAL_MESH, PIPELINE, SPARSE_LONG, THIN_BARS, TWO_HUBS, UNEVEN_SIZES } from "./coverage.ts";
+export { BOTTLENECK, CHANNEL, COMB, ESCAPE, MAZE, PARALLEL_EDGES, RINGS, SPIRAL, SWITCHBOX, WALLED_LEVEL, WEEKLY_FAMILIES } from "./weekly.ts";
 // The parts of the shared registry that a host of the families uses. The site imports only `@mark1russell7/highways`.
 export {
   createFamilyRegistry,
@@ -27,11 +29,17 @@ export {
 } from "@mark1russell7/layout-contract";
 
 /**
- * The corpus families of highways, in the order of the screen sets. Each family at its defaults makes the board of its screen family.
+ * The corpus families of highways. The first 15 families have the order of the screen sets, and each one at its defaults makes the board of its screen family.
  * The first 6 families are the families of `screen-v1` and `screen-v2`. The 9 families of `COVERAGE_FAMILIES` follow them (CORPUS-FAMILIES).
+ *
+ * The families of `WEEKLY_FAMILIES` come last (FAMILIES-WEEKLY). They are in no screen set, so the list can grow and no set changes.
+ *
  * An import registers nothing. A host makes a registry with `createFamilyRegistry(HIGHWAYS_FAMILIES)`, or with the lists of other engines too.
  */
-export const HIGHWAYS_FAMILIES: readonly HighwaysFamily[] = Object.freeze([TINY_UNIFORM, SMALL_CLUSTERED, DENSE_GROUPS, HUB_CHAIN, MANY_GROUPS, PACKED_GRID, ...COVERAGE_FAMILIES]);
+export const HIGHWAYS_FAMILIES: readonly HighwaysFamily[] = Object.freeze([TINY_UNIFORM, SMALL_CLUSTERED, DENSE_GROUPS, HUB_CHAIN, MANY_GROUPS, PACKED_GRID, ...COVERAGE_FAMILIES, ...WEEKLY_FAMILIES]);
+
+/** This list names the families whose edges carry the key `data.collection`. With no key, `shared` has 0 ways, and it is `corners` with other tie breaks. */
+export const KEYED_FAMILIES: readonly string[] = Object.freeze(["tiny-uniform", "small-clustered", "dense-groups"]);
 
 /** This function gives a new registry of `HIGHWAYS_FAMILIES`. */
 export function highwaysRegistry(): FamilyRegistry<HighwaysBoard> {

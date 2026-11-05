@@ -1,6 +1,6 @@
 import type { Point } from "../../geom.ts";
 import type { Result } from "../../model.ts";
-import { laneRoutes, runKey, segmentsOf, type Segment, type SegmentGraph } from "../../segments.ts";
+import { laneOffset, laneRoutes, runKey, segmentsOf, type Segment, type SegmentGraph } from "../../segments.ts";
 import { arcCurve } from "../arc/index.ts";
 import { fitPieces } from "../fit.ts";
 import { distinctPoints, type CurveSegment } from "../model.ts";
@@ -378,7 +378,7 @@ export function tracedHighwayCurves(
       if (!s) continue;
       const sp = spacingOf(s);
       const c = centerOf(s);
-      const offset = ((s.count - 1) / 2 - ref.lane) * sp;
+      const { offset } = laneOffset(s, ref.lane, sp);
       const off = ref.reverse ? -offset : offset;
       const n = c.length;
       for (let j = 0; j + 1 < n; j++) {

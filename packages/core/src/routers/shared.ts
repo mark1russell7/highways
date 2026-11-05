@@ -1,5 +1,5 @@
 import { center, dist, type Point } from "../geom.ts";
-import { nodeIndex, outerGraph, type Edge, type Graph, type GroupRule, type Result, type Route, type Router, type SharedRun } from "../model.ts";
+import { nodeIndex, outerGraph, type Edge, type Graph, type GroupRule, type Node, type Result, type Route, type Router, type SharedRun } from "../model.ts";
 import { channelWidth } from "../channels.ts";
 import { orderRun } from "../lane-order.ts";
 import { stretchLaneOrders, type LaneStretchOrder } from "../lane-orders/stretch/index.ts";
@@ -7,6 +7,8 @@ import { byText } from "../compare.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { buildSections, type Section } from "../sections.ts";
 import { orderLanes, type RunOrder } from "../segments.ts";
+import { withLaneRoom } from "../lane-room.ts";
+import { joinNote, markThrough } from "../through.ts";
 import { WayFinder, type WayOptions } from "../ways.ts";
 import { snellMerges } from "./snell.ts";
 import { groupRuleOf, type GroupRuleName } from "./trunks.ts";
@@ -439,7 +441,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       }
 
       const routes: Route[] = [];
-      for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? [w.ps.point, w.pt.point] });
+      for (const w of all) routes.push({ edge: w.edge.id, points: points.get(w.edge.id) ?? (ways.outSteps ? ways.between(w.ps, w.pt, new Set<Node>([byId.get(w.edge.source.node)!, byId.get(w.edge.target.node)!])) : [w.ps.point, w.pt.point]) });
       const shared: SharedRun[] = [];
       const routeOf = new Map(routes.map((r) => [r.edge, r]));
       const list = [...runs.values()];
@@ -451,7 +453,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
         const edges = options.laneOrder === "run" ? laneOrderOfRun(run) : (stretch?.[i] ?? orderLanes(run.points, routesOf(run), "bundle"));
         shared.push({ id: `r${shared.length}`, key: run.key, points: run.points, edges });
       });
-      return { routes, runs: shared };
+      return { routes: markThrough(graph, routes, ways.obstacles), runs: withLaneRoom(shared, ways.obstacles), ...joinNote(ways) };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };

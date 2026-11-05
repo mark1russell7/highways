@@ -4,6 +4,7 @@
 // With `--check`, the script writes nothing. It stops with an error when `queue.json` is old.
 // With `--take`, the script freezes the predicted numbers of one idea in `queue-taken.json`, then writes the queue.
 // With `--calibration`, the script writes the table of the predicted and the measured gain, and the rank correlation.
+// The plain command also tells when the open ideas are fewer than one week of build slots (QUEUE-REFILL).
 // The queue also scores the enablers: each one removes a block of ideas. The header has the back test with its bootstrap interval.
 // The test `src/bench/screen/queue.test.ts` uses the same functions.
 import { mulberry32 } from "@mark1russell7/rigor-generators";
@@ -26,6 +27,12 @@ export const TAKEN_URL = new URL("queue-taken.json", RESEARCH);
 export const VERDICTS_DIR = new URL("verdicts/", RESEARCH);
 /** The folder of the verdict snapshots of the opt-in strategies. Only the measured gain reads them. */
 export const OPT_IN_DIR = new URL("opt-in/", VERDICTS_DIR);
+
+/**
+ * The build slots of one week (QUEUE-REFILL): 3 builds at a time, 6 ideas in each build, and 2 rounds in a week.
+ * The builds of 2026-10-29 to 2026-11-03 had this pace.
+ */
+export const WEEK_SLOTS = 36;
 
 /** The uncertainty of each kind of idea. */
 export const UNCERTAINTY: Readonly<Record<string, number>> = { ours: 1.0, hybrid: 0.85, literature: 0.7 };
@@ -531,6 +538,18 @@ const head = (): string => {
     return "";
   }
 };
+/** This function counts the ideas that a build can take now: not built, not blocked and not a duplicate. */
+export function openIdeas(rows: readonly Pick<QueueRow, "id" | "canonical" | "blockedBy" | "status">[]): number {
+  return rows.filter((r) => r.status === "queued" && r.canonical === r.id && r.blockedBy.length === 0).length;
+}
+
+/** This function gives the line about the open ideas (QUEUE-REFILL). Under one week of build slots, the line asks for a refill. */
+export function refillText(rows: readonly Pick<QueueRow, "id" | "canonical" | "blockedBy" | "status">[], slots: number = WEEK_SLOTS): string {
+  const open = openIdeas(rows);
+  const state = `${String(open)} open ideas, ${String(slots)} build slots in a week.`;
+  return open < slots ? `${state} Refill the queue: start a literature survey and a round of hybrids.` : state;
+}
+
 const argOf = (name: string): string | undefined => {
   const i = process.argv.indexOf(name);
   return i < 0 ? undefined : process.argv[i + 1];
@@ -569,5 +588,6 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
     const q = same ? old.queue : readQueue(today(), head());
     if (!same) writeFileSync(QUEUE_URL, queueText(q));
     console.log(`${same ? "No change in" : "Wrote"} ${fileURLToPath(QUEUE_URL)}: ${q.rows.length} rows, ${String(q.counts["ranked"])} ranked.`);
+    console.log(refillText(q.rows));
   }
 }

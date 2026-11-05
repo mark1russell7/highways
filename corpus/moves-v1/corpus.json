@@ -1,0 +1,208 @@
+{
+  "schema": "layout-corpus/1",
+  "corpus": "moves-v1",
+  "specs": [
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "equal-neighbours"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "near-neighbours"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "leaf-pair"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "spread-modules"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "hidden-plug"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "small-saving"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "half-fits"
+      },
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "generator": "move-board",
+      "version": 1,
+      "params": {
+        "board": "short-link"
+      },
+      "seeds": [
+        0
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "moves-v1/equal-neighbours/s0",
+      "hash": "cf414eb1191d630e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/near-neighbours/s0",
+      "hash": "896a87779946e3e4",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/leaf-pair/s0",
+      "hash": "b7197c2438c3c642",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/spread-modules/s0",
+      "hash": "fe2a1acd7f29e1f2",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/hidden-plug/s0",
+      "hash": "6283e69323a860b4",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/small-saving/s0",
+      "hash": "5ef13236832e598d",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/half-fits/s0",
+      "hash": "6d1d517a50e45f6e",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    },
+    {
+      "id": "moves-v1/short-link/s0",
+      "hash": "fb41dc1e85c7ddbc",
+      "cell": {
+        "containerSize": "freeAspect",
+        "containerShape": "rect",
+        "obstacles": "none",
+        "mode": "offline",
+        "groups": "none",
+        "count": "10",
+        "edgeDensity": "sparse",
+        "edgeShape": "random",
+        "ports": "free"
+      }
+    }
+  ]
+}

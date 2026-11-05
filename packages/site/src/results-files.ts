@@ -4,7 +4,7 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { MEASURES } from "@mark1russell7/highways";
+import { KEYED_FAMILIES, MEASURES } from "@mark1russell7/highways";
 import { marked } from "marked";
 import { resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
 
@@ -19,6 +19,10 @@ export const RESULT_FILES = {
   bench: "docs/research/bench",
   /** The idea queue that `pnpm queue` writes (IDEA-QUEUE). */
   queue: "docs/research/queue.json",
+  /** The record of the coverage of the space (SPACE-COVERAGE). */
+  coverage: "docs/research/space-coverage/record.json",
+  /** The weekly points of the coverage of the space. */
+  coverageTrend: "docs/research/space-coverage/trend.json",
 } as const;
 
 /** This function gives the snapshot files of the folder of verdicts: each JSON file. */
@@ -68,6 +72,9 @@ export function readResults(root: string): ResultsData {
     text: textSections(readFileSync(join(root, RESULT_FILES.text), "utf8")),
     queue: readFileSync(join(root, RESULT_FILES.queue), "utf8"),
     measures: measureRows(),
+    core: (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version,
+    coverage: { record: readFileSync(join(root, RESULT_FILES.coverage), "utf8"), trend: readFileSync(join(root, RESULT_FILES.coverageTrend), "utf8") },
+    keyed: KEYED_FAMILIES,
   });
 }
 

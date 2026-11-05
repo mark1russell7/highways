@@ -1,6 +1,7 @@
 import { COMPARE_STEPS, createRegistry, getStrategy, listStrategies, STRATEGIES, type AnyStrategy, type Registry, type Step, type Strategy } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
 import { COMPARE_BOARDS, computePanels, controlOptions, CURVE_ROUTER, PACKED_BOARD, type ControlOption, type OptionValues, type Panel } from "./compare-data.ts";
+import { COMPARE_STRATEGIES } from "./opt-in.ts";
 
 /** The boards of the test, in the order of the page. A control is live when it changes the output on one of them. */
 const BOARDS = COMPARE_BOARDS.map((b) => b.id);
@@ -18,6 +19,10 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "trunks.laneOrder": "On these boards, the trunks give each shared way the same lane order with `bundle` and with `run`.",
   "shared.smooth": "The router `shared` finds its ways in the corner graph itself, and it does not read `smooth`. This is a gap of the core.",
   "shared-all.smooth": "The router `shared` finds its ways in the corner graph itself, and it does not read `smooth`. This is a gap of the core.",
+  "shared-stretch.smooth": "The router `shared` finds its ways in the corner graph itself, and it does not read `smooth`. This is a gap of the core.",
+  "portfolio.hashes": "The option changes only the output hashes of the trace of the router. The page reads the routes.",
+  "tight.penalty": "The slack of a way orders the ways. On these boards, no value of `penalty` changes a route.",
+  "canals.steps": "The updates of `canals` stop when the ways do not change for 3 updates. On these boards, they stop before the lowest limit of 30.",
   "levels.collapse": "No cell of these boards shrinks two times without a split.",
   "routes.lanes": "Each pair of boxes of these boards has one edge or none. So a link takes one lane with `link` and with `count`.",
   "lines.lanes": "Each pair of boxes of these boards has one edge or none. So a link takes one lane with `link` and with `count`.",
@@ -30,6 +35,20 @@ const NO_EFFECT: Readonly<Record<string, string>> = {
   "corners-smooth.inner": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
   "corners.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
   "corners-smooth.bendCost": "The boards of the compare page have no frames (INTERIOR-ROUTE), so they have no inner routes.",
+  "corners.joinWork": "A route of these boards takes no link of the join (CORNER-REACH), so its limit changes no drawing.",
+  "corners-smooth.joinWork": "A route of these boards takes no link of the join (CORNER-REACH), so its limit changes no drawing.",
+  "corners.joinRegions": "The regions (JOIN-COST) skip only pairs that cannot link, so the drawing stays the same.",
+  "corners-smooth.joinRegions": "The regions (JOIN-COST) skip only pairs that cannot link, so the drawing stays the same.",
+  "sections.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
+  "sections-tree.levelJoinWork": "The level graphs of these boards have no part that the join can link (JOIN-COST), so its limit changes no drawing.",
+  "corners.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "corners-smooth.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "trunks.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared-all.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "shared-stretch.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "sections.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
+  "sections-tree.outSteps": "Each route of these boards has a way at the whole margin (PLUG-OUT-BLOCKED), so the steps of the margin do not start.",
 };
 
 /** The options that act only with another option. The test sets the other option in the base state and in the changed state. */
@@ -42,14 +61,18 @@ const WITH: Readonly<Record<string, Readonly<Record<string, number | boolean | s
   // The exponent of the flow cost acts only with the cost `flow` (EDA-029).
   "shared.alpha": { cost: "flow" },
   "shared-all.alpha": { cost: "flow" },
+  "shared-stretch.alpha": { cost: "flow" },
   // The reuse discount (HWY-005) acts only from the second pass. Its exponent acts only with a discount.
   "shared.reuse": { passes: 2 },
   "shared-all.reuse": { passes: 2 },
+  "shared-stretch.reuse": { passes: 2 },
   "shared.reuseExponent": { passes: 2, reuse: 1 },
   "shared-all.reuseExponent": { passes: 2, reuse: 1 },
+  "shared-stretch.reuseExponent": { passes: 2, reuse: 1 },
   // The lane width acts only with the channel capacity (HWY-016).
   "shared.laneWidth": { capacity: 1 },
   "shared-all.laneWidth": { capacity: 1 },
+  "shared-stretch.laneWidth": { capacity: 1 },
   // The passes of the sifting act only with the stretch order `sifting` (LANE-STRETCH).
   "shared.siftPasses": { stretchOrder: "sifting" },
   "shared-all.siftPasses": { stretchOrder: "sifting" },
@@ -93,7 +116,7 @@ describe("the controls of the compare page (EX2-FIX)", () => {
     let checked = 0;
     const dead: string[] = [];
     for (const step of LIVE_STEPS) {
-      for (const strategy of listStrategies(STRATEGIES, step) as readonly (Strategy<Step, object> & AnyStrategy)[]) {
+      for (const strategy of listStrategies(COMPARE_STRATEGIES, step) as readonly (Strategy<Step, object> & AnyStrategy)[]) {
         for (const o of controlOptions(strategy)) {
           const id = `${strategy.name}.${o.key}`;
           const base = WITH[id] ?? {};

@@ -1,8 +1,10 @@
-import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
+import { checkDeclared, corpusHashOf, EDGE_KEY_STEP_VERSION, edgeKeyStep, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type EdgeKey, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
 import { highwaysRegistry, type HighwaysBoard } from "../../families/index.ts";
 import type { Graph } from "../../model.ts";
+import { makeRoom, roomLinks } from "../../room/index.ts";
 import { EXACT_V1, EXACT_V1_BOUNDS } from "./exact-set.ts";
 import { graphInput, type LayoutCell, type LayoutGenerator, type LayoutInput } from "./forms.ts";
+import { MOVES_V1 } from "./moves-set.ts";
 
 /** A family of boards of a screen set. The member `k` of the family has the seed `k`. */
 export interface ScreenFamily {
@@ -147,7 +149,7 @@ export const SCREEN_V3_HELD_OUT: readonly number[] = [7, 8, 9];
 const V3_FAMILIES = [...screenFamilies(10, 10), ...coverageFamilies(10)];
 
 /**
- * The screen set `screen-v3` (CORPUS-FAMILIES): the 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
+ * The screen set `screen-v3` (CORPUS-FAMILIES): the first 15 families of `HIGHWAYS_FAMILIES`, each with the 10 members 0 to 9, thus 150 boards.
  * The first 6 families are the families of `screen-v2` with their seeds. Thus their boards are the boards of `screen-v2`, under the ids of `screen-v3`.
  * The 9 new families cover frames with rows, a long chain, a wide fan-out and two hubs.
  * They also cover uneven sizes, thin bars, long edges, short edges and a complete bipartite part.
@@ -182,16 +184,113 @@ export function signTestPower(families: number, level = 0.05): number | undefine
   return undefined;
 }
 
+/** The room of each board of `screen-v4`: the options of `makeRoom`. They have the values of the defaults of `makeRoom`. */
+export const SCREEN_V4_ROOM: Readonly<{ gutter: number; spacing: number }> = Object.freeze({ gutter: 8, spacing: 4 });
+
+/** The member seeds of each family of `screen-v4` that the split `default` holds out. */
+export const SCREEN_V4_HELD_OUT: readonly number[] = [7, 8, 9];
+
+/** This function gives a family with the boards of `family` after `makeRoom`. The generator record names the room and the generator of the first board. */
+function roomFamily(family: ScreenFamily): ScreenFamily {
+  return {
+    ...family,
+    shows: `${family.shows} The board comes after makeRoom.`,
+    make: (k) => {
+      const graph = family.make(k);
+      return { ...graph, nodes: makeRoom(graph.nodes, roomLinks(graph), SCREEN_V4_ROOM).items };
+    },
+    generator: (k) => {
+      const { seed, ...base } = family.generator(k);
+      return { name: "room", version: 1, params: { ...SCREEN_V4_ROOM, base }, seed };
+    },
+  };
+}
+
+const V4_FAMILIES = V2_FAMILIES.map(roomFamily);
+
+/**
+ * The screen set `screen-v4` (PASS-GRID): the 60 boards of `screen-v2`, each after `makeRoom` with `SCREEN_V4_ROOM`.
+ * The set compares the routers on boards with room between the boxes. It keeps the 6 families, the member seeds and the split of `screen-v2`.
+ *
+ * The screen of this set uses the same floor rule as the other sets.
+ * This set does not change. The tests compare it with the files in `corpus/screen-v4`.
+ */
+export const SCREEN_V4: ScreenSet = {
+  id: "screen-v4",
+  families: V4_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V4_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V4_HELD_OUT,
+};
+
+/** The arms of `screen-v5`: the values of the dimension `edgeKey` of the contract. */
+export const SCREEN_V5_KEYS: readonly EdgeKey[] = Object.freeze(["none", "random", "cluster"] as const);
+
+/** The member seeds of each family of `screen-v5` that the split `default` holds out. */
+export const SCREEN_V5_HELD_OUT: readonly number[] = [7, 8, 9];
+
+/**
+ * This function gives a family with the boards of `family` under one value of `edgeKey`. The function `edgeKeyStep` of the contract writes the keys.
+ * Only the field `data.collection` of the edges changes. The seed of the step is the seed of the generator of the member.
+ */
+function keyFamily(family: ScreenFamily, edgeKey: EdgeKey): ScreenFamily {
+  return {
+    ...family,
+    name: `${family.name}.key-${edgeKey}`,
+    shows: `${family.shows} The key of the edges is ${edgeKey}.`,
+    make: (k) => {
+      const graph = family.make(k);
+      const seed = family.generator(k).seed;
+      const input = graphInput(graph, { id: family.name, set: "screen-v5", family: family.name, seed });
+      const keyed = edgeKeyStep(input as Parameters<typeof edgeKeyStep>[0], { edgeKey }, seed);
+      const data = new Map((keyed.edges ?? []).map((e) => [e.id, e.data]));
+      const edges = graph.edges.map((e) => {
+        const { data: _old, ...plain } = e;
+        const d = data.get(e.id);
+        return d === undefined ? plain : { ...plain, data: d };
+      });
+      return { ...graph, edges };
+    },
+    generator: (k) => {
+      const { seed, ...base } = family.generator(k);
+      return { name: "edge-key", version: EDGE_KEY_STEP_VERSION, params: { edgeKey, base }, seed };
+    },
+    cell: { ...family.cell, edgeKey },
+  };
+}
+
+const V5_FAMILIES = SCREEN_V5_KEYS.flatMap((key) => V3_FAMILIES.map((f) => keyFamily(f, key)));
+
+/**
+ * The screen set `screen-v5` (COLLECTION-KEY): the 150 boards of `screen-v3` under each value of `edgeKey`, thus 450 boards in 45 families.
+ * The base `shared` makes ways only from the key `data.collection`. So the arm `none` compares the routers with no key, and the arms `random` and `cluster` with a key on each edge.
+ * The name of a family is the name of its family of `screen-v3` and `.key-<edgeKey>`. A screen of one arm names its 15 families.
+ *
+ * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
+ * This set does not change. The tests compare it with the files in `corpus/screen-v5`.
+ */
+export const SCREEN_V5: ScreenSet = {
+  id: "screen-v5",
+  families: V5_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V5_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V5_HELD_OUT,
+};
+
 /**
  * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
+ * `screen-v4` has the boards of `screen-v2` after `makeRoom` (PASS-GRID).
+ * `screen-v5` has the boards of `screen-v3` under each value of the key of the edges (COLLECTION-KEY).
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
+ * `moves-v1` has one small board for each reason of REBUILD-SILENT.
  */
 export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V1.id]: SCREEN_V1,
   [SCREEN_V2.id]: SCREEN_V2,
   [SCREEN_V3.id]: SCREEN_V3,
+  [SCREEN_V4.id]: SCREEN_V4,
+  [SCREEN_V5.id]: SCREEN_V5,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
+  [MOVES_V1.id]: MOVES_V1,
 };
 
 /** This function gives the id of the member `seed` of a family of a set: `<set>/<family>/s<seed>`. */

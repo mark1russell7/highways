@@ -313,6 +313,8 @@ The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pul
 |---|---|---|---|
 | The noise cap | log(1.06) = 0.058 on \|log r\| | A run with an A/A spread above the cap cannot decide. | The quiet run 41542329976 (#257) had the spread 0.027. The cap is approximately 2 times that spread. |
 | The second run | 1 | After a run that cannot decide, the job `retry` starts the gate once more on a fresh runner. A second run that cannot decide fails the gate. | A noisy runner is often one bad runner. A run that cannot decide does not pass at any time. |
+| The paths | `scripts/gates/scope.ts` | The job `changes` reads the imports of the measured route. A change outside them skips the gate. A walk that fails gives `**`, so the gate runs. | A change of a router that the gate does not measure gave a noise result on #303. Of the last 30 pull requests on the old paths, 10 skip. |
+| The daily run | 1 for each day on main | The schedule times main in full. The check against the fixed base shows a rise that many pull requests made together. | A skip shows no missed effect for later pull requests. |
 | Against the parent | `timeVerdict`, rule `difference`, margin max(log(1.05), the pooled A/A spread) | The outcome `slower` fails. The outcome `cannot decide` starts the second run. The outcomes `same` and `faster` pass. | The home decides with an interval, not with one ratio. The floor log(1.05) keeps the step of 5 % of slice 1 as the band `same`. |
 | Against the fixed base | 1.10 | The check fails when the ratio head/fixed base is above 1.10. | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
 
