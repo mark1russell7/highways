@@ -101,13 +101,16 @@ describe("inkSaved (B1) and ambiguity (B4)", () => {
   };
 
   it("gives 0 when no two routes share a segment", () => {
-    expect(ambiguity(graph, [route("ab", [0, 0], [30, 0]), route("cd", [0, 10], [30, 10])])).toEqual({ value: 0, estimated: false });
+    expect(ambiguity(graph, [route("ab", [0, 0], [30, 0]), route("cd", [0, 10], [30, 10])])).toEqual({ value: 0, estimated: false, nearPerNode: 0, falsePerNode: 0, reach: 0 });
   });
 
   it("counts the false neighbours that a shared segment makes", () => {
     // Each node sees three nodes along the shared segment, and only one of them is its neighbour.
     const routes = [route("ab", [0, 0], [10, 0], [20, 0], [30, 0]), route("cd", [0, 10], [10, 0], [20, 0], [30, 10])];
     expect(ambiguity(graph, routes).value).toBeCloseTo(2 / 3);
+    expect(ambiguity(graph, routes).nearPerNode).toBe(3);
+    expect(ambiguity(graph, routes).falsePerNode).toBe(2);
+    expect(ambiguity(graph, routes).reach).toBe(2 / 4);
     expect(ambiguity(graph, routes, { exact: 1, sample: 50 }).estimated).toBe(true);
     expect(ambiguity(graph, routes, { exact: 1, sample: 50 }).value).toBeCloseTo(2 / 3);
   });
