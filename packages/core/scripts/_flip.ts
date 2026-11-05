@@ -2,7 +2,10 @@
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { cpus } from "node:os";
 import { mulberry32 } from "@mark1russell7/rigor-generators";
+import { classifySegments } from "@mark1russell7/predicates";
 import { crossingPairs, type EdgeLine } from "../src/bench/measures/crossing-pairs.ts";
+import { dist } from "../src/geom.ts";
+import { Grid } from "../src/grid.ts";
 import { curveSpace, sampleCurve } from "../src/curves/index.ts";
 import { highwayCurves } from "../src/curves/highway/index.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
@@ -90,6 +93,8 @@ function readFlips(tag: string, base: readonly EdgeLine[], other: readonly EdgeL
     const [ca, cb] = [crossingsOf(ae, af), crossingsOf(be, bf)];
     const sameCount = ae.length === be.length && af.length === bf.length;
     classes[sameCount ? "sameSamples" : "otherSamples"] = (classes[sameCount ? "sameSamples" : "otherSamples"] ?? 0) + 1;
+    const parity = Math.abs((p.get(key) ?? 0) - (q.get(key) ?? 0)) % 2 === 0 ? "evenMove" : "oddMove";
+    classes[parity] = (classes[parity] ?? 0) + 1;
     const keyOf = (c: { i: number; j: number }): string => `${c.i},${c.j}`;
     const [ka, kb] = [new Set(ca.map(keyOf)), new Set(cb.map(keyOf))];
     const only = [...ca.filter((c) => !kb.has(keyOf(c))), ...cb.filter((c) => !ka.has(keyOf(c)))];
@@ -109,10 +114,53 @@ function readFlips(tag: string, base: readonly EdgeLine[], other: readonly EdgeL
   }
 }
 
-const GRIDS = [["raw", 0], ["1e-6", 1e6], ["1e-9", 1e9]] as const;
+type Test = (a: Point, b: Point, c: Point, d: Point) => boolean;
+/** This function is `crossingPairs` with its test as a parameter. */
+function pairsBy(lines: readonly EdgeLine[], test: Test): ReadonlyMap<string, number> {
+  const segments: { readonly line: number; readonly a: Point; readonly b: Point }[] = [];
+  lines.forEach((line, index) => {
+    for (let i = 1; i < line.points.length; i++) {
+      const [a, b] = [line.points[i - 1]!, line.points[i]!];
+      if (a.x !== b.x || a.y !== b.y) segments.push({ line: index, a, b });
+    }
+  });
+  const pairs = new Map<string, number>();
+  if (segments.length === 0) return pairs;
+  const mean = segments.reduce((sum, q) => sum + dist(q.a, q.b), 0) / segments.length;
+  const grid = new Grid<number>(Math.max(20, mean));
+  segments.forEach((q, i) => grid.addSegment(i, q.a, q.b));
+  segments.forEach((q, i) => {
+    grid.querySegment(q.a, q.b, 0, (j) => {
+      const other = segments[j]!;
+      if (j <= i || lines[other.line]!.edge === lines[q.line]!.edge || !test(q.a, q.b, other.a, other.b)) return;
+      const key = [lines[q.line]!.edge, lines[other.line]!.edge].sort().join("|");
+      pairs.set(key, (pairs.get(key) ?? 0) + 1);
+    });
+  });
+  return pairs;
+}
+/** The side of `p` from the line of `a` and `b`. A point within `tolerance` of the line is on the positive side, so a touch has one stable answer. */
+const sideOf = (p: Point, a: Point, b: Point, tolerance: number): number => {
+  const [dx, dy] = [b.x - a.x, b.y - a.y];
+  const d = (dx * (p.y - a.y) - dy * (p.x - a.x)) / Math.sqrt(dx * dx + dy * dy);
+  return Math.abs(d) <= tolerance || d > 0 ? 1 : -1;
+};
+const halfOpen = (tolerance: number): Test => (a, b, c, d) => sideOf(c, a, b, tolerance) !== sideOf(d, a, b, tolerance) && sideOf(a, c, d, tolerance) !== sideOf(b, c, d, tolerance);
+const exact: Test = (a, b, c, d) => classifySegments(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y).relation === "cross";
+const asIs = (lines: readonly EdgeLine[]): readonly EdgeLine[] => lines;
+const ARMS: readonly { readonly name: string; readonly lines: (l: readonly EdgeLine[]) => readonly EdgeLine[]; readonly test: Test }[] = [
+  { name: "float", lines: asIs, test: segmentsCross },
+  { name: "exact", lines: asIs, test: exact },
+  { name: "snap-1e-9", lines: (l) => snap(l, 1e9), test: segmentsCross },
+  { name: "snap-1e-6", lines: (l) => snap(l, 1e6), test: segmentsCross },
+  { name: "half-open-1e-9", lines: asIs, test: halfOpen(1e-9) },
+  { name: "half-open-1e-6", lines: asIs, test: halfOpen(1e-6) },
+];
+
 for (const router of routers) {
   const totals: Record<string, number> = {};
   const add = (k: string, n: number): void => void (totals[k] = (totals[k] ?? 0) + n);
+  let boardIndex = 0;
   const classes: Record<string, Record<string, number>> = { polyOldNew: {}, paintOldNew: {}, polyShift: {}, paintShift: {} };
   for (const f of HIGHWAYS_FAMILIES) {
     for (let seed = 0; seed < 3; seed++) {
@@ -127,17 +175,27 @@ for (const router of routers) {
       readFlips(tag, la.paint, lb.paint, classes.paintOldNew!, "paint old-new");
       readFlips(tag, la.poly, ls.poly, classes.polyShift!, "poly shift");
       readFlips(tag, la.paint, ls.paint, classes.paintShift!, "paint shift");
-      for (const [name, grid] of GRIDS) {
-        const of = (l: readonly EdgeLine[]): ReadonlyMap<string, number> => crossingPairs(grid === 0 ? l : snap(l, grid));
-        const [pa, pb, ps, qa, qb, qs] = [of(la.poly), of(lb.poly), of(ls.poly), of(la.paint), of(lb.paint), of(ls.paint)];
-        add(`${name} polyOldNew`, moved(pa, pb));
-        add(`${name} polyShift`, moved(pa, ps));
-        add(`${name} paintOldNew`, moved(qa, qb));
-        add(`${name} paintShift`, moved(qa, qs));
-        add(`${name} polyPoints`, [...pa.values()].reduce((s, n) => s + n, 0));
-        add(`${name} paintPoints`, [...qa.values()].reduce((s, n) => s + n, 0));
-        add(`${name} polyPairs`, pa.size);
-        add(`${name} paintPairs`, qa.size);
+      // Each arm counts the same lines. The order of the arms turns with each board, so that a time does not depend on its place.
+      const turn = (boardIndex++) % ARMS.length;
+      for (let k = 0; k < ARMS.length; k++) {
+        const arm = ARMS[(k + turn) % ARMS.length]!;
+        const t0 = performance.now();
+        const qa = pairsBy(arm.lines(la.paint), arm.test);
+        const t1 = performance.now();
+        const pa = pairsBy(arm.lines(la.poly), arm.test);
+        const t2 = performance.now();
+        add(`${arm.name} paintMs`, t1 - t0);
+        add(`${arm.name} polyMs`, t2 - t1);
+        const of = (l: readonly EdgeLine[]): ReadonlyMap<string, number> => pairsBy(arm.lines(l), arm.test);
+        const [pb, ps, qb, qs] = [of(lb.poly), of(ls.poly), of(lb.paint), of(ls.paint)];
+        add(`${arm.name} polyOldNew`, moved(pa, pb));
+        add(`${arm.name} polyShift`, moved(pa, ps));
+        add(`${arm.name} paintOldNew`, moved(qa, qb));
+        add(`${arm.name} paintShift`, moved(qa, qs));
+        add(`${arm.name} polyPoints`, [...pa.values()].reduce((t, n) => t + n, 0));
+        add(`${arm.name} paintPoints`, [...qa.values()].reduce((t, n) => t + n, 0));
+        add(`${arm.name} polyPairs`, pa.size);
+        add(`${arm.name} paintPairs`, qa.size);
       }
     }
     log(`DONE ${router.name} ${f.name}`);
