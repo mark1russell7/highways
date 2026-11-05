@@ -1,4 +1,4 @@
-import { dist, type Point } from "./geom.ts";
+import { dist, type Box, type Point } from "./geom.ts";
 import type { LaneRoom, SharedRun } from "./model.ts";
 import { TOLERANCE } from "./bench/properties.ts";
 import type { Obstacles } from "./visibility.ts";
@@ -27,6 +27,16 @@ interface HalfPlane {
 
 const inside = (p: Point, h: HalfPlane): number => (p.x - h.at.x) * h.normal.x + (p.y - h.at.y) * h.normal.y - h.least;
 
+/** This function gives the largest value of `inside` over a box. A value below 0 means that the half plane holds no part of the box. */
+const most = (box: Box, h: HalfPlane): number =>
+  ((h.normal.x > 0 ? box.x + box.w : box.x) - h.at.x) * h.normal.x + ((h.normal.y > 0 ? box.y + box.h : box.y) - h.at.y) * h.normal.y - h.least;
+
+/** This function gives the smallest value of `inside` over a box. */
+const fewest = (box: Box, h: HalfPlane): number =>
+  ((h.normal.x > 0 ? box.x : box.x + box.w) - h.at.x) * h.normal.x + ((h.normal.y > 0 ? box.y : box.y + box.h) - h.at.y) * h.normal.y - h.least;
+
+const cornersOf = (box: Box): Point[] => [{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y }, { x: box.x + box.w, y: box.y + box.h }, { x: box.x, y: box.y + box.h }];
+
 /** This function cuts a convex polygon with a half plane. */
 function clip(polygon: readonly Point[], h: HalfPlane): Point[] {
   const out: Point[] = [];
@@ -41,7 +51,7 @@ function clip(polygon: readonly Point[], h: HalfPlane): Point[] {
 }
 
 const unit = (v: Point): Point | undefined => {
-  const l = Math.hypot(v.x, v.y);
+  const l = Math.sqrt(v.x * v.x + v.y * v.y);
   return l > 1e-9 ? { x: v.x / l, y: v.y / l } : undefined;
 };
 
@@ -74,14 +84,21 @@ export function laneRoom(points: readonly Point[], obstacles: Obstacles): LaneRo
     const start: HalfPlane = { at: a, normal: before ?? dir, least: TOUCH };
     const stop: HalfPlane = { at: b, normal: { x: -end.x, y: -end.y }, least: TOUCH };
     const left = { x: dir.y, y: -dir.x };
+    const sides = [
+      { name: "left", side: { at: a, normal: left, least: TOLERANCE } },
+      { name: "right", side: { at: a, normal: { x: -left.x, y: -left.y }, least: TOLERANCE } },
+    ] as const;
     const reach = MITER * LANE_ROOM_LIMIT;
     const [x, y] = [Math.min(a.x, b.x) - reach, Math.min(a.y, b.y) - reach];
     const search = { x, y, w: Math.abs(b.x - a.x) + 2 * reach, h: Math.abs(b.y - a.y) + 2 * reach };
     obstacles.query(search, ({ box }) => {
-      const corners = [{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y }, { x: box.x + box.w, y: box.y + box.h }, { x: box.x, y: box.y + box.h }];
-      const part = clip(clip(corners, start), stop);
-      for (const [name, normal] of [["left", left], ["right", { x: -left.x, y: -left.y }]] as const) {
-        const side: HalfPlane = { at: a, normal, least: TOLERANCE };
+      // A box outside the part of this leg gives nothing. The bounds of a box are cheap, and this read runs for each box near each leg.
+      if (most(box, start) < 0 || most(box, stop) < 0) return;
+      let part: Point[] | undefined;
+      for (const { name, side } of sides) {
+        const least = fewest(box, side);
+        if (most(box, side) < 0 || (least > 1e-9 && least + TOLERANCE >= room[name])) continue;
+        part ??= clip(clip(cornersOf(box), start), stop);
         const near = clip(part, side).map((p) => inside(p, side));
         if (near.length === 0) continue;
         const gap = Math.min(...near);
@@ -114,9 +131,10 @@ function wedgeRoom(before: Point, at: Point, after: Point, obstacles: Obstacles)
   const past: HalfPlane = { at, normal: dir, least: TOUCH };
   const ahead: HalfPlane = { at, normal: { x: -next.x, y: -next.y }, least: TOUCH };
   const reach = LANE_ROOM_LIMIT;
+  const middle: HalfPlane = { at, normal: across, least: 0 };
   obstacles.query({ x: at.x - reach, y: at.y - reach, w: 2 * reach, h: 2 * reach }, ({ box }) => {
-    const corners = [{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y }, { x: box.x + box.w, y: box.y + box.h }, { x: box.x, y: box.y + box.h }];
-    for (const p of clip(clip(corners, past), ahead)) {
+    if (most(box, past) < 0 || most(box, ahead) < 0 || fewest(box, middle) / scale >= room[outer]) return;
+    for (const p of clip(clip(cornersOf(box), past), ahead)) {
       const offset = ((p.x - at.x) * across.x + (p.y - at.y) * across.y) / scale;
       room[outer] = Math.min(room[outer], Math.max(0, offset));
     }
