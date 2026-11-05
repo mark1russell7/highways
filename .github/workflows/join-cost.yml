@@ -65,8 +65,7 @@ jobs:
       - name: Time the join
         run: |
           set -o pipefail
-          node packages/core/scripts/join-cost.ts --rounds "$ROUNDS"
-          cat out/join-cost.md >> "$GITHUB_STEP_SUMMARY"
+          node packages/core/scripts/route-pairs.ts out/join-cost.json --screen
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
