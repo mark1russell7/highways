@@ -8,17 +8,21 @@ import { quantile } from "./stats.ts";
 /**
  * This function gives the share of the ink that shared segments save (B1 of MEAS0): `inkSaved = 1 - ink(S) / Σ_e L(r_e)`.
  * `ink(S)` counts a shared segment one time, as `measureQuality` does. The scale is 0 to 1, and higher is better. The cost is `n log n`.
+ *
+ * The argument `base` is a fixed length in place of `Σ_e L(r_e)` (SEARCH-CROSS). Then the value changes only with `ink(S)`.
+ * With `base`, the value can be below 0. A route that is longer than its base route makes it lower.
  */
-export function inkSaved(routes: readonly Route[]): number {
+export function inkSaved(routes: readonly Route[], base?: number): number {
   let total = 0;
   for (const r of routes) {
     total += polylineLength(r.points);
     WORK.score += r.points.length;
   }
-  if (total <= 0) return 0;
+  const length = base ?? total;
+  if (length <= 0) return 0;
   let ink = 0;
   for (const [a, b] of drawnSegments(routes)) ink += dist(a, b);
-  return Math.max(0, 1 - ink / total);
+  return base === undefined ? Math.max(0, 1 - ink / length) : 1 - ink / length;
 }
 
 /** The ambiguity of a result (B4 of MEAS0). */
@@ -27,6 +31,12 @@ export interface Ambiguity {
   readonly value: number;
   /** This value is true when the value comes from a sample of the nodes. */
   readonly estimated: boolean;
+  /** The mean count of near nodes of a node. A near node shares a drawn segment with a route of the node. */
+  readonly nearPerNode: number;
+  /** The mean count of false neighbours of a node. */
+  readonly falsePerNode: number;
+  /** The value `falsePerNode` over the count of the nodes, from 0 to 1. Lower is better. */
+  readonly reach: number;
 }
 
 /** The options of `ambiguity`. */
@@ -124,7 +134,8 @@ export function ambiguity(graph: Graph, routes: readonly Route[], options: Ambig
       }
   });
   WORK.score += visits;
-  return { value: all ? wrong / all : 0, estimated: !exact };
+  const count = Math.max(1, pick.length);
+  return { value: all ? wrong / all : 0, estimated: !exact, nearPerNode: all / count, falsePerNode: wrong / count, reach: n ? wrong / count / n : 0 };
 }
 
 /** The drawn segments of each route, as keys, in the order of its points. A segment shorter than the grain of `segmentKey` has no key. */

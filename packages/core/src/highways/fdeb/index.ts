@@ -1,3 +1,4 @@
+import { quantile } from "@mark1russell7/rigor-statistics";
 import { dist, type Point } from "../../geom.ts";
 import { WayFinder, type WayOptions } from "../../ways.ts";
 import { compatibility } from "../hdbscan/index.ts";
@@ -122,9 +123,8 @@ export function fdebLines(input: HighwayInput, finder: WayFinder, o: Readonly<Fd
   if (n === 0) return out;
   const partners = partnersOf(segments, o.compatibility);
   const lengths = segments.map((s) => dist(s.a, s.b));
-  const sorted = [...lengths].sort((a, b) => a - b);
-  // This median takes the upper middle value of an even list. The `median` of `@mark1russell7/rigor-statistics` takes the midpoint.
-  const median = sorted[Math.floor(sorted.length / 2)]!;
+  // This median takes the upper middle value of an even list (the method `higher`).
+  const median = quantile(lengths, 0.5, "higher");
   const pad = finder.margin / 2;
   const reach = finder.margin * 2;
   const budget = o.pullLimit > 0 ? o.pullLimit : Infinity;

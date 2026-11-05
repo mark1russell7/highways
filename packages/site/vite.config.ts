@@ -1,7 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteKpi } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
+import type { BenchMeta } from "./src/bench-label.ts";
+import { kpiFacts } from "./src/kpi-files.ts";
+import { siteKpiInput } from "./src/kpi.ts";
 import { buildInfo, dataLineHtml, readResults, RESULT_FILES } from "./src/results-files.ts";
 import { BUILT_FILE, readStrategies } from "./src/strategies-files.ts";
 
@@ -10,6 +14,15 @@ const env = (globalThis as { process?: { env: Record<string, string | undefined>
 const base = env["SITE_BASE"] ? `${env["SITE_BASE"].replace(/\/$/, "")}/` : "/";
 const page = (name: string): string => fileURLToPath(new URL(name, import.meta.url));
 const root = fileURLToPath(new URL("../../", import.meta.url));
+
+/** This function gives the input of `kpi.json`. A snapshot with no date stops the build, because the file then has no time of the data. */
+function kpiInput(): NonNullable<ReturnType<typeof siteKpiInput>> {
+  const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+  const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
+  const input = siteKpiInput(meta, core, (file) => existsSync(page(file)), kpiFacts(root));
+  if (input === undefined) throw new Error("bench-meta.json has no date, so kpi.json has no time of the data.");
+  return input;
+}
 
 /** The files of the benchmark snapshot. The demo page reads them at run time. */
 const BENCH_FILES = ["bench.json", "bench-meta.json"] as const;
@@ -60,7 +73,7 @@ function committedResults(): Plugin {
 // The site has five pages: the live demo, the examples, the compare page, the results and the strategy cards.
 export default defineConfig({
   base,
-  plugins: [committedResults()],
+  plugins: [committedResults(), siteKpi(kpiInput, env)],
   worker: { format: "es" },
   build: {
     target: "es2022",

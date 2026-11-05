@@ -15,10 +15,14 @@
 //   It makes a git worktree of the base, the commit and the parent. `confirmPair` times the commit, the parent and the A/A arm of the parent on the board of the base.
 //   It writes `<dir>/confirm-pair<n>.json` and prints the table of the pair.
 // - The join of the confirm mode: `node scripts/sections-bisect.ts --confirm-join <dir> --pairs <pairs> [--summary <file>] [--json <file>]`.
-// - The sections time gate (GATE-LIMITS): `node scripts/sections-bisect.ts --gate --parent <ref> --trees <dir> --out <dir> [--rounds <n>]`.
-//   It makes a git worktree of the base, the parent, the checkout and the fixed base of `data/sections-gate/fixed-base.json`.
-//   `confirmPair` times the parent, the checkout, the fixed base and the A/A arm of the parent on `sections-tree`, on the board of the base.
-//   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`, and exits with the code 1 when a check of the gate does not pass.
+// - The sections time gate (GATE-LIMITS): `node scripts/sections-bisect.ts --gate --head <sha> --parent <sha> [--head-input <text>] [--parent-input <text>] --trees <dir> --out <dir> [--rounds <n>] [--attempt <1|2>]`.
+//   The options `--head` and `--parent` take only full hashes. `scripts/gates/commits.ts` resolves the inputs of the job one time.
+//   The options `--head-input` and `--parent-input` give the input texts for the record, for example `HEAD^1`.
+//   It makes a git worktree of the base, the parent, the head and the fixed base of `data/sections-gate/fixed-base.json`.
+//   `confirmPair` times the parent, the head, the fixed base and the A/A arm of the parent on `sections-tree`, on the board of the base.
+//   `timeVerdict` of `@mark1russell7/rigor-bench` decides the check against the parent, with the pool `data/sections-gate/aa-pool.json`. The record keeps its verdict.
+//   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`. The exit code is 0 for a pass and 1 for a fail.
+//   The exit code is 3 when the first run (`--attempt 1`) cannot decide. A second run that cannot decide exits with the code 1.
 // `scripts/sections-bisect-verdict.ts` has the plan and the verdict. `scripts/sections-confirm-verdict.ts` has them for the confirm mode.
 // `scripts/sections-gate-verdict.ts` has the checks of the gate.
 import { spawnSync } from "node:child_process";
@@ -26,7 +30,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { envOf, measureIsolated, runChild, type Arm, type Input, type PairedReport } from "./gates/paired.ts";
-import { confirmPair } from "./gates/pair-confirm.ts";
+import { COMMIT_ARM, confirmPair } from "./gates/pair-confirm.ts";
+import { requireFullHash, type GateCommit, type GateCommits } from "./gates/commits.ts";
 import {
   BASE_ARM,
   BASE_REF,
@@ -60,7 +65,22 @@ import {
   type PairRecord,
   type Side,
 } from "./sections-confirm-verdict.ts";
-import { BASE_FILE, FIXED_ARM, GATE_ROUNDS, GATE_ROUTER, GATE_SCHEMA, gateText, parseFixedBase, recordVerdict, type GateRecord } from "./sections-gate-verdict.ts";
+import {
+  BASE_FILE,
+  FIXED_ARM,
+  GATE_ROUNDS,
+  GATE_ROUTER,
+  GATE_SCHEMA,
+  POOL_FILE,
+  gateExit,
+  gateOptions,
+  gateText,
+  homeRecord,
+  parseFixedBase,
+  parsePool,
+  type GateRecord,
+  type HomeVerdict,
+} from "./sections-gate-verdict.ts";
 
 /** The parts of a version of the core that the arms call. Each candidate has the list `ROUTERS`, and the base has the fixtures. */
 interface Core {
@@ -181,6 +201,11 @@ async function runShard(shard: number, treesDir: string, out: string, routers: r
   return { schema: SHARD_SCHEMA, shard, shards: BISECT_SHARDS, head, base, fixture: BISECT_FIXTURE, routers, rounds, order, commits, skipped, env: envOf("fresh"), report };
 }
 
+/** This function gives one side of the gate: the input text, the full hash that the job resolved and its subject. A hash of no commit throws an error. */
+function sideOfHash(root: string, sha: string, input: string): Side {
+  return { ref: input, sha, subject: git(root, "log", "-1", "--format=%s", `${sha}^{commit}`).trim() };
+}
+
 /** This function gives one side of a comparison: the ref, its full hash and its subject. The ref `HEAD` is the checkout. */
 function sideOf(root: string, head: string, ref: string): Side {
   const sha = ref === HEAD_REF ? head : git(root, "rev-parse", "--verify", `${ref}^{commit}`).trim();
@@ -225,17 +250,20 @@ async function runPair(pair: number, commitRef: string, parentRef: string, trees
 
 /**
  * This function runs the sections time gate: the parent, the checkout, the fixed base and the A/A arm of the parent, in fresh processes, on the board of the base.
- * The fixed base comes from the file `BASE_FILE` of the checkout.
+ * The head and the parent are full hashes that the job resolved one time (`scripts/gates/commits.ts`). The input texts go into the record.
+ * The fixed base comes from the file `BASE_FILE` of the checkout, and the pool of the home verdict comes from the file `POOL_FILE`.
  */
-async function runGate(parentRef: string, treesDir: string, out: string, rounds: number): Promise<GateRecord> {
-  const { root, base, head } = refsOfRun();
+async function runGate(commits: GateCommits, treesDir: string, out: string, rounds: number, attempt: 1 | 2): Promise<GateRecord> {
+  const { root, base, head: checkout } = refsOfRun();
   const fixedBase = parseFixedBase(readFileSync(join(HERE, "..", BASE_FILE), "utf8"));
-  const headSide = sideOf(root, head, HEAD_REF);
-  const parent = sideOf(root, head, parentRef);
-  const fixed = sideOf(root, head, fixedBase.commit);
-  const board = sideOf(root, head, base);
-  if (headSide.sha === parent.sha) throw new Error(`The gate: the parent ${parentRef} is the checkout ${head}.`);
-  console.error(`Sections gate: ${head.slice(0, 7)} against the parent ${parent.sha.slice(0, 7)} and the fixed base ${fixed.sha.slice(0, 7)}.`);
+  const pool = parsePool(readFileSync(join(HERE, "..", POOL_FILE), "utf8"));
+  const headSide = sideOfHash(root, commits.head.sha, commits.head.input);
+  const parent = sideOfHash(root, commits.parent.sha, commits.parent.input);
+  const head = headSide.sha;
+  const fixed = sideOf(root, checkout, fixedBase.commit);
+  const board = sideOf(root, checkout, base);
+  if (headSide.sha === parent.sha) throw new Error(`The gate: the parent ${parent.ref} is the head ${head}.`);
+  console.error(`Sections gate: the head ${headSide.ref} = ${head} against the parent ${parent.ref} = ${parent.sha} and the fixed base ${fixed.sha.slice(0, 7)}.`);
   const routers = [GATE_ROUTER];
   const treeOf = worktrees(root, treesDir, [base, parent.sha, head, fixed.sha]);
   const skipped = prepare([parent, headSide, fixed], treeOf, routers);
@@ -246,7 +274,14 @@ async function runGate(parentRef: string, treesDir: string, out: string, rounds:
     const child = (sha: string): string[] => [...NODE, SCRIPT, "--child", "--tree", treeOf(sha), "--board", file];
     report = await confirmPair({ parent: child(parent.sha), commit: child(head), others: [{ id: FIXED_ARM, command: child(fixed.sha) }], inputs: routers, rounds });
   }
-  return { schema: GATE_SCHEMA, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh"), report };
+  let home: HomeVerdict | null = null;
+  if (report !== null) {
+    // Only this job needs the installed packages of the home, so the other modes of this script start with no install.
+    const { homeVerdict } = await import("./gates/home-verdict.ts");
+    // The home decides the check against the parent: the noise cap, the pooled band and the margin are its options.
+    home = homeRecord(homeVerdict(report, GATE_ROUTER, COMMIT_ARM, gateOptions(pool)));
+  }
+  return { schema: GATE_SCHEMA, attempt, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh"), report, home };
 }
 
 if (args.includes("--child")) {
@@ -267,12 +302,20 @@ if (args.includes("--child")) {
   const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));
   const out = resolve(need("--out"));
   mkdirSync(out, { recursive: true });
-  const record = await runGate(need("--parent"), resolve(need("--trees")), out, rounds);
+  const attempt = opt("--attempt") ?? "1";
+  if (attempt !== "1" && attempt !== "2") throw new Error(`The attempt of the gate is 1 or 2, not ${attempt}.`);
+  // The job resolves the names one time, so this mode takes only full hashes (FAIL-CLOSED).
+  const commitOf = (role: "head" | "parent"): GateCommit => {
+    const sha = requireFullHash(`--${role}`, opt(`--${role}`));
+    return { input: opt(`--${role}-input`) || sha, sha };
+  };
+  const commits: GateCommits = { head: commitOf("head"), parent: commitOf("parent") };
+  const record = await runGate(commits, resolve(need("--trees")), out, rounds, attempt === "1" ? 1 : 2);
   writeFileSync(join(out, "sections-gate.json"), JSON.stringify(record, null, 2) + "\n");
   const text = gateText(record).join("\n") + "\n";
   writeFileSync(join(out, "sections-gate.md"), text);
   console.log(text);
-  if (!recordVerdict(record).pass) process.exitCode = 1;
+  process.exitCode = gateExit(record);
 } else if (args.includes("--confirm")) {
   const pair = Number(need("--pair"));
   const [own] = parsePairs(`${need("--commit")}:${opt("--parent") ?? ""}`);

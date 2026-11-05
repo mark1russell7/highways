@@ -327,11 +327,6 @@ export function jobRatios(s: JobSamples, r2: boolean): JobRatios {
   };
 }
 
-/** This function gives a random source of numbers in [0, 1) from a seed. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
-export function seeded(seed: number): () => number {
-  return mulberry32(seed);
-}
-
 /** The rates of a resample of the alone processes. */
 export interface Rates {
   /** The share of the resamples with no effect that give `no change` for E of the arm. A row with R2 also needs `no change` for R2. */
@@ -354,7 +349,7 @@ export const RESAMPLE_SEED = 20261102;
  * With no effect, it counts `no change`. With the time of the row arm in order scaled by 1 + b, it counts `slower`.
  */
 export function resampleRates(jobs: readonly JobSamples[], budget: number, r2: boolean, resamples = RESAMPLES, seed = RESAMPLE_SEED): Rates {
-  const next = seeded(seed);
+  const next = mulberry32(seed);
   const pools = jobs.map((j) => [...j.alone, ...j.aa]).filter((p) => p.length > 0);
   const draw = (pool: readonly Sample[], n: number): Sample[] => Array.from({ length: n }, () => pool[Math.floor(next() * pool.length)]!);
   let pass = 0;

@@ -60,8 +60,9 @@
           </div>
         </div>
         <p class="res-summary" id="summary" role="status" aria-live="polite"></p>
+        <p class="hint" id="age"></p>
         <div class="res-split">
-          <div class="table-wrap res-grid-wrap" id="grid"></div>
+          <div class="table-wrap res-grid-wrap scroll-cue" id="grid" tabindex="0" aria-label="The verdicts, by case and strategy"></div>
           <aside class="panel res-detail" id="detail" aria-live="polite"></aside>
         </div>
       </section>
@@ -72,11 +73,19 @@
         <div id="split-list" class="res-groups"></div>
       </section>
 
+      <section class="prose wide" id="coverage" aria-labelledby="coverage-title">
+        <h2 id="coverage-title">The coverage of the space</h2>
+        <div id="coverage-body"></div>
+        <p id="coverage-value"></p>
+        <div class="table-wrap scroll-cue" id="coverage-trend" tabindex="0" aria-label="The coverage of the space over time"></div>
+        <p class="hint" id="coverage-age"></p>
+      </section>
+
       <section class="prose wide" id="ideas" aria-labelledby="ideas-title">
         <h2 id="ideas-title">The ideas</h2>
         <div id="ideas-body"></div>
         <div id="stages"></div>
-        <div class="table-wrap" id="kept"></div>
+        <div class="table-wrap scroll-cue" id="kept" tabindex="0" aria-label="The ideas that the project keeps"></div>
       </section>
 
       <section class="prose wide" id="queue" aria-labelledby="queue-title">
@@ -84,13 +93,13 @@
         <div id="queue-body"></div>
         <ul class="res-legend" id="queue-counts"></ul>
         <p class="hint" id="queue-backtest"></p>
-        <div class="table-wrap" id="queue-top"></div>
+        <div class="table-wrap scroll-cue" id="queue-top" tabindex="0" aria-label="The top of the build queue"></div>
       </section>
 
       <section class="prose wide" id="measures" aria-labelledby="measures-title">
         <h2 id="measures-title">The measures</h2>
         <div id="measures-body"></div>
-        <div class="table-wrap" id="measure-list"></div>
+        <div class="table-wrap scroll-cue" id="measure-list" tabindex="0" aria-label="The measures with a definition"></div>
       </section>
 
       <section class="prose wide" id="new" aria-labelledby="new-title">

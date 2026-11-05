@@ -5,6 +5,8 @@ import { SIDE_NORMAL, type Plug } from "../plugs.ts";
 /**
  * One inner edge of a frame for the gutter mode. `plug` is the plug of the wall, with the outward normal of the wall.
  * `end` is the node at the other end. `port` is the fixed plug of that node, if it has one. `side` limits the entry to one side of the node.
+ *
+ * For an inner edge without a plug of a frame, `plug` is the plug of the source node, with the inward normal of its side. The route leaves the node along the outward normal.
  */
 export interface GutterEdge {
   readonly plug: Plug;

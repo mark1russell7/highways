@@ -6,6 +6,7 @@ import type { Graph, Router } from "../model.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { ROUTERS } from "./index.ts";
 import { trunksRouter } from "./trunks.ts";
+import { withoutRoom } from "./without-room.ts";
 
 // The digests of the routers `trunks`, `trunks-all`, `shared` and `shared-all` before the step `highway` (HWY-STEP).
 // The highway strategies `keys` and `shared-ways` read these routers. The routers must give the same bytes.
@@ -44,7 +45,8 @@ const graphs: readonly (readonly [string, () => Graph])[] = [
 
 /** This function gives the digest of the routes, the run keys and the lane routes of a router on a graph. */
 function digest(router: Router, graph: Graph): string {
-  const result = router.route(graph);
+  // The field `room` tells the free room of a way and moves no route. With no room, the lanes keep their old form, so each digest also pins that form.
+  const result = withoutRoom(router.route(graph));
   const segments = segmentsOf(result);
   const keys = segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges));
   const lanes = laneRoutes(segments, new Set(keys), 2.4, 16);

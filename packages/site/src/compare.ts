@@ -1,4 +1,4 @@
-import { listStrategies, STRATEGIES, type Step, type Strategy } from "@mark1russell7/highways";
+import { listStrategies, type Step, type Strategy } from "@mark1russell7/highways";
 import compareText from "../content/compare.md?raw";
 import {
   cleanOptions,
@@ -22,6 +22,7 @@ import {
 import { html, sectionOf } from "./content.ts";
 import { genPanel } from "./gen-controls.ts";
 import { cleanGen, START_GEN, type GenSpec } from "./generated.ts";
+import { COMPARE_STRATEGIES, OPT_IN_NOTES, OPT_IN_TAG, type OptInNote } from "./opt-in.ts";
 import { optionSet } from "./option-control.ts";
 import type { CompareReply, CompareRequest } from "./protocol.ts";
 import "./style.css";
@@ -33,6 +34,8 @@ const $ = <T extends HTMLElement>(id: string): T => {
 };
 
 const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+/** This function escapes a text and shows each span between backticks as code. */
+const codeText = (text: string): string => esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 const fmt = new Intl.NumberFormat("en-US");
 
 /** The names of the axes of the fronts that are not columns of the page. */
@@ -102,7 +105,7 @@ function run(): void {
   busy = true;
   next++;
   const board = compareBoardOf(state);
-  const count = listStrategies(STRATEGIES, state.step).length;
+  const count = listStrategies(COMPARE_STRATEGIES, state.step).length;
   const large = board.nodes > COMPARE_MAX_NODES ? ` The board has ${fmt.format(board.nodes)} nodes, more than ${COMPARE_MAX_NODES}, so some strategies take a long time.` : "";
   $("status").textContent = `The worker runs ${count} ${NOUNS[state.step]} on ${board.name}…${large}`;
   $("panels").setAttribute("aria-busy", "true");
@@ -203,7 +206,7 @@ function controls(): void {
   body.replaceChildren();
   let changed = 0;
   // The options of the picked strategies come first.
-  const all = (listStrategies(STRATEGIES, state.step) as readonly Strategy<Step, object>[]).map((st) => ({ strategy: st.name, st }));
+  const all = (listStrategies(COMPARE_STRATEGIES, state.step) as readonly Strategy<Step, object>[]).map((st) => ({ strategy: st.name, st }));
   for (const { st: strategy } of pickFirst(all, state.pick)) {
     const group = optionSet("opt", strategy, state.options[strategy.name], (key, v) => setOption(strategy.name, key, v));
     if (!group) continue;
@@ -236,10 +239,23 @@ function svgOf(p: Panel, board: string): string {
   return `<svg class="cmp-map" viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" aria-label="The output of ${esc(p.strategy)} on ${esc(board)}"><g class="cmp-groups">${outlines}</g><g class="cmp-routes">${lines}</g><g class="cmp-boxes">${rects}</g></svg>`;
 }
 
+/** This function gives the note of a panel of an opt-in router. */
+const noteOf = (p: Panel): OptInNote | undefined => (state.step === "router" ? OPT_IN_NOTES[p.strategy] : undefined);
+
+/** This function writes the note of an opt-in router. On a skipped panel, it says that the numbers are recorded. */
+function noteHtml(p: Panel): string {
+  const note = noteOf(p);
+  if (!note) return "";
+  const text = codeText(note.text);
+  const skipped = p.skipped ? " This board is too large for a live run, so the page shows only these recorded numbers." : "";
+  return `<p class="cmp-note">${text}${skipped} Stage: ${esc(note.stage)}.</p>`;
+}
+
 /** This function writes the tags of a panel: the front and the faults of the hard rules. */
 function tagsOf(p: Panel): string {
   const tags: string[] = [];
   if (picked(p.strategy)) tags.push(`<span class="tag picked">Picked</span>`);
+  if (noteOf(p)) tags.push(`<span class="tag opt-in">${OPT_IN_TAG}</span>`);
   if (p.skipped) return [...tags, `<span class="tag">Skipped: ${esc(p.skipped)}</span>`].join("");
   if (p.front) tags.push(`<span class="tag front">On the front</span>`);
   if (p.violations > 0) tags.push(`<span class="tag bad">${fmt.format(p.violations)} hard-rule ${p.violations === 1 ? "fault" : "faults"}</span>`);
@@ -271,7 +287,7 @@ function show(all: ComparePanels): void {
       const f = m.value === Infinity ? 1 : largest[i]! > 0 && Number.isFinite(m.value) ? Math.max(0, m.value) / largest[i]! : 0;
       return `<td${m.best ? ' class="best"' : ""}>${esc(formatValue(m.value, c))}${m.best ? '<span class="star" aria-label="best"> ★</span>' : ""}<span class="bar" style="--f:${f.toFixed(3)}"></span></td>`;
     });
-    const name = `<button type="button" class="table-pick" data-panel="${esc(p.strategy)}"><code>${esc(p.strategy)}</code></button>${p.front ? ' <span class="dot" title="On the Pareto front">◆</span>' : ""}`;
+    const name = `<button type="button" class="table-pick" data-panel="${esc(p.strategy)}"><code>${esc(p.strategy)}</code></button>${p.front ? ' <span class="dot" title="On the Pareto front">◆</span>' : ""}${noteOf(p) ? ' <span class="opt-in-mark">opt-in</span>' : ""}`;
     const cls = [p.violations > 0 || p.skipped ? "faulty" : "", picked(p.strategy) ? "picked" : ""].filter(Boolean).join(" ");
     return `<tr${cls ? ` class="${cls}"` : ""}><th scope="row">${name}</th>${cells.join("")}</tr>`;
   });
@@ -289,7 +305,8 @@ function show(all: ComparePanels): void {
       const toggle = `<button type="button" class="link cmp-pick" data-pick="${esc(p.strategy)}" aria-pressed="${on}">${on ? "Remove the pick" : "Pick"}</button>`;
       return `<article class="${cls}" id="panel-${esc(p.strategy)}" aria-labelledby="title-${esc(p.strategy)}">
         <header class="cmp-head"><h3 id="title-${esc(p.strategy)}">${esc(p.strategy)}</h3><div class="cmp-tags">${tagsOf(p)}${toggle}</div></header>
-        <p class="cmp-describe">${esc(p.describe)}${options ? `<br />Options: ${options}` : ""}</p>
+        <p class="cmp-describe">${codeText(p.describe)}${options ? `<br />Options: ${options}` : ""}</p>
+        ${noteHtml(p)}
         ${svgOf(p, board.name)}
         <dl class="cmp-measures">${measures}</dl>
       </article>`;

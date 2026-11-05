@@ -1,0 +1,248 @@
+{
+ "schema": "crossings-sample/1",
+ "rows": [
+  {
+   "board": "grid-400",
+   "router": "corners-smooth",
+   "nodes": 400,
+   "edges": 800,
+   "segments": 20789,
+   "full": 12614,
+   "estimate": 12364,
+   "error": 0.019819,
+   "draws": [
+    10997,
+    12068,
+    12551,
+    11808,
+    12473
+   ],
+   "low": 10997,
+   "high": 12551,
+   "worstDraw": 0.128191
+  },
+  {
+   "board": "mid-uniform",
+   "router": "plugs",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 48000,
+   "full": 80360,
+   "estimate": 80616,
+   "error": 0.003186,
+   "draws": [
+    79872,
+    79464,
+    81804,
+    77712,
+    79356
+   ],
+   "low": 77712,
+   "high": 81804,
+   "worstDraw": 0.032952
+  },
+  {
+   "board": "mid-uniform",
+   "router": "corners-smooth",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 56182,
+   "full": 44087,
+   "estimate": 42431,
+   "error": 0.037562,
+   "draws": [
+    43808,
+    50451,
+    46757,
+    45339,
+    41181
+   ],
+   "low": 41181,
+   "high": 50451,
+   "worstDraw": 0.144351
+  },
+  {
+   "board": "mid-clustered",
+   "router": "plugs",
+   "nodes": 1000,
+   "edges": 3000,
+   "segments": 72000,
+   "full": 198801,
+   "estimate": 193986,
+   "error": 0.02422,
+   "draws": [
+    197766,
+    198144,
+    209034,
+    192114,
+    208980
+   ],
+   "low": 192114,
+   "high": 209034,
+   "worstDraw": 0.051474
+  },
+  {
+   "board": "mid-clustered",
+   "router": "corners-smooth",
+   "nodes": 1000,
+   "edges": 3000,
+   "segments": 79750,
+   "full": 79788,
+   "estimate": 75962,
+   "error": 0.047952,
+   "draws": [
+    69442,
+    71077,
+    83239,
+    89041,
+    79890
+   ],
+   "low": 69442,
+   "high": 89041,
+   "worstDraw": 0.129669
+  },
+  {
+   "board": "mid-hubs",
+   "router": "plugs",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 48000,
+   "full": 74680,
+   "estimate": 76464,
+   "error": 0.023889,
+   "draws": [
+    76200,
+    74532,
+    75132,
+    72960,
+    72840
+   ],
+   "low": 72840,
+   "high": 76200,
+   "worstDraw": 0.024638
+  },
+  {
+   "board": "mid-hubs",
+   "router": "corners-smooth",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 54946,
+   "full": 37090,
+   "estimate": 35083,
+   "error": 0.054112,
+   "draws": [
+    38696,
+    35770,
+    37391,
+    40385,
+    38613
+   ],
+   "low": 35770,
+   "high": 40385,
+   "worstDraw": 0.088838
+  },
+  {
+   "board": "mid-fanout",
+   "router": "plugs",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 48000,
+   "full": 293383,
+   "estimate": 294084,
+   "error": 0.002389,
+   "draws": [
+    296652,
+    292356,
+    294912,
+    293340,
+    295536
+   ],
+   "low": 292356,
+   "high": 296652,
+   "worstDraw": 0.011142
+  },
+  {
+   "board": "mid-fanout",
+   "router": "corners-smooth",
+   "nodes": 1000,
+   "edges": 2000,
+   "segments": 56396,
+   "full": 72057,
+   "estimate": 83607,
+   "error": 0.16029,
+   "draws": [
+    72441,
+    69156,
+    69663,
+    67436,
+    71101
+   ],
+   "low": 67436,
+   "high": 72441,
+   "worstDraw": 0.06413
+  },
+  {
+   "board": "large-clustered",
+   "router": "straight",
+   "nodes": 10000,
+   "edges": 30000,
+   "segments": 30000,
+   "full": 14975599,
+   "estimate": 15579705,
+   "error": 0.040339,
+   "draws": [
+    15634478,
+    14930333,
+    14048933,
+    14157788,
+    14220473
+   ],
+   "low": 14048933,
+   "high": 15634478,
+   "worstDraw": 0.061878
+  },
+  {
+   "board": "large-clustered",
+   "router": "plugs",
+   "nodes": 10000,
+   "edges": 30000,
+   "segments": 719999,
+   "full": 15471129,
+   "estimate": 16364137,
+   "error": 0.057721,
+   "draws": [
+    15027639,
+    14987499,
+    15697778,
+    15682478,
+    16128338
+   ],
+   "low": 14987499,
+   "high": 16128338,
+   "worstDraw": 0.04248
+  }
+ ],
+ "sets": [
+  {
+   "set": "screen-v1",
+   "boards": 14,
+   "largestNodes": 150,
+   "largestEdges": 300,
+   "segmentsPerRouteAtLimit": 66.666667
+  },
+  {
+   "set": "screen-v2",
+   "boards": 60,
+   "largestNodes": 150,
+   "largestEdges": 300,
+   "segmentsPerRouteAtLimit": 66.666667
+  },
+  {
+   "set": "screen-v3",
+   "boards": 150,
+   "largestNodes": 150,
+   "largestEdges": 300,
+   "segmentsPerRouteAtLimit": 66.666667
+  }
+ ]
+}

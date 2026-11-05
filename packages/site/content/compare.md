@@ -3,6 +3,7 @@ Choose a step and a board. Each strategy of the step runs on the same board, and
 ## How to read the panels
 
 - The registry `STRATEGIES` gives the panels. A new strategy gets its panel with no change to this page.
+- The step `router` also shows the 11 opt-in routers, with the tag "Opt-in, not promoted". No default uses them. Each panel has the recorded numbers of its router and its time. `repel` takes 52.1 times the time of `shared`. The page does not run `repel`, `portfolio` or `shared-stretch` on a board of more than 500 nodes, so that panel shows only the recorded numbers.
 - Each option with a range gets a control. An option without a range, for example a rule or a list, keeps its default, and the page shows the default as text.
 - Each measure comes from the measure suite of the benchmark (`runSuite`), with the same keys.
 - A star marks the best value of each measure. A strategy that breaks a hard rule gets no star.

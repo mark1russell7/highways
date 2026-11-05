@@ -38,7 +38,8 @@ describe("benchRoom on the packed grid (ROOM)", () => {
 
   it("the gutter alone and the method lines are worse: more crossings, or much more area", () => {
     expect(row("gutter").crossings).toBeGreaterThan(row("routes").crossings);
-    expect(row("gutter").laneThrough).toBeGreaterThan(row("routes").laneThrough);
+    // LANE-ROOM: the lanes share the room of each way, so no lane goes through a box on either board. Before it, the gutter alone had more of them.
+    expect([row("gutter").laneThrough, row("routes").laneThrough]).toEqual([0, 0]);
     expect(row("lines").area).toBeGreaterThan(2 * row("routes").area);
   });
 });
@@ -51,7 +52,8 @@ describe("the sweeps of the room on the packed grid (ROOM-A, ROOM-C, ROOM-D)", (
   it("ROOM-A: the area grows with maxGrowth and stays flat when the demand is met, with no link through a box", () => {
     const rows = sweepRoom("packed-grid", graph, growthSettings([0, 0.12, 0.25, 0.3, Infinity]));
     const [fair, zero, low, knee, met, free] = rows as [RoomBenchRow, RoomBenchRow, RoomBenchRow, RoomBenchRow, RoomBenchRow, RoomBenchRow];
-    expect([fair.crossings, fair.laneThrough]).toEqual([345, 10]);
+    // LANE-ROOM: the lanes through a box go from 10 to 0.
+    expect([fair.crossings, fair.laneThrough]).toEqual([345, 0]);
     // Each gap keeps its gutter, so the smallest board is the board open to the gutter.
     expect(zero.area).toBeCloseTo(fair.area, 6);
     expect(low.area).toBeGreaterThan(zero.area);

@@ -42,7 +42,7 @@ jobs:
       match: ${{ steps.changes.outputs.match }}
     steps:
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+        uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
         with:
           paths: |
             packages/core/src/highways/search/**
@@ -156,7 +156,7 @@ jobs:
             cat stops/search-stops-ubuntu-latest-*/stops.jsonl
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          cmp stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
+          node packages/core/scripts/gates/same-stops.ts stops/search-stops-ubuntu-latest-*/stops.jsonl stops/search-stops-windows-latest-*/stops.jsonl
           echo "Gate (b): the stops of Linux and Windows are byte-equal." >> "$GITHUB_STEP_SUMMARY"
 
   search-work-ok:
@@ -167,6 +167,6 @@ jobs:
     timeout-minutes: 2
     permissions: {}
     steps:
-      - uses: mark1russell7/template/.github/actions/gate-summary@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+      - uses: mark1russell7/template/.github/actions/gate-summary@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
         with:
           needs: ${{ toJSON(needs) }}

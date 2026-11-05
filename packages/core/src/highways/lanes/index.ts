@@ -19,6 +19,11 @@ export interface LanesOptions {
   readonly maxWidth: number;
   /** The number of times that a highway can split, one half after the other. The default is 3. */
   readonly depth: number;
+  /**
+   * The lanes for which the old spine counts as narrow, when the split compares it with a new spine.
+   * `half` (the default) counts only the lanes that move. `all` counts all the lanes of the highway (REBUILD-SILENT).
+   */
+  readonly measure?: "half" | "all";
 }
 
 /** The default options of the strategy `lanes`. */
@@ -179,7 +184,8 @@ export function lanesPlan(input: HighwayInput, o: Readonly<LanesOptions>): Highw
     if (!raw) return [h];
     const pulled = corners.pull(raw);
     const spine = tight(pulled, need) <= tight(raw, need) ? pulled : raw;
-    if (spine.length < 2 || polylineLength(spine) <= finder.margin || tight(spine, need) >= tight(h.spine, need)) return [h];
+    const old = tight(h.spine, o.measure === "all" ? widthOf(h.lanes.length, o) : need);
+    if (spine.length < 2 || polylineLength(spine) <= finder.margin || tight(spine, need) >= old) return [h];
     const moved = move(h, spine, second);
     if (first.length === 0) return split(moved, depth - 1);
     return [...split(move(h, h.spine, first), depth - 1), ...split(moved, depth - 1)];

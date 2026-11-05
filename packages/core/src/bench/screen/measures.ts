@@ -77,6 +77,9 @@ const ROWS: readonly Row[] = [
   // The routes. A placement makes crossings, plugs on short sides and boxes that touch, so these measures depend on it.
   ["R1.crossings", "R1", "route.crossings", "count", "lower", true],
   ["R1.perEdge", "R1", "route.crossings.per-edge", "count for each edge", "lower", true],
+  ["R1.estimated", "R1", "route.crossings.estimated", "0 or 1", "lower", true, "This value is 1 when the crossings come from a sample and not from a full count. A ratio across routers does not compare such a row with a full count."],
+  ["R1.pairs", "R1", "route.crossings.pairs", "count", "lower", true, "The crossings between pairs of routes, including a shared vertex and a shared stretch that two routes leave on opposite sides. The partner of `route.crossings`: a bundle lowers the count of ink crossings by overlap."],
+  ["R1.pairsEstimated", "R1", "route.crossings.pairs.estimated", "0 or 1", "lower", true, "This value is 1 when `route.crossings.pairs` has an estimate from a sample of the pairs of routes."],
   ["R2.angle", "R2", "route.crossing-angle.mean", "0 to 1", "higher", true],
   ["R2.min", "R2", "route.crossing-angle.min", "degrees", "higher", true],
   ["R3.bends", "R3", "route.bends", "count for each route", "lower", false],
@@ -101,10 +104,18 @@ const ROWS: readonly Row[] = [
   // BALANCE-STABILITY. R16 is the spread of the gaps between neighbor parallel legs of two edges, also when each gap is wide.
   ["R16.cv", "R16", "route.balance.cv", "no unit", "lower", true, "The spread of the gaps between parallel routes: the standard deviation of the gaps over their mean. A value of 0 is even."],
   ["R16.low", "R16", "route.balance.low", "0 to 1", "lower", true, "The share of the parallel overlap with a gap less than half of the median gap."],
+  // PASS-GRID. R17 tells that a route went straight because the corner graph had no way. The hard rule R9 alone does not tell the reason.
+  ["R17.noGraph", "R17", "route.no-graph", "count", "lower", true, "The count of the routes that are one straight line because the corner graph of the board has no way between their plugs. A value of 0 is good."],
+  // PLUG-ROW-GAP. R18 reads the `rowHeight` of the ports, so a board without rows has no value.
+  ["R18.fit", "R18", "route.row.fit", "0 to 1", "higher", true, "The share of the rows of the ports that fit on their walls, with no overlap of another row or plug. More is better."],
+  ["R18.gap", "R18", "route.row.gap", "no unit", "higher", true, "The least distance of two neighbor plugs of one wall, in the mean height of their rows. A value of 1 or more leaves room for each row."],
   ["ink", "R1", "route.ink", "units", "lower", true],
   // The bundles.
   ["B1.inkSaved", "B1", "route.bundle.ink-saved", "0 to 1", "higher", false],
+  ["B11.share", "B11", "route.overlap.share", "0 to 1", "lower", false, "The share of the length of all routes on a piece of a line with two routes or more. A good result for a router with no lanes is near the value of `corners`."],
+  ["B11.peak", "B11", "route.overlap.peak", "count", "lower", false, "The most routes on one piece of a line. A good result for a router with no lanes is near the value of `corners`."],
   ["B4.ambiguity", "B4", "route.bundle.ambiguity", "0 to 1", "lower", false],
+  ["B4.reach", "B4", "route.bundle.reach", "0 to 1", "lower", false],
   // B2, B3 and B6 score the shared ways of the routes for a fixed placement, as B1 does. B3 compares with the routes of `corners` on the same input.
   ["B2.share", "B2", "route.bundle.share", "0 to 1", "higher", false],
   ["B3.median", "B3", "route.bundle.stretch.median", "ratio", "lower", false],

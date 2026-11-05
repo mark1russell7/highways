@@ -33,7 +33,7 @@ import { FIXTURES, makeFixture } from "../src/fixtures.ts";
 import type { Point } from "../src/geom.ts";
 import type { Graph } from "../src/model.ts";
 import { callSiteRuleOf, setPredicateSink, type PredicateSink } from "../src/predicate-sink.ts";
-import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../src/routers/index.ts";
+import { OPT_IN_STRATEGIES } from "../src/strategies/opt-in.ts";
 import type { Strategy } from "../src/strategies/model.ts";
 import { graphInput, screen, SCREEN_SETS, SCREEN_STEPS, screenInputs, type LayoutInput, type ScreenSet, type ScreenStep } from "../src/bench/screen/index.ts";
 
@@ -51,19 +51,9 @@ export const TIE_NEAR = 1e-9;
 export const MAX_LINES = 200_000;
 /**
  * The opt-in routers of `src/routers`. The step `router` of the dump runs them with the built-in routers, because some of them have their own copy of a predicate.
- * The router `portfolio` is not in the list, because it runs the built-in routers again.
+ * The router `portfolio` is not in the list, because it runs the built-in routers again. The list has no `shared-stretch`, so the rows of a dump stay the same.
  */
-export const OPT_IN_ROUTERS: readonly Strategy<"router">[] = [
-  adamStrategy,
-  annealingStrategy,
-  attractionStrategy,
-  canalStrategy,
-  nudgeStrategy,
-  repelStrategy,
-  rerouteStrategy,
-  springsStrategy,
-  tightStrategy,
-] as readonly Strategy<"router">[];
+export const OPT_IN_ROUTERS: readonly Strategy<"router">[] = OPT_IN_STRATEGIES.filter((s) => s.name !== "portfolio" && s.name !== "shared-stretch") as readonly Strategy<"router">[];
 
 const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 
@@ -337,7 +327,7 @@ function boardInput(set: string, name: string, graph: Graph): LayoutInput {
 }
 
 /**
- * The board sets of the dump. The 5 screen sets run each step of the screen.
+ * The board sets of the dump. The 6 screen sets run each step of the screen.
  * The set `fixtures` has the fixtures of the benchmark up to 1 000 nodes (seed 0) and its 3 case boards.
  * The set `fixtures-large` has the fixture of 10 000 nodes, with the steps `router` and `group`, as the large parts of the workflow `Bench`.
  * The set `dense-board` has the dense board of ROUTE-SCALE, with the steps `router` and `highway`.

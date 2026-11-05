@@ -16,6 +16,8 @@
 // Each child runs `searchRun` 2 times, as mode process does for each arm and input. So the run time does not change.
 // The starts add 0.3 to 1 s for each child on a CI runner, thus 5 to 18 min. Parts 1 and 2 take 35 min, and the job time limit is 120 min.
 // The workflow `Search objective` (.github/workflows/search-objective.yml) starts it. The runs go in CI, not on a local machine.
+// SEARCH-CROSS: `--variants search-cross` gives the candidate scores of `SEARCH_CROSS_VARIANTS`. Each record of a run has the work of each opt-in term.
+// The report splits B1 into the drawn ink and the length of the routes, and it gives the median ρ of each term for each variant.
 import { readFileSync, writeFileSync, writeSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
@@ -24,8 +26,9 @@ import { ambiguity, bundleStretch, inkSaved, mergeAngle } from "../src/bench/mea
 import { totalTurn } from "../src/bench/measures/routes.ts";
 import { measureQuality } from "../src/bench/quality.ts";
 import { graphInput, inputGraph, inputId, SCREEN_SETS, screenInputs } from "../src/bench/screen/index.ts";
+import { polylineLength } from "../src/geom.ts";
 import { follow } from "../src/highways/follow.ts";
-import { SEARCH_DEFAULTS, searchRun, type SearchOptions, type SearchStep } from "../src/highways/search/index.ts";
+import { SEARCH_DEFAULTS, searchRun, type SearchOptions, type SearchStep, type SearchTerm, type SearchTermWorks } from "../src/highways/search/index.ts";
 import type { Graph, Route } from "../src/model.ts";
 import { envOf, measureIsolated, runChild } from "./gates/paired.ts";
 import { pairedTable } from "./gates/time-gate.ts";
@@ -45,8 +48,25 @@ const pairedOut = opt("--paired");
 const env = envOf("process");
 /** The variants of the score that the screen compares with the default. The term `X` is the crossing term of `crossingWeight`. */
 const DEFAULT_VARIANTS = "ink-only:stretchWeight=0,ambiguityWeight=0,angleWeight=0;half-penalties:stretchWeight=0.25,ambiguityWeight=0.25,angleWeight=0.125;cross-0.1:crossingWeight=0.1;cross-0.3:crossingWeight=0.3;cross-0.3-half:crossingWeight=0.3,stretchWeight=0.25,ambiguityWeight=0.25,angleWeight=0.125";
+/** The half penalties of SEARCH-OBJECTIVE. */
+const HALF = "stretchWeight=0.25,ambiguityWeight=0.25,angleWeight=0.125";
+/**
+ * The candidate scores of SEARCH-CROSS. The term `T` is the turn term of `turnWeight`. The value `inkBase=first` divides the drawn ink by the length of the first routes.
+ * The reference is `cross-0.3-half`, the best variant of SEARCH-OBJECTIVE. The weights come from a fit on the moves of its run 41446536480.
+ */
+const SEARCH_CROSS_VARIANTS = [
+  `cross-0.3-half:crossingWeight=0.3,${HALF}`,
+  `turn-1:crossingWeight=0.3,${HALF},turnWeight=1`,
+  `ink-first:crossingWeight=0.3,${HALF},inkBase=first`,
+  `ink-first-turn-1:crossingWeight=0.3,${HALF},inkBase=first,turnWeight=1`,
+  "turn-1.5-cross-0.6:crossingWeight=0.6,turnWeight=1.5",
+].join(";");
+/** The named lists of variants of `--variants`. */
+const NAMED_VARIANTS: Readonly<Record<string, string>> = { "search-cross": SEARCH_CROSS_VARIANTS };
 const MEASURES = ["ink", "R1", "R4"] as const;
-const TERMS = ["B1", "B3", "B4", "B6", "X"] as const;
+const TERMS = ["B1", "B3", "B4", "B6", "X", "T"] as const;
+/** The opt-in terms of the score that count their work. */
+const WORK_TERMS: readonly SearchTerm[] = ["crossing", "turn", "inkFirst"];
 type MeasureKey = (typeof MEASURES)[number];
 type TermKey = (typeof TERMS)[number];
 
@@ -58,6 +78,8 @@ interface Point {
   readonly score: number;
   readonly terms: Record<TermKey, number>;
   readonly measures: Record<MeasureKey, number>;
+  /** The two parts of B1 = 1 - drawn / length (SEARCH-CROSS): the drawn ink and the total length of the routes. A record of SEARCH-OBJECTIVE has no parts. */
+  readonly parts?: { readonly drawn: number; readonly length: number };
 }
 
 /** This function gives the window of the board: the `size` boxes with the lowest y, and the edges between them. */
@@ -132,33 +154,47 @@ function holm(ps: readonly number[]): number[] {
 /** The options of one variant of the score: the default options with other weights. */
 type Variant = { readonly name: string; readonly options: Readonly<SearchOptions> };
 
-/** This function reads the variants: `name:key=value,key=value;name:...`. The variant `default` is always the first. */
+/**
+ * This function reads the variants: `name:key=value,key=value;name:...`, or the name of a list of `NAMED_VARIANTS`. The variant `default` is always the first.
+ * A value that is not a number stays text, for an option such as `inkBase=first`.
+ */
 function variants(text: string): Variant[] {
   const list: Variant[] = [{ name: "default", options: SEARCH_DEFAULTS }];
-  for (const part of text.split(";").map((x) => x.trim()).filter(Boolean)) {
+  for (const part of (NAMED_VARIANTS[text.trim()] ?? text).split(";").map((x) => x.trim()).filter(Boolean)) {
     const [name, body = ""] = part.split(":");
-    const options: Record<string, number> = {};
+    const options: Record<string, number | string> = {};
     for (const kv of body.split(",").filter(Boolean)) {
-      const [k, v] = kv.split("=");
-      options[k!.trim()] = Number(v);
+      const [k, v = ""] = kv.split("=");
+      const x = Number(v);
+      options[k!.trim()] = v.trim() !== "" && Number.isFinite(x) ? x : v.trim();
     }
     list.push({ name: name!.trim(), options: { ...SEARCH_DEFAULTS, ...options } });
   }
   return list;
 }
 
-/** This function measures one plan: the weighted terms of its score and the bench measures ink, R1 and R4. */
-function measure(graph: Graph, step: SearchStep, first: readonly Route[], o: Readonly<SearchOptions>): Point {
+/** This function gives the total length of the routes. */
+const lengthOf = (routes: readonly Route[]): number => routes.reduce((s, r) => s + polylineLength(r.points), 0);
+
+/** This function measures one plan: the weighted terms of its score, the parts of B1 and the bench measures ink, R1 and R4. */
+function measure(graph: Graph, step: SearchStep, first: readonly Route[], firstLength: number, o: Readonly<SearchOptions>): Point {
   const routes = step.result.routes;
   const q = measureQuality(graph, step.result);
+  const turn = totalTurn(routes).mean;
+  const length = lengthOf(routes);
+  const b1 = o.inkBase === "first" ? inkSaved(routes, firstLength) : inkSaved(routes);
   const terms: Record<TermKey, number> = {
-    B1: o.inkWeight * inkSaved(routes),
+    B1: o.inkWeight * b1,
     B3: -o.stretchWeight * bundleStretch(routes, first).q95,
     B4: -o.ambiguityWeight * ambiguity(graph, routes).value,
     B6: (-o.angleWeight * mergeAngle(routes)) / 180,
     X: (-(o.crossingWeight ?? 0) * q.crossings) / Math.max(1, routes.length),
+    T: -(o.turnWeight ?? 0) * turn,
   };
-  return { n: step.n, from: step.from, accepted: step.accepted, score: step.score, terms, measures: { ink: q.ink, R1: q.crossings, R4: totalTurn(routes).mean } };
+  // The drawn ink of B1 is `(1 - B1) × length`, with the length that B1 divides by. This is the ink of `drawnSegments`, near the ink of `measureQuality`.
+  const base = o.inkBase === "first" ? firstLength : length;
+  const parts = { drawn: base > 0 ? (1 - b1) * base : 0, length };
+  return { n: step.n, from: step.from, accepted: step.accepted, score: step.score, terms, measures: { ink: q.ink, R1: q.crossings, R4: turn }, parts };
 }
 
 /** The record of one input and one variant: the points of each seed and the time of each seed. */
@@ -168,7 +204,8 @@ interface InputRecord {
   readonly variant: string;
   readonly nodes: number;
   readonly edges: number;
-  readonly runs: { readonly seed: number; readonly ms: number; readonly best: number; readonly points: Point[] }[];
+  /** The runs of each seed. The value `terms` is the work of each opt-in term of the score, from `searchRun` (SEARCH-CROSS). */
+  readonly runs: { readonly seed: number; readonly ms: number; readonly best: number; readonly points: Point[]; readonly terms?: SearchTermWorks }[];
   /** The computer and the mode of the times (MEASURE-ISOLATE). */
   readonly env?: ReturnType<typeof envOf>;
 }
@@ -212,19 +249,20 @@ const lines: string[] = [];
 for (const { id, family, graph } of inputs) {
   if (graph.edges.length === 0) continue;
   const first = follow(graph, { highways: [] }).routes;
+  const firstLength = lengthOf(first);
   for (const v of VARIANTS) {
     const runs: InputRecord["runs"] = [];
     for (let seed = 1; seed <= seeds; seed++) {
       const points: Point[] = [];
       const o = { ...v.options, seed };
       const t0 = performance.now();
-      searchRun({ graph }, o, (step) => points.push(measure(graph, step, first, o)));
+      const run = searchRun({ graph }, o, (step) => points.push(measure(graph, step, first, firstLength, o)));
       const ms = performance.now() - t0;
       // The best plan is the first plan with the best score, as `searchRun` keeps it.
       let best = 0;
       let bestScore = -Infinity;
       for (const p of points) if (p.score > bestScore + 1e-12) [best, bestScore] = [p.n, p.score];
-      runs.push({ seed, ms, best, points });
+      runs.push(run.terms ? { seed, ms, best, points, terms: run.terms } : { seed, ms, best, points });
     }
     const record: InputRecord = { id, family, variant: v.name, nodes: graph.nodes.length, edges: graph.edges.length, runs, env };
     byVariant.get(v.name)!.push(record);
@@ -299,8 +337,48 @@ for (const v of VARIANTS)
     const ok = rs.filter(Number.isFinite);
     report.push(`| ${v.name} | ${m} | ${f(quantile(ok, 0.5))} | ${f(quantile(ok, 0.1))} | ${f(quantile(ok, 0.9))} | ${pct(ok.filter((x) => x > 0.3).length / Math.max(1, ok.length))} | ${pct(ok.filter((x) => x < 0).length / Math.max(1, ok.length))} | ${rs.length - ok.length} |`);
   }
-report.push("", "### The median ρ of each term of the score of the default", "", `| Term | ${MEASURES.join(" | ")} |`, `|---|${MEASURES.map(() => "---:").join("|")}|`);
-for (const t of TERMS) report.push(`| ${t} | ${MEASURES.map((m) => f(quantile(base.map((r) => correlation(r, m, (p) => p.terms[t])), 0.5))).join(" | ")} |`);
+// The split of the score (SEARCH-CROSS): the median ρ of each term of each variant. A term with the weight 0 has no spread and gives "-".
+report.push("", "### The median ρ of each term of the score, for each variant", "", `| Variant | Term | ${MEASURES.join(" | ")} |`, `|---|---|${MEASURES.map(() => "---:").join("|")}|`);
+for (const v of VARIANTS)
+  for (const t of TERMS) {
+    const rs = byVariant.get(v.name)!;
+    const row = MEASURES.map((m) => quantile(rs.map((r) => correlation(r, m, (p) => p.terms[t])), 0.5));
+    if (row.some(Number.isFinite)) report.push(`| ${v.name} | ${t} | ${row.map((x) => f(x)).join(" | ")} |`);
+  }
+// The parts of B1: a lower drawn ink and a greater length both raise B1 = 1 - drawn / length. The sign of each part is turned, so a positive ρ follows the measure.
+report.push("", "### The parts of B1 for each variant: the drawn ink and the length of the routes", "");
+report.push("The column \"drawn\" is the ρ of minus the drawn ink. The column \"length\" is the ρ of the length, the direction in which B1 goes up.", "");
+report.push(`| Variant | Part | ${MEASURES.join(" | ")} | B1 up with more drawn ink |`, `|---|---|${MEASURES.map(() => "---:").join("|")}|---:|`);
+for (const v of VARIANTS) {
+  const rs = byVariant.get(v.name)!;
+  // The share of the moves that raise B1 and also raise the drawn ink: B1 rewards them only for a greater length.
+  let up = 0;
+  let worse = 0;
+  for (const r of rs)
+    for (const run of r.runs) {
+      const at = new Map(run.points.map((p) => [p.n, p] as const));
+      for (const p of run.points) {
+        const from = at.get(p.from);
+        if (!from || !p.parts || !from.parts || p.terms.B1 <= from.terms.B1 + 1e-12) continue;
+        up++;
+        if (p.parts.drawn > from.parts.drawn + 1e-9) worse++;
+      }
+    }
+  const share = up > 0 ? `${worse} of ${up} (${pct(worse / up)})` : "-";
+  report.push(`| ${v.name} | drawn | ${MEASURES.map((m) => f(quantile(rs.map((r) => correlation(r, m, (p) => -(p.parts?.drawn ?? NaN))), 0.5))).join(" | ")} | ${share} |`);
+  report.push(`| ${v.name} | length | ${MEASURES.map((m) => f(quantile(rs.map((r) => correlation(r, m, (p) => p.parts?.length ?? NaN)), 0.5))).join(" | ")} | |`);
+}
+// The work of each opt-in term (SEARCH-CROSS step 2), next to the median ρ of the score of the variant.
+report.push("", "### The work of each opt-in term of the score, next to the median ρ of the score", "");
+report.push("The calls and the steps are the medians over the runs. A step is one route point that the term reads.", "");
+report.push(`| Variant | ${MEASURES.map((m) => `ρ ${m}`).join(" | ")} | ${WORK_TERMS.map((t) => `${t} calls | ${t} steps`).join(" | ")} |`, `|---|${MEASURES.map(() => "---:").join("|")}|${WORK_TERMS.map(() => "---:|---:").join("|")}|`);
+for (const v of VARIANTS) {
+  const rs = byVariant.get(v.name)!;
+  const rho = MEASURES.map((m) => f(quantile(rs.map((r) => correlation(r, m, (p) => p.score)), 0.5)));
+  const runs = rs.flatMap((r) => r.runs);
+  const cells = WORK_TERMS.map((t) => `${f(quantile(runs.map((x) => x.terms?.[t]?.calls ?? 0), 0.5), 0)} | ${f(quantile(runs.map((x) => x.terms?.[t]?.steps ?? 0), 0.5), 0)}`);
+  report.push(`| ${v.name} | ${rho.join(" | ")} | ${cells.join(" | ")} |`);
+}
 report.push("", "### The median ρ of the score of the default for each family", "", `| Family | Inputs | ${MEASURES.join(" | ")} |`, `|---|---:|${MEASURES.map(() => "---:").join("|")}|`);
 for (const fam of [...new Set(base.map((r) => r.family))]) {
   const rs = base.filter((r) => r.family === fam);

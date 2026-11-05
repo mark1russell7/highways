@@ -44,6 +44,8 @@ The [strategies page](https://mark1russell7.github.io/highways/strategies.html) 
 | `sections` | A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly. |
 | `sections-tree` | The same as `sections`, but without the limit of the stretch. |
 
+Two more routers are controls of the benchmark, and no chooser offers them. `one-trunk` puts each route on one trunk. `perimeter` goes around the frame of the boxes. [What each control buys](docs/research/MEASURES.md#what-each-control-buys) tells which measure each control wins.
+
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 
 The inflection rule sets the number of inflections from the angle of the chord: 0 near an axis, 1 near a diagonal, 2 between them. The inflections are at 1/2, or at 1/3 and 2/3, of the chord.
@@ -128,7 +130,7 @@ A fourth table measures the room of the links on a packed board of touching boxe
 
 The workflow `Bench` races the routers in CI, in parts that run at the same time. A change of `packages/core` on `main` races the fixtures to 10 000 nodes. Each night, the workflow races all the fixtures, to 100 000 nodes. A run by hand with `max` 100000 does the same. The last job joins the parts with `pnpm bench:join`. The join fails when a part of the plan has no rows or no report. It writes the table to the summary of the run and keeps `bench.json` as an artifact.
 
-The workflow divides the step `highway` of the suite into 10 shards to 1 000 nodes, one job each (BENCH-GREEN). A push run caps `mlseb` at 400 nodes, and the nightly run has no cap. Each part to 1 000 nodes pairs each strategy with `shared`. The ratio of the times comes from one CPU, so it compares better between runs than the time.
+The workflow divides the step `highway` of the suite into 10 shards to 1 000 nodes, one job each (BENCH-GREEN). A dispatch caps `mlseb` at 400 nodes by default, and the nightly run has no cap. Each part to 1 000 nodes pairs each strategy with `shared`. The ratio of the times comes from one CPU, so it compares better between runs than the time.
 
 Each router must obey the hard rules. A broken rule is a violation:
 
@@ -184,7 +186,9 @@ The benchmark also races the routers on three case boards of made-up data. Each 
 
 The examples page has a tab `Generator`. Pick a family of `HIGHWAYS_FAMILIES`, a seed and a value for each dimension of the family. A web worker generates the board and routes it with the default pipeline. The URL keeps the board, for example `#family=hub-chain&seed=12&rows=6`. The list "Named examples" sets the controls to a known board.
 
-The generator has 15 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
+The generator has 25 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
+
+The 10 families of FAMILIES-WEEKLY add worst cases. They are one narrow door in a long wall, many edges between the same two boxes, and a closed maze. The next 3 are a channel between two rows, two combs that reach into each other, and a square spiral of wall. The last 3 are pins around a box, a grid of pads in a ring of terminals, and closed walls with one door each. The tenth is a maze with one tiny knot of nodes. These 10 families are in no screen set.
 
 The compare page and the live demo have the choice "Generated", with the same controls and the same keys of the URL. The screen sets make their boards with the same families.
 

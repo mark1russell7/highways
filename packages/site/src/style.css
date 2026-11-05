@@ -1,3 +1,5 @@
+@import "@mark1russell7/site-pages/scroll-cue.css";
+
 /* The colors of a road map by day, and of asphalt by night. */
 :root {
   --paper: #e3eae5;
@@ -205,6 +207,16 @@ main {
   filter: brightness(1.12);
 }
 
+.exit.opt-in {
+  border-style: dashed;
+}
+
+.router-tag {
+  flex: none;
+  align-self: center;
+  margin-left: 8px;
+}
+
 .exit[aria-checked="true"] {
   color: var(--yellow-ink);
   background: var(--yellow);
@@ -353,13 +365,14 @@ select {
 
 .seg {
   display: flex;
+  flex-wrap: wrap;
   border: 1px solid var(--rule);
   border-radius: 8px;
   overflow: hidden;
 }
 
 .seg label {
-  flex: 1;
+  flex: 1 1 auto;
   position: relative;
 }
 
@@ -550,6 +563,7 @@ input[type="range"] {
 }
 
 .table-wrap {
+  --scroll-cue-bg: var(--paper);
   overflow-x: auto;
 }
 
@@ -590,6 +604,53 @@ table.num thead th:not(:first-child) {
 td.best {
   color: var(--good);
   font-weight: 800;
+}
+
+/* On a phone each router is a card of labels and values, so the table does not scroll out of view. */
+@media (max-width: 767px) {
+  #bench-table {
+    overflow-x: visible;
+  }
+
+  #bench-table thead {
+    display: none;
+  }
+
+  #bench-table table,
+  #bench-table tbody,
+  #bench-table caption {
+    display: block;
+  }
+
+  #bench-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  #bench-table th {
+    grid-column: 1 / -1;
+    padding: 0 0 0.25rem;
+    border: 0;
+  }
+
+  #bench-table td {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 0.5rem;
+    padding: 0.15rem 0;
+    border: 0;
+    white-space: normal;
+  }
+
+  #bench-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-weight: 400;
+  }
 }
 
 .table-pick {
@@ -1221,6 +1282,23 @@ pre code {
   white-space: nowrap;
 }
 
+.tag.opt-in {
+  font-weight: 700;
+  border-style: dashed;
+}
+
+.opt-in-mark {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cmp-note {
+  font-size: 0.82rem;
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 0.6rem;
+  border-left: 3px dashed var(--rule);
+}
+
 .cmp-panel.picked {
   outline: 3px solid var(--sign-bg);
   outline-offset: 2px;
@@ -1800,8 +1878,13 @@ pre code {
   font-variant-numeric: tabular-nums;
 }
 
+.gen-seed {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 .gen-seed-box input[type="number"] {
   flex: 1;
+  min-width: 8ch;
 }
 
 .gen-status {

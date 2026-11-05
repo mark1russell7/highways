@@ -49,6 +49,12 @@ export interface LevelLinkOptions extends WayOptions {
    * The value 0 turns the second way off and gives the links of version 0.1.5. The default is 8.
    */
   readonly throughCost?: number;
+  /**
+   * The limit of the work of the join of parts on the corner graphs of a level, in looks. The value goes to `joinWork` of `CornerGraph`.
+   * The default is 0, so the level graphs have no join. At `levelJoinWork` 0, a level link of walled items can go through a wall box, and no link is lost.
+   * A level link of a real router can also go through a box, with or without the join. The section "Level links through boxes" of `docs/research/GROUPING.md` has the counts.
+   */
+  readonly levelJoinWork?: number;
 }
 
 /** The default values of the three limits of `LevelLinkOptions`. */
@@ -156,10 +162,11 @@ function levelWays(nodes: readonly Node[], options: LevelLinkOptions): LevelWays
   let size = 0;
   for (const n of nodes) size += Math.max(n.box.w, n.box.h);
   const obstacles = new Obstacles(nodes, Math.max(180, (2 * size) / Math.max(1, nodes.length)));
-  const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true });
+  const joinWork = options.levelJoinWork ?? 0;
+  const corners = new CornerGraph(nodes, obstacles, { margin, k, cones: true, joinWork });
   const out = (p: Plug): Point => ({ x: p.point.x + p.normal.x * margin, y: p.point.y + p.normal.y * margin });
   let tight: CornerGraph | undefined;
-  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true }));
+  const tightGraph = (): CornerGraph => (tight ??= new CornerGraph(nodes, obstacles, { margin: Math.min(margin, options.tightMargin ?? LEVEL_LINK_DEFAULTS.tightMargin), k, cones: true, joinWork }));
   let soft: SoftGraph | undefined;
   const softGraph = (): SoftGraph => (soft ??= new SoftGraph(nodes, obstacles, { margin, k }));
   return { obstacles, corners, margin, out, tight: tightGraph, free: new Map(), soft: softGraph, size: size / Math.max(1, nodes.length) };

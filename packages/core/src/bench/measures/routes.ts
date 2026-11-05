@@ -1,14 +1,51 @@
-import { dist, polylineLength, turns, type Point } from "../../geom.ts";
+import { segmentsCross } from "@mark1russell7/layout-contract";
+import { center, dist, polylineLength, turns, type Point } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import { Grid } from "../../grid.ts";
 import { predicateSink } from "../../predicate-sink.ts";
-import { nodeIndex, type Graph, type Route } from "../../model.ts";
-import { nearestSide } from "../../plugs.ts";
+import { nodeIndex, resolvePorts, splitFrames, type Graph, type Route } from "../../model.ts";
+import { nearestSide, placePlug } from "../../plugs.ts";
+import { WayFinder } from "../../ways.ts";
 import { TOLERANCE } from "../properties.ts";
 import { quantile } from "./stats.ts";
 
 /** A drawn segment: a pair of points. */
 export type DrawnSegment = readonly [Point, Point];
+
+/** The edges with no way of each graph. A screen asks once for each strategy, and each answer reads one graph. */
+const NO_WAY = new WeakMap<Graph, ReadonlySet<string>>();
+
+/**
+ * This function gives the ids of the edges with no way through the corner graph between their facing plugs.
+ * It asks the question of `WayFinder.between`, with the default options. An inner edge of a frame has no such question.
+ */
+export function edgesWithNoWay(input: Graph): ReadonlySet<string> {
+  const known = NO_WAY.get(input);
+  if (known) return known;
+  const { graph } = splitFrames(resolvePorts(input));
+  const byId = nodeIndex(graph);
+  const ways = new WayFinder(graph.nodes);
+  const out = new Set<string>();
+  for (const e of graph.edges) {
+    const s = byId.get(e.source.node);
+    const t = byId.get(e.target.node);
+    if (!s || !t) continue;
+    const ps = placePlug(s, e.source, center(t.box));
+    const pt = placePlug(t, e.target, center(s.box));
+    if (!ways.corners.path(ways.out(ps), ways.out(pt))) out.add(e.id);
+  }
+  NO_WAY.set(input, out);
+  return out;
+}
+
+/**
+ * R17: the count of the routes that had no graph to use. Each one is one straight line, and the corner graph has no way between its plugs.
+ * This function reads the routes and the board. It does not change a route, so no hash of an output changes.
+ */
+export function noGraphRoutes(graph: Graph, routes: readonly Route[]): number {
+  const blocked = edgesWithNoWay(graph);
+  return routes.filter((r) => r.points.length === 2 && blocked.has(r.edge)).length;
+}
 
 const key = (p: Point): string => `${Math.round(p.x * 8)},${Math.round(p.y * 8)}`;
 
@@ -114,11 +151,9 @@ export function crossingAngles(segs: readonly DrawnSegment[]): CrossingAngles {
   return { crossings, estimated: !exact, mean: count ? sum / count / 90 : 1, min: count ? min : 90 };
 }
 
-const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-
-/** This test is the test of `segmentsCross`, so the count of `crossingAngles` is the count of `countCrossings`. */
+/** This test is the test of `segmentsCross` of the home, so the count of `crossingAngles` is the count of `countCrossings`. The census has its own name here. */
 function segmentsCrossInside(a: Point, b: Point, c: Point, d: Point): boolean {
-  const answer = orient(c, d, a) * orient(c, d, b) < 0 && orient(a, b, c) * orient(a, b, d) < 0;
+  const answer = segmentsCross(a, b, c, d);
   if (predicateSink !== null) predicateSink.cross("routes.segmentsCrossInside", a, b, c, d, answer);
   return answer;
 }

@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, keptRows, linkHtml, parseSnapshot, QUEUE_TOP, queueView, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, ageText, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import type { VerdictTable } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -46,7 +47,105 @@ describe("results data", () => {
   });
 });
 
+describe("the age of a record", () => {
+  it("counts the days to today, and compares the core with the core of the site", () => {
+    expect(recordAge("2026-11-02", "0.10.0", "0.14.0", "2026-11-04")).toEqual({ days: 2, sameCore: false });
+    expect(recordAge("2026-11-04", "0.14.0", "0.14.0", "2026-11-04")).toEqual({ days: 0, sameCore: true });
+  });
+
+  it("does not give a negative age for a date after the date of the viewer", () => {
+    expect(recordAge("2026-11-05", "0.14.0", "0.14.0", "2026-11-04").days).toBe(0);
+  });
+
+  it("gives the age as text", () => {
+    expect([0, 1, 2].map(ageText)).toEqual(["from today", "1 day old", "2 days old"]);
+  });
+});
+
+describe("the view of the coverage", () => {
+  it("keeps the counts of the record and the points of the trend", () => {
+    const record = JSON.stringify({ schema: "x", measures: 2, strategies: 3, options: 4, inputs: 5, cells: 24, fitted: 6, value: 0.25, fits: [] });
+    const point = { date: "2026-11-04", core: "0.14.0", cells: 24, fitted: 6, value: 0.25 };
+    expect(coverageView(record, JSON.stringify([point]))).toEqual({ measures: 2, strategies: 3, options: 4, inputs: 5, cells: 24, fitted: 6, value: 0.25, trend: [point] });
+  });
+});
+
+describe("the marks of the families with no key", () => {
+  const table: VerdictTable = {
+    set: "s",
+    step: "router",
+    base: "shared",
+    level: 0.05,
+    run: 1,
+    commit: "c",
+    date: "2026-11-05",
+    core: "0.1.0",
+    families: ["keyed-a", "plain-b", "plain-c", "plain-d"],
+    guards: [{ id: "R1", measure: "route.crossings" }],
+    strategies: [
+      { name: "corners", cells: [{ guard: "R1", label: "worse", against: 1, of: 4, ties: 1, signs: "-+-0", p: 0.01 }] },
+      { name: "other", cells: [{ guard: "R1", label: "worse", against: 1, of: 4, ties: 1, signs: "-+-0", p: 0.01 }] },
+    ],
+  };
+
+  it("changes each mark of the row `corners` with no key to a tie, and it keeps the label", () => {
+    const [corners, other] = keylessTies(table, ["keyed-a"]).strategies;
+    expect(corners!.cells[0]).toEqual({ guard: "R1", label: "worse", against: 0, of: 4, ties: 3, signs: "-000", p: 0.01, tiedByCause: 2 });
+    expect(other).toEqual(table.strategies[1]);
+  });
+
+  it("states the families with no key, and it leaves a table with another base as it is", () => {
+    expect(keylessTies(table, ["keyed-a"]).keyless).toEqual(["plain-b", "plain-c", "plain-d"]);
+    const other = { ...table, base: "pipeline" };
+    expect(keylessTies(other, ["keyed-a"])).toBe(other);
+  });
+});
+
 describe("the committed files of the results page", () => {
+  it("reads the row `corners` of `screen-v3` with a tie by cause on the 12 families with no key", () => {
+    const t = readResults(root).tables.find((x) => x.set === "screen-v3" && x.step === "router")!;
+    expect(t.keyless).toHaveLength(12);
+    const r1 = t.strategies.find((s) => s.name === "corners")!.cells.find((c) => c.guard === "R1")!;
+    expect(r1).toMatchObject({ label: "worse", against: 0, of: 15, ties: 12, tiedByCause: 4 });
+  });
+
+  it("states on the page the counts of the list of the moved labels, and the list holds the labels of the snapshots", () => {
+    const list = JSON.parse(readFileSync(join(root, "docs/research/key-split/moved.json"), "utf8")) as {
+      schema: string;
+      labels: number;
+      moved: number;
+      rows: { step: string; strategy: string; guard: string; shared: string; corners: string }[];
+    };
+    const flips = list.rows.filter((r) => [r.shared, r.corners].sort().join() === "better,worse").length;
+    expect([list.schema, list.labels, list.moved, list.rows.length, flips]).toEqual(["key-split-moved/1", 299, 92, 92, 33]);
+    const text = readFileSync(join(root, "packages/site/content/results.md"), "utf8");
+    expect(text).toContain(`${list.moved} of ${list.labels} labels of \`screen-v3\` move, and ${flips} of them`);
+    expect(text).toContain("blob/main/docs/research/key-split/moved.json");
+    const { tables } = readResults(root);
+    for (const r of list.rows) {
+      const cell = tables.find((t) => t.set === "screen-v3" && t.step === r.step)!.strategies.find((s) => s.name === r.strategy)!.cells.find((c) => c.guard === r.guard)!;
+      expect(cell.label, `${r.strategy} ${r.guard}`).toBe(r.shared);
+    }
+  });
+
+  it("has the run, the date and the core of each verdict snapshot", () => {
+    const { tables, core } = readResults(root);
+    expect(tables.length).toBeGreaterThanOrEqual(15);
+    expect(core).toMatch(/^\d+\.\d+\.\d+/);
+    for (const t of tables) {
+      expect(t.run, `${t.set} ${t.step}`).toBeGreaterThan(0);
+      expect(t.date, `${t.set} ${t.step}`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(t.core, `${t.set} ${t.step}`).toMatch(/^\d+\.\d+\.\d+/);
+    }
+  });
+
+  it("shows the value of the coverage with its denominator and its weekly points", () => {
+    const { coverage } = readResults(root);
+    expect(coverage!.cells).toBe(coverage!.measures * (coverage!.strategies + coverage!.options + coverage!.inputs));
+    expect(coverage!.value).toBe(coverage!.fitted / coverage!.cells);
+    expect(coverage!.trend.at(-1)!.cells).toBe(coverage!.cells);
+  });
+
   const files = snapshotFiles(root);
 
   it("has a snapshot with a full header for each set and step", () => {

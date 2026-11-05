@@ -227,6 +227,8 @@ describe("laneRoutes", () => {
   const result = sectionsRouter({ name: "sections", cap: 2 }).route(groups);
   const sg = segmentsOf(result);
   const widest = [...sg.segments].sort((p, q) => q.count - p.count)[0]!;
+  // The lanes of these segments take their full width. The file `lane-room.test.ts` tests the room.
+  const noRoom = { ...sg, segments: sg.segments.map(({ room: _room, ...s }) => s) };
   const pointsOf = (routes: readonly { edge: string; points: readonly { x: number; y: number }[] }[]) =>
     new Map(routes.map((r) => [r.edge, r.points]));
 
@@ -243,7 +245,7 @@ describe("laneRoutes", () => {
   it("moves only the edges of an open run, into lanes at the lane width", () => {
     expect(widest.count).toBeGreaterThanOrEqual(2);
     const open = new Set([runKey(widest.edges)]);
-    const routes = pointsOf(laneRoutes(result, open, 4));
+    const routes = pointsOf(laneRoutes(noRoom, open, 4));
     const before = pointsOf(result.routes);
     for (const [edge, points] of routes) {
       if (widest.edges.includes(edge)) continue;
@@ -264,7 +266,7 @@ describe("laneRoutes", () => {
   it("puts lane 0 on the left of the run, with the y axis down", () => {
     const a = widest.points[0]!;
     const b = widest.points[1]!;
-    const routes = pointsOf(laneRoutes(result, new Set([runKey(widest.edges)]), 4));
+    const routes = pointsOf(laneRoutes(noRoom, new Set([runKey(widest.edges)]), 4));
     // The left normal of the direction a → b is (dy, -dx) when the y axis points down.
     const l = dist(a, b);
     const k = ((widest.count - 1) / 2) * 4;

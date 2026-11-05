@@ -1,25 +1,25 @@
 # The benchmark of the routers. The large fixtures run only here, not on a local machine.
 # The job `plan` divides the benchmark into parts. Each job of the matrix `part` routes some fixtures with some routers.
 # The job `join` joins the rows of the parts into one table and one bench.json, in the format of one run.
-# A push to main runs the fixtures up to 10 000 nodes. The nightly run and a run with `max` 100000 also run the fixture of 100 000 nodes.
+# A dispatch runs the fixtures up to 10 000 nodes by default. The nightly run and a run with `max` 100000 also run the fixture of 100 000 nodes.
+# A push does not start this workflow, because no gate or page reads the run of a push, and each such run took 158 job-minutes. The nightly run covers the same code.
 # Each cell has a time limit. After the routes of a cell pass the limit, the cell starts no more routes, and its row shows "over the limit".
 # The measure suite runs each fixture family over `seeds` seeds to 1 000 nodes, and over one seed above. Each part keeps its report.
 # The job `join` joins the reports into one report.json, in the same artifact as bench.json.
 # BENCH-GREEN: the step `highway` of the suite runs in `shards` shards (`--shard`). Each shard gets one seed of each strategy, so the shards take similar times.
 # The input `caps` stops a slow strategy above a fixture size. The report and the summary list each capped cell, so the row is capped, not missing.
 # Each part to 1 000 nodes also routes `shared` in turn with each strategy on the first seed (`--pair shared`), so each strategy gets a ratio from the same CPU.
+# The job `land` pushes the record of a complete nightly run to the branch `bench-data`, and it starts `Pages`. So the site stays fresh with no merge.
+# The rules of the main branch stop a direct push, and a pull request of the token of GitHub Actions starts no workflow. So the record has its own branch.
 name: Bench
 
 on:
-  push:
-    branches: [main]
-    paths: ["packages/core/**", ".github/workflows/bench.yml"]
   schedule:
     - cron: "53 3 * * *"
   workflow_dispatch:
     inputs:
       max:
-        description: "The largest fixture, in nodes. 10000 is the run of a push. 100000 adds the parts of the huge fixture."
+        description: "The largest fixture, in nodes. 100000 adds the parts of the huge fixture."
         default: "10000"
       repeat:
         description: "The runs of each cell up to 10 000 nodes (the time is the median). A cell of 100 000 nodes runs two times."
@@ -30,6 +30,10 @@ on:
       shards:
         description: "The shards of the step highway of the suite, to 1 000 nodes."
         default: "10"
+      land:
+        description: "Push the record of a complete run on main to the branch bench-data, as the nightly run does."
+        type: boolean
+        default: false
       caps:
         description: "The caps of slow strategies, as name=nodes with commas. An empty text has no cap. The nightly run has no cap."
         default: "mlseb=400"
@@ -38,9 +42,9 @@ permissions:
   contents: read
 
 # On main, a new run does not stop the run in progress. It waits, and a newer run takes the place of a waiting run.
-# The nightly run has its own group, so it does not block the runs of a push. On other branches, a new run stops the old run.
+# The nightly run has its own group, so it does not block a dispatch. On other branches, a new run stops the old run.
 concurrency:
-  group: bench-${{ github.ref }}-${{ github.event_name }}
+  group: bench-${{ github.event_name == 'pull_request' && github.ref || github.sha }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
@@ -62,11 +66,11 @@ jobs:
           SEEDS: ${{ inputs.seeds || '5' }}
           SHARDS: ${{ inputs.shards || '10' }}
           # A dispatch can give an empty text, so the default comes from the event, not from `||`.
-          CAPS: ${{ github.event_name == 'workflow_dispatch' && inputs.caps || github.event_name == 'push' && 'mlseb=400' || '' }}
+          CAPS: ${{ github.event_name == 'workflow_dispatch' && inputs.caps || '' }}
         # Each part has the nodes of its fixtures, the options of `pnpm bench`, the cell limit in milliseconds and the time limit of its job in minutes.
         # A part runs when its smallest fixture is not larger than `max`. The routers `shared-all` and `shared` are the slowest at 10 000 nodes, so they have their own parts.
         # Each step of the measure suite runs in one part of each size: `small` runs each step but `highway`, and the parts `rest` run the step `group`.
-        # The part `opt-in` races the opt-in router `portfolio` (PORTFOLIO-API) to 400 nodes, with one seed. The default race does not have it.
+        # The part `opt-in` races each router of `OPT_IN_STRATEGIES` to 400 nodes, with one seed. The default race does not have them.
         # With k = 3, one fixture of 1 000 nodes took approximately 9 minutes. The default is now the fit (PORTFOLIO-FIT), and the part keeps its limit of 400 nodes.
         # BENCH-GREEN: on 2026-10-28, the part `small` with each step went past its 30 min. The step `highway` took approximately 43 min of it.
         # So the parts `highway-<i>of<n>` run the step `highway` to 1 000 nodes, one shard each.
@@ -83,7 +87,7 @@ jobs:
           parts=$(jq -nc --argjson max "$MAX" --arg repeat "$REPEAT" --arg seeds "$SEEDS" --argjson shards "$SHARDS" --arg caps "$caps" '[
             {name: "small", min: 0, max: ([$max, 1000] | min), args: "--repeat \($repeat) --seeds \($seeds) --suite-steps router,curve,room,group --pair shared\($caps)", limit: 300000, timeout: 30},
             (range(1; $shards + 1) as $i | {name: "highway-\($i)of\($shards)", min: 0, max: ([$max, 1000] | min), args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps highway --shard \($i)/\($shards) --pair shared\($caps)", limit: 300000, timeout: 30}),
-            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in portfolio,shared-stretch --routers portfolio,shared-stretch --pair shared", limit: 900000, timeout: 30},
+            {name: "opt-in", min: 0, max: ([$max, 400] | min), args: "--rows-only --repeat \($repeat) --seeds 1 --suite-steps router --opt-in all --routers opt-in --pair shared", limit: 900000, timeout: 30},
             {name: "large-shared-all", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared-all", limit: 900000, timeout: 40},
             {name: "large-shared", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router --routers shared,sections", limit: 900000, timeout: 40},
             {name: "large-rest", min: 10000, max: 10000, args: "--rows-only --repeat \($repeat) --seeds \($seeds) --suite-steps router,group --skip-routers shared-all,shared,sections", limit: 900000, timeout: 40},
@@ -209,3 +213,42 @@ jobs:
             bench.json
             report.json
           if-no-files-found: warn
+
+  land:
+    needs: [plan, part, join]
+    # A record lands only when each part finished. The job `join` also runs after a failed part, so this job reads both results.
+    if: needs.part.result == 'success' && needs.join.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.land)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only this job writes. It pushes to the branch bench-data, never to main.
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: bench-${{ github.sha }}
+          path: ${{ runner.temp }}/record
+      - name: Push the record to the branch bench-data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAX: ${{ needs.plan.outputs.max }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tree="$RUNNER_TEMP/branch"
+          if git fetch --depth 1 origin bench-data; then git worktree add -q "$tree" FETCH_HEAD; else git worktree add -q --orphan -b bench-data "$tree"; fi
+          time=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" -q .run_started_at)
+          core=$(jq -r .version packages/core/package.json)
+          node packages/site/scripts/bench-land.ts "$RUNNER_TEMP/record/bench.json" "$tree" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$time" "$core" "$MAX"
+          git -C "$tree" add bench.json bench-meta.json
+          git -C "$tree" commit -q -m "bench: the record of run $GITHUB_RUN_ID, core $core"
+          git push origin "$(git -C "$tree" rev-parse HEAD):refs/heads/bench-data"
+      - name: Start the Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main --repo "$GITHUB_REPOSITORY"

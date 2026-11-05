@@ -1,3 +1,4 @@
+import { pointSegmentDistance, segmentsCross as crossInside } from "@mark1russell7/layout-contract";
 import { predicateSink } from "./predicate-sink.ts";
 
 /** A point in the plane. */
@@ -26,6 +27,11 @@ export function center(b: Box): Point {
   return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
 }
 
+/** This function tells if the point is in the box. A point on an edge of the box is in it. */
+export function inBox(p: Point, b: Box): boolean {
+  return p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h;
+}
+
 /** This function gives a box that is larger by `m` on each side. A negative `m` makes the box smaller. */
 export function inflate(b: Box, m: number): Box {
   return { x: b.x - m, y: b.y - m, w: Math.max(0, b.w + 2 * m), h: Math.max(0, b.h + 2 * m) };
@@ -38,20 +44,34 @@ export function polylineLength(p: readonly Point[]): number {
   return s;
 }
 
-const orient = (a: Point, b: Point, c: Point): number => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+export { pointSegmentDistance };
 
 /**
  * This function tells if the segments `ab` and `cd` cross at one point inside both of them.
  * Segments that only touch at an end, or that are collinear, do not cross.
+ * The test is `segmentsCross` of `@mark1russell7/layout-contract`. This wrapper adds the predicate census.
  */
 export function segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
-  const d1 = orient(c, d, a);
-  const d2 = orient(c, d, b);
-  const d3 = orient(a, b, c);
-  const d4 = orient(a, b, d);
-  const answer = d1 * d2 < 0 && d3 * d4 < 0;
+  const answer = crossInside(a, b, c, d);
   if (predicateSink !== null) predicateSink.cross("geom.segmentsCross", a, b, c, d, answer);
   return answer;
+}
+
+/**
+ * This function gives the point where the segments `ab` and `cd` cross inside both, or `undefined`.
+ * Segments that only touch at an end, or that are parallel, give `undefined`.
+ */
+export function crossingPoint(a: Point, b: Point, c: Point, d: Point): Point | undefined {
+  const rx = b.x - a.x;
+  const ry = b.y - a.y;
+  const sx = d.x - c.x;
+  const sy = d.y - c.y;
+  const den = rx * sy - ry * sx;
+  if (Math.abs(den) < 1e-12) return undefined;
+  const t = ((c.x - a.x) * sy - (c.y - a.y) * sx) / den;
+  const u = ((c.x - a.x) * ry - (c.y - a.y) * rx) / den;
+  const eps = 1e-9;
+  return t > eps && t < 1 - eps && u > eps && u < 1 - eps ? { x: a.x + t * rx, y: a.y + t * ry } : undefined;
 }
 
 /**
@@ -105,15 +125,6 @@ export function pointBoxDistance(p: Point, b: Box): number {
   const qx = Math.max(b.x, Math.min(b.x + b.w, p.x));
   const qy = Math.max(b.y, Math.min(b.y + b.h, p.y));
   return Math.hypot(p.x - qx, p.y - qy);
-}
-
-/** This function gives the distance from a point to the segment `ab`. */
-export function pointSegmentDistance(p: Point, a: Point, b: Point): number {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const l2 = dx * dx + dy * dy;
-  const t = l2 === 0 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2));
-  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 }
 
 /** This function gives the distance from the segment `ab` to a box. The distance is 0 when they touch. */

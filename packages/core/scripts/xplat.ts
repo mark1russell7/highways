@@ -35,7 +35,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { canonicalJson, outputHash, RECORD_EPS } from "@mark1russell7/layout-contract";
-import { asRouter, routerStrategies, sharedStretchStrategy, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { asRouter, OPT_IN_STRATEGIES, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { hasCycle, observeLanes } from "../src/lane-order.ts";
 
 /** The Math functions that the log wraps. The index of a name in this list is its id in the hash of a chunk. */
@@ -249,7 +249,7 @@ function readInput(name: string, path: string): XplatInput | undefined {
 }
 
 /** The opt-in routers that `--extra` can add. They are not in the registry `STRATEGIES`. */
-const OPT_IN: Readonly<Record<string, Strategy<"router", object>>> = { "shared-stretch": sharedStretchStrategy as unknown as Strategy<"router", object> };
+const OPT_IN = Object.fromEntries(OPT_IN_STRATEGIES.map((s) => [s.name, s])) as unknown as Readonly<Record<string, Strategy<"router", object>>>;
 
 /** This function gives the router of a name, as the joint runner of layout-contract gives it. */
 function routerOf(name: string): (graph: Graph) => Result {

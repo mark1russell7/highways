@@ -30,7 +30,8 @@ const router = sectionsRouter({ name: "sections", margin: MARGIN, stretch: 3, ca
 
 /**
  * The routers of the inner edges of a card with rows (INTERIOR-ROUTE), one for each mode of the option `inner`.
- * The router `sections` gives no route for an inner edge.
+ * The router `sections` gives no route for an inner edge with a plug of a frame.
+ * A sibling edge gets the inner route of `corners` in place of its outer route of `sections`.
  */
 const inners: Readonly<Record<InnerMode, ReturnType<typeof cornersRouter>>> = {
   corners: cornersRouter({ name: "corners", margin: 6 }),
@@ -44,7 +45,9 @@ const hasFrames = (graph: Graph): boolean => graph.nodes.some((n) => n.parent !=
 function routeBoard(graph: Graph, mode: InnerMode): Result {
   const outer = router.route(graph);
   if (!hasFrames(graph)) return outer;
-  return { ...outer, routes: [...outer.routes, ...inners[mode].route(graph).routes.filter((r) => r.frame !== undefined)] };
+  const inside = inners[mode].route(graph).routes.filter((r) => r.frame !== undefined);
+  const done = new Set(inside.map((r) => r.edge));
+  return { ...outer, routes: [...outer.routes.filter((r) => !done.has(r.edge)), ...inside] };
 }
 
 /** The mode of the inner routes on the page. The buttons "Corners" and "Gutters" change it. */
@@ -193,7 +196,7 @@ row.addEventListener("keydown", (e) => {
 
 $("zoom-in").addEventListener("click", () => view.zoomBy(1.6));
 $("zoom-out").addEventListener("click", () => view.zoomBy(1 / 1.6));
-$("zoom-fit").addEventListener("click", () => view.fit());
+$("zoom-fit").addEventListener("click", () => view.fit(0));
 $("open-all").addEventListener("click", () => {
   state.open = new Set(current()?.runs ?? []);
   render();

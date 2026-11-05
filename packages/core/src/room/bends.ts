@@ -1,7 +1,7 @@
 import type { Box, Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import type { Edge, Router } from "../model.ts";
-import { segmentsOf, type SegmentGraph } from "../segments.ts";
+import { laneOffset, segmentsOf, type SegmentGraph } from "../segments.ts";
 import type { Boxed, Gap, RoomLink } from "./index.ts";
 
 /**
@@ -66,7 +66,7 @@ function legsOf(graph: SegmentGraph, spacing: number, maxWidth: number): BendLeg
       const s = byId.get(ref.segment);
       if (!s) continue;
       const sp = s.count > 1 ? Math.min(spacing, maxWidth / (s.count - 1)) : 0;
-      const offset = ((s.count - 1) / 2 - ref.lane) * sp;
+      const { offset } = laneOffset(s, ref.lane, sp);
       const c: Point[] = [];
       for (const p of s.points) if (c.length === 0 || Math.hypot(p.x - c[c.length - 1]!.x, p.y - c[c.length - 1]!.y) > SAME) c.push(p);
       const n = c.length;

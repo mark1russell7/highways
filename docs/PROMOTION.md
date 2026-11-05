@@ -302,18 +302,110 @@ This file does not copy the floors of the other projects:
 
 ## The sections time gate
 
-The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pull request when `sections-tree` gets slower at 10 000 nodes (GATE-LIMITS slice 1). It starts on each pull request that changes `packages/core/src`.
+The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pull request when `sections-tree` gets slower at 10 000 nodes (GATE-LIMITS slices 1 to 3). It starts on each pull request that changes `packages/core/src`.
 
 - One job times four arms in turn: the parent of the pull request, the head, the A/A copy of the parent and the fixed base. Each route has its own fresh process.
 - Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`. Each arm has 10 rounds.
-- The A/A spread of the job is p90 of |r - 1| over the A/A ratios of its rounds. A ratio is a median time over the median time of the parent.
+- An A/A round ratio is the time of the A/A arm over the time of the parent in one round. Each round is one case of `@mark1russell7/rigor-bench`.
+- The A/A spread is p90 of \|log r\| over the A/A round ratios. The ratio of a check is a median time over the median time of the other side.
 
-| Check | Fails when | Value | Reason |
+| Rule | Value | What it does | Reason |
 |---|---|---|---|
-| Against the parent | the ratio head/parent is above 1 + max(0.05, the A/A spread) | 0.05 | A step of 5 % or more is a real cost at 10 000 nodes. A step that the A/A spread of the job covers is noise, so the band of the job replaces 0.05 when it is wider. |
-| Against the fixed base | the ratio head/fixed base is above 1.10 | 1.10 | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
+| The noise cap | log(1.06) = 0.058 on \|log r\| | A run with an A/A spread above the cap cannot decide. | The quiet run 41542329976 (#257) had the spread 0.027. The cap is approximately 2 times that spread. |
+| The second run | 1 | After a run that cannot decide, the job `retry` starts the gate once more on a fresh runner. A second run that cannot decide fails the gate. | A noisy runner is often one bad runner. A run that cannot decide does not pass at any time. |
+| The paths | `scripts/gates/scope.ts` | The job `changes` reads the imports of the measured route. A change outside them skips the gate. A walk that fails gives `**`, so the gate runs. | A change of a router that the gate does not measure gave a noise result on #303. Of the last 30 pull requests on the old paths, 10 skip. |
+| The daily run | 1 for each day on main | The schedule times main in full. The check against the fixed base shows a rise that many pull requests made together. | A skip shows no missed effect for later pull requests. |
+| Against the parent | `timeVerdict`, rule `difference`, margin max(log(1.05), the pooled A/A spread) | The outcome `slower` fails. The outcome `cannot decide` starts the second run. The outcomes `same` and `faster` pass. | The home decides with an interval, not with one ratio. The floor log(1.05) keeps the step of 5 % of slice 1 as the band `same`. |
+| Against the fixed base | 1.10 | The check fails when the ratio head/fixed base is above 1.10. | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
 
-- The strategist gave these first values on 2026-11-02. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
+- The strategist gave the values of slice 1 on 2026-11-02, and the cap, the second run and the pool on 2026-11-03. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
+- The summary of each run (`sections-gate.md`) shows the A/A spread of the run, the cap and the pool with its count of runs and cases. It also shows the margin, the interval and the outcome.
+- The record `sections-gate.json` (schema `sections-gate/3`) keeps the same facts in its field `home`.
+- The job resolves the inputs `head` and `parent` to full hashes one time, at the start (GATE-CONFIRM-SHA). Then each job times only these hashes. A name that does not resolve fails the job.
+- The default head is the checkout, and the default parent is the first parent of the head. A dispatch with `-f head=<sha>` times that commit against its first parent.
+- The summary and the record give the input text and the full hash of each commit, for example "the parent: `HEAD^1` = `414ec5f...`".
+
+### The scale of the home
+
+Slices 1 and 2 had their spreads on \|r - 1\|. The home `@mark1russell7/rigor-bench` has its spreads, its floor and its cap on \|log r\|. Slice 3 keeps the rules of slice 2 on the new scale:
+
+| Rule | Slice 2, on \|r - 1\| | Slice 3, on \|log r\| |
+|---|---:|---:|
+| The noise cap | 0.06 | log(1.06) = 0.058 |
+| The floor of the margin | 0.05 | log(1.05) = 0.049 |
+
+A ratio of 1.06 has \|r - 1\| = 0.06 and \|log r\| = 0.058. So the cap of slice 3 lets the same runs decide as the cap of slice 2.
+
+### Why slice 2 caps the noise
+
+Slice 1 took the limit against the parent from the A/A spread of the same run. The two runs below show the hole.
+
+| Run | Pull request | CPU | A/A spread on \|r - 1\| | Limit of slice 1 | Outcome of slices 2 and 3 |
+|---|---|---|---:|---:|---|
+| 41542329976 | #257 | AMD EPYC 7763 | 0.027 | 1.050 | The run passes. The home says `same`, with the interval 0.991 to 1.016. |
+| 41548965076 | #255 | AMD EPYC 9V45 | 0.196 | 1.196 | The run cannot decide. Slice 1 passed it, but a step of 19 % passes such a limit. |
+
+A noisy run makes its own limit wider, so the noisiest runner passes the largest step. Slice 2 cuts that link: the run gives only the yes or no of the cap, and the pool gives the band.
+
+### The pool of A/A rounds
+
+- The pool is in `packages/core/scripts/data/sections-gate/aa-pool.json`. Each run of the pool has its run id, its commit and the commit of its parent. It also has the CPU model, the date and its 10 A/A round ratios.
+- The file keeps the spread of each run on \|r - 1\|, as slice 2 wrote it. The home uses the ratios, not that field.
+- Only a run with an A/A spread at or below the cap goes into the pool. `aaSpread` of the home gives that spread. Only a run whose parent is a commit of `main` goes in.
+- The A/A arm times the parent, so each run of a pull request to `main` gives A/A rounds of `main`.
+- The pool keeps the newest 20 quiet runs. The gate gives each ratio to the home as one case. The option `run` names the run of each case with its run id and its job.
+- The noise of the pooled band is the larger of the floor log(1.05) and p90 of \|log r\| over all the pooled cases. The home needs 5 pooled cases or more for a spread.
+- `pnpm --filter @mark1russell7/highways gate:pool` rebuilds the pool from the artifacts of the gate runs. It makes one call of `gh run list`, and downloads the artifact `sections-gate-<sha>` of each run.
+- Commit the new pool in a pull request. No workflow commits it to `main`.
+
+The first pool (2026-11-03) has 3 quiet runs from the 7 runs of the workflow.
+
+| Run | CPU | A/A spread on \|r - 1\| | In the pool |
+|---|---|---:|---|
+| 41551225572 | Intel Xeon 6975P-C | 0.033 | yes |
+| 41549397160 | AMD EPYC 7763 | 0.101 | no, above the cap |
+| 41548991752 | AMD EPYC 7763 | 0.051 | yes |
+| 41548965076 | AMD EPYC 9V45 | 0.196 | no, above the cap |
+| 41542329976 | AMD EPYC 7763 | 0.027 | yes |
+
+Two more runs skipped the job `gate` or were cancelled, so they have no artifact. The 30 cases of the pool have the spread 0.042 on \|log r\|. That spread is below the floor 0.049, so the margin is the floor. The band `same` is 0.952 to 1.050.
+
+Slice 2 used the floor until the pool had 5 runs. The home counts cases, not runs. The 30 cases of the 3 runs give a spread, but the floor is larger. The summary shows the count of runs, so a pool of few runs is clear.
+
+### The shared home of the comparison
+
+Since slice 3, `timeVerdict` of `@mark1russell7/rigor-bench` (0.2.0 or later) decides the check against the parent. `scripts/gates/home-verdict.ts` maps the rounds to the `PairedTime` records of the home. The gate gives these options:
+
+| Option | Value |
+|---|---|
+| `rule` | `difference` |
+| `margin` | log(1.05) = 0.049 |
+| `noiseCap` | log(1.06) = 0.058 |
+| `spreadLevel` | 0.9 |
+| `pool` | the records of `aa-pool.json`, the floor log(1.05) = 0.049 and the run of each record |
+
+The local code of the cap and of the pooled band is gone. The gate copies no verdict logic of the home.
+
+- The rule `difference` gives an interval of the median ratio of the head over the median ratio of the A/A arm.
+- The outcome is `same` when the interval is in the band of the margin. Else it is `slower` when the whole interval is above 1, and `faster` when it is below 1.
+- Each other interval, and each run above the cap, gives `cannot decide`.
+
+On the two runs above, the home gives the same outcome as slice 2. The quiet run is `same`, and the noisy run is `cannot decide`.
+
+The home and the old rule 1 + max(0.05, the pooled spread) do not agree on each set of rounds. The tests of `scripts/sections-gate-verdict.test.ts` have these sets of made-up rounds:
+
+| Rounds | The old rule | The home |
+|---|---|---|
+| The head is 3 % slower in each round, with a quiet A/A arm. | pass: 1.03 is below 1.05 | `same`: the interval is in the margin, so the gate passes |
+| The head goes from 0.92 to 1.16, with the median 1.0625. | fail: 1.0625 is above 1.05 | `cannot decide`, with the interval 0.96 to 1.14: the retry |
+
+The two agree on the step of 3 %. The margin log(1.05) is the claim of the gate: a change in 5 % is `same`. Since rigor-bench 0.2.0, `same` comes before `slower`, so the gate keeps its claim. On the wide head the home wins. The old rule compared one median with a fixed band, and it did not see how sure the ratio is. A head 19 % slower with a quiet A/A arm is `slower` under the two rules.
+
+The other rules stay local:
+
+- The check against the fixed base stays local code. It moves to `limitVerdict` of the home in GATE-FIXED-ROUNDS.
+- `limitVerdict` needs 6 rounds or more for each case and 5 A/A cases or more. The gate has 10 rounds of one case.
+- The confirm mode of `Sections bisect` keeps its local band rule. On the noisy run, that rule says `inside`, and the home says `cannot decide`.
 - The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`, with its date and its reason. The first fixed base is the head of `main` when the gate merges.
 - Move the fixed base only in a commit that tells the reason. An example is a feature that costs time on purpose.
 - A check with no time does not pass, so the gate fails (FAIL-CLOSED).

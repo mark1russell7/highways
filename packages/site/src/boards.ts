@@ -23,11 +23,6 @@ export interface Board {
 /** The free space between two cards, in units of the plane. The routes go in this space. */
 export const GAP = 48;
 
-/** This function gives a pseudo-random generator with a seed. It is `mulberry32` of `@mark1russell7/rigor-generators`. */
-export function seeded(seed: number): () => number {
-  return mulberry32(seed);
-}
-
 /** A board while it grows: the functions add cards and edges in order. */
 class Builder {
   readonly nodes: Node[] = [];
@@ -89,7 +84,7 @@ const pick = <T>(rnd: () => number, list: readonly T[]): T => list[Math.floor(rn
  * The group of a card is the supply (the depot and the shops) or the orders of its district. The kind of a card is depot, shop or order.
  */
 export function deliveryBoard(): Board {
-  const rnd = seeded(4817);
+  const rnd = mulberry32(4817);
   const b = new Builder();
   const depots = ["North depot", "Harbor depot", "Valley depot", "Old Mill depot"];
   const districts = ["North", "Harbor", "Valley", "Old Mill"];
@@ -289,7 +284,7 @@ export function coursesBoard(): Board {
   const b = new Builder();
   const w = 150;
   const h = 48;
-  const credits = seeded(27);
+  const credits = mulberry32(27);
   for (const [id, title, year, column] of COURSES) {
     const x = column * (w + GAP) + (year === 5 ? (w + GAP) / 2 : 0);
     const y = (year - 1) * (h + 2 * GAP);

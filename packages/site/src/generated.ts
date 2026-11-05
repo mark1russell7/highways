@@ -154,6 +154,7 @@ export interface NamedGen {
 /**
  * The named examples of the generator: the board of each family at its defaults, then some boards away from the defaults.
  * The base seeds are the seeds of the screen sets, so the first 15 boards are the screen boards of the member 0 of `screen-v3`.
+ * The weekly families are in no screen set. Their base seeds are the next primes.
  */
 export const NAMED_GENS: readonly NamedGen[] = [
   { id: "tiny", name: "Tiny board", spec: { family: "tiny-uniform", seed: 1, dims: {} } },
@@ -171,6 +172,16 @@ export const NAMED_GENS: readonly NamedGen[] = [
   { id: "sparse", name: "A sparse board with long edges", spec: { family: "sparse-long", seed: 37, dims: {} } },
   { id: "mesh", name: "Many short edges", spec: { family: "local-mesh", seed: 41, dims: {} } },
   { id: "bipartite", name: "Crossings that no plan removes", spec: { family: "bipartite", seed: 43, dims: {} } },
+  { id: "bottleneck", name: "One narrow door in a long wall", spec: { family: "bottleneck", seed: 47, dims: {} } },
+  { id: "parallel", name: "Many edges between the same boxes", spec: { family: "parallel-edges", seed: 53, dims: {} } },
+  { id: "maze", name: "A closed maze with long detours", spec: { family: "maze", seed: 59, dims: {} } },
+  { id: "channel", name: "A channel between two rows, with fixed plugs", spec: { family: "channel", seed: 61, dims: {} } },
+  { id: "comb", name: "Two combs that reach into each other", spec: { family: "comb", seed: 67, dims: {} } },
+  { id: "spiral", name: "One wall in a square spiral", spec: { family: "spiral", seed: 71, dims: {} } },
+  { id: "switchbox", name: "Pins on the four sides of a box", spec: { family: "switchbox", seed: 73, dims: {} } },
+  { id: "escape", name: "A grid of pads in a ring of terminals", spec: { family: "escape", seed: 79, dims: {} } },
+  { id: "rings", name: "Closed walls with one door each", spec: { family: "rings", seed: 83, dims: {} } },
+  { id: "walled-level", name: "A maze with one tiny knot of nodes", spec: { family: "walled-level", seed: 89, dims: {} } },
   { id: "large-grid", name: "A large grid of nodes", spec: { family: "tiny-uniform", seed: 5, dims: { layout: "grid", nodes: 200, edgesPerNode: 2 } } },
   { id: "hub-nodes", name: "Hub nodes with many edges", spec: { family: "small-clustered", seed: 9, dims: { layout: "hubs", nodes: 120, fixedPorts: 0 } } },
   { id: "far-links", name: "Long links between far rows", spec: { family: "hub-chain", seed: 12, dims: { rows: 6, cols: 24, long: 120 } } },

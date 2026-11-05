@@ -1,0 +1,26 @@
+{
+  "set": "screen-v3",
+  "boards": 150,
+  "routers": [
+    "straight",
+    "plugs",
+    "corners",
+    "corners-smooth",
+    "trunks",
+    "shared",
+    "shared-all",
+    "sections",
+    "sections-tree"
+  ],
+  "digests": {
+    "straight": "6fcf2fe258e2827d",
+    "plugs": "1ce4535c3acc0fdc",
+    "corners": "420fee66e98c5608",
+    "corners-smooth": "c75e7130909878be",
+    "trunks": "2680aeae68e61f51",
+    "shared": "addb18fa2683072e",
+    "shared-all": "5cc5fd2d03af1e8a",
+    "sections": "6000a0ead6111f2f",
+    "sections-tree": "6d55fb3acffefc9e"
+  }
+}

@@ -143,3 +143,52 @@ The ratio is the time of the workspace over the old time. The columns give each 
 - The old arm is the core before `fa1dd82`. So the ratio also contains each change after `fa1dd82`.
 - On this board, the 2 jobs on EPYC 9V45 differ more than the CPU models. So the CPU model does not explain all of the spread here.
 - The open item SECTIONS-SLOW finds the change that makes `sections` and `sections-tree` slower.
+
+### The profile of `sections-tree` and the second fix (SECTIONS-SLOW step 2)
+
+The workflow `Profile` (run 41505173044) profiled `sections-tree` on `large-clustered` at `bce22a5`, the commit before SEARCH-SPEED (#259).
+The run keeps one profile, the profile of `bce22a5`. It has no profile of `c6af859`.
+A function that `c6af859` does not have gets the share 0 % at `c6af859`.
+
+| Function | Self time at `bce22a5` | Total time at `bce22a5` | At `c6af859` | Changed by #259 |
+|---|---:|---:|---|---|
+| `CornerGraph.#search` | 20.8 % | 58.2 % | not there | yes |
+| `MinHeap.#down` | 11.1 % | | there | yes, 8.3 % of it is in `#search` |
+| `dist` | 10.1 % | | there | yes, 6.7 % of it is in `#search` |
+| `SoftGraph.path` | 8.7 % | 14.5 % | not there, 0 % | no |
+| `Grid.#walk` | 8.3 % | 17.6 % | there | no |
+| `CornerGraph.#nearestVisible` | 7.1 % | 13.8 % | there | only the table of buckets |
+
+The largest cost that #259 did not change is `SoftGraph.path`. Only `fewerFar` uses it, and `fewerFar` came after `c6af859` (#33).
+The search is a feature: it finds a way through fewer far boxes. But much of its time is waste, and a change can remove that waste:
+
+- One line takes 4.5 % of all the time. It gets the cost of each box of each link from a function, with a look-up in a set.
+- Each search makes three new arrays over all the vertices, and a new heap.
+
+The fix keeps the costs of the boxes in a typed array with a stamp, so the search uses `cost` one time for each box.
+The links, their lengths and their boxes are in flat typed arrays. The arrays of the search and the heap stay from one search to the next.
+The search adds the same box costs in the same order, so each path and each cost stays the same to the last bit.
+A new test compares the search with a copy of the search of version 0.11.0, with a new cost function in each search.
+The `Sections gate` run 41691623211 of #276 timed the fix. The A/A spread of the run is 0.025, below the noise cap 0.058.
+The head takes 0.943 times the time of its parent (41.4 s against 43.9 s), and 0.928 times the time of the fixed base `25a2be4`.
+The interval of the head over the A/A arm is 0.930 to 0.950. So the fix is faster, and the gain is 5 % to 7 %.
+
+### The walk of the grid (SECTIONS-SLOW step 3)
+
+The same profile gives `Grid.#walk` 8.3 % self time and 17.6 % total time. No fix changed it.
+Most of its time comes from the legs of `square` in `levels.ts`, through `Obstacles.clear`. Each leg is a different segment, so the fix is in the walk.
+The line data of the profile shows two costs in the walk:
+
+- The look-up of each bucket takes 2.0 % of all the time. The key of a bucket is not a small integer, so the map hashes a boxed number.
+- `Math.hypot` takes 1.8 % of all the time. It gives the number of steps of each segment.
+
+The fix ([#280](https://github.com/mark1russell7/highways/pull/280)) keeps the buckets in a table with open addressing, by the same keys. Each key gives the same list of items.
+
+A segment parallel to an axis uses its other side as its length. `Math.hypot` gives the same value.
+For a different segment, a square root gives the length. The square root and `Math.hypot` differ by a few units in the last place.
+Far from a whole number of steps, the two lengths round up to the same number. Near a whole number, the walk uses `Math.hypot`.
+
+So the walk has the same steps, the same buckets, the same items in the same order and the same work counts.
+A new test compares the grid with a copy of the grid of version 0.11.0, on seeded scripts of adds and queries.
+
+The gate run 41712051689 finds the head faster against its parent: ratio 0.964, interval over the A/A arm 0.950 to 0.988, A/A spread 0.019. The head is 0.904 times the fixed base `25a2be4`.

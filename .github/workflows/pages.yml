@@ -1,26 +1,30 @@
 # Builds packages/site and publishes it to GitHub Pages at https://mark1russell7.github.io/highways/, with
 # the shared Pages workflow of mark1russell7 (reusable-pages.yml of mark1russell7/template, its CI.md).
 # The Pages source of the repository is "GitHub Actions" (Settings > Pages).
-# The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/,
+# The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/
+# or the newer record of the branch bench-data, which the job `land` of Bench pushes,
 # the verdict snapshots of docs/research/verdicts/, the idea records and the roadmap (SITE-LIVE).
 # The shared site-pages action adds the Status page (from docs/ROADMAP.md) and the Releases page (from npm).
+# A pull request builds and checks the site in a browser, with no deploy.
 name: Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  pull_request:
 
 permissions: {}
 
-# One deployment at a time. A newer push cancels a deployment that waits.
+# One deployment at a time. A newer push replaces a deployment that waits, but it does not stop a deployment that runs (rule `main-runs-finish`).
+# Each pull request has its own group, and a newer push cancels its run.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   pages:
-    uses: mark1russell7/template/.github/workflows/reusable-pages.yml@3377b376fb6e39e4d65f130a98e74125d592f1f3 # main
+    uses: mark1russell7/template/.github/workflows/reusable-pages.yml@5ff05c26ff13af7db53ecc45fce714efff36c7b5 # main
     # The build job of the shared workflow gets only the read permissions. Only its deploy job,
     # which runs no code of the repository, writes to Pages.
     permissions:
@@ -34,13 +38,19 @@ jobs:
       id-token: write
     with:
       # The site reads the committed snapshots, so the build takes a few minutes. The workflow Bench races the routers.
-      build: pnpm --filter @highways/site run build
+      build: node packages/site/scripts/bench-overlay.ts && pnpm --filter @highways/site run build
       out: packages/site/dist
       env: '{"SITE_BASE": "/${{ github.event.repository.name }}"}'
+      deploy: ${{ github.event_name != 'pull_request' }}
       # The Releases page and the Status page (releases/, status/ and their data/*.json), at deploy time.
       # The package has no changelog file. The Releases page takes the versions from npm.
       site-pages: true
       roadmap: docs/ROADMAP.md
       packages: "@mark1russell7/highways"
       site-name: highways
+      # The check opens each page in a browser at each width, in light and dark. The probe drives the map of the home
+      # page with the real routers. The check reads the TypeScript source and removes its types.
+      site-check: true
+      site-check-pages: /,/compare.html,/examples.html,/results.html,/strategies.html,/releases/,/status/
+      site-check-probe: packages/site/src/check-probe.ts
       timeout-minutes: 15

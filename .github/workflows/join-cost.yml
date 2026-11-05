@@ -1,0 +1,75 @@
+# The time of the join of the corner graph (CORNER-REACH). This run only reports: it is not a gate.
+# The other gates run on boards where the join does nothing, so they cannot show its time.
+# One job runs the arms in turn on each board, with an A/A arm, and the record names the CPU model.
+name: Join cost
+
+on:
+  # Each pull request starts this workflow. The job changes skips the work when the pull request changes no file of the join.
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: "The rounds of each board."
+        default: "15"
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run for each workflow and ref (RUNNER-SLOTS). A new push cancels the run of the push before it.
+  group: join-cost-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+        with:
+          paths: |
+            packages/core/src/visibility.ts
+            packages/core/src/free-regions.ts
+            packages/core/src/levels.ts
+            packages/core/src/routers/sections.ts
+            packages/core/scripts/join-cost.ts
+            .github/workflows/join-cost.yml
+
+  measure:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      ROUNDS: ${{ inputs.rounds || '15' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Time the join
+        run: |
+          set -o pipefail
+          node packages/core/scripts/join-cost.ts --rounds "$ROUNDS"
+          cat out/join-cost.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: join-cost
+          path: out/join-cost.*
+          if-no-files-found: warn
