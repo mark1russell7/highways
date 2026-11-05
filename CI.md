@@ -299,7 +299,11 @@ A dispatch with another `all`, `run` or `fault` names its gate job `Xplat partia
 
 A test pins the expression of that name. If the expression gives another name on a pull request, the necessary check does not report and the pull request waits. So this fault stops a merge.
 
-The flip on the whole workflow, each with `all` false: [no fault](https://github.com/mark1russell7/highways/actions/runs/42055629759), green; [a route that differs](https://github.com/mark1russell7/highways/actions/runs/42055671579), with `summary` and `Xplat partial` red; [a failed download](https://github.com/mark1russell7/highways/actions/runs/42055704453), red with its own text.
+The flip on the whole workflow has 3 dispatches, each with `all` false:
+
+- [No fault](https://github.com/mark1russell7/highways/actions/runs/42055629759): the run is green.
+- [A route that differs](https://github.com/mark1russell7/highways/actions/runs/42055671579): `summary` and `Xplat partial` are red.
+- [A failed download](https://github.com/mark1russell7/highways/actions/runs/42055704453): the run is red with its own text.
 
 No workflow starts `screen-verdict.ts`. It runs by hand on the records of a run of `Screen`, so its check of the records holds nothing in CI.
 
