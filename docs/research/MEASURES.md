@@ -116,7 +116,7 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 
 ### The read of the painted count
 
-The record `paint-tie/1` reads 3 routers on 75 boards, with 5 drawn vectors for each move. `node packages/core/scripts/paint-tie.ts` writes it.
+The record `paint-tie/1` reads 3 routers on 75 boards, with 5 drawn vectors for each move. `node packages/core/scripts/paint-tie.ts` writes it. Each figure of this section is of counter version 2, the value of `PAINT_COUNTER`.
 
 **The one count.** `crossingPairs` reads lines, and `routePairCrossings` reads routes. Both read each point on the grid `EPS_STEPS`, which comes from `EPS` of the contract. A property test pins equal counts on lines with no shared vertex. These counts answer other questions and keep their own rules: R1 of `measureQuality`, `measureHighways`, `drawnSegments`, `tracing` and `curriculum`. `route.bundle.lane-crossings` (B5) reads the order of lanes in a bundle.
 
