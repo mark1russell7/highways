@@ -1,0 +1,40 @@
+{
+  "boxes": [
+    {"h": 22, "id": "n0", "w": 53, "x": 32, "y": 111},
+    {"h": 28, "id": "n1", "w": 51, "x": 252, "y": 66},
+    {"h": 21, "id": "n2", "w": 48, "x": -11, "y": 205},
+    {"h": 20, "id": "n3", "w": 38, "x": 149, "y": 9},
+    {"h": 29, "id": "n4", "w": 54, "x": 102, "y": 164},
+    {"h": 29, "id": "n5", "w": 30, "x": 18, "y": 32},
+    {"h": 29, "id": "n6", "w": 37, "x": 1, "y": 255},
+    {"h": 24, "id": "n7", "w": 40, "x": 80, "y": -11},
+    {"h": 21, "id": "n8", "w": 49, "x": 168, "y": 157},
+    {"h": 24, "id": "n9", "w": 38, "x": 172, "y": 225}
+  ],
+  "cell": {"containerShape": "rect", "containerSize": "freeAspect", "count": "10", "edgeDensity": "medium", "edgeKey": "none", "edgeShape": "random", "groups": "none", "mode": "offline", "obstacles": "none", "ports": "free"},
+  "edges": [
+    {"id": "e0", "source": "n5", "target": "n9"},
+    {"id": "e1", "source": "n7", "target": "n8"},
+    {"id": "e2", "source": "n8", "target": "n3"},
+    {"id": "e3", "source": "n5", "target": "n1"},
+    {"id": "e4", "source": "n1", "target": "n7"},
+    {"id": "e5", "source": "n6", "target": "n9"},
+    {"id": "e6", "source": "n2", "target": "n6"},
+    {"id": "e7", "source": "n7", "target": "n5"},
+    {"id": "e8", "source": "n0", "target": "n3"},
+    {"id": "e9", "source": "n8", "target": "n4"},
+    {"id": "e10", "source": "n0", "target": "n6"},
+    {"id": "e11", "source": "n9", "target": "n2"},
+    {"id": "e12", "source": "n8", "target": "n5"},
+    {"id": "e13", "source": "n6", "target": "n8"},
+    {"id": "e14", "source": "n3", "target": "n9"}
+  ],
+  "family": "tiny-uniform.key-none",
+  "generator": {"name": "edge-key", "params": {"base": {"name": "fixture", "params": {"edgesPerNode": 1.5, "kind": "uniform", "nodes": 10}, "version": 1}, "edgeKey": "none"}, "seed": 5046, "version": 1},
+  "hash": "6ba01e34bcda19bb",
+  "id": "screen-v5/tiny-uniform.key-none/s5",
+  "schema": "layout-input/1",
+  "seed": 5,
+  "set": "screen-v5",
+  "source": "made-up"
+}
