@@ -1,14 +1,5 @@
 # Changelog of `@mark1russell7/highways`
 
-## 0.16.0
-
-This version is a MINOR before 1.0, because the public types name `layout-contract` and its range moves to `^0.5.0`.
-
-### Not in this version
-
-- The exact count of `route.crossings` (CROSSINGS-LIMIT) is not in this version.
-- The grid of the painted count (PAINT-TIE) and the measure of true shapes are not in this version.
-
 ## 0.15.0
 
 This version is a MINOR before 1.0, because default routes change and the public types name `layout-contract` 0.4.0.
