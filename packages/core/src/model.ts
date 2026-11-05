@@ -82,7 +82,7 @@ export interface Route {
   readonly through?: readonly string[];
   /** This id names the frame of an inner route: the route stays inside the box of that node. An outer route has no frame. */
   readonly frame?: string;
-  /** This flag marks a lane that stays outside the room of its shared way, because the room cannot hold the lanes at the smallest distance. `laneRoutes` and `pullApart` give it. */
+  /** This flag marks a lane that stays outside the room of its shared way, because the room cannot hold the lanes at the smallest distance. `laneRoutes` and `pullApart` give it. The box that takes the room can be an end box of the lane itself. */
   readonly outOfRoom?: true;
 }
 

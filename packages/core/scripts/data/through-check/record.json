@@ -1615,7 +1615,7 @@
       "laneBends": 3447,
       "fullLength": 233486.905,
       "fullBends": 3445,
-      "laneCrossings": 7190,
+      "laneCrossings": 7192,
       "fullCrossings": 6945,
       "bySeed": [
         {
@@ -1670,10 +1670,10 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 3061,
+          "laneCrossings": 3063,
           "fullCrossings": 2908,
           "polyline": {
-            "points": 3246,
+            "points": 3248,
             "beforePoints": 3097,
             "pairs": 2061,
             "beforePairs": 2018,
@@ -1681,7 +1681,7 @@
             "lost": 8
           },
           "painted": {
-            "points": 2845,
+            "points": 2843,
             "beforePoints": 2777,
             "pairs": 2010,
             "beforePairs": 1965,
@@ -1860,7 +1860,7 @@
             "lost": 9
           },
           "painted": {
-            "points": 4324,
+            "points": 4326,
             "beforePoints": 4286,
             "pairs": 2411,
             "beforePairs": 2414,
@@ -2049,7 +2049,7 @@
             "lost": 9
           },
           "painted": {
-            "points": 4296,
+            "points": 4298,
             "beforePoints": 4258,
             "pairs": 2394,
             "beforePairs": 2397,
@@ -2161,20 +2161,20 @@
       "laneBends": 4997,
       "fullLength": 212030.447,
       "fullBends": 4997,
-      "laneCrossings": 8127,
+      "laneCrossings": 8120,
       "fullCrossings": 7644,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 2413,
+          "laneCrossings": 2412,
           "fullCrossings": 2328,
           "polyline": {
-            "points": 2370,
+            "points": 2369,
             "beforePoints": 2272,
-            "pairs": 1340,
+            "pairs": 1341,
             "beforePairs": 1293,
             "added": 54,
-            "lost": 7
+            "lost": 6
           },
           "painted": {
             "points": 1482,
@@ -2191,10 +2191,10 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 2484,
+          "laneCrossings": 2482,
           "fullCrossings": 2352,
           "polyline": {
-            "points": 2417,
+            "points": 2415,
             "beforePoints": 2283,
             "pairs": 1375,
             "beforePairs": 1327,
@@ -2216,10 +2216,10 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 3230,
+          "laneCrossings": 3226,
           "fullCrossings": 2964,
           "polyline": {
-            "points": 3170,
+            "points": 3166,
             "beforePoints": 2892,
             "pairs": 1569,
             "beforePairs": 1511,
@@ -2658,7 +2658,7 @@
             "lost": 6
           },
           "painted": {
-            "points": 2851,
+            "points": 2849,
             "beforePoints": 2824,
             "pairs": 2589,
             "beforePairs": 2554,
@@ -2708,7 +2708,7 @@
             "lost": 4
           },
           "painted": {
-            "points": 3353,
+            "points": 3351,
             "beforePoints": 3243,
             "pairs": 2922,
             "beforePairs": 2858,
@@ -3397,7 +3397,7 @@
       "laneBends": 8302,
       "fullLength": 357442.779,
       "fullBends": 8303,
-      "laneCrossings": 17752,
+      "laneCrossings": 17750,
       "fullCrossings": 16907,
       "bySeed": [
         {
@@ -3452,10 +3452,10 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 6357,
+          "laneCrossings": 6355,
           "fullCrossings": 6109,
           "polyline": {
-            "points": 6243,
+            "points": 6241,
             "beforePoints": 5970,
             "pairs": 3361,
             "beforePairs": 3285,
@@ -9779,11 +9779,11 @@
             "lost": 7
           },
           "painted": {
-            "points": 736,
+            "points": 734,
             "beforePoints": 778,
-            "pairs": 469,
+            "pairs": 468,
             "beforePairs": 484,
-            "added": 12,
+            "added": 11,
             "lost": 27
           },
           "bundleBody": 1,
@@ -11899,7 +11899,7 @@
       "laneBends": 3285,
       "fullLength": 250883.09,
       "fullBends": 3285,
-      "laneCrossings": 8426,
+      "laneCrossings": 8427,
       "fullCrossings": 8275,
       "bySeed": [
         {
@@ -11954,10 +11954,10 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 2411,
+          "laneCrossings": 2412,
           "fullCrossings": 2409,
           "polyline": {
-            "points": 2693,
+            "points": 2694,
             "beforePoints": 2703,
             "pairs": 1892,
             "beforePairs": 1887,
@@ -12067,7 +12067,7 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
-      "laneCrossings": 14863,
+      "laneCrossings": 14862,
       "fullCrossings": 14369,
       "bySeed": [
         {
@@ -12097,10 +12097,10 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 4767,
+          "laneCrossings": 4766,
           "fullCrossings": 4528,
           "polyline": {
-            "points": 5632,
+            "points": 5631,
             "beforePoints": 5452,
             "pairs": 2671,
             "beforePairs": 2653,
@@ -12108,7 +12108,7 @@
             "lost": 8
           },
           "painted": {
-            "points": 4633,
+            "points": 4639,
             "beforePoints": 4636,
             "pairs": 2517,
             "beforePairs": 2500,
@@ -12217,7 +12217,7 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
-      "laneCrossings": 14863,
+      "laneCrossings": 14862,
       "fullCrossings": 14369,
       "bySeed": [
         {
@@ -12247,10 +12247,10 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 4767,
+          "laneCrossings": 4766,
           "fullCrossings": 4528,
           "polyline": {
-            "points": 5632,
+            "points": 5631,
             "beforePoints": 5452,
             "pairs": 2671,
             "beforePairs": 2653,
@@ -12258,7 +12258,7 @@
             "lost": 8
           },
           "painted": {
-            "points": 4633,
+            "points": 4639,
             "beforePoints": 4636,
             "pairs": 2517,
             "beforePairs": 2500,
@@ -18399,7 +18399,7 @@
       "laneBends": 2127,
       "fullLength": 147491.118,
       "fullBends": 2127,
-      "laneCrossings": 4484,
+      "laneCrossings": 4483,
       "fullCrossings": 4143,
       "bySeed": [
         {
@@ -18429,10 +18429,10 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 1571,
+          "laneCrossings": 1570,
           "fullCrossings": 1473,
           "polyline": {
-            "points": 2337,
+            "points": 2336,
             "beforePoints": 2233,
             "pairs": 1435,
             "beforePairs": 1432,
@@ -18632,7 +18632,7 @@
             "lost": 0
           },
           "painted": {
-            "points": 2603,
+            "points": 2605,
             "beforePoints": 2588,
             "pairs": 1434,
             "beforePairs": 1433,
@@ -18782,7 +18782,7 @@
             "lost": 0
           },
           "painted": {
-            "points": 2603,
+            "points": 2605,
             "beforePoints": 2588,
             "pairs": 1434,
             "beforePairs": 1433,
@@ -18866,15 +18866,15 @@
       "laneBends": 2762,
       "fullLength": 134243.605,
       "fullBends": 2762,
-      "laneCrossings": 9702,
+      "laneCrossings": 9699,
       "fullCrossings": 9334,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 2677,
+          "laneCrossings": 2675,
           "fullCrossings": 2572,
           "polyline": {
-            "points": 2698,
+            "points": 2696,
             "beforePoints": 2566,
             "pairs": 1240,
             "beforePairs": 1222,
@@ -18921,10 +18921,10 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 3662,
+          "laneCrossings": 3661,
           "fullCrossings": 3609,
           "polyline": {
-            "points": 3643,
+            "points": 3642,
             "beforePoints": 3583,
             "pairs": 1420,
             "beforePairs": 1393,
@@ -25273,15 +25273,15 @@
       "laneBends": 1167,
       "fullLength": 35202.74,
       "fullBends": 1175,
-      "laneCrossings": 778,
+      "laneCrossings": 780,
       "fullCrossings": 780,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 221,
+          "laneCrossings": 223,
           "fullCrossings": 219,
           "polyline": {
-            "points": 204,
+            "points": 206,
             "beforePoints": 199,
             "pairs": 106,
             "beforePairs": 105,
