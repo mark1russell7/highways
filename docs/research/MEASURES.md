@@ -175,7 +175,7 @@ A control reads no route quality. So a measure that a control wins cannot call a
 The record lists each win. These results are the ones to keep in mind:
 
 - `route.crossings.pairs` needs `route.through` beside it. In sum, `straight` reads 24,707 pairs, and `corners` reads 32,194. For that count, 3,013 of the routes of `straight` go through a box.
-- The crossing angle and the plug spacing read their best value when a router has no crossing of ink or one plug on each side of a box. So these values tell nothing on a router that shares much.
+- The crossing angle reads its best value when a router has no crossing of ink. The plug spacing reads its best value with one plug on each side of a box. So these values tell nothing on a router that shares much.
 - No control buys `route.through`. This measure counts routes that go through a box. Of 6,065 routes, `perimeter` reads 3,826 and `straight` reads 3,013. `perimeter` reads less than `straight` in 10 of the 25 families, and it reads 0 only on `tiny-uniform`. On these boards, a straight way out of a box usually crosses another box. `corners` reads a median of 0 at a median detour of 1.021, and all of its 292 are on `packed-grid`.
 
 ### The exact forms of MEAS3A

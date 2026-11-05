@@ -65,7 +65,7 @@ function cornersBetween(ring: Box, from: Point, to: Point): Point[] {
 }
 
 /**
- * A control of the benchmark: each end goes straight out past the bounding frame of the boxes, along the frame by the shorter way, and back in.
+ * A control of the benchmark. Each end goes straight out past the bounding frame of the boxes, along the frame by the shorter way, and back in.
  * A free end takes the side with the fewest boxes on its way out, and then the shortest way out. This router pays any length for that.
  * On a board with many boxes, each way out of a box can cross a box, so this control usually does not buy `route.through`.
  * The router does not mark `through`, and it gives no shared run, as `straight`.
