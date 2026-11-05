@@ -1,3 +1,5 @@
+@import "@mark1russell7/site-pages/scroll-cue.css";
+
 /* The colors of a road map by day, and of asphalt by night. */
 :root {
   --paper: #e3eae5;
@@ -363,13 +365,14 @@ select {
 
 .seg {
   display: flex;
+  flex-wrap: wrap;
   border: 1px solid var(--rule);
   border-radius: 8px;
   overflow: hidden;
 }
 
 .seg label {
-  flex: 1;
+  flex: 1 1 auto;
   position: relative;
 }
 
@@ -560,6 +563,7 @@ input[type="range"] {
 }
 
 .table-wrap {
+  --scroll-cue-bg: var(--paper);
   overflow-x: auto;
 }
 
