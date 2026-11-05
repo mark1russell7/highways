@@ -945,7 +945,7 @@ Today each run, or each stretch of a bundle, orders its lanes. The inverse fixes
 | Makes better | B5, R1 |
 | Risks | R1, B9 |
 | Reads the placement | Yes |
-| Cheapest test | Against the order `bundle` on `shared-all` over `case-many-groups`: keep it when the end crossings drop below 687, with 0 body crossings. The 687 reads version 1 of the bundle counter. |
+| Cheapest test | Against the order `bundle` on `shared-all` over `case-many-groups`: keep it when the end crossings drop below 720, with 0 body crossings. The 720 reads version 2 of the bundle counter. |
 | Size | S: one file in a strategy folder. |
 | Related | [WILD-038](#wild-038-braid-crossings-at-the-best-place), `EDA-026`, `HWY-016` |
 | Sources | [Bekos 2007][bekos07], [Pupyrev 2011][pupyrev11] |

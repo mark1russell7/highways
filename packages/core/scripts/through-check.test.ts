@@ -16,11 +16,11 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 const PAINTED: Record<string, readonly number[]> = {
   "corners": [33271, 31144, 0, 0, 0, 0],
   "trunks": [34056, 31696, 0, 0, 0, 1],
-  "shared": [35923, 32448, 274, 42, 10, 522],
-  "sections": [54016, 40297, 815, 501, 319, 1864],
-  "sections-site": [83802, 46980, 121, 68, 489, 2274],
-  "sections-site-no-ladder": [81724, 46226, 128, 120, 483, 2353],
-  "shared-all": [43398, 36006, 1421, 459, 79, 12027],
+  "shared": [35923, 32448, 274, 42, 1, 531],
+  "sections": [54016, 40297, 815, 501, 144, 2055],
+  "sections-site": [83802, 46980, 121, 68, 441, 2340],
+  "sections-site-no-ladder": [81724, 46226, 128, 120, 435, 2420],
+  "shared-all": [43398, 36006, 1421, 459, 0, 12027],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 

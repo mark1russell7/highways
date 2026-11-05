@@ -161,6 +161,7 @@ export function runKey(edges: readonly string[]): string {
  * A segment with a room keeps its lanes in that room. Each side compresses on its own, so each lane keeps its order and its side.
  * The outer lane keeps `LANE_CLEAR` from the box when it can, and two lanes of a side stay at least `least` apart.
  * A lane that then reaches the room can touch or enter a box, and it gets the field `outOfRoom`.
+ * The box that takes the room can be an end box of the lane itself.
  *
  * Lane 0 is on the left of the segment, from its first point to its last, with the y axis down.
  * The function takes a result or its segments. It gives a route for each edge, with the ends at their plugs.

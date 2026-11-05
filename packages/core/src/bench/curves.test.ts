@@ -46,6 +46,15 @@ describe("benchHighways", () => {
     expect(bundle!.crossings).toBe(0);
     expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);
   });
+
+  it("keeps 0 in the body of that board under a harmless shift of the boxes", () => {
+    const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
+    for (const [dx, dy] of [[1e-12, -1e-12], [-1e-10, 1e-10], [1e-8, 1e-8], [-1e-7, -1e-7]] as const) {
+      const nodes = graph.nodes.map((n) => ({ ...n, box: { ...n.box, x: n.box.x + dx, y: n.box.y + dy } }));
+      const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", { ...graph, nodes });
+      expect(bundle!.crossings, `shift ${dx}, ${dy}`).toBe(0);
+    }
+  });
 });
 
 describe("the crossings of measureHighways on a long straight piece", () => {

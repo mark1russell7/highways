@@ -27123,7 +27123,7 @@
         "B9"
       ],
       "placementDependent": true,
-      "screen": "Against the order bundle on shared-all over case-many-groups: keep it when the end crossings drop below 687, with 0 body crossings.",
+      "screen": "Against the order bundle on shared-all over case-many-groups: keep it when the end crossings drop below 720, with 0 body crossings. The 720 reads version 2 of the bundle counter.",
       "prototype": "S",
       "stage": "screened",
       "related": [
