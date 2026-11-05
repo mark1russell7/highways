@@ -14,6 +14,11 @@ The screen sets are `screen-v1`, `screen-v2` and `screen-v3`. `screen-v1` and `s
 
 Select a cell to see its families. The snapshots are in [`docs/research/verdicts/`](https://github.com/mark1russell7/highways/tree/main/docs/research/verdicts).
 
+With no key, `shared` is `corners` with other tie breaks. Any difference on those boards is a tie and not a win. The base `shared` makes ways only from the key `data.collection` of an edge. 12 of the 15 families of `screen-v3` have no key, so the base has 0 ways there.
+
+- The row `corners` marks each family with no key as a tie by cause, until the item ROUTE-TIE closes. Its labels stay as the run gave them, and they read all the families.
+- With `corners` as the base, 92 of 299 labels of `screen-v3` move, and 33 of them change between `better` and `worse`. On the 12 families with no key alone, 0 labels move. The [list of the 92 labels](https://github.com/mark1russell7/highways/blob/main/docs/research/key-split/moved.json) tells each one.
+
 ## Where no single default wins
 
 These verdicts are `better`, but 1 or more families are against them. On these families, the default stays better. A selector that knows the family can take the best strategy for each input.
