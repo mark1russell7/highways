@@ -4,7 +4,7 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { MEASURES } from "@mark1russell7/highways";
+import { KEYED_FAMILIES, MEASURES } from "@mark1russell7/highways";
 import { marked } from "marked";
 import { resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
 
@@ -74,6 +74,7 @@ export function readResults(root: string): ResultsData {
     measures: measureRows(),
     core: (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version,
     coverage: { record: readFileSync(join(root, RESULT_FILES.coverage), "utf8"), trend: readFileSync(join(root, RESULT_FILES.coverageTrend), "utf8") },
+    keyed: KEYED_FAMILIES,
   });
 }
 

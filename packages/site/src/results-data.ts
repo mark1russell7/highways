@@ -73,6 +73,8 @@ export interface VerdictCell {
   /** The sign of each family, in the sequence of `families` of the table. */
   readonly signs: string;
   readonly p: number;
+  /** The count of family marks of the run that `keylessTies` changed to a tie. A cell of another strategy does not have this field. */
+  readonly tiedByCause?: number;
 }
 
 /** The verdict grid of one set and one step: the strategy rows and the guard columns. */
@@ -80,6 +82,8 @@ export interface VerdictTable extends SnapshotHeader {
   readonly families: readonly string[];
   readonly guards: readonly { readonly id: string; readonly measure: string }[];
   readonly strategies: readonly { readonly name: string; readonly cells: readonly VerdictCell[] }[];
+  /** The families with no key, where the base `shared` has 0 ways. Only a table with that base has this field. */
+  readonly keyless?: readonly string[];
 }
 
 /** This function gives the verdict grid of a snapshot. It keeps only the fields that the page shows. */
@@ -373,6 +377,31 @@ export interface MeasureRow {
   readonly definition: string;
 }
 
+/** The base that makes ways only from a key. */
+const KEY_BASE = "shared";
+/** The strategy that the base `shared` equals on a board with no key, but for its tie breaks. */
+const KEY_TWIN = "corners";
+
+/**
+ * This function marks the families with no key on a table with the base `shared`.
+ * With no key, `shared` is `corners` with other tie breaks. So each mark of the row `corners` on such a family is a tie by cause.
+ * The label of a cell does not change, because the run read it over all the families.
+ */
+export function keylessTies(t: VerdictTable, keyed: readonly string[]): VerdictTable {
+  if (t.base !== KEY_BASE) return t;
+  const tieCell = (c: VerdictCell): VerdictCell => {
+    const signs = [...c.signs].map((sign, i) => (keyed.includes(t.families[i] ?? "") ? sign : SIGN_CHAR[0]));
+    const count = (sign: string): number => signs.filter((s) => s === sign).length;
+    const against = c.label === "better" ? count(SIGN_CHAR[-1]) : c.label === "worse" ? count(SIGN_CHAR[1]) : c.against;
+    return { ...c, signs: signs.join(""), against, ties: count(SIGN_CHAR[0]), tiedByCause: signs.filter((s, i) => s !== c.signs[i]).length };
+  };
+  return {
+    ...t,
+    keyless: t.families.filter((f) => !keyed.includes(f)),
+    strategies: t.strategies.map((s) => (s.name === KEY_TWIN ? { name: s.name, cells: s.cells.map(tieCell) } : s)),
+  };
+}
+
 /** The inputs of `resultsData`: the texts of the committed files. */
 export interface ResultsInput {
   readonly snapshots: readonly { readonly name: string; readonly text: string }[];
@@ -389,6 +418,8 @@ export interface ResultsInput {
   readonly core?: string;
   /** The text of `record.json` and of `trend.json` of `docs/research/space-coverage`. */
   readonly coverage?: { readonly record: string; readonly trend: string };
+  /** The families whose edges carry a key, from `KEYED_FAMILIES` of the core. With no list, the page marks no family. */
+  readonly keyed?: readonly string[];
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -419,7 +450,7 @@ export function resultsData(input: ResultsInput): ResultsData {
   const betterCount = snapshots.filter((s) => s.set === splitSet).reduce((n, s) => n + s.rows.filter((r) => r.label === "better").length, 0);
   const shipped = shippedRows(input.roadmap);
   return {
-    tables: snapshots.map(verdictTable),
+    tables: snapshots.map(verdictTable).map((t) => (input.keyed ? keylessTies(t, input.keyed) : t)),
     splitSet,
     split,
     betterCount,
