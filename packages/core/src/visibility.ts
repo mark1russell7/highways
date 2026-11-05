@@ -135,6 +135,9 @@ export interface CornerGraphOptions {
  */
 export const JOIN_WORK: number = 3 * 2048 * 2048;
 
+/** Two costs of a path within this distance tie. The distance is far above the rounding of a sum of lengths, and far below a real difference. */
+const TIE = 1e-9;
+
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
  * Each corner links to its `k` nearest corners that it can see. A lattice of free points links the groups of nodes.
@@ -668,24 +671,38 @@ export class CornerGraph {
     let bestEnd = -1;
     let settled = 0;
     while (heap.size > 0) {
-      if (heap.topKey >= best) break;
+      if (heap.topKey > best + TIE) break;
       const i = heap.pop();
       closed[i] = stamp;
       const m0 = start[i]!;
       const m1 = start[i + 1]!;
       settled += 1 + (m1 - m0);
       const gi = G[i]!;
-      if (goalAt[i] === stamp && gi + goalTail[i]! < best) {
-        best = gi + goalTail[i]!;
-        bestEnd = i;
+      if (goalAt[i] === stamp) {
+        const end = gi + goalTail[i]!;
+        if (end < best - TIE || (end <= best + TIE && i < bestEnd)) bestEnd = i;
+        if (end < best) best = end;
       }
       for (let m = m0; m < m1; m++) {
         const j = next[m]!;
-        if (closed[j] === stamp) continue;
         const d = length[m]!;
+        const shut = closed[j] === stamp;
+        // A closed corner reads a link only if a path through the link can tie, so a lower estimate does not change the tie.
+        if (shut && gi + floor * d > G[j]! + TIE) continue;
         const g = gi + (cost ? cost(i, j, d) : d);
         if (open[j] === stamp) {
-          if (G[j]! <= g) continue;
+          const gap = g - G[j]!;
+          if (gap > TIE) continue;
+          // A corner keeps its lowest parent among the paths that tie, so the order of the search does not choose the path.
+          if (gap >= -TIE) {
+            if (g - gi > TIE && i < parentOf[j]!) parentOf[j] = i;
+            if (!shut && gap < 0) {
+              G[j] = g;
+              heap.set(g + H[j]!, j);
+            }
+            continue;
+          }
+          if (shut) continue;
         } else {
           open[j] = stamp;
           H[j] = estimate(j);
