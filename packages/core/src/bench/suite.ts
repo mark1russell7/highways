@@ -273,6 +273,7 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
   const turn = totalTurn(routes);
   const detour = detourSpread(routes);
   const plugs = plugSpacing(graph, routes);
+  const amb = ambiguity(graph, routes);
   const overlap = routeOverlap(routes);
   const pairs = routePairCrossings(routes);
   return {
@@ -300,7 +301,8 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
     "R13.outside": row.faults.outside,
     "R11.min": plugs.min,
     "R11.q05": plugs.q05,
-    "B4.ambiguity": ambiguity(graph, routes).value,
+    "B4.ambiguity": amb.value,
+    "B4.reach": amb.reach,
     ...levelMeasures(graph, result),
   };
 }
