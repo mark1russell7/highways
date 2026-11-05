@@ -1,5 +1,19 @@
 [
   {
+    "id": "EDA-010",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "rip-up",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 34,
+      "uncertainty": 0.7,
+      "cost": 1,
+      "score": 23.8,
+      "rank": 1
+    }
+  },
+  {
     "id": "EDA-017",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4B",
@@ -24,6 +38,20 @@
       "uncertainty": 0.7,
       "cost": 1,
       "score": 23.8,
+      "rank": 3
+    }
+  },
+  {
+    "id": "EDA-032",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "concave-convex",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 41.5,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 20.75,
       "rank": 3
     }
   },
@@ -210,6 +238,34 @@
     }
   },
   {
+    "id": "RULE-051",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "currents",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 41.5,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 20.75,
+      "rank": 4
+    }
+  },
+  {
+    "id": "WILD-003",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "auction",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 40,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 20,
+      "rank": 6
+    }
+  },
+  {
     "id": "WILD-016",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4B",
@@ -249,6 +305,20 @@
       "cost": 2,
       "score": 21.75,
       "rank": 6
+    }
+  },
+  {
+    "id": "WILD-035",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "cut-streets",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 42,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 21,
+      "rank": 2
     }
   },
   {
@@ -319,6 +389,20 @@
       "cost": 2,
       "score": 23.4,
       "rank": 4
+    }
+  },
+  {
+    "id": "WILD-054",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W5",
+    "strategy": "moats",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 40.5,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 20.25,
+      "rank": 5
     }
   },
   {

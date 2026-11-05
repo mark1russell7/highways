@@ -103,6 +103,8 @@ export interface SharedSearch {
   readonly graph: Graph;
   /** The number of corners of the corner graph. */
   readonly corners: number;
+  /** The point of each corner of the corner graph, by its index. The router `shared` gives it. */
+  readonly points?: readonly Point[];
   /** This function gives the key of the link between the indices `i` and `j`, for each order of the two. */
   link(i: number, j: number): number;
   /**
@@ -211,6 +213,7 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       const search: SharedSearch = {
         graph,
         corners: corners.points.length,
+        points: corners.points,
         link,
         find: (w, cost, floor = 1) => {
           const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);

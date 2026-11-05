@@ -113,3 +113,6 @@ export * from "./gates/index.ts";
 export { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "./two-way/index.ts";
 export { addPairs, disagreement, GLOBAL_KEYS, GLOBAL_ORDER_DEFAULTS, globalOrderPlan, hilbertRank, keyOrder, pseudoAngle, SIFT_CAP, sift, type GlobalKey, type GlobalOrderOptions, type PairWeights } from "./global-order/index.ts";
 export { APPROVAL_DEFAULTS, APPROVAL_PICKS, approvalPlan, approvedLinks, distancesFrom, pickLinks, type ApprovalOptions, type ApprovalPick } from "./approval/index.ts";
+export { CUT_STREET_DEFAULTS, CUT_STREET_GROUPINGS, cutLines, cutStreetPlan, streetGraph, type CutLine, type CutStreetGrouping, type CutStreetOptions, type StreetGraph } from "./cut-streets/index.ts";
+export { CONCAVE_DEFAULTS, CONCAVE_KEYS, CONCAVE_MAX_CAP, concaveCost, concaveMarginal, concavePlan, type ConcaveCost, type ConcaveKeys, type ConcaveOptions } from "./concave-convex/index.ts";
+export { CURRENT_DEFAULTS, CURRENT_MAX_CELLS, cellOf, currentOf, currentPlan, directionClass, nearestFree, partsOf, solveSheet, type CurrentOptions, type Sheet } from "./currents/index.ts";

@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1513 names
+## . (build/index.d.ts): 1564 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -20,6 +20,7 @@ AREA_WIDTHS: build/index.d.ts#AREA_WIDTHS
 ASSIGN_DEFAULTS: build/index.d.ts#ASSIGN_DEFAULTS
 ATTRACTION_DEFAULTS: build/index.d.ts#ATTRACTION_DEFAULTS
 ATTRACTION_SCHEMA: build/index.d.ts#ATTRACTION_SCHEMA
+AUCTION_DEFAULTS: build/index.d.ts#AUCTION_DEFAULTS
 ActivationReport: build/index.d.ts#ActivationReport
 ActivationRow: build/index.d.ts#ActivationRow
 type AdamOptions: build/index.d.ts#AdamOptions
@@ -43,6 +44,7 @@ type AreaOptions: build/index.d.ts#AreaOptions
 type AreaWidth: build/index.d.ts#AreaWidth
 AssignOptions: build/index.d.ts#AssignOptions
 type AttractionOptions: build/index.d.ts#AttractionOptions
+AuctionOptions: build/index.d.ts#AuctionOptions
 BACKTRACK_MIN: build/index.d.ts#BACKTRACK_MIN
 BACKTRACK_SHARE: build/index.d.ts#BACKTRACK_SHARE
 BALANCE_DEFAULTS: build/index.d.ts#BALANCE_DEFAULTS
@@ -98,6 +100,9 @@ CLEARANCE_CAP: build/index.d.ts#CLEARANCE_CAP
 COMB: build/index.d.ts#COMB
 COMPARE_ALL_STEPS: build/index.d.ts#COMPARE_ALL_STEPS
 COMPARE_STEPS: build/index.d.ts#COMPARE_STEPS
+CONCAVE_DEFAULTS: build/index.d.ts#CONCAVE_DEFAULTS
+CONCAVE_KEYS: build/index.d.ts#CONCAVE_KEYS
+CONCAVE_MAX_CAP: build/index.d.ts#CONCAVE_MAX_CAP
 CONFLUENT_DEFAULTS: build/index.d.ts#CONFLUENT_DEFAULTS
 CONSENSUS_DEFAULTS: build/index.d.ts#CONSENSUS_DEFAULTS
 CONSENSUS_LINKAGES: build/index.d.ts#CONSENSUS_LINKAGES
@@ -106,11 +111,15 @@ COVERAGE_FAMILIES: build/index.d.ts#COVERAGE_FAMILIES
 CROP_DEFAULTS: build/index.d.ts#CROP_DEFAULTS
 CROSSBAR_DEFAULTS: build/index.d.ts#CROSSBAR_DEFAULTS
 CUBU_DEFAULTS: build/index.d.ts#CUBU_DEFAULTS
+CURRENT_DEFAULTS: build/index.d.ts#CURRENT_DEFAULTS
+CURRENT_MAX_CELLS: build/index.d.ts#CURRENT_MAX_CELLS
 CURRICULUM_DEFAULTS: build/index.d.ts#CURRICULUM_DEFAULTS
 CURRICULUM_ORDERS: build/index.d.ts#CURRICULUM_ORDERS
 CURRICULUM_POOL: build/index.d.ts#CURRICULUM_POOL
 CURVE_TYPES: build/index.d.ts#CURVE_TYPES
 CUT_DEFAULTS: build/index.d.ts#CUT_DEFAULTS
+CUT_STREET_DEFAULTS: build/index.d.ts#CUT_STREET_DEFAULTS
+CUT_STREET_GROUPINGS: build/index.d.ts#CUT_STREET_GROUPINGS
 type CanalHub: build/index.d.ts#CanalHub
 type CanalOptions: build/index.d.ts#CanalOptions
 type CandidateSource: build/index.d.ts#CandidateSource
@@ -129,6 +138,9 @@ CompareOptions: build/index.d.ts#CompareOptions
 CompareRow: build/index.d.ts#CompareRow
 CompareSpec: build/index.d.ts#CompareSpec
 CompareStep: build/index.d.ts#CompareStep
+type ConcaveCost: build/index.d.ts#ConcaveCost
+type ConcaveKeys: build/index.d.ts#ConcaveKeys
+type ConcaveOptions: build/index.d.ts#ConcaveOptions
 type ConfluentOptions: build/index.d.ts#ConfluentOptions
 type ConsensusLinkage: build/index.d.ts#ConsensusLinkage
 type ConsensusOptions: build/index.d.ts#ConsensusOptions
@@ -148,6 +160,7 @@ type CrossbarOptions: build/index.d.ts#CrossbarOptions
 CrossingAngles: build/index.d.ts#CrossingAngles
 CubicSegment: build/index.d.ts#CubicSegment
 type CubuOptions: build/index.d.ts#CubuOptions
+type CurrentOptions: build/index.d.ts#CurrentOptions
 CurriculumOptions: build/index.d.ts#CurriculumOptions
 CurriculumOrder: build/index.d.ts#CurriculumOrder
 CurriculumRule: build/index.d.ts#CurriculumRule
@@ -163,8 +176,11 @@ CurveRunOptions: build/index.d.ts#CurveRunOptions
 CurveSegment: build/index.d.ts#CurveSegment
 type CurveSpace: build/index.d.ts#CurveSpace
 CurveType: build/index.d.ts#CurveType
+type CutLine: build/index.d.ts#CutLine
 type CutObjective: build/index.d.ts#CutObjective
 type CutOptions: build/index.d.ts#CutOptions
+type CutStreetGrouping: build/index.d.ts#CutStreetGrouping
+type CutStreetOptions: build/index.d.ts#CutStreetOptions
 DEFAULT_RNG: @mark1russell7/layout-contract#DEFAULT_RNG (external)
 DENSE_GROUPS: build/index.d.ts#DENSE_GROUPS
 DENSITY_KERNELS: build/index.d.ts#DENSITY_KERNELS
@@ -314,6 +330,7 @@ type HysteresisOptions: build/index.d.ts#HysteresisOptions
 INTERCHANGE_BASES: build/index.d.ts#INTERCHANGE_BASES
 INTERCHANGE_DEFAULTS: build/index.d.ts#INTERCHANGE_DEFAULTS
 InflectionOptions: build/index.d.ts#InflectionOptions
+InkFloor: build/index.d.ts#InkFloor
 InnerEdge: build/index.d.ts#InnerEdge
 type InnerMode: build/index.d.ts#InnerMode
 type Interchange: build/index.d.ts#Interchange
@@ -417,6 +434,8 @@ MINGLE_DEFAULTS: build/index.d.ts#MINGLE_DEFAULTS
 MIN_EFFECTS: build/index.d.ts#MIN_EFFECTS
 MLSEB_DEFAULTS: build/index.d.ts#MLSEB_DEFAULTS
 MLS_FITS: build/index.d.ts#MLS_FITS
+MOAT_DEFAULTS: build/index.d.ts#MOAT_DEFAULTS
+MOAT_POINTS: build/index.d.ts#MOAT_POINTS
 MODULE_RULES: build/index.d.ts#MODULE_RULES
 MOVES_V1: build/index.d.ts#MOVES_V1
 MOVE_BOARDS: build/index.d.ts#MOVE_BOARDS
@@ -440,6 +459,9 @@ MinHeap: build/index.d.ts#MinHeap
 type MingleOptions: build/index.d.ts#MingleOptions
 type MlsFit: build/index.d.ts#MlsFit
 type MlsebOptions: build/index.d.ts#MlsebOptions
+MoatEntry: build/index.d.ts#MoatEntry
+MoatOptions: build/index.d.ts#MoatOptions
+MoatRun: build/index.d.ts#MoatRun
 type ModuleRule: build/index.d.ts#ModuleRule
 MoveBoard: build/index.d.ts#MoveBoard
 MoveCounter: build/index.d.ts#MoveCounter
@@ -544,6 +566,8 @@ REROUTE_SCHEMA: build/index.d.ts#REROUTE_SCHEMA
 RESISTANCE_DEFAULTS: build/index.d.ts#RESISTANCE_DEFAULTS
 RIDGE_DEFAULTS: build/index.d.ts#RIDGE_DEFAULTS
 RINGS: build/index.d.ts#RINGS
+RIP_UP_DEFAULTS: build/index.d.ts#RIP_UP_DEFAULTS
+RIP_UP_SCHEMA: build/index.d.ts#RIP_UP_SCHEMA
 ROAD_CLASS_DEFAULTS: build/index.d.ts#ROAD_CLASS_DEFAULTS
 ROOM_FAMILIES: build/index.d.ts#ROOM_FAMILIES
 ROUTED_STEPS: build/index.d.ts#ROUTED_STEPS
@@ -567,6 +591,9 @@ Result: build/index.d.ts#Result
 type Ridge: build/index.d.ts#Ridge
 type RidgeOptions: build/index.d.ts#RidgeOptions
 type RidgeSource: build/index.d.ts#RidgeSource
+type RipUpOptions: build/index.d.ts#RipUpOptions
+type RipUpOrder: build/index.d.ts#RipUpOrder
+type RipUpScope: build/index.d.ts#RipUpScope
 type RoadClassOptions: build/index.d.ts#RoadClassOptions
 Room: build/index.d.ts#Room
 RoomBenchRow: build/index.d.ts#RoomBenchRow
@@ -699,6 +726,7 @@ SharedRun: build/index.d.ts#SharedRun
 type SharedSearch: build/index.d.ts#SharedSearch
 type SharedStretchOptions: build/index.d.ts#SharedStretchOptions
 type SharedWaysOptions: build/index.d.ts#SharedWaysOptions
+type Sheet: build/index.d.ts#Sheet
 Side: build/index.d.ts#Side
 type SkeletonGroups: build/index.d.ts#SkeletonGroups
 type SkeletonTarget: build/index.d.ts#SkeletonTarget
@@ -738,6 +766,7 @@ Strategy: build/index.d.ts#Strategy
 StrategyDefinition: build/index.d.ts#StrategyDefinition
 StrategyLookup: build/index.d.ts#StrategyLookup
 type StreetEdge: build/index.d.ts#StreetEdge
+type StreetGraph: build/index.d.ts#StreetGraph
 type StreetOptions: build/index.d.ts#StreetOptions
 type StreetRide: build/index.d.ts#StreetRide
 type StreetSource: build/index.d.ts#StreetSource
@@ -850,6 +879,8 @@ assignWall: build/index.d.ts#assignWall
 attraction: build/index.d.ts#attraction
 attractionRouter: build/index.d.ts#attractionRouter
 attractionStrategy: build/index.d.ts#attractionStrategy
+auctionAssign: build/index.d.ts#auctionAssign
+auctionEnds: build/index.d.ts#auctionEnds
 backboneLinks: build/index.d.ts#backboneLinks
 backtrackOf: build/index.d.ts#backtrackOf
 balance: build/index.d.ts#balance
@@ -900,6 +931,7 @@ candidateScore: build/index.d.ts#candidateScore
 canonicalJson: @mark1russell7/layout-contract#canonicalJson (external)
 capSettings: build/index.d.ts#capSettings
 caseSeed: build/index.d.ts#caseSeed
+cellOf: build/index.d.ts#cellOf
 cellSteps: build/index.d.ts#cellSteps
 center: build/index.d.ts#center
 chainClusters: build/index.d.ts#chainClusters
@@ -930,6 +962,9 @@ compareSpec: build/index.d.ts#compareSpec
 compareStep: build/index.d.ts#compareStep
 compatibility: build/index.d.ts#compatibility
 compatibilityMatrix: build/index.d.ts#compatibilityMatrix
+concaveCost: build/index.d.ts#concaveCost
+concaveMarginal: build/index.d.ts#concaveMarginal
+concavePlan: build/index.d.ts#concavePlan
 configOfMember: build/index.d.ts#configOfMember
 confluentPlan: build/index.d.ts#confluentPlan
 consensusGroups: build/index.d.ts#consensusGroups
@@ -952,6 +987,8 @@ crossingAngles: build/index.d.ts#crossingAngles
 crossingPoint: build/index.d.ts#crossingPoint
 cubicAt: build/index.d.ts#cubicAt
 cubuPlan: build/index.d.ts#cubuPlan
+currentOf: build/index.d.ts#currentOf
+currentPlan: build/index.d.ts#currentPlan
 curriculum: build/index.d.ts#curriculum
 curvatureVariation: build/index.d.ts#curvatureVariation
 curveDeviation: build/index.d.ts#curveDeviation
@@ -963,7 +1000,9 @@ curveSpace: build/index.d.ts#curveSpace
 curveStrategies: build/index.d.ts#curveStrategies
 curvesHash: build/index.d.ts#curvesHash
 cutGroups: build/index.d.ts#cutGroups
+cutLines: build/index.d.ts#cutLines
 cutShare: build/index.d.ts#cutShare
+cutStreetPlan: build/index.d.ts#cutStreetPlan
 declaresFamily: build/index.d.ts#declaresFamily
 defineStrategy: build/index.d.ts#defineStrategy
 denseGroupsBoard: build/index.d.ts#denseGroupsBoard
@@ -977,6 +1016,7 @@ diamondAngle: build/index.d.ts#diamondAngle
 diffusionPlan: build/index.d.ts#diffusionPlan
 dimensionAt: @mark1russell7/layout-contract#dimensionAt (external)
 dimensionUnit: @mark1russell7/layout-contract#dimensionUnit (external)
+directionClass: build/index.d.ts#directionClass
 disagreement: build/index.d.ts#disagreement
 dist: build/index.d.ts#dist
 distanceDistortion: build/index.d.ts#distanceDistortion
@@ -1115,7 +1155,9 @@ inflate: build/index.d.ts#inflate
 inflectionCount: build/index.d.ts#inflectionCount
 inflectionCurve: build/index.d.ts#inflectionCurve
 inflectionSector: build/index.d.ts#inflectionSector
+inkFloor: build/index.d.ts#inkFloor
 inkSaved: build/index.d.ts#inkSaved
+inkShare: build/index.d.ts#inkShare
 innerPoints: build/index.d.ts#innerPoints
 inputGraph: build/index.d.ts#inputGraph
 inputId: build/index.d.ts#inputId
@@ -1216,12 +1258,14 @@ mixesCollections: build/index.d.ts#mixesCollections
 mlsPoint: build/index.d.ts#mlsPoint
 mlsebLines: build/index.d.ts#mlsebLines
 mlsebPlan: build/index.d.ts#mlsebPlan
+moats: build/index.d.ts#moats
 modularity: build/index.d.ts#modularity
 modulesOf: build/index.d.ts#modulesOf
 moveResponse: build/index.d.ts#moveResponse
 mulberry32: @mark1russell7/rigor-generators#mulberry32 (external)
 namedObjectives: build/index.d.ts#namedObjectives
 nearestCentre: build/index.d.ts#nearestCentre
+nearestFree: build/index.d.ts#nearestFree
 nearestOnBoundary: build/index.d.ts#nearestOnBoundary
 nearestOnLine: build/index.d.ts#nearestOnLine
 nearestSide: build/index.d.ts#nearestSide
@@ -1274,6 +1318,7 @@ paramProblem: @mark1russell7/layout-contract#paramProblem (external)
 paretoFront: build/index.d.ts#paretoFront
 parseLines: build/index.d.ts#parseLines
 partWithin: build/index.d.ts#partWithin
+partsOf: build/index.d.ts#partsOf
 passSettings: build/index.d.ts#passSettings
 passThroughs: build/index.d.ts#passThroughs
 passesThrough: build/index.d.ts#passesThrough
@@ -1288,6 +1333,7 @@ placePlug: build/index.d.ts#placePlug
 placeSlots: build/index.d.ts#placeSlots
 planMoves: build/index.d.ts#planMoves
 planOfResult: build/index.d.ts#planOfResult
+plugPairs: build/index.d.ts#plugPairs
 plugSpacing: build/index.d.ts#plugSpacing
 plugStrategies: build/index.d.ts#plugStrategies
 plugsRouter: build/index.d.ts#plugsRouter
@@ -1346,6 +1392,9 @@ resultForm: build/index.d.ts#resultForm
 resultHash: build/index.d.ts#resultHash
 ridgeLines: build/index.d.ts#ridgeLines
 ridgePlan: build/index.d.ts#ridgePlan
+ripUpRouter: build/index.d.ts#ripUpRouter
+ripUpStrategy: build/index.d.ts#ripUpStrategy
+ripUpWays: build/index.d.ts#ripUpWays
 rng: @mark1russell7/rigor-generators#mulberry32 (external)
 roadClassPlan: build/index.d.ts#roadClassPlan
 roomDemand: build/index.d.ts#roomDemand
@@ -1434,6 +1483,7 @@ softDistance: build/index.d.ts#softDistance
 softKeyClusters: build/index.d.ts#softKeyClusters
 softKeyPlan: build/index.d.ts#softKeyPlan
 softStep: build/index.d.ts#softStep
+solveSheet: build/index.d.ts#solveSheet
 spanningTree: build/index.d.ts#spanningTree
 spectralClusters: build/index.d.ts#spectralClusters
 spectralLabels: build/index.d.ts#spectralLabels
@@ -1465,6 +1515,7 @@ straightRouter: build/index.d.ts#straightRouter
 strategyKey: build/index.d.ts#strategyKey
 strategyOfKey: build/index.d.ts#strategyOfKey
 streetEdges: build/index.d.ts#streetEdges
+streetGraph: build/index.d.ts#streetGraph
 streetPlan: build/index.d.ts#streetPlan
 streetPoint: build/index.d.ts#streetPoint
 streetRide: build/index.d.ts#streetRide
@@ -1563,6 +1614,9 @@ export declare const ATTRACTION_DEFAULTS: Readonly<AttractionOptions>;
 
 ### build/index.d.ts#ATTRACTION_SCHEMA
 export declare const ATTRACTION_SCHEMA: OptionSchema<AttractionOptions>;
+
+### build/index.d.ts#AUCTION_DEFAULTS
+export declare const AUCTION_DEFAULTS: Readonly<AuctionOptions>;
 
 ### build/index.d.ts#ActivationReport
 export interface ActivationReport {
@@ -1721,6 +1775,15 @@ interface AttractionOptions {
   readonly attraction: number;
   readonly capacityWeight: number;
   readonly laneWidth: number;
+}
+
+### build/index.d.ts#AuctionOptions
+export interface AuctionOptions {
+  readonly slots: number;
+  readonly angle: number;
+  readonly detour: number;
+  readonly crossing: number;
+  readonly eps: number;
 }
 
 ### build/index.d.ts#BACKTRACK_MIN
@@ -1972,6 +2035,15 @@ export declare const COMPARE_ALL_STEPS: readonly Step[];
 ### build/index.d.ts#COMPARE_STEPS
 export declare const COMPARE_STEPS: readonly CompareStep[];
 
+### build/index.d.ts#CONCAVE_DEFAULTS
+export declare const CONCAVE_DEFAULTS: Readonly<Required<Omit<ConcaveOptions, "margin" | "k">>>;
+
+### build/index.d.ts#CONCAVE_KEYS
+export declare const CONCAVE_KEYS: readonly ConcaveKeys[];
+
+### build/index.d.ts#CONCAVE_MAX_CAP
+export declare const CONCAVE_MAX_CAP = 16;
+
 ### build/index.d.ts#CONFLUENT_DEFAULTS
 export declare const CONFLUENT_DEFAULTS: Readonly<Required<Omit<ConfluentOptions, "margin" | "k">>>;
 
@@ -1996,6 +2068,12 @@ export declare const CROSSBAR_DEFAULTS: Readonly<Required<Omit<CrossbarOptions, 
 ### build/index.d.ts#CUBU_DEFAULTS
 export declare const CUBU_DEFAULTS: Readonly<Required<Omit<CubuOptions, "margin" | "k">>>;
 
+### build/index.d.ts#CURRENT_DEFAULTS
+export declare const CURRENT_DEFAULTS: Readonly<Required<Omit<CurrentOptions, "margin" | "k">>>;
+
+### build/index.d.ts#CURRENT_MAX_CELLS
+export declare const CURRENT_MAX_CELLS = 96;
+
 ### build/index.d.ts#CURRICULUM_DEFAULTS
 export declare const CURRICULUM_DEFAULTS: Readonly<CurriculumOptions>;
 
@@ -2010,6 +2088,12 @@ export declare const CURVE_TYPES: readonly CurveType[];
 
 ### build/index.d.ts#CUT_DEFAULTS
 export declare const CUT_DEFAULTS: Readonly<Required<CutOptions>>;
+
+### build/index.d.ts#CUT_STREET_DEFAULTS
+export declare const CUT_STREET_DEFAULTS: Readonly<Required<Omit<CutStreetOptions, "margin" | "k">>>;
+
+### build/index.d.ts#CUT_STREET_GROUPINGS
+export declare const CUT_STREET_GROUPINGS: readonly CutStreetGrouping[];
 
 ### build/index.d.ts#CanalHub
 interface CanalHub {
@@ -2134,6 +2218,24 @@ export type CompareSpec = Pick<MeasureSpec, "direction" | "minEffect">;
 
 ### build/index.d.ts#CompareStep
 export type CompareStep = Exclude<Step, "room" | RoutedStep>;
+
+### build/index.d.ts#ConcaveCost
+type ConcaveCost = Readonly<Pick<ConcaveOptions, "alpha" | "beta" | "power" | "mu">>;
+
+### build/index.d.ts#ConcaveKeys
+type ConcaveKeys = "all" | "collection";
+
+### build/index.d.ts#ConcaveOptions
+interface ConcaveOptions extends Pick<WayOptions, "margin" | "k"> {
+  readonly alpha: number;
+  readonly beta: number;
+  readonly power: number;
+  readonly mu: number;
+  readonly spacing: number;
+  readonly passes: number;
+  readonly keys: ConcaveKeys;
+  readonly minSize: number;
+}
 
 ### build/index.d.ts#ConfluentOptions
 interface ConfluentOptions extends Pick<WayOptions, "margin" | "k"> {
@@ -2281,6 +2383,14 @@ interface CubuOptions extends KdeebOptions {
   readonly resample: number;
 }
 
+### build/index.d.ts#CurrentOptions
+interface CurrentOptions extends Pick<WayOptions, "margin" | "k"> {
+  readonly beta: number;
+  readonly cell: number;
+  readonly classes: number;
+  readonly minSize: number;
+}
+
 ### build/index.d.ts#CurriculumOptions
 export interface CurriculumOptions {
   readonly order: CurriculumOrder;
@@ -2398,6 +2508,14 @@ interface CurveSpace {
 ### build/index.d.ts#CurveType
 export type CurveType = "straight" | "rounded" | "spline" | "arc" | "smooth" | "clothoid";
 
+### build/index.d.ts#CutLine
+interface CutLine {
+  readonly axis: "x" | "y";
+  readonly c: number;
+  readonly lo: number;
+  readonly hi: number;
+}
+
 ### build/index.d.ts#CutObjective
 type CutObjective = "ratio" | "normalized" | "sparsest";
 
@@ -2410,6 +2528,18 @@ interface CutOptions {
   readonly objective?: CutObjective;
   readonly pull?: number;
   readonly guard?: boolean;
+}
+
+### build/index.d.ts#CutStreetGrouping
+type CutStreetGrouping = "cut" | "kd";
+
+### build/index.d.ts#CutStreetOptions
+interface CutStreetOptions extends Pick<WayOptions, "margin" | "k"> {
+  readonly grouping: CutStreetGrouping;
+  readonly levels: number;
+  readonly reach: number;
+  readonly detour: number;
+  readonly minSize: number;
 }
 
 ### build/index.d.ts#DENSE_GROUPS
@@ -3221,6 +3351,13 @@ export interface InflectionOptions {
   readonly maxAngle?: number;
 }
 
+### build/index.d.ts#InkFloor
+export interface InkFloor {
+  readonly floor: number;
+  readonly pairs: number;
+  readonly read: number;
+}
+
 ### build/index.d.ts#InnerEdge
 export interface InnerEdge {
   readonly edge: Edge;
@@ -3836,6 +3973,12 @@ export declare const MLSEB_DEFAULTS: Readonly<Required<Omit<MlsebOptions, "margi
 ### build/index.d.ts#MLS_FITS
 export declare const MLS_FITS: readonly MlsFit[];
 
+### build/index.d.ts#MOAT_DEFAULTS
+export declare const MOAT_DEFAULTS: Readonly<MoatOptions>;
+
+### build/index.d.ts#MOAT_POINTS
+export declare const MOAT_POINTS = 400;
+
 ### build/index.d.ts#MODULE_RULES
 export declare const MODULE_RULES: readonly ModuleRule[];
 
@@ -3965,6 +4108,25 @@ interface MlsebOptions extends Pick<WayOptions, "margin" | "k"> {
   readonly spacing: number;
   readonly snap: number;
   readonly minSize: number;
+}
+
+### build/index.d.ts#MoatEntry
+export interface MoatEntry {
+  readonly name: string;
+  readonly share: number;
+  readonly saved: number;
+}
+
+### build/index.d.ts#MoatOptions
+export interface MoatOptions {
+  readonly settings: number;
+}
+
+### build/index.d.ts#MoatRun
+export interface MoatRun {
+  readonly output: WholeOutput;
+  readonly pick: string;
+  readonly entries: readonly MoatEntry[];
 }
 
 ### build/index.d.ts#ModuleRule
@@ -4487,6 +4649,12 @@ export declare const RIDGE_DEFAULTS: Readonly<Required<Omit<RidgeOptions, "margi
 ### build/index.d.ts#RINGS
 export declare const RINGS: HighwaysFamily;
 
+### build/index.d.ts#RIP_UP_DEFAULTS
+export declare const RIP_UP_DEFAULTS: Readonly<RipUpOptions>;
+
+### build/index.d.ts#RIP_UP_SCHEMA
+export declare const RIP_UP_SCHEMA: OptionSchema<RipUpOptions>;
+
 ### build/index.d.ts#ROAD_CLASS_DEFAULTS
 export declare const ROAD_CLASS_DEFAULTS: Readonly<Required<Omit<RoadClassOptions, "margin" | "k">>>;
 
@@ -4643,6 +4811,23 @@ interface RidgeOptions extends Pick<WayOptions, "margin" | "k"> {
 
 ### build/index.d.ts#RidgeSource
 type RidgeSource = "lines" | "routes";
+
+### build/index.d.ts#RipUpOptions
+interface RipUpOptions {
+  readonly rounds: number;
+  readonly scope: RipUpScope;
+  readonly order: RipUpOrder;
+  readonly seed: number;
+  readonly beta: number;
+  readonly gamma: number;
+  readonly cross: number;
+}
+
+### build/index.d.ts#RipUpOrder
+type RipUpOrder = "fault" | "seed";
+
+### build/index.d.ts#RipUpScope
+type RipUpScope = "fault" | "neighbours";
 
 ### build/index.d.ts#RoadClassOptions
 interface RoadClassOptions extends Pick<WayOptions, "margin" | "k"> {
@@ -5345,6 +5530,7 @@ export interface SharedRun {
 interface SharedSearch {
   readonly graph: Graph;
   readonly corners: number;
+  readonly points?: readonly Point[];
   link(i: number, j: number): number;
   find(w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number): {
     seq: Point[];
@@ -5362,6 +5548,16 @@ interface SharedStretchOptions {
 
 ### build/index.d.ts#SharedWaysOptions
 type SharedWaysOptions = Omit<SharedOptions, "name" | "maxNodes">;
+
+### build/index.d.ts#Sheet
+interface Sheet {
+  readonly x0: number;
+  readonly y0: number;
+  readonly size: number;
+  readonly w: number;
+  readonly h: number;
+  readonly free: Uint8Array;
+}
 
 ### build/index.d.ts#Side
 export type Side = "north" | "east" | "south" | "west";
@@ -5661,6 +5857,14 @@ interface StreetEdge {
   readonly s: Point;
   readonly t: Point;
   readonly base: number;
+}
+
+### build/index.d.ts#StreetGraph
+interface StreetGraph {
+  readonly points: readonly Point[];
+  readonly adj: readonly (readonly number[])[];
+  readonly streets: readonly FreeLine[];
+  readonly along: readonly (readonly number[])[];
 }
 
 ### build/index.d.ts#StreetOptions
@@ -6268,6 +6472,12 @@ export declare function attractionRouter(options: Partial<AttractionOptions> & {
 ### build/index.d.ts#attractionStrategy
 export declare const attractionStrategy: Strategy<"router", AttractionOptions>;
 
+### build/index.d.ts#auctionAssign
+export declare function auctionAssign(bidders: number, places: number, options: (i: number) => readonly (readonly [number, number])[], last: number, top?: number): number[];
+
+### build/index.d.ts#auctionEnds
+export declare function auctionEnds(input: PlugInput, options?: Partial<AuctionOptions>): PlugPair[];
+
 ### build/index.d.ts#backboneLinks
 export declare function backboneLinks(points: readonly Point[], backbone: VenationBackbone): [number, number][];
 
@@ -6432,6 +6642,9 @@ export declare function capSettings(values?: readonly number[]): SectionsSetting
 ### build/index.d.ts#caseSeed
 export declare function caseSeed(base: number, k: number): number;
 
+### build/index.d.ts#cellOf
+export declare function cellOf(s: Sheet, p: Point): number;
+
 ### build/index.d.ts#cellSteps
 export declare function cellSteps(line: readonly Point[], centres: readonly Point[], step: number): CellStep[];
 
@@ -6521,6 +6734,15 @@ export declare function compatibility(p0: Point, p1: Point, q0: Point, q1: Point
 ### build/index.d.ts#compatibilityMatrix
 export declare function compatibilityMatrix(ends: readonly EdgeEnds[], c0: number, scale?: (i: number, j: number) => number): Float64Array;
 
+### build/index.d.ts#concaveCost
+export declare function concaveCost(own: number, f: number, cap: number, o: ConcaveCost): number;
+
+### build/index.d.ts#concaveMarginal
+export declare function concaveMarginal(own: number, f: number, cap: number, o: ConcaveCost): number;
+
+### build/index.d.ts#concavePlan
+export declare function concavePlan(input: HighwayInput, o: Readonly<ConcaveOptions>): HighwayPlan;
+
 ### build/index.d.ts#configOfMember
 export declare function configOfMember(name: string): MemberPoint;
 
@@ -6584,6 +6806,12 @@ export declare function cubicAt(p0: Point, p1: Point, p2: Point, p3: Point, t: n
 ### build/index.d.ts#cubuPlan
 export declare function cubuPlan(input: HighwayInput, o: Readonly<CubuOptions>): HighwayPlan;
 
+### build/index.d.ts#currentOf
+export declare function currentOf(s: Sheet, u: Float64Array): Float64Array;
+
+### build/index.d.ts#currentPlan
+export declare function currentPlan(input: HighwayInput, o: Readonly<CurrentOptions>): HighwayPlan;
+
 ### build/index.d.ts#curriculum
 export declare function curriculum(graph: Graph, list: readonly PortfolioSetting[], options?: Partial<CurriculumOptions>): WholeOutput;
 
@@ -6625,8 +6853,14 @@ export declare function curvesHash(edges: readonly string[], curves: readonly (r
 ### build/index.d.ts#cutGroups
 export declare function cutGroups(graph: Graph, options?: CutOptions): Section;
 
+### build/index.d.ts#cutLines
+export declare function cutLines(root: Section, levels: number): CutLine[];
+
 ### build/index.d.ts#cutShare
 export declare function cutShare(graph: Graph, groups: Grouping): number;
+
+### build/index.d.ts#cutStreetPlan
+export declare function cutStreetPlan(input: HighwayInput, o: Readonly<CutStreetOptions>): HighwayPlan;
 
 ### build/index.d.ts#declaresFamily
 export declare const declaresFamily: (input: {
@@ -6662,6 +6896,9 @@ export declare function diamondAngle(dx: number, dy: number): number;
 
 ### build/index.d.ts#diffusionPlan
 export declare function diffusionPlan(input: HighwayInput, o: Readonly<DiffusionOptions>): HighwayPlan;
+
+### build/index.d.ts#directionClass
+export declare function directionClass(a: Point, b: Point, classes: number): number;
 
 ### build/index.d.ts#disagreement
 export declare function disagreement(w: PairWeights, order: readonly string[]): number;
@@ -7109,6 +7346,9 @@ export declare const highwayStrategies: {
   readonly "two-way": Strategy<"highway", TwoWayOptions>;
   readonly "global-order": Strategy<"highway", GlobalOrderOptions>;
   readonly approval: Strategy<"highway", ApprovalOptions>;
+  readonly "cut-streets": Strategy<"highway", CutStreetOptions>;
+  readonly "concave-convex": Strategy<"highway", ConcaveOptions>;
+  readonly currents: Strategy<"highway", CurrentOptions>;
   readonly "corridors+breakeven": Strategy<"highway", CorridorOptions & BreakEvenOptions>;
   readonly "corridors+stretch": Strategy<"highway", CorridorOptions & StretchOptions>;
   readonly "corridors+ambiguity": Strategy<"highway", CorridorOptions & AmbiguityGuardOptions>;
@@ -7165,8 +7405,14 @@ export declare function inflectionCurve(p0: Point, normal: Point, target: Point,
 ### build/index.d.ts#inflectionSector
 export declare function inflectionSector(angle: number, tol?: number): 0 | 1 | 2;
 
+### build/index.d.ts#inkFloor
+export declare function inkFloor(pairs: readonly (readonly [Point, Point])[]): InkFloor;
+
 ### build/index.d.ts#inkSaved
 export declare function inkSaved(routes: readonly Route[], base?: number): number;
+
+### build/index.d.ts#inkShare
+export declare function inkShare(result: Result): number;
 
 ### build/index.d.ts#innerPoints
 export declare function innerPoints(line: readonly Point[], step: number): Point[];
@@ -7493,6 +7739,9 @@ export declare function mlsebLines(input: HighwayInput, finder: WayFinder, o: Re
 ### build/index.d.ts#mlsebPlan
 export declare function mlsebPlan(input: HighwayInput, o: Readonly<MlsebOptions>): HighwayPlan;
 
+### build/index.d.ts#moats
+export declare function moats(graph: Graph, list: readonly PortfolioSetting[], options?: Partial<MoatOptions>): MoatRun;
+
 ### build/index.d.ts#modularity
 export declare function modularity(graph: Graph, groups: Grouping): number;
 
@@ -7507,6 +7756,9 @@ export declare function namedObjectives(objectives: readonly Objective[]): Objec
 
 ### build/index.d.ts#nearestCentre
 export declare function nearestCentre(centres: readonly Point[], p: Point): number;
+
+### build/index.d.ts#nearestFree
+export declare function nearestFree(s: Sheet, p: Point): number;
 
 ### build/index.d.ts#nearestOnBoundary
 export declare function nearestOnBoundary(box: Box, p: Point): Point;
@@ -7672,6 +7924,9 @@ export declare function parseLines<T>(text: string): T[];
 ### build/index.d.ts#partWithin
 export declare function partWithin(p: readonly Point[], q: readonly Point[], eps: number): boolean;
 
+### build/index.d.ts#partsOf
+export declare function partsOf(s: Sheet): Int32Array;
+
 ### build/index.d.ts#passSettings
 export declare function passSettings(gutters?: readonly number[], passes?: readonly number[]): RoomSetting[];
 
@@ -7711,6 +7966,9 @@ export declare function planMoves(name: string, plan: HighwayPlan): Record<strin
 ### build/index.d.ts#planOfResult
 export declare function planOfResult(result: Result): HighwayPlan;
 
+### build/index.d.ts#plugPairs
+export declare function plugPairs(result: Result): [Point, Point][];
+
 ### build/index.d.ts#plugSpacing
 export declare function plugSpacing(graph: Graph, routes: readonly Route[]): PlugSpacing;
 
@@ -7723,6 +7981,7 @@ export declare const plugStrategies: {
   readonly leaders: Strategy<"plugs", LeaderOptions>;
   readonly assign: Strategy<"plugs", AssignOptions>;
   readonly escape: Strategy<"plugs", EscapeOptions>;
+  readonly auction: Strategy<"plugs", AuctionOptions>;
 };
 
 ### build/index.d.ts#plugsRouter
@@ -7899,6 +8158,19 @@ export declare function ridgeLines(input: HighwayInput, o: Readonly<RidgeOptions
 
 ### build/index.d.ts#ridgePlan
 export declare function ridgePlan(input: HighwayInput, o: Readonly<RidgeOptions>): HighwayPlan;
+
+### build/index.d.ts#ripUpRouter
+export declare function ripUpRouter(options: Partial<RipUpOptions> & {
+  readonly name: string;
+  readonly rule?: GroupRule;
+  readonly maxNodes?: number;
+}): Router;
+
+### build/index.d.ts#ripUpStrategy
+export declare const ripUpStrategy: Strategy<"router", RipUpOptions>;
+
+### build/index.d.ts#ripUpWays
+export declare function ripUpWays(ways: readonly Way[], search: SharedSearch, options?: Partial<RipUpOptions>): void;
 
 ### build/index.d.ts#roadClassPlan
 export declare function roadClassPlan(input: HighwayInput, o: Readonly<RoadClassOptions>): HighwayPlan;
@@ -8198,6 +8470,9 @@ export declare function softKeyPlan(input: HighwayInput, o: Readonly<SoftKeyOpti
 ### build/index.d.ts#softStep
 export declare function softStep(z: number): number;
 
+### build/index.d.ts#solveSheet
+export declare function solveSheet(s: Sheet, b: Float64Array): Float64Array;
+
 ### build/index.d.ts#spanningTree
 export declare function spanningTree(points: readonly Point[], metric: SteinerMetric): {
   links: [number, number][];
@@ -8303,6 +8578,9 @@ export declare function strategyOfKey(key: string, registry?: Registry): Strateg
 
 ### build/index.d.ts#streetEdges
 export declare function streetEdges(input: HighwayInput, finder: WayFinder): StreetEdge[];
+
+### build/index.d.ts#streetGraph
+export declare function streetGraph(streets: readonly FreeLine[]): StreetGraph;
 
 ### build/index.d.ts#streetPlan
 export declare function streetPlan(input: HighwayInput, o: Readonly<StreetOptions>): HighwayPlan;
@@ -8461,6 +8739,7 @@ export declare const wholeStrategies: {
   readonly tracing: Strategy<"whole", TracingOptions>;
   readonly crops: Strategy<"whole", CropOptions>;
   readonly choice: Strategy<"whole", ChoiceOptions>;
+  readonly moats: Strategy<"whole", MoatOptions>;
 };
 
 ### build/index.d.ts#withBends
