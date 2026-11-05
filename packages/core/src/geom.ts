@@ -160,6 +160,27 @@ export function turns(p: readonly Point[], eps = 1e-9): number[] {
   return out;
 }
 
+/**
+ * This function removes each repeated point of a polyline, and each inner stop on a straight line between its two neighbours.
+ * Such a stop is not a bend, so the drawn line does not change. A turn back stays, and the first and the last point stay.
+ * The test of a straight line is relative to the lengths of the two legs, so it does not depend on the scale.
+ * A polyline of two points or more keeps two points, so a route of zero length keeps an end on each node.
+ */
+export function dropStraightStops(points: readonly Point[]): Point[] {
+  const out: Point[] = [];
+  for (const p of points) {
+    if (out.length > 0 && dist(p, out[out.length - 1]!) === 0) continue;
+    if (out.length >= 2) {
+      const a = out[out.length - 2]!;
+      const b = out[out.length - 1]!;
+      const [ux, uy, vx, vy] = [b.x - a.x, b.y - a.y, p.x - b.x, p.y - b.y];
+      if (Math.abs(ux * vy - uy * vx) <= 1e-9 * Math.hypot(ux, uy) * Math.hypot(vx, vy) && ux * vx + uy * vy > 0) out.pop();
+    }
+    out.push(p);
+  }
+  return out.length === 1 && points.length > 1 ? [points[0]!, points[points.length - 1]!] : out;
+}
+
 /** This function counts the vertices of a polyline where the direction changes by more than `minTurn` radians. */
 export function bendCount(p: readonly Point[], minTurn = 0.05): number {
   return turns(p).filter((t) => Math.abs(t) > minTurn).length;

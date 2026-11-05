@@ -1,4 +1,4 @@
-import { center, dist, type Point } from "../geom.ts";
+import { center, dropStraightStops } from "../geom.ts";
 import { framesOf, nodeIndex, resolvePorts, splitFrames, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { spacePlugs } from "../plugs/justify.ts";
@@ -180,29 +180,10 @@ function crossRoutes(
     }
     const tops = (id: string): boolean => id === lift.topS.id || id === lift.topT.id;
     const outer = markRoute({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([lift.topS, lift.topT])) }, ways.obstacles, tops);
-    const points = joinPoints([...(first ? [...first.points].reverse() : []), ...outer.points, ...(last ? last.points : [])]);
+    const points = dropStraightStops([...(first ? [...first.points].reverse() : []), ...outer.points, ...(last ? last.points : [])]);
     const through = [...new Set([...(first?.through ?? []), ...(outer.through ?? []), ...(last?.through ?? [])])].sort();
     cross.set(e, { edge: e.id, points, ...(through.length > 0 ? { through } : {}) });
   }
   return { cross, innerRoutes: list.slice(0, inner.length).filter((r): r is Route => r !== undefined) };
 }
 
-/**
- * This function joins the legs of a route. It removes each point that is equal to the point before it, so that the legs meet in one point.
- * It also removes each inner stop on a straight line between its two neighbours, because that stop is not a bend. A turn back stays.
- */
-function joinPoints(points: readonly Point[]): Point[] {
-  const out: Point[] = [];
-  for (const p of points) {
-    if (out.length > 0 && dist(p, out.at(-1)!) === 0) continue;
-    if (out.length >= 2 && onLine(out.at(-2)!, out.at(-1)!, p)) out.pop();
-    out.push(p);
-  }
-  return out;
-}
-
-/** This function tells if b is a stop on the straight line from a to c, in the same direction. */
-function onLine(a: Point, b: Point, c: Point): boolean {
-  const [ux, uy, vx, vy] = [b.x - a.x, b.y - a.y, c.x - b.x, c.y - b.y];
-  return Math.abs(ux * vy - uy * vx) <= 1e-9 * Math.hypot(ux, uy) * Math.hypot(vx, vy) && ux * vx + uy * vy > 0;
-}

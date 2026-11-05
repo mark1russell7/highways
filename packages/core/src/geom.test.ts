@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rng } from "./fixtures.ts";
 import {
   bendCount,
+  dropStraightStops,
   frechet,
   inflectionCount,
   pointSegmentDistance,
@@ -102,6 +103,35 @@ describe("frechet", () => {
       const f = frechet(a, b);
       expect(frechet(b, a)).toBeCloseTo(f);
       expect(f).toBeGreaterThanOrEqual(Math.hypot(a[0]!.x - b[0]!.x, a[0]!.y - b[0]!.y) - 1e-9);
+    }
+  });
+});
+
+describe("dropStraightStops (INNER-STRAIGHT-STOPS)", () => {
+  it("removes the repeated points and the stops on a straight line, and keeps the bends, the turns back and the two ends", () => {
+    const p = (x: number, y: number): Point => ({ x, y });
+    expect(dropStraightStops([p(0, 0), p(0, 0), p(5, 0), p(10, 0), p(10, 5), p(10, 5), p(10, 9)])).toEqual([p(0, 0), p(10, 0), p(10, 9)]);
+    expect(dropStraightStops([p(0, 0), p(5, 0), p(2, 0)])).toEqual([p(0, 0), p(5, 0), p(2, 0)]);
+    expect(dropStraightStops([p(3, 3), p(3, 3)])).toEqual([p(3, 3), p(3, 3)]);
+    expect(dropStraightStops([p(1, 1)])).toEqual([p(1, 1)]);
+    expect(dropStraightStops([p(0, 0), p(1e-7, 1e-7), p(2e-7, 2e-7)])).toEqual([p(0, 0), p(2e-7, 2e-7)]);
+  });
+
+  it("keeps the drawn line and the real turns of random polylines (property, 200 polylines)", () => {
+    const R = rng(31);
+    for (let n = 0; n < 200; n++) {
+      // Points on a grid of 4, so that many stops lie on a straight line.
+      const pts = Array.from({ length: 2 + Math.floor(R() * 8) }, () => ({ x: 4 * Math.floor(R() * 5), y: 4 * Math.floor(R() * 5) }));
+      const out = dropStraightStops(pts);
+      expect([out[0], out.at(-1)]).toEqual([pts[0], pts.at(-1)]);
+      expect(bendCount(out, 0)).toBe(bendCount(pts, 0));
+      expect(polylineLength(out)).toBeCloseTo(polylineLength(pts), 9);
+      for (let i = 1; i + 1 < out.length; i++) {
+        const [a, b, c] = [out[i - 1]!, out[i]!, out[i + 1]!];
+        const cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+        const dot = (b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y);
+        expect(cross !== 0 || dot < 0, `polyline ${n} stop ${i}`).toBe(true);
+      }
     }
   });
 });

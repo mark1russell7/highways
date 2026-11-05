@@ -1,4 +1,4 @@
-import { center, dist, type Box, type Point } from "../geom.ts";
+import { center, dist, dropStraightStops, type Box, type Point } from "../geom.ts";
 import { fixedPortPoint, nodeIndex, type Graph, type InnerEdge, type Node, type Route } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { predicateSink } from "../predicate-sink.ts";
@@ -106,7 +106,7 @@ export function frameRouteList(graph: Graph, inner: readonly FrameItem[], option
       if (!s || !t) return;
       const ps = placePlug(s, edge.source, center(t.box));
       const pt = placePlug(t, edge.target, center(s.box));
-      routes[at] = markRoute({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame }, room.ways.obstacles, notCrossed(s.id, t.id));
+      routes[at] = markRoute({ edge: edge.id, points: dropStraightStops(room.ways.between(ps, pt, new Set<Node>([s, t]))), frame }, room.ways.obstacles, notCrossed(s.id, t.id));
       return;
     }
     const [own, far] = plug === "source" ? [edge.source, edge.target] : [edge.target, edge.source];
@@ -121,7 +121,7 @@ export function frameRouteList(graph: Graph, inner: readonly FrameItem[], option
     const ends = new Set<Node>([end]);
     const points =
       plug === "source" ? stub(fp.point, room.ways.between(start, ep, ends)) : stub(fp.point, room.ways.between(ep, start, ends).reverse()).reverse();
-    routes[at] = markRoute({ edge: edge.id, points, frame }, room.ways.obstacles, notCrossed(end.id));
+    routes[at] = markRoute({ edge: edge.id, points: dropStraightStops(points), frame }, room.ways.obstacles, notCrossed(end.id));
   });
   return routes;
 }
@@ -201,7 +201,7 @@ function gutterFrameRoutes(
       const points = found[k];
       if (!points) return;
       const { edge, frame, plug } = inner[at]!;
-      routes[at] = markRoute({ edge: edge.id, points: plug === "target" ? points.reverse() : points, frame }, obstacles, notCrossed(edge.source.node, edge.target.node));
+      routes[at] = markRoute({ edge: edge.id, points: dropStraightStops(plug === "target" ? points.reverse() : points), frame }, obstacles, notCrossed(edge.source.node, edge.target.node));
     });
   }
   return routes;

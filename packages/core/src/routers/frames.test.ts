@@ -296,8 +296,10 @@ describe("the sibling edges of a frame (FRAME-SIBLINGS)", () => {
     const loop = (options: Partial<CornersOptions>): Route => byEdge(cornersRouter({ name: "corners", ...options }).route(g).routes).get("loop")!;
     const corner = loop({});
     expect(corner.frame).toBe("Q");
-    expect(corner.points).toHaveLength(4);
-    expect(corner.points[0]).toEqual(corner.points[3]);
+    // The stub goes out to one stop and back. A stop on the straight line of the stub is not a bend, so the route has 3 points (INNER-STRAIGHT-STOPS).
+    expect(corner.points).toHaveLength(3);
+    expect(corner.points[0]).toEqual(corner.points[2]);
+    expect(corner.points[1]).not.toEqual(corner.points[0]);
     const gutter = loop({ inner: "gutter" });
     expect(gutter.frame).toBe("Q");
     expect(gutter.points.length).toBeGreaterThan(2);

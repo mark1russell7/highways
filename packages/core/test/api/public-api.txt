@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1518 names
+## . (build/index.d.ts): 1519 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -991,6 +991,7 @@ dividedPlan: build/index.d.ts#dividedPlan
 documentHash: build/index.d.ts#documentHash
 dominates: build/index.d.ts#dominates
 drawnSegments: build/index.d.ts#drawnSegments
+dropStraightStops: build/index.d.ts#dropStraightStops
 edgeBlocks: build/index.d.ts#edgeBlocks
 edgeEnds: build/index.d.ts#edgeEnds
 edgeLengths: build/index.d.ts#edgeLengths
@@ -6711,6 +6712,9 @@ export declare function dominates(a: Readonly<Record<string, number>>, b: Readon
 
 ### build/index.d.ts#drawnSegments
 export declare function drawnSegments(routes: readonly Route[]): DrawnSegment[];
+
+### build/index.d.ts#dropStraightStops
+export declare function dropStraightStops(points: readonly Point[]): Point[];
 
 ### build/index.d.ts#edgeBlocks
 export declare function edgeBlocks<T extends EdgeEnds>(ends: readonly T[]): T[][];
