@@ -150,7 +150,15 @@ A node can name a frame node in `parent`. A frame is a node that holds other nod
   - A port of a frame that does not hold the other end is a port of a node. The route uses that port.
   - In a room with such an edge, the option `outside` also applies to a box out of the common frame.
   - Each other router gives such an edge an outer route, as before. With your outer router and `corners`, the edge gets two routes. Keep the inner route of `corners`.
-  - An edge with no common frame stays an outer edge. An edge from a frame to a node in that frame, without a plug, stays an outer edge too.
+  - An edge from a frame to a node in that frame, without a plug, stays an outer edge.
+- An edge between frames stays an outer edge (CROSS-FRAME-ROUTE). It has an end in a frame, and no frame holds its two ends.
+  - The router `corners` routes it in three legs. The first leg goes from the source to a plug of the wall of its top frame.
+  - The outer leg goes from that plug to a plug of the top frame of the target, around the other top nodes.
+  - The last leg goes from that plug into the frame of the target. An end at the top level has no inner leg.
+  - The inner legs go around the other nodes of their frames, as the route of an edge at two depths does.
+  - The route has no `Route.frame`, and it keeps its place among the outer routes.
+  - When a leg has no route, for example with `outside: skip`, the edge gets the outer way between its two ends.
+  - Each other router gives such an edge the outer route, as before.
 - The default of `frameInset` is the margin of the router.
 - A route takes its first stop on the bounds, and each other stop stays in them. A child closer to a wall than `frameInset` gives that wall half of its free strip.
 - A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.

@@ -6,6 +6,7 @@ import { inBox, inflate, segmentHitsBox, type Box, type Point } from "../geom.ts
 import { splitFrames, type Edge, type Graph, type Node, type Port, type Route, type Side } from "../model.ts";
 import { listStrategies, STRATEGIES } from "../strategies/index.ts";
 import { cornersRouter, type CornersOptions } from "./corners.ts";
+import { ROUTERS } from "./index.ts";
 import { sectionsRouter } from "./sections.ts";
 
 // A made-up board: the card "card" (240 x 200) with 6 rows (200 x 24, gap 6), 2 plugs on its east wall and 2 on its west wall.
@@ -585,5 +586,112 @@ describe("the first leg of an inner route (INNER-SPIKE)", () => {
     expect(route("west")[1]).toEqual({ x: 305, y: 100 + 194 * 0.7 });
     expect(route("north").at(-2)).toEqual({ x: 410, y: 105 });
     expect(route("south").at(-2)).toEqual({ x: 410, y: 289 });
+  });
+});
+
+// A made-up board for the edges between frames: the cards A and C with a nested panel in A, the card B between them, and the node "solo" at the top level.
+// Each edge between frames has no common frame, so the outer graph holds it.
+function between(): Graph {
+  const card = (id: string, x: number): Node => ({ id, box: { x, y: 100, w: 200, h: 220 } });
+  const row = (id: string, parent: string, x: number, y: number): Node => ({ id, parent, box: { x, y, w: 160, h: 24 } });
+  return {
+    nodes: [
+      card("A", 40),
+      { id: "A_p", parent: "A", box: { x: 55, y: 200, w: 170, h: 100 } },
+      row("A_1", "A", 60, 120),
+      row("A_2", "A", 60, 160),
+      row("A_p1", "A_p", 60, 215),
+      row("A_p2", "A_p", 60, 260),
+      card("B", 340),
+      row("B_1", "B", 360, 150),
+      row("B_2", "B", 360, 230),
+      card("C", 640),
+      row("C_1", "C", 660, 120),
+      row("C_2", "C", 660, 260),
+      { id: "solo", box: { x: 380, y: 420, w: 120, h: 40 } },
+    ],
+    edges: [
+      { id: "a-c", source: { node: "A_1" }, target: { node: "C_2" } },
+      { id: "deep-c", source: { node: "A_p2" }, target: { node: "C_1" } },
+      { id: "solo-a", source: { node: "solo" }, target: { node: "A_p1" } },
+      { id: "c-solo", source: { node: "C_2" }, target: { node: "solo" } },
+      { id: "in-a", source: { node: "A_1" }, target: { node: "A_2" } },
+      { id: "a-b", source: { node: "A_2" }, target: { node: "B_2" } },
+    ],
+  };
+}
+
+/** This function gives the ancestors of a node, the nearest first. */
+function ancestorsOf(g: Graph, id: string): string[] {
+  const parent = new Map(g.nodes.map((n) => [n.id, n.parent] as const));
+  const out: string[] = [];
+  for (let p = parent.get(id); p !== undefined; p = parent.get(p)) out.push(p);
+  return out;
+}
+
+/** This function gives each box that a route goes through: not an end, and not a frame that holds an end. */
+function crossed(g: Graph, r: Route): string[] {
+  const e = g.edges.find((x) => x.id === r.edge)!;
+  const skip = new Set([e.source.node, e.target.node, ...ancestorsOf(g, e.source.node), ...ancestorsOf(g, e.target.node)]);
+  const out = new Set<string>();
+  for (let i = 1; i < r.points.length; i++) for (const n of g.nodes) if (!skip.has(n.id) && segmentHitsBox(r.points[i - 1]!, r.points[i]!, n.box)) out.add(n.id);
+  return [...out];
+}
+
+describe("the edges between frames (CROSS-FRAME-ROUTE)", () => {
+  const CROSS = ["a-c", "deep-c", "solo-a", "c-solo", "a-b"];
+
+  it("keeps each edge between frames in the outer graph, because no frame holds its two ends", () => {
+    const { graph, inner } = splitFrames(between());
+    expect(graph.edges.map((e) => e.id)).toEqual(CROSS);
+    expect(inner.map((i) => i.edge.id)).toEqual(["in-a"]);
+  });
+
+  it("routes each edge between frames around each other box, from its source box to its target box, in the modes corners and gutter", () => {
+    const g = between();
+    for (const options of [{}, { smooth: true }, { frameInset: 8 }, { inner: "gutter" }] satisfies Partial<CornersOptions>[]) {
+      const by = byEdge(cornersRouter({ name: "corners", ...options }).route(g).routes);
+      for (const id of CROSS) {
+        const r = by.get(id)!;
+        const e = g.edges.find((x) => x.id === id)!;
+        const box = (n: string): Box => g.nodes.find((x) => x.id === n)!.box;
+        expect(crossed(g, r), `${id} ${JSON.stringify(options)}`).toEqual([]);
+        expect(r.through, `${id} ${JSON.stringify(options)}`).toBeUndefined();
+        expect(r.frame, id).toBeUndefined();
+        expect([inBox(r.points[0]!, inflate(box(e.source.node), 1e-6)), inBox(r.points.at(-1)!, inflate(box(e.target.node), 1e-6))], id).toEqual([true, true]);
+      }
+    }
+  });
+
+  it("leaves the top frame of each end once, at one plug of its wall", () => {
+    const g = between();
+    const by = byEdge(corners.route(g).routes);
+    const card = (n: string): Box => g.nodes.find((x) => x.id === n)!.box;
+    const changes = (r: Route, b: Box): number =>
+      r.points.slice(1).filter((p, i) => inBox(p, shrink(b, 1e-6)) !== inBox(r.points[i]!, shrink(b, 1e-6))).length;
+    expect(changes(by.get("a-c")!, card("A"))).toBe(1);
+    expect(changes(by.get("a-c")!, card("C"))).toBe(1);
+    expect(changes(by.get("deep-c")!, card("A"))).toBe(1);
+    expect(changes(by.get("solo-a")!, card("A"))).toBe(1);
+    expect(changes(by.get("c-solo")!, card("C"))).toBe(1);
+  });
+
+  it("keeps the place of each edge between frames among the outer routes, and the inner routes after them", () => {
+    expect(corners.route(between()).routes.map((r) => r.edge)).toEqual([...CROSS, "in-a"]);
+  });
+
+  it("gives the outer way between the two ends, as before, when a leg has no route", () => {
+    const g = between();
+    const out: Graph = { ...g, nodes: g.nodes.map((n) => (n.id === "C_2" ? { ...n, box: { ...n.box, x: 900 } } : n)) };
+    const by = byEdge(cornersRouter({ name: "corners", outside: "skip" }).route(out).routes);
+    expect(by.get("a-c")?.points.length).toBeGreaterThan(1);
+    expect(by.has("deep-c")).toBe(true);
+    expect(crossed(out, by.get("deep-c")!)).toEqual([]);
+  });
+
+  it("leaves the router straight as it was: one straight line for each edge between frames", () => {
+    const straight = ROUTERS.find((r) => r.name === "straight")!;
+    const by = byEdge(straight.route(between()).routes);
+    for (const id of CROSS) expect(by.get(id)?.points, id).toHaveLength(2);
   });
 });
