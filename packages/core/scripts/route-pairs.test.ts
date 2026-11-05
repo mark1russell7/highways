@@ -5,10 +5,10 @@ import { boardRows, CONTROL_MOVE, pairsRecord, REGENERATE, type BoardRow } from 
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/route-pairs/record.json", import.meta.url), "utf8")) as ReturnType<typeof pairsRecord>;
-const STALE = `The record route-pairs/1 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record route-pairs/2 is stale. Write it again with: ${REGENERATE}`;
 const keyOf = (r: BoardRow): string => `${r.family}/${r.seed}/${r.router}`;
 
-describe("the record route-pairs/1", () => {
+describe("the record route-pairs/2", () => {
   it("holds 25 families at 3 seeds for 5 routers", () => {
     expect(record.rows).toHaveLength(25 * 3 * 5);
   });
@@ -25,6 +25,21 @@ describe("the record route-pairs/1", () => {
       expect(r.pairs).toBe(r.proper + r.contact);
       expect(r.pairsEstimated).toBe(false);
     }
+  });
+
+  it("holds the relation of the two counts on each row, so a row outside the two cases is a finding", () => {
+    for (const r of record.rows) expect(r.crossings - r.self - r.touch, keyOf(r)).toBeLessThanOrEqual(r.pairs);
+  });
+
+  it("explains each row with fewer pairs than painted crossings by one class", () => {
+    const under = record.rows.filter((r) => r.pairs < r.crossings);
+    expect(under.map((r) => [keyOf(r), r.self > 0 ? "self" : r.touch > 0 ? "touch" : "none"]).sort()).toEqual([
+      ["local-mesh/0/sections-site", "self"],
+      ["local-mesh/1/sections-site", "self"],
+      ["packed-grid/1/corners", "touch"],
+      ["packed-grid/1/shared", "touch"],
+      ["packed-grid/1/shared-all", "touch"],
+    ]);
   });
 
   it("does not move the pair count at any shift of the test", () => {
