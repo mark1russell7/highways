@@ -1,0 +1,7342 @@
+{
+ "schema": "paint-tie/1",
+ "regenerate": "node packages/core/scripts/paint-tie.ts packages/core/scripts/data/paint-tie/record.json",
+ "paintCounter": 2,
+ "grid": 0.000001,
+ "boards": 75,
+ "seeds": 3,
+ "moves": [
+  1e-12,
+  1e-10,
+  1e-8,
+  1e-7
+ ],
+ "translations": [
+  0.5,
+  0.3,
+  7
+ ],
+ "vectors": [
+  "shift-a",
+  "shift-b",
+  "shift-c",
+  "shift-d",
+  "shift-e"
+ ],
+ "rates": [
+  {
+   "kind": "painted",
+   "move": 1e-12,
+   "moved": 0,
+   "crossingsUnderGrid": 7145,
+   "pairsUnderGrid": 85330,
+   "rateOfCrossings": 0,
+   "rateOfPairs": 0,
+   "low": 0,
+   "high": 0.0005373540374089972,
+   "formula": 0.0000014546000589616598
+  },
+  {
+   "kind": "painted",
+   "move": 1e-10,
+   "moved": 9,
+   "crossingsUnderGrid": 7145,
+   "pairsUnderGrid": 85330,
+   "rateOfCrossings": 0.0012596221133659902,
+   "rateOfPairs": 0.0001054728700339857,
+   "low": 0.0006628480094627461,
+   "high": 0.002392396528621778,
+   "formula": 0.00014982915515545755
+  },
+  {
+   "kind": "painted",
+   "move": 1e-8,
+   "moved": 495,
+   "crossingsUnderGrid": 7145,
+   "pairsUnderGrid": 85330,
+   "rateOfCrossings": 0.06927921623512946,
+   "rateOfPairs": 0.005801007851869214,
+   "low": 0.063619830045004,
+   "high": 0.07540150152955898,
+   "formula": 0.016036978301359344
+  },
+  {
+   "kind": "painted",
+   "move": 1e-7,
+   "moved": 4704,
+   "crossingsUnderGrid": 7145,
+   "pairsUnderGrid": 85330,
+   "rateOfCrossings": 0.6583624912526242,
+   "rateOfPairs": 0.05512715340442986,
+   "low": 0.6472833224173468,
+   "high": 0.6692714666398042,
+   "formula": 0.1514481009845622
+  },
+  {
+   "kind": "polyline",
+   "move": 1e-12,
+   "moved": 0,
+   "crossingsUnderGrid": 7420,
+   "pairsUnderGrid": 15965,
+   "rateOfCrossings": 0,
+   "rateOfPairs": 0,
+   "low": 0,
+   "high": 0.0005174489301801922,
+   "formula": 0.0000014546000589616598
+  },
+  {
+   "kind": "polyline",
+   "move": 1e-10,
+   "moved": 12,
+   "crossingsUnderGrid": 7420,
+   "pairsUnderGrid": 15965,
+   "rateOfCrossings": 0.0016172506738544475,
+   "rateOfPairs": 0.0007516442217350455,
+   "low": 0.0009254029268232974,
+   "high": 0.0028248736618037514,
+   "formula": 0.00014982915515545755
+  },
+  {
+   "kind": "polyline",
+   "move": 1e-8,
+   "moved": 576,
+   "crossingsUnderGrid": 7420,
+   "pairsUnderGrid": 15965,
+   "rateOfCrossings": 0.07762803234501348,
+   "rateOfPairs": 0.03607892264328218,
+   "low": 0.07175576697013601,
+   "high": 0.0839374095654933,
+   "formula": 0.016036978301359344
+  },
+  {
+   "kind": "polyline",
+   "move": 1e-7,
+   "moved": 6330,
+   "crossingsUnderGrid": 7420,
+   "pairsUnderGrid": 15965,
+   "rateOfCrossings": 0.8530997304582211,
+   "rateOfPairs": 0.39649232696523645,
+   "low": 0.8448621833442663,
+   "high": 0.8609718554166309,
+   "formula": 0.1514481009845622
+  }
+ ],
+ "laneOrder": [
+  {
+   "router": "shared-all",
+   "laneOrderFlips": 774
+  },
+  {
+   "router": "sections",
+   "laneOrderFlips": 359
+  },
+  {
+   "router": "sections-site",
+   "laneOrderFlips": 469
+  }
+ ],
+ "rows": [
+  {
+   "router": "shared-all",
+   "kind": "painted",
+   "floatPoints": 43398,
+   "snapPoints": 43357,
+   "exactPoints": 43401,
+   "anchoredPoints": 43353,
+   "floatPairs": 36006,
+   "snapPairs": 35982,
+   "exactPairs": 36008,
+   "anchoredPairs": 35982,
+   "lost": {
+    "count": 94,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 0.7295334004020921,
+    "overGrid": 0,
+    "under1e9": 94,
+    "under1e6": 94,
+    "farFromEnd": 3,
+    "widestFarSine": 5.229774070077316e-14,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 53,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 33.629554655870244,
+    "overGrid": 0,
+    "under1e9": 53,
+    "under1e6": 53,
+    "farFromEnd": 1,
+    "widestFarSine": 1.6131457733415917e-15,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 3,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 3,
+    "under1e6": 3,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 248,
+   "nearCrossings": 72,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 25,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 19,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 11,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 10,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 15,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 14,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 10,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 10,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 15,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 7,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 10,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 14,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 8,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 19,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 8,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 24,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 16,
+     "snapMoved": 6,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 19,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 9,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 16,
+     "snapMoved": 0,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 3,
+     "snapMoved": 6,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 24,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 3,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 6,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 19,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 26,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 39,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 36,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 21,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 23,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 7,
+     "snapMoved": 7,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 7,
+     "snapMoved": 28,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 7,
+     "snapMoved": 41,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 7,
+     "snapMoved": 37,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 47,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 11
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 39
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 48
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 36
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 42
+    }
+   ]
+  },
+  {
+   "router": "shared-all",
+   "kind": "polyline",
+   "floatPoints": 78274,
+   "snapPoints": 78491,
+   "exactPoints": 78280,
+   "anchoredPoints": 78562,
+   "floatPairs": 39140,
+   "snapPairs": 39169,
+   "exactPairs": 39140,
+   "anchoredPairs": 39188,
+   "lost": {
+    "count": 2128,
+    "widest": 4.602649920770331e-13,
+    "widestToEnd": 3.5371042909228083e-12,
+    "overGrid": 0,
+    "under1e9": 2128,
+    "under1e6": 2128,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 2345,
+    "widest": 4.602649920770331e-13,
+    "widestToEnd": 6.752653646307179e-12,
+    "overGrid": 0,
+    "under1e9": 2345,
+    "under1e6": 2345,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 6,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 6,
+    "under1e6": 6,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 1774,
+   "nearCrossings": 859,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 31,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 911,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 17,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 909,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 17,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 898,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 35,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 924,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 35,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 886,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 41,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 892,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 31,
+     "snapMoved": 6,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 938,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 25,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 886,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 877,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 32,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 890,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 33,
+     "snapMoved": 66,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 900,
+     "snapMoved": 7,
+     "anchoredMoved": 25
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 25,
+     "snapMoved": 43,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 882,
+     "snapMoved": 9,
+     "anchoredMoved": 15
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 21,
+     "snapMoved": 56,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 936,
+     "snapMoved": 6,
+     "anchoredMoved": 13
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 35,
+     "snapMoved": 75,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 938,
+     "snapMoved": 11,
+     "anchoredMoved": 27
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 10,
+     "snapMoved": 62,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 889,
+     "snapMoved": 6,
+     "anchoredMoved": 10
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 47,
+     "snapMoved": 719,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 951,
+     "snapMoved": 87,
+     "anchoredMoved": 108
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 20,
+     "snapMoved": 689,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 952,
+     "snapMoved": 47,
+     "anchoredMoved": 84
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 19,
+     "snapMoved": 631,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 954,
+     "snapMoved": 70,
+     "anchoredMoved": 104
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 11,
+     "snapMoved": 671,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 939,
+     "snapMoved": 73,
+     "anchoredMoved": 113
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 31,
+     "snapMoved": 579,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 929,
+     "snapMoved": 76,
+     "anchoredMoved": 107
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 1960,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 9,
+     "snapMoved": 2396,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 5,
+     "snapMoved": 2522,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 1565,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 1620,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 22,
+     "snapMoved": 594,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 27,
+     "snapMoved": 2063,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 35,
+     "snapMoved": 2492,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 35,
+     "snapMoved": 1883,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 2605,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 1,
+     "snapMoved": 7,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 38,
+     "snapMoved": 10,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 38,
+     "snapMoved": 5,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 30,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 917
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 2223
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 2601
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 2118
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 2620
+    }
+   ]
+  },
+  {
+   "router": "sections",
+   "kind": "painted",
+   "floatPoints": 54016,
+   "snapPoints": 53790,
+   "exactPoints": 54099,
+   "anchoredPoints": 53806,
+   "floatPairs": 40297,
+   "snapPairs": 40261,
+   "exactPairs": 40317,
+   "anchoredPairs": 40275,
+   "lost": {
+    "count": 1133,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 99.72578266071761,
+    "overGrid": 0,
+    "under1e9": 1133,
+    "under1e6": 1133,
+    "farFromEnd": 425,
+    "widestFarSine": 3.797180885561183e-13,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 907,
+    "widest": 2.7735010819251407e-7,
+    "widestToEnd": 870.5516456940119,
+    "overGrid": 0,
+    "under1e9": 906,
+    "under1e6": 907,
+    "farFromEnd": 164,
+    "widestFarSine": 0.07343416487537498,
+    "farWithAngle": 1
+   },
+   "exactAdded": {
+    "count": 83,
+    "widest": 5.684341886080802e-14,
+    "widestToEnd": 83.33068385845654,
+    "overGrid": 0,
+    "under1e9": 83,
+    "under1e6": 83,
+    "farFromEnd": 26,
+    "widestFarSine": 1.3002779771763857e-15,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 7608,
+   "nearCrossings": 520,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 57,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 230,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 33,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 201,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 201,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 203,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 201,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 55,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 232,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 47,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 214,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 35,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 222,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 47,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 253,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 53,
+     "snapMoved": 5,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 221,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 9,
+     "snapMoved": 35,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 201,
+     "snapMoved": 5,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 41,
+     "snapMoved": 35,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 207,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 10,
+     "snapMoved": 35,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 202,
+     "snapMoved": 7,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 16,
+     "snapMoved": 67,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 187,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 21,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 192,
+     "snapMoved": 2,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 76,
+     "snapMoved": 427,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 200,
+     "snapMoved": 42,
+     "anchoredMoved": 39
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 43,
+     "snapMoved": 410,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 204,
+     "snapMoved": 32,
+     "anchoredMoved": 40
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 17,
+     "snapMoved": 400,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 210,
+     "snapMoved": 34,
+     "anchoredMoved": 46
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 11,
+     "snapMoved": 391,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 222,
+     "snapMoved": 66,
+     "anchoredMoved": 65
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 38,
+     "snapMoved": 334,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 211,
+     "snapMoved": 27,
+     "anchoredMoved": 36
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 994,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 3,
+     "snapMoved": 1158,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 1169,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 702,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 823,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 24,
+     "snapMoved": 301,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 42,
+     "snapMoved": 980,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 11,
+     "snapMoved": 1148,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 11,
+     "snapMoved": 937,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 3,
+     "snapMoved": 1242,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 42,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 41,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 274
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1028
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1184
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 942
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1173
+    }
+   ]
+  },
+  {
+   "router": "sections",
+   "kind": "polyline",
+   "floatPoints": 57891,
+   "snapPoints": 58000,
+   "exactPoints": 57891,
+   "anchoredPoints": 57998,
+   "floatPairs": 39281,
+   "snapPairs": 39295,
+   "exactPairs": 39281,
+   "anchoredPairs": 39299,
+   "lost": {
+    "count": 463,
+    "widest": 2.085575717305321e-7,
+    "widestToEnd": 3.1666667343277255,
+    "overGrid": 0,
+    "under1e9": 462,
+    "under1e6": 463,
+    "farFromEnd": 20,
+    "widestFarSine": 1.6591696563016953e-13,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 572,
+    "widest": 2.5421149729252077e-13,
+    "widestToEnd": 3.2713300124373386,
+    "overGrid": 0,
+    "under1e9": 572,
+    "under1e6": 572,
+    "farFromEnd": 7,
+    "widestFarSine": 4.198056767293094e-14,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 518,
+   "nearCrossings": 227,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 14,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 520,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 10,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 503,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 527,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 16,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 523,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 474,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 502,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 15,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 482,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 512,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 15,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 474,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 482,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 6,
+     "snapMoved": 24,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 529,
+     "snapMoved": 16,
+     "anchoredMoved": 5
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 8,
+     "snapMoved": 27,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 518,
+     "snapMoved": 6,
+     "anchoredMoved": 6
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 11,
+     "snapMoved": 30,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 476,
+     "snapMoved": 9,
+     "anchoredMoved": 8
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 15,
+     "snapMoved": 34,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 484,
+     "snapMoved": 8,
+     "anchoredMoved": 12
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 7,
+     "snapMoved": 22,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 503,
+     "snapMoved": 9,
+     "anchoredMoved": 7
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 26,
+     "snapMoved": 221,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 534,
+     "snapMoved": 58,
+     "anchoredMoved": 48
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 16,
+     "snapMoved": 234,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 570,
+     "snapMoved": 42,
+     "anchoredMoved": 45
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 18,
+     "snapMoved": 217,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 566,
+     "snapMoved": 27,
+     "anchoredMoved": 31
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 4,
+     "snapMoved": 253,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 540,
+     "snapMoved": 57,
+     "anchoredMoved": 38
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 12,
+     "snapMoved": 165,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 532,
+     "snapMoved": 38,
+     "anchoredMoved": 46
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 601,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 724,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 835,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 598,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 519,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 8,
+     "snapMoved": 204,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 11,
+     "snapMoved": 714,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 12,
+     "snapMoved": 843,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 12,
+     "snapMoved": 557,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 806,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 1,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 10,
+     "snapMoved": 5,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 10,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 7,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 256
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 718
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 865
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 603
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 861
+    }
+   ]
+  },
+  {
+   "router": "sections-site",
+   "kind": "painted",
+   "floatPoints": 83802,
+   "snapPoints": 83528,
+   "exactPoints": 83900,
+   "anchoredPoints": 83546,
+   "floatPairs": 46980,
+   "snapPairs": 46957,
+   "exactPairs": 46984,
+   "anchoredPairs": 46954,
+   "lost": {
+    "count": 1674,
+    "widest": 2.1869434618841006e-8,
+    "widestToEnd": 224.1571871058832,
+    "overGrid": 0,
+    "under1e9": 1673,
+    "under1e6": 1674,
+    "farFromEnd": 571,
+    "widestFarSine": 4.315891810432604e-13,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 1400,
+    "widest": 2.1869434618841006e-8,
+    "widestToEnd": 9993.60324960657,
+    "overGrid": 0,
+    "under1e9": 1399,
+    "under1e6": 1400,
+    "farFromEnd": 273,
+    "widestFarSine": 1.1004300930050837e-12,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 102,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 248.1554437521914,
+    "overGrid": 0,
+    "under1e9": 102,
+    "under1e6": 102,
+    "farFromEnd": 35,
+    "widestFarSine": 1.330803139554369e-15,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 4,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 1.2297111682519208e-12,
+    "overGrid": 0,
+    "under1e9": 4,
+    "under1e6": 4,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 9210,
+   "nearCrossings": 837,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 52,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 115,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 31,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 112,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 42,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 105,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 48,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 127,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 43,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 110,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 47,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 110,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 49,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 127,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 33,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 107,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 49,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 129,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 38,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 106,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 25,
+     "snapMoved": 41,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 112,
+     "snapMoved": 1,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 44,
+     "snapMoved": 62,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 115,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 36,
+     "snapMoved": 81,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 104,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 32,
+     "snapMoved": 67,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 120,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 28,
+     "snapMoved": 37,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 105,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 66,
+     "snapMoved": 532,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 121,
+     "snapMoved": 19,
+     "anchoredMoved": 11
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 46,
+     "snapMoved": 573,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 126,
+     "snapMoved": 12,
+     "anchoredMoved": 9
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 35,
+     "snapMoved": 574,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 123,
+     "snapMoved": 9,
+     "anchoredMoved": 14
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 12,
+     "snapMoved": 634,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 125,
+     "snapMoved": 6,
+     "anchoredMoved": 11
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 35,
+     "snapMoved": 405,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 123,
+     "snapMoved": 13,
+     "anchoredMoved": 12
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 1329,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 1435,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 1542,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 966,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 1100,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 43,
+     "snapMoved": 391,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 47,
+     "snapMoved": 1362,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 20,
+     "snapMoved": 1542,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 20,
+     "snapMoved": 1191,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 1607,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 23,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 415
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1370
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1530
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1230
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1583
+    }
+   ]
+  },
+  {
+   "router": "sections-site",
+   "kind": "polyline",
+   "floatPoints": 96267,
+   "snapPoints": 96371,
+   "exactPoints": 96277,
+   "anchoredPoints": 96459,
+   "floatPairs": 48072,
+   "snapPairs": 48084,
+   "exactPairs": 48073,
+   "anchoredPairs": 48086,
+   "lost": {
+    "count": 987,
+    "widest": 2.3437142008433856e-13,
+    "widestToEnd": 30.238925469708963,
+    "overGrid": 0,
+    "under1e9": 987,
+    "under1e6": 987,
+    "farFromEnd": 46,
+    "widestFarSine": 7.03098180273014e-14,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 1091,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 2194.9999999999204,
+    "overGrid": 0,
+    "under1e9": 1091,
+    "under1e6": 1091,
+    "farFromEnd": 42,
+    "widestFarSine": 6.777053542320553e-14,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 10,
+    "widest": 4.440892098500626e-16,
+    "widestToEnd": 0.13602843467060635,
+    "overGrid": 0,
+    "under1e9": 10,
+    "under1e6": 10,
+    "farFromEnd": 1,
+    "widestFarSine": 2.4388343045531602e-15,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 901,
+   "nearCrossings": 398,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 49,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 325,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 17,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 310,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 21,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 287,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 302,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 283,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 307,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 302,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 13,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 334,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 320,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 14,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 308,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 3,
+     "snapMoved": 22,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 381,
+     "snapMoved": 7,
+     "anchoredMoved": 6
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 22,
+     "snapMoved": 31,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 370,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 25,
+     "snapMoved": 37,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 367,
+     "snapMoved": 7,
+     "anchoredMoved": 6
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 6,
+     "snapMoved": 25,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 365,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 26,
+     "snapMoved": 22,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 308,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 22,
+     "snapMoved": 363,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 319,
+     "snapMoved": 41,
+     "anchoredMoved": 18
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 29,
+     "snapMoved": 414,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 298,
+     "snapMoved": 38,
+     "anchoredMoved": 15
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 15,
+     "snapMoved": 381,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 303,
+     "snapMoved": 31,
+     "anchoredMoved": 13
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 16,
+     "snapMoved": 481,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 336,
+     "snapMoved": 38,
+     "anchoredMoved": 14
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 20,
+     "snapMoved": 312,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 333,
+     "snapMoved": 36,
+     "anchoredMoved": 16
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 1,
+     "snapMoved": 1182,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 1329,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 1,
+     "snapMoved": 1497,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 1,
+     "snapMoved": 1014,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 1,
+     "snapMoved": 1139,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 29,
+     "snapMoved": 364,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 29,
+     "snapMoved": 1294,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 13,
+     "snapMoved": 1391,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 13,
+     "snapMoved": 1090,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 1443,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 11,
+     "snapMoved": 12,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 23,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 3,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 23,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 16,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 492
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1335
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1427
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1218
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 1521
+    }
+   ]
+  }
+ ],
+ "slice": [
+  {
+   "router": "shared-all",
+   "kind": "painted",
+   "floatPoints": 2062,
+   "snapPoints": 2062,
+   "exactPoints": 2062,
+   "anchoredPoints": 2062,
+   "floatPairs": 1792,
+   "snapPairs": 1792,
+   "exactPairs": 1792,
+   "anchoredPairs": 1792,
+   "lost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 6,
+   "nearCrossings": 3,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    }
+   ]
+  },
+  {
+   "router": "shared-all",
+   "kind": "polyline",
+   "floatPoints": 4348,
+   "snapPoints": 4324,
+   "exactPoints": 4348,
+   "anchoredPoints": 4323,
+   "floatPairs": 2080,
+   "snapPairs": 2080,
+   "exactPairs": 2080,
+   "anchoredPairs": 2081,
+   "lost": {
+    "count": 185,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 6.915300366811402e-13,
+    "overGrid": 0,
+    "under1e9": 185,
+    "under1e6": 185,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 161,
+    "widest": 1.1718571004216928e-13,
+    "widestToEnd": 1.1718571004216928e-12,
+    "overGrid": 0,
+    "under1e9": 161,
+    "under1e6": 161,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 107,
+   "nearCrossings": 56,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 53,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 57,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 61,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 54,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 50,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 0,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 47,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 0,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 52,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 56,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 38,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 49,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 0,
+     "snapMoved": 6,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 59,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 53,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 70,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 0,
+     "snapMoved": 11,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 49,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 0,
+     "snapMoved": 6,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 52,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 0,
+     "snapMoved": 32,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 60,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 0,
+     "snapMoved": 34,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 60,
+     "snapMoved": 2,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 0,
+     "snapMoved": 27,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 53,
+     "snapMoved": 2,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 0,
+     "snapMoved": 61,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 62,
+     "snapMoved": 0,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 0,
+     "snapMoved": 26,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 53,
+     "snapMoved": 0,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 97,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 161,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 165,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 144,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 148,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 36,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 137,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 199,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 127,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 181,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 33
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 138
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 196
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 113
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 166
+    }
+   ]
+  },
+  {
+   "router": "sections",
+   "kind": "painted",
+   "floatPoints": 3424,
+   "snapPoints": 3404,
+   "exactPoints": 3428,
+   "anchoredPoints": 3407,
+   "floatPairs": 2291,
+   "snapPairs": 2280,
+   "exactPairs": 2293,
+   "anchoredPairs": 2285,
+   "lost": {
+    "count": 56,
+    "widest": 1.2710574864626038e-13,
+    "widestToEnd": 23.605051851780427,
+    "overGrid": 0,
+    "under1e9": 56,
+    "under1e6": 56,
+    "farFromEnd": 8,
+    "widestFarSine": 4.8202608262671045e-15,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 36,
+    "widest": 1.6077746776921858e-13,
+    "widestToEnd": 120.68032134916102,
+    "overGrid": 0,
+    "under1e9": 36,
+    "under1e6": 36,
+    "farFromEnd": 5,
+    "widestFarSine": 4.7502714041489496e-15,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 4,
+    "widest": 0,
+    "widestToEnd": 0.6426878456711368,
+    "overGrid": 0,
+    "under1e9": 4,
+    "under1e6": 4,
+    "farFromEnd": 1,
+    "widestFarSine": 4.0075268936938495e-16,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 95,
+   "nearCrossings": 26,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 7,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 7,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 1,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 9,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 0,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 0,
+     "snapMoved": 4,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 1,
+     "snapMoved": 3,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 5,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 1,
+     "snapMoved": 32,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 6,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 0,
+     "snapMoved": 39,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 3,
+     "snapMoved": 2,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 0,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 5,
+     "snapMoved": 2,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 1,
+     "snapMoved": 25,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 1,
+     "snapMoved": 2,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 1,
+     "snapMoved": 18,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 6,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 56,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 84,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 66,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 57,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 1,
+     "snapMoved": 21,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 1,
+     "snapMoved": 60,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 68,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 77,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 80,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 16
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 82
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 66
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 53
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 67
+    }
+   ]
+  },
+  {
+   "router": "sections",
+   "kind": "polyline",
+   "floatPoints": 3431,
+   "snapPoints": 3430,
+   "exactPoints": 3431,
+   "anchoredPoints": 3431,
+   "floatPairs": 2232,
+   "snapPairs": 2231,
+   "exactPairs": 2232,
+   "anchoredPairs": 2232,
+   "lost": {
+    "count": 29,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 2.2737367544323206e-13,
+    "overGrid": 0,
+    "under1e9": 29,
+    "under1e6": 29,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 28,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 1.7316263224219958e-12,
+    "overGrid": 0,
+    "under1e9": 28,
+    "under1e6": 28,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 21,
+   "nearCrossings": 11,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 29,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 22,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 30,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 24,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 31,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 29,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 30,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 22,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 32,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 27,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 25,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 18,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 26,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 17,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 0,
+     "snapMoved": 11,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 31,
+     "snapMoved": 0,
+     "anchoredMoved": 1
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 0,
+     "snapMoved": 14,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 28,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 0,
+     "snapMoved": 11,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 31,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 2,
+     "snapMoved": 13,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 25,
+     "snapMoved": 3,
+     "anchoredMoved": 2
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 0,
+     "snapMoved": 10,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 33,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 43,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 57,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 47,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 43,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 2,
+     "snapMoved": 14,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 2,
+     "snapMoved": 48,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 61,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 39,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 12
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 49
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 45
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 37
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 56
+    }
+   ]
+  },
+  {
+   "router": "sections-site",
+   "kind": "painted",
+   "floatPoints": 3507,
+   "snapPoints": 3511,
+   "exactPoints": 3507,
+   "anchoredPoints": 3506,
+   "floatPairs": 2090,
+   "snapPairs": 2088,
+   "exactPairs": 2088,
+   "anchoredPairs": 2088,
+   "lost": {
+    "count": 91,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 24.87020951636436,
+    "overGrid": 0,
+    "under1e9": 91,
+    "under1e6": 91,
+    "farFromEnd": 15,
+    "widestFarSine": 7.659307760825716e-14,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 95,
+    "widest": 2.2737367544323206e-13,
+    "widestToEnd": 1372.8240794773,
+    "overGrid": 0,
+    "under1e9": 95,
+    "under1e6": 95,
+    "farFromEnd": 18,
+    "widestFarSine": 2.8835448978742366e-15,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 3,
+    "widest": 0,
+    "widestToEnd": 220.96060642213342,
+    "overGrid": 0,
+    "under1e9": 3,
+    "under1e6": 3,
+    "farFromEnd": 1,
+    "widestFarSine": 1.2408871380794565e-16,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 3,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 1.2297111682519208e-12,
+    "overGrid": 0,
+    "under1e9": 3,
+    "under1e6": 3,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 362,
+   "nearCrossings": 38,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 6,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 6,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 5,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 6,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 4,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 4,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 4,
+     "snapMoved": 1,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 7,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 3,
+     "snapMoved": 10,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 5,
+     "snapMoved": 10,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 3,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 4,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 7,
+     "snapMoved": 37,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 4,
+     "snapMoved": 35,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 4,
+     "snapMoved": 37,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 3,
+     "snapMoved": 28,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 8,
+     "snapMoved": 31,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 67,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 63,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 86,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 41,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 50,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 3,
+     "snapMoved": 30,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 3,
+     "snapMoved": 58,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 3,
+     "snapMoved": 98,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 3,
+     "snapMoved": 57,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 81,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 39
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 72
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 109
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 74
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 98
+    }
+   ]
+  },
+  {
+   "router": "sections-site",
+   "kind": "polyline",
+   "floatPoints": 3934,
+   "snapPoints": 3927,
+   "exactPoints": 3934,
+   "anchoredPoints": 3942,
+   "floatPairs": 2097,
+   "snapPairs": 2097,
+   "exactPairs": 2097,
+   "anchoredPairs": 2101,
+   "lost": {
+    "count": 32,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 29.244139231941233,
+    "overGrid": 0,
+    "under1e9": 32,
+    "under1e6": 32,
+    "farFromEnd": 2,
+    "widestFarSine": 1.4957236870241584e-15,
+    "farWithAngle": 0
+   },
+   "added": {
+    "count": 25,
+    "widest": 1.1368683772161603e-13,
+    "widestToEnd": 3.126388037344441e-13,
+    "overGrid": 0,
+    "under1e9": 25,
+    "under1e6": 25,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactAdded": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "exactLost": {
+    "count": 0,
+    "widest": 0,
+    "widestToEnd": 0,
+    "overGrid": 0,
+    "under1e9": 0,
+    "under1e6": 0,
+    "farFromEnd": 0,
+    "widestFarSine": 0,
+    "farWithAngle": 0
+   },
+   "near": 33,
+   "nearCrossings": 14,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.41460852115415e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6.035800299141556e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.090400782180949e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.65298846294172e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 9.171203408623113e-13,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-12,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-12,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6.800273273256608e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.497796991374343e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.122634924598969e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 7.732763380045071e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 8.303820219589399e-11,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-10,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-10,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 7.608067183755338e-9,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.297261950443499e-9,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 9.100245509762317e-9,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.89773343282286e-9,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 7.189137676614337e-9,
+     "floatMoved": 0,
+     "snapMoved": 2,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-8,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-8,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 8.024749835021793e-8,
+     "floatMoved": 0,
+     "snapMoved": 8,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-a",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 7.866211563814431e-8,
+     "floatMoved": 0,
+     "snapMoved": 11,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-b",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 7.335534832673147e-8,
+     "floatMoved": 0,
+     "snapMoved": 12,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-c",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 8.470632964745162e-8,
+     "floatMoved": 0,
+     "snapMoved": 16,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-d",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 2,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 6.16489604988601e-8,
+     "floatMoved": 0,
+     "snapMoved": 7,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 1e-7,
+     "vector": "shift-e",
+     "form": "rooms",
+     "meanMove": 1e-7,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.3035272725392133,
+     "floatMoved": 0,
+     "snapMoved": 33,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.3671150855370797,
+     "floatMoved": 0,
+     "snapMoved": 56,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.353822036908241,
+     "floatMoved": 0,
+     "snapMoved": 54,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2947108348016627,
+     "floatMoved": 0,
+     "snapMoved": 45,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.5,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.49327552583417855,
+     "floatMoved": 0,
+     "snapMoved": 47,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 25,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 44,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 46,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 35,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 58,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-a",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-b",
+     "form": "lines",
+     "meanMove": 6,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-c",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-d",
+     "form": "lines",
+     "meanMove": 5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 7,
+     "vector": "shift-e",
+     "form": "lines",
+     "meanMove": 4.5,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 0
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-a",
+     "form": "corner",
+     "meanMove": 0.2114434436545707,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 15
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-b",
+     "form": "corner",
+     "meanMove": 0.19395822903024962,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 34
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-c",
+     "form": "corner",
+     "meanMove": 0.20951690531219355,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 41
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-d",
+     "form": "corner",
+     "meanMove": 0.2338216556876432,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 39
+    },
+    {
+     "move": 0.3,
+     "vector": "shift-e",
+     "form": "corner",
+     "meanMove": 0.26969458544044755,
+     "floatMoved": 0,
+     "snapMoved": 0,
+     "anchoredMoved": 34
+    }
+   ]
+  }
+ ]
+}

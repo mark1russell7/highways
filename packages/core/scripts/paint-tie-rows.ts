@@ -9,7 +9,7 @@ import { deriveSeed, mulberry32, seedOf } from "@mark1russell7/rigor-generators"
 import { wilson } from "@mark1russell7/rigor-statistics";
 import { crossingPairs, eachCrossing, PAINT_COUNTER, snapLines, type EdgeLine, type LineSegment } from "../src/bench/measures/crossing-pairs.ts";
 import { laneCrossings } from "../src/bench/measures/lanes.ts";
-import { dist, type Point } from "../src/geom.ts";
+import { dist, snapToEps, type Point } from "../src/geom.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
 import type { Graph, Result } from "../src/model.ts";
 import { laneRoutes, runKey, segmentsOf } from "../src/segments.ts";
@@ -24,6 +24,13 @@ export const SCHEMA = "paint-tie/1";
 export const NAMES = ["shared-all", "sections", "sections-site"] as const;
 /** The largest move of each shift of the record. */
 export const MOVES = [1e-12, 1e-10, 1e-8, 1e-7] as const;
+/**
+ * The largest moves of the arms of a translation. A host can move a whole board by any amount. The rooms do not change, so these arms have only the form `lines`.
+ * The move 0.5 gives a dyadic shift with at most 34 fraction bits, so float addition is exact and float reads no rounding. The move 0.3 gives a shift that float addition rounds. The move 7 gives a whole number on each axis.
+ */
+export const TRANSLATIONS = [0.5, 0.3, 7] as const;
+/** The size of the arm `corner`: one more line that crosses nothing moves the low corner of the lines by a fraction. An edit of a board can do this. */
+export const CORNER_MOVE = 0.3;
 /** The named seeds of the shifts. */
 export const VECTORS = ["shift-a", "shift-b", "shift-c", "shift-d", "shift-e"] as const;
 /** The seeds of each family. */
@@ -36,9 +43,23 @@ export function shiftOf(name: string, move: number): { readonly dx: number; read
   return { dx: axis(), dy: axis() };
 }
 
+/** The shift of one seed for one translation. A whole move gives a whole number on each axis. */
+export function translationOf(name: string, move: number): { readonly dx: number; readonly dy: number } {
+  const shift = shiftOf(name, move);
+  return Number.isInteger(move) ? { dx: Math.round(shift.dx), dy: Math.round(shift.dy) } : shift;
+}
+
 /** This function moves each point of the lines by one shift. */
 function shiftLines(lines: readonly EdgeLine[], shift: { readonly dx: number; readonly dy: number }): EdgeLine[] {
   return lines.map((line) => ({ edge: line.edge, points: line.points.map((p) => ({ x: p.x + shift.dx, y: p.y + shift.dy })) }));
+}
+
+/** This function adds one short line under and to the left of each point. The line crosses nothing, so each change of a count comes from the grid. */
+function withCornerLine(lines: readonly EdgeLine[], shift: { readonly dx: number; readonly dy: number }): EdgeLine[] {
+  const points = lines.flatMap((line) => line.points);
+  const x = points.reduce((low, p) => Math.min(low, p.x), Infinity) - 1 - Math.abs(shift.dx);
+  const y = points.reduce((low, p) => Math.min(low, p.y), Infinity) - 1 - Math.abs(shift.dy);
+  return [...lines, { edge: "corner-line", points: [{ x, y }, { x: x - 1, y }] }];
 }
 
 /** This function moves each side of each room by the move, with a sign from the seed. A room stays at 0 or over 0. */
@@ -71,6 +92,17 @@ function crossToEnd(s: LineSegment, o: LineSegment): number {
   return Math.min(dist(at, s.a), dist(at, s.b), dist(at, o.a), dist(at, o.b));
 }
 
+/** One far crossing, so that a reader can examine it by hand. */
+export interface FarCrossing {
+  readonly points: readonly [Point, Point, Point, Point];
+  readonly touch: number;
+  readonly toEnd: number;
+  readonly sine: number;
+}
+
+/** The record keeps this count of far crossings for each read. These have the widest angles. */
+export const FAR_KEPT = 3;
+
 /** The crossings that one count has and another count does not have. */
 export interface OnlyIn {
   readonly count: number;
@@ -82,9 +114,17 @@ export interface OnlyIn {
   /** The crossings by the size of the touch. */
   readonly under1e9: number;
   readonly under1e6: number;
+  /** The crossings with a crossing point at the grid or over it from each end. A small touch and a far point give a pair that lies on one line. */
+  readonly farFromEnd: number;
+  /** The largest sine of the angle of the pair, over the far crossings. */
+  readonly widestFarSine: number;
+  /** The far crossings with a sine at 1e-6 or over it. A count over 0 is a pair with an angle that is not rounding. */
+  readonly farWithAngle: number;
+  /** The far crossings with the widest angles. */
+  readonly farWidest: readonly FarCrossing[];
 }
 
-const NONE: OnlyIn = { count: 0, widest: 0, widestToEnd: 0, overGrid: 0, under1e9: 0, under1e6: 0 };
+const NONE: OnlyIn = { count: 0, widest: 0, widestToEnd: 0, overGrid: 0, under1e9: 0, under1e6: 0, farFromEnd: 0, widestFarSine: 0, farWithAngle: 0, farWidest: [] };
 
 /** This function adds two reads of crossings. */
 function addOnly(a: OnlyIn, b: OnlyIn): OnlyIn {
@@ -95,7 +135,18 @@ function addOnly(a: OnlyIn, b: OnlyIn): OnlyIn {
     overGrid: a.overGrid + b.overGrid,
     under1e9: a.under1e9 + b.under1e9,
     under1e6: a.under1e6 + b.under1e6,
+    farFromEnd: a.farFromEnd + b.farFromEnd,
+    widestFarSine: Math.max(a.widestFarSine, b.widestFarSine),
+    farWithAngle: a.farWithAngle + b.farWithAngle,
+    farWidest: [...a.farWidest, ...b.farWidest].sort((x, y) => y.sine - x.sine).slice(0, FAR_KEPT),
   };
+}
+
+/** This function gives the sine of the angle of two segments. */
+function sineOf(s: LineSegment, o: LineSegment): number {
+  const [ax, ay, bx, by] = [s.b.x - s.a.x, s.b.y - s.a.y, o.b.x - o.a.x, o.b.y - o.a.y];
+  const size = Math.hypot(ax, ay) * Math.hypot(bx, by);
+  return size === 0 ? 0 : Math.abs(ax * by - ay * bx) / size;
 }
 
 /** The crossings of one count, by the numbers of their segments. */
@@ -117,7 +168,21 @@ function onlyIn(a: Crossings, b: Crossings, floats: Crossings, lines: readonly E
     const at = (x: LineSegment): LineSegment => ({ ...x, a: lines[x.line]!.points[x.index]!, b: lines[x.line]!.points[x.index + 1]! });
     const [fs, fo] = own ? [own.s, own.o] : [at(s), at(o)];
     const touch = touchOf(fs, fo);
-    read = addOnly(read, { count: 1, widest: touch, widestToEnd: crossToEnd(fs, fo), overGrid: touch >= EPS ? 1 : 0, under1e9: touch < 1e-9 ? 1 : 0, under1e6: touch < 1e-6 ? 1 : 0 });
+    const toEnd = crossToEnd(fs, fo);
+    const far = toEnd >= EPS;
+    const sine = far ? sineOf(fs, fo) : 0;
+    read = addOnly(read, {
+      count: 1,
+      widest: touch,
+      widestToEnd: toEnd,
+      overGrid: touch >= EPS ? 1 : 0,
+      under1e9: touch < 1e-9 ? 1 : 0,
+      under1e6: touch < 1e-6 ? 1 : 0,
+      farFromEnd: far ? 1 : 0,
+      widestFarSine: sine,
+      farWithAngle: sine >= 1e-6 ? 1 : 0,
+      farWidest: far ? [{ points: [fs.a, fs.b, fo.a, fo.b], touch, toEnd, sine }] : [],
+    });
   }
   return read;
 }
@@ -150,12 +215,14 @@ function nearPairs(lines: readonly EdgeLine[], floats: Crossings): { readonly ne
 export interface ShiftRow {
   readonly move: number;
   readonly vector: string;
-  /** The form of the shift: `lines` moves each point of the board by one vector. `rooms` moves each room, and the lines follow. */
-  readonly form: "lines" | "rooms";
+  /** The form of the shift: `lines` moves each point of the board by one vector. `rooms` moves each room, and the lines follow. `corner` moves no line and adds one line at a new low corner. */
+  readonly form: "lines" | "rooms" | "corner";
   /** The largest size of the shift on an axis, and its mean over the two axes for the form `lines`. */
   readonly meanMove: number;
   readonly floatMoved: number;
   readonly snapMoved: number;
+  /** The moved pairs on a grid that starts at the low corner of the board. */
+  readonly anchoredMoved: number;
 }
 
 /** The read of one router and one kind of line over the boards. */
@@ -165,9 +232,12 @@ export interface KindRow {
   readonly floatPoints: number;
   readonly snapPoints: number;
   readonly exactPoints: number;
+  /** The crossing points on a grid that starts at the low corner of the board. */
+  readonly anchoredPoints: number;
   readonly floatPairs: number;
   readonly snapPairs: number;
   readonly exactPairs: number;
+  readonly anchoredPairs: number;
   /** The crossings of the floats that the grid removes, and the crossings that the grid adds. */
   readonly lost: OnlyIn;
   readonly added: OnlyIn;
@@ -197,6 +267,18 @@ function floatPairs(lines: readonly EdgeLine[]): ReadonlyMap<string, number> {
   return pairs;
 }
 
+/** This function rounds each point on a grid that starts at the low corner of the lines, so a rigid shift keeps each rounding. */
+function anchored(lines: readonly EdgeLine[]): EdgeLine[] {
+  let [x0, y0] = [Infinity, Infinity];
+  for (const line of lines) {
+    for (const p of line.points) {
+      x0 = Math.min(x0, p.x);
+      y0 = Math.min(y0, p.y);
+    }
+  }
+  return lines.map((line) => ({ edge: line.edge, points: line.points.map((p) => snapToEps({ x: p.x - x0, y: p.y - y0 })) }));
+}
+
 const exact = (a: Point, b: Point, c: Point, d: Point): boolean => classifySegments(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y).relation === "cross";
 
 /** One sum of a kind over the boards. */
@@ -206,9 +288,11 @@ const emptySum = (): Sum => ({
   floatPoints: 0,
   snapPoints: 0,
   exactPoints: 0,
+  anchoredPoints: 0,
   floatPairs: 0,
   snapPairs: 0,
   exactPairs: 0,
+  anchoredPairs: 0,
   lost: NONE,
   added: NONE,
   exactAdded: NONE,
@@ -228,6 +312,9 @@ function addLines(sum: Sum, lines: readonly EdgeLine[]): void {
   sum.floatPoints += floats.size;
   sum.snapPoints += snaps.size;
   sum.exactPoints += exacts.size;
+  const fixedLines = anchored(lines);
+  sum.anchoredPoints += crossings(fixedLines).size;
+  sum.anchoredPairs += floatPairs(fixedLines).size;
   sum.floatPairs += fp.size;
   sum.snapPairs += sp.size;
   sum.exactPairs += ep.size;
@@ -241,11 +328,12 @@ function addLines(sum: Sum, lines: readonly EdgeLine[]): void {
 }
 
 /** This function adds one shift of one board to a sum. */
-function addShift(sum: Sum, form: "lines" | "rooms", move: number, vector: string, meanMove: number, base: readonly EdgeLine[], other: readonly EdgeLine[]): void {
+function addShift(sum: Sum, form: "lines" | "rooms" | "corner", move: number, vector: string, meanMove: number, base: readonly EdgeLine[], other: readonly EdgeLine[]): void {
   const key = `${form}/${move}/${vector}`;
-  const row = sum.shifts.get(key) ?? { move, vector, form, meanMove, floatMoved: 0, snapMoved: 0 };
+  const row = sum.shifts.get(key) ?? { move, vector, form, meanMove, floatMoved: 0, snapMoved: 0, anchoredMoved: 0 };
   row.floatMoved += moved(floatPairs(base), floatPairs(other));
   row.snapMoved += moved(crossingPairs(base), crossingPairs(other));
+  row.anchoredMoved += moved(floatPairs(anchored(base)), floatPairs(anchored(other)));
   sum.shifts.set(key, row);
 }
 
@@ -280,6 +368,20 @@ export function kindRows(families?: readonly string[], seeds: number = SEEDS, lo
             addShift(of(name, "painted"), "rooms", move, vector, move, base.painted, rooms.painted);
             addShift(of(name, "polyline"), "rooms", move, vector, move, base.polyline, rooms.polyline);
           }
+        }
+        for (const move of TRANSLATIONS) {
+          for (const vector of VECTORS) {
+            const shift = translationOf(vector, move);
+            const mean = (Math.abs(shift.dx) + Math.abs(shift.dy)) / 2;
+            addShift(of(name, "painted"), "lines", move, vector, mean, base.painted, shiftLines(base.painted, shift));
+            addShift(of(name, "polyline"), "lines", move, vector, mean, base.polyline, shiftLines(base.polyline, shift));
+          }
+        }
+        for (const vector of VECTORS) {
+          const shift = shiftOf(vector, CORNER_MOVE);
+          const mean = (Math.abs(shift.dx) + Math.abs(shift.dy)) / 2;
+          addShift(of(name, "painted"), "corner", CORNER_MOVE, vector, mean, base.painted, withCornerLine(base.painted, shift));
+          addShift(of(name, "polyline"), "corner", CORNER_MOVE, vector, mean, base.polyline, withCornerLine(base.polyline, shift));
         }
       }
     }
@@ -352,5 +454,5 @@ export const SLICE = { families: ["small-clustered", "bottleneck"], seeds: 1 } a
 
 /** This function gives the record. */
 export function paintRecord(rows: readonly KindRow[], slice: readonly KindRow[], laneOrder: ReturnType<typeof laneOrderRows>, boards: number) {
-  return { schema: SCHEMA, regenerate: REGENERATE, paintCounter: PAINT_COUNTER, grid: EPS, boards, seeds: SEEDS, moves: MOVES, vectors: VECTORS, rates: rateRows(rows), laneOrder, rows, slice };
+  return { schema: SCHEMA, regenerate: REGENERATE, paintCounter: PAINT_COUNTER, grid: EPS, boards, seeds: SEEDS, moves: MOVES, translations: TRANSLATIONS, vectors: VECTORS, rates: rateRows(rows), laneOrder, rows, slice };
 }
