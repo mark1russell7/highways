@@ -22,7 +22,7 @@ import {
 import { html, sectionOf } from "./content.ts";
 import { genPanel } from "./gen-controls.ts";
 import { cleanGen, START_GEN, type GenSpec } from "./generated.ts";
-import { COMPARE_STRATEGIES, OPT_IN_NOTES, type OptInNote } from "./opt-in.ts";
+import { COMPARE_STRATEGIES, OPT_IN_NOTES, OPT_IN_TAG, type OptInNote } from "./opt-in.ts";
 import { optionSet } from "./option-control.ts";
 import type { CompareReply, CompareRequest } from "./protocol.ts";
 import "./style.css";
@@ -255,7 +255,7 @@ function noteHtml(p: Panel): string {
 function tagsOf(p: Panel): string {
   const tags: string[] = [];
   if (picked(p.strategy)) tags.push(`<span class="tag picked">Picked</span>`);
-  if (noteOf(p)) tags.push(`<span class="tag opt-in">Opt-in, not promoted</span>`);
+  if (noteOf(p)) tags.push(`<span class="tag opt-in">${OPT_IN_TAG}</span>`);
   if (p.skipped) return [...tags, `<span class="tag">Skipped: ${esc(p.skipped)}</span>`].join("");
   if (p.front) tags.push(`<span class="tag front">On the front</span>`);
   if (p.violations > 0) tags.push(`<span class="tag bad">${fmt.format(p.violations)} hard-rule ${p.violations === 1 ? "fault" : "faults"}</span>`);

@@ -67,7 +67,7 @@ describe("each step and each strategy on the pages (COMPARE-ALL)", () => {
   it("gives the demo a picker for each step, with each strategy of the registry", () => {
     const pickers = demoPickers();
     expect(pickers.map((p) => p.step)).toEqual(STEPS);
-    for (const p of pickers) expect(p.names, p.step).toEqual(names(STRATEGIES, p.step));
+    for (const p of pickers) expect(p.names, p.step).toEqual(names(COMPARE_STRATEGIES, p.step));
   });
 
   it("gives a new strategy of each step its panel and its pick with no change to the pages", () => {

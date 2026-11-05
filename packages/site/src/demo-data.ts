@@ -1,4 +1,5 @@
 import {
+  BASELINE_STRATEGIES,
   fixtureGroupOptions,
   getStrategy,
   highwayRouterStrategy,
@@ -6,8 +7,8 @@ import {
   keyOfStrategy,
   listStrategies,
   STEPS,
-  STRATEGIES,
   strategyKey,
+  UNSCREENED_STRATEGIES,
   wholeStrategies,
   type AnyStrategy,
   type Graph,
@@ -73,7 +74,7 @@ const NONE: Readonly<Partial<Record<Step, string>>> = {
  * This function gives a picker for each step of `STEPS`, with each strategy of the registry.
  * The demo builds its controls from these pickers, so a new strategy or step shows up with no edit of the page.
  */
-export function demoPickers(registry: Registry = STRATEGIES): DemoPicker[] {
+export function demoPickers(registry: Registry = COMPARE_STRATEGIES): DemoPicker[] {
   return STEPS.map((step) => ({ step, names: listStrategies(registry, step).map((s) => s.name), ...(NONE[step] ? { none: NONE[step] } : {}) }));
 }
 
@@ -92,7 +93,7 @@ export interface PageCoverage {
 }
 
 /** This function counts what the demo and the compare page show from `keyed`. The demo reads `shown`, and the compare page reads `compare`. */
-export function pageCoverage(keyed: Registry = KEYED_STRATEGIES, shown: Registry = STRATEGIES, compare: Registry = COMPARE_STRATEGIES): PageCoverage {
+export function pageCoverage(keyed: Registry = KEYED_STRATEGIES, shown: Registry = COMPARE_STRATEGIES, compare: Registry = COMPARE_STRATEGIES): PageCoverage {
   const keys = (registry: Registry): AnyStrategy[] => STEPS.flatMap((step) => listStrategies(registry, step) as readonly AnyStrategy[]);
   const demo = new Set(demoPickers(shown).flatMap((p) => p.names.map((name) => `${p.step}/${name}`)));
   const both = new Set([...demo, ...keys(compare).map(keyOfStrategy)]);
@@ -105,6 +106,12 @@ export function pageCoverage(keyed: Registry = KEYED_STRATEGIES, shown: Registry
     controls: listed.reduce((n, s) => n + controlOptions(s).length, 0),
     fixed: listed.reduce((n, s) => n + textOptions(s).length, 0),
   };
+}
+
+/** This function tells if the demo lists each strategy that no ruling keeps off the page: the baselines and the strategies with no screen. */
+export function demoComplete(coverage: PageCoverage): boolean {
+  const ruled = new Set([...BASELINE_STRATEGIES, ...UNSCREENED_STRATEGIES].map(keyOfStrategy));
+  return coverage.leftByDemo.every((key) => ruled.has(key));
 }
 
 /** This function tells if a router reads a grouping rule: its schema has an option of the type `strategy` of the step `group`. */
@@ -125,7 +132,7 @@ export interface DemoRoute {
  * Otherwise the router routes, with each rule of the steps `group`, `plugs` and `levels` that the router reads.
  * It throws an error for a board with more nodes than the `maxNodes` of the router or the highway strategy.
  */
-export function demoRoute(graph: Graph, pick: DemoPick, registry: Registry = STRATEGIES): DemoRoute {
+export function demoRoute(graph: Graph, pick: DemoPick, registry: Registry = COMPARE_STRATEGIES): DemoRoute {
   const own = <S extends Step>(step: S, name: string): Readonly<Record<string, number | boolean | string>> | undefined => pick.options?.[step]?.[name];
   const router = getStrategy(registry, "router", pick.router);
   const highway = pick.highway ? getStrategy(registry, "highway", pick.highway) : undefined;
