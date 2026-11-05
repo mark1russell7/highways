@@ -46,7 +46,7 @@ permissions:
 # On main, a new run does not stop the run in progress. It waits, and a newer run takes the place of a waiting run.
 # The nightly run has its own group, so it does not block the runs of a push. On other branches, a new run stops the old run.
 concurrency:
-  group: bench-${{ github.ref }}-${{ github.event_name }}
+  group: bench-${{ github.event_name == 'pull_request' && github.ref || github.sha }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
