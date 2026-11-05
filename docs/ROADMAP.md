@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| CROSSINGS-SAMPLE | The record `crossings-sample/1` reads each estimate of `route.crossings` on the benchmark against a full count. The error reaches 16.03%. 18 of 132 rows hold an estimate. The verdict sets stay under the limit by size, and the next Screen confirms it. | 2026-11-05 | [#334](https://github.com/mark1russell7/highways/pull/334) |
 | BENCH-NO-PUSH | The workflow `Bench` does not start on a push. No gate or page read the run of a push, and each one took 158 job-minutes. The nightly run and a dispatch stay. | 2026-11-05 | #338 |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
@@ -220,7 +221,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| CROSSINGS-SAMPLE | Above 20,000 segments, `route.crossings` reads a sample, so a ratio can compare an estimate with a full count. The record marks this as `route.crossings.estimated`. This item says which verdicts the sample reaches. Due 2026-11-08. | `next` | ROUTE-PAIRS | P1 |
+| CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
 | THROUGH-FLOOR | Five real routers read 292 on `route.through`, and `seams` reads 0, so the 292 is no floor of the board. This item reads them, and the 4 more of `sections-site`. Due 2026-11-14. | `active` | | P1 |
 | WON-LINES | This item lists each page line that quotes a measure that a control wins, and it corrects the line or gives it a partner. Due 2026-11-14. | `next` | | P1 |
