@@ -4,7 +4,10 @@ import { CASES } from "../cases.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
 import { ROUTERS } from "../routers/index.ts";
 import { sharedRouter } from "../routers/shared.ts";
-import { benchCurves, benchHighways, formatCurves, formatHighways, SPACING_LIMIT } from "./curves.ts";
+import type { LaneCurve } from "../curves/highway/index.ts";
+import type { Point } from "../geom.ts";
+import { runKey, type SegmentGraph } from "../segments.ts";
+import { benchCurves, benchHighways, formatCurves, formatHighways, measureHighways, SPACING_LIMIT } from "./curves.ts";
 
 describe("benchCurves", () => {
   it("gives one row for each type, and a clamped curve goes through no box that its route avoids", () => {
@@ -38,11 +41,45 @@ describe("benchHighways", () => {
     const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
     const [, run] = benchHighways(sharedRouter({ name: "shared-all", laneOrder: "run" }), "case-many-groups", graph);
     const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
-    expect(run!.crossings).toBeGreaterThan(0);
-    // LANE-ROOM: each way has its own width, so two lanes can meet where the shifts of both ends of a short way meet. Before it, this value was 0.
-    // This test is a ratchet. The item LANE-WIDTH-CHAIN takes the value back toward 0, or states why it cannot.
-    expect(bundle!.crossings).toBeLessThanOrEqual(2);
-    expect(bundle!.crossings).toBeLessThan(run!.crossings);
+    // Version 2 of the bundle counter reads 0 in the body of this board. The values above 0 of version 1 were crossings at the ends, in the wrong class.
+    // So the gain of the lane order shows at the ends of the bundles.
+    expect(bundle!.crossings).toBe(0);
     expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);
+  });
+
+  it("keeps 0 in the body of that board under a harmless shift of the boxes", () => {
+    const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
+    for (const [dx, dy] of [[1e-12, -1e-12], [-1e-10, 1e-10], [1e-8, 1e-8], [-1e-7, -1e-7]] as const) {
+      const nodes = graph.nodes.map((n) => ({ ...n, box: { ...n.box, x: n.box.x + dx, y: n.box.y + dy } }));
+      const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", { ...graph, nodes });
+      expect(bundle!.crossings, `shift ${dx}, ${dy}`).toBe(0);
+    }
+  });
+});
+
+describe("the crossings of measureHighways on a long straight piece", () => {
+  // One bundle of two lanes along the x axis, 300 long. The body of the bundle is from 12 to 288.
+  const graph: SegmentGraph = {
+    segments: [{ id: "s", points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 290, y: 0 }, { x: 300, y: 0 }], edges: ["a", "b"], count: 2 }],
+    paths: ["a", "b"].map((edge, lane) => ({ edge, segments: [{ segment: "s", reverse: false, lane }] })),
+  };
+  const lane = (edge: string, points: readonly Point[]): LaneCurve => ({
+    edge,
+    segments: points.map((to, i) => (i === 0 ? { kind: "move", to } : { kind: "line", to })),
+  });
+  const measure = (b: readonly Point[]) => {
+    // The lane `a` is one straight piece, so the middle of the piece is far from each crossing.
+    const a = lane("a", [{ x: 0, y: -2 }, { x: 300, y: 2 }]);
+    return measureHighways(graph, new Set([runKey(["a", "b"])]), 4, [a, lane("b", b)]);
+  };
+
+  it("classes a crossing by its point, not by the middle of the piece", () => {
+    const m = measure([{ x: 0, y: -3 }, { x: 280, y: -3 }, { x: 300, y: 3 }]);
+    expect({ body: m.crossings, ends: m.endCrossings }).toEqual({ body: 0, ends: 1 });
+  });
+
+  it("counts each crossing of one pair on one piece", () => {
+    const m = measure([{ x: 0, y: -3 }, { x: 100, y: 3 }, { x: 200, y: -3 }, { x: 300, y: 3 }]);
+    expect({ body: m.crossings, ends: m.endCrossings }).toEqual({ body: 3, ends: 0 });
   });
 });

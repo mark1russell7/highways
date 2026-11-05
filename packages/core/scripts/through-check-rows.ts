@@ -1,5 +1,5 @@
 /**
- * This module makes the rows of the record `through-check/4`, with no side effect (THROUGH-CHECK).
+ * This module makes the rows of the record `through-check/5`, with no side effect (THROUGH-CHECK).
  * The script `through-check.ts` writes them, and the gate `through-check.test.ts` makes them again and compares them with the record.
  * It keeps the routers and the lanes out of `src/bench/measures/through-check.ts`, so the imports of that module stay types only.
  * Each family of `highwaysRegistry()` runs at its defaults, for each router of `SCORED`, `OUTSIDE` and `SITE_ROUTERS`.
@@ -8,7 +8,7 @@
  * The routers of `OUTSIDE` do not mark `through`, so the record keeps them in `unmarkedRows`, apart from `rows`.
  * The routers of `SITE_ROUTERS` and `REPORT_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
  */
-import { measureHighways } from "../src/bench/curves.ts";
+import { BUNDLE_COUNTER, measureHighways } from "../src/bench/curves.ts";
 import { crossingPairs, splitPairs, type EdgeLine, type PairSplit } from "../src/bench/measures/crossing-pairs.ts";
 import { measureQuality } from "../src/bench/quality.ts";
 import { checkRoutes, deciding, falseThrough, flagged, HAIRLINE, THROUGH_CLASSES, type RouteCheck, type ThroughClass, type ThroughContact } from "../src/bench/measures/through-check.ts";
@@ -279,7 +279,7 @@ export interface ThroughScope {
   readonly log?: (line: string) => void;
 }
 
-/** This function gives the record `through-check/4` over `seeds` seeds. The counts are deterministic, and it reads no time. */
+/** This function gives the record `through-check/5` over `seeds` seeds. The counts are deterministic, and it reads no time. */
 export function throughRecord(seeds: number, scope: ThroughScope = {}) {
   const reg = highwaysRegistry();
   const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name), ...REPORT_ROUTERS]), ...OUTSIDE];
@@ -316,7 +316,8 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     }
   }
   return {
-    schema: "through-check/4",
+    schema: "through-check/5",
+    bundleCounter: BUNDLE_COUNTER,
     seeds,
     size: "default",
     classes: THROUGH_CLASSES,

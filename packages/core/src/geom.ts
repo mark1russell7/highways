@@ -58,6 +58,23 @@ export function segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
 }
 
 /**
+ * This function gives the point where the segments `ab` and `cd` cross inside both, or `undefined`.
+ * Segments that only touch at an end, or that are parallel, give `undefined`.
+ */
+export function crossingPoint(a: Point, b: Point, c: Point, d: Point): Point | undefined {
+  const rx = b.x - a.x;
+  const ry = b.y - a.y;
+  const sx = d.x - c.x;
+  const sy = d.y - c.y;
+  const den = rx * sy - ry * sx;
+  if (Math.abs(den) < 1e-12) return undefined;
+  const t = ((c.x - a.x) * sy - (c.y - a.y) * sx) / den;
+  const u = ((c.x - a.x) * ry - (c.y - a.y) * rx) / den;
+  const eps = 1e-9;
+  return t > eps && t < 1 - eps && u > eps && u < 1 - eps ? { x: a.x + t * rx, y: a.y + t * ry } : undefined;
+}
+
+/**
  * This function tells if the segment `ab` goes through the inside of the box.
  * The function clips the segment to the box (Liang-Barsky) and asks for a part longer than `eps`.
  */

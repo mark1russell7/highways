@@ -5,7 +5,7 @@ import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-row
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/4 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/5 is stale. Write it again with: ${REGENERATE}`;
 /** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
@@ -16,11 +16,11 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 const PAINTED: Record<string, readonly number[]> = {
   "corners": [33271, 31144, 0, 0, 0, 0],
   "trunks": [34056, 31696, 0, 0, 0, 1],
-  "shared": [35923, 32448, 274, 42, 10, 522],
-  "sections": [54016, 40297, 815, 501, 319, 1864],
-  "sections-site": [83802, 46980, 121, 68, 489, 2274],
-  "sections-site-no-ladder": [81724, 46226, 128, 120, 483, 2353],
-  "shared-all": [43398, 36006, 1421, 459, 79, 12027],
+  "shared": [35923, 32448, 274, 42, 1, 531],
+  "sections": [54016, 40297, 815, 501, 144, 2055],
+  "sections-site": [83802, 46980, 121, 68, 441, 2340],
+  "sections-site-no-ladder": [81724, 46226, 128, 120, 435, 2420],
+  "shared-all": [43398, 36006, 1421, 459, 0, 12027],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
@@ -31,7 +31,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/4", () => {
+describe("the gate through-check/5", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 
