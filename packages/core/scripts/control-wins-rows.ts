@@ -52,6 +52,7 @@ export const CONTROL_PARTNERS: Readonly<Record<(typeof CONTROLS)[number], Readon
       "route.overlap.share",
       "route.overlap.peak",
       "route.bundle.ambiguity",
+      "route.bundle.reach",
     ].map((name) => [name, "route.through"]),
   ),
 };

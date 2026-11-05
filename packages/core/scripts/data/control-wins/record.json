@@ -110,6 +110,10 @@
    {
     "measure": "route.bundle.ambiguity",
     "partner": "route.through"
+   },
+   {
+    "measure": "route.bundle.reach",
+    "partner": "route.through"
    }
   ]
  },
@@ -1034,6 +1038,34 @@
    "best": [
     "straight"
    ]
+  },
+  {
+   "name": "route.bundle.reach",
+   "key": "B4.reach",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0.3760330578512397,
+    "perimeter": 0.1056,
+    "straight": 0,
+    "corners": 0.01679243277712828,
+    "shared": 0.01697530864197531,
+    "shared-all": 0.06444444444444444,
+    "sections": 0.05807158509861213,
+    "sections-site": 0.05092592592592592
+   },
+   "sums": {
+    "one-trunk": 30.93498718667318,
+    "perimeter": 13.349324686120084,
+    "straight": 0,
+    "corners": 2.227672311931923,
+    "shared": 2.7117649012914233,
+    "shared-all": 9.07165069981255,
+    "sections": 5.993659842825397,
+    "sections-site": 7.10034993650786
+   },
+   "best": [
+    "straight"
+   ]
   }
  ],
  "slice": [
@@ -1678,6 +1710,34 @@
     "shared-all": 1.8003953998601636,
     "sections": 1.6330870209558155,
     "sections-site": 1.7652874489860308
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.bundle.reach",
+   "key": "B4.reach",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0.6187,
+    "perimeter": 0.1728,
+    "straight": 0,
+    "corners": 0.1076,
+    "shared": 0.1333,
+    "shared-all": 0.3907,
+    "sections": 0.25470000000000004,
+    "sections-site": 0.3387
+   },
+   "sums": {
+    "one-trunk": 1.2374,
+    "perimeter": 0.3456,
+    "straight": 0,
+    "corners": 0.2152,
+    "shared": 0.2666,
+    "shared-all": 0.7814,
+    "sections": 0.5094000000000001,
+    "sections-site": 0.6774
    },
    "best": [
     "straight"
