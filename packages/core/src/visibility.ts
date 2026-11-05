@@ -137,6 +137,8 @@ export const JOIN_WORK: number = 3 * 2048 * 2048;
 
 /** Two costs of a path within this distance tie. The distance is far above the rounding of a sum of lengths, and far below a real difference. */
 const TIE = 1e-9;
+/** The search marks a corner that two paths reach within this distance. It is wider than `TIE`, so the rounding of a sum of lengths does not hide a tie from the walk. */
+const TIE_MARK = 2 * TIE;
 
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
@@ -175,6 +177,8 @@ export class CornerGraph {
   #h = new Float64Array(0);
   #goalTail = new Float64Array(0);
   #goalAt = new Int32Array(0);
+  #tied = new Int32Array(0);
+  #link = new Float64Array(0);
   #stamp = 0;
   readonly #heap = new CornerHeap();
   // The corners in each bucket of the point grid, by the key of the bucket. A corner is in one bucket: the bucket of its point.
@@ -594,6 +598,8 @@ export class CornerGraph {
       this.#h = new Float64Array(n);
       this.#goalTail = new Float64Array(n);
       this.#goalAt = new Int32Array(n);
+      this.#tied = new Int32Array(n);
+      this.#link = new Float64Array(n);
     }
     const stamp = ++this.#stamp;
     const points = this.points;
@@ -629,6 +635,8 @@ export class CornerGraph {
     const parentOf = this.#parent;
     const open = this.#open;
     const closed = this.#closed;
+    const tied = this.#tied;
+    const linkOf = this.#link;
     const X = this.#x;
     const Y = this.#y;
     const start = this.#start;
@@ -657,6 +665,7 @@ export class CornerGraph {
       for (const j of starts[i]!) {
         const g = a.cost + dist(a.point, points[j]!);
         if (open[j] === stamp) {
+          if (Math.abs(g - G[j]!) <= TIE_MARK) tied[j] = stamp;
           if (G[j]! <= g) continue;
         } else {
           open[j] = stamp;
@@ -683,17 +692,23 @@ export class CornerGraph {
       }
       for (let m = m0; m < m1; m++) {
         const j = next[m]!;
-        if (closed[j] === stamp) continue;
         const d = length[m]!;
-        const g = gi + (cost ? cost(i, j, d) : d);
+        const shut = closed[j] === stamp;
+        // A link into a closed corner counts only if it can tie. The corner at the other end of a tie can close first, because the keys of a tie differ by up to the tie.
+        if (shut && gi + floor * d > G[j]! + TIE_MARK) continue;
+        const c = cost ? cost(i, j, d) : d;
+        const g = gi + c;
         if (open[j] === stamp) {
-          if (g >= G[j]!) continue;
+          const gap = g - G[j]!;
+          if (gap <= TIE_MARK && (shut || gap >= -TIE_MARK)) tied[j] = stamp;
+          if (shut || gap >= 0) continue;
         } else {
           open[j] = stamp;
           H[j] = estimate(j);
         }
         G[j] = g;
         parentOf[j] = i;
+        linkOf[j] = c;
         heap.set(g + H[j]!, j);
       }
     }
@@ -716,12 +731,15 @@ export class CornerGraph {
       const here = points[at]!;
       out.push(here);
       let first = -1;
-      for (let f = 0; f < from.length && first < 0; f++) {
-        if (from[f]!.cost + dist(from[f]!.point, here) + rest <= limit && starts[f]!.includes(at)) first = f;
-      }
       let back = -1;
       let step = 0;
-      if (first < 0) {
+      // A corner with no mark has one way back, its parent. So the walk reads the links only at a marked corner.
+      if (tied[at] === stamp) {
+        for (let f = 0; f < from.length && first < 0; f++) {
+          if (from[f]!.cost + dist(from[f]!.point, here) + rest <= limit && starts[f]!.includes(at)) first = f;
+        }
+      }
+      if (first < 0 && tied[at] === stamp) {
         const m0 = start[at]!;
         const m1 = start[at + 1]!;
         settled += 1 + (m1 - m0);
@@ -735,14 +753,15 @@ export class CornerGraph {
             step = c;
           }
         }
-        if (back < 0) {
-          // Only a link of no cost, or noise at the limit, leaves no corner. The parent of the search closed before this corner, so this rule has no loop.
-          const parent = parentOf[at]!;
-          if (parent < 0) first = -1 - parent;
-          else {
-            back = parent;
-            step = G[at]! - G[parent]!;
-          }
+      }
+      if (first < 0 && back < 0) {
+        // Only a link of no cost, or noise at the limit, leaves no corner. The parent of the search closed before this corner, so this rule has no loop.
+        const parent = parentOf[at]!;
+        if (parent < 0) first = -1 - parent;
+        else {
+          back = parent;
+          const c = linkOf[at]!;
+          step = G[parent]! < G[at]! && G[parent]! + c + rest <= limit ? c : G[at]! - G[parent]!;
         }
       }
       if (first >= 0) {
