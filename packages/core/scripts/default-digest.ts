@@ -7,6 +7,11 @@ import { inputGraph } from "../src/bench/screen/forms.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, type AnyStrategy } from "../src/strategies/model.ts";
 
+/** The fields of a result that the digest leaves out, each with its reason. A new field needs a line here, or it changes each digest. */
+const LEFT_OUT: Readonly<Record<string, string>> = {
+  room: "It tells the free room of a way. It reads the boxes, and it moves no point of a route.",
+};
+
 const out = process.argv[2];
 const inputs = screenInputs(SCREEN_SETS["screen-v3"]!);
 const routers = listStrategies(STRATEGIES, "router") as readonly AnyStrategy[];
@@ -14,7 +19,7 @@ const digests: Record<string, string> = {};
 for (const router of routers) {
   const hash = createHash("sha256");
   const run = router.run as (graph: unknown, options: object) => unknown;
-  for (const input of inputs) hash.update(`${input.id}\n${JSON.stringify(run(inputGraph(input), router.defaults))}\n`);
+  for (const input of inputs) hash.update(`${input.id}\n${JSON.stringify(run(inputGraph(input), router.defaults), (key, value) => (Object.hasOwn(LEFT_OUT, key) ? undefined : value))}\n`);
   digests[router.name] = hash.digest("hex").slice(0, 16);
   console.log(router.name, digests[router.name]);
 }

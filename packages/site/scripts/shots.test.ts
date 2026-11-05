@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reportLine, shotPlan } from "./shots.ts";
+import { MAP_VIEWS, mapViewFile, reportLine, shotPlan } from "./shots.ts";
 
 describe("the plan of the shots", () => {
   it("gives two widths and two color schemes for each page", () => {
@@ -19,6 +19,23 @@ describe("the plan of the shots", () => {
   it("skips an empty name, and keeps the name of a page with a query", () => {
     expect(shotPlan(" , ")).toEqual([]);
     expect(shotPlan("compare.html?board=grid,")[0]?.file).toBe("compare-1280-light.png");
+  });
+});
+
+describe("the views of the map", () => {
+  const views = MAP_VIEWS["examples.html"]!;
+
+  it("gives a file for each view of a shot in the light scheme, and each file once", () => {
+    const files = shotPlan("examples.html").flatMap((shot) => views.map((view) => mapViewFile(shot, view)));
+    const light = files.filter((file) => file !== undefined);
+    expect(light).toHaveLength(2 * views.length);
+    expect(new Set(light).size).toBe(light.length);
+    expect(light[0]).toBe("examples-1280-light-closed-near.png");
+  });
+
+  it("gives no view in the dark scheme", () => {
+    const dark = shotPlan("examples.html").find((shot) => shot.colorScheme === "dark")!;
+    expect(mapViewFile(dark, views[0]!)).toBeUndefined();
   });
 });
 

@@ -257,11 +257,25 @@ The independent check `checkRoutes` in `bench/measures/through-check.ts` has no 
 
 The two tests relate in one direction. A route that breaks the rule has a contact with that box, because the box made smaller lies inside the closed box. A route with a contact can read clear under the rule, and the check gives its class and its depth. The rule and the field `through` stay as they are.
 
-The script `packages/core/scripts/through-check.ts` writes the record `through-check/3`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
+The script `packages/core/scripts/through-check.ts` writes the record `through-check/4`. Its list `rows` holds the routers that mark `through`. The routers `straight` and `plugs` do not mark `through`, so their counts are outside each claim on that field. The list `unmarkedRows` holds them, on their own rows.
 
 The router `sections-site` has the settings of the examples page, with `outSteps` on. The router `sections-site-no-ladder` has the same settings with `outSteps: false`, and no drawing uses it. Each is a report row.
 
 A row with the view `lanes` opens each shared segment. The compare page draws that form. The examples page starts with no segment open, so its first drawing has the view `routes`.
+
+A row with the view `lanes` also tells what the room of each way does. Its fields:
+
+- `outOfRoom` counts the lanes with that mark.
+- `deepUnmarked` counts the lanes of class `deep` with no mark.
+- `silentLanes` counts the flagged lanes with no mark, on an edge that its closed route does not flag.
+- `laneLength` and `laneBends` sum the shape of the lanes.
+- `fullLength` and `fullBends` sum the same lanes with no room.
+- `laneCrossings` and `fullCrossings` count the crossings of the board with the lanes, with the room and with no room. The room adds crossings, because each way has its own width.
+- `bySeed` holds one entry for each board. It has `laneCrossings` and `fullCrossings`, `polyline` and `painted`, and the four counts of the bundles.
+- `polyline` and `painted` are the fields of `PairSplit`, for the polylines and for the sampled `highway` curves of the whole board. `points` and `beforePoints` are crossing points. `pairs` and `beforePairs` are pairs of edges. `added` and `lost` are the pairs that cross on one side only. A crossing point counts once for each pair of edges. So `points` can be over the count of `measureQuality`, because `measureQuality` keeps one copy of each drawn segment.
+- `bundleBody` and `bundleEnds` are `crossings` and `endCrossings` of `measureHighways`, with the room. `fullBundleBody` and `fullBundleEnds` are the same counts with no room. These counts hold only two lanes of one bundle.
+
+The gate fails when `deepUnmarked` or `silentLanes` is over 0 on a row. It also compares the classes of the site settings with a stated list, and that list makes no claim. A flagged lane on a closed route that the record flags too is a contact of the route, not of the lanes.
 
 An inner route marks `through` against the boxes of its room: the children of its frame, except the nodes that hold an end. The walls of the room are no boxes of the board, so `through` does not name them. The boards `frame-rows+inner` and `frame-rows+inner12` hold the inner routes, with 10 seeds each, because no family has an inner route at its defaults. The fields `innerMarked`, `innerFlagged`, `innerFalse` and `innerUnnamed` count them.
 

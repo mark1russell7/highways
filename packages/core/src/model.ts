@@ -82,6 +82,14 @@ export interface Route {
   readonly through?: readonly string[];
   /** This id names the frame of an inner route: the route stays inside the box of that node. An outer route has no frame. */
   readonly frame?: string;
+  /** This flag marks a lane that stays outside the room of its shared way, because the room cannot hold the lanes at the smallest distance. `laneRoutes` and `pullApart` give it. */
+  readonly outOfRoom?: true;
+}
+
+/** The free room beside a shared way, in units of the board. Left is on the left of the way, from its first point to its last. The y axis points down. */
+export interface LaneRoom {
+  readonly left: number;
+  readonly right: number;
 }
 
 /**
@@ -134,6 +142,8 @@ export interface Bundle {
   readonly edges: readonly string[];
   /** The shared start of each route of the bundle, from the plug to the split point. */
   readonly trunk: readonly Point[];
+  /** The free room on each side of this way, from `laneRoom`. A router that knows its boxes gives it. Without it, the lanes take their full width. */
+  readonly room?: LaneRoom;
 }
 
 /**
@@ -147,6 +157,8 @@ export interface SharedRun {
   readonly points: readonly Point[];
   /** The edges in lane order. Lane 0 is on the left of the run, from its first point to its last. The y axis points down. */
   readonly edges: readonly string[];
+  /** The free room on each side of this way, from `laneRoom`. A router that knows its boxes gives it. Without it, the lanes take their full width. */
+  readonly room?: LaneRoom;
 }
 
 /** A grouping rule gives each edge a key. The edges from one plug with one key make a bundle. An edge without a key stays alone. */

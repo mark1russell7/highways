@@ -1,6 +1,7 @@
 import { dist, type Point } from "./geom.ts";
 import { findRun, orderPlaced, placeRoutes } from "./lane-order.ts";
-import type { Result, Route } from "./model.ts";
+import { LANE_CLEAR, LANE_LEAST } from "./lane-room.ts";
+import type { LaneRoom, Result, Route } from "./model.ts";
 import { keepThrough } from "./through.ts";
 
 /** A piece of drawn way. A shared segment carries several edges, in lane order. A private segment carries one edge. */
@@ -11,6 +12,8 @@ export interface Segment {
   readonly edges: readonly string[];
   /** The number of edges. A renderer shows it on a fat edge. */
   readonly count: number;
+  /** The free room on each side of a shared segment, if the router gave it. The lanes of the segment stay in it, down to the smallest distance. */
+  readonly room?: LaneRoom;
 }
 
 /** One step of a path: a segment, the way through it, and the lane of the edge in it. */
@@ -41,8 +44,8 @@ const SAME = 1e-6;
  */
 export function segmentsOf(result: Result): SegmentGraph {
   const shared = [
-    ...(result.runs ?? []).map((r) => ({ id: r.id, points: r.points, edges: r.edges })),
-    ...(result.bundles ?? []).map((b) => ({ id: b.id, points: b.trunk, edges: b.edges })),
+    ...(result.runs ?? []).map((r) => ({ id: r.id, points: r.points, edges: r.edges, room: r.room })),
+    ...(result.bundles ?? []).map((b) => ({ id: b.id, points: b.trunk, edges: b.edges, room: b.room })),
   ].filter((s) => s.points.length >= 2);
   const onEdge = new Map<string, { id: string; points: readonly Point[]; lane: number }[]>();
   for (const s of shared) {
@@ -52,7 +55,7 @@ export function segmentsOf(result: Result): SegmentGraph {
       else onEdge.set(edge, [{ id: s.id, points: s.points, lane }]);
     });
   }
-  const segments: Segment[] = shared.map((s) => ({ id: s.id, points: s.points, edges: s.edges, count: s.edges.length }));
+  const segments: Segment[] = shared.map((s) => ({ id: s.id, points: s.points, edges: s.edges, count: s.edges.length, ...(s.room === undefined ? {} : { room: s.room }) }));
   const paths: Path[] = [];
   for (const route of result.routes) {
     const p = route.points;
@@ -133,14 +136,17 @@ export interface PullApartOptions {
   readonly spacing: number;
   /** The largest width of a segment, from its outer lane on the left to its outer lane on the right. */
   readonly maxWidth: number;
+  /** The smallest distance between two lanes on one side, when the room of a segment compresses them. The default is `LANE_LEAST`. */
+  readonly least?: number;
 }
 
 /**
  * This function pulls the lanes of each shared segment apart, and gives a route for each edge.
  * The lanes keep the lane order, so they do not cross in a segment. The two ends of each route stay at their plugs.
+ * A segment with a room compresses each side to fit it, as `laneRoutes` does.
  */
 export function pullApart(graph: SegmentGraph, options: PullApartOptions): Route[] {
-  return lanePaths(graph, (s) => (s.count > 1 ? Math.min(options.spacing, options.maxWidth / (s.count - 1)) : 0));
+  return lanePaths(graph, (s) => (s.count > 1 ? Math.min(options.spacing, options.maxWidth / (s.count - 1)) : 0), options.least ?? LANE_LEAST);
 }
 
 /** This function gives the key of a shared run: the ids of its edges, sorted and joined with commas. */
@@ -152,19 +158,37 @@ export function runKey(edges: readonly string[]): string {
  * This function opens the shared segments whose key is in `open`: each edge of an open segment gets its own lane.
  * The lanes are `laneWidth` apart, and an open segment is at most `maxWidth` wide. The other segments stay as one way.
  *
+ * A segment with a room keeps its lanes in that room. Each side compresses on its own, so each lane keeps its order and its side.
+ * The outer lane keeps `LANE_CLEAR` from the box when it can, and two lanes of a side stay at least `least` apart.
+ * A lane that then reaches the room can touch or enter a box, and it gets the field `outOfRoom`.
+ *
  * Lane 0 is on the left of the segment, from its first point to its last, with the y axis down.
  * The function takes a result or its segments. It gives a route for each edge, with the ends at their plugs.
  * The key of a segment is `runKey` of its edges.
  */
-export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<string>, laneWidth: number, maxWidth: number = Infinity): Route[] {
+export function laneRoutes(source: Result | SegmentGraph, open: ReadonlySet<string>, laneWidth: number, maxWidth: number = Infinity, least: number = LANE_LEAST): Route[] {
   const graph = "paths" in source ? source : segmentsOf(source);
   const keep = (routes: Route[]): Route[] => ("paths" in source ? routes : keepThrough(source, routes));
   if (open.size === 0) return keep(graph.paths.map((path) => ({ edge: path.edge, points: pathPoints(graph, path) })));
-  return keep(lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0)));
+  return keep(lanePaths(graph, (s) => (s.count > 1 && open.has(runKey(s.edges)) ? Math.min(laneWidth, maxWidth / (s.count - 1)) : 0), least));
+}
+
+/**
+ * This function gives the offset of a lane from its segment, as one rule for the polylines and the curves of the lanes.
+ * It tells if the lane stays outside the room of the segment.
+ */
+export function laneOffset(s: Segment, lane: number, spacing: number, least: number = LANE_LEAST): { readonly offset: number; readonly out: boolean } {
+  const full = ((s.count - 1) / 2 - lane) * spacing;
+  if (s.room === undefined || full === 0) return { offset: full, out: false };
+  const room = full > 0 ? s.room.left : s.room.right;
+  const widest = ((s.count - 1) / 2) * spacing;
+  const scale = Math.min(1, Math.max((room - LANE_CLEAR) / widest, least / spacing));
+  const offset = full * scale;
+  return { offset, out: Math.abs(offset) >= room - SAME };
 }
 
 /** This function gives the route of each path, with the lanes of each segment at the spacing that `spacingOf` gives. */
-function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number): Route[] {
+function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number, least: number): Route[] {
   const byId = new Map(graph.segments.map((s) => [s.id, s]));
   // Each segment gets its spacing one time (ROUTE-SCALE). A key of `runKey` sorts the edges of the segment, and a busy segment is on many paths.
   const spacings = new Map<Segment, number>();
@@ -172,19 +196,22 @@ function lanePaths(graph: SegmentGraph, spacingOf: (s: Segment) => number): Rout
   for (const path of graph.paths) {
     const ends = pathPoints(graph, path);
     const out: Point[] = [];
+    let outOfRoom = false;
     for (const ref of path.segments) {
       const s = byId.get(ref.segment);
       if (!s) continue;
       let spacing = spacings.get(s);
       if (spacing === undefined) spacings.set(s, (spacing = spacingOf(s)));
-      const moved = offsetPolyline(s.points, ((s.count - 1) / 2 - ref.lane) * spacing);
+      const lane = laneOffset(s, ref.lane, spacing, least);
+      outOfRoom ||= lane.out;
+      const moved = offsetPolyline(s.points, lane.offset);
       for (const q of ref.reverse ? moved.reverse() : moved) if (out.length === 0 || dist(q, out[out.length - 1]!) > SAME) out.push(q);
     }
     if (out.length >= 2 && ends.length >= 2) {
       out[0] = ends[0]!;
       out[out.length - 1] = ends[ends.length - 1]!;
     }
-    routes.push({ edge: path.edge, points: out });
+    routes.push({ edge: path.edge, points: out, ...(outOfRoom ? { outOfRoom: true as const } : {}) });
   }
   return routes;
 }

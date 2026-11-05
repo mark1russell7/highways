@@ -6,6 +6,7 @@ import { FIXTURES, makeFixture } from "../fixtures.ts";
 import type { Graph } from "../model.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { sectionsRouter, type SectionsOptions } from "./sections.ts";
+import { withoutRoom } from "./without-room.ts";
 
 /**
  * The digests of the results of version 0.1.2. A host app pins `^0.1.2`, so a change that only makes the router faster
@@ -52,7 +53,8 @@ const GRAPHS: readonly [string, () => Graph][] = [
 
 /** This function gives the digest of the result of a router on a graph, with the data that a host app reads from it. */
 function digest(graph: Graph, options: SectionsOptions): string {
-  const result = sectionsRouter(options).route(graph);
+  // The field `room` tells the free room of a way and moves no route. With no room, the lanes keep their old form, so each digest also pins that form.
+  const result = withoutRoom(sectionsRouter(options).route(graph));
   const segments = segmentsOf(result);
   const keys = segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges));
   const lanes = laneRoutes(segments, new Set(keys), 2.4, 16);
