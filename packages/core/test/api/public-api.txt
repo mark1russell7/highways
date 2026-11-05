@@ -1593,6 +1593,9 @@ interface AdvectionSettings {
 export interface Ambiguity {
   readonly value: number;
   readonly estimated: boolean;
+  readonly nearPerNode: number;
+  readonly falsePerNode: number;
+  readonly reach: number;
 }
 
 ### build/index.d.ts#AmbiguityGuardOptions
