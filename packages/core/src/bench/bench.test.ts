@@ -75,6 +75,18 @@ describe("measureQuality", () => {
     expect(q.detour).toBeCloseTo(1);
     expect(q.plugAngle).toBeCloseTo(0);
   });
+  it("takes the limit of the full count and the seed of the sample", () => {
+    const segs = Array.from({ length: 200 }, (_, i) => {
+      const y = i % 100;
+      return i < 100 ? ([{ x: 0, y: y + 0.5 }, { x: 100, y: y + 0.5 }] as const) : ([{ x: y + 0.5, y: 0 }, { x: y + 0.5, y: 100 }] as const);
+    });
+    expect(countCrossings(segs)).toEqual([10_000, false]);
+    expect(countCrossings(segs, { limit: 100, seed: 7 })[1]).toBe(true);
+    expect(countCrossings(segs, { limit: 100, seed: 7 })).toEqual(countCrossings(segs, { limit: 100, seed: 7 }));
+    expect(countCrossings(segs, { limit: 100, seed: 7 })).not.toEqual(countCrossings(segs, { limit: 100 }));
+    expect(countCrossings(segs, { limit: Infinity })).toEqual([10_000, false]);
+  });
+
   it("estimates the crossings of a large set close to the exact count", () => {
     const segs = Array.from({ length: 30_000 }, (_, i) => {
       const y = i % 150;

@@ -506,11 +506,11 @@ function showLevel(level: number): void {
   badge.hidden = false;
 }
 
-function delta(value: number, base: number | undefined, unit: string, fewer = "less"): string {
+function delta(value: number, base: number | undefined, unit: string, fewer = "less", estimated = false): string {
   if (base === undefined || base === 0 || (state.router === "straight" && !state.picks.highway)) return "";
   const p = Math.round((1 - value / base) * 100);
-  if (p === 0) return `<span class="delta">the same as straight lines</span>`;
-  return `<span class="delta ${p > 0 ? "good" : "bad"}">${Math.abs(p)}% ${p > 0 ? fewer : "more"} ${unit} than straight lines</span>`;
+  if (p === 0) return `<span class="delta">${estimated ? "near " : ""}the same as straight lines</span>`;
+  return `<span class="delta ${p > 0 ? "good" : "bad"}">${estimated ? "near " : ""}${Math.abs(p)}% ${p > 0 ? fewer : "more"} ${unit} than straight lines</span>`;
 }
 
 function stats(graph: Graph, done: RouteDone | undefined): void {
@@ -525,7 +525,7 @@ function stats(graph: Graph, done: RouteDone | undefined): void {
     ["Size", `${fmt.format(graph.nodes.length)} nodes, ${fmt.format(graph.edges.length)} edges`],
     ["Time", `${done.ms < 10 ? done.ms.toFixed(1) : fmt.format(Math.round(done.ms))} ms on this device`],
     ["Ink", `${fmt.format(Math.round(q.ink))} ${delta(q.ink, c?.ink, "ink")}`],
-    ["Crossings", `${q.crossingsEstimated ? "≈" : ""}${fmt.format(q.crossings)} ${delta(q.crossings, c?.crossings, "crossings", "fewer")}`],
+    ["Crossings", `${q.crossingsEstimated ? "≈" : ""}${fmt.format(q.crossings)} ${delta(q.crossings, c?.crossings, "crossings", "fewer", q.crossingsEstimated || c?.crossingsEstimated)}`],
     ["Bends", `${q.bends.toFixed(1)} for each route`],
     ["Detour", `${q.detour.toFixed(2)} times the line between the plugs`],
     ["Broken rules", done.violations === 0 ? `<span class="ok">0</span>` : `<span class="bad">${fmt.format(done.violations)}</span>`],
