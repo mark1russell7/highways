@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1498 names
+## . (build/index.d.ts): 1499 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -140,6 +140,7 @@ type CorpusDimension: @mark1russell7/layout-contract#CorpusDimension (external)
 type CorpusFamily: @mark1russell7/layout-contract#CorpusFamily (external)
 CorpusSpec: build/index.d.ts#CorpusSpec
 type CorridorOptions: build/index.d.ts#CorridorOptions
+CountCrossingsOptions: build/index.d.ts#CountCrossingsOptions
 CropOptions: build/index.d.ts#CropOptions
 CropRun: build/index.d.ts#CropRun
 type Crossbar: build/index.d.ts#Crossbar
@@ -2198,6 +2199,12 @@ interface CorridorOptions extends Pick<WayOptions, "margin" | "k"> {
   readonly bands: number;
   readonly near: number;
   readonly lane: number;
+}
+
+### build/index.d.ts#CountCrossingsOptions
+export interface CountCrossingsOptions {
+  readonly limit?: number;
+  readonly seed?: number;
 }
 
 ### build/index.d.ts#CropOptions
@@ -6480,7 +6487,7 @@ export declare function corpusManifest(corpus: string, inputs: readonly LayoutIn
 export declare function corridorPlan(input: HighwayInput, o: Readonly<CorridorOptions>): HighwayPlan;
 
 ### build/index.d.ts#countCrossings
-export declare function countCrossings(segs: readonly (readonly [Point, Point])[]): [number, boolean];
+export declare function countCrossings(segs: readonly (readonly [Point, Point])[], options?: CountCrossingsOptions): [number, boolean];
 
 ### build/index.d.ts#countOverlaps
 export declare function countOverlaps(boxes: readonly Box[]): number;
