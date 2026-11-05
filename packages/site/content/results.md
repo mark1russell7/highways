@@ -2,6 +2,8 @@ This page shows the committed results of the screens. The build reads them from 
 
 ## The verdicts
 
+The `seams` screen has not run at version 0.15.0, so this page has no verdict for `seams`.
+
 Each cell is the verdict of one strategy against the default `shared` on one guard measure. The family is the unit of the verdict.
 
 - `better` and `worse` count only when they hold under both weightings, with the level 0.05.
