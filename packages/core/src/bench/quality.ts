@@ -511,7 +511,7 @@ function onGridSegment(wx: number, wy: number, ux: number, uy: number, vx: numbe
 
 /** This function tells if two segments cross strictly on the grid `EPS`, with no end of one on the other. */
 function crossesOnGrid(s: readonly [Point, Point], t: readonly [Point, Point]): boolean {
-  const [ax, ay, bx, by, cx, cy, dx, dy] = [s[0].x, s[0].y, s[1].x, s[1].y, t[0].x, t[0].y, t[1].x, t[1].y].map((v) => Math.round(v * PAIR_SNAP)) as [number, number, number, number, number, number, number, number];
+  const [ax, ay, bx, by, cx, cy, dx, dy] = [s[0].x, s[0].y, s[1].x, s[1].y, t[0].x, t[0].y, t[1].x, t[1].y].map((v) => Math.round(v * EPS_STEPS)) as [number, number, number, number, number, number, number, number];
   if (classifySegments(ax, ay, bx, by, cx, cy, dx, dy).relation !== "cross") return false;
   return !onGridSegment(cx, cy, ax, ay, bx, by) && !onGridSegment(dx, dy, ax, ay, bx, by) && !onGridSegment(ax, ay, cx, cy, dx, dy) && !onGridSegment(bx, by, cx, cy, dx, dy);
 }
