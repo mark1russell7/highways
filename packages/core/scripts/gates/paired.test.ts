@@ -25,7 +25,7 @@ describe("armOrder", () => {
     expect([0, 1, 2, 3].map((r) => armOrder(2, r, "process"))).toEqual([[0, 1], [1, 0], [0, 1], [1, 0]]);
   });
 
-  it("rotates the order by the round in mode fresh", () => {
+  it("gives the rotated order of a report in mode fresh with no field order", () => {
     expect([0, 1, 2, 3].map((r) => armOrder(3, r, "fresh"))).toEqual([[0, 1, 2], [1, 2, 0], [2, 0, 1], [0, 1, 2]]);
   });
 });
@@ -131,15 +131,26 @@ describe("measureIsolated in mode fresh", () => {
     };
   }
 
-  it("gives each input its arms in turn, rotated by the round", async () => {
+  it("gives each input its arms in the order of the bench home, and each pair each order evenly", async () => {
     const log: string[] = [];
     const arms = ["A", "B", "C"].map((id) => ({ id, command: [id] }));
     await measureIsolated({ arms, inputs: [{ id: "x" }, { id: "y" }], repeats: 3, mode: "fresh", aa: false, startChild: fakeStart({ A: 1, B: 1, C: 1 }, log), env });
     expect(log.map((l) => l.split(":").slice(0, 2).join(":"))).toEqual([
       "A:x", "B:x", "C:x", "A:y", "B:y", "C:y",
+      "C:x", "B:x", "A:x", "C:y", "B:y", "A:y",
       "B:x", "C:x", "A:x", "B:y", "C:y", "A:y",
-      "C:x", "A:x", "B:x", "C:y", "A:y", "B:y",
     ]);
+  });
+
+  it("gives a pair of 4 arms each order evenly over 10 rounds, and states the order in the report", async () => {
+    const log: string[] = [];
+    const arms = ["A", "B", "C"].map((id) => ({ id, command: [id] }));
+    const r = await measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 10, mode: "fresh", startChild: fakeStart({ A: 1, B: 1, C: 1 }, log), env });
+    expect(r.order).toBe("mirrored");
+    expect(r.arms).toEqual(["A", "B", "C", "A~aa"]);
+    // Each round is 4 starts. The A/A arm starts the command of the base, so this test reads the pair B and C.
+    const rounds = Array.from({ length: 10 }, (_, k) => log.slice(k * 4, k * 4 + 4).map((l) => l.split(":")[0]!));
+    expect(rounds.filter((round) => round.indexOf("B") < round.indexOf("C"))).toHaveLength(5);
   });
 
   it("passes the warm-up count to the child, and adds the A/A arm with the command of the base", async () => {

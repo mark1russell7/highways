@@ -1,9 +1,9 @@
 // The paired time test of two or more arms, to the shared interface paired-time/1 (MEASURE-ISOLATE).
 // The rule: a comparison runs its arms in one job, in turn on each input, and an A/A arm (the base against itself) gives the noise floor.
-// This module imports only node modules and knows no type of highways. Two other repos keep a copy to the same interface, and the copies merge with no rewrite.
+// The static imports of this module are node modules, so a child loads no package. It knows no type of highways. Mode `fresh` imports the order of the bench home with `import()`. Two other repos keep a copy to the same interface, and the copies merge with no rewrite.
 //
 // - Mode `process`: one process. In each round, the arms run in turn on each input. Odd rounds reverse the order (ABBA).
-// - Mode `fresh`: a fresh process for each arm, each input and each round. Each input takes the arms in turn. The order rotates by the round.
+// - Mode `fresh`: a fresh process for each arm, each input and each round. Each input takes the arms in turn. The order is `armOrder` of `@mark1russell7/rigor-bench`: each pair of arms has each order one time in each two rounds.
 //
 // The child protocol of mode `fresh`: the helper appends `--input <id> --warmup <n>` to the command of the arm.
 // The child runs the warm-up untimed, times one run itself, and prints one JSON line `{"ms": n, "peakRss"?: bytes}`. `runChild` does this for a script.
@@ -101,6 +101,11 @@ export interface PairedInput {
 export interface PairedReport {
   readonly schema: "paired-time/1";
   readonly mode: Mode;
+  /**
+   * The order of the arms in mode `fresh`. The value `mirrored` is `armOrder` of the bench home.
+   * A report without this field ran with the arms rotated by the round, and `armOrder` of this module gives that order.
+   */
+  readonly order?: "mirrored";
   /** The context of the run: `BENCH_MODE`, else `ci` or `local`, then the flags of Node.js. */
   readonly context?: string;
   readonly env: PairedEnv;
@@ -161,10 +166,10 @@ export function envOf(mode: Mode): RecordEnv {
 }
 
 /**
- * This function gives the order of the arms in one round, as indexes into the arms.
+ * This function gives the order of the arms in one round of a report with no field `order`, as indexes into the arms.
  *
  * - Mode `process`: the order of the arms, reversed in each odd round (ABBA).
- * - Mode `fresh`: the order of the arms, rotated by the index of the round.
+ * - Mode `fresh`: the order of the arms, rotated by the index of the round. A new run does not use it: with 3 or more arms, one arm of a pair runs first in most rounds.
  */
 export function armOrder(arms: number, round: number, mode: Mode): number[] {
   const at = Array.from({ length: arms }, (_, i) => i);
@@ -357,16 +362,16 @@ function measureProcess<I>(o: PairedOptions<I>, arms: readonly Arm<I>[]): Paired
   return pairedReport("process", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
 }
 
-/** This function times the arms with a fresh process for each arm, each input and each round. In round r, each input takes the arms rotated by r. */
+/** This function times the arms with a fresh process for each arm, each input and each round. In each round, each input takes the arms in the order of the bench home. */
 async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
   const arms = armsOf(o);
+  const { armOrder: mirrored } = await import("@mark1russell7/rigor-bench");
   const start = o.startChild ?? startProcess;
   const warmup = o.warmup ?? 1;
   const raw = rawOf(o.inputs, arms);
   for (let round = 0; round < o.repeats; round++) {
     for (const input of o.inputs) {
-      for (const at of armOrder(arms.length, round, "fresh")) {
-        const arm = arms[at]!;
+      for (const arm of mirrored(arms, round)) {
         // The children run one at a time, because two children at one time change the times of each other.
         const result = await start(arm.command!, input.id, warmup);
         if (typeof result?.ms !== "number" || !Number.isFinite(result.ms)) throw new Error(`The child of the arm ${arm.id} on ${input.id} gave no time.`);
@@ -378,7 +383,7 @@ async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
       }
     }
   }
-  return pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
+  return { ...pairedReport("fresh", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw), order: "mirrored" };
 }
 
 /**

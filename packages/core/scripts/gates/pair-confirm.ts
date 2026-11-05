@@ -37,7 +37,7 @@ export interface PairOptions {
 /**
  * This function times a commit against its parent in fresh processes, and gives the report of schema `paired-time/1`.
  *
- * - The arms are `parent`, `commit`, the arms of `others` and the A/A arm `parent~aa`. In each round, the order of the arms rotates.
+ * - The arms are `parent`, `commit`, the arms of `others` and the A/A arm `parent~aa`. In each round, the arms take the order of the bench home.
  * - Each route has its own fresh process, and the children run one at a time.
  * - A bad option makes the promise reject with a `RangeError`.
  */

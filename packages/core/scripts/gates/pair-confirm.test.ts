@@ -40,10 +40,10 @@ describe("the timing of a pair", () => {
     const { start, calls } = fakeStart({ old: 1, new: 2, fix: 4 }, { a: 100 });
     const report = await confirmPair({ parent: ["old"], commit: ["new"], others: [{ id: "fixed", command: ["fix"] }], inputs: ["a"], rounds: 4, startChild: start, env: ENV, context: "test" });
     expect(report.arms).toEqual([PARENT_ARM, COMMIT_ARM, "fixed", aaId(PARENT_ARM)]);
-    // 4 rounds x 1 input x 4 arms. The order rotates by one arm in each round.
+    // 4 rounds x 1 input x 4 arms. An odd round is the reverse of the round before it, and the last arm of the first round is the A/A arm.
     expect(calls).toHaveLength(16);
     expect(calls.slice(0, 4).map((c) => c.command)).toEqual(["old", "new", "fix", "old"]);
-    expect(calls.slice(4, 8).map((c) => c.command)).toEqual(["new", "fix", "old", "old"]);
+    expect(calls.slice(4, 8).map((c) => c.command)).toEqual(["old", "fix", "new", "old"]);
     expect(report.inputs[0]!.ratio["fixed"]).toBeCloseTo(4, 10);
   });
 

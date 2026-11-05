@@ -551,7 +551,7 @@ gh workflow run screen.yml --ref main -f step=router -f wrap=stable -f shuffles=
 The input `paired` of the workflow `Screen` names the base of a paired time (MEASURE-ISOLATE). 5 jobs time the base, the strategies of the call and an A/A arm.
 
 - Each case runs in its own fresh processes (BENCH-FRESH-CASES). Each arm, each input and each round gets a fresh process. The processes start one at a time.
-- In each round, each input takes the arms in turn. The order of the arms rotates by the round.
+- In each round, each input takes the arms in turn. The order is `armOrder` of `@mark1russell7/rigor-bench`, and the report states it in the field `order`.
 - Each process routes its input 1 time as an untimed warm-up. Then it times 1 route.
 - The report has the mode `fresh`. The promotion time test counts only reports of the mode `fresh`.
 - A report of the mode `process` timed each case after other cases in one process. The time test does not count it, and gives "cannot decide".
