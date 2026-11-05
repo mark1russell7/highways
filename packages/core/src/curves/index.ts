@@ -10,6 +10,7 @@ import { straightCurve } from "./straight/index.ts";
 
 export * from "./model.ts";
 export { cubicAt, sampleCurve, toSvgPath } from "./sample.ts";
+export { pointAtFraction, type PointAlong } from "./along.ts";
 export { curveSpace, type CurveSpace } from "./space.ts";
 export { straightCurve } from "./straight/index.ts";
 export { roundedCurve, type RoundedOptions } from "./rounded/index.ts";

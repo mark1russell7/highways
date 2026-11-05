@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1513 names
+## . (build/index.d.ts): 1515 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -509,6 +509,7 @@ PlugInput: build/index.d.ts#PlugInput
 PlugPair: build/index.d.ts#PlugPair
 PlugSpacing: build/index.d.ts#PlugSpacing
 Point: build/index.d.ts#Point
+type PointAlong: build/index.d.ts#PointAlong
 Port: build/index.d.ts#Port
 type Portfolio: @mark1russell7/layout-contract#Portfolio (external)
 PortfolioBand: build/index.d.ts#PortfolioBand
@@ -1292,6 +1293,7 @@ plugSpacing: build/index.d.ts#plugSpacing
 plugStrategies: build/index.d.ts#plugStrategies
 plugsRouter: build/index.d.ts#plugsRouter
 pointAt: build/index.d.ts#pointAt
+pointAtFraction: build/index.d.ts#pointAtFraction
 pointBoxDistance: build/index.d.ts#pointBoxDistance
 pointDensity: build/index.d.ts#pointDensity
 pointGroups: build/index.d.ts#pointGroups
@@ -4314,6 +4316,12 @@ export interface PlugSpacing {
 export interface Point {
   readonly x: number;
   readonly y: number;
+}
+
+### build/index.d.ts#PointAlong
+interface PointAlong {
+  readonly point: Point;
+  readonly tangent: Point;
 }
 
 ### build/index.d.ts#Port
@@ -7730,6 +7738,9 @@ export declare const plugsRouter: Router;
 
 ### build/index.d.ts#pointAt
 export declare function pointAt(line: readonly Point[], at: number): Point;
+
+### build/index.d.ts#pointAtFraction
+export declare function pointAtFraction(line: readonly Point[] | readonly CurveSegment[], t: number, tolerance?: number): PointAlong;
 
 ### build/index.d.ts#pointBoxDistance
 export declare function pointBoxDistance(p: Point, b: Box): number;
