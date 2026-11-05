@@ -23,7 +23,7 @@ on:
   # Xplat is not a job of ci.yml: release.yml gives ci.yml only "contents: read", and the job inputs needs "actions: read".
   pull_request:
   schedule:
-    - cron: "37 5 * * 2"
+    - cron: "11 5 * * 2"
 
 permissions:
   contents: read

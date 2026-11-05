@@ -276,7 +276,7 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 | `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. | None at this time. |
 | `Search objective OK` | A missing set or input, or a job that stops. | The correlation, the variants and the time. The tables only report them. | None at this time. |
 | `Screen OK` | A missing input, or a job that stops. | Each measure. A screen writes records, and `promotion.ts` writes the win test as text. | None at this time. |
-| `Xplat OK` | A missing cell, a missing route, or a job that stops. | A route that differs between the cells, the time and the quality. The tables only report them. | None at this time. |
+| `Xplat OK` | A route, an exact result or a repeat that differs between the cells. A cell that does not hold the stated rows. A failed download of the inputs. A missing cell, or a job that stops. | The time and the quality. The tables only report them. | `xplat`: a route, an exact result and a repeat that differ, one short cell and 4 short cells, against a copy with no fault. |
 | `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
 
 Two rulesets make all 8 checks of this table necessary on `main`, so one ruleset alone does not hold the list. Read the list with `gh api repos/mark1russell7/highways/rules/branches/main`.
@@ -287,9 +287,19 @@ So each merge waits on these four checks, and they do not judge what they measur
 
 A green on one of these checks is not a result. Do not count it as a pass on a measure, on a page or in a pull request.
 
-A green `Xplat OK` shows that the run ended with all its inputs. Do not call a gain held on this check.
+A green `Xplat OK` shows byte-equal routes on each of the 4 cells, for `corners`, `shared`, `shared-stretch` and `sections`, on 75 rows. It shows nothing on another router.
 
-A green `Xplat OK` does not show that the routes are equal on each cell. Read the table of the run for that.
+The cells read two lines of V8, 13.6 and 14.6. A new line reaches the check on the pull request that moves its pin of node.
+
+A red on a pull request that moves a pin of node: hold the pin, or remove the Math call. Do not widen the check to pass it.
+
+A move in the field `ulps` only, with equal routes, goes to the owner of this repository.
+
+A dispatch with another `all`, `run` or `fault` names its gate job `Xplat partial`, so it cannot write the check `Xplat OK`. A run with `all` false claims only its 10 rows.
+
+A test pins the expression of that name. If the expression gives another name on a pull request, the necessary check does not report and the pull request waits. So this fault stops a merge.
+
+The flip on the whole workflow, each with `all` false: [no fault](https://github.com/mark1russell7/highways/actions/runs/42055629759), green; [a route that differs](https://github.com/mark1russell7/highways/actions/runs/42055671579), with `summary` and `Xplat partial` red; [a failed download](https://github.com/mark1russell7/highways/actions/runs/42055704453), red with its own text.
 
 No workflow starts `screen-verdict.ts`. It runs by hand on the records of a run of `Screen`, so its check of the records holds nothing in CI.
 

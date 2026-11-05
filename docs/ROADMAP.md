@@ -9,6 +9,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | Id | Item | Shipped | Link |
 |---|---|---|---|
 | CROSSINGS-SAMPLE | The record `crossings-sample/1` reads each estimate of `route.crossings` on the benchmark against a full count. The error reaches 16.03%. 18 of 132 rows hold an estimate. The verdict sets stay under the limit by size, and the next Screen confirms it. | 2026-11-05 | [#334](https://github.com/mark1russell7/highways/pull/334) |
+| XPLAT-VERDICT | `Xplat OK` fails on a route, an exact result or a repeat that differs between the cells, for 4 routers on 75 rows. A flip runs in the job, and a dispatch read the gate red. The cells pin their node versions. [`CI.md`](../CI.md) gives the limits. | 2026-11-05 | #348 |
 | BENCH-NO-PUSH | The workflow `Bench` does not start on a push. No gate or page read the run of a push, and each one took 158 job-minutes. The nightly run and a dispatch stay. | 2026-11-05 | #338 |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
@@ -242,7 +243,6 @@ The rule for the next predictions:
 | OUTER-HOOK | An outer route leaves a plug that faces away from its way, and it comes back past the wall. The record holds 93 such routes on `corners`, and 900 on `sections-tree`, on 245 boards. Read each cause, then fix the shape or state the limit. | next | | P2 |
 | GATE-FLIP | Each gate check of a measure has a flip test: a fault of a stated size turns the check red, and a clean copy stays green in the same job. The workflow `Gate flip` holds the heap gate, gate (b) of `Search work` and the sections gate. Due 2026-11-12. The parity of `Scale`, gate (a) of `Search work` and the win test of `promotion.ts` get real verdicts by 2026-11-19. The time of `Scale` gets a report by 2026-11-26. | active | | P1 |
 | VERDICT-RUN | No workflow starts `screen-verdict.ts`, and the results page reads what it writes. This item lists each snapshot with its run and commit. Then a workflow starts the script, or the script goes. Due 2026-11-12. | active | | P1 |
-| XPLAT-VERDICT | `Xplat OK` does not fail on a route that differs between the cells. A read of each kept record comes first, then a verdict with a flip test in the job, then a pin of the node versions of the cells. Due 2026-11-12. | active | | P1 |
 | ROUTER-BUDGET | The time of each router at each size. Read each cost as its real order of growth or a waste to fix, and open an item for each router over its budget. | next | | P1 |
 | SCREEN-INNER | The next frozen set gets a family with inner routes, because `screen-v3` has none and a defect in 1,322 routes stayed hidden. | next | | P1 |
 | INSIDE-PAD | `Obstacles.inside` reads only the bucket of the point, so a box in the next bucket does not count its pad. A corner in that pad stays in the graph. Count the routes that change, then fix it. | next | | P2 |
