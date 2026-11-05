@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| CROSSINGS-SAMPLE | The record `crossings-sample/1` reads each estimate of `route.crossings` on the benchmark against a full count. The error reaches 16.03%. 18 of 132 rows hold an estimate. The verdict sets stay under the limit by size, and the next Screen confirms it. | 2026-11-05 | [#334](https://github.com/mark1russell7/highways/pull/334) |
 | BENCH-NO-PUSH | The workflow `Bench` does not start on a push. No gate or page read the run of a push, and each one took 158 job-minutes. The nightly run and a dispatch stay. | 2026-11-05 | #338 |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
@@ -219,7 +220,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| CROSSINGS-SAMPLE | Above 20,000 segments, `route.crossings` reads a sample, so a ratio can compare an estimate with a full count. The record marks this as `route.crossings.estimated`. This item says which verdicts the sample reaches. Due 2026-11-08. | `next` | ROUTE-PAIRS | P1 |
+| CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | AMBIGUITY-FLAT | `route.bundle.ambiguity` reads 0.987 to 0.992 on 10 pairs of one input. This item reads it on keyed inputs. If it stays flat, the item fixes or removes it. Due 2026-11-11. | `next` | | P1 |
 | TRUE-SHAPE-MEASURE | `route.through` reads a box. A route that touches a corner of the box of a circle, and not the circle, is not `through`. The measure calls the circle rule of `layout-contract` after the box test, and it stays byte-equal on rectangles. Due 2026-11-13. | `blocked` | the circle rule of `layout-contract` | P1 |
 | TRUE-SHAPE | The routers read each obstacle as its box, so routes keep out of the corners of a circle's box. Circle obstacles go into `Obstacles` and the corner graph. The first slice reads ink and detour against the box routes on one pack. Due 2026-11-28. | `later` | TRUE-SHAPE-MEASURE | P1 |
