@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1512 names
+## . (build/index.d.ts): 1515 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -611,6 +611,9 @@ SCREEN_V3_HELD_OUT: build/index.d.ts#SCREEN_V3_HELD_OUT
 SCREEN_V4: build/index.d.ts#SCREEN_V4
 SCREEN_V4_HELD_OUT: build/index.d.ts#SCREEN_V4_HELD_OUT
 SCREEN_V4_ROOM: build/index.d.ts#SCREEN_V4_ROOM
+SCREEN_V5: build/index.d.ts#SCREEN_V5
+SCREEN_V5_HELD_OUT: build/index.d.ts#SCREEN_V5_HELD_OUT
+SCREEN_V5_KEYS: build/index.d.ts#SCREEN_V5_KEYS
 SCREEN_WRAPS: build/index.d.ts#SCREEN_WRAPS
 SEAM_DEFAULTS: build/index.d.ts#SEAM_DEFAULTS
 SEARCH_DEFAULTS: build/index.d.ts#SEARCH_DEFAULTS
@@ -3503,6 +3506,7 @@ export interface LayoutCell {
   readonly edgeShape?: "random" | "clustered" | "hubChain" | "longRange" | "tree" | "bundled";
   readonly groups?: "none" | "flat" | "nested";
   readonly ports?: "free" | "sides" | "fixed";
+  readonly edgeKey?: "none" | "random" | "cluster";
 }
 
 ### build/index.d.ts#LayoutChange
@@ -4887,6 +4891,15 @@ export declare const SCREEN_V4_ROOM: Readonly<{
   gutter: number;
   spacing: number;
 }>;
+
+### build/index.d.ts#SCREEN_V5
+export declare const SCREEN_V5: ScreenSet;
+
+### build/index.d.ts#SCREEN_V5_HELD_OUT
+export declare const SCREEN_V5_HELD_OUT: readonly number[];
+
+### build/index.d.ts#SCREEN_V5_KEYS
+export declare const SCREEN_V5_KEYS: readonly EdgeKey[];
 
 ### build/index.d.ts#SCREEN_WRAPS
 export declare const SCREEN_WRAPS: readonly ScreenWrap[];
