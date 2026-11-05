@@ -163,17 +163,25 @@ export function sideAngle(box: Box, at: Point, next: Point): number | undefined 
   return (Math.acos(cos) * 180) / Math.PI;
 }
 
+/** The options of `countCrossings`. The defaults give the count of `route.crossings`. */
+export interface CountCrossingsOptions {
+  /** The largest number of segments for a full count. Above it, a sample of 2 000 segments gives an estimate. The default is 20 000. */
+  readonly limit?: number;
+  /** The seed of the draw of the sample. The default is the number of segments. */
+  readonly seed?: number;
+}
+
 /**
  * This function counts the crossings of a set of segments with a grid of buckets.
  * Above 20 000 segments, it counts the crossings of a seeded sample of 2 000 segments and scales the count.
  */
-export function countCrossings(segs: readonly (readonly [Point, Point])[]): [number, boolean] {
+export function countCrossings(segs: readonly (readonly [Point, Point])[], options: CountCrossingsOptions = {}): [number, boolean] {
   if (segs.length < 2) return [0, false];
   const len = segs.reduce((s, [a, b]) => s + dist(a, b), 0) / segs.length;
   const grid = new Grid<number>(Math.max(20, len));
   segs.forEach(([a, b], i) => grid.addSegment(i, a, b));
-  const exact = segs.length <= EXACT_CROSSINGS;
-  const R = rng(segs.length);
+  const exact = segs.length <= (options.limit ?? EXACT_CROSSINGS);
+  const R = rng(options.seed ?? segs.length);
   const pick = exact ? segs.map((_, i) => i) : Array.from({ length: SAMPLE }, () => Math.floor(R() * segs.length));
   let count = 0;
   for (const i of pick) {
