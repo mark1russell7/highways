@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1506 names
+## . (build/index.d.ts): 1507 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -325,6 +325,7 @@ type JogStyle: build/index.d.ts#JogStyle
 KDEEB_DEFAULTS: build/index.d.ts#KDEEB_DEFAULTS
 KD_DEFAULTS: build/index.d.ts#KD_DEFAULTS
 KENDALL_EXACT: build/index.d.ts#KENDALL_EXACT
+KEYED_FAMILIES: build/index.d.ts#KEYED_FAMILIES
 KEYED_STRATEGIES: build/index.d.ts#KEYED_STRATEGIES
 KNEE_DEFAULTS: build/index.d.ts#KNEE_DEFAULTS
 KNEE_RULES: build/index.d.ts#KNEE_RULES
@@ -3267,6 +3268,9 @@ export declare const KD_DEFAULTS: Readonly<Required<KdOptions>>;
 
 ### build/index.d.ts#KENDALL_EXACT
 export declare const KENDALL_EXACT = 1500;
+
+### build/index.d.ts#KEYED_FAMILIES
+export declare const KEYED_FAMILIES: readonly string[];
 
 ### build/index.d.ts#KEYED_STRATEGIES
 export declare const KEYED_STRATEGIES: Registry;

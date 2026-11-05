@@ -314,6 +314,8 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 
 This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
 
+The figure 102.8% of `split` is not a settled result. The table of 2026-10-27 read 68.2% in that cell, and the cause of the change is open (SPLIT-SPACING).
+
 The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
 
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
@@ -1025,7 +1027,8 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
-- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run. Thus the 4 cells of `Xplat` agree.
+- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run.
+- The workflow `Xplat` compares the route hashes of 4 cells, and it reports each difference. Its check `Xplat OK` does not fail on a difference at this time. So no gate holds the rules of this section.
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 
