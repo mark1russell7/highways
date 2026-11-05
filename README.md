@@ -32,6 +32,21 @@ The [strategies page](https://mark1russell7.github.io/highways/strategies.html) 
 
 ## The routers
 
+**A figure on one measure is no win.** Three controls that no chooser offers (`straight`, `one-trunk` and `perimeter`) win 17 of the 22 route measures. Each win loses a partner. For this reason, read `route.crossings` with `route.crossings.pairs`, and read the ink saved with the median detour.
+
+The table gives the medians over 75 boards of the record `packages/core/scripts/data/control-wins/record.json`. A control has its name in italics.
+
+| Router | `route.crossings` | `route.crossings.pairs` | Ink saved | Median detour | `route.through` |
+|---|---:|---:|---:|---:|---:|
+| *`straight`* | 93 | 99 | 0 | 1 | 18 |
+| *`one-trunk`* | 0 | 153 | 0.749 | 1.41 | 48 |
+| *`perimeter`* | 0 | 229 | 0.459 | 2.395 | 35 |
+| `corners` | 83 | 120 | 0.074 | 1.021 | 0 |
+| `shared` | 84 | 122 | 0.085 | 1.027 | 0 |
+| `shared-all` | 21 | 152 | 0.442 | 1.075 | 0 |
+| `sections` | 44 | 148 | 0.351 | 1.15 | 0 |
+| `sections-site` | 102 | 267 | 0.398 | 1.39 | 0 |
+
 | Router | Method |
 |---|---|
 | `straight` | The control. Each edge is one straight line between its plugs. |
@@ -52,15 +67,15 @@ The inflection rule sets the number of inflections from the angle of the chord: 
 
 The corner graph links each corner to its 8 nearest corners in view. A path keeps a clearance of at least half of the margin (5 units). A coarse lattice of free points links groups of nodes across empty space.
 
-The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule and has 14 times fewer crossings than straight lines. It takes approximately 21 s. The routers with sections also race at 100 000 nodes.
+The benchmark races `corners` only to 10 000 nodes. There, it breaks no hard rule, and `route.crossings` reads 14 times lower than straight lines. The benchmark does not read the pair count, so this figure has no partner at this size. It takes approximately 21 s. The routers with sections also race at 100 000 nodes.
 
 The rule of `trunks` in the benchmark groups the edges by the collection of the target. The result gives each bundle with its trunk and the order of its lanes. Lane 0 turns most to the left, so two lanes do not cross at the split point.
 
-The fixture `mid-fanout` has nodes that link to many nodes of one collection. There, `trunks` uses 8% less ink and has 10% fewer crossings than `corners`. The metric `ink` counts a shared segment one time.
+The fixture `mid-fanout` has nodes that link to many nodes of one collection. There, `trunks` uses 8% less ink and reads 10% lower on `route.crossings` than `corners`. The metric `ink` counts a shared segment one time. The benchmark does not read the partners of these two figures, so they are no win.
 
 The routers `shared` and `shared-all` follow Pupyrev, Nachmanson, Bereg and Holroyd, "Edge routing with ordered bundles". The edges go one by one, the longest first. A stretch that several edges share has the same points in each of their routes. The result gives each stretch as a run, with the order of its lanes. Where two edges part, the edge that turns more to the left has the lane more to the left. Thus two lanes do not cross where they part.
 
-On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than `corners`. `shared-all` uses 60% to 74% less. The routes are 10% to 17% longer, with more bends. The crossings go down by 4 to 30 times, but the metric counts a crossing of two shared stretches one time.
+On the fixtures from 400 to 1 000 nodes, `shared` uses 43% to 58% less ink than `corners`. `shared-all` uses 60% to 74% less. The routes are 10% to 17% longer, with more bends. `route.crossings` reads 4 to 30 times lower, but it counts a crossing of two shared stretches one time. On the 75 boards of the table, `route.crossings.pairs` of `shared-all` is above `corners`.
 
 The routers `sections` and `sections-tree` divide the plane into a quadtree of sections. A section with more than 8 nodes splits in four. The hub of a section is the free corner nearest to the center of its nodes. An edge goes from its node up the hubs to the lowest common section, then down the hubs to the other node. The router finds each way between two hubs one time, so all the edges on it share its points.
 
@@ -70,9 +85,9 @@ The result gives one zoom level for each depth of the tree. A link of a level co
 
 A link between two groups starts on the box of one group and ends on the box of the other group. It goes around the boxes of the other items of its level. Where there is space, its legs are horizontal or vertical. Where two boxes overlap, no clear way is possible, and the link goes straight. The last level shows each node, and its links are the routes of the edges.
 
-On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less ink than `corners`. It has 3.4 to 5.1 times fewer crossings. Its routes are 1.45 to 1.56 times as long as the line between their plugs.
+On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less ink than `corners`. Its `route.crossings` reads 3.4 to 5.1 times lower, and no record reads its pair count. Its routes are 1.45 to 1.56 times as long as the line between their plugs.
 
-`sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39% and the crossings by 2.2 to 3 times. The routes are 20% to 32% longer.
+`sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39%, and `route.crossings` by 2.2 to 3 times. The routes are 20% to 32% longer. On the 75 boards of the table, `route.crossings.pairs` of `sections` is above `corners`.
 
 `sections` and `sections-tree` are slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-tree-of-sections-at-10-000-nodes-h3), `sections` takes 1.15 to 1.33 times the old time, and `sections-tree` 2.67 to 3.21 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) finds the change and fixes it.
 
