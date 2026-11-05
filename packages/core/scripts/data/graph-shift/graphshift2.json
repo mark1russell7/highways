@@ -1,0 +1,3291 @@
+{
+ "counts": {
+  "neither:no-partner -> list:tie": 16,
+  "neither:same-links-path-differs -> end:flip": 14,
+  "neither:points-differ -> points": 3
+ },
+ "rows": [
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e164",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 500,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 499,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 514,
+       "gap": 1.1368683772161603e-13,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e164",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 500,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 499,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 514,
+       "gap": 1.1368683772161603e-13,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "thin-bars",
+   "seed": 1,
+   "vector": 1,
+   "edge": "e36",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 1110,
+       "y": 283
+      },
+      {
+       "x": 1183,
+       "y": 275.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 73.43704787094852,
+     "lists": {
+      "sizes": [
+       6,
+       16
+      ],
+      "lost": [
+       {
+        "j": 215,
+        "d": 14,
+        "bestGap": 37.35172830587107,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 210,
+        "d": 98.00510190801293,
+        "bestGap": 13.005101908012932,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 194,
+        "d": 51.35172830587107,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 213,
+        "d": 85,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 216,
+        "d": 123,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 199,
+        "d": 161.11176245079065,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 196,
+        "d": 163.41664541900252,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 178,
+        "d": 212.73457640919588,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 331,
+        "d": 355.1482707803619,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 191,
+        "d": 437.0411879903312,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 186,
+        "d": 501.03592685555,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 217,
+        "d": 514,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 208,
+        "d": 516,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 205,
+        "d": 561,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 1216,
+       "y": 233
+      },
+      {
+       "x": 1139,
+       "y": 241.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 77.41446893184772,
+     "lists": {
+      "sizes": [
+       9,
+       16
+      ],
+      "lost": [
+       {
+        "j": 173,
+        "d": 14,
+        "bestGap": 75,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 176,
+        "d": 30.4138126514911,
+        "bestGap": 58.5861873485089,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 213,
+        "d": 66.84309986827361,
+        "bestGap": 22.15690013172639,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 216,
+        "d": 99.31767214348109,
+        "bestGap": 10.31767214348109,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 219,
+        "d": 110.43550153822818,
+        "bestGap": 0.2719867068648938,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 199,
+        "d": 132.9661611087573,
+        "bestGap": 1.0338388912427092,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 175,
+        "d": 89,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 192,
+        "d": 110.16351483136329,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 170,
+        "d": 134,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 189,
+        "d": 200.08997975910736,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 196,
+        "d": 205.08778608196053,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 178,
+        "d": 254,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 188,
+        "d": 393.04579885809744,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 171,
+        "d": 429,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 185,
+        "d": 457.0393856113497,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 166,
+        "d": 506,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 197,
+        "d": 622.0289382335841,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 167,
+        "d": 679,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 162,
+        "d": 721,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e33",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 264,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 276,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 288,
+       "gap": 1.1368683772161603e-13,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e33",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 264,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 276,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 288,
+       "gap": 1.1368683772161603e-13,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e7",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 355,
+       "y": 178
+      },
+      {
+       "x": 368,
+       "y": 189.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365927042,
+     "lists": {
+      "sizes": [
+       5,
+       2
+      ],
+      "lost": [
+       {
+        "j": 91,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 6,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 59,
+        "d": 64.53681120105021,
+        "bestGap": 19.536811201050213,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 5,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 93,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 266
+      },
+      {
+       "x": 292,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925742,
+     "lists": {
+      "sizes": [
+       15,
+       13
+      ],
+      "lost": [
+       {
+        "j": 105,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 110,
+        "d": 58.83026432033091,
+        "bestGap": 13.830264320330912,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 64.07027391856539,
+        "bestGap": 9.529997820063414,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 88,
+        "d": 119,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 143.20963654726592,
+        "bestGap": 14.691651527685337,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 120,
+        "d": 145.16542288024377,
+        "bestGap": 12.735865194707486,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 32,
+        "d": 280.7507791618752,
+        "bestGap": 1.7507791618751867,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 70,
+        "d": 286.60251220113196,
+        "bestGap": 7.602512201131958,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 35,
+        "d": 293.9200571584049,
+        "bestGap": 14.920057158404916,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 103,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 58,
+        "d": 73.6002717386288,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 90,
+        "d": 79.88116173416611,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 108,
+        "d": 121,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 136,
+        "d": 157.90128807495125,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 111,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 112,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 521,
+       "y": 178
+      },
+      {
+       "x": 508,
+       "y": 189.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365927042,
+     "lists": {
+      "sizes": [
+       4,
+       4
+      ],
+      "lost": [
+       {
+        "j": 96,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 98,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 571,
+       "y": 266
+      },
+      {
+       "x": 584,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925742,
+     "lists": {
+      "sizes": [
+       12,
+       7
+      ],
+      "lost": [
+       {
+        "j": 114,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 21,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 69,
+        "d": 66.49060083951716,
+        "bestGap": 21.490600839517157,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 22,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 20,
+        "d": 153.44380078712857,
+        "bestGap": 75.55619921287143,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 109,
+        "d": 161.01242188104618,
+        "bestGap": 67.98757811895382,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 236.02754076590298,
+        "bestGap": 7.027540765902984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 61,
+        "d": 239.0083680543424,
+        "bestGap": 10.008368054342412,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 18,
+        "d": 241.91940806805889,
+        "bestGap": 12.919408068058885,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 112,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 107,
+        "d": 229,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 104,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 103,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e13",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 266
+      },
+      {
+       "x": 292,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925742,
+     "lists": {
+      "sizes": [
+       15,
+       13
+      ],
+      "lost": [
+       {
+        "j": 105,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 110,
+        "d": 58.83026432033091,
+        "bestGap": 13.830264320330912,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 64.07027391856539,
+        "bestGap": 9.529997820063414,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 88,
+        "d": 119,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 143.20963654726592,
+        "bestGap": 14.691651527685337,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 120,
+        "d": 145.16542288024377,
+        "bestGap": 12.735865194707486,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 32,
+        "d": 280.7507791618752,
+        "bestGap": 1.7507791618751867,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 70,
+        "d": 286.60251220113196,
+        "bestGap": 7.602512201131958,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 35,
+        "d": 293.9200571584049,
+        "bestGap": 14.920057158404916,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 103,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 58,
+        "d": 73.6002717386288,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 90,
+        "d": 79.88116173416611,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 108,
+        "d": 121,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 136,
+        "d": 157.90128807495125,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 111,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 112,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 463,
+       "y": 70
+      },
+      {
+       "x": 476,
+       "y": 81.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365927042,
+     "lists": {
+      "sizes": [
+       8,
+       7
+      ],
+      "lost": [
+       {
+        "j": 83,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 91,
+        "d": 132.6386067478093,
+        "bestGap": 87.63860674780929,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 85,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e7",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 355,
+       "y": 178
+      },
+      {
+       "x": 368.000000000001,
+       "y": 189.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365927824,
+     "lists": {
+      "sizes": [
+       5,
+       2
+      ],
+      "lost": [
+       {
+        "j": 91,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 6,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 59,
+        "d": 64.53681120105021,
+        "bestGap": 19.536811201050213,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 5,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 93,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 266
+      },
+      {
+       "x": 292.000000000001,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592496,
+     "lists": {
+      "sizes": [
+       15,
+       13
+      ],
+      "lost": [
+       {
+        "j": 105,
+        "d": 31,
+        "bestGap": 14.000000000000028,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 110,
+        "d": 58.83026432033091,
+        "bestGap": 13.830264320330883,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 64.07027391856539,
+        "bestGap": 9.529997820063443,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 88,
+        "d": 119,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 143.20963654726592,
+        "bestGap": 14.691651527685366,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 120,
+        "d": 145.16542288024377,
+        "bestGap": 12.735865194707515,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 32,
+        "d": 280.7507791618752,
+        "bestGap": 1.7507791618751867,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 70,
+        "d": 286.60251220113196,
+        "bestGap": 7.602512201131958,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 35,
+        "d": 293.9200571584049,
+        "bestGap": 14.920057158404916,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 103,
+        "d": 45.00000000000003,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 58,
+        "d": 73.60027173862883,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 90,
+        "d": 79.88116173416613,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 108,
+        "d": 121,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 136,
+        "d": 157.90128807495128,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 111,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 112,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 521,
+       "y": 178
+      },
+      {
+       "x": 508.000000000001,
+       "y": 189.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365926264,
+     "lists": {
+      "sizes": [
+       4,
+       4
+      ],
+      "lost": [
+       {
+        "j": 96,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 98,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 571,
+       "y": 266
+      },
+      {
+       "x": 584.000000000001,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592652,
+     "lists": {
+      "sizes": [
+       12,
+       7
+      ],
+      "lost": [
+       {
+        "j": 114,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 21,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 69,
+        "d": 66.49060083951716,
+        "bestGap": 21.490600839517157,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 22,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 20,
+        "d": 153.44380078712857,
+        "bestGap": 75.55619921287143,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 109,
+        "d": 161.01242188104618,
+        "bestGap": 67.98757811895382,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 236.02754076590298,
+        "bestGap": 7.027540765902984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 61,
+        "d": 239.0083680543424,
+        "bestGap": 10.008368054342412,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 18,
+        "d": 241.91940806805889,
+        "bestGap": 12.919408068058885,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 112,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 107,
+        "d": 229,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 104,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 103,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e13",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 266
+      },
+      {
+       "x": 292.000000000001,
+       "y": 255.00000000000102
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592496,
+     "lists": {
+      "sizes": [
+       15,
+       13
+      ],
+      "lost": [
+       {
+        "j": 105,
+        "d": 31,
+        "bestGap": 14.000000000000028,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 110,
+        "d": 58.83026432033091,
+        "bestGap": 13.830264320330883,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 64.07027391856539,
+        "bestGap": 9.529997820063443,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 88,
+        "d": 119,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 143.20963654726592,
+        "bestGap": 14.691651527685366,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 120,
+        "d": 145.16542288024377,
+        "bestGap": 12.735865194707515,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 32,
+        "d": 280.7507791618752,
+        "bestGap": 1.7507791618751867,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 70,
+        "d": 286.60251220113196,
+        "bestGap": 7.602512201131958,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 35,
+        "d": 293.9200571584049,
+        "bestGap": 14.920057158404916,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 103,
+        "d": 45.00000000000003,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 58,
+        "d": 73.60027173862883,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 90,
+        "d": 79.88116173416613,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 108,
+        "d": 121,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 136,
+        "d": 157.90128807495128,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 111,
+        "d": 279,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 112,
+        "d": 337,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 463,
+       "y": 70
+      },
+      {
+       "x": 476.000000000001,
+       "y": 81.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365927824,
+     "lists": {
+      "sizes": [
+       8,
+       7
+      ],
+      "lost": [
+       {
+        "j": 83,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 91,
+        "d": 132.6386067478093,
+        "bestGap": 87.63860674780929,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 85,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 247,
+       "y": 286
+      },
+      {
+       "x": 259.999999999999,
+       "y": 297.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925802,
+     "lists": {
+      "sizes": [
+       5,
+       10
+      ],
+      "lost": [
+       {
+        "j": 103,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 58,
+        "d": 76.2954782408499,
+        "bestGap": 7.639020030123277,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 90,
+        "d": 97,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 87,
+        "d": 139,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 105,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 17,
+        "d": 83.93449827097318,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 110,
+        "d": 95,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 109,
+        "d": 153,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 20,
+        "d": 168.44286865284622,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 23,
+        "d": 172.69916039170545,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 21,
+        "d": 297.8137001549794,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 114,
+        "d": 311,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 113,
+        "d": 369,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 89,
+       "y": 482
+      },
+      {
+       "x": 75.99999999999899,
+       "y": 471.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592699,
+     "lists": {
+      "sizes": [
+       16,
+       16
+      ],
+      "lost": [
+       {
+        "j": 125,
+        "d": 31,
+        "bestGap": 13.999999999999993,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 37,
+        "d": 153.44380078712857,
+        "bestGap": 86.0828156879513,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 28,
+        "d": 236.48467180770933,
+        "bestGap": 3.0419446673705295,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 65,
+        "d": 241.91940806805889,
+        "bestGap": 2.392791592979023,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 123,
+        "d": 44.99999999999999,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 54,
+        "d": 239.52661647507986,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 7,
+        "d": 347.0518693221519,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 52,
+        "d": 357.0224082603219,
+        "clearA": true,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 4,
+   "edge": "e3",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 247,
+       "y": 286
+      },
+      {
+       "x": 260.0000000000007,
+       "y": 296.9999999999991
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365926335,
+     "lists": {
+      "sizes": [
+       5,
+       10
+      ],
+      "lost": [
+       {
+        "j": 103,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 58,
+        "d": 76.2954782408499,
+        "bestGap": 7.639020030123277,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 90,
+        "d": 97,
+        "bestGap": 2,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 87,
+        "d": 139,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 105,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 17,
+        "d": 83.93449827097318,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 110,
+        "d": 95,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 109,
+        "d": 153,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 20,
+        "d": 168.44286865284622,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 23,
+        "d": 172.69916039170545,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 21,
+        "d": 297.8137001549794,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 114,
+        "d": 311,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 113,
+        "d": 369,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 89,
+       "y": 482
+      },
+      {
+       "x": 76.0000000000007,
+       "y": 470.9999999999991
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592646,
+     "lists": {
+      "sizes": [
+       16,
+       16
+      ],
+      "lost": [
+       {
+        "j": 125,
+        "d": 31,
+        "bestGap": 13.999999999999993,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 37,
+        "d": 153.44380078712857,
+        "bestGap": 86.0828156879513,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 28,
+        "d": 236.48467180770933,
+        "bestGap": 3.0419446673705295,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 65,
+        "d": 241.91940806805889,
+        "bestGap": 2.392791592979023,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 123,
+        "d": 44.99999999999999,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 54,
+        "d": 239.52661647507986,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 7,
+        "d": 347.0518693221519,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 52,
+        "d": 357.0224082603219,
+        "clearA": true,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "maze",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 571,
+       "y": 286
+      },
+      {
+       "x": 583.999999999999,
+       "y": 297.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925802,
+     "lists": {
+      "sizes": [
+       8,
+       4
+      ],
+      "lost": [
+       {
+        "j": 113,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 18,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 82,
+        "d": 66.49060083951716,
+        "bestGap": 21.490600839517157,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 117,
+        "d": 132.6386067478093,
+        "bestGap": 87.63860674780929,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 115,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 590
+      },
+      {
+       "x": 291.999999999999,
+       "y": 579.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592696,
+     "lists": {
+      "sizes": [
+       11,
+       12
+      ],
+      "lost": [
+       {
+        "j": 139,
+        "d": 31,
+        "bestGap": 13.999999999999972,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 91,
+        "d": 340.9824042381073,
+        "bestGap": 154.01759576189272,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 137,
+        "d": 44.99999999999997,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 145,
+        "d": 495,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 146,
+        "d": 553,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e12",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 332,
+       "y": 66
+      },
+      {
+       "x": 319.5,
+       "y": 77.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 16.65082580534737,
+     "lists": {
+      "sizes": [
+       6,
+       6
+      ],
+      "lost": [
+       {
+        "j": 102,
+        "d": 29,
+        "bestGap": 13.5,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 129,
+        "d": 345.3259329966401,
+        "bestGap": 189.53681270898974,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 133,
+        "d": 668.8452735872476,
+        "bestGap": 513.0561532995972,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 137,
+        "d": 1182.4491532408488,
+        "bestGap": 1026.6600329531984,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 104,
+        "d": 42.5,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 47,
+        "d": 134.00093283257397,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 49,
+        "d": 143.8966643115816,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 46,
+        "d": 155.78912028765038,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 481,
+       "y": 252
+      },
+      {
+       "x": 493.5,
+       "y": 241.000000000001
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 16.650825805346056,
+     "lists": {
+      "sizes": [
+       6,
+       2
+      ],
+      "lost": [
+       {
+        "j": 64,
+        "d": 29,
+        "bestGap": 13.5,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 102.47438704378767,
+        "bestGap": 59.97438704378767,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 25,
+        "d": 111.35977729862789,
+        "bestGap": 68.85977729862789,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 22,
+        "d": 122.24974437601087,
+        "bestGap": 79.74974437601087,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 130,
+        "d": 136.69308687713507,
+        "bestGap": 94.19308687713507,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 62,
+        "d": 42.5,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e12",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 132,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 136,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 140,
+       "gap": 1.1368683772161603e-13,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 332,
+       "y": 66
+      },
+      {
+       "x": 319.499999999999,
+       "y": 77.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 16.65082580534768,
+     "lists": {
+      "sizes": [
+       6,
+       6
+      ],
+      "lost": [
+       {
+        "j": 102,
+        "d": 29,
+        "bestGap": 13.5,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 129,
+        "d": 345.3259329966401,
+        "bestGap": 189.53681270898977,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 133,
+        "d": 668.8452735872476,
+        "bestGap": 513.0561532995972,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 137,
+        "d": 1182.4491532408488,
+        "bestGap": 1026.6600329531984,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 104,
+        "d": 42.5,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 47,
+        "d": 134.00093283257394,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 49,
+        "d": 143.89666431158156,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 46,
+        "d": 155.78912028765035,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 481,
+       "y": 252
+      },
+      {
+       "x": 493.499999999999,
+       "y": 241.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 16.65082580534574,
+     "lists": {
+      "sizes": [
+       6,
+       2
+      ],
+      "lost": [
+       {
+        "j": 64,
+        "d": 29,
+        "bestGap": 13.5,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 23,
+        "d": 102.47438704378767,
+        "bestGap": 59.97438704378767,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 25,
+        "d": 111.35977729862789,
+        "bestGap": 68.85977729862789,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 22,
+        "d": 122.24974437601087,
+        "bestGap": 79.74974437601087,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 130,
+        "d": 136.69308687713507,
+        "bestGap": 94.19308687713507,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 62,
+        "d": 42.5,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "escape",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e1",
+   "cls": "neither:points-differ",
+   "onlyA": [
+    {
+     "x": 603,
+     "y": 324.69230769230774
+    },
+    {
+     "x": 603,
+     "y": 417.4615384615385
+    }
+   ],
+   "onlyB": [],
+   "limit": {
+    "x1": 632,
+    "y1": 632
+   },
+   "inside": [
+    {
+     "p": {
+      "x": 603,
+      "y": 324.69230769230774
+     },
+     "a5": false,
+     "b5": true
+    },
+    {
+     "p": {
+      "x": 603,
+      "y": 417.4615384615385
+     },
+     "a5": false,
+     "b5": true
+    }
+   ],
+   "verdict": "points"
+  },
+  {
+   "family": "escape",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e15",
+   "cls": "neither:points-differ",
+   "onlyA": [
+    {
+     "x": 603,
+     "y": 324.69230769230774
+    },
+    {
+     "x": 603,
+     "y": 417.4615384615385
+    }
+   ],
+   "onlyB": [],
+   "limit": {
+    "x1": 632,
+    "y1": 632
+   },
+   "inside": [
+    {
+     "p": {
+      "x": 603,
+      "y": 324.69230769230774
+     },
+     "a5": false,
+     "b5": true
+    },
+    {
+     "p": {
+      "x": 603,
+      "y": 417.4615384615385
+     },
+     "a5": false,
+     "b5": true
+    }
+   ],
+   "verdict": "points"
+  },
+  {
+   "family": "escape",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e11",
+   "cls": "neither:points-differ",
+   "onlyA": [
+    {
+     "x": 603,
+     "y": 324.69230769230774
+    },
+    {
+     "x": 603,
+     "y": 417.4615384615385
+    }
+   ],
+   "onlyB": [],
+   "limit": {
+    "x1": 632,
+    "y1": 632
+   },
+   "inside": [
+    {
+     "p": {
+      "x": 603,
+      "y": 324.69230769230774
+     },
+     "a5": false,
+     "b5": true
+    },
+    {
+     "p": {
+      "x": 603,
+      "y": 417.4615384615385
+     },
+     "a5": false,
+     "b5": true
+    }
+   ],
+   "verdict": "points"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e0",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e3",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e4",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e0",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e3",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e4",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 0,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    },
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 1.4210854715202004e-14,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e4",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 1.4210854715202004e-14,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e12",
+   "cls": "neither:no-partner",
+   "ends": [
+    {
+     "end": 52,
+     "inX": true,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": [
+      {
+       "m": 16,
+       "gap": 1.4210854715202004e-14,
+       "clearX": true,
+       "clearY": true
+      }
+     ]
+    },
+    {
+     "end": 56,
+     "inX": false,
+     "inY": false,
+     "sizes": [
+      8,
+      8
+     ],
+     "took": []
+    }
+   ],
+   "verdict": "list:tie"
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e0",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 571,
+       "y": 286
+      },
+      {
+       "x": 583.999999999999,
+       "y": 297.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925802,
+     "lists": {
+      "sizes": [
+       9,
+       5
+      ],
+      "lost": [
+       {
+        "j": 112,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 18,
+        "d": 54.817880294662984,
+        "bestGap": 9.817880294662984,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 81,
+        "d": 66.49060083951716,
+        "bestGap": 21.490600839517157,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 17,
+        "d": 76.2954782408499,
+        "bestGap": 31.295478240849903,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 116,
+        "d": 132.6386067478093,
+        "bestGap": 87.63860674780929,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 114,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 305,
+       "y": 590
+      },
+      {
+       "x": 291.999999999999,
+       "y": 579.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592696,
+     "lists": {
+      "sizes": [
+       16,
+       16
+      ],
+      "lost": [
+       {
+        "j": 142,
+        "d": 31,
+        "bestGap": 13.999999999999972,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 183,
+        "d": 77.51714857181014,
+        "bestGap": 32.51714857181017,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 187,
+        "d": 321.07212999486393,
+        "bestGap": 152.30932295824874,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 90,
+        "d": 340.9824042381073,
+        "bestGap": 132.3990487150054,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 140,
+        "d": 44.99999999999997,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 160,
+        "d": 473.38145295311267,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 152,
+        "d": 473.4659438650261,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 171,
+        "d": 475.30411317387103,
+        "clearA": true,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e1",
+   "cls": "neither:same-links-path-differs",
+   "ends": [
+    {
+     "out": [
+      {
+       "x": 629,
+       "y": 590
+      },
+      {
+       "x": 615.999999999999,
+       "y": 579.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.02938636592696,
+     "lists": {
+      "sizes": [
+       16,
+       16
+      ],
+      "lost": [
+       {
+        "j": 146,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 171,
+        "d": 140.81193131265547,
+        "bestGap": 1.7678709035070312,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "j": 163,
+        "d": 141.22322755127783,
+        "bestGap": 1.3565746648846755,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "j": 164,
+        "d": 147.6787053031005,
+        "bestGap": 4.916665530617507,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "j": 156,
+        "d": 148.07092894960846,
+        "bestGap": 5.308889177125479,
+        "clearA": true,
+        "clearB": true
+       }
+      ],
+      "gained": [
+       {
+        "m": 144,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 85,
+        "d": 62.9682459657247,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 86,
+        "d": 83.93449827097321,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 89,
+        "d": 142.5798022161625,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 42,
+        "d": 142.76203977248298,
+        "clearA": false,
+        "clearB": true
+       }
+      ]
+     }
+    },
+    {
+     "out": [
+      {
+       "x": 787,
+       "y": 394
+      },
+      {
+       "x": 799.999999999999,
+       "y": 405.0000000000003
+      }
+     ],
+     "steps": [
+      0,
+      0
+     ],
+     "far": 17.029386365925802,
+     "lists": {
+      "sizes": [
+       16,
+       16
+      ],
+      "lost": [
+       {
+        "j": 120,
+        "d": 31,
+        "bestGap": 14,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 135,
+        "d": 119,
+        "bestGap": 35.87091398968374,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 161,
+        "d": 155.2610704587599,
+        "bestGap": 0.3901564690761461,
+        "clearA": true,
+        "clearB": false
+       },
+       {
+        "j": 169,
+        "d": 157.25775020646836,
+        "bestGap": 0.41069094171828624,
+        "clearA": true,
+        "clearB": false
+       }
+      ],
+      "gained": [
+       {
+        "m": 122,
+        "d": 45,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 133,
+        "d": 79.88116173416608,
+        "clearA": false,
+        "clearB": true
+       },
+       {
+        "m": 151,
+        "d": 154.87091398968374,
+        "clearA": true,
+        "clearB": true
+       },
+       {
+        "m": 159,
+        "d": 156.84705926475007,
+        "clearA": true,
+        "clearB": true
+       }
+      ]
+     }
+    }
+   ],
+   "verdict": "end:flip"
+  }
+ ]
+}

@@ -1,0 +1,3066 @@
+{
+ "moves": 64,
+ "counts": {
+  "graph neither:no-partner": 13,
+  "search tie": 2,
+  "graph tie": 28,
+  "search neither:same-links-path-differs": 14,
+  "search tie (off the path)": 1,
+  "graph neither:no-partner (off the path)": 3,
+  "graph neither:points-differ": 3
+ },
+ "rows": [
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e164",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    551,
+    551
+   ],
+   "linksCount": [
+    2556,
+    2554
+   ],
+   "differing": [
+    4,
+    2
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1228.0877745702928,
+    1230.4816646346167
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    500,
+    499
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     131.47500000000008,
+     131.47500000000008
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e164",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    551,
+    551
+   ],
+   "linksCount": [
+    2556,
+    2554
+   ],
+   "differing": [
+    6,
+    4
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1228.0877745702928,
+    1230.4816646346167
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    500,
+    499
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     131.47500000000008,
+     131.47500000000002
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e297",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    876,
+    876
+   ],
+   "linksCount": [
+    4061,
+    4061
+   ],
+   "differing": [
+    5,
+    5
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1235.2172736383634,
+    1206.6029247872739
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    728,
+    727
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     130.06,
+     130.06
+    ]
+   },
+   "partners": [
+    {
+     "end": 728,
+     "partner": 743,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 727,
+     "partner": 742,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e297",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    876,
+    876
+   ],
+   "linksCount": [
+    4061,
+    4065
+   ],
+   "differing": [
+    5,
+    9
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1235.2172736383634,
+    1206.6029247872739
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    728,
+    727
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     130.06,
+     130.06
+    ]
+   },
+   "partners": [
+    {
+     "end": 728,
+     "partner": 743,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 727,
+     "partner": 742,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e297",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    876,
+    876
+   ],
+   "linksCount": [
+    4061,
+    4061
+   ],
+   "differing": [
+    5,
+    5
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1235.2172736383634,
+    1206.6029247872737
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    728,
+    727
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     130.06,
+     130.06
+    ]
+   },
+   "partners": [
+    {
+     "end": 728,
+     "partner": 743,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 727,
+     "partner": 742,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "thin-bars",
+   "seed": 1,
+   "vector": 1,
+   "edge": "e36",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    339,
+    339
+   ],
+   "linksCount": [
+    1602,
+    1602
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    176.94858492469072,
+    168.5410134171692
+   ],
+   "rawGap": 8.40757150752151,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "thin-bars",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e36",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    339,
+    339
+   ],
+   "linksCount": [
+    1602,
+    1602
+   ],
+   "differing": [
+    1,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    176.94858492469072,
+    168.5410134171692
+   ],
+   "onPath": false,
+   "holdsIt": "base",
+   "link": [
+    91,
+    95
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     427,
+     427
+    ]
+   },
+   "partners": [
+    {
+     "end": 95,
+     "partner": 94,
+     "gap": 1.1368683772161603e-13,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.1368683772161603e-13,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e1",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1366
+   ],
+   "differing": [
+    10,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2238.229723342249,
+    2252.5527317065335
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    215,
+    202
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 215,
+     "partner": 227,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 215,
+     "partner": 229,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e11",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1366
+   ],
+   "differing": [
+    10,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2145.864889950315,
+    2084.11628516711
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    187,
+    199
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.2622319811412,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 212,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e16",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1366
+   ],
+   "differing": [
+    10,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3029.620328876889,
+    3067.933105828015
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 187,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e27",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1366
+   ],
+   "differing": [
+    10,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3116.643662796026,
+    3137.0532174946934
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 187,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 1,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1366
+   ],
+   "differing": [
+    12,
+    10
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1893.2804518798644,
+    1961.8543826841487
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    251,
+    237
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 251,
+     "partner": 239,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1362
+   ],
+   "differing": [
+    18,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1893.2804518798644,
+    1961.8543826841487
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    251,
+    237
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 251,
+     "partner": 239,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e10",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1362
+   ],
+   "differing": [
+    18,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1750.7753863623952,
+    1758.1230057978205
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e16",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1362
+   ],
+   "differing": [
+    18,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3029.620328876889,
+    3034.3079636464404
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e27",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1362
+   ],
+   "differing": [
+    18,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3116.643662796026,
+    3121.3312975655776
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e1",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1363
+   ],
+   "differing": [
+    17,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2238.229723342249,
+    2252.552731706534
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    215,
+    202
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 215,
+     "partner": 227,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 215,
+     "partner": 229,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1363
+   ],
+   "differing": [
+    17,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1893.2804518798644,
+    1961.8543826841492
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    251,
+    237
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811412
+    ]
+   },
+   "partners": [
+    {
+     "end": 251,
+     "partner": 239,
+     "gap": 5.684341886080802e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 5.684341886080802e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e10",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1363
+   ],
+   "differing": [
+    17,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1750.7753863623952,
+    1758.1230057978207
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e16",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1363
+   ],
+   "differing": [
+    17,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3029.620328876889,
+    3034.3079636464404
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e27",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    296,
+    296
+   ],
+   "linksCount": [
+    1368,
+    1363
+   ],
+   "differing": [
+    17,
+    12
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3116.643662796026,
+    3121.3312975655776
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    199,
+    212
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     355.26223198114116,
+     355.2622319811413
+    ]
+   },
+   "partners": [
+    {
+     "end": 199,
+     "partner": 185,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    5,
+    4
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3061.087318626441,
+    3042.782512551964
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    202,
+    214
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.25008973437457,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 202,
+     "partner": 188,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e7",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    5,
+    4
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1352.7235502576723,
+    1352.7235502576723
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    214,
+    202
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.25008973437457,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 202,
+     "partner": 188,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    6,
+    5
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3061.087318626441,
+    3092.3261316649846
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    236,
+    248
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 236,
+     "partner": 250,
+     "gap": 1.1368683772161603e-13,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.1368683772161603e-13,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e33",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    6,
+    5
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2405.3004665711906,
+    2426.554215403852
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    264,
+    276
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e6",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1428
+   ],
+   "differing": [
+    11,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3061.087318626441,
+    3061.050701046898
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    236,
+    248
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 236,
+     "partner": 250,
+     "gap": 1.1368683772161603e-13,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.1368683772161603e-13,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e7",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1428
+   ],
+   "differing": [
+    11,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1352.7235502576723,
+    1352.7235502576723
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    214,
+    202
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.25008973437457,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 202,
+     "partner": 188,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e33",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1428
+   ],
+   "differing": [
+    11,
+    8
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2405.3004665711906,
+    2426.554215403852
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    264,
+    276
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e14",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    17,
+    16
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3529.3964686668132,
+    3526.803940664796
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    189,
+    179
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343745,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 189,
+     "partner": 177,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e19",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    17,
+    16
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1882.7635600124408,
+    1934.7042026517547
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    214,
+    227
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 227,
+     "partner": 216,
+     "gap": 1.7053025658242404e-13,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.7053025658242404e-13,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e25",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1430
+   ],
+   "differing": [
+    17,
+    16
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    3137.246962813848,
+    3120.9443141674824
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    179,
+    189
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343745,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 189,
+     "partner": 177,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 4,
+   "edge": "e24",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1428
+   ],
+   "differing": [
+    10,
+    7
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1528.7366500121475,
+    1507.826481852557
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    264,
+    278
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343747
+    ]
+   },
+   "partners": [
+    {
+     "end": 264,
+     "partner": 250,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 264,
+     "partner": 252,
+     "gap": 0,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 0,
+   "cls": "tie"
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 4,
+   "edge": "e33",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    310,
+    310
+   ],
+   "linksCount": [
+    1431,
+    1428
+   ],
+   "differing": [
+    10,
+    7
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    2405.3004665711906,
+    2426.554215403852
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    252,
+    264
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     348.2500897343747,
+     348.2500897343748
+    ]
+   },
+   "partners": [
+    {
+     "end": 264,
+     "partner": 278,
+     "gap": 1.1368683772161603e-13,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.1368683772161603e-13,
+   "cls": "tie"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e7",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    672.4449347644545,
+    674.5017194664852
+   ],
+   "rawGap": 2.0567847020306544,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1212.529122739825,
+    1241.4271566369646
+   ],
+   "rawGap": 28.898033897139612,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e13",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    719.6587925026356,
+    710.0178661148577
+   ],
+   "rawGap": 9.640926387777881,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e7",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    672.4449347644545,
+    674.5017194664854
+   ],
+   "rawGap": 2.056784702030882,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1212.529122739825,
+    1241.4271566369646
+   ],
+   "rawGap": 28.898033897139612,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e13",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    719.6587925026356,
+    710.0178661148578
+   ],
+   "rawGap": 9.640926387777768,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    419.7059319318522,
+    434.32181785605167
+   ],
+   "rawGap": 14.61588592419946,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 4,
+   "edge": "e3",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    150,
+    150
+   ],
+   "linksCount": [
+    647,
+    647
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    419.7059319318522,
+    434.3218178560517
+   ],
+   "rawGap": 14.615885924199517,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "maze",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    165,
+    165
+   ],
+   "linksCount": [
+    707,
+    707
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1095.0597103587788,
+    1123.5718114185613
+   ],
+   "rawGap": 28.51210105978248,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e12",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    141,
+    141
+   ],
+   "linksCount": [
+    523,
+    523
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    5564.163915882743,
+    5517.259695041798
+   ],
+   "rawGap": 46.90422084094462,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e12",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    141,
+    141
+   ],
+   "linksCount": [
+    523,
+    522
+   ],
+   "differing": [
+    1,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    5564.163915882743,
+    5517.259695041798
+   ],
+   "onPath": false,
+   "holdsIt": "base",
+   "link": [
+    132,
+    136
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     558,
+     558
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    141,
+    141
+   ],
+   "linksCount": [
+    523,
+    523
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    5564.163915882743,
+    5517.259695041798
+   ],
+   "rawGap": 46.90422084094462,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "switchbox",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e5",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    221,
+    221
+   ],
+   "linksCount": [
+    1008,
+    1006
+   ],
+   "differing": [
+    3,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    425.1958852404487,
+    448.05823735457165
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    194,
+    200
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     119.56532845517988,
+     119.56532845517987
+    ]
+   },
+   "partners": [
+    {
+     "end": 200,
+     "partner": 206,
+     "gap": 1.4210854715202004e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.4210854715202004e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "switchbox",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e5",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    221,
+    221
+   ],
+   "linksCount": [
+    1008,
+    1004
+   ],
+   "differing": [
+    6,
+    2
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    425.1958852404487,
+    448.05823735457165
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    194,
+    200
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     119.56532845517988,
+     119.56532845517987
+    ]
+   },
+   "partners": [
+    {
+     "end": 200,
+     "partner": 206,
+     "gap": 1.4210854715202004e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 1.4210854715202004e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "escape",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e1",
+   "group": "graph",
+   "aligned": false,
+   "points": [
+    585,
+    583
+   ],
+   "linksCount": [
+    2689,
+    2622
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    468.53521846126495,
+    468.535218461265
+   ],
+   "firstPoint": 571,
+   "cls": "neither:points-differ"
+  },
+  {
+   "family": "escape",
+   "seed": 0,
+   "vector": 4,
+   "edge": "e1",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    585,
+    585
+   ],
+   "linksCount": [
+    2689,
+    2657
+   ],
+   "differing": [
+    66,
+    34
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    468.53521846126495,
+    468.53521846126495
+   ],
+   "onPath": true,
+   "holdsIt": "base",
+   "link": [
+    95,
+    135
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     36,
+     36
+    ]
+   },
+   "partners": [
+    {
+     "end": 95,
+     "partner": 99,
+     "gap": 2.842170943040401e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    },
+    {
+     "end": 135,
+     "partner": 139,
+     "gap": 2.842170943040401e-14,
+     "clear": [
+      true,
+      true
+     ],
+     "chord": [
+      0,
+      0
+     ]
+    }
+   ],
+   "bestGap": 2.842170943040401e-14,
+   "cls": "tie"
+  },
+  {
+   "family": "escape",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e15",
+   "group": "graph",
+   "aligned": false,
+   "points": [
+    585,
+    583
+   ],
+   "linksCount": [
+    2689,
+    2622
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    384.614677129125,
+    362.1377560283497
+   ],
+   "firstPoint": 571,
+   "cls": "neither:points-differ"
+  },
+  {
+   "family": "escape",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e11",
+   "group": "graph",
+   "aligned": false,
+   "points": [
+    585,
+    583
+   ],
+   "linksCount": [
+    2689,
+    2622
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    445.3366742303042,
+    445.28093035748884
+   ],
+   "firstPoint": 571,
+   "cls": "neither:points-differ"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e0",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1948.1010584200696,
+    1940.8870850648927
+   ],
+   "onPath": false,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e3",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    884.2730864937848,
+    868.4723119200994
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    56,
+    52
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e4",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    982.7127720587616,
+    966.9119974850762
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    732.1887392872052,
+    730.5648209625946
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e0",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1948.1010584200696,
+    1940.8870850648927
+   ],
+   "onPath": false,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e3",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    884.2730864937848,
+    868.4723119200996
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    56,
+    52
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e4",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    982.7127720587616,
+    966.9119974850763
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    732.1887392872052,
+    730.5648209625946
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468859,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    884.2730864937848,
+    868.4723119200994
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    56,
+    52
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468858,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e4",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    982.7127720587616,
+    966.9119974850761
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468858,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e12",
+   "group": "graph",
+   "aligned": true,
+   "points": [
+    166,
+    166
+   ],
+   "linksCount": [
+    731,
+    732
+   ],
+   "differing": [
+    0,
+    1
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    732.1887392872052,
+    730.5648209625946
+   ],
+   "onPath": true,
+   "holdsIt": "shifted",
+   "link": [
+    52,
+    56
+   ],
+   "sight": {
+    "holder": true,
+    "other": true,
+    "chordHolder": 0,
+    "chordOther": 0,
+    "d": [
+     88.76936408468858,
+     88.76936408468859
+    ]
+   },
+   "partners": [],
+   "bestGap": null,
+   "cls": "neither:no-partner"
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e0",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    196,
+    196
+   ],
+   "linksCount": [
+    854,
+    854
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    1088.1136598982744,
+    1116.6257609580566
+   ],
+   "rawGap": 28.512101059782253,
+   "cls": "neither:same-links-path-differs"
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e1",
+   "group": "search",
+   "aligned": true,
+   "points": [
+    196,
+    196
+   ],
+   "linksCount": [
+    854,
+    854
+   ],
+   "differing": [
+    0,
+    0
+   ],
+   "rawMoved": true,
+   "rawLength": [
+    316.4558075116863,
+    318.05358375686393
+   ],
+   "rawGap": 1.597776245177613,
+   "cls": "neither:same-links-path-differs"
+  }
+ ]
+}

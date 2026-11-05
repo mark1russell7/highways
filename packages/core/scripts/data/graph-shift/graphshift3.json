@@ -1,0 +1,1421 @@
+{
+ "counts": {
+  "graph neither:no-partner / plug:same": 13,
+  "search tie / plug:same": 2,
+  "graph tie / plug:same": 28,
+  "search neither:same-links-path-differs / plug:side": 14,
+  "search tie / plug:side": 1,
+  "graph neither:no-partner / plug:side": 3,
+  "graph neither:points-differ / plug:same": 3
+ },
+ "rows": [
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e164",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 1077.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "small-clustered",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e164",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.048140854583481e-12,
+    1.0658141036401503e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 1077.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e297",
+   "group": "search",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.983125437429408e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 245,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e297",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.4295203383502196e-12,
+    1.4320036511095764e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 245,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "dense-groups",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e297",
+   "group": "search",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0549645532598574e-12,
+    1.0658141036401503e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 245,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "thin-bars",
+   "seed": 1,
+   "vector": 1,
+   "edge": "e36",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    68.0661443009665,
+    72.06247289678593
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "thin-bars",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e36",
+   "group": "search",
+   "cls": "tie",
+   "plug": "plug:side",
+   "moved": [
+    68.06614430096741,
+    72.06247289678502
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e1",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.094947017729282e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 1398,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e11",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    9.094947017729282e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 535,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e16",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    9.094947017729282e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 436,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 0,
+   "edge": "e27",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    9.094947017729282e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 304.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 1,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.094947017729282e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 658,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.2862197421537486e-12,
+    1.368970808788651e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 658,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e10",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.446997209922967e-12,
+    1.2862197421537486e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 243.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e16",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.446997209922967e-12,
+    1.2862197421537486e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 436,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 2,
+   "edge": "e27",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.446997209922967e-12,
+    1.2862197421537486e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 304.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e1",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.016845989170083e-12,
+    1.048140854583481e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 1398,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.016845989170083e-12,
+    9.713407672867936e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 658,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e10",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.061922699379318e-12,
+    9.374856803373542e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 243.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e16",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.061922699379318e-12,
+    1.016845989170083e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 436,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e27",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.061922699379318e-12,
+    1.016845989170083e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 304.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    9.094947017729282e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 41.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e7",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.094947017729282e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 631.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.094947017729282e-13,
+    9.947598300641403e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 41.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e33",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    9.094947017729282e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 737.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e6",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.368970808788651e-12,
+    1.3478604275154994e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 41.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e7",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.2862197421537486e-12,
+    1.368970808788651e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 631.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e33",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.368970808788651e-12,
+    1.368970808788651e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 737.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e14",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.572041857978156e-13,
+    1.0937743243683745e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 189,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e19",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.048140854583481e-12,
+    1.016845989170083e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 276,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e25",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.0937743243683745e-12,
+    9.572041857978156e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 1015.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 4,
+   "edge": "e24",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.1368683772161603e-12,
+    1.2862197421537486e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 44.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "sparse-long",
+   "seed": 2,
+   "vector": 4,
+   "edge": "e33",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.1368683772161603e-12,
+    1.2862197421537486e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 737.5,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e7",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    10.000000000000597,
+    9.999999999999385
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    10.000000000000597,
+    9.999999999999385
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e13",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999385,
+    10.000000000000597
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e7",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    10.000000000001416,
+    9.999999999998568
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999778,
+    10.000000000000204
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e13",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999998568,
+    10.000000000001416
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999352,
+    10.000000000000636
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "vector": 4,
+   "edge": "e3",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    10,
+    9.99999999999999
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999352,
+    10.000000000000615
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 1,
+   "edge": "e12",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.604686356149895,
+    9.604686356148651
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e12",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:side",
+   "moved": [
+    9.604686356149095,
+    9.60468635614945
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "spiral",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e12",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.604686356150259,
+    9.604686356148278
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "switchbox",
+   "seed": 2,
+   "vector": 0,
+   "edge": "e5",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    9.947598300641403e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 120,
+   "port": [
+    "p",
+    "p"
+   ]
+  },
+  {
+   "family": "switchbox",
+   "seed": 2,
+   "vector": 2,
+   "edge": "e5",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.4270415488946573e-12,
+    1.4270415488946573e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 120,
+   "port": [
+    "p",
+    "p"
+   ]
+  },
+  {
+   "family": "escape",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e1",
+   "group": "graph",
+   "cls": "neither:points-differ",
+   "plug": "plug:same",
+   "moved": [
+    1.0698801261650437e-12,
+    1.0516032489249483e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 419,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "escape",
+   "seed": 0,
+   "vector": 4,
+   "edge": "e1",
+   "group": "graph",
+   "cls": "tie",
+   "plug": "plug:same",
+   "moved": [
+    1.1368683772161603e-12,
+    1.154145394607835e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 419,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "escape",
+   "seed": 1,
+   "vector": 3,
+   "edge": "e15",
+   "group": "graph",
+   "cls": "neither:points-differ",
+   "plug": "plug:same",
+   "moved": [
+    1.061922699379318e-12,
+    1.0698801261650437e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 275,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "escape",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e11",
+   "group": "graph",
+   "cls": "neither:points-differ",
+   "plug": "plug:same",
+   "moved": [
+    1.034565839472708e-12,
+    1.061922699379318e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 427,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e0",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999385,
+    10.000000000000597
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e3",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.0231815394945443e-12,
+    9.947598300641403e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 216,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e4",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    9.947598300641403e-13,
+    1.0231815394945443e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 1,
+   "edge": "e12",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    9.947598300641403e-13,
+    9.947598300641403e-13
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e0",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999998568,
+    10.000000000001416
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e3",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.446997209922967e-12,
+    1.4270415488946573e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 216,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e4",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.4270415488946573e-12,
+    1.446997209922967e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 2,
+   "edge": "e12",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.4270415488946573e-12,
+    1.4270415488946573e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e3",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.061922699379318e-12,
+    1.0658141036401503e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 216,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e4",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.0698801261650437e-12,
+    1.061922699379318e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 0,
+   "vector": 3,
+   "edge": "e12",
+   "group": "graph",
+   "cls": "neither:no-partner",
+   "plug": "plug:same",
+   "moved": [
+    1.0658141036401503e-12,
+    1.0698801261650437e-12
+   ],
+   "sides": [
+    false,
+    false
+   ],
+   "gap": 108,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e0",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    9.999999999999352,
+    10.000000000000615
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  },
+  {
+   "family": "walled-level",
+   "seed": 2,
+   "vector": 3,
+   "edge": "e1",
+   "group": "search",
+   "cls": "neither:same-links-path-differs",
+   "plug": "plug:side",
+   "moved": [
+    10.000000000000615,
+    9.999999999999352
+   ],
+   "sides": [
+    true,
+    true
+   ],
+   "gap": 0,
+   "port": [
+    null,
+    null
+   ]
+  }
+ ]
+}
