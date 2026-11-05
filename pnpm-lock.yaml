@@ -222,7 +222,7 @@ importers:
         specifier: github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/rigor-bench':
-        specifier: ^0.2.0
+        specifier: ^0.2.14
         version: 0.2.14
       '@types/node':
         specifier: ^26.6.4

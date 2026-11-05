@@ -38,6 +38,9 @@ export {
  */
 export const HIGHWAYS_FAMILIES: readonly HighwaysFamily[] = Object.freeze([TINY_UNIFORM, SMALL_CLUSTERED, DENSE_GROUPS, HUB_CHAIN, MANY_GROUPS, PACKED_GRID, ...COVERAGE_FAMILIES, ...WEEKLY_FAMILIES]);
 
+/** This list names the families whose edges carry the key `data.collection`. With no key, `shared` has 0 ways, and it is `corners` with other tie breaks. */
+export const KEYED_FAMILIES: readonly string[] = Object.freeze(["tiny-uniform", "small-clustered", "dense-groups"]);
+
 /** This function gives a new registry of `HIGHWAYS_FAMILIES`. */
 export function highwaysRegistry(): FamilyRegistry<HighwaysBoard> {
   return createFamilyRegistry(HIGHWAYS_FAMILIES);
