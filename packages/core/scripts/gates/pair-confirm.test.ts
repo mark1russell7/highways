@@ -27,10 +27,11 @@ describe("the timing of a pair", () => {
     expect(report.arms).toEqual([PARENT_ARM, COMMIT_ARM, aaId(PARENT_ARM)]);
     expect(report.env.cpu).toBe("Made-up CPU");
     // 3 rounds x 2 inputs x 3 arms, one child at a time. The A/A arm starts the command of the parent.
+    // The second round of the input `a` is the mirror of the first round. The arm `commit` stays in the middle.
     expect(calls).toHaveLength(18);
     expect(calls.every((c) => c.warmup === 0)).toBe(true);
     expect(calls.slice(0, 3).map((c) => c.command)).toEqual(["old", "new", "old"]);
-    expect(calls.slice(6, 9).map((c) => c.command)).toEqual(["new", "old", "old"]);
+    expect(calls.slice(6, 9).map((c) => c.command)).toEqual(["old", "new", "old"]);
     expect(report.inputs.map((i) => i.id)).toEqual(["a", "b"]);
     expect(report.inputs[0]!.ratio[COMMIT_ARM]).toBeCloseTo(3, 10);
     expect(report.inputs[1]!.median[PARENT_ARM]).toBe(50);
