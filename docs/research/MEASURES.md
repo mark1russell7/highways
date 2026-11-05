@@ -172,7 +172,7 @@ The function `paintedOutsidePairs` reads the two classes, and the record `route-
 
 Two limits apply to this check:
 
-- **It is not an identity.** Real functions can read outside it. The painted count joins two segments when their ends round to one key on a grid of 1/8, so a second route that nearly draws a segment takes the crossing out of `self`. The pair count reads the exact points, and it leaves that crossing out. A test in `src/bench/route-pairs.test.ts` builds this case on two made-up routes, and it reads 1 painted crossing outside the relation against 0 pairs. No row of the record reads this.
+- **It is not an identity.** Real functions can read outside it. The painted count joins two segments when their ends round to one key on a grid of 1/8. So a second route that nearly draws a segment takes the crossing out of `self`. The pair count reads the exact points, and it leaves that crossing out. A test in `src/bench/route-pairs.test.ts` builds this case on two made-up routes, and it reads 1 painted crossing outside the relation against 0 pairs. No row of the record reads this.
 - **It is a one-sided bound with room.** The room of a row is `pairs - (crossings - self - touch)`. The median room is 54 over the 375 rows, and the room is 0 on 43 rows. A fault that lowers the pair count by less than the room of a row reads no fault. So this check holds the classes, and it does not hold the size of either count.
 
 The pair count is under the painted count on 5 of the 375 rows:
