@@ -110,7 +110,7 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 | No value gives the angle of a crossing. | closed | `route.crossing-angle.mean` and `route.crossing-angle.min` (R2). |
 | No value gives the space between plugs. | closed | `route.plug-spacing.min` and `route.plug-spacing.q05` (R11). |
 | No value gives the shape of a curve. | closed | C1 to C4 and C8 of the suite read the joints, the energy and the deviation. C5 has no code, and the table below states this. |
-| No value gives the quality of a group. | open | 2026-11-11, AMBIGUITY-FLAT. `route.bundle.ambiguity` (B4) reads 0.987 to 0.992 on 10 pairs of one input. That item reads it on keyed inputs, and fixes or removes it. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
+| No value gives the quality of a group. | open | 2026-11-11, COLLECTION-KEY. AMBIGUITY-FLAT read `route.bundle.ambiguity` (B4) on keyed inputs: it keeps a range over routers, and it hides a large change at its top. `route.bundle.reach` (B4) joins it. Neither reads if a group has a meaning. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
 | No value compares two zoom levels. | closed | Z6 to Z9 read the nesting, the positions, the order and the agreement of the levels. |
 | No value compares two results of inputs with a small change. | open | 2026-11-14, ROUTE-TIE. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. No value reads a shift with no meaning, and ROUTE-TIE gives the floor of each route measure. |
 
@@ -364,6 +364,7 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B2 | Bundled share | Edges that share their ways | `count(e : e is in a run or a bundle) / m` | 0..1, `↑` in context | `linear` | score | yes, `B2.share` of the screen | [Holten 2006][holten06] |
 | B3 | Bundle stretch | Bundles that add little length | `st(e) = L(r_e) / L(r*_e)`, with `r*_e` the route of `corners`. Report `q_0.5` and `q_0.95`. | ratio, `↓` | `extra run` | score | yes, `B3.median` and `B3.q95` of the screen. MEAS2 adds `B3.max`, the largest stretch | [Pupyrev 2016][pupyrev16], [Wallinger 2022][wallinger22] |
 | B4 | Ambiguity | No false neighbours | `N(v)` is the set of nodes whose routes share a segment with a route of `v`. `amb = Σ_v count(w in N(v) : no edge v-w) / Σ_v count(N(v))` | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.ambiguity` of the suite, sampled above 1000 nodes | [Wallinger 2022][wallinger22], [Nguyen 2017][nguyen17] |
+| B4 | Reach of a false neighbour | No false neighbours | `reach = (Σ_v count(w in N(v) : no edge v-w) / count(v)) / n`, with `N(v)` as in the row above | 0..1, `↓` | `quadratic`, sampled | score | yes, `B4.reach` of the suite, sampled above 1000 nodes | this project |
 | B5 | Lane crossings | Lanes that keep their order | `lc = count of pairs (e, f) whose lane order flips from one shared segment to the next` | count, `↓` | `n log n` | score | yes, `B5.crossings` of the screen. ROOM-C counts the lanes of the far view | [Pupyrev 2016][pupyrev16] |
 | B6 | Merge angle | Smooth merges and splits | `ma = max angle of the turn of a lane where it joins or leaves a run` | degrees, `↓` | `linear` | score | yes, `B6.max` of the screen | [Gansner 2011][gansner11] (a limit of 40° on the turn) |
 | B7 | Occupied area | Less clutter | `moa = cells that S touches / cells that the straight lines touch`, with cells of side `u` | ratio, `↓` | `n log n` | score | yes, `B7.ratio` of the screen | [Saga 2016][saga16] |
@@ -371,6 +372,28 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
 | B10 | Gap closed | Ink saved near the optimum | `gc = (B1(s) - B1(b)) / (B1* - B1(b))`. `b` is the baseline, and `B1*` is the optimum at the smallest cap at or above the largest stretch of `s`. | share of the gap, `↑`. 0 is the baseline, and 1 is the optimum | an exact solve for each input, kept in a file | score | yes, `gap` of the screen on `exact-v1`, with `gap.cap` and the views `gap.collection` and `gap.all` | [Magnanti and Wong 1984][magnanti84] |
 | B11 | Route overlap | Routes that a reader can follow | `share`: length on a line with two routes or more, over all length. `peak`: the most routes on one piece of a line. | 0..1 and count, `↓` | `n log n` | score | yes, `B11.share` and `B11.peak` of the suite | [Holten 2006][holten06] |
+
+### The read of `route.bundle.ambiguity`
+
+The first report read `route.bundle.ambiguity` at 0.987 to 0.992 on 10 pairs of one input. That input has 1000 nodes, 4 edges for each node and two tight packs. The hypothesis was that the share stays near 1 at this size, whatever the router or the key. The record `packages/core/scripts/data/ambiguity-read/record.json` tests it on 9 boards, with the 3 values of the key on 2 of them.
+
+**The rule of the read did not fire.** The rule calls a board flat when the 5 real routers (`corners`, `trunks`, `shared`, `shared-all`, `sections`) have a range under 0.05 at 1000 nodes. No board has it. The hypothesis is a miss, and the measure stays.
+
+**The share does hide a change at its top.** The share is `false / (false + true)`. A node has few true neighbours, so each new false neighbour moves the share less. The row `route.bundle.reach` divides the false neighbours of a node by the count of the nodes, so it keeps its size.
+
+| Board, 1000 nodes | Share, 5 routers | Range | Share, `shared`, `shared-all`, `sections` | Reach, the same 3 routers |
+|---|---|---|---|---|
+| `mid-uniform` | 0.8133 to 0.9871 | 0.1739 | 0.9739, 0.9871, 0.9702 | 0.1490, 0.3064, 0.1301 |
+| `mid-hubs` | 0.8068 to 0.9848 | 0.1780 | 0.9692, 0.9848, 0.9643 | 0.1257, 0.2593, 0.1080 |
+| `mid-fanout` | 0.9140 to 0.9915 | 0.0774 | 0.9787, 0.9915, 0.9819 | 0.1837, 0.4655, 0.2168 |
+| `dense-hubs` | 0.8833 to 0.9863 | 0.1030 | 0.9798, 0.9863, 0.9755 | 0.3876, 0.5755, 0.3189 |
+| `dense-clustered` | 0.9345 to 0.9888 | 0.0543 | 0.9818, 0.9888, 0.9807 | 0.4327, 0.7054, 0.4055 |
+
+The key shows the same fault. On `mid-clustered`, `shared` with a random key reaches 0.2824 of the board, and `shared` with a cluster key reaches 0.1394. That is 2 times, and the share reads 0.9792 and 0.9587, a difference of 0.0205. With no key, `shared` reads 0.8801 and 0.0441. These are the values of `corners`, and that tie has a known cause.
+
+**A control wins both values.** `straight` shares no segment, so it reads 0 on the share and on the reach. Neither value calls a win alone. The partner of `straight` on both values is `route.through`. `one-trunk` reads the highest values on each board, with reach 0.6183 to 0.9152 at 1000 nodes.
+
+**Limits.** The record has no tight pack, so it does not repeat 0.987 to 0.992, and it does not say what those packs read. The 2 dense boards joined after the first read of the record, because they are nearer to that input. The key `cluster` is a grid over the corners of the boxes, by target. No value here is an estimate: the sample starts above 1000 nodes. Neither value reads if a group has a meaning.
 
 ### Notes on the bundles
 
