@@ -1,4 +1,4 @@
-// The summary of XPLAT-HASH: `node scripts/xplat-summary.ts --cells <dir> --expect <cell ids> [--near <dir>] [--targets <file>] [--out <md>] [--json <file>]`.
+// The summary of XPLAT-HASH: `node scripts/xplat-summary.ts --cells <dir> --expect <cell ids> --rows <n> [--near <dir>] [--targets <file>] [--out <md>] [--json <file>]`.
 // Each folder under `--cells` with a `meta.json` file is the output of `scripts/xplat.ts` on one cell of the matrix (a system and a node version).
 // The script compares each cell with the reference cell: linux with node 26, the cell of the joint bench of layout-contract.
 // - The table of the route hashes, with a letter for each group of cells that agree.
@@ -6,6 +6,9 @@
 // - With the call logs, the first chunk of 1000 Math calls that differs. With `--targets <file>`, the script writes only those chunks, for `XPLAT_NEAR`.
 // - With `--near <dir>` (the outputs of `XPLAT_NEAR`), the first call that differs: the function, the arguments, the two results and the frames in `src/`.
 // `--expect` names the cells of the matrix, for example `linux-node26,win32-node26`. The script fails when a cell is missing, or when a cell lacks a route of the reference cell (FAIL-CLOSED).
+// `--rows` states the rows of each cell in this run. A cell with another count fails with its own text.
+// This check is necessary because 4 cells that are short alike agree on the rows that they hold.
+// The script exits 1 when a route differs between cells, or when the repeats of a cell differ. It writes its files first, so a red run keeps its record.
 // The script needs only node. It imports no package, only the check of the inputs in `scripts/gates/inputs.ts`.
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -317,6 +320,28 @@ function firstCall(key: string, refDir: string, cell: string, cellDir: string): 
   return undefined;
 }
 
+/** This function gives a line for each cell that does not hold the stated count of rows. */
+function shortCells(cells: readonly Cell[], rows: number): string[] {
+  return cells.filter((c) => c.rows.size !== rows).map((c) => `${c.id} holds ${c.rows.size} rows of the stated ${rows}.`);
+}
+
+/** This function gives a line for each route that fails the gate: a hash or an exact result that differs from the reference cell, or repeats of a cell that differ. */
+function routeFaults(cells: readonly Cell[], ref: Cell, keys: readonly string[]): string[] {
+  const faults: string[] = [];
+  for (const key of keys) {
+    const q = ref.rows.get(key);
+    for (const cell of cells) {
+      const r = cell.rows.get(key);
+      if (r === undefined || q === undefined) continue;
+      if (r.hash !== r.again || (r.traced !== null && r.traced !== r.hash)) faults.push(`${key} on ${cell.id}: the repeats differ.`);
+      if (cell === ref) continue;
+      if (r.hash !== q.hash) faults.push(`${key} on ${cell.id}: the route hash differs from ${ref.id}.`);
+      else if (r.exact !== q.exact) faults.push(`${key} on ${cell.id}: the exact result differs from ${ref.id}.`);
+    }
+  }
+  return faults;
+}
+
 /** This function gives a letter for each value: the same letter for the same value, and "-" for a missing value. */
 function letters(values: readonly (string | undefined)[]): string {
   const seen = new Map<string, string>();
@@ -350,13 +375,25 @@ function main(): void {
     console.error("xplat-summary: --expect <cell ids> names the cells of the matrix.");
     process.exit(2);
   }
+  const targetsFile = opt("--targets");
+  const stated = opt("--rows");
+  const rows = Number(stated);
+  if (targetsFile === undefined && (stated === undefined || !Number.isInteger(rows) || rows <= 0)) {
+    console.error("xplat-summary: --rows <n> states the rows of each cell in this run.");
+    process.exit(2);
+  }
   requireInputs("xplat cells", parseList(expected), cells.map((c) => c.id));
+  const short = targetsFile === undefined ? shortCells(cells, rows) : [];
+  if (short.length > 0) {
+    console.error(`::error::xplat-summary: ${short.length} cells do not hold the stated rows.`);
+    for (const line of short) console.error(`  ${line}`);
+    process.exit(2);
+  }
   const ref = cells.find((c) => c.id === "linux-node26") ?? cells[0]!;
   for (const c of cells) requireInputs(`xplat routes of the cell ${c.id}`, [...ref.rows.keys()], [...c.rows.keys()]);
   const keys = [...new Set(cells.flatMap((c) => [...c.rows.keys()]))].sort();
 
   // The targets of the near pass: for each input and router, the first chunk of each cell that differs from the reference.
-  const targetsFile = opt("--targets");
   if (targetsFile !== undefined) {
     const targets: Record<string, number[]> = {};
     for (const key of keys)
@@ -374,7 +411,7 @@ function main(): void {
 
   const md: string[] = [];
   md.push("# XPLAT-HASH: the routes on each cell", "");
-  md.push(`The reference cell is \`${ref.id}\`. Each other cell is compared with it.`, "");
+  md.push(`The reference cell is \`${ref.id}\`. Each other cell is compared with it. Each cell holds the ${rows} rows that this run states.`, "");
   md.push("| cell | system | node | V8 | highways |", "|---|---|---|---|---|");
   for (const c of cells) md.push(`| ${c.id} | ${c.meta.os} ${c.meta.arch} | ${c.meta.node} | ${c.meta.v8} | ${c.meta.highways} |`);
   md.push("");
@@ -569,6 +606,14 @@ function main(): void {
     const cellsOut = cells.map((c) => ({ id: c.id, meta: c.meta, rows: [...c.rows.values()] }));
     writeFileSync(jsonFile, JSON.stringify({ ref: ref.id, cells: cellsOut, groups: groupsOf, repeatAll, routeDiffs, chunkDiffs, callDiffs, probes }, null, 2) + "\n");
   }
+
+  // The verdict comes after the files, so a red run keeps its record.
+  const faults = routeFaults(cells, ref, keys);
+  if (faults.length > 0) {
+    console.error(`xplat-summary: ${faults.length} routes fail the gate.`);
+    for (const fault of faults) console.error(`  ${fault}`);
+    process.exitCode = 1;
+  } else console.log(`xplat-summary: ${rows} rows on ${cells.length} cells agree.`);
 }
 
 main();
