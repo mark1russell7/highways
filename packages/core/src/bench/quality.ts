@@ -45,15 +45,36 @@ const SAMPLE = 2_000;
 
 const key = (p: Point): string => `${Math.round(p.x * 8)},${Math.round(p.y * 8)}`;
 
+/** This function gives the painted segments, one for each distinct pair of ends, and the numbers of the routes that draw each one. */
+function paintedSegments(routes: readonly { readonly points: readonly Point[] }[]): { readonly segs: [Point, Point][]; readonly owners: number[][] } {
+  const segs: [Point, Point][] = [];
+  const owners: number[][] = [];
+  const seen = new Map<string, number>();
+  routes.forEach((route, n) => {
+    const p = route.points;
+    for (let i = 1; i < p.length; i++) {
+      const ka = key(p[i - 1]!);
+      const kb = key(p[i]!);
+      if (ka === kb) continue;
+      const k = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+      const at = seen.get(k);
+      if (at === undefined) {
+        seen.set(k, segs.length);
+        segs.push([p[i - 1]!, p[i]!]);
+        owners.push([n]);
+      } else if (owners[at]![owners[at]!.length - 1] !== n) owners[at]!.push(n);
+    }
+  });
+  return { segs, owners };
+}
+
 /** This function measures the quality of a result. */
 export function measureQuality(graph: Graph, result: Result): Quality {
   const byId = nodeIndex(graph);
   const nodes = new Grid<Node>(180);
   for (const n of graph.nodes) nodes.add(n, n.box);
 
-  // The drawn segments: one for each distinct pair of ends.
-  const segs: [Point, Point][] = [];
-  const seen = new Set<string>();
+  const { segs } = paintedSegments(result.routes);
   let bends = 0;
   let infl = 0;
   let clear = 0;
@@ -64,15 +85,6 @@ export function measureQuality(graph: Graph, result: Result): Quality {
   let angleN = 0;
   for (const r of result.routes) {
     const p = r.points;
-    for (let i = 1; i < p.length; i++) {
-      const ka = key(p[i - 1]!);
-      const kb = key(p[i]!);
-      if (ka === kb) continue;
-      const k = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      segs.push([p[i - 1]!, p[i]!]);
-    }
     bends += bendCount(p);
     infl += inflectionCount(p);
     const ends = endNodes(graph, byId, r.edge);
@@ -475,4 +487,51 @@ export function routePairCrossings(routes: readonly { readonly points: readonly 
   const proper = properPairCrossings(paths);
   const contact = contactPairCrossings(paths);
   return { pairs: proper + contact.total, proper, contact: contact.total, estimated: contact.estimated };
+}
+
+/**
+ * The painted crossings that the pair count can leave out (R1-PAIRS-RELATION).
+ * The relation is `crossings - self - touch <= pairs`, for the routes of one result with no sample.
+ */
+export interface PaintedOutsidePairs {
+  /** The painted crossings, with no sample. Up to 20 000 segments, this value equals `crossings` of `measureQuality`. */
+  readonly crossings: number;
+  /** The crossings of two segments that one route alone draws. The pair count leaves out a route that crosses itself. */
+  readonly self: number;
+  /** The other crossings that are not strict on the grid `EPS`: the segments touch, or an end of one lies on the other. */
+  readonly touch: number;
+}
+
+/** This function tells if the vertex `w` lies on the open segment from `u` to `v`, by the rule of `splitAtVertices`. All values are grid steps. */
+function onGridSegment(wx: number, wy: number, ux: number, uy: number, vx: number, vy: number): boolean {
+  const [dx, dy] = [vx - ux, vy - uy];
+  const [ex, ey] = [wx - ux, wy - uy];
+  const along = ex * dx + ey * dy;
+  const square = dx * dx + dy * dy;
+  return along > 0 && along < square && Math.abs(dx * ey - dy * ex) <= PAIR_ON_SEGMENT * Math.sqrt(square);
+}
+
+/** This function tells if two segments cross strictly on the grid `EPS`, with no end of one on the other. */
+function crossesOnGrid(s: readonly [Point, Point], t: readonly [Point, Point]): boolean {
+  const [ax, ay, bx, by, cx, cy, dx, dy] = [s[0].x, s[0].y, s[1].x, s[1].y, t[0].x, t[0].y, t[1].x, t[1].y].map((v) => Math.round(v * PAIR_SNAP)) as [number, number, number, number, number, number, number, number];
+  if (classifySegments(ax, ay, bx, by, cx, cy, dx, dy).relation !== "cross") return false;
+  return !onGridSegment(cx, cy, ax, ay, bx, by) && !onGridSegment(dx, dy, ax, ay, bx, by) && !onGridSegment(ax, ay, cx, cy, dx, dy) && !onGridSegment(bx, by, cx, cy, dx, dy);
+}
+
+/** This function reads each painted crossing and gives the two classes that the pair count can leave out. */
+export function paintedOutsidePairs(routes: readonly { readonly points: readonly Point[] }[]): PaintedOutsidePairs {
+  const { segs, owners } = paintedSegments(routes);
+  if (segs.length < 2) return { crossings: 0, self: 0, touch: 0 };
+  const grid = new Grid<number>(Math.max(20, segs.reduce((sum, [a, b]) => sum + dist(a, b), 0) / segs.length));
+  segs.forEach(([a, b], i) => grid.addSegment(i, a, b));
+  let [crossings, self, touch] = [0, 0, 0];
+  segs.forEach((s, i) => {
+    grid.querySegment(s[0], s[1], 0, (j) => {
+      if (j <= i || !segmentsCross(s[0], s[1], segs[j]![0], segs[j]![1])) return;
+      crossings++;
+      if (owners[i]!.length === 1 && owners[j]!.length === 1 && owners[i]![0] === owners[j]![0]) self++;
+      else if (!crossesOnGrid(s, segs[j]!)) touch++;
+    });
+  });
+  return { crossings, self, touch };
 }
