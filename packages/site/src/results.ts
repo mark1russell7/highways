@@ -1,6 +1,6 @@
 // The results page (SITE-LIVE). The build gives all its data from the committed files, so the page reads no network.
 import data from "virtual:results";
-import { ageText, LABELS, recordAge, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
+import { ageText, LABELS, readCore, recordAge, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
 import { cardId } from "./strategies-data.ts";
 import "./style.css";
 
@@ -17,11 +17,17 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const count = (n: number): string => n.toLocaleString("en-US");
 const percent = (value: number): string => `${Number((value * 100).toFixed(2))} %`;
 
-/** This function gives the age and the core of a verdict snapshot as HTML. An older core has a mark, so the color is not the only sign. */
+/** This function gives the age and the cores of a verdict snapshot as HTML. A snapshot with no read on the core of the site has a mark. So the color is not the only sign. */
+function readText(t: VerdictTable): string {
+  const v = t.verified;
+  const verified = v === undefined ? "" : ` Verified on core <code>${esc(v.core)}</code> by run <a href="${REPO}/actions/runs/${v.run}">${v.run}</a> on ${esc(v.date)}: the same rows.`;
+  return readCore(t) === data.core ? verified : `${verified} Not read on core <code>${esc(data.core)}</code>, the core of this site.`;
+}
+
+/** This function gives the age and the cores of a verdict snapshot as HTML. A snapshot not read on the core of the site has a mark, so the color is not the only sign. */
 function ageHtml(t: VerdictTable): string {
-  const age = recordAge(t.date, t.core, data.core, TODAY);
-  const core = age.sameCore ? `the core of this site, <code>${esc(t.core)}</code>` : `core <code>${esc(t.core)}</code>, and this site builds on <code>${esc(data.core)}</code>`;
-  return `${age.sameCore ? "" : '<b aria-hidden="true">⚠</b> '}From run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)}, ${ageText(age.days)}, on ${core}.`;
+  const age = recordAge(t.date, readCore(t), data.core, TODAY);
+  return `${age.sameCore ? "" : '<b aria-hidden="true">⚠</b> '}From run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)}, ${ageText(age.days)}, measured on core <code>${esc(t.core)}</code>.${readText(t)}`;
 }
 
 /** The mark of each label. The page does not show a label by its color only. */
@@ -269,7 +275,8 @@ function snapshots(): void {
   $("snapshots").innerHTML = `Snapshots: ${data.tables
     .map((t) => {
       const age = recordAge(t.date, t.core, data.core, TODAY);
-      return `<code>${esc(t.set)}</code> <code>${esc(t.step)}</code> from the run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)} (${ageText(age.days)}, core <code>${esc(t.core)}</code>)`;
+      const read = t.verified === undefined ? "" : `, verified on <code>${esc(t.verified.core)}</code> by run <a href="${REPO}/actions/runs/${t.verified.run}">${t.verified.run}</a>`;
+      return `<code>${esc(t.set)}</code> <code>${esc(t.step)}</code> from the run <a href="${REPO}/actions/runs/${t.run}">${t.run}</a> on ${esc(t.date)} (${ageText(age.days)}, measured on <code>${esc(t.core)}</code>${read})`;
     })
     .join(", ")}. This site builds on core <code>${esc(data.core)}</code>.`;
 }
