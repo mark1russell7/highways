@@ -29,7 +29,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: xplat-${{ github.ref }}
+  # Each set of inputs has its own group, so the dispatches of a flip do not cancel each other.
+  group: xplat-${{ github.ref }}-${{ inputs.all }}-${{ inputs.run }}-${{ inputs.fault }}
   cancel-in-progress: true
 
 defaults:
