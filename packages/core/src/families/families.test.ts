@@ -102,7 +102,8 @@ describe("the corpus families of highways (CORPUS-GEN)", () => {
         const board = reg.generate(f.name, 4, dims);
         expectRouted(board.graph, `${f.name} ${JSON.stringify(dims)}`);
       }
-  });
+    // This test checks routes, not speed. It took 2.8 s to 4.9 s on the runners, so the default limit of 5 s failed under load.
+  }, 60_000);
 
   it("gives levels for each numeric dimension, so a host can sweep it", () => {
     for (const f of HIGHWAYS_FAMILIES) for (const d of f.dimensions) expect(levelsOf(d, 3).length, `${f.name}.${d.name}`).toBeGreaterThan(0);
