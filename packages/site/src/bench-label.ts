@@ -5,6 +5,8 @@ export interface BenchMeta {
   readonly run?: number;
   readonly sha?: string;
   readonly date?: string;
+  /** The time of the run in UTC, for the data stamp of the site. The label does not read it. */
+  readonly time?: string;
   /** The version of the engine at the commit of the snapshot. */
   readonly core?: string;
 }
