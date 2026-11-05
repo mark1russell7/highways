@@ -1150,7 +1150,7 @@ A cell gives the label and the breadth: the families against, of 6, and the ties
 | 3. HWY-044 takes 2 times or more the warm median time of `shared` on the router screen of `screen-v1`. | 0.5 | Met: 2.63 times. |
 | 4. HWY-036 has a median B1 ratio over `shared` of 1.05 or more on `screen-v2`. | 0.35 | Met: 2.108. |
 | 5. HWY-057 and HWY-058 add 0 new hard-rule breaks on both sets. | medium | Met: 0 on each input of both sets. |
-| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass, and `xplat` passes at `a32522f`. The router screen of `Scale` gives 126 of 126 equal records against `main`. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass at `a32522f`. The job `xplat` does not fail on a route that differs, so it adds nothing here. The router screen of `Scale` gives 126 of 126 equal records against `main`. |
 
 ### The queue after wave 3G
 
@@ -1255,7 +1255,7 @@ The ratios are the paired ratios of the candidate over the baseline on `screen-v
 | 3. WILD-045 gets `better` on R1 or B1 on `screen-v2` with 0 families against. | 0.35 | Met: R1 and B1 are `better` with 0 of 6 against. |
 | 4. NAT-016 changes Z3 by more than the tie on `screen-v2`. | 0.45 | Met: Z3 length is `worse`, with a median ratio of 1.053. The change is a loss. |
 | 5. The 6 strategies add 0 new hard-rule breaks on both sets. | medium | Partly met: `venation` added 61 `link-ends` breaks before the fix of `577bb94`. After the fix, each strategy adds 0. |
-| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #168. |
+| 6. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass on #168. The job `xplat` does not fail on a route that differs, so it adds nothing here. |
 
 ### The queue after wave 4A
 
@@ -1360,7 +1360,7 @@ The ratios are the paired ratios of the candidate over the baseline on `screen-v
 | 2. At least 1 idea gets `better` on one of its named wins on `screen-v3` with 12 or more of 15 families for it. | 0.35 | Met: `manifolds` gets B1 with 14 of 15 families for it, and R14 with 13 of 15. |
 | 3. EDA-041 changes the plugs on at least half of the inputs of `screen-v2` and adds 0 hard-rule breaks. | 0.5 | Met: 60 of 60 inputs, and 0 breaks. |
 | 4. The 6 strategies add 0 new hard-rule breaks on all sets. | medium | Met: 0 on `screen-v1`, `screen-v2` and `screen-v3`. |
-| 5. The defaults do not change. The release is a PATCH. | high | Met: the digest tests and `xplat` pass on #176. |
+| 5. The defaults do not change. The release is a PATCH. | high | Met: the digest tests pass on #176. The job `xplat` does not fail on a route that differs, so it adds nothing here. |
 
 ### The queue after wave 4B
 
