@@ -183,7 +183,8 @@ Above 20,000 segments, `route.crossings` reads a sample of 2,000 segments and gi
 - **The page marks an estimate.** The benchmark table and the playground show `≈` on the value. The percent against straight lines on the playground says `near` when either side is an estimate.
 - **The verdicts read no estimate, by size.** The largest board of `screen-v1`, `screen-v2` and `screen-v3` has 300 edges, so a route needs a mean of 66.7 segments to reach the limit. The largest size on the router and highway records of `screen-v3` is 4,753 and 7,233 segments, by `edges × (route.bends + 1)`.
 - **The limit of that read.** The records of `screen-v3` hold no `route.crossings.estimated`, and the read leaves out the sets `screen-v1` and `screen-v2` and the steps `levels`, `plugs` and `whole`. The next Screen records the field, and it confirms or corrects this line.
-- **Choosers can read an estimate.** `portfolio`, `crops`, `fireflies`, `adam` and `search` choose by `measureQuality`. Above the limit they compare estimates. The item CROSSINGS-LIMIT reads this with the time of a full count.
+- **Choosers can read an estimate.** `portfolio`, `crops`, `fireflies`, `adam` and `search` choose by `measureQuality`. Above the limit they choose on estimates. The item CHOOSER-OBJECTIVE holds this.
+- **No win across the two methods.** Until CROSSINGS-LIMIT lands, no text calls a win on a row that compares an estimate with a full count, and `≈` stays on each estimate.
 
 ### The exact forms of MEAS3A
 
