@@ -177,6 +177,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | LANE-ROOM | Each run and trunk has its free room on each side as data, and the lanes of each side compress to fit it, in order and on their side, down to a distance of 1. On the three example boards, the lanes with a contact go from 26 to 0. Over 25 families on `sections`, deep lanes go from 522 to 5, and all flagged lanes from 684 to 70. Each lane that the lanes bring to a box has the mark `outOfRoom`. The closed routes do not change. | 2026-11-04 | [PR #318](https://github.com/mark1russell7/highways/pull/318) |
 | KPI-TRUE | The demo lists each strategy except the 2 that a ruling keeps off the page, and a test holds that count. The file `kpi.json` reads the page coverage, the coverage record and the oldest verdict, so a current benchmark snapshot does not hide an old verdict. | 2026-11-04 | [#323](https://github.com/mark1russell7/highways/pull/323) |
 | ROUTE-PAIRS | The measure `route.crossings.pairs` counts the pairs of routes that cross, at a shared vertex and on a shared stretch too. `route.crossings` stays beside it. On 75 boards, `shared-all` reads 0.417 of `corners` on `route.crossings` and 1.033 on pairs. `docs/research/MEASURES.md` names each verdict and page line that rests on `route.crossings`. | 2026-11-05 | [#328](https://github.com/mark1russell7/highways/pull/328) |
+| ROUTE-ADVERSARY | Two controls that no chooser offers: `one-trunk` puts all routes on one trunk, and `perimeter` goes out to a ring around the boxes. Each measure that a control wins names a partner that the control loses, and a test holds this. `straight` wins `route.crossings.pairs`, and no control buys `route.through`. | 2026-11-05 | PRNUM |
 
 ## Calibration
 
@@ -216,7 +217,6 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| ROUTE-ADVERSARY | Two control routers: `one-trunk` puts all routes on one trunk, and `perimeter` goes out to the bounding frame, along it and back in. Each has its folder, its tests and a bench row. Each goes through each measure of the screen. A measure that a control wins cannot call a win alone, and it names a partner measure that the control loses. Due 2026-11-08. | `next` | | P1 |
 | CROSSINGS-SAMPLE | Above 20,000 segments, `route.crossings` reads a sample, so a ratio can compare an estimate with a full count. The record marks this as `route.crossings.estimated`. This item says which verdicts the sample reaches. Due 2026-11-08. | `next` | ROUTE-PAIRS | P1 |
 | AMBIGUITY-FLAT | `route.bundle.ambiguity` reads 0.987 to 0.992 on 10 pairs of one input. This item reads it on keyed inputs. If it stays flat, the item fixes or removes it. Due 2026-11-11. | `next` | | P1 |
 | TRUE-SHAPE-MEASURE | `route.through` reads a box. A route that touches a corner of the box of a circle, and not the circle, is not `through`. The measure calls the circle rule of `layout-contract` after the box test, and it stays byte-equal on rectangles. Due 2026-11-13. | `blocked` | the circle rule of `layout-contract` | P1 |
