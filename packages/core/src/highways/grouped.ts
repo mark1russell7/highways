@@ -58,6 +58,15 @@ export function weberPoint(points: readonly Point[], iterations = 32): Point {
   return p;
 }
 
+/** This function gives the terminal of a bundle end: the Weber point of `points`. A terminal in a box moves to the nearest of those points. */
+export function bundleTerminal(finder: WayFinder, points: readonly Point[]): Point {
+  const p = weberPoint(points);
+  if (!finder.obstacles.inside(p, finder.margin / 2)) return p;
+  let best = points[0]!;
+  for (const q of points) if (dist(q, p) < dist(best, p)) best = q;
+  return best;
+}
+
 /**
  * This function gives the highways of the groups of edges. Only the edges in `groups` ride a highway, and each group needs `minSize` edges.
  * The spine `shared` gives the shared stretches of the router `shared` with the group as the key.
@@ -87,20 +96,12 @@ export function groupedPlan(input: HighwayInput, groups: ReadonlyMap<string, Edg
     if (list) list.push(item);
     else byKey.set(g.key, [item]);
   }
-  const pad = finder.margin / 2;
-  const terminal = (points: readonly Point[]): Point => {
-    const p = weberPoint(points);
-    if (!finder.obstacles.inside(p, pad)) return p;
-    let best = points[0]!;
-    for (const q of points) if (dist(q, p) < dist(best, p)) best = q;
-    return best;
-  };
   const highways: Highway[] = [];
   const legMax = o.legMax ?? Infinity;
   for (const [key, list] of byKey) {
     if (list.length < min) continue;
-    const ta = terminal(list.map((x) => x.a));
-    const tb = terminal(list.map((x) => x.b));
+    const ta = bundleTerminal(finder, list.map((x) => x.a));
+    const tb = bundleTerminal(finder, list.map((x) => x.b));
     const span = dist(ta, tb);
     if (span <= finder.margin) continue;
     const riders = list.filter((x) => dist(x.a, ta) <= legMax * span && dist(x.b, tb) <= legMax * span);

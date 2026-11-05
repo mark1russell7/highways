@@ -1,7 +1,7 @@
 import { sharedWaysAll } from "../bench/screen/gap.ts";
 import { sharedStretchStrategy } from "../lane-orders/stretch/router.ts";
 import { portfolioStrategy } from "../portfolio/router.ts";
-import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../routers/index.ts";
+import { adamStrategy, angleCrossStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../routers/index.ts";
 import { oneTrunkStrategy } from "../routers/one-trunk/index.ts";
 import { perimeterStrategy } from "../routers/perimeter/index.ts";
 import { seamsStrategy } from "../routers/seams/index.ts";
@@ -33,7 +33,7 @@ export const ALL_STRATEGIES: Registry = register(STRATEGIES, ...OPT_IN_STRATEGIE
 export const BASELINE_STRATEGIES: readonly AnyStrategy[] = [sharedWaysAll, oneTrunkStrategy, perimeterStrategy];
 
 /** The opt-in strategies with no recorded numbers. Each one moves to `OPT_IN_STRATEGIES`, with its note on the compare page, after its screen. */
-export const UNSCREENED_STRATEGIES: readonly AnyStrategy[] = [seamsStrategy];
+export const UNSCREENED_STRATEGIES: readonly AnyStrategy[] = [angleCrossStrategy, seamsStrategy];
 
 /** The registry of each strategy that has a key: `ALL_STRATEGIES`, `BASELINE_STRATEGIES` and `UNSCREENED_STRATEGIES`. A test holds that no strategy of the source is outside it. */
 export const KEYED_STRATEGIES: Registry = register(ALL_STRATEGIES, ...BASELINE_STRATEGIES, ...UNSCREENED_STRATEGIES);

@@ -103,6 +103,8 @@ export interface SharedSearch {
   readonly graph: Graph;
   /** The number of corners of the corner graph. */
   readonly corners: number;
+  /** The point of each corner of the corner graph, by its index. The router `shared` gives it. */
+  readonly points?: readonly Point[];
   /** This function gives the key of the link between the indices `i` and `j`, for each order of the two. */
   link(i: number, j: number): number;
   /**
@@ -110,6 +112,8 @@ export interface SharedSearch {
    * The function `cost` can change the cost of the link from corner `i` to corner `j`, of length `d`. It must give at least `floor` × `d`.
    */
   find(w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number): { seq: Point[]; ids: number[] } | undefined;
+  /** This function does the search of `find`, and it does not stop at a clear straight line. The router `shared` gives it. */
+  readonly through?: (w: Way, cost?: (i: number, j: number, d: number) => number, floor?: number) => { seq: Point[]; ids: number[] } | undefined;
   /** This function gives the free space across the link from corner `i` to corner `j` (`channelWidth`). The router keeps each width that it finds. */
   width(i: number, j: number): number;
 }
@@ -134,6 +138,8 @@ export interface Way {
   /** The index of each point of `seq` in the corner graph. The two ends get an index after the corners, one for each place. */
   ids: number[];
   found: boolean;
+  /** The hook `refine` sets this value when the way keeps its corners. The router `shared` itself does not set it. */
+  held?: boolean;
 }
 
 interface Run {
@@ -211,9 +217,14 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       const search: SharedSearch = {
         graph,
         corners: corners.points.length,
+        points: corners.points,
         link,
         find: (w, cost, floor = 1) => {
           const way = corners.path(ways.out(w.ps), ways.out(w.pt), cost, floor);
+          return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
+        },
+        through: (w, cost, floor = 1) => {
+          const way = corners.pathThrough(ways.out(w.ps), ways.out(w.pt), cost, floor);
           return way && { seq: way, ids: way.map((p, i) => (i === 0 || i === way.length - 1 ? endId(p) : index.get(p)!)) };
         },
         width: (i, j) => widthOf(i, j),
@@ -398,6 +409,8 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
       for (const w of all) {
         if (!w.found) continue;
         const own = sigs.get(w.key)!;
+        // A way that a hook moved keeps its corners. A pull gives the straight line back.
+        const pull = (raw: readonly Point[]): Point[] => (w.held ? [...raw] : corners.pull(raw));
         const sig = (i: number): number => own.get(pairOf(w.ids[i]!, w.ids[i + 1]!))!;
         const out: Point[] = [w.ps.point];
         const append = (piece: readonly Point[]): void => {
@@ -408,14 +421,14 @@ export function sharedRouter(options: SharedOptions, negotiation?: SharedNegotia
           const s = sig(i);
           if (i + 1 < w.seq.length - 1 && sig(i + 1) === s) continue;
           const raw = w.seq.slice(start, i + 2);
-          if (s === 0) append(corners.pull(raw));
+          if (s === 0) append(pull(raw));
           else {
             const a = w.ids[start]!;
             const b = w.ids[i + 1]!;
             const id = `${s}\u0002${Math.min(a, b)}\u0002${Math.max(a, b)}`;
             let run = runs.get(id);
             if (!run) {
-              run = { key: w.key, first: Math.min(a, b), last: Math.max(a, b), points: corners.pull(a < b ? raw : [...raw].reverse()), ways: [] };
+              run = { key: w.key, first: Math.min(a, b), last: Math.max(a, b), points: pull(a < b ? raw : [...raw].reverse()), ways: [] };
               runs.set(id, run);
             }
             run.ways.push(w);

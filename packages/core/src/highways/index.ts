@@ -112,4 +112,7 @@ export { SCALE_SPACE_DEFAULTS, scaleClusters, scaleSpaceGroups, scaleSpacePlan, 
 export * from "./gates/index.ts";
 export { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "./two-way/index.ts";
 export { addPairs, disagreement, GLOBAL_KEYS, GLOBAL_ORDER_DEFAULTS, globalOrderPlan, hilbertRank, keyOrder, pseudoAngle, SIFT_CAP, sift, type GlobalKey, type GlobalOrderOptions, type PairWeights } from "./global-order/index.ts";
-export { APPROVAL_DEFAULTS, APPROVAL_PICKS, approvalPlan, approvedLinks, distancesFrom, pickLinks, type ApprovalOptions, type ApprovalPick } from "./approval/index.ts";
+export { APPROVAL_DEFAULTS, APPROVAL_PICKS, approvalPlan, approvedLinks, discountedCorridorPlan, distancesFrom, pickLinks, type ApprovalOptions, type ApprovalPick } from "./approval/index.ts";
+export { CURRENT_CORRIDOR_DEFAULTS, corridorLinks, currentCorridorPlan, linkCurrents, type CurrentCorridorOptions } from "./current-corridors/index.ts";
+export { axisGraph, axisPoints, burn, clearanceAt, GRASSFIRE_DEFAULTS, grassfirePlan, type Fire, type GrassfireOptions } from "./grassfire/index.ts";
+export { fairMerge, SAVINGS_DEFAULTS, SAVINGS_SHARES, savingsBundles, savingsPlan, type SavingsOptions, type SavingsRider, type SavingsShare } from "./savings/index.ts";

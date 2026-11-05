@@ -225,6 +225,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| BUILD-W6 | Wave 6: `savings` (WILD-033), `current-corridors` (NAT-037) and `grassfire` (NAT-034) of the step `highway`, `termites` (NAT-010) of the step `group`, the opt-in router `angle-cross` (WILD-025), and `layers` (RULE-017) of the step `whole`. RULE-043 is not built: it needs the exact program of RULE-013, and that program does not exist. RULE-017 takes its place. The next step is the 12 screens. | `active` | The screens | P1 |
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
 | THROUGH-FLOOR | Five real routers read 292 on `route.through`, and `seams` reads 0, so the 292 is no floor of the board. This item reads them, and the 4 more of `sections-site`. Due 2026-11-14. | `active` | | P1 |

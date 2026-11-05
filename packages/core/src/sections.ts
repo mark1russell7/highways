@@ -1,4 +1,4 @@
-import { center, type Box } from "./geom.ts";
+import { center, type Box, type Point } from "./geom.ts";
 import type { LevelItem, Node } from "./model.ts";
 
 /** A section of the plane: a cell of a quadtree, with the nodes whose centers are in it. */
@@ -10,6 +10,8 @@ export interface Section {
   /** The indices of the nodes, in the order of the graph. */
   readonly nodes: readonly number[];
   readonly children: readonly Section[];
+  /** The place of the hub of the section. The router `sections` takes the corner nearest to it. Without it, the router uses the mean of the centers of the nodes. */
+  readonly hub?: Point;
 }
 
 /** The options of the tree of sections. */

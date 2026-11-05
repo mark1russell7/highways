@@ -22,6 +22,11 @@ import type { TracingOptions } from "../whole/tracing/index.ts";
 import type { TwoWayOptions } from "../highways/two-way/index.ts";
 import type { GlobalOrderOptions } from "../highways/global-order/index.ts";
 import type { ApprovalOptions } from "../highways/approval/index.ts";
+import type { TermiteOptions } from "../groups/termites/index.ts";
+import type { CurrentCorridorOptions } from "../highways/current-corridors/index.ts";
+import type { GrassfireOptions } from "../highways/grassfire/index.ts";
+import type { SavingsOptions } from "../highways/savings/index.ts";
+import type { LayerOptions } from "../whole/layers/index.ts";
 import type { EscapeOptions } from "../plugs/escape/index.ts";
 import type { CropOptions } from "../whole/crops/index.ts";
 import type { ChoiceOptions } from "../whole/choice/index.ts";
@@ -1156,6 +1161,55 @@ export const APPROVAL_SCHEMA: OptionSchema<ApprovalOptions> = {
   budget: { type: "number", min: 0.05, max: 0.5, step: 0.05, marks: [0.05, 0.2, 0.5], default: 0.2, describe: "The largest share of the approved links that become corridor links." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A corridor link has this number of approvals or more, and a highway this number of edges or more." },
   pick: { type: "enum", values: ["score", "cover"], default: "score", describe: "The rule that picks the corridor links: the most approvals, or a greedy cover of the edges." },
+};
+
+/** The declarations of the options of the highway strategy `savings` (WILD-033). */
+export const SAVINGS_SCHEMA: OptionSchema<SavingsOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  pairs: { type: "integer", min: 4, max: 16, step: 1, marks: [4, 8, 16], default: 8, describe: "Each bundle offers a merge to this number of nearest bundles." },
+  detour: { type: "number", min: 1.1, max: 2, step: 0.1, marks: [1.1, 1.5, 2], default: 1.5, describe: "The way of an edge along a bundle is this many times its way alone or less." },
+  share: { type: "enum", values: ["equal", "length"], default: "equal", describe: "The rule that divides the trunk among the edges: equal parts, or parts by length." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A bundle with this number of edges or more gets a highway." },
+};
+
+/** The declarations of the options of the highway strategy `current-corridors` (NAT-037). */
+export const CURRENT_CORRIDOR_SCHEMA: OptionSchema<CurrentCorridorOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  q: { type: "number", min: 0.5, max: 0.95, step: 0.05, marks: [0.5, 0.8, 0.95], default: 0.8, describe: "A link with current at this quantile of the links with current or more is a corridor." },
+  discount: { type: "number", min: 0.3, max: 0.8, step: 0.1, marks: [0.3, 0.5, 0.8], default: 0.5, describe: "The second pass gives each corridor link this discount, as a share of its length." },
+  sketch: { type: "integer", min: 8, max: 32, step: 1, marks: [8, 16, 32], default: 16, describe: "A board with more edges than this number uses this number of seeded solves." },
+  seed: { type: "integer", min: 0, max: 1_000_000, step: 1, marks: [1, 2, 3], default: 1, describe: "The seed of the signs of the seeded solves." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the highway strategy `grassfire` (NAT-034). */
+export const GRASSFIRE_SCHEMA: OptionSchema<GrassfireOptions> = {
+  margin: WAY_SCHEMA.margin,
+  k: WAY_SCHEMA.k,
+  lambda: { type: "number", min: 0, max: 4, step: 0.25, marks: [0, 1, 4], default: 1, describe: "The price of a link near a box, over its clearance in mean node sizes." },
+  spur: { type: "number", min: 1, max: 5, step: 0.5, marks: [1, 3, 5], default: 3, describe: "The largest length of the first and the last link of a way, in mean node sizes." },
+  cell: { type: "number", min: 0.25, max: 1, step: 0.25, marks: [0.25, 0.5, 1], default: 0.5, describe: "The size of a grid cell, in mean node sizes." },
+  spacing: { type: "number", min: 0.5, max: 4, step: 0.5, marks: [0.5, 1.5, 4], default: 1.5, describe: "The spacing of the points of the road graph, in mean node sizes." },
+  discount: { type: "number", min: 0.2, max: 1, step: 0.1, marks: [0.2, 0.5, 1], default: 0.5, describe: "The cost of a used link, as a share of its price." },
+  minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
+};
+
+/** The declarations of the options of the group strategy `termites` (NAT-010). */
+export const TERMITE_SCHEMA: OptionSchema<Required<TermiteOptions>> = {
+  ...SECTION_SCHEMA,
+  radius: { type: "number", min: 2, max: 10, step: 0.5, marks: [2, 4, 10], default: 4, describe: "The smallest distance between two peaks, in mean node sizes." },
+  steps: { type: "integer", min: 10, max: 100, step: 1, marks: [10, 30, 100], default: 30, describe: "The number of growth steps." },
+  decay: { type: "number", min: 0.05, max: 0.5, step: 0.05, marks: [0.05, 0.2, 0.5], default: 0.2, describe: "The share of the deposit that fades at each step." },
+  cell: { type: "number", min: 0.5, max: 2, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The size of a grid cell, in mean node sizes." },
+};
+
+/** The declarations of the options of the whole strategy `layers` (RULE-017). */
+export const LAYER_SCHEMA: OptionSchema<LayerOptions> = {
+  order: { type: "enum", values: ["crossings,detour,ink", "crossings,ink,detour", "detour,crossings,ink", "detour,ink,crossings", "ink,crossings,detour", "ink,detour,crossings"], default: "crossings,detour,ink", describe: "The order of the layers. The first rule has the highest priority." },
+  slack: { type: "number", min: 0, max: 0.2, step: 0.01, marks: [0, 0.05, 0.2], default: 0.05, describe: "Each layer holds its value within this share of its best value." },
+  settings: { type: "integer", min: 3, max: 12, step: 1, marks: [3, 4, 8, 12], default: 4, describe: "The number of settings that the layers rank, from the start of the list." },
 };
 
 /** The declarations of the options of the plug strategy `escape` (EDA-022). */

@@ -70,6 +70,20 @@
     }
   },
   {
+    "id": "NAT-010",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "termites",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 42.5,
+      "uncertainty": 0.85,
+      "cost": 2,
+      "score": 18.063,
+      "rank": 9
+    }
+  },
+  {
     "id": "NAT-016",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4A",
@@ -112,6 +126,34 @@
     }
   },
   {
+    "id": "NAT-034",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "grassfire",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 42,
+      "uncertainty": 0.85,
+      "cost": 2,
+      "score": 17.85,
+      "rank": 10
+    }
+  },
+  {
+    "id": "NAT-037",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "current-corridors",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 43,
+      "uncertainty": 0.85,
+      "cost": 2,
+      "score": 18.275,
+      "rank": 8
+    }
+  },
+  {
     "id": "NAT-047",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4C",
@@ -123,6 +165,20 @@
       "cost": 1,
       "score": 30.24,
       "rank": 4
+    }
+  },
+  {
+    "id": "RULE-017",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "layers",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 33,
+      "uncertainty": 1,
+      "cost": 2,
+      "score": 16.5,
+      "rank": 13
     }
   },
   {
@@ -238,6 +294,20 @@
     }
   },
   {
+    "id": "WILD-025",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "angle-cross",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 33,
+      "uncertainty": 1.02,
+      "cost": 2,
+      "score": 16.83,
+      "rank": 11
+    }
+  },
+  {
     "id": "WILD-031",
     "takenAt": "2026-10-29",
     "by": "BUILD-W4D",
@@ -249,6 +319,20 @@
       "cost": 2,
       "score": 21.75,
       "rank": 6
+    }
+  },
+  {
+    "id": "WILD-033",
+    "takenAt": "2026-11-03",
+    "by": "BUILD-W6",
+    "strategy": "savings",
+    "predicted": {
+      "formula": "queue/2",
+      "gain": 46.5,
+      "uncertainty": 0.85,
+      "cost": 2,
+      "score": 19.763,
+      "rank": 7
     }
   },
   {
