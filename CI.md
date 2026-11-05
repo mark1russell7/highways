@@ -263,3 +263,22 @@ The workflows of the template call the shared workflows and actions by a local p
 The job `publish` of `release.yml` uses the pinned form of `npm-publish`, also in the template. A local action needs a checkout, and that job does no checkout.
 
 `new-repo.ps1` does not copy the shared workflows, the actions or `actions-test.yml`. It changes each local path and each pin of the template to the pinned form, with the commit of the template that it copies.
+
+## What each gate check of this repository reads
+
+A gate check holds a gain only when it can fail on that gain. Each check below states what it reads. The workflow `Gate flip` holds the flip tests.
+
+| Check | It can fail on | It cannot fail on | Flip test |
+|---|---|---|---|
+| `CI OK` | The tests, the types, the lint and the heap gate. A router with no budget fails as a no read. | Time. | `heap`: a fault of 150 MB, and a budget of `null`. |
+| `Sections gate OK` | The time of `sections-tree` at 10 000 nodes, against the parent and against the fixed base. A second run that cannot decide fails. | The time of other routers. | `sections`: a spin of 20% of the route time. |
+| `Search work OK` | Gate (b): the stops of Linux and Windows differ. | Gate (a), the fit of the work to the time. This fit is text in the summary at this time. | `work`: a copy with one stop changed. |
+| `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. | None at this time. |
+| `Search objective OK` | A missing set or input, or a job that stops. | The correlation, the variants and the time. The tables only report them. | None at this time. |
+| `Screen OK` | A missing input, or a job that stops. | Each measure. A screen writes records, and `promotion.ts` writes the win test as text. | None at this time. |
+| `Xplat OK` | A difference of the route hashes between the systems. | Time and quality. | None at this time. |
+| `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
+
+So a green `Scale OK`, `Search objective OK` or `Screen OK` shows that the run ended with all its inputs. Do not call a gain held on one of these three checks.
+
+The dates of the open rows are in `docs/ROADMAP.md`, item GATE-FLIP.

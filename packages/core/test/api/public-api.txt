@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1501 names
+## . (build/index.d.ts): 1507 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -140,6 +140,7 @@ type CorpusDimension: @mark1russell7/layout-contract#CorpusDimension (external)
 type CorpusFamily: @mark1russell7/layout-contract#CorpusFamily (external)
 CorpusSpec: build/index.d.ts#CorpusSpec
 type CorridorOptions: build/index.d.ts#CorridorOptions
+CountCrossingsOptions: build/index.d.ts#CountCrossingsOptions
 CropOptions: build/index.d.ts#CropOptions
 CropRun: build/index.d.ts#CropRun
 type Crossbar: build/index.d.ts#Crossbar
@@ -472,6 +473,7 @@ type Outside: build/index.d.ts#Outside
 OverLimit: build/index.d.ts#OverLimit
 PACKED_GRID: build/index.d.ts#PACKED_GRID
 PARALLEL_EDGES: build/index.d.ts#PARALLEL_EDGES
+PERIMETER_MARGIN: build/index.d.ts#PERIMETER_MARGIN
 type PHubOptions: build/index.d.ts#PHubOptions
 PICK: build/index.d.ts#PICK
 PIPELINE: build/index.d.ts#PIPELINE
@@ -1240,6 +1242,8 @@ odGroups: build/index.d.ts#odGroups
 offsetLine: build/index.d.ts#offsetLine
 offsetPolyline: build/index.d.ts#offsetPolyline
 oneSteiner: build/index.d.ts#oneSteiner
+oneTrunkRouter: build/index.d.ts#oneTrunkRouter
+oneTrunkStrategy: build/index.d.ts#oneTrunkStrategy
 openGaps: build/index.d.ts#openGaps
 openLanes: build/index.d.ts#openLanes
 optimaFile: build/index.d.ts#optimaFile
@@ -1269,6 +1273,8 @@ passThroughs: build/index.d.ts#passThroughs
 passesThrough: build/index.d.ts#passesThrough
 pathPoints: build/index.d.ts#pathPoints
 peakCurvature: build/index.d.ts#peakCurvature
+perimeterRouter: build/index.d.ts#perimeterRouter
+perimeterStrategy: build/index.d.ts#perimeterStrategy
 pickLevel: build/index.d.ts#pickLevel
 pickLinks: build/index.d.ts#pickLinks
 pickMoves: @mark1russell7/layout-contract#pickMoves (external)
@@ -2201,6 +2207,12 @@ interface CorridorOptions extends Pick<WayOptions, "margin" | "k"> {
   readonly bands: number;
   readonly near: number;
   readonly lane: number;
+}
+
+### build/index.d.ts#CountCrossingsOptions
+export interface CountCrossingsOptions {
+  readonly limit?: number;
+  readonly seed?: number;
 }
 
 ### build/index.d.ts#CropOptions
@@ -4128,6 +4140,9 @@ export declare const PACKED_GRID: HighwaysFamily;
 
 ### build/index.d.ts#PARALLEL_EDGES
 export declare const PARALLEL_EDGES: HighwaysFamily;
+
+### build/index.d.ts#PERIMETER_MARGIN
+export declare const PERIMETER_MARGIN = 20;
 
 ### build/index.d.ts#PHubOptions
 interface PHubOptions {
@@ -6505,7 +6520,7 @@ export declare function corpusManifest(corpus: string, inputs: readonly LayoutIn
 export declare function corridorPlan(input: HighwayInput, o: Readonly<CorridorOptions>): HighwayPlan;
 
 ### build/index.d.ts#countCrossings
-export declare function countCrossings(segs: readonly (readonly [Point, Point])[]): [number, boolean];
+export declare function countCrossings(segs: readonly (readonly [Point, Point])[], options?: CountCrossingsOptions): [number, boolean];
 
 ### build/index.d.ts#countOverlaps
 export declare function countOverlaps(boxes: readonly Box[]): number;
@@ -7545,6 +7560,12 @@ export declare function oneSteiner(terminals: readonly Point[], metric: SteinerM
   links: [number, number][];
 };
 
+### build/index.d.ts#oneTrunkRouter
+export declare const oneTrunkRouter: Router;
+
+### build/index.d.ts#oneTrunkStrategy
+export declare const oneTrunkStrategy: Strategy<"router", object>;
+
 ### build/index.d.ts#openGaps
 export declare function openGaps<T extends Boxed>(items: readonly T[], gaps: readonly Gap[], snap?: number): T[];
 
@@ -7631,6 +7652,12 @@ export declare function pathPoints(graph: SegmentGraph, path: Path): Point[];
 
 ### build/index.d.ts#peakCurvature
 export declare function peakCurvature(segments: readonly CurveSegment[]): number;
+
+### build/index.d.ts#perimeterRouter
+export declare const perimeterRouter: Router;
+
+### build/index.d.ts#perimeterStrategy
+export declare const perimeterStrategy: Strategy<"router", object>;
 
 ### build/index.d.ts#pickLevel
 export declare function pickLevel(sizes: readonly number[], scale: number, options?: Partial<PickOptions>): number;
