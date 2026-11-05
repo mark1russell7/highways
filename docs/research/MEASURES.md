@@ -157,6 +157,27 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 | `docs/research/CATALOG.md:1876` | `approval`: 1.288 crossings for each edge, against 2.079 of `shared`. | Not read. |
 | `packages/site/src/compare-data.ts:119` | The row `R1.crossings` of the compare page. | A measure with no claim. It needs a partner row. |
 
+### What each control buys
+
+A control reads no route quality. So a measure that a control wins cannot call a win alone. Three routers are controls: `straight`, `one-trunk` and `perimeter`. The record `packages/core/scripts/data/control-wins/record.json` reads each measure of `routeMeasures` on 75 boards of 25 families. It reads the controls and 5 routers. A win is the best median, with no router that is not a control at that median. The test `control-wins.test.ts` holds that each win has a partner, and that the control reads worse than `corners` on that partner.
+
+| Measure | Control that wins it, median | `corners`, median | Partner | Control, median | `corners`, median |
+|---|---|---|---|---|---|
+| `route.crossings` | `one-trunk` 0, `perimeter` 0 | 83 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.crossing-angle.mean` | `one-trunk` 1, `perimeter` 1 | 0.531 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.crossing-angle.min` | `one-trunk` 90, `perimeter` 90 | 2.493 | `route.crossings.pairs` | 153, 229 | 120 |
+| `route.plug-spacing.min` | `one-trunk` 1, `perimeter` 1 | 0.131 | `route.overlap.peak` | 21, 16 | 4 |
+| `route.bundle.ink-saved` | `one-trunk` 0.749 | 0.074 | `route.detour.median` | 1.41 | 1.021 |
+| `route.crossings.pairs` | `straight` 99 | 120 | `route.through` | 18 | 0 |
+| `route.detour.median` | `straight` 1 | 1.021 | `route.through` | 18 | 0 |
+| `route.overlap.share` | `straight` 0 | 0.036 | `route.through` | 18 | 0 |
+
+The record lists each win. These results are the ones to keep in mind:
+
+- `route.crossings.pairs` needs `route.through` beside it. In sum, `straight` reads 24,707 pairs, and `corners` reads 32,194. For that count, 3,013 of the routes of `straight` go through a box.
+- The crossing angle reads its best value when a router has no crossing of ink. The plug spacing reads its best value with one plug on each side of a box. So these values tell nothing on a router that shares much.
+- No control buys `route.through`. This measure counts routes that go through a box. Of 6,065 routes, `perimeter` reads 3,826 and `straight` reads 3,013. `perimeter` reads less than `straight` in 10 of the 25 families, and it reads 0 only on `tiny-uniform`. On these boards, a straight way out of a box usually crosses another box. `corners` reads a median of 0 at a median detour of 1.021, and all of its 292 are on `packed-grid`.
+
 ### The exact forms of MEAS3A
 
 Since MEAS3A, the screen computes ten more measures. Some formulas below leave a choice open, so the screen uses the forms of this list. The code is in [`measures/lanes.ts`](../../packages/core/src/bench/measures/lanes.ts) and [`measures/levels.ts`](../../packages/core/src/bench/measures/levels.ts).
