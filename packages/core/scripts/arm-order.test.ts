@@ -9,6 +9,7 @@ import {
   rotatedOrder,
   SCHEMA,
   SENTINELS,
+  sentinelFault,
   sentinelReads,
   sentinelVerdict,
   type OrderJob,
@@ -191,9 +192,25 @@ describe("the sentinel check", () => {
     expect(sentinelVerdict(sentinelReads(reference, [job(() => 1.28)])).limit).toBe("An even slowdown passes, so no compare of ms across runs rests on this check.");
   });
 
-  it("names each sentinel in the committed reference, for each job of the before run", () => {
+  it("does not count the level of a reference job", () => {
+    const faster: SentinelReference = { cpu: CPU, medians: Object.fromEntries(Object.entries(reference[0]!.medians).map(([id, ms]) => [id, ms / 1.28])) };
+    const read = sentinelReads([...reference, faster], [job((id) => (id === SENTINELS[0] ? 1.2 : 1))])[0]!;
+    expect(read.shape).toBeCloseTo(Math.log(1.2), 12);
+    expect(read.referenceJobs).toBe(2);
+    expect(sentinelReads([...reference, faster], [job(() => 1)])[0]!.shape).toBeCloseTo(0, 12);
+  });
+
+  it("puts the factor of the fault on each arm of one sentinel", () => {
+    const plain = job(() => 1);
+    const faulted = sentinelFault(plain, SENTINELS[1], 1.5);
+    expect(faulted.inputs[1]!.ms["old~aa"]![0]).toBeCloseTo(plain.inputs[1]!.ms["old~aa"]![0]! * 1.5, 9);
+    expect(faulted.inputs[0]).toEqual(plain.inputs[0]);
+    expect(sentinelReads(reference, [faulted])[0]!.aa).toBe(0);
+  });
+
+  it("names each sentinel in the committed reference, for each job of the two runs", () => {
     const committed = JSON.parse(readFileSync(new URL("./data/arm-order/sentinel-reference.json", import.meta.url), "utf8")) as { readonly jobs: readonly SentinelReference[] };
-    expect(committed.jobs).toHaveLength(5);
+    expect(committed.jobs).toHaveLength(10);
     for (const r of committed.jobs) expect(Object.keys(r.medians).sort()).toEqual([...SENTINELS].sort());
   });
 });

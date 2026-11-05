@@ -277,8 +277,9 @@ export const SENTINEL_AA_LIMIT = 0.16;
 /** The fewest jobs on a model of the reference that give a read. */
 export const SENTINEL_JOBS = 3;
 
-/** The old arm of one job of the reference run: the median time of each sentinel. */
+/** The old arm of one job of a reference run: the median time of each sentinel. */
 export interface SentinelReference {
+  readonly run?: string;
   readonly cpu: string;
   readonly medians: Readonly<Record<string, number>>;
 }
@@ -304,7 +305,8 @@ export interface SentinelRead {
 
 /**
  * This function reads the sentinels of each job as a shape.
- * It takes the log of each sentinel against the mean of the reference jobs on the model of the job, then it takes off the median of those logs.
+ * It takes the logs of a job less their own median, and the same logs of each reference job on the model. The shape is the largest distance between the job and the mean of the reference.
+ * So the level of a reference job does not count, and jobs of two speeds of one model can both be in the reference.
  * An even factor on all the sentinels of a job passes, because one name of a CPU model can hold two speeds.
  * The check cannot find an even shift, so a read of times across two runs cannot rest on it.
  */
@@ -328,15 +330,31 @@ export function sentinelReads(reference: readonly SentinelReference[], jobs: rea
     );
     const speed = job.env?.speed === undefined ? {} : { speed: job.env.speed };
     if (known.length === 0) return { job: at + 1, cpu, referenceJobs: 0, note: "no read", level: null, shape: null, aa, holds: null, ...speed };
-    const logs = inputs.map((input) => {
-      const mean = known.reduce((sum, r) => sum + r.medians[input.id]!, 0) / known.length;
-      return Math.log(median(input.ms[base]!) / mean);
+    const refs = known.map((r) => {
+      const logs = SENTINELS.map((id) => Math.log(r.medians[id]!));
+      const own = median(logs);
+      return { own, shape: logs.map((log) => log - own) };
     });
-    const level = median(logs);
-    const shape = Math.max(...logs.map((log) => Math.abs(log - level)));
+    const mean = (values: readonly number[]): number => values.reduce((sum, value) => sum + value, 0) / values.length;
+    const logs = inputs.map((input) => Math.log(median(input.ms[base]!)));
+    const own = median(logs);
+    const apart = logs.map((log, at) => log - own - mean(refs.map((r) => r.shape[at]!)));
+    const centre = median(apart);
+    const level = own - mean(refs.map((r) => r.own));
+    const shape = Math.max(...apart.map((value) => Math.abs(value - centre)));
     const note = known.length === 1 ? { note: "reference: one job" } : {};
     return { job: at + 1, cpu, referenceJobs: known.length, ...note, level, shape, aa, holds: shape <= SHAPE_LIMIT && aa <= SENTINEL_AA_LIMIT, ...speed };
   });
+}
+
+/** This function gives a copy of a job with a factor on each arm of one sentinel. It is the fault of the flip of the check. */
+export function sentinelFault(job: OrderJob, id: string, factor: number): OrderJob {
+  return {
+    ...job,
+    inputs: job.inputs.map((input) =>
+      input.id === id ? { ...input, ms: Object.fromEntries(Object.entries(input.ms).map(([arm, ms]) => [arm, ms.map((value) => value * factor)])) } : input,
+    ),
+  };
 }
 
 /** The verdict of the sentinel check over the jobs of one run. */
