@@ -668,7 +668,6 @@ export class CornerGraph {
       }
     });
     let best = Infinity;
-    let bestEnd = -1;
     let settled = 0;
     while (heap.size > 0) {
       if (heap.topKey > best + TIE) break;
@@ -680,29 +679,15 @@ export class CornerGraph {
       const gi = G[i]!;
       if (goalAt[i] === stamp) {
         const end = gi + goalTail[i]!;
-        if (end < best - TIE || (end <= best + TIE && i < bestEnd)) bestEnd = i;
         if (end < best) best = end;
       }
       for (let m = m0; m < m1; m++) {
         const j = next[m]!;
+        if (closed[j] === stamp) continue;
         const d = length[m]!;
-        const shut = closed[j] === stamp;
-        // A closed corner reads a link only if a path through the link can tie, so a lower estimate does not change the tie.
-        if (shut && gi + floor * d > G[j]! + TIE) continue;
         const g = gi + (cost ? cost(i, j, d) : d);
         if (open[j] === stamp) {
-          const gap = g - G[j]!;
-          if (gap > TIE) continue;
-          // A corner keeps its lowest parent among the paths that tie, so the order of the search does not choose the path.
-          if (gap >= -TIE) {
-            if (g - gi > TIE && i < parentOf[j]!) parentOf[j] = i;
-            if (!shut && gap < 0) {
-              G[j] = g;
-              heap.set(g + H[j]!, j);
-            }
-            continue;
-          }
-          if (shut) continue;
+          if (g >= G[j]!) continue;
         } else {
           open[j] = stamp;
           H[j] = estimate(j);
@@ -712,18 +697,63 @@ export class CornerGraph {
         heap.set(g + H[j]!, j);
       }
     }
-    WORK.corner += settled;
-    if (bestEnd < 0) return undefined;
-    const k = goalOf.get(bestEnd)!;
-    const out: Point[] = [to[k]!.point];
-    for (let i = bestEnd; ; i = parentOf[i]!) {
-      out.push(points[i]!);
-      if (parentOf[i]! < 0) {
-        const f = -1 - parentOf[i]!;
-        out.push(from[f]!.point);
-        return { points: out.reverse(), from: f, to: k, cost: best };
-      }
+    if (best === Infinity) {
+      WORK.corner += settled;
+      return undefined;
     }
+    // Each test of the walk reads one number, the limit. So the route depends on the graph and the limit, and not on the order of the search.
+    // The search stops above the limit. A corner on a path within the limit has a key within the limit at each floor, so the search closed it.
+    const limit = best + TIE;
+    let end = -1;
+    for (const [j, tail] of goal) {
+      if (closed[j] === stamp && G[j]! + tail <= limit && (end < 0 || j < end)) end = j;
+    }
+    const k = goalOf.get(end)!;
+    const out: Point[] = [to[k]!.point];
+    let at = end;
+    let rest = goalTail[end]!;
+    for (let steps = 0; steps <= n; steps++) {
+      const here = points[at]!;
+      out.push(here);
+      let first = -1;
+      for (let f = 0; f < from.length && first < 0; f++) {
+        if (from[f]!.cost + dist(from[f]!.point, here) + rest <= limit && starts[f]!.includes(at)) first = f;
+      }
+      let back = -1;
+      let step = 0;
+      if (first < 0) {
+        const m0 = start[at]!;
+        const m1 = start[at + 1]!;
+        settled += 1 + (m1 - m0);
+        for (let m = m0; m < m1; m++) {
+          const i = next[m]!;
+          // G falls at each step of this rule, so a link of no length cannot start a loop.
+          if (closed[i] !== stamp || G[i]! >= G[at]! || (back >= 0 && i > back)) continue;
+          const c = cost ? cost(i, at, length[m]!) : length[m]!;
+          if (G[i]! + c + rest <= limit) {
+            back = i;
+            step = c;
+          }
+        }
+        if (back < 0) {
+          // Only a link of no cost, or noise at the limit, leaves no corner. The parent of the search closed before this corner, so this rule has no loop.
+          const parent = parentOf[at]!;
+          if (parent < 0) first = -1 - parent;
+          else {
+            back = parent;
+            step = G[at]! - G[parent]!;
+          }
+        }
+      }
+      if (first >= 0) {
+        out.push(from[first]!.point);
+        WORK.corner += settled;
+        return { points: out.reverse(), from: first, to: k, cost: best };
+      }
+      rest += step;
+      at = back;
+    }
+    throw new Error("The walk of the corner search did not reach a start.");
   }
 
   /** This method tells if a corner of `starts` and a corner of `goal` are in one connected part of the graph. */

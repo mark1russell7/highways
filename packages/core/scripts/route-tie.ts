@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { HIGHWAYS_FAMILIES } from "../src/families/index.ts";
 import {
   armRows,
@@ -65,7 +65,7 @@ if (process.argv[2] === "--arm") {
     if (hook.before) env["ROUTE_TIE_BEFORE"] = before;
     if (hook.tie !== undefined) env["ROUTE_TIE_TIE"] = String(hook.tie);
     if (hook.floor !== undefined && hook.floor !== 1) env["ROUTE_TIE_FLOOR"] = String(hook.floor);
-    const child = spawnSync(process.execPath, ["--import", HOOK, SCRIPT, "--arm", file, JSON.stringify(options)], { env, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+    const child = spawnSync(process.execPath, ["--import", pathToFileURL(HOOK).href, SCRIPT, "--arm", file, JSON.stringify(options)], { env, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
     if (child.status !== 0) throw new Error(`The arm ${JSON.stringify(hook)} failed: ${child.stderr}`);
     const rows = JSON.parse(readFileSync(file, "utf8")) as ArmRow[];
     rmSync(file);
