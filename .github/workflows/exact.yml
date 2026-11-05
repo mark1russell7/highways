@@ -29,7 +29,7 @@ permissions:
 
 concurrency:
   # One run for each ref (RUNNER-SLOTS). A dispatch waits for the run before it.
-  group: exact-${{ github.ref }}
+  group: exact-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: false
 
 jobs:
