@@ -16,6 +16,8 @@ export interface KpiFacts {
   readonly coverageCells: number;
   /** The core of each verdict of the Results page. An entry is `undefined` when a verdict does not name its core. */
   readonly verdictCores: readonly (string | undefined)[];
+  /** The core of the last read of each verdict: the core of its stamp `verified`, or else the core of its run. */
+  readonly verdictReads: readonly (string | undefined)[];
 }
 
 /** One measure of the file. */
@@ -60,6 +62,15 @@ export function resultsLag(cores: readonly (string | undefined)[], engine: strin
 }
 
 /**
+ * This function counts the verdicts of the Results page with no read on the minor of the engine.
+ * A read on the same minor with the same rows stamps a verdict, so a version gap with equal numbers does not count.
+ * A verdict that does not name its core counts, because its read is not known.
+ */
+export function resultsUnread(reads: readonly (string | undefined)[], engine: string): number {
+  return reads.filter((c) => c === undefined || minorsBehind(c, engine) !== 0).length;
+}
+
+/**
  * This function gives the input of the writer. It gives `undefined` when the snapshot has no date, because the time of the data is then not known.
  *
  * @param meta - The fields of `bench-meta.json`.
@@ -75,6 +86,7 @@ export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: stri
     at: `${meta.date}T00:00:00Z`,
     measures: [
       ...(lag === undefined ? [] : [{ id: "results-lag", value: lag, unit: "releases" }]),
+      { id: "results-unread", value: resultsUnread(facts.verdictReads, core), unit: "snapshots" },
       { id: "playground-live", value: facts.demoComplete ? 1 : 0 },
       { id: "coverage-shown", value: facts.coverageCells > 0 ? 1 : 0 },
       ...Object.entries(KPI_PAGES).map(([id, file]) => ({ id, value: hasPage(file) ? 1 : 0 })),

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, ageText, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
 import type { VerdictTable } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
@@ -37,6 +37,29 @@ describe("results data", () => {
 
   it("refuses a snapshot without its header", () => {
     expect(() => parseSnapshot(JSON.stringify({ set: "s", step: "router", rows: [] }))).toThrow(/base/);
+  });
+
+  const HEAD = { set: "s", step: "router", base: "shared", level: 0.05, run: 1, commit: "c", date: "2026-11-05", core: "0.9.2" };
+  const ROW = { strategy: "a", guard: "R1", measure: "route.crossings", label: "worse", old: "worse", stratified: -2, pooled: -3, p: 0.01, families: [{ family: "f", n: 3, mean: -2, sign: -1 }], breadth: { against: 0, of: 1, ties: 0 } };
+
+  it("reads the stamp of a later read, and refuses a stamp without its fields", () => {
+    const stamp = { core: "0.15.0", run: 2, commit: "d", date: "2026-11-06" };
+    const s = parseSnapshot(JSON.stringify({ ...HEAD, verified: stamp, rows: [] }));
+    expect([readCore(s), readCore({ core: "0.9.2" })]).toEqual(["0.15.0", "0.9.2"]);
+    expect(() => parseSnapshot(JSON.stringify({ ...HEAD, verified: { core: "0.15.0" }, rows: [] }))).toThrow(/"run" in its field "verified"/);
+  });
+
+  it("verifies a read with the same rows, and gives each row that differs with its fields", () => {
+    const snap = parseSnapshot(JSON.stringify({ ...HEAD, rows: [ROW, { ...ROW, strategy: "b" }] }));
+    const same = parseSnapshot(JSON.stringify({ ...HEAD, core: "0.15.0", run: 2, rows: [{ ...ROW, strategy: "b", through: 4 }, { ...ROW }] }));
+    expect(compareReads(snap, same)).toEqual([]);
+    const moved = parseSnapshot(JSON.stringify({ ...HEAD, rows: [{ ...ROW, label: "no verdict", p: 0.2 }, { ...ROW, strategy: "c" }] }));
+    expect(compareReads(snap, moved)).toEqual([
+      { key: "a R1 route.crossings", fields: ["label", "p"] },
+      { key: "b R1 route.crossings", fields: ["row"] },
+      { key: "c R1 route.crossings", fields: ["row"] },
+    ]);
+    expect(() => compareReads(snap, { ...same, step: "plugs" })).toThrow(/step plugs/);
   });
 
   it("counts the stages in the sequence of the page", () => {
