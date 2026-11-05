@@ -3,6 +3,7 @@ import { sharedStretchStrategy } from "../lane-orders/stretch/router.ts";
 import { portfolioStrategy } from "../portfolio/router.ts";
 import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "../routers/index.ts";
 import { oneTrunkStrategy } from "../routers/one-trunk/index.ts";
+import { borderWalkStrategy } from "../routers/border-walk/index.ts";
 import { perimeterStrategy } from "../routers/perimeter/index.ts";
 import { seamsStrategy } from "../routers/seams/index.ts";
 import { STRATEGIES } from "./builtins.ts";
@@ -30,7 +31,7 @@ export const OPT_IN_STRATEGIES: readonly AnyStrategy[] = [
 export const ALL_STRATEGIES: Registry = register(STRATEGIES, ...OPT_IN_STRATEGIES);
 
 /** The baselines and the controls: a screen or a benchmark compares a strategy with them, and no chooser offers them. */
-export const BASELINE_STRATEGIES: readonly AnyStrategy[] = [sharedWaysAll, oneTrunkStrategy, perimeterStrategy];
+export const BASELINE_STRATEGIES: readonly AnyStrategy[] = [sharedWaysAll, oneTrunkStrategy, perimeterStrategy, borderWalkStrategy];
 
 /** The opt-in strategies with no recorded numbers. Each one moves to `OPT_IN_STRATEGIES`, with its note on the compare page, after its screen. */
 export const UNSCREENED_STRATEGIES: readonly AnyStrategy[] = [seamsStrategy];

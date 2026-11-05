@@ -20,6 +20,7 @@ export { SEAM_DEFAULTS, seamGraph, seamsRouter, seamsStrategy, type SeamOptions 
 export { TIGHT_DEFAULTS, TIGHT_FIRSTS, TIGHT_SCHEMA, TIGHT_TIES, tightRouter, tightStrategy, waySlacks, type TightFirst, type TightOptions, type TightTies } from "./tight/index.ts";
 export { ATTRACTION_DEFAULTS, ATTRACTION_SCHEMA, attractionRouter, attractionStrategy, type AttractionOptions } from "./attraction/index.ts";
 export { sectionsRouter, type SectionsOptions } from "./sections.ts";
+export { BORDER_WALK_DEFAULTS, borderWalkRouter, borderWalkStrategy, type BorderWalkOptions } from "./border-walk/index.ts";
 export { oneTrunkRouter, oneTrunkStrategy } from "./one-trunk/index.ts";
 export { PERIMETER_MARGIN, perimeterRouter, perimeterStrategy } from "./perimeter/index.ts";
 export { boxField, keepRules, passesThrough, relaxRoutes, resample as resampleRoute, simplify, type BoxField, type RelaxOptions } from "./physics.ts";

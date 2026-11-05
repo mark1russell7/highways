@@ -88,6 +88,7 @@ const ROWS: readonly Row[] = [
   ["R5.median", "R5", "route.detour.median", "ratio", "lower", false],
   ["R5.q95", "R5", "route.detour.q95", "ratio", "lower", false],
   ["R5.mean", "R5", "route.detour.mean", "ratio", "lower", false],
+  ["R5.length", "R5", "route.length", "units", "lower", true, "The sum of the lengths of the routes. A stretch that several routes share counts for each of them."],
   ["R6.worstDetour", "R6", "route.detour.max", "ratio", "lower", false],
   ["R7.backtrack", "R7", "route.backtrack", "0 to 1", "lower", false],
   ["R8.clearance", "R8", "route.clearance.mean", "units", "higher", true],

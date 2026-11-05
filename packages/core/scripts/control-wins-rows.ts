@@ -9,7 +9,7 @@ import { MEASURES } from "../src/bench/screen/measures.ts";
 import { routeMeasures } from "../src/bench/suite.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
 import type { Router } from "../src/model.ts";
-import { oneTrunkRouter, perimeterRouter, straightRouter } from "../src/routers/index.ts";
+import { borderWalkRouter, oneTrunkRouter, perimeterRouter, straightRouter } from "../src/routers/index.ts";
 import { NAMES, routerOf, SEEDS } from "./route-pairs-rows.ts";
 
 /** The command that writes the record again. */
@@ -17,7 +17,7 @@ export const REGENERATE = "node packages/core/scripts/control-wins.ts packages/c
 /** The version of the record. */
 export const SCHEMA = "control-wins/1";
 /** The controls. Each one buys some measures and reads no route quality. */
-export const CONTROLS = ["one-trunk", "perimeter", "straight"] as const;
+export const CONTROLS = ["one-trunk", "perimeter", "straight", "border-walk", "border-walk-short"] as const;
 /** The routers that the record reads. */
 export const RACE: readonly string[] = [...CONTROLS, ...NAMES];
 /** The router that a partner measure compares with: a control loses the partner when it reads worse than this router. */
@@ -54,10 +54,22 @@ export const CONTROL_PARTNERS: Readonly<Record<(typeof CONTROLS)[number], Readon
       "route.bundle.ambiguity",
     ].map((name) => [name, "route.through"]),
   ),
+  "border-walk": {},
+  "border-walk-short": {},
 };
 
+/**
+ * The partners of `route.through`. A walker reads 0 on it, so a claim on `route.through` needs a walker that loses one of these. On the family `packed-grid` a walker ties `route.clearance.tight` and loses only `route.length`.
+ */
+export const THROUGH_PARTNERS = ["route.clearance.tight", "route.length"] as const;
+
+/** The two forms of the walker. `border-walk` keeps to the sides of the boxes, and `border-walk-short` takes the shortest way over their corners, so it is the harder test of a real router. */
+const WALKERS: readonly Router[] = [borderWalkRouter({ name: "border-walk" }), borderWalkRouter({ name: "border-walk-short", leave: 1 })];
+
 /** This function gives the router of a name of `RACE`. */
-function routerNamed(name: string): Router {
+export function routerNamed(name: string): Router {
+  const walker = WALKERS.find((w) => w.name === name);
+  if (walker) return walker;
   if (name === oneTrunkRouter.name) return oneTrunkRouter;
   if (name === perimeterRouter.name) return perimeterRouter;
   if (name === straightRouter.name) return straightRouter;
@@ -139,6 +151,27 @@ function throughByFamily({ families, values }: BoardValues): Record<string, Reco
   return out;
 }
 
+/** The values of `route.through` and of its partners for one router on one family: the sums of the first and the last, and the median of the share. */
+export interface FamilyPartners {
+  readonly through: number;
+  readonly tight: number;
+  readonly length: number;
+}
+
+/** This function gives the values of `route.through` and of its partners for `corners` and the walkers on each family. The seeds of this record are seen seeds, so this table claims nothing. */
+function partnersByFamily({ families, values }: BoardValues): Record<string, Record<string, FamilyPartners>> {
+  const out: Record<string, Record<string, FamilyPartners>> = {};
+  for (const family of new Set(families)) {
+    const at = families.flatMap((name, i) => (name === family ? [i] : []));
+    const read = (name: string, key: string): number[] => at.map((i) => values[name]![key]![i]!);
+    const sum = (list: readonly number[]): number => list.reduce((s, v) => s + v, 0);
+    out[family] = Object.fromEntries(
+      [PARTNER_BASE, "border-walk", "border-walk-short"].map((name) => [name, { through: sum(read(name, "R9.through")), tight: median(read(name, "R8.tight")), length: sum(read(name, "R5.length")) }]),
+    );
+  }
+  return out;
+}
+
 /** This function gives the record. */
 export function winsRecord(boards: BoardValues, slice: BoardValues) {
   const rows = measureRows(boards);
@@ -151,6 +184,8 @@ export function winsRecord(boards: BoardValues, slice: BoardValues) {
     wins: Object.fromEntries(CONTROLS.map((control) => [control, rows.filter((r) => controlWins(r, control)).map((r) => ({ measure: r.name, partner: CONTROL_PARTNERS[control][r.name] ?? null }))])),
     ties: Object.fromEntries(CONTROLS.map((control) => [control, rows.filter((r) => r.best.includes(control) && !controlWins(r, control)).map((r) => r.name)])),
     throughByFamily: throughByFamily(boards),
+    throughPartners: THROUGH_PARTNERS,
+    partnersByFamily: partnersByFamily(boards),
     rows,
     slice: measureRows(slice),
   };
