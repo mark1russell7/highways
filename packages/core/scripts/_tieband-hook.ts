@@ -1,7 +1,7 @@
 // Probe of ROUTE-TIE, kept on a measure branch. It adds a read of each cost gap to `#search`, and a factor of the search floor.
 import { registerHooks } from "node:module";
 const once = (text: string, from: string | RegExp, to: string): string => {
-  const n = (text.match(new RegExp(from, "g")) ?? []).length;
+  const n = typeof from === "string" ? text.split(from).length - 1 : (text.match(new RegExp(from, "g")) ?? []).length;
   if (n !== 1) throw new Error(`hook: ${n} matches of ${String(from)}`);
   return text.replace(from, to);
 };
