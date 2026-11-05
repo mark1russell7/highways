@@ -1,0 +1,657 @@
+{
+ "schema": "key-split-moved/1",
+ "about": "The labels of screen-v3 that move when the base changes from shared to corners. The column shared is the label with the base shared, and the column corners is the label with the base corners. The 299 labels are the 304 rows of the two snapshots, without the 5 rows of corners.",
+ "runs": {
+  "router": 40804553123,
+  "highway": 41508652642
+ },
+ "method": "node packages/core/scripts/screen-verdict.ts <screen.jsonl> --default <base> --json <out>, on the records of each run, with the base shared and with the base corners. A row counts when it has a label with both bases. The read over the 12 families with no key takes the same command on the records of those families. 0 labels move there.",
+ "labels": 299,
+ "moved": 92,
+ "rows": [
+  {
+   "step": "router",
+   "strategy": "corners-smooth",
+   "guard": "R4",
+   "shared": "better",
+   "corners": "no verdict"
+  },
+  {
+   "step": "router",
+   "strategy": "corners-smooth",
+   "guard": "R5 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "router",
+   "strategy": "trunks",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "no verdict"
+  },
+  {
+   "step": "router",
+   "strategy": "trunks",
+   "guard": "R4",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "router",
+   "strategy": "trunks",
+   "guard": "R5 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "router",
+   "strategy": "trunks",
+   "guard": "B1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "keys",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "no verdict"
+  },
+  {
+   "step": "highway",
+   "strategy": "keys",
+   "guard": "B1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "keys",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "shared-ways",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "shared-ways",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "meet",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "meet",
+   "guard": "B1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "meet",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "meet",
+   "guard": "B6 max",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "weiszfeld",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "weiszfeld",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "weiszfeld",
+   "guard": "B6 max",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "quickbundles",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "quickbundles",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "flow-field",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "flow-field",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "flow-field",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "flow-field",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "wspd",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "od-cells",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "spiral",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "traclus",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "no verdict"
+  },
+  {
+   "step": "highway",
+   "strategy": "traclus",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "nested",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "nested",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "lanes",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "lanes",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "hough",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "hough",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "hough",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "ridges",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "divided",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "divided",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "divided",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "hierarchy",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "no verdict"
+  },
+  {
+   "step": "highway",
+   "strategy": "fdeb",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "areas",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "confluent",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "power",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "power",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "crossbars",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "link-communities",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "link-communities",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "link-communities",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "link-communities",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "consensus",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "consensus",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "scale-space",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "scale-space",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "scale-space",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "scale-space",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "steiner",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "search",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "search",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "search",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "knee",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "bronchial",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "balance",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "balance",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "balance",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "balance",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "slots",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "slots",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "two-way",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "two-way",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "global-order",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "global-order",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+breakeven",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+breakeven",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+breakeven",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+stretch",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+stretch",
+   "guard": "B3 q0.95",
+   "shared": "better",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+stretch",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ambiguity",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ambiguity",
+   "guard": "B1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ambiguity",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ambiguity",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+hysteresis",
+   "guard": "R1",
+   "shared": "worse",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+hysteresis",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+hysteresis",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ids",
+   "guard": "R1",
+   "shared": "no verdict",
+   "corners": "better"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ids",
+   "guard": "B3 q0.95",
+   "shared": "no verdict",
+   "corners": "worse"
+  },
+  {
+   "step": "highway",
+   "strategy": "corridors+ids",
+   "guard": "B6 max",
+   "shared": "no verdict",
+   "corners": "worse"
+  }
+ ]
+}

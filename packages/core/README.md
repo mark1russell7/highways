@@ -314,6 +314,8 @@ The benchmark measures the lanes of `highwayCurves` on the case boards, with eac
 
 This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
 
+The figure 102.8% of `split` is not a settled result. The table of 2026-10-27 read 68.2% in that cell, and the cause of the change is open (SPLIT-SPACING).
+
 The error of 47.6% is on a new run of two lanes. With `split`, these lanes go on one line with no lane spacing, and the benchmark does not measure them. The run starts at the plug of a bundle with a very short trunk. Its first leg is 13 units long, to the corner of a box.
 
 The benchmark compares each curve type to the polylines of each router, on the fixtures of 100 nodes or fewer. It counts the curves that go through a box, with and without the free space. It also gives the ratio of the lengths.
