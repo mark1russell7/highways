@@ -9,6 +9,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | Id | Item | Shipped | Link |
 |---|---|---|---|
 | CROSSINGS-SAMPLE | The record `crossings-sample/1` reads each estimate of `route.crossings` on the benchmark against a full count. The error reaches 16.03%. 18 of 132 rows hold an estimate. The verdict sets stay under the limit by size, and the next Screen confirms it. | 2026-11-05 | [#334](https://github.com/mark1russell7/highways/pull/334) |
+| XPLAT-VERDICT | `Xplat OK` fails on a route, an exact result or a repeat that differs between the cells, for 4 routers on 75 rows. A flip runs in the job, and a dispatch read the gate red. The cells pin their node versions. [`CI.md`](../CI.md) gives the limits. | 2026-11-05 | #348 |
 | BENCH-NO-PUSH | The workflow `Bench` does not start on a push. No gate or page read the run of a push, and each one took 158 job-minutes. The nightly run and a dispatch stay. | 2026-11-05 | #338 |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
@@ -184,6 +185,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | R1-PAIRS-RELATION | `route.crossings` and `route.crossings.pairs` have an exact relation: `crossings - self - touch <= pairs`. `paintedOutsidePairs` reads the two classes, and a test holds the relation on each of the 375 rows of the record. A later row outside the relation is a finding. | 2026-11-05 | [#332](https://github.com/mark1russell7/highways/pull/332) |
 | KEY-LINE | The Results page states that with no key `shared` is `corners` with other tie breaks. The row `corners` marks each family with no key as a tie by cause, and the page links the list of the 92 labels that move. | 2026-11-05 | #330 |
 | SPLIT-SPACING | The figure of `trunks-all` on `case-many-groups` rose from 68.2% to 102.7% because LANE-ROOM changed the denominator, on the same two lanes. A bisect of 8 commits shows it in a committed record. Each row states its method, `checkMeasures` reports `mixed-method`, and the table reads the count over 25%. | 2026-11-05 | [#333](https://github.com/mark1russell7/highways/pull/333) |
+| AMBIGUITY-FLAT | `route.bundle.ambiguity` keeps a range over routers on keyed inputs, so it stays. It hides a change at its top, so `route.bundle.reach` joins it. `straight` wins both. | 2026-11-05 | [#339](https://github.com/mark1russell7/highways/pull/339) |
 
 ## Calibration
 
@@ -224,8 +226,10 @@ The rule for the next predictions:
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
+| JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
+| THROUGH-FLOOR | Five real routers read 292 on `route.through`, and `seams` reads 0, so the 292 is no floor of the board. This item reads them, and the 4 more of `sections-site`. Due 2026-11-14. | `active` | | P1 |
+| WON-LINES | This item lists each page line that quotes a measure that a control wins, and it corrects the line or gives it a partner. Due 2026-11-14. | `next` | | P1 |
 | ARM-ORDER | Mode `fresh` rotates the arms, so one arm of a pair goes first in 2 of 3 rounds. The record `arm-order/1` reads no limit moved on one run. The item takes the mirrored order of `rigor-bench`, then reads `router n41-64` first. | `in-progress` | `rigor-bench` 0.2.17 on npm | P2 |
-| AMBIGUITY-FLAT | `route.bundle.ambiguity` reads 0.987 to 0.992 on 10 pairs of one input. This item reads it on keyed inputs. If it stays flat, the item fixes or removes it. Due 2026-11-11. | `next` | | P1 |
 | LANE-OPENING | Lanes open to twice their gap where a pair opens, on `trunks-all` with `split`. The read rests on one board. This item reads it on more boards with the slot of ROUTE-TIE. | `later` | ROUTE-TIE | P3 |
 | TRUE-SHAPE-MEASURE | `route.through` reads a box. A route that touches a corner of the box of a circle, and not the circle, is not `through`. The measure calls the circle rule of `layout-contract` after the box test, and it stays byte-equal on rectangles. Due 2026-11-13. | `blocked` | the circle rule of `layout-contract` | P1 |
 | TRUE-SHAPE | The routers read each obstacle as its box, so routes keep out of the corners of a circle's box. Circle obstacles go into `Obstacles` and the corner graph. The first slice reads ink and detour against the box routes on one pack. Due 2026-11-28. | `later` | TRUE-SHAPE-MEASURE | P1 |
@@ -242,7 +246,6 @@ The rule for the next predictions:
 | OUTER-HOOK | An outer route leaves a plug that faces away from its way, and it comes back past the wall. The record holds 93 such routes on `corners`, and 900 on `sections-tree`, on 245 boards. Read each cause, then fix the shape or state the limit. | next | | P2 |
 | GATE-FLIP | Each gate check of a measure has a flip test: a fault of a stated size turns the check red, and a clean copy stays green in the same job. The workflow `Gate flip` holds the heap gate, gate (b) of `Search work` and the sections gate. Due 2026-11-12. The parity of `Scale`, gate (a) of `Search work` and the win test of `promotion.ts` get real verdicts by 2026-11-19. The time of `Scale` gets a report by 2026-11-26. | active | | P1 |
 | VERDICT-RUN | The job `screen` of `Screen` starts `screen-verdict.ts`, with its flip `verdict` and the weekly `Verdict check`. The rule of the rows is in code. Due 2026-11-12. | active | | P1 |
-| XPLAT-VERDICT | `Xplat OK` does not fail on a route that differs between the cells. A read of each kept record comes first, then a verdict with a flip test in the job, then a pin of the node versions of the cells. Due 2026-11-12. | active | | P1 |
 | ROUTER-BUDGET | The time of each router at each size. Read each cost as its real order of growth or a waste to fix, and open an item for each router over its budget. | next | | P1 |
 | SCREEN-INNER | The next frozen set gets a family with inner routes, because `screen-v3` has none and a defect in 1,322 routes stayed hidden. | next | | P1 |
 | INSIDE-PAD | `Obstacles.inside` reads only the bucket of the point, so a box in the next bucket does not count its pad. A corner in that pad stays in the graph. Count the routes that change, then fix it. | next | | P2 |
