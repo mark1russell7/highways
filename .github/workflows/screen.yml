@@ -173,6 +173,13 @@ jobs:
             echo
             echo "The job ran the screen in $((SECONDS - start)) s."
           } >> "$GITHUB_STEP_SUMMARY"
+      # The verdict over families of the step (VERDICT-RUN). It runs only on a screen of the whole step, in the job 1. A test pins the list of steps.
+      # The file verdict.json has the rows of the page: the built-in strategies of the step. The file verdict-all.json has the rows of each strategy.
+      - name: The verdict
+        if: ${{ contains(fromJSON('["router","highway","plugs","levels","whole"]'), matrix.step) && !inputs.strategy && !inputs.module && !inputs.members && matrix.job == 1 }}
+        run: |
+          set -o pipefail
+          node packages/core/scripts/screen-verdict.ts screen.jsonl --json verdict.json --all-json verdict-all.json --run "$GITHUB_RUN_ID" --commit "$GITHUB_SHA" | tee verdict.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -181,6 +188,9 @@ jobs:
             screen.jsonl
             screen.md
             paired-job*.json
+            verdict.json
+            verdict-all.json
+            verdict.md
           if-no-files-found: warn
 
   # The promotion time test of a paired screen (MEASURE-ISOLATE). It reads the reports of the 5 jobs, and it runs only when each job gave its report.

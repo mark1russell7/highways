@@ -1,0 +1,76 @@
+# The weekly check of the verdict snapshots (VERDICT-RUN). It is not a gate on those snapshots, and it is not a necessary check.
+# For each committed snapshot of `docs/research/verdicts`, the job downloads the records of the run that its header names.
+# Then `screen-verdict.ts --check` reads the rows of the snapshot again, with the script of this commit.
+# A red run tells one of two things:
+#   - The script of this commit gives another label, or no row, on the same records.
+#   - The records of a run are gone. GitHub keeps an artifact for 90 days. Then the snapshot needs a new screen.
+# The flip `verdict` of the workflow `Gate flip` shows that `--check` goes red on a moved label, a missing row and a missing record.
+name: Verdict check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "11 4 * * 3"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check each snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -o pipefail
+          fails=0
+          {
+            echo "## The check of the verdict snapshots"
+            echo
+            echo "This check is not a gate on those snapshots. It reads them again from the records of their runs."
+            echo
+            echo "| Snapshot | Run | Exit | Last line |"
+            echo "| --- | --- | --- | --- |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for file in docs/research/verdicts/screen-v*.json docs/research/verdicts/opt-in/*.json; do
+            read -r run set step < <(jq -r '"\(.run) \(.set) \(.step)"' "$file")
+            dir="$RUNNER_TEMP/runs/$run-$set-$step"
+            if [ ! -d "$dir" ] && ! gh run download "$run" -p "screen-$set-$step-*" -D "$dir"; then
+              echo "| $file | $run | none | The records of the run are gone. |" >> "$GITHUB_STEP_SUMMARY"
+              fails=$((fails + 1))
+              continue
+            fi
+            # A paired screen has an artifact for each job. The job 1 comes first.
+            records=$(find "$dir" -name screen.jsonl | sort | head -1)
+            code=0
+            node packages/core/scripts/screen-verdict.ts "$records" --check "$file" > "$RUNNER_TEMP/check.txt" 2>&1 || code=$?
+            echo "| $file | $run | $code | $(tail -1 "$RUNNER_TEMP/check.txt") |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" != 0 ]; then
+              echo "$file:"
+              cat "$RUNNER_TEMP/check.txt"
+              fails=$((fails + 1))
+            fi
+          done
+          echo "$fails snapshots failed the check."
+          [ "$fails" = 0 ]

@@ -1,10 +1,11 @@
 // The flip tests of the gate checks (GATE-FLIP): an injected fault of a stated size turns a check red, and a copy with no fault stays green in the same job.
-// `node packages/core/scripts/gates/flip.ts --check <heap|work|sections> --out <dir> [--rounds <n>] [--trees <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
+// `node packages/core/scripts/gates/flip.ts --check <heap|work|sections|verdict> --out <dir> [--rounds <n>] [--trees <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
 // The exit code is 0 only when each arm gives its stated exit code and its stated reason. So a crash is not a red, and a run that cannot decide is not a green.
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
 // - `sections` runs `sections-bisect.ts --gate` on two commits on top of the checkout: an empty commit, and a commit that spins `SECTIONS_FAULT_SHARE` of the route time.
+// - `verdict` runs `screen-verdict.ts --check` on records that it makes: the same snapshot, a moved label, a row with no records, and records with one missing.
 //
 // The commits of `sections` are made with the plumbing of git, so the checkout does not change. An arm that cannot decide takes the second attempt, as the job `retry` does.
 import { spawnSync } from "node:child_process";
@@ -142,6 +143,54 @@ function workFlip(dir: string): FlipArm[] {
   ];
 }
 
+/** The families of the records of the flip of the verdict step. With 6 families, the sign test can pass at the level 0.05. */
+export const VERDICT_FAMILIES: readonly string[] = ["a", "b", "c", "d", "e", "f"];
+
+/** This function gives the records of the flip of the verdict step: `shared` and `corners` on the step `router`, with 3 seeds in each family. */
+export function verdictRecords(): string {
+  const lines: string[] = [];
+  for (const [i, family] of VERDICT_FAMILIES.entries()) {
+    for (let seed = 0; seed < 3; seed++) {
+      for (const strategy of ["shared", "corners"]) {
+        const fewer = strategy === "corners" ? 10 : 0;
+        const measures = { "route.crossings": 20 + i + seed - fewer, "route.turn.mean": 1 + 0.1 * seed, "route.detour.q95": 1.2, "route.plug-spacing.min": 4, "route.bundle.ink-saved": 0.1 };
+        const record = { schema: "layout-record/1", stage: "route", step: "router", strategy, options: {}, corpus: "flip", input: `flip/${family}/s${seed}`, inputHash: "0", set: "flip", seed, nodes: 10, edges: 12, measures, hard: {}, deterministic: true, ms: 1 };
+        lines.push(JSON.stringify(record));
+      }
+    }
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+/** This function gives the flip of the verdict step of `Screen`: the compare of `screen-verdict.ts --check`. */
+function verdictFlip(dir: string): FlipArm[] {
+  const script = here("../screen-verdict.ts");
+  const records = join(dir, "screen.jsonl");
+  const short = join(dir, "screen-short.jsonl");
+  const snapshot = join(dir, "verdict.json");
+  writeFileSync(records, verdictRecords());
+  writeFileSync(short, verdictRecords().split("\n").slice(1).join("\n"));
+  const written = runNode([script, records, "--json", snapshot]);
+  if (written.exit !== 0) throw new Error(`The snapshot was not written: ${written.text}`);
+  const stored = JSON.parse(readFileSync(snapshot, "utf8")) as { readonly rows: readonly { readonly strategy: string; readonly label: string }[] };
+  const first = stored.rows[0];
+  if (first === undefined) throw new Error("The snapshot of the flip has no rows.");
+  const copy = (name: string, rows: readonly unknown[]): string => {
+    const file = join(dir, name);
+    writeFileSync(file, JSON.stringify({ ...stored, rows }));
+    return file;
+  };
+  const moved = copy("verdict-label.json", [{ ...first, label: first.label === "better" ? "worse" : "better" }, ...stored.rows.slice(1)]);
+  const extra = copy("verdict-row.json", [...stored.rows, { ...first, strategy: "flip-no-records" }]);
+  const check = (file: string, against: string): { exit: number | null; text: string } => runNode([script, file, "--check", against]);
+  return [
+    judge({ id: "clean", fault: null, ...check(records, snapshot) }, { exit: 0, reason: "The labels hold" }),
+    judge({ id: "label", fault: "one label of the snapshot moved", ...check(records, moved) }, { exit: 1, reason: "the label moved" }),
+    judge({ id: "row", fault: "the snapshot has a row of a strategy with no records", ...check(records, extra) }, { exit: 1, reason: "the row is missing" }),
+    judge({ id: "record", fault: "one record of the screen is missing", ...check(short, snapshot) }, { exit: 1, reason: "the gate expected" }),
+  ];
+}
+
 /** This function starts git in the root and gives its output. */
 function git(root: string, argv: readonly string[], options: { input?: string; env?: NodeJS.ProcessEnv } = {}): string {
   const out = spawnSync("git", argv, { cwd: root, encoding: "utf8", input: options.input, env: { ...process.env, ...options.env } });
@@ -201,9 +250,10 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
     heap: () => heapFlip(dir),
     work: () => workFlip(dir),
     sections: () => sectionsFlip(join(out, "sections"), resolve(values.trees ?? join(dir, "trees")), values.rounds),
+    verdict: () => verdictFlip(dir),
   };
   const flip = flips[values.check ?? ""];
-  if (flip === undefined) throw new Error(`The check is heap, work or sections, not "${values.check}".`);
+  if (flip === undefined) throw new Error(`The check is heap, work, sections or verdict, not "${values.check}".`);
   const arms = flip();
   const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), env: envOf("fresh") };
   writeFileSync(join(out, `gate-flip-${record.check}.json`), JSON.stringify(record, null, 1) + "\n");

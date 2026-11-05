@@ -527,6 +527,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - The columns `through` and `no graph` of the summary are absolute sums over the inputs, with no floor. Thus a strategy at the floor still shows its count of pass-throughs.
 - `route.no-graph` (R17) counts the routes with two points where the corner graph has no way between the facing plugs. The screen reads the routes after the run, thus no output and no hash changes.
 - Each row of `screen-verdict.ts` has `through` and `baseThrough`: the absolute counts of the strategy and of the base. A snapshot from before PASS-GRID has no such fields, and the site reads each form.
+- The header of a verdict snapshot from VERDICT-RUN on has `script`: the commit of the checkout that ran `screen-verdict.ts`. An older snapshot has no such field.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
