@@ -1,5 +1,5 @@
 /**
- * This script writes the record `route-pairs/1`. The module `route-pairs-rows.ts` makes the rows and tells what they hold.
+ * This script writes the record `route-pairs/2`. The module `route-pairs-rows.ts` makes the rows and tells what they hold.
  * The first argument is the out file.
  * With the second argument `--screen`, the script also reads the set `screen-v3` for samples and the time of the count. Start this form only in CI: a local machine gives no time for a record.
  */
