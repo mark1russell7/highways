@@ -1,5 +1,5 @@
 // The command line of the screen: `pnpm screen [--step router] [--strategy <name,...>] [--module <file,...>] [--export <name,...>]
-// [--options <file.json>] [--families <a,b>] [--members <from-to>] [--no-baseline] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
+// [--options <file.json>] [--families <a,b>] [--members <from-to>] [--no-baseline] [--baselines <name,...>] [--predictions <file.jsonl>] [--inputs <dir>] [--commit <sha>]
 // [--wrap <stable,repair>] [--shuffles <n>] [--edits <n>] [--moves] [--activation <families>] [--paired <file> --paired-base <name> [--paired-arms <name,...>] [--paired-repeats <n>]]
 // [--out screen.jsonl] [--summary screen.md]`.
 // `--paired` times the arms of a comparison with `measureIsolated` (MEASURE-ISOLATE), after the screen, and writes the report `paired-time/1` to the file.
@@ -19,6 +19,7 @@
 // `--wrap` adds the router `<name>+<w>` for each router and each wrapper. `--shuffles` measures the order fragility (W3) over this number of random orders.
 // `--strategy` names strategies of the registry. `--module` loads a prototype file and screens each export that is a strategy of the step,
 // or only the exports of `--export`. An export can also be a list of strategies. The registry does not change. Without `--strategy` and `--module`, the screen runs the built-in strategies.
+// The screen also runs each built-in strategy of the step as the baseline. `--baselines` names the built-in strategies of the baseline in place of all (SCREEN-FILTER).
 // `--set exact-v1` screens the small boards with a known optimum (MEAS2). With that set, the screen reads the optima of `src/bench/exact/optima-exact-v1.json`,
 // or of `--optima <file>`, and gives the gap closed of each strategy. `--optima none` gives no optima.
 // `--members 10-23` screens the members 10 to 23 of each family of the set, in place of its members (PROMO-CANALS). These fresh seeds are in no screen set.
@@ -198,6 +199,7 @@ async function runScreen(): Promise<void> {
     ...(inputs ? { inputs } : {}),
     ...(list("--families") ? { families: list("--families")! } : {}),
     baseline: !args.includes("--no-baseline"),
+    ...(list("--baselines") ? { baselines: list("--baselines")! } : {}),
     ...(options ? { options } : {}),
     ...(predictions ? { predictions } : {}),
     ...(commit ? { commit } : {}),

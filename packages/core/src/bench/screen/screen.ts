@@ -78,6 +78,12 @@ export interface ScreenOptions {
    * With `false`, it runs only the strategies of the call. The default is `true`.
    */
   readonly baseline?: boolean;
+  /**
+   * The names of the built-in strategies that the screen runs as the baseline, in place of each built-in strategy of the step (SCREEN-FILTER).
+   * A narrow rerun of one strategy then runs only the baselines of its verdict. A name that is not a built-in strategy of the step is an error.
+   * With `baseline: false`, the screen does not read it.
+   */
+  readonly baselines?: readonly string[];
   /** The options of each strategy, by its name. A strategy without an entry gets its defaults. */
   readonly options?: Readonly<Record<string, object>>;
   /** The router whose routes the step `curve` draws. The default is `corners`. */
@@ -221,8 +227,18 @@ function meets(value: number, op: PredictionOp, expected: number): boolean {
 }
 
 /** This function makes the registry of a screen. It refuses a strategy of another step, and a new strategy with the name of a built-in strategy. */
-function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenStep> | string)[], baseline: boolean): { registry: Registry; candidates: Set<string> } {
+function screenRegistry(
+  step: ScreenStep,
+  strategies: readonly (Strategy<ScreenStep> | string)[],
+  baseline: boolean,
+  names?: readonly string[],
+): { registry: Registry; candidates: Set<string> } {
   const builtins = listStrategies(STRATEGIES, step) as readonly Strategy<ScreenStep>[];
+  const base = (names ?? builtins.map((b) => b.name)).map((n) => {
+    const known = builtins.find((b) => b.name === n);
+    if (!known) throw new Error(`There is no ${step} "${n}" for the baseline. The registry has ${builtins.map((b) => b.name).join(", ")}.`);
+    return known;
+  });
   const chosen: Strategy<ScreenStep>[] = [];
   for (const s of strategies) {
     if (typeof s === "string") {
@@ -238,7 +254,7 @@ function screenRegistry(step: ScreenStep, strategies: readonly (Strategy<ScreenS
   }
   const candidates = new Set(chosen.map((s) => s.name));
   const others = STEPS.filter((x) => x !== step).flatMap((x) => listStrategies(STRATEGIES, x) as readonly AnyStrategy[]);
-  const own = baseline ? [...builtins, ...chosen.filter((s) => !builtins.includes(s))] : chosen.filter((s, i) => chosen.indexOf(s) === i);
+  const own = baseline ? [...base.filter((s, i) => base.indexOf(s) === i), ...chosen.filter((s, i) => !base.includes(s) && chosen.indexOf(s) === i)] : chosen.filter((s, i) => chosen.indexOf(s) === i);
   return { registry: createRegistry([...others, ...(own as readonly AnyStrategy[])]), candidates };
 }
 
@@ -403,7 +419,7 @@ function named(values: Readonly<Record<string, number>>): Record<string, number>
  */
 export function screen(step: ScreenStep, strategies: readonly (Strategy<ScreenStep> | string)[] = [], options: ScreenOptions = {}): ScreenReport {
   const set = options.set ?? SCREEN_V1;
-  const screened = screenRegistry(step, strategies, options.baseline ?? true);
+  const screened = screenRegistry(step, strategies, options.baseline ?? true, options.baselines);
   const candidates = screened.candidates;
   // The step `highway` runs as the step `router`. Each highway strategy with `follow` is a router, after the base routers.
   const base = step === "highway" ? (options.baseRouters ?? HIGHWAY_BASE_ROUTERS).map((name) => getStrategy(STRATEGIES, "router", name)) : [];

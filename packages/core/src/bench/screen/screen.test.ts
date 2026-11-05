@@ -210,6 +210,20 @@ describe("screen", () => {
     expect(again.records.map(strip)).toEqual(one.records.map(strip));
   });
 
+  it("runs only the named built-in strategies as the baseline, next to the strategies of the call (SCREEN-FILTER)", () => {
+    const { summary, records } = screen("router", ["corners"], { inputs: [tiny], baselines: ["straight"] });
+    expect(summary.strategies.map((s) => [s.strategy, s.candidate])).toEqual([
+      ["straight", false],
+      ["corners", true],
+    ]);
+    expect(new Set(records.map((r) => r.strategy))).toEqual(new Set(["straight", "corners"]));
+    // A strategy of the call that is also a baseline runs once, as a candidate.
+    expect(screen("router", ["straight"], { inputs: [tiny], baselines: ["straight"] }).summary.strategies.map((s) => [s.strategy, s.candidate])).toEqual([["straight", true]]);
+    expect(() => screen("router", ["corners"], { inputs: [tiny], baselines: ["no-such-router"] })).toThrow(/no router "no-such-router" for the baseline/);
+    // With `baseline: false`, the screen does not read the list.
+    expect(screen("router", ["corners"], { inputs: [tiny], baseline: false, baselines: ["straight"] }).summary.strategies.map((s) => s.strategy)).toEqual(["corners"]);
+  });
+
   it("gives `null`, not `true`, as `deterministic` of a strategy with no run, and counts it (SCREEN-NO-RUN)", () => {
     const corners = getStrategy(STRATEGIES, "router", "corners");
     const small = defineStrategy({ step: "router", name: "proto-small", describe: "corners, for boards of 1 node at most.", defaults: {}, maxNodes: 1, run: (graph) => corners.run(graph) });
