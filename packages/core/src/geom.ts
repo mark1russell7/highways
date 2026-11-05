@@ -1,10 +1,18 @@
-import { pointSegmentDistance, segmentsCross as crossInside } from "@mark1russell7/layout-contract";
+import { EPS, pointSegmentDistance, segmentsCross as crossInside } from "@mark1russell7/layout-contract";
 import { predicateSink } from "./predicate-sink.ts";
 
 /** A point in the plane. */
 export interface Point {
   readonly x: number;
   readonly y: number;
+}
+
+/** The count of grid steps in one unit, for the grid of the tolerance `EPS` of the contract. The crossing counts read their points on this one grid. */
+export const EPS_STEPS = Math.round(1 / EPS);
+
+/** This function gives the place of the grid `EPS_STEPS` that is nearest to a point. */
+export function snapToEps(p: Point): Point {
+  return { x: Math.round(p.x * EPS_STEPS) / EPS_STEPS, y: Math.round(p.y * EPS_STEPS) / EPS_STEPS };
 }
 
 /** A box with its top-left corner at (`x`, `y`). */

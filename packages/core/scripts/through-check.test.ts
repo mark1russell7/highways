@@ -5,7 +5,7 @@ import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-row
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/5 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/6 is stale. Write it again with: ${REGENERATE}`;
 /** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
@@ -31,7 +31,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/5", () => {
+describe("the gate through-check/6", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 
