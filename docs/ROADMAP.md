@@ -8,7 +8,6 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
-| ROUTE-PAIRS | The measure `route.crossings.pairs` counts the pairs of routes that cross, at a shared vertex and on a shared stretch too. `route.crossings` stays beside it. On 75 boards, `shared-all` reads 0.417 of `corners` on `route.crossings` and 1.033 on pairs. `docs/research/MEASURES.md` names each verdict and page line that rests on `route.crossings`. | 2026-11-05 | [#328](https://github.com/mark1russell7/highways/pull/328) |
 | H0 | The geometry, the fixtures from 10 to 100 000 nodes, the hard rules, the metrics and a straight-line control. The workflow `Bench` races the routers in CI. | 2026-10-25 | `5c05df7` |
 | H1 | Plugs that face the other end, the inflection curve and the corner router. | 2026-10-25 | `5c05df7` |
 | H2 | Bundles: the router `trunks` (bundles by a rule), the router `shared` (shared ways in lane order) and the segments with a count. | 2026-10-25 | `c910fb7` |
@@ -177,6 +176,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SPACE-COVERAGE-1 | Results shows the coverage of the space: 0 of 118,537 cells, with its denominator from the registries and a weekly trend. Each verdict shows its run, date and core version. A test states the strategies that each page leaves out. | 2026-11-04 | [#321](https://github.com/mark1russell7/highways/pull/321) |
 | LANE-ROOM | Each run and trunk has its free room on each side as data, and the lanes of each side compress to fit it, in order and on their side, down to a distance of 1. On the three example boards, the lanes with a contact go from 26 to 0. Over 25 families on `sections`, deep lanes go from 522 to 5, and all flagged lanes from 684 to 70. Each lane that the lanes bring to a box has the mark `outOfRoom`. The closed routes do not change. | 2026-11-04 | [PR #318](https://github.com/mark1russell7/highways/pull/318) |
 | KPI-TRUE | The demo lists each strategy except the 2 that a ruling keeps off the page, and a test holds that count. The file `kpi.json` reads the page coverage, the coverage record and the oldest verdict, so a current benchmark snapshot does not hide an old verdict. | 2026-11-04 | [#323](https://github.com/mark1russell7/highways/pull/323) |
+| ROUTE-PAIRS | The measure `route.crossings.pairs` counts the pairs of routes that cross, at a shared vertex and on a shared stretch too. `route.crossings` stays beside it. On 75 boards, `shared-all` reads 0.417 of `corners` on `route.crossings` and 1.033 on pairs. `docs/research/MEASURES.md` names each verdict and page line that rests on `route.crossings`. | 2026-11-05 | [#328](https://github.com/mark1russell7/highways/pull/328) |
 
 ## Calibration
 
