@@ -42,34 +42,56 @@ jobs:
             packages/core/src/free-regions.ts
             packages/core/src/levels.ts
             packages/core/src/routers/sections.ts
-            packages/core/scripts/join-cost.ts
+            packages/core/scripts/_flag-scale.ts
             .github/workflows/join-cost.yml
 
   measure:
     needs: changes
     if: needs.changes.outputs.match == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 50
-    env:
-      ROUNDS: ${{ inputs.rounds || '15' }}
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [B, C]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Time the join
+      # Each cell has its own process and its own limit, so a cell that does not end costs only its limit and leaves its log.
+      - name: The arm
+        env:
+          ARM: ${{ matrix.arm }}
+          NODE_OPTIONS: --max-old-space-size=10240
         run: |
-          set -o pipefail
-          node packages/core/scripts/join-cost.ts --rounds "$ROUNDS"
-          cat out/join-cost.md >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p out/flag
+          OUT="$PWD/out/flag"
+          if [ "$ARM" = "B" ]; then
+            git show 9dcdc91e0166b0f104a6706b11ea104ee7e3f3b2:packages/core/src/visibility.ts > "$RUNNER_TEMP/visibility-budget.ts"
+            export ANCHOR_SOURCE="$RUNNER_TEMP/visibility-budget.ts"
+          fi
+          cd packages/core/scripts
+          for cell in "offset 10000" "offset 100000" "offset 1000000" "offset 10000000" "offset 100000000" "scale 1" "scale 100" "scale 1000" "scale 10000" "scale 100000"; do
+            set -- $cell
+            code=0
+            timeout -k 20 480 node --import ./_flag-hook.ts _flag-scale.ts "$OUT/$ARM-$1-$2.json" "$1" "$2" > "$OUT/$ARM-$1-$2.log" 2>&1 || code=$?
+            echo "$ARM $1 $2 exit $code, last line: $(tail -1 "$OUT/$ARM-$1-$2.log" | cut -c1-160)"
+          done
+          for fixture in large-clustered huge-clustered; do
+            code=0
+            timeout -k 20 1500 node --import ./_flag-hook.ts _flag-mem.ts "$fixture" "$OUT/$ARM-mem-$fixture.json" > "$OUT/$ARM-mem-$fixture.log" 2>&1 || code=$?
+            echo "$ARM mem $fixture exit $code, last line: $(tail -1 "$OUT/$ARM-mem-$fixture.log" | cut -c1-200)"
+          done
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: join-cost
-          path: out/join-cost.*
+          name: flag-${{ matrix.arm }}
+          path: out/flag/
           if-no-files-found: warn
