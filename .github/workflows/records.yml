@@ -15,6 +15,7 @@ on:
           - through-floor
           - through-check
           - paint-tie
+          - route-tie
           - joint-win
 
 permissions:
