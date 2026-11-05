@@ -78,11 +78,23 @@ jobs:
             export ANCHOR_SOURCE="$RUNNER_TEMP/visibility-budget.ts"
           fi
           cd packages/core/scripts
-          for cell in "offset 10000" "offset 100000" "offset 1000000" "offset 10000000" "offset 100000000" "scale 1" "scale 100" "scale 1000" "scale 10000" "scale 100000"; do
-            set -- $cell
-            code=0
-            timeout -k 20 480 node --import ./_flag-hook.ts _flag-scale.ts "$OUT/$ARM-$1-$2.json" "$1" "$2" > "$OUT/$ARM-$1-$2.log" 2>&1 || code=$?
-            echo "$ARM $1 $2 exit $code, last line: $(tail -1 "$OUT/$ARM-$1-$2.log" | cut -c1-160)"
+          # Each router of each cell has its own process. After a no read, the larger values of that kind and router do not run, and the log says so.
+          for router in corners shared-all; do
+            for kind in offset scale; do
+              if [ "$kind" = offset ]; then values="10000 100000 1000000 10000000 100000000"; else values="1 100 1000 10000 100000"; fi
+              stopped=""
+              for value in $values; do
+                name="$ARM-$router-$kind-$value"
+                if [ -n "$stopped" ]; then
+                  echo "$name not run: no read at $kind $stopped"
+                  continue
+                fi
+                code=0
+                SCALE_ROUTERS="$router" timeout -k 20 480 node --import ./_flag-hook.ts _flag-scale.ts "$OUT/$name.json" "$kind" "$value" > "$OUT/$name.log" 2>&1 || code=$?
+                echo "$name exit $code, last line: $(tail -1 "$OUT/$name.log" | cut -c1-160)"
+                if [ "$code" != 0 ]; then stopped="$value"; fi
+              done
+            done
           done
           for fixture in large-clustered huge-clustered; do
             code=0
