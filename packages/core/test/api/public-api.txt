@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1507 names
+## . (build/index.d.ts): 1510 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -627,6 +627,8 @@ SLOT_KEYS: build/index.d.ts#SLOT_KEYS
 SMALL_CLUSTERED: build/index.d.ts#SMALL_CLUSTERED
 SOFT_KEY_DEFAULTS: build/index.d.ts#SOFT_KEY_DEFAULTS
 SPACING_LIMIT: build/index.d.ts#SPACING_LIMIT
+SPACING_METHOD: build/index.d.ts#SPACING_METHOD
+SPACING_WIDE: build/index.d.ts#SPACING_WIDE
 SPARSE_LONG: build/index.d.ts#SPARSE_LONG
 SPECTRAL_DEFAULTS: build/index.d.ts#SPECTRAL_DEFAULTS
 SPIRAL: build/index.d.ts#SPIRAL
@@ -708,6 +710,7 @@ type SnapOptions: build/index.d.ts#SnapOptions
 SoftGraph: build/index.d.ts#SoftGraph
 SoftGraphOptions: build/index.d.ts#SoftGraphOptions
 type SoftKeyOptions: build/index.d.ts#SoftKeyOptions
+SpacingSample: build/index.d.ts#SpacingSample
 type SpectralOptions: build/index.d.ts#SpectralOptions
 type SpiralNode: build/index.d.ts#SpiralNode
 type SpiralOptions: build/index.d.ts#SpiralOptions
@@ -3046,6 +3049,7 @@ export interface HighwayBenchOptions {
   readonly maxWidth?: number;
   readonly radius?: number;
   readonly minRadius?: number;
+  readonly onSample?: (sample: SpacingSample) => void;
   readonly jogs?: readonly JogStyle[];
   readonly jogPieces?: number;
 }
@@ -3091,6 +3095,7 @@ export interface HighwayMeasureOptions {
   readonly minRadius?: number;
   readonly ends?: number;
   readonly space?: CurveSpace;
+  readonly onSample?: (sample: SpacingSample) => void;
 }
 
 ### build/index.d.ts#HighwayMeasures
@@ -3098,6 +3103,9 @@ export interface HighwayMeasures {
   readonly bundles: number;
   readonly lanes: number;
   readonly samples: number;
+  readonly spacingMethod: typeof SPACING_METHOD;
+  readonly overWide: number;
+  readonly overWidePairs: number;
   readonly worstSpacing: number;
   readonly meanSpacing: number;
   readonly overLimit: number;
@@ -4926,6 +4934,12 @@ export declare const SOFT_KEY_DEFAULTS: Readonly<SoftKeyOptions>;
 ### build/index.d.ts#SPACING_LIMIT
 export declare const SPACING_LIMIT = .05;
 
+### build/index.d.ts#SPACING_METHOD
+export declare const SPACING_METHOD = "pair-gap";
+
+### build/index.d.ts#SPACING_WIDE
+export declare const SPACING_WIDE = .25;
+
 ### build/index.d.ts#SPARSE_LONG
 export declare const SPARSE_LONG: HighwaysFamily;
 
@@ -5426,6 +5440,17 @@ interface SoftKeyOptions {
   readonly linkage: Linkage;
   readonly minSize: number;
   readonly spine: GroupSpine;
+}
+
+### build/index.d.ts#SpacingSample
+export interface SpacingSample {
+  readonly edges: readonly [string, string];
+  readonly at: Point;
+  readonly distance: number;
+  readonly gap: number;
+  readonly spacing: number;
+  readonly lanes: number;
+  readonly length: number;
 }
 
 ### build/index.d.ts#SpectralOptions
