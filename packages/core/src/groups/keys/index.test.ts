@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Graph, Node } from "../../model.ts";
 import { sectionsRouter } from "../../routers/sections.ts";
-import { allSections, checkSections } from "../../sections.ts";
+import { allSections, checkSections, type Section } from "../../sections.ts";
 import { groupStrategies } from "../../strategies/builtins.ts";
 import { defineStrategy } from "../../strategies/model.ts";
 import { byDataGroup, keyedSections, keyGroups } from "./index.ts";
@@ -53,6 +53,32 @@ describe("the grouping rule keys", () => {
     expect(root.children[0]!.cell).toEqual({ x: 0, y: 0, w: 10, h: 50 });
     expect(() => checkSections(root, nodes.length)).not.toThrow();
     expect(groupStrategies.keys.run({ nodes, edges: [] })).toEqual(root);
+  });
+
+  it("gives a group in a group for each part of a key path with the option nest (KEYS-PATH)", () => {
+    // Made-up keys: two outer groups, inner groups in G1, a node with the key of G1 itself, an empty part and a node without a key.
+    const keys = ["G1/g1", "G2", "G1/g2", "G1", "G1/g1", undefined, "G2/", "G1//g2"];
+    const nodes: Node[] = keys.map((k, i) => ({ id: `n${i}`, box: { x: i * 30, y: (i % 3) * 30, w: 20, h: 20 }, ...(k === undefined ? {} : { data: { group: k } }) }));
+    const root = keyedSections(nodes, { nest: true });
+    expect(() => checkSections(root, nodes.length)).not.toThrow();
+    const shape = (s: Section): unknown => (s.children.length ? [s.id, s.depth, s.children.map(shape)] : [s.id, s.depth, s.nodes]);
+    expect(root.children.map(shape)).toEqual([
+      ["s:G1", 1, [["s:G1/g1", 2, [0, 4]], ["s:G1/g2", 2, [2, 7]], ["s:G1/", 2, [3]]]],
+      ["s:G2", 1, [1, 6]],
+      ["s#5", 1, [5]],
+    ]);
+    expect(root.children[0]!.nodes).toEqual([0, 2, 3, 4, 7]);
+    expect(groupStrategies.keys.run({ nodes, edges: [] }, { nest: true })).toEqual(root);
+    // Without nest, each key stays one group at depth 1, as before.
+    expect(keyedSections(nodes).children.map((c) => c.id)).toEqual(["s:G1/g1", "s:G2", "s:G1/g2", "s:G1", "s#5", "s:G2/", "s:G1//g2"]);
+    // With split, a large inner group splits below its own depth.
+    const big: Node[] = Array.from({ length: 12 }, (_, i) => ({ id: `b${i}`, box: { x: (i % 4) * 50, y: Math.floor(i / 4) * 50, w: 20, h: 20 }, data: { group: `G${i % 2}/g${i % 3}` } }));
+    const tree = keyedSections(big, { nest: true, split: { cap: 1 } });
+    expect(() => checkSections(tree, big.length)).not.toThrow();
+    const deep = allSections(tree).filter((s) => s.depth === 3);
+    expect(deep.length).toBeGreaterThan(0);
+    expect(deep.every((s) => /^s:G[01]\/g[012]\/./.test(s.id))).toBe(true);
+    expect(sectionsRouter({ name: "nest", group: groupStrategies.keys, groupOptions: { nest: true } }).route({ nodes: big, edges: [{ id: "e", source: { node: "b0" }, target: { node: "b11" } }] }).levels!.length).toBeGreaterThan(2);
   });
 
   it("splits a large group into a quadtree with the option split", () => {

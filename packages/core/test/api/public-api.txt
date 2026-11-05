@@ -3324,6 +3324,7 @@ interface KdeebOptions extends Pick<WayOptions, "margin" | "k"> {
 interface KeyOptions {
   readonly key?: NodeKey;
   readonly split?: SectionOptions;
+  readonly nest?: boolean;
 }
 
 ### build/index.d.ts#KeyedWay

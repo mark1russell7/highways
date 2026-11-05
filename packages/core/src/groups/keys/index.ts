@@ -14,6 +14,14 @@ export interface KeyOptions {
    * Without it, each group is one leaf. The default is no split.
    */
   readonly split?: SectionOptions;
+  /**
+   * With `true`, a key is a path, and each `/` of the key starts a group in a group (KEYS-PATH).
+   * Thus the key `G1/g2` gives the group `g2` in the group `G1`.
+   * A group can have inner groups and nodes with its own key. Those nodes make one more leaf in the group.
+   * The id of that leaf is the id of the group and a `/`.
+   * The default is `false`: each key is one group at depth 1.
+   */
+  readonly nest?: boolean;
 }
 
 /** This key rule gives the string `data.group` of the node, or `undefined` when the node has no such string. */
@@ -45,6 +53,7 @@ function boundsOf(nodes: readonly Node[], list: readonly number[]): Box {
  */
 export function keyedSections(nodes: readonly Node[], options: KeyOptions = {}): Section {
   const key = options.key ?? byDataGroup;
+  if (options.nest) return nestedSections(nodes, key, options.split);
   const groups = new Map<string, number[]>();
   nodes.forEach((n, i) => {
     const k = key(n, i);
@@ -57,9 +66,50 @@ export function keyedSections(nodes: readonly Node[], options: KeyOptions = {}):
   return { id: "s", depth: 0, cell: boundsOf(nodes, nodes.map((_, i) => i)), nodes: nodes.map((_, i) => i), children };
 }
 
-/** This function gives the section of one group at depth 1. With `split`, the section has the quadtree of its nodes below it. */
-function group(nodes: readonly Node[], id: string, list: readonly number[], split: SectionOptions | undefined): Section {
-  if (!split) return { id, depth: 1, cell: boundsOf(nodes, list), nodes: list, children: [] };
+/** One group of a key path, with the nodes of its own key and its inner groups in the order of their first node. */
+interface PathGroup {
+  readonly own: number[];
+  readonly inner: Map<string, PathGroup>;
+  /** The nodes of the group and of its inner groups, in the order of the graph. */
+  readonly all: number[];
+}
+
+/** This function gives the tree of sections of the option `nest`: one level of the tree for each part of the key path. */
+function nestedSections(nodes: readonly Node[], key: NodeKey, split: SectionOptions | undefined): Section {
+  const top: PathGroup = { own: [], inner: new Map(), all: [] };
+  const alone: [number, Section][] = [];
+  nodes.forEach((n, i) => {
+    const parts = key(n, i)?.split("/").filter((p) => p !== "");
+    if (!parts?.length) {
+      alone.push([i, { id: `s#${i}`, depth: 1, cell: boundsOf(nodes, [i]), nodes: [i], children: [] }]);
+      return;
+    }
+    let at = top;
+    for (const part of parts) {
+      let next = at.inner.get(part);
+      if (!next) at.inner.set(part, (next = { own: [], inner: new Map(), all: [] }));
+      next.all.push(i);
+      at = next;
+    }
+    at.own.push(i);
+  });
+  // Each child is a pair of its first node and its section, so the children keep the order of their first nodes.
+  const childrenOf = (g: PathGroup, path: string, depth: number): [number, Section][] =>
+    [...g.inner].map(([part, inner]): [number, Section] => {
+      const id = path === "" ? `s:${part}` : `${path}/${part}`;
+      if (inner.inner.size === 0) return [inner.all[0]!, group(nodes, id, inner.all, split, depth)];
+      const kids = childrenOf(inner, id, depth + 1);
+      if (inner.own.length) kids.push([inner.own[0]!, group(nodes, `${id}/`, inner.own, split, depth + 1)]);
+      kids.sort((a, b) => a[0] - b[0]);
+      return [inner.all[0]!, { id, depth, cell: boundsOf(nodes, inner.all), nodes: inner.all, children: kids.map(([, s]) => s) }];
+    });
+  const children = [...childrenOf(top, "", 1), ...alone].sort((a, b) => a[0] - b[0]).map(([, s]) => s);
+  return { id: "s", depth: 0, cell: boundsOf(nodes, nodes.map((_, i) => i)), nodes: nodes.map((_, i) => i), children };
+}
+
+/** This function gives the section of one group at its depth, 1 by default. With `split`, the section has the quadtree of its nodes below it. */
+function group(nodes: readonly Node[], id: string, list: readonly number[], split: SectionOptions | undefined, depth = 1): Section {
+  if (!split) return { id, depth, cell: boundsOf(nodes, list), nodes: list, children: [] };
   const tree = buildSections(
     list.map((i) => nodes[i]!),
     split,
@@ -67,7 +117,7 @@ function group(nodes: readonly Node[], id: string, list: readonly number[], spli
   // The quadtree numbers the nodes of the group from 0. Each section gets the indices of the graph, one more level and the id of the group before its path.
   const rebase = (s: Section): Section => ({
     id: s.id === "s" ? id : `${id}/${s.id.slice(1)}`,
-    depth: s.depth + 1,
+    depth: s.depth + depth,
     cell: s.cell,
     nodes: s.nodes.map((j) => list[j]!),
     children: s.children.map(rebase),
