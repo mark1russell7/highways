@@ -8,6 +8,8 @@
 # BENCH-GREEN: the step `highway` of the suite runs in `shards` shards (`--shard`). Each shard gets one seed of each strategy, so the shards take similar times.
 # The input `caps` stops a slow strategy above a fixture size. The report and the summary list each capped cell, so the row is capped, not missing.
 # Each part to 1 000 nodes also routes `shared` in turn with each strategy on the first seed (`--pair shared`), so each strategy gets a ratio from the same CPU.
+# The job `land` pushes the record of a complete nightly run to the branch `bench-data`, and it starts `Pages`. So the site stays fresh with no merge.
+# The rules of the main branch stop a direct push, and a pull request of the token of GitHub Actions starts no workflow. So the record has its own branch.
 name: Bench
 
 on:
@@ -30,6 +32,10 @@ on:
       shards:
         description: "The shards of the step highway of the suite, to 1 000 nodes."
         default: "10"
+      land:
+        description: "Push the record of a complete run on main to the branch bench-data, as the nightly run does."
+        type: boolean
+        default: false
       caps:
         description: "The caps of slow strategies, as name=nodes with commas. An empty text has no cap. The nightly run has no cap."
         default: "mlseb=400"
@@ -209,3 +215,42 @@ jobs:
             bench.json
             report.json
           if-no-files-found: warn
+
+  land:
+    needs: [plan, part, join]
+    # A record lands only when each part finished. The job `join` also runs after a failed part, so this job reads both results.
+    if: needs.part.result == 'success' && needs.join.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.land)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only this job writes. It pushes to the branch bench-data, never to main.
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: bench-${{ github.sha }}
+          path: ${{ runner.temp }}/record
+      - name: Push the record to the branch bench-data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAX: ${{ needs.plan.outputs.max }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tree="$RUNNER_TEMP/branch"
+          if git fetch --depth 1 origin bench-data; then git worktree add -q "$tree" FETCH_HEAD; else git worktree add -q --orphan -b bench-data "$tree"; fi
+          time=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" -q .run_started_at)
+          core=$(jq -r .version packages/core/package.json)
+          node packages/site/scripts/bench-land.ts "$RUNNER_TEMP/record/bench.json" "$tree" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$time" "$core" "$MAX"
+          git -C "$tree" add bench.json bench-meta.json
+          git -C "$tree" commit -q -m "bench: the record of run $GITHUB_RUN_ID, core $core"
+          git push origin "$(git -C "$tree" rev-parse HEAD):refs/heads/bench-data"
+      - name: Start the Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main --repo "$GITHUB_REPOSITORY"

@@ -1,7 +1,8 @@
 # Builds packages/site and publishes it to GitHub Pages at https://mark1russell7.github.io/highways/, with
 # the shared Pages workflow of mark1russell7 (reusable-pages.yml of mark1russell7/template, its CI.md).
 # The Pages source of the repository is "GitHub Actions" (Settings > Pages).
-# The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/,
+# The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/
+# or the newer record of the branch bench-data, which the job `land` of Bench pushes,
 # the verdict snapshots of docs/research/verdicts/, the idea records and the roadmap (SITE-LIVE).
 # The shared site-pages action adds the Status page (from docs/ROADMAP.md) and the Releases page (from npm).
 # A pull request builds and checks the site in a browser, with no deploy.
@@ -37,7 +38,7 @@ jobs:
       id-token: write
     with:
       # The site reads the committed snapshots, so the build takes a few minutes. The workflow Bench races the routers.
-      build: pnpm --filter @highways/site run build
+      build: node packages/site/scripts/bench-overlay.ts && pnpm --filter @highways/site run build
       out: packages/site/dist
       env: '{"SITE_BASE": "/${{ github.event.repository.name }}"}'
       deploy: ${{ github.event_name != 'pull_request' }}
