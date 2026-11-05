@@ -1,6 +1,6 @@
 import { dist, inflate, pointBoxDistance, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
-import { fixedPortPoint, nodeIndex, type Graph, type Level, type Node, type Result } from "../model.ts";
+import { fixedPortPoint, framesOf, nodeIndex, type Graph, type Level, type Node, type Result } from "../model.ts";
 
 /** A broken hard rule. A correct router has none. */
 export interface Violation {
@@ -22,7 +22,8 @@ export const TOLERANCE = 0.5;
 
 /**
  * This function checks the hard rules of a result. Each edge has one route, and each route starts and ends at its nodes.
- * Fixed plugs stay in place. No route goes through a node that is not one of its ends. The counts of each level add up.
+ * Fixed plugs stay in place. No route goes through a node that is not one of its ends or a frame that holds an end. The counts of each level add up.
+ * A route from a node in a frame must leave that frame, so such a frame does not count, as in the through check (THROUGH-CHECK).
  * Each link of a level starts on the box of its source and ends on the box of its target.
  *
  * Each route of a bundle starts with its trunk, and an edge is in one bundle at most.
@@ -57,12 +58,13 @@ export function checkProperties(graph: Graph, result: Result, limit = 100): Viol
     const ft = fixedPortPoint(t, e.target);
     if ((fs && dist(fs, a) > TOLERANCE) || (ft && dist(ft, b) > TOLERANCE))
       if (add({ rule: "fixed-plugs", edge: e.id, detail: "the route does not start or end at its fixed plug" })) return out;
+    const holders = new Set([...framesOf(byId, s.id), ...framesOf(byId, t.id)]);
     for (let i = 1; i < r.points.length; i++) {
       const p = r.points[i - 1]!;
       const q = r.points[i]!;
       let hit: Node | undefined;
       grid.querySegment(p, q, 0, (n) => {
-        if (!hit && n !== s && n !== t && segmentHitsBox(p, q, inflate(n.box, -TOLERANCE))) hit = n;
+        if (!hit && n !== s && n !== t && !holders.has(n.id) && segmentHitsBox(p, q, inflate(n.box, -TOLERANCE))) hit = n;
       });
       if (hit) {
         if (add({ rule: "no-pass-through", edge: e.id, detail: `segment ${i} goes through ${hit.id}` })) return out;

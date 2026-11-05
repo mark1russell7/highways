@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CASES, denseGroupsBoard, hubChainBoard, manyGroupsBoard } from "../cases.ts";
 import type { Box, Point } from "../geom.ts";
-import type { Graph } from "../model.ts";
+import type { Graph, Result } from "../model.ts";
 import { sectionsRouter } from "../routers/sections.ts";
 import { backtrackOf, countOverlaps, goesOutAndBack, measureLevelFaults, measureLinks, measureRouteFaults, sumFaults } from "./links.ts";
 
@@ -82,6 +82,22 @@ describe("the case boards", () => {
     expect(levels.reduce((s, l) => s + l.overlaps, 0)).toBe(30);
     // Before ER3a, 26 level links went through other groups.
     expect(sumFaults(levels).through).toBe(0);
+  });
+
+  it("does not count a frame that holds an end of a route, and counts each other frame", () => {
+    const g: Graph = {
+      nodes: [
+        { id: "f", box: { x: 0, y: 0, w: 100, h: 60 } },
+        { id: "a", box: { x: 20, y: 20, w: 20, h: 20 }, parent: "f" },
+        { id: "c", box: { x: 240, y: 20, w: 20, h: 20 } },
+      ],
+      edges: [{ id: "ac", source: { node: "a" }, target: { node: "c" } }],
+    };
+    const line: Result = { routes: [{ edge: "ac", points: [{ x: 40, y: 30 }, { x: 240, y: 30 }] }] };
+    expect(measureRouteFaults(g, line).through).toBe(0);
+    const walled: Graph = { ...g, nodes: [...g.nodes, { id: "g", box: { x: 140, y: 0, w: 40, h: 60 } }] };
+    expect([measureRouteFaults(walled, line).through, measureRouteFaults(walled, line).avoidable]).toEqual([1, 1]);
+    expect(measureLinks(new Map(g.nodes.map((n) => [n.id, n.box])), [{ source: "a", target: "c", points: line.routes[0]!.points }]).through).toBe(1);
   });
 
   it("hub chain: no route goes away from its target and comes back (ER3b)", () => {

@@ -1,7 +1,7 @@
 import { overlapOf } from "@mark1russell7/layout-contract";
 import { dist, inflate, pointSegmentDistance, polylineLength, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
-import type { Graph, Level, Result } from "../model.ts";
+import { framesOf, nodeIndex, type Graph, type Level, type Result } from "../model.ts";
 import { TOLERANCE } from "./properties.ts";
 
 /**
@@ -66,6 +66,8 @@ export interface MeasuredLink {
   readonly source: string;
   readonly target: string;
   readonly points: readonly Point[];
+  /** The ids of the boxes that do not count for this link. They are the frames that hold an end: a route from a node in a frame must leave that frame. */
+  readonly skip?: readonly string[];
 }
 
 /**
@@ -128,7 +130,7 @@ export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly Me
       const a = p[i - 1]!;
       const b = p[i]!;
       grid.querySegment(a, b, 0, (id) => {
-        if (far || id === l.source || id === l.target) return;
+        if (far || id === l.source || id === l.target || l.skip?.includes(id)) return;
         const box = boxes.get(id)!;
         if (!segmentHitsBox(a, b, inflate(box, -TOLERANCE), TOLERANCE)) return;
         hit = true;
@@ -151,14 +153,17 @@ export function boxesOverlap(a: Box, b: Box): boolean {
   return x > TOLERANCE && y > TOLERANCE;
 }
 
-/** This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge. */
+/** This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge. A frame that holds an end does not count. */
 export function measureRouteFaults(graph: Graph, result: Result, options: LinkFaultOptions = {}): LinkFaults {
   const boxes = new Map(graph.nodes.map((n) => [n.id, n.box]));
   const edges = new Map(graph.edges.map((e) => [e.id, e]));
+  const byId = nodeIndex(graph);
   const links: MeasuredLink[] = [];
   for (const r of result.routes) {
     const e = edges.get(r.edge);
-    if (e) links.push({ source: e.source.node, target: e.target.node, points: r.points });
+    if (!e) continue;
+    const skip = [...framesOf(byId, e.source.node), ...framesOf(byId, e.target.node)];
+    links.push({ source: e.source.node, target: e.target.node, points: r.points, ...(skip.length > 0 ? { skip } : {}) });
   }
   return measureLinks(boxes, links, options);
 }
