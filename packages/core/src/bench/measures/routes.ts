@@ -123,12 +123,12 @@ export function crossingAngle(a: Point, b: Point, c: Point, d: Point): number {
  * It uses the grid and the sample of `countCrossings`. Above 20 000 segments, a seeded sample of 2 000 segments gives an estimate.
  * The cost is `n log n`.
  */
-export function crossingAngles(segs: readonly DrawnSegment[]): CrossingAngles {
+export function crossingAngles(segs: readonly DrawnSegment[], options: { readonly limit?: number } = {}): CrossingAngles {
   if (segs.length < 2) return { crossings: 0, estimated: false, mean: 1, min: 90 };
   const len = segs.reduce((s, [a, b]) => s + dist(a, b), 0) / segs.length;
   const grid = new Grid<number>(Math.max(20, len));
   segs.forEach(([a, b], i) => grid.addSegment(i, a, b));
-  const exact = segs.length <= EXACT_CROSSINGS;
+  const exact = segs.length <= (options.limit ?? EXACT_CROSSINGS);
   const R = rng(segs.length);
   const pick = exact ? segs.map((_, i) => i) : Array.from({ length: SAMPLE }, () => Math.floor(R() * segs.length));
   let count = 0;
