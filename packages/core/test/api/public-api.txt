@@ -4907,7 +4907,7 @@ export declare const SPACING_LIMIT = .05;
 export declare const SPACING_METHOD = "pair-gap";
 
 ### build/index.d.ts#SPACING_WIDE
-export declare const SPACING_WIDE = 0.25;
+export declare const SPACING_WIDE = .25;
 
 ### build/index.d.ts#SPARSE_LONG
 export declare const SPARSE_LONG: HighwaysFamily;
