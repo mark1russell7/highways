@@ -10,7 +10,7 @@
 //   It reads each file `bisect-shard<n>.json` below `<dir>`. It writes the record, and exits with the code 1 when the record is not complete.
 // - A check: `node scripts/sections-bisect.ts --check --tree <dir> --routers <a,b>`. It loads the core of a worktree and finds the routers.
 // - A child of mode `fresh`: `node scripts/sections-bisect.ts --child --tree <dir> --board <file>`. `measureIsolated` appends `--input <router> --warmup <n>`.
-// - The plan of the confirm mode: `node scripts/sections-bisect.ts --plan <pairs> [--rounds <n>]`. It prints the pairs as the JSON of a matrix.
+// - The plan of the confirm mode: `node scripts/sections-bisect.ts --plan <pairs> [--rounds <n>] [--routers <names>]`. It prints the pairs as the JSON of a matrix.
 // - One job of the confirm mode: `node scripts/sections-bisect.ts --confirm --pair <n> --commit <ref> --parent <ref> --trees <dir> --out <dir> [--routers <a,b>] [--rounds <n>]`.
 //   It makes a git worktree of the base, the commit and the parent. `confirmPair` times the commit, the parent and the A/A arm of the parent on the board of the base.
 //   It writes `<dir>/confirm-pair<n>.json` and prints the table of the pair.
@@ -299,6 +299,7 @@ if (args.includes("--child")) {
 } else if (opt("--plan") !== undefined) {
   // The plan job checks the rounds too, so a bad input fails before the matrix starts.
   if (opt("--rounds") !== undefined) parseRounds(opt("--rounds"));
+  if (opt("--routers") !== undefined) parseRouters(opt("--routers"));
   console.log(JSON.stringify(parsePairs(opt("--plan"))));
 } else if (args.includes("--gate")) {
   const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));
