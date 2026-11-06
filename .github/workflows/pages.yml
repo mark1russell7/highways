@@ -11,8 +11,16 @@ name: Pages
 on:
   push:
     branches: [main]
+  # After a release, so that the Releases page has the new version
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
   pull_request:
+  # Each day, in case a release fails after it publishes
+  schedule:
+    - cron: "32 5 * * *"
 
 permissions: {}
 

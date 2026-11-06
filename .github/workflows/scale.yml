@@ -260,7 +260,7 @@ jobs:
 
   scale-ok:
     name: Scale OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, routers, time, summary, screen]
     runs-on: ubuntu-latest
     timeout-minutes: 2
