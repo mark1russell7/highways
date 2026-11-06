@@ -336,8 +336,6 @@ const emptySum = (): Sum => ({
   shifts: new Map(),
 });
 
-const total = (pairs: ReadonlyMap<string, number>): number => [...pairs.values()].reduce((sum, n) => sum + n, 0);
-
 /** This function adds one set of lines of a board to a sum. */
 function addLines(sum: Sum, lines: readonly EdgeLine[], frame: Frame): void {
   const snapped = snapLines(lines);

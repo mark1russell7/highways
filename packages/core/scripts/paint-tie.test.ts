@@ -6,7 +6,7 @@ import { FLOOR_MOVE, FLOOR_UNIT, floorRows, kindRows, MOVES, paintRecord, REGENE
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/paint-tie/record.json", import.meta.url), "utf8")) as ReturnType<typeof paintRecord>;
 const through = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as {
-  readonly lanes?: readonly { readonly router: string; readonly bySeed: readonly { readonly painted: { readonly points: number } }[] }[];
+  readonly lanes?: readonly { readonly router: string; readonly view?: string; readonly bySeed: readonly { readonly painted: { readonly points: number } }[] }[];
   readonly rows?: readonly { readonly router: string; readonly view?: string; readonly bySeed?: readonly { readonly painted: { readonly points: number } }[] }[];
 };
 const STALE = `The record paint-tie/1 is stale. Write it again with: ${REGENERATE}`;
