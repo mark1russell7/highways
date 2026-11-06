@@ -184,12 +184,12 @@ describe("the inner routes of the mode gutter (INTERIOR-GUTTER)", () => {
       expect(same).toEqual(base);
     }
     const digest = createHash("sha256")
-      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes.map(({ through: _through, ...route }) => route))))
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c", outSteps: false }).route(b).routes.map(({ through: _through, near: _near, ...route }) => route))))
       .digest("hex");
-    // The digest of the routes with `outSteps: false`. The field `through` does not count. INNER-SPIKE moved the first stop of each route that leaves a wall plug, so this digest is not the digest of version 0.9.2.
+    // The digest of the routes with `outSteps: false`. The fields `through` and `near` do not count. INNER-SPIKE moved the first stop of each route that leaves a wall plug, so this digest is not the digest of version 0.9.2.
     expect(digest).toBe("efe7c2ccbad0d88e558c454a598785d82d9079c3ce0d9c40604b29353a23c907");
     const ladder = createHash("sha256")
-      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.map(({ through: _through, ...route }) => route))))
+      .update(JSON.stringify(boards.map((b) => cornersRouter({ name: "c" }).route(b).routes.map(({ through: _through, near: _near, ...route }) => route))))
       .digest("hex");
     // INNER-SPIKE: a strip of 4 takes the lower steps, so the ladder gives the ways along the strip.
     expect(ladder).toBe("460f62926fe5620f20407cc407715e366c7ceb3ca75846d18faffde35274dc81");

@@ -1,6 +1,6 @@
 import { TOLERANCE } from "./bench/properties.ts";
 import { freeRegions } from "./free-regions.ts";
-import { dist, inBox, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
+import { dist, inBox, inflate, segmentBoxDistance, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
 import { WORK } from "./work.ts";
@@ -58,6 +58,13 @@ export class Obstacles {
   across(a: Point, b: Point, visit: (n: Node) => void): void {
     this.#grid.querySegment(a, b, 0, (n) => {
       if (segmentHitsBox(a, b, inflate(n.box, -TOLERANCE))) visit(n);
+    });
+  }
+
+  /** This method gives each node whose box is nearer than `width` to the segment `ab` to `visit`. A box that the segment touches or goes into counts too. */
+  near(a: Point, b: Point, width: number, visit: (n: Node) => void): void {
+    this.#grid.querySegment(a, b, width, (n) => {
+      if (segmentBoxDistance(a, b, n.box) < width) visit(n);
     });
   }
 
