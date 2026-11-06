@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1520 names
+## . (build/index.d.ts): 1521 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -232,6 +232,7 @@ FixtureSpec: build/index.d.ts#FixtureSpec
 type FlowClusterOptions: build/index.d.ts#FlowClusterOptions
 type FlowFieldOptions: build/index.d.ts#FlowFieldOptions
 type FollowOptions: build/index.d.ts#FollowOptions
+type FrameItem: build/index.d.ts#FrameItem
 type FrameOptions: build/index.d.ts#FrameOptions
 type FrechetBundle: build/index.d.ts#FrechetBundle
 type FrechetOptions: build/index.d.ts#FrechetOptions
@@ -2747,6 +2748,11 @@ interface FlowFieldOptions extends Pick<WayOptions, "margin" | "k"> {
 interface FollowOptions extends WayOptions {
   readonly routes?: Result;
   readonly laneOrder?: RunOrder;
+}
+
+### build/index.d.ts#FrameItem
+interface FrameItem extends InnerEdge {
+  readonly wall?: Plug;
 }
 
 ### build/index.d.ts#FrameOptions
@@ -6890,7 +6896,7 @@ export declare function formatTable(rows: readonly BenchRow[]): string;
 export declare function formatTracks(rows: readonly TrackBenchRow[]): string;
 
 ### build/index.d.ts#frameRoutes
-export declare function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: FrameOptions): Route[];
+export declare function frameRoutes(graph: Graph, inner: readonly FrameItem[], options: FrameOptions): Route[];
 
 ### build/index.d.ts#framesOf
 export declare function framesOf(byId: ReadonlyMap<string, Node>, id: string): string[];

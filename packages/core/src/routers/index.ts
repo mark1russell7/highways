@@ -9,7 +9,7 @@ import { byCollection, trunksRouter } from "./trunks.ts";
 export { boxExit, straightRouter } from "./straight.ts";
 export { plugsRouter } from "./plugs.ts";
 export { cornersRouter, type CornersOptions } from "./corners.ts";
-export { frameRoutes, type FrameOptions, type InnerMode, type Outside } from "./frames.ts";
+export { frameRoutes, type FrameItem, type FrameOptions, type InnerMode, type Outside } from "./frames.ts";
 export { GUTTER_BEND_COST, gutterRoutes, type GutterEdge, type GutterOptions } from "./gutter.ts";
 export { sharedRouter, type ShareCost, type SharedHooks, type SharedNegotiation, type SharedOptions, type SharedSearch, type ShareMerge, type ShareOrder } from "./shared.ts";
 export { ANNEALING_DEFAULTS, ANNEALING_SCHEMA, annealingRouter, annealingStrategy, annealWays, type AnnealingOptions } from "./annealing/index.ts";

@@ -35,6 +35,14 @@ export interface FrameOptions extends WayOptions {
   readonly bendCost?: number;
 }
 
+/**
+ * An inner edge with an optional plug of the wall. With `wall`, the route leaves the frame at that plug, in place of the plug that faces the far end.
+ * A leg of an edge between frames (CROSS-FRAME-ROUTE) gets the plug of its outer leg, so that the legs meet.
+ */
+export interface FrameItem extends InnerEdge {
+  readonly wall?: Plug;
+}
+
 /** The inside of one frame for the inner edges to one depth: the bounds, the way finder and the obstacles by id. */
 interface Room {
   readonly bounds: Box;
@@ -64,7 +72,12 @@ const notCrossed =
  * A sibling edge has its two ends in the frame, and the route goes around the other children.
  * An edge at two depths also enters the nested frames that hold an end. It goes around each other node of the room, and around each nested frame that holds no end.
  */
-export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: FrameOptions): Route[] {
+export function frameRoutes(graph: Graph, inner: readonly FrameItem[], options: FrameOptions): Route[] {
+  return frameRouteList(graph, inner, options).filter((r): r is Route => r !== undefined);
+}
+
+/** This function gives the route of each item of `frameRoutes` at the position of the item. An item with no route gives `undefined`. */
+export function frameRouteList(graph: Graph, inner: readonly FrameItem[], options: FrameOptions): (Route | undefined)[] {
   const byId = nodeIndex(graph);
   const children = new Map<string, Node[]>();
   for (const n of graph.nodes) {
@@ -78,8 +91,8 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
   const margin = options.margin ?? 5;
   const inset = options.frameInset ?? margin;
   const rooms = new Map<string, Room>();
-  const routes: Route[] = [];
-  for (const item of inner) {
+  const routes: (Route | undefined)[] = inner.map(() => undefined);
+  inner.forEach((item, at) => {
     const { edge, frame, plug } = item;
     const f = byId.get(frame)!;
     const chain = roomChain(byId, item);
@@ -90,16 +103,16 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
       // An edge without a plug of a frame: the two ends are nodes of the room.
       const s = room.nodes.get(edge.source.node);
       const t = room.nodes.get(edge.target.node);
-      if (!s || !t) continue;
+      if (!s || !t) return;
       const ps = placePlug(s, edge.source, center(t.box));
       const pt = placePlug(t, edge.target, center(s.box));
-      routes.push(markRoute({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame }, room.ways.obstacles, notCrossed(s.id, t.id)));
-      continue;
+      routes[at] = markRoute({ edge: edge.id, points: room.ways.between(ps, pt, new Set<Node>([s, t])), frame }, room.ways.obstacles, notCrossed(s.id, t.id));
+      return;
     }
     const [own, far] = plug === "source" ? [edge.source, edge.target] : [edge.target, edge.source];
     const end = room.nodes.get(far.node);
-    if (!end) continue;
-    const fp = placePlug(f, own, center(end.box));
+    if (!end) return;
+    const fp = item.wall ?? placePlug(f, own, center(end.box));
     const inward = { x: -fp.normal.x, y: -fp.normal.y };
     // The way starts on the bounds, straight in from the plug of the wall. That stop is the first stop of the way, so the way takes no second step inward.
     const depth = insetOfWall(f.box, room.bounds, inward);
@@ -108,8 +121,8 @@ export function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: 
     const ends = new Set<Node>([end]);
     const points =
       plug === "source" ? stub(fp.point, room.ways.between(start, ep, ends)) : stub(fp.point, room.ways.between(ep, start, ends).reverse()).reverse();
-    routes.push(markRoute({ edge: edge.id, points, frame }, room.ways.obstacles, notCrossed(end.id)));
-  }
+    routes[at] = markRoute({ edge: edge.id, points, frame }, room.ways.obstacles, notCrossed(end.id));
+  });
   return routes;
 }
 
@@ -148,12 +161,12 @@ function deepRooms(byId: ReadonlyMap<string, Node>, inner: readonly InnerEdge[])
  * A route is orthogonal, in the free room of the frame box. An edge without a way through the free room gets no route.
  */
 function gutterFrameRoutes(
-  inner: readonly InnerEdge[],
+  inner: readonly FrameItem[],
   options: FrameOptions,
   byId: ReadonlyMap<string, Node>,
   children: ReadonlyMap<string, readonly Node[]>,
   deep: ReadonlySet<string>,
-): Route[] {
+): (Route | undefined)[] {
   const rooms = new Map<string, { readonly nodes: Map<string, Node>; readonly items: { at: number; edge: GutterEdge }[]; readonly frame: Box }>();
   const routes: (Route | undefined)[] = inner.map(() => undefined);
   inner.forEach((item, at) => {
@@ -169,7 +182,7 @@ function gutterFrameRoutes(
     if (!end) return;
     const from = plug === undefined ? room.nodes.get(own.node) : f;
     if (!from) return;
-    const placed = placePlug(from, own, center(end.box));
+    const placed = (plug === undefined ? undefined : item.wall) ?? placePlug(from, own, center(end.box));
     // The plug of a node faces out of the node. The gutter mode reads the normal of a wall plug, so the normal turns round.
     const fp: Plug = plug === undefined ? { point: placed.point, normal: { x: -placed.normal.x, y: -placed.normal.y } } : placed;
     const port = fixedPortPoint(end, far) === undefined ? undefined : placePlug(end, far, fp.point);
@@ -191,7 +204,7 @@ function gutterFrameRoutes(
       routes[at] = markRoute({ edge: edge.id, points: plug === "target" ? points.reverse() : points, frame }, obstacles, notCrossed(edge.source.node, edge.target.node));
     });
   }
-  return routes.filter((r): r is Route => r !== undefined);
+  return routes;
 }
 
 /** This function puts the plug of the wall before a way that starts on the bounds. A first point on the line of the stub goes. */

@@ -30630,11 +30630,11 @@
       "family": "nested",
       "view": "routes",
       "routes": 24,
-      "marked": 24,
+      "marked": 0,
       "flagged": 0,
       "falseThrough": 0,
       "partFalse": 0,
-      "unnamed": 2,
+      "unnamed": 0,
       "hairline": 0,
       "hairlineClear": 0,
       "skipsFrame": 57,
@@ -30647,7 +30647,7 @@
       "innerSpikes": 0,
       "innerBends": 74,
       "innerLength": 2046.44,
-      "crossings": 33,
+      "crossings": 32,
       "outOfRoom": 0,
       "deepUnmarked": 0,
       "silentLanes": 0,
@@ -30660,28 +30660,18 @@
       "bySeed": [],
       "classes": {},
       "innerClasses": {},
-      "unnamedClasses": {
-        "band": {
-          "routes": 2,
-          "sample": [
-            "0:e7",
-            "2:e5"
-          ],
-          "leastDepth": 0.07038123167154708,
-          "mostDepth": 0.13994169096207543
-        }
-      }
+      "unnamedClasses": {}
     },
     {
       "router": "corners",
       "family": "nested",
       "view": "lanes",
       "routes": 57,
-      "marked": 24,
+      "marked": 0,
       "flagged": 0,
       "falseThrough": 0,
       "partFalse": 0,
-      "unnamed": 2,
+      "unnamed": 0,
       "hairline": 0,
       "hairlineClear": 0,
       "skipsFrame": 57,
@@ -30698,30 +30688,30 @@
       "outOfRoom": 0,
       "deepUnmarked": 0,
       "silentLanes": 0,
-      "laneLength": 8294.778,
-      "laneBends": 74,
-      "fullLength": 8294.778,
-      "fullBends": 74,
-      "laneCrossings": 33,
-      "fullCrossings": 33,
+      "laneLength": 9957.301,
+      "laneBends": 224,
+      "fullLength": 9957.301,
+      "fullBends": 224,
+      "laneCrossings": 32,
+      "fullCrossings": 32,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 10,
-          "fullCrossings": 10,
+          "laneCrossings": 12,
+          "fullCrossings": 12,
           "polyline": {
-            "points": 10,
-            "beforePoints": 10,
-            "pairs": 10,
-            "beforePairs": 10,
+            "points": 13,
+            "beforePoints": 13,
+            "pairs": 13,
+            "beforePairs": 13,
             "added": 0,
             "lost": 0
           },
           "painted": {
-            "points": 10,
-            "beforePoints": 10,
-            "pairs": 10,
-            "beforePairs": 10,
+            "points": 14,
+            "beforePoints": 14,
+            "pairs": 13,
+            "beforePairs": 13,
             "added": 0,
             "lost": 0
           },
@@ -30735,18 +30725,18 @@
           "laneCrossings": 7,
           "fullCrossings": 7,
           "polyline": {
-            "points": 7,
-            "beforePoints": 7,
-            "pairs": 6,
-            "beforePairs": 6,
+            "points": 8,
+            "beforePoints": 8,
+            "pairs": 8,
+            "beforePairs": 8,
             "added": 0,
             "lost": 0
           },
           "painted": {
-            "points": 7,
-            "beforePoints": 7,
-            "pairs": 6,
-            "beforePairs": 6,
+            "points": 8,
+            "beforePoints": 8,
+            "pairs": 8,
+            "beforePairs": 8,
             "added": 0,
             "lost": 0
           },
@@ -30757,21 +30747,21 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 16,
-          "fullCrossings": 16,
+          "laneCrossings": 13,
+          "fullCrossings": 13,
           "polyline": {
-            "points": 16,
-            "beforePoints": 16,
-            "pairs": 16,
-            "beforePairs": 16,
+            "points": 23,
+            "beforePoints": 23,
+            "pairs": 21,
+            "beforePairs": 21,
             "added": 0,
             "lost": 0
           },
           "painted": {
-            "points": 16,
-            "beforePoints": 16,
-            "pairs": 16,
-            "beforePairs": 16,
+            "points": 20,
+            "beforePoints": 20,
+            "pairs": 20,
+            "beforePairs": 20,
             "added": 0,
             "lost": 0
           },
@@ -30783,17 +30773,7 @@
       ],
       "classes": {},
       "innerClasses": {},
-      "unnamedClasses": {
-        "band": {
-          "routes": 2,
-          "sample": [
-            "0:e7",
-            "2:e5"
-          ],
-          "leastDepth": 0.07038123167154708,
-          "mostDepth": 0.13994169096207543
-        }
-      }
+      "unnamedClasses": {}
     },
     {
       "router": "trunks",

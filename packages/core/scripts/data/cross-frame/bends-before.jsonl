@@ -1,0 +1,2 @@
+{"router":"corners","family":"nested","seeds":20,"kind":"between","routes":175,"stops":0,"turns":0,"line":0,"back":0,"most":0,"stopsPerRoute":0,"turnsPerRoute":0}
+{"router":"corners","family":"nested","seeds":20,"kind":"inner","routes":231,"stops":526,"turns":344,"line":130,"back":0,"most":4,"stopsPerRoute":2.277056277056277,"turnsPerRoute":1.4891774891774892}
