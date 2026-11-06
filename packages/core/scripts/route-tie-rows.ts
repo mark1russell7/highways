@@ -1,7 +1,8 @@
 /**
  * This module makes the rows of the record `route-tie/1` (ROUTE-TIE).
- * Each arm reads the boards of the families with one text of the corner search, and the script `route-tie.ts` starts each arm in its own process.
- * The record holds the table of the tolerances, the moves and the law for each router, the floor of each route measure, and the moves under a shift.
+ * Each arm reads the boards of the families with one text of the corner search. The script `route-tie.ts` starts each arm in its own process.
+ * The record holds the table of the tolerances, and the moves and the law for each router.
+ * It also holds the floor of each route measure, the moves under a shift, and the table of the two keys of the walk.
  */
 import { deriveSeed, fnv1a32, mulberry32, seedOf } from "@mark1russell7/rigor-generators";
 import { median, medianInterval } from "@mark1russell7/rigor-statistics";
@@ -221,6 +222,46 @@ export function routerRow(router: string, before: Side, after: Side): RouterRow 
   };
 }
 
+/** The sums of one router with one key of the walk, over the boards of the families. */
+export interface KeyRow {
+  readonly router: string;
+  /** The routes that move against the search before the rule. */
+  readonly moved: number;
+  /** The routes that move at each lower floor of the search: the law. */
+  readonly law: readonly number[];
+  /** The routes that move under each shift. */
+  readonly shift: readonly number[];
+  readonly work: number;
+  readonly length: number;
+  readonly pairs: number;
+  /** The sum of each route measure over the boards. */
+  readonly measures: Readonly<Record<string, number>>;
+}
+
+/** The keys of the walk: the search before the rule, the key `index` and the key `straight`. */
+export interface KeyTable {
+  readonly before: readonly KeyRow[];
+  readonly index: readonly KeyRow[];
+  readonly straight: readonly KeyRow[];
+}
+
+/** This function gives the row of one router on one side, against the search before the rule. */
+export function keyRow(router: string, before: Side, side: Side): KeyRow {
+  const base = pick(side.floors[0]!, router);
+  const measures: Record<string, number> = {};
+  for (const r of base) for (const [k, v] of Object.entries(r.measures ?? {})) measures[k] = (measures[k] ?? 0) + v;
+  return {
+    router,
+    moved: movedRoutes(pick(before.floors[0]!, router), base),
+    law: side.floors.slice(1).map((arm) => movedRoutes(base, arm, 0, router)),
+    shift: side.shifts.map((arm) => movedRoutes(base, arm, MOVE, router)),
+    work: sum(base, (r) => r.work),
+    length: sum(base, (r) => r.length),
+    pairs: sum(base, (r) => r.pairs),
+    measures,
+  };
+}
+
 /** The moved routes of `corners` under the shifts, by their first difference. */
 export interface ShiftKinds {
   /** The corner graph has another count of points or links. */
@@ -313,6 +354,8 @@ export interface RouteTieRecord {
   readonly predictionNote: string;
   readonly tolerances: readonly ToleranceRow[];
   readonly routers: readonly RouterRow[];
+  /** The two keys of the walk among the corners within the limit, beside the search before the rule. */
+  readonly keys: KeyTable;
   readonly shiftKinds: ShiftKinds;
   readonly floors: readonly MeasureFloor[];
   readonly slice: readonly SliceRow[];

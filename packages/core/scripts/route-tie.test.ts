@@ -14,6 +14,7 @@ describe("the record route-tie/1", () => {
 
   it("names the distance of the source, and holds its read on each side", () => {
     expect(source).toContain(`const TIE = ${CHOSEN};`);
+    expect(source).toContain("const STRAIGHT = true;");
     expect(record.chosen).toBe(CHOSEN);
     expect(record.tolerances.map((row) => row.tie)).toEqual([...TOLERANCES]);
     const row = record.tolerances.find((r) => r.tie === CHOSEN)!;
@@ -29,6 +30,14 @@ describe("the record route-tie/1", () => {
     expect(corners.lawBefore.every((moved) => moved > 0)).toBe(true);
   });
 
+  it("reads the law with each key of the walk on each router", () => {
+    for (const key of ["index", "straight"] as const) {
+      expect(record.keys[key].map((r) => r.router), key).toEqual([...NAMES]);
+      for (const row of record.keys[key]) expect(row.law, `${key} ${row.router}`).toEqual([0, 0]);
+    }
+    expect(record.keys.straight.map((r) => r.pairs)).toEqual(record.routers.map((r) => r.pairsAfter));
+  });
+
   it("gives each moved route under a shift one kind", () => {
     const corners = record.routers.find((r) => r.router === "corners")!;
     const { graph, search, other } = record.shiftKinds;
@@ -37,16 +46,19 @@ describe("the record route-tie/1", () => {
 });
 
 describe("the text of an arm of the record", () => {
-  const text = "const TIE = 1e-9;\n  count: number,\n  ): Among | undefined {\n";
+  const text = "const TIE = 1e-9;\nconst STRAIGHT = true;\n  count: number,\n  ): Among | undefined {\n";
 
   it("changes only what the arm asks", () => {
     expect(patchVisibility(text, {})).toBe(text);
     expect(patchVisibility(text, { tie: "1e-5" })).toContain("const TIE = 1e-5;");
     expect(patchVisibility(text, { floor: "0.5" })).toContain("floor *= 0.5;");
+    expect(patchVisibility(text, { key: "index" })).toContain("const STRAIGHT = false;");
+    expect(patchVisibility(text, { key: "straight" })).toBe(text);
   });
 
   it("refuses a search with no text to change, so an arm does not read the wrong code", () => {
     expect(() => patchVisibility("const OTHER = 1;", { tie: "1e-5" })).toThrow(/finds 0 matches/);
     expect(() => patchVisibility("const OTHER = 1;", { floor: "0.5" })).toThrow(/finds 0 matches/);
+    expect(() => patchVisibility("const OTHER = 1;", { key: "index" })).toThrow(/finds 0 matches/);
   });
 });

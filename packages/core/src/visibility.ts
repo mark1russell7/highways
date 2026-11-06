@@ -138,6 +138,9 @@ export const JOIN_WORK: number = 3 * 2048 * 2048;
 /** Two costs of a path within this distance tie. The distance is far above the rounding of a sum of lengths, and far below a real difference. */
 const TIE = 1e-9;
 
+/** The walk back from the goal takes the straightest corner among the corners within the limit. With `false`, the smallest index wins. The record route-tie reads both keys. */
+const STRAIGHT = true;
+
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
  * Each corner links to its `k` nearest corners that it can see. A lattice of free points links the groups of nodes.
@@ -725,12 +728,22 @@ export class CornerGraph {
         const m0 = start[at]!;
         const m1 = start[at + 1]!;
         settled += 1 + (m1 - m0);
+        // Among the corners within the limit, the walk takes the straightest continuation of the leg after this corner.
+        // The score is the dot product of the two legs over the length of the new leg. A score within `near` of the best ties, and then the smaller index wins.
+        const after = out[out.length - 2]!;
+        const [ax, ay] = [after.x - here.x, after.y - here.y];
+        const near = TIE * (Math.abs(ax) + Math.abs(ay) + 1);
+        let score = -Infinity;
         for (let m = m0; m < m1; m++) {
           const i = next[m]!;
           // G falls at each step of this rule, so a link of no length cannot start a loop.
-          if (closed[i] !== stamp || G[i]! >= G[at]! || (back >= 0 && i > back)) continue;
+          if (closed[i] !== stamp || G[i]! >= G[at]!) continue;
           const c = cost ? cost(i, at, length[m]!) : length[m]!;
-          if (G[i]! + c + rest <= limit) {
+          if (G[i]! + c + rest > limit) continue;
+          const p = points[i]!;
+          const s = STRAIGHT && length[m]! > 0 ? ((here.x - p.x) * ax + (here.y - p.y) * ay) / length[m]! : 0;
+          if (back < 0 || s > score + near || (s >= score - near && i < back)) {
+            if (back < 0 || s > score + near) score = s;
             back = i;
             step = c;
           }

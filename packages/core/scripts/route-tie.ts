@@ -15,6 +15,7 @@ import {
   FLOORS,
   measureFloors,
   NAMES,
+  keyRow,
   REGENERATE,
   routerRow,
   SCHEMA,
@@ -59,11 +60,12 @@ if (process.argv[2] === "--arm") {
 
   let count = 0;
   /** This function runs one arm in a fresh process, with its own text of the search. */
-  const arm = (hook: { readonly before?: boolean; readonly tie?: number; readonly floor?: number }, options: ArmOptions): ArmRow[] => {
+  const arm = (hook: { readonly before?: boolean; readonly tie?: number; readonly floor?: number; readonly key?: "index" }, options: ArmOptions): ArmRow[] => {
     const file = join(temp, `arm-${count++}.json`);
     const env: NodeJS.ProcessEnv = { ...process.env, ROUTE_TIE_HOOK: "1" };
     if (hook.before) env["ROUTE_TIE_BEFORE"] = before;
     if (hook.tie !== undefined) env["ROUTE_TIE_TIE"] = String(hook.tie);
+    if (hook.key !== undefined) env["ROUTE_TIE_KEY"] = hook.key;
     if (hook.floor !== undefined && hook.floor !== 1) env["ROUTE_TIE_FLOOR"] = String(hook.floor);
     const child = spawnSync(process.execPath, ["--import", pathToFileURL(HOOK).href, SCRIPT, "--arm", file, JSON.stringify(options)], { env, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
     if (child.status !== 0) throw new Error(`The arm ${JSON.stringify(hook)} failed: ${child.stderr}`);
@@ -88,13 +90,16 @@ if (process.argv[2] === "--arm") {
   });
 
   const all: ArmOptions = { routers: NAMES };
-  const side = (hook: { readonly before?: boolean }, options: ArmOptions): Side => ({
+  const side = (hook: { readonly before?: boolean; readonly key?: "index" }, options: ArmOptions): Side => ({
     // The law reads the routes alone, so only the arm at the floor 1 and the shifts read the measures.
     floors: FLOORS.map((floor) => arm({ ...hook, floor }, floor === 1 ? options : all)),
     shifts: shifts.map((shift) => arm(hook, { ...options, shift })),
   });
   console.log("The routers: the search before the rule.");
-  const old = side({ before: true }, all);
+  // The search before the rule also reads the measures, so the table of the keys compares the quality with it.
+  const old = side({ before: true }, { ...all, measures: true });
+  console.log("The routers: the rule with the key index, with the measures.");
+  const index = side({ key: "index" }, { ...all, measures: true });
   console.log("The routers: the search with the rule, with the measures.");
   const now = side({}, { ...all, measures: true });
 
@@ -111,6 +116,7 @@ if (process.argv[2] === "--arm") {
       "The outcome routes-moved-under-8pct-of-routes named no router, so it reads against the widest row and misses on shared-all. It should have named a router. The rows of this record give the moves of each router.",
     tolerances,
     routers: NAMES.map((router) => routerRow(router, old, now)),
+    keys: { before: NAMES.map((r) => keyRow(r, old, old)), index: NAMES.map((r) => keyRow(r, old, index)), straight: NAMES.map((r) => keyRow(r, old, now)) },
     shiftKinds: shiftKinds(now.floors[0]!, now.shifts),
     floors: measureFloors(now.floors[0]!, now.shifts),
     slice: sliceRows(),

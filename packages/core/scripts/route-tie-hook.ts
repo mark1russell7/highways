@@ -9,6 +9,8 @@ import { registerHooks } from "node:module";
 export interface PatchOptions {
   readonly tie?: string;
   readonly floor?: string;
+  /** The key of the walk: `index` sets `STRAIGHT` to `false`. */
+  readonly key?: "index" | "straight";
 }
 
 /** This function replaces one text that occurs once. A text that does not occur once throws an error, so an arm does not run on another search. */
@@ -26,6 +28,7 @@ export function patchVisibility(text: string, options: PatchOptions): string {
   let out = text;
   if (options.tie !== undefined) out = once(out, "const TIE = 1e-9;", `const TIE = ${options.tie};`);
   if (options.floor !== undefined) out = once(out, /count: number,(\r?\n)  \): Among \| undefined \{/, `count: number,$1  ): Among | undefined {$1    floor *= ${options.floor};`);
+  if (options.key === "index") out = once(out, "const STRAIGHT = true;", "const STRAIGHT = false;");
   return out;
 }
 
@@ -33,12 +36,13 @@ if (process.env["ROUTE_TIE_HOOK"] === "1") {
   const before = process.env["ROUTE_TIE_BEFORE"];
   const tie = process.env["ROUTE_TIE_TIE"];
   const floor = process.env["ROUTE_TIE_FLOOR"];
+  const key = process.env["ROUTE_TIE_KEY"] === "index" ? ("index" as const) : undefined;
   registerHooks({
     load(url, context, next) {
       const result = next(url, context);
       if (!url.endsWith("/src/visibility.ts")) return result;
       const source = before === undefined ? String(result.source) : readFileSync(before, "utf8");
-      return { ...result, source: patchVisibility(source, { ...(tie === undefined ? {} : { tie }), ...(floor === undefined ? {} : { floor }) }) };
+      return { ...result, source: patchVisibility(source, { ...(tie === undefined ? {} : { tie }), ...(floor === undefined ? {} : { floor }), ...(key === undefined ? {} : { key }) }) };
     },
   });
 }
