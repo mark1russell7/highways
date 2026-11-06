@@ -4,7 +4,7 @@ This page shows the committed results of the screens. The build reads them from 
 
 The `seams` screen has not run at version 0.15.0, so this page has no verdict for `seams`.
 
-Each cell is the verdict of one strategy against the default `shared` on one guard measure. The family is the unit of the verdict.
+Each cell is the verdict of one strategy against the default of its step on one guard measure. The defaults are `shared` for `router` and `highway`, `facing` for `plugs`, `depths` for `levels` and `pipeline` for `whole`. The family is the unit of the verdict.
 
 - `better` and `worse` count only when they hold under both weightings, with the level 0.05.
 - `depends on the mix` tells that the two weightings do not agree.
@@ -15,6 +15,8 @@ Each cell is the verdict of one strategy against the default `shared` on one gua
 The screen sets are `screen-v1`, `screen-v2` and `screen-v3`. `screen-v1` and `screen-v2` have 6 families. Thus a sign test passes only at 6 of 6. `screen-v3` has 15 families, and a sign test passes at 12 of 15 (CORPUS-FAMILIES). `screen-v4` has the boards of `screen-v2` after `makeRoom` (PASS-GRID). This page has no verdict of `screen-v4`.
 
 Select a cell to see its families. The snapshots are in [`docs/research/verdicts/`](https://github.com/mark1russell7/highways/tree/main/docs/research/verdicts).
+
+The rows of this page are the built-in strategies of each step at the commit of the records, without the default. So the 15 screens give 1,137 of their 1,500 rows. The [full rows](https://github.com/mark1russell7/highways/tree/main/docs/research/verdicts/all) also have the opt-in strategies of each screen.
 
 With no key, `shared` is `corners` with other tie breaks. Any difference on those boards is a tie and not a win. The base `shared` makes ways only from the key `data.collection` of an edge. 12 of the 15 families of `screen-v3` have no key, so the base has 0 ways there.
 

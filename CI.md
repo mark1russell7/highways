@@ -305,8 +305,10 @@ The flip on the whole workflow has 3 dispatches, each with `all` false:
 - [A route that differs](https://github.com/mark1russell7/highways/actions/runs/42055671579): `summary` and `Xplat partial` are red.
 - [A failed download](https://github.com/mark1russell7/highways/actions/runs/42055704453): the run is red with its own text.
 
-No workflow starts `screen-verdict.ts`. It runs by hand on the records of a run of `Screen`, so its check of the records holds nothing in CI.
+The job `screen` of `Screen` starts `screen-verdict.ts` on a screen of a whole step. Its artifact has `verdict.json`, `verdict-all.json` and `verdict.md`. This step gives the verdicts. It does not fail on a label.
 
-The header of a verdict snapshot names the run and the commit of the records. It does not name the commit of the script.
+The workflow `Verdict check` reads each committed snapshot again from the records of its run, each week. It is not a gate on those snapshots. The flip `verdict` of `Gate flip` shows that its check goes red on a moved label, a missing row and a missing record.
+
+The header of a new verdict snapshot names the run and the commit of the records, and the commit of the script in `script`.
 
 The dates of the open rows are in `docs/ROADMAP.md`, items GATE-FLIP and VERDICT-RUN.
