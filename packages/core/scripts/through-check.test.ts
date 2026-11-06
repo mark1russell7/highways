@@ -11,16 +11,17 @@ const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 /**
  * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
+ * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33081, 31067, 0, 0, 0, 0],
-  "trunks": [33873, 31608, 0, 0, 0, 1],
-  "shared": [35729, 32371, 273, 40, 1, 531],
-  "sections": [53790, 40261, 814, 489, 144, 2055],
-  "sections-site": [83528, 46957, 121, 68, 441, 2340],
-  "sections-site-no-ladder": [81519, 46210, 127, 119, 435, 2420],
-  "shared-all": [43357, 35982, 1424, 453, 0, 12027],
+  "corners": [33533, 31341, 0, 0, 0, 0],
+  "trunks": [34318, 31893, 0, 0, 0, 1],
+  "shared": [36185, 32645, 274, 42, 1, 531],
+  "sections": [54359, 40555, 816, 501, 144, 2067],
+  "sections-site": [84287, 47330, 121, 68, 441, 2365],
+  "sections-site-no-ladder": [82209, 46576, 128, 120, 435, 2445],
+  "shared-all": [43668, 36267, 1423, 459, 0, 12061],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 

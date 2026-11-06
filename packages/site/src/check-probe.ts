@@ -85,6 +85,6 @@ const kpi = (await fetch("kpi.json")
   .catch(() => undefined)) as { project?: string; at?: string; measures?: unknown[] } | undefined;
 check("the file of measures names this project", kpi?.project === "highways", kpi?.project);
 check("the file of measures has a data time", !Number.isNaN(Date.parse(kpi?.at ?? "")), kpi?.at);
-check("the file of measures has 5 measures", kpi?.measures?.length === 5, kpi?.measures?.length);
+check("the file of measures has 6 measures", kpi?.measures?.length === 6, kpi?.measures?.length);
 
 export {};
