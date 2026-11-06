@@ -58,8 +58,8 @@ function digest(graph: Graph, options: SectionsOptions): string {
   const segments = segmentsOf(result);
   const keys = segments.segments.filter((s) => s.count > 1).map((s) => runKey(s.edges));
   const lanes = laneRoutes(segments, new Set(keys), 2.4, 16);
-  // The field `through` is a report on a route, not a part of it. Without it, each digest still pins the same route.
-  return createHash("sha256").update(JSON.stringify({ result, keys, lanes }, (key, value: unknown) => (key === "through" ? undefined : value))).digest("hex");
+  // The fields `through` and `near` (THIN-GAP) are reports on a route, not parts of it. Without them, each digest still pins the same route.
+  return createHash("sha256").update(JSON.stringify({ result, keys, lanes }, (key, value: unknown) => (key === "through" || key === "near" ? undefined : value))).digest("hex");
 }
 
 describe("the output of the sections router", () => {

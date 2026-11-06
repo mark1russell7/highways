@@ -68,6 +68,12 @@ export interface Edge {
   readonly data?: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * The width of a drawn route, in units of the board, for the field `Route.near` (THIN-GAP).
+ * A renderer draws a route in screen pixels at each zoom. So this width is a stated unit, not the drawn pixel.
+ */
+export const NEAR_WIDTH = 1.1;
+
 /** The input of a router. */
 export interface Graph {
   readonly nodes: readonly Node[];
@@ -80,6 +86,11 @@ export interface Route {
   readonly points: readonly Point[];
   /** The ids of the boxes that this route goes through, sorted. A route with no way gets this field. A clean route does not have it. An inner route reads the boxes of its room. */
   readonly through?: readonly string[];
+  /**
+   * The ids of the boxes that this route passes nearer than `NEAR_WIDTH` to, sorted (THIN-GAP). Only a route with no `through` gets this field.
+   * Such a route goes through no box, but its drawn line can cover the wall of a box. A route with room does not have the field.
+   */
+  readonly near?: readonly string[];
   /** This id names the frame of an inner route: the route stays inside the box of that node. An outer route has no frame. */
   readonly frame?: string;
   /** This flag marks a lane that stays outside the room of its shared way, because the room cannot hold the lanes at the smallest distance. `laneRoutes` and `pullApart` give it. */

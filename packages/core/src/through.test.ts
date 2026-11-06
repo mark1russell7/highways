@@ -3,10 +3,13 @@ import { checkProperties } from "./bench/properties.ts";
 import { highwaysRegistry } from "./families/index.ts";
 import { edgePlugs } from "./highways/stretches.ts";
 import { follow } from "./highways/follow.ts";
-import type { Graph, Result } from "./model.ts";
+import { segmentBoxDistance } from "./geom.ts";
+import { NEAR_WIDTH, type Graph, type Node, type Result, type Route } from "./model.ts";
 import { byCollection, cornersRouter, sectionsRouter, sharedRouter, trunksRouter } from "./routers/index.ts";
 import { seamsRouter } from "./routers/seams/index.ts";
 import { laneRoutes } from "./segments.ts";
+import { markRoute } from "./through.ts";
+import { Obstacles } from "./visibility.ts";
 import { WayFinder } from "./ways.ts";
 
 const reg = highwaysRegistry();
@@ -119,5 +122,65 @@ describe("the field through of a route (CORNER-REACH)", () => {
     const graph = walledOff();
     const result = follow(graph, { highways: [] });
     expect(marked(result)).toEqual(breaks(graph, result));
+  });
+});
+
+describe("the field near of a route (THIN-GAP)", () => {
+  const box = (id: string, x: number, y: number): Node => ({ id, box: { x, y, w: 40, h: 20 } });
+  // A made-up board: the ends S and T, and the box A above the line from S to T.
+  const nodes = [box("S", 0, 0), box("T", 200, 0), box("A", 100, -40)];
+  const obstacles = new Obstacles(nodes, 100);
+  const ends = (id: string): boolean => id === "S" || id === "T";
+  const at = (y: number): Route => ({ edge: "e", points: [{ x: 40, y }, { x: 200, y }] });
+
+  it("names a box that the route passes nearer than NEAR_WIDTH to, and keeps a route with room the same object", () => {
+    expect(markRoute(at(-20 + 0.6), obstacles, ends).near).toEqual(["A"]);
+    const room = at(-20 + NEAR_WIDTH + 0.01);
+    expect(markRoute(room, obstacles, ends)).toBe(room);
+  });
+
+  it("names a box that the route touches or goes into by less than the band of through", () => {
+    for (const y of [-20, -20.3]) {
+      const route = markRoute(at(y), obstacles, ends);
+      expect(route.through, String(y)).toBeUndefined();
+      expect(route.near, String(y)).toEqual(["A"]);
+    }
+  });
+
+  it("gives through and not near to a route that goes through a box", () => {
+    const route = markRoute(at(-30), obstacles, ends);
+    expect(route.through).toEqual(["A"]);
+    expect(route.near).toBeUndefined();
+  });
+
+  it("does not name the boxes at the ends of the edge", () => {
+    const route: Route = { edge: "e", points: [{ x: 40, y: 10 }, { x: 200, y: 10 }] };
+    expect(markRoute(route, obstacles, ends)).toBe(route);
+  });
+
+  it("names on each route of corners on escape only the boxes nearer than NEAR_WIDTH, and each other route has room", () => {
+    const { graph } = reg.generate("escape", 0, { gap: 40, nets: 100 } as never);
+    const byId = new Map(graph.nodes.map((n) => [n.id, n] as const));
+    const routes = cornersRouter({ name: "corners" }).route(graph).routes;
+    expect(routes.filter((r) => r.near !== undefined).length).toBeGreaterThan(0);
+    for (const r of routes) {
+      if (r.through !== undefined) continue;
+      const e = graph.edges.find((x) => x.id === r.edge)!;
+      const least = new Map<string, number>();
+      for (const n of graph.nodes) {
+        if (n.id === e.source.node || n.id === e.target.node) continue;
+        for (let i = 1; i < r.points.length; i++) least.set(n.id, Math.min(least.get(n.id) ?? Infinity, segmentBoxDistance(r.points[i - 1]!, r.points[i]!, n.box)));
+      }
+      const near = [...least].filter(([, d]) => d < NEAR_WIDTH).map(([id]) => id).sort();
+      expect(r.near ?? [], r.edge).toEqual(near);
+      for (const id of r.near ?? []) expect(byId.has(id)).toBe(true);
+    }
+  });
+
+  it("stays on the route after laneRoutes", () => {
+    const { graph } = reg.generate("escape", 0, { gap: 40, nets: 100 } as never);
+    const result = cornersRouter({ name: "corners" }).route(graph);
+    const near = (routes: readonly Route[]): string[] => routes.filter((r) => r.near !== undefined).map((r) => `${r.edge}:${r.near!.join(",")}`).sort();
+    expect(near(laneRoutes(result, new Set(), 4))).toEqual(near(result.routes));
   });
 });

@@ -194,7 +194,12 @@ A route that goes through a box has the field `through`, with the ids of those b
 - When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
 - A clean route does not have the field, so its bytes do not change.
-- `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
+- A route that goes through no box, but passes nearer than `NEAR_WIDTH` (1.1 units) to a box, has the field `near` (THIN-GAP).
+  - The field has the ids of those boxes, sorted. The drawn line of such a route can cover the wall of a box.
+  - A route of a lower step of `OUT_STEPS` can get it. A route on the seam of boxes that touch at a corner gets it too.
+  - A renderer draws a route in screen pixels at each zoom. So `NEAR_WIDTH` is a stated unit, not the drawn pixel.
+  - A route has `through` or `near`, not the two. A route with room has neither field.
+- `laneRoutes` keeps the two fields. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
 
 ## Curve types
 
