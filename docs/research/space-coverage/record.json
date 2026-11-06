@@ -1,10 +1,10 @@
 {
   "schema": "space-coverage/1",
-  "measures": 117,
-  "strategies": 122,
-  "options": 797,
+  "measures": 118,
+  "strategies": 123,
+  "options": 799,
   "inputs": 149,
-  "cells": 124956,
+  "cells": 126378,
   "fitted": 0,
   "value": 0,
   "fits": []

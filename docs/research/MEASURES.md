@@ -235,6 +235,34 @@ The record lists each win. These results are the ones to keep in mind:
 - The crossing angle reads its best value when a router has no crossing of ink. The plug spacing reads its best value with one plug on each side of a box. So these values tell nothing on a router that shares much.
 - No control buys `route.through`. This measure counts routes that go through a box. Of 6,065 routes, `perimeter` reads 3,826 and `straight` reads 3,013. `perimeter` reads less than `straight` in 10 of the 25 families, and it reads 0 only on `tiny-uniform`. On these boards, a straight way out of a box usually crosses another box. `corners` reads a median of 0 at a median detour of 1.021, and all of its 292 are on `packed-grid`.
 
+### The floor of `route.through`
+
+`route.through` makes each box smaller by 0.5. So a route that goes over the corners of the boxes reads 0, and the count alone holds no win. Two controls show this floor. `border-walk` prefers the sides of the boxes, and `border-walk-short` takes the shortest way over the corners. Both have no clearance.
+
+A claim on `route.through` on a family needs a win over a walker on that family, on `route.clearance.tight` or on `route.length`, after correction. The whole read does not stand in for a family. A family where a walker loses neither has no through win. The records `packages/core/scripts/data/through-floor/record.json` and `packages/core/scripts/data/control-wins/record.json` hold these reads.
+
+| Read of 75 boards | `corners` | `border-walk` | `border-walk-short` |
+|---|---|---|---|
+| `route.through`, sum | 292 | 0 | 0 |
+| `route.clearance.tight`, median | 7.358 | 45.63 | 45.24 |
+| `route.length`, sum | 2,249,123 | 2,215,736 | 2,074,782 |
+
+| Family | `route.clearance.tight` of `corners` | Of `border-walk-short` | `route.length` of `border-walk-short` over `corners` | Read |
+|---|---|---|---|---|
+| `packed-grid` | 0.87 | 0.87 | 1.318 | The only family with `route.through` on `corners`, and the walker loses length to it |
+| `local-mesh` | 0 | 0 | 0.907 | `corners` reads 0 through, so no through claim exists here. It prints a tie. |
+| `spiral` | 0 | 0.929 | 0.318 | The walker is shorter by a factor of 3, with no clearance |
+| `comb` | 0 | 0.923 | 0.481 | The same form |
+| `rings` | 0 | 0.923 | 0.459 | The same form |
+| `maze` | 0.067 | 0.867 | 0.406 | The same form |
+| `walled-level` | 0.4 | 0.923 | 0.476 | The same form |
+
+- **The 292 of `corners`.** All are on `packed-grid`. `corners`, `shared`, `shared-all` and `sections` read the same 292. The end boxes of each one do not touch, and the router itself marks each one with the field `through`.
+- **The target on `packed-grid`.** On the new seeds 3 to 23, with 2,784 links, `seams` reads 0 through at a length of 859,220.33. `border-walk-short` reads the same length. `corners` reads 663,901.35, so the ratio is 1.2942. The seen seeds 0 to 2 read 1.3176, and they carry no claim.
+- **`seams` has no through win on `packed-grid`.** A read by hand on seeds 0 and 1 gives the same bytes for `seams` and `border-walk-short` on each route, with `packages/core/scripts/_walk-equal.ts`. So on that family the real router is the control. This read is local, and only the sum of lengths comes from the record.
+- **The 4 of `sections-site`.** `sections-site` reads 296, and 4 of them are off `packed-grid`: 2 on `thin-bars` and 2 on `comb`. Each step of the ladder finds no way, so the router draws a straight piece through the box. These are real faults. The item SITE-LADDER-END holds them.
+- **A long way in narrow rooms.** On `maze`, `comb`, `spiral`, `rings` and `walled-level`, a walk with no clearance reads 0.32 to 0.54 of the length of `corners`. So the length of `corners` on these families is partly the price of its clearance. The item MAZE-WAYS reads the ways on `maze`.
+
 ### The exact forms of MEAS3A
 
 Since MEAS3A, the screen computes ten more measures. Some formulas below leave a choice open, so the screen uses the forms of this list. The code is in [`measures/lanes.ts`](../../packages/core/src/bench/measures/lanes.ts) and [`measures/levels.ts`](../../packages/core/src/bench/measures/levels.ts).
@@ -282,6 +310,7 @@ The evidence for routes is strong. [Purchase 1997][purchase97] found that the nu
 | R3 | Bends | Few real turns | `b(r) = count(i : abs(φ_i) > 1°)`, mean over routes | count for each route, `↓` | `linear` | score | part, `bends` counts each vertex | [Purchase 1997][purchase97], [Wybrow 2009][wybrow09] |
 | R4 | Total turn | Paths that go straight on | `T(r) = Σ_i abs(φ_i) / π`, and `max_i abs(φ_i)` | half turns for each route, `↓` | `linear` | score | yes, `R4.turn` and `R4.max` of the suite | [Ware 2002][ware02] |
 | R5 | Detour spread | Short routes, with no bad tail | `δ(e) = L(r_e) / span(e)`. Report `q_0.5(δ)`, `q_0.95(δ)` and the mean. | ratio `≥ 1`, `↓` | `linear` | score | yes, `R5.median`, `R5.q95` and `R5.mean` of the suite | [Ware 2002][ware02], [Wybrow 2009][wybrow09] |
+| R5.length | Route length | Short routes | `Σ_e L(r_e)`. A stretch that several routes share counts for each of them, so sharing earns nothing on this measure. | units, `↓` | `linear` | score | yes, `R5.length` of the suite | |
 | R6 | Worst detour | No very long route | `max_e δ(e)` | ratio `≥ 1`, `↓` | `linear` | score | yes, `worstDetour` | Own (QFIX), [Ware 2002][ware02] |
 | R7 | Out and back | Routes that go toward their target | `count(e : backtrackOf(r_e) > max(40, 0.25 span(e))) / m` | share 0..1, `↓` | `linear` | fault | yes, `backtrack` | Own (QFIX, ER3b) |
 | R8 | Clearance | Space between a route and the other boxes | `cl(r) = min(40, min_v dist(r, box(v)))` for each node `v` that is not an end. Report the mean of `cl / u`, and `tight = share(cl < 4)`. | units, `↑`, and share, `↓` | `n log n` | score | yes, `clearance` and `tight` | [Wybrow 2009][wybrow09], [Marriott 2014][marriott14] |

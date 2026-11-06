@@ -44,7 +44,7 @@ The [strategies page](https://mark1russell7.github.io/highways/strategies.html) 
 | `sections` | A tree of sections, with a hub in each section. A long edge goes through the hubs, and a short edge goes directly. |
 | `sections-tree` | The same as `sections`, but without the limit of the stretch. |
 
-Two more routers are controls of the benchmark, and no chooser offers them. `one-trunk` puts each route on one trunk. `perimeter` goes around the frame of the boxes. [What each control buys](docs/research/MEASURES.md#what-each-control-buys) tells which measure each control wins.
+Four more routers are controls of the benchmark, and no chooser offers them. `one-trunk` puts each route on one trunk. `perimeter` goes around the frame of the boxes. `border-walk` and `border-walk-short` go over the corners of the boxes, with no clearance. [What each control buys](docs/research/MEASURES.md#what-each-control-buys) tells which measure each control wins.
 
 A free plug goes on the side that faces the other end. Thus the angle between the normal of the plug and the chord is 45° or less.
 

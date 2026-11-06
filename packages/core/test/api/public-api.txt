@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1516 names
+## . (build/index.d.ts): 1520 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -53,6 +53,7 @@ BIPARTITE: build/index.d.ts#BIPARTITE
 BIPARTITE_LAYOUTS: build/index.d.ts#BIPARTITE_LAYOUTS
 BOARD_PORTFOLIO_DEFAULTS: build/index.d.ts#BOARD_PORTFOLIO_DEFAULTS
 BOARD_PORTFOLIO_SETTINGS: build/index.d.ts#BOARD_PORTFOLIO_SETTINGS
+BORDER_WALK_DEFAULTS: build/index.d.ts#BORDER_WALK_DEFAULTS
 BOTTLENECK: build/index.d.ts#BOTTLENECK
 BREAK: build/index.d.ts#BREAK
 BREAK_EVEN: build/index.d.ts#BREAK_EVEN
@@ -72,6 +73,7 @@ BoardPortfolioOptions: build/index.d.ts#BoardPortfolioOptions
 BoardPortfolioRun: build/index.d.ts#BoardPortfolioRun
 BooleanOption: build/index.d.ts#BooleanOption
 BootstrapMedian: build/index.d.ts#BootstrapMedian
+type BorderWalkOptions: build/index.d.ts#BorderWalkOptions
 BoundaryWalk: build/index.d.ts#BoundaryWalk
 Box: build/index.d.ts#Box
 type BoxField: build/index.d.ts#BoxField
@@ -878,6 +880,8 @@ boardPortfolio: build/index.d.ts#boardPortfolio
 boardUnit: build/index.d.ts#boardUnit
 boardWins: build/index.d.ts#boardWins
 bootstrapMedian: build/index.d.ts#bootstrapMedian
+borderWalkRouter: build/index.d.ts#borderWalkRouter
+borderWalkStrategy: build/index.d.ts#borderWalkStrategy
 boundsFamilyName: build/index.d.ts#boundsFamilyName
 boxDisplacement: build/index.d.ts#boxDisplacement
 boxExit: build/index.d.ts#boxExit
@@ -1756,6 +1760,9 @@ export declare const BOARD_PORTFOLIO_DEFAULTS: Readonly<BoardPortfolioOptions>;
 ### build/index.d.ts#BOARD_PORTFOLIO_SETTINGS
 export declare const BOARD_PORTFOLIO_SETTINGS: readonly PortfolioSetting[];
 
+### build/index.d.ts#BORDER_WALK_DEFAULTS
+export declare const BORDER_WALK_DEFAULTS: Readonly<BorderWalkOptions>;
+
 ### build/index.d.ts#BOTTLENECK
 export declare const BOTTLENECK: HighwaysFamily;
 
@@ -1862,6 +1869,12 @@ export interface BootstrapMedian {
   readonly median: number;
   readonly lo: number;
   readonly hi: number;
+}
+
+### build/index.d.ts#BorderWalkOptions
+interface BorderWalkOptions {
+  readonly leave: number;
+  readonly k: number;
 }
 
 ### build/index.d.ts#BoundaryWalk
@@ -6342,6 +6355,14 @@ export declare function bootstrapMedian(values: readonly number[], o?: {
   readonly level?: number;
   readonly seed?: number;
 }): BootstrapMedian;
+
+### build/index.d.ts#borderWalkRouter
+export declare function borderWalkRouter(options: Partial<BorderWalkOptions> & {
+  readonly name: string;
+}): Router;
+
+### build/index.d.ts#borderWalkStrategy
+export declare const borderWalkStrategy: Strategy<"router", BorderWalkOptions>;
 
 ### build/index.d.ts#boundsFamilyName
 export declare function boundsFamilyName(cls: ExactClass, nodes: number): string;
