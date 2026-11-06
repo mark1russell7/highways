@@ -269,4 +269,5 @@ jobs:
       - uses: mark1russell7/template/.github/actions/gate-summary@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
         with:
           needs: ${{ toJSON(needs) }}
-          allow-skip: summary
+          # A run of the sizes skips the job screen on purpose.
+          allow-skip: ${{ inputs.sizes != '' && 'summary screen' || 'summary' }}
