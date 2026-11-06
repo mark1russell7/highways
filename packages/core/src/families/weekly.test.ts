@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { documentHash } from "../bench/screen/hash.ts";
 import { SCREEN_SETS } from "../bench/screen/set.ts";
 import type { Box } from "../geom.ts";
-import type { Graph } from "../model.ts";
+import { framesOf, nodeIndex, type Graph } from "../model.ts";
 import { sectionsRouter } from "../routers/index.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry, WEEKLY_FAMILIES } from "./index.ts";
 import { cutMaze } from "./weekly.ts";
@@ -24,14 +24,24 @@ const DIGESTS: Readonly<Record<string, readonly [string, number, number]>> = {
   layered: ["e0505a42708137f6", 24, 29],
   "lattice-x": ["85b850f156c7175e", 35, 33],
   "arc-row": ["7bd05f341217b6fd", 24, 23],
+  nested: ["5380a609b1d6508b", 36, 19],
+  tree: ["ce83318d563c164c", 5, 4],
+  geometric: ["884ff39b18a1d7f2", 40, 49],
 };
 
 const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
-/** This function gives the pairs of boxes that overlap. */
+/** This function gives the pairs of boxes that overlap. A frame and a node that it holds are not a pair. */
 function overlaps(g: Graph): string[] {
+  const byId = nodeIndex(g);
   const out: string[] = [];
-  for (let i = 0; i < g.nodes.length; i++) for (let j = i + 1; j < g.nodes.length; j++) if (overlap(g.nodes[i]!.box, g.nodes[j]!.box)) out.push(`${g.nodes[i]!.id} ${g.nodes[j]!.id}`);
+  for (let i = 0; i < g.nodes.length; i++)
+    for (let j = i + 1; j < g.nodes.length; j++) {
+      const a = g.nodes[i]!;
+      const c = g.nodes[j]!;
+      if (framesOf(byId, a.id).includes(c.id) || framesOf(byId, c.id).includes(a.id)) continue;
+      if (overlap(a.box, c.box)) out.push(`${a.id} ${c.id}`);
+    }
   return out;
 }
 
@@ -64,9 +74,9 @@ function reached(table: readonly (readonly boolean[])[]): number {
 }
 
 describe("the families of FAMILIES-WEEKLY", () => {
-  it("has 13 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
+  it("has 16 families at the end of HIGHWAYS_FAMILIES, each exact, of version 1 and owned by highways", () => {
     expect(WEEKLY_FAMILIES.map((f) => f.name)).toEqual(Object.keys(DIGESTS));
-    expect(HIGHWAYS_FAMILIES.slice(-13)).toEqual(WEEKLY_FAMILIES);
+    expect(HIGHWAYS_FAMILIES.slice(-16)).toEqual(WEEKLY_FAMILIES);
     for (const f of WEEKLY_FAMILIES) expect([f.version, f.owner, f.crossEngine], f.name).toEqual([1, "highways", "exact"]);
   });
 
@@ -362,5 +372,54 @@ describe("the families of FAMILIES-WEEKLY", () => {
     }
     const near = reg.generate("arc-row", 0, { nodes: 40, edges: 80, reach: 1 }).graph;
     for (const e of near.edges) expect(Math.abs(Number(e.source.node.slice(1)) - Number(e.target.node.slice(1)))).toBe(1);
+  });
+
+  it("puts each node of `nested` fully inside its frame, gives the leaves only the edges, and makes the given number of leaves", () => {
+    const inside = (a: Box, f: Box): boolean => a.x > f.x && a.y > f.y && a.x + a.w < f.x + f.w && a.y + a.h < f.y + f.h;
+    for (const seed of [0, 1, 2]) {
+      const dims = { top: 3, depth: 3, fan: 2, leaves: 4, edges: 60 };
+      const g = reg.generate("nested", seed, dims).graph;
+      const byId = nodeIndex(g);
+      const frames = new Set(g.nodes.flatMap((n) => (n.parent === undefined ? [] : [n.parent])));
+      expect(g.nodes.filter((n) => !frames.has(n.id))).toHaveLength(3 * 2 * 2 * 4);
+      for (const n of g.nodes) if (n.parent !== undefined) expect(inside(n.box, byId.get(n.parent)!.box), `${seed} ${n.id}`).toBe(true);
+      for (const n of g.nodes) expect(framesOf(byId, n.id).length, n.id).toBe(n.id.split("_").length - 1 + (frames.has(n.id) ? 0 : 1));
+      for (const e of g.edges) expect([frames.has(e.source.node), frames.has(e.target.node)]).toEqual([false, false]);
+    }
+    const local = reg.generate("nested", 0, { top: 4, local: 1, edges: 80 }).graph;
+    for (const e of local.edges) expect(e.source.node.split("_")[0]).toBe(e.target.node.split("_")[0]);
+  });
+
+  it("gives `tree` one parent on the level above to each node, and puts each parent at the middle of its first and last child", () => {
+    const middle = (b: Box): number => b.x + Math.floor(b.w / 2);
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("tree", seed, { nodes: 200, depth: 4, fan: 3, cross: 0 }).graph;
+      const byId = nodeIndex(g);
+      expect(g.edges).toHaveLength(g.nodes.length - 1);
+      const parents = new Map(g.edges.map((e) => [e.target.node, e.source.node]));
+      expect(parents.size).toBe(g.nodes.length - 1);
+      const kids = new Map<string, string[]>();
+      for (const [child, parent] of parents) {
+        expect(byId.get(child)!.box.y).toBeGreaterThan(byId.get(parent)!.box.y);
+        kids.set(parent, [...(kids.get(parent) ?? []), child]);
+      }
+      for (const [parent, list] of kids) {
+        const xs = list.map((c) => middle(byId.get(c)!.box));
+        expect(Math.abs(middle(byId.get(parent)!.box) - Math.floor((Math.min(...xs) + Math.max(...xs)) / 2)), parent).toBeLessThanOrEqual(1);
+      }
+      expect(new Set(g.nodes.map((n) => n.box.y)).size, `${seed}`).toBe(5);
+    }
+  });
+
+  it("joins each node of `geometric` to its `k` nearest nodes, and keeps each node in its own cell", () => {
+    for (const seed of [0, 1, 2]) {
+      const g = reg.generate("geometric", seed, { nodes: 30, k: 3, cell: 100 }).graph;
+      const cells = new Set(g.nodes.map((n) => `${Math.floor(n.box.x / 100)},${Math.floor(n.box.y / 100)}`));
+      expect(cells.size).toBe(30);
+      for (const n of g.nodes) expect([n.box.x % 100 <= 100 - n.box.w - 8, n.box.y % 100 <= 100 - n.box.h - 8], n.id).toEqual([true, true]);
+      const degree = new Map<string, number>();
+      for (const e of g.edges) for (const id of [e.source.node, e.target.node]) degree.set(id, (degree.get(id) ?? 0) + 1);
+      for (const n of g.nodes) expect(degree.get(n.id) ?? 0, n.id).toBeGreaterThanOrEqual(3);
+    }
   });
 });

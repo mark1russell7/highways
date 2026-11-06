@@ -15,13 +15,13 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33533, 31341, 0, 0, 0, 0],
-  "trunks": [34318, 31893, 0, 0, 0, 1],
-  "shared": [36185, 32645, 274, 42, 1, 531],
-  "sections": [54359, 40555, 816, 501, 144, 2067],
-  "sections-site": [84287, 47330, 121, 68, 441, 2365],
-  "sections-site-no-ladder": [82209, 46576, 128, 120, 435, 2445],
-  "shared-all": [43668, 36267, 1423, 459, 0, 12061],
+  "corners": [33604, 31411, 0, 0, 0, 0],
+  "trunks": [34385, 31960, 0, 0, 0, 1],
+  "shared": [36252, 32712, 274, 42, 1, 531],
+  "sections": [54447, 40633, 816, 501, 144, 2067],
+  "sections-site": [84479, 47472, 121, 68, 441, 2368],
+  "sections-site-no-ladder": [82405, 46720, 128, 120, 435, 2448],
+  "shared-all": [43756, 36355, 1434, 459, 0, 12065],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
@@ -71,6 +71,7 @@ describe("the gate through-check/5", () => {
   it("names no box of an inner route that the route does not meet, and each box that it goes through", () => {
     const inner = fresh.rows.filter((r) => r.inner > 0);
     expect(inner.map((r) => [r.router, r.family])).toEqual([
+      ["corners", "nested"],
       ["corners", "frame-rows+inner"],
       ["corners", "frame-rows+inner12"],
     ]);
@@ -79,7 +80,7 @@ describe("the gate through-check/5", () => {
 
   it("has no inner route with the shape spike (INNER-SPIKE)", () => {
     const rows = [...fresh.rows, ...fresh.unmarkedRows].filter((r) => r.inner > 0);
-    expect(rows.reduce((sum, r) => sum + r.inner, 0)).toBe(1322);
+    expect(rows.reduce((sum, r) => sum + r.inner, 0)).toBe(1355);
     expect(rows.filter((r) => r.innerSpikes > 0).map(keyOf)).toEqual([]);
   });
 

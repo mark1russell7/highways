@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1516 names
+## . (build/index.d.ts): 1520 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -242,6 +242,7 @@ GAP_CAPS: build/index.d.ts#GAP_CAPS
 GAP_DEFAULTS: build/index.d.ts#GAP_DEFAULTS
 GAP_RULES: build/index.d.ts#GAP_RULES
 GAP_VIEWS: build/index.d.ts#GAP_VIEWS
+GEOMETRIC: build/index.d.ts#GEOMETRIC
 GLOBAL_KEYS: build/index.d.ts#GLOBAL_KEYS
 GLOBAL_ORDER_DEFAULTS: build/index.d.ts#GLOBAL_ORDER_DEFAULTS
 GROUP_SCOPES: build/index.d.ts#GROUP_SCOPES
@@ -448,6 +449,7 @@ MoveBoard: build/index.d.ts#MoveBoard
 MoveCounter: build/index.d.ts#MoveCounter
 MoveResponse: build/index.d.ts#MoveResponse
 MoveSegment: build/index.d.ts#MoveSegment
+NESTED: build/index.d.ts#NESTED
 NESTED_DEFAULTS: build/index.d.ts#NESTED_DEFAULTS
 NUDGE_DEFAULTS: build/index.d.ts#NUDGE_DEFAULTS
 NUDGE_SCHEMA: build/index.d.ts#NUDGE_SCHEMA
@@ -771,6 +773,7 @@ TRACING_QUANTILES: build/index.d.ts#TRACING_QUANTILES
 TRACING_WEIGHTS: build/index.d.ts#TRACING_WEIGHTS
 TRACLUS_DEFAULTS: build/index.d.ts#TRACLUS_DEFAULTS
 TRAFFIC_RULES: build/index.d.ts#TRAFFIC_RULES
+TREE: build/index.d.ts#TREE
 TWO_HUBS: build/index.d.ts#TWO_HUBS
 TWO_WAY_DEFAULTS: build/index.d.ts#TWO_WAY_DEFAULTS
 TWO_WAY_SIDES: build/index.d.ts#TWO_WAY_SIDES
@@ -1055,6 +1058,7 @@ formatSummaries: build/index.d.ts#formatSummaries
 formatTable: build/index.d.ts#formatTable
 formatTracks: build/index.d.ts#formatTracks
 frameRoutes: build/index.d.ts#frameRoutes
+framesOf: build/index.d.ts#framesOf
 frechet: build/index.d.ts#frechet
 frechetBundles: build/index.d.ts#frechetBundles
 frechetPlan: build/index.d.ts#frechetPlan
@@ -2802,6 +2806,9 @@ export declare const GAP_RULES: readonly GapRule[];
 ### build/index.d.ts#GAP_VIEWS
 export declare const GAP_VIEWS: readonly GapView[];
 
+### build/index.d.ts#GEOMETRIC
+export declare const GEOMETRIC: HighwaysFamily;
+
 ### build/index.d.ts#GLOBAL_KEYS
 export declare const GLOBAL_KEYS: readonly GlobalKey[];
 
@@ -3902,6 +3909,7 @@ export interface MeasuredLink {
   readonly source: string;
   readonly target: string;
   readonly points: readonly Point[];
+  readonly skip?: readonly string[];
 }
 
 ### build/index.d.ts#MeetOptions
@@ -4005,6 +4013,9 @@ export interface MoveSegment {
   readonly kind: "move";
   readonly to: Point;
 }
+
+### build/index.d.ts#NESTED
+export declare const NESTED: HighwaysFamily;
 
 ### build/index.d.ts#NESTED_DEFAULTS
 export declare const NESTED_DEFAULTS: Readonly<NestedOptions>;
@@ -5847,6 +5858,9 @@ export declare const TRACLUS_DEFAULTS: Readonly<Required<Omit<TraclusOptions, "m
 ### build/index.d.ts#TRAFFIC_RULES
 export declare const TRAFFIC_RULES: readonly TrafficRule[];
 
+### build/index.d.ts#TREE
+export declare const TREE: HighwaysFamily;
+
 ### build/index.d.ts#TWO_HUBS
 export declare const TWO_HUBS: HighwaysFamily;
 
@@ -6877,6 +6891,9 @@ export declare function formatTracks(rows: readonly TrackBenchRow[]): string;
 
 ### build/index.d.ts#frameRoutes
 export declare function frameRoutes(graph: Graph, inner: readonly InnerEdge[], options: FrameOptions): Route[];
+
+### build/index.d.ts#framesOf
+export declare function framesOf(byId: ReadonlyMap<string, Node>, id: string): string[];
 
 ### build/index.d.ts#frechet
 export declare function frechet(p: readonly Point[], q: readonly Point[]): number;

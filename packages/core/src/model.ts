@@ -282,6 +282,16 @@ export function checkParents(graph: Graph, byId: ReadonlyMap<string, Node> = nod
   }
 }
 
+/**
+ * This function gives the ids of the frames that hold the node `id`, at any depth, the nearest first. A node does not hold itself.
+ * A parent that names no node ends the list, and so does a cycle of parents.
+ */
+export function framesOf(byId: ReadonlyMap<string, Node>, id: string): string[] {
+  const out: string[] = [];
+  for (let p = byId.get(id)?.parent; p !== undefined && p !== id && !out.includes(p); p = byId.get(p)?.parent) out.push(p);
+  return out;
+}
+
 /** This function tells if the node `frame` holds the node `id`, at any depth. A node does not hold itself. */
 function holds(byId: ReadonlyMap<string, Node>, frame: string, id: string): boolean {
   for (let p = byId.get(id)?.parent; p !== undefined; p = byId.get(p)?.parent) if (p === frame) return true;

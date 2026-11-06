@@ -117,6 +117,9 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `layered` | `layers`, `width`, `edges`, `span`, `long`, `rise`, `gap` | `mulberry32` of the seed | `exact` |
 | `lattice-x` | `cols`, `rows`, `size`, `gap`, `diagonal`, `side` | `mulberry32` of the seed | `exact` |
 | `arc-row` | `nodes`, `edges`, `reach`, `gap` | `mulberry32` of the seed | `exact` |
+| `nested` | `top`, `depth`, `fan`, `leaves`, `edges`, `local`, `gap` | `mulberry32` of the seed | `exact` |
+| `tree` | `nodes`, `depth`, `fan`, `cross`, `rise`, `gap` | `mulberry32` of the seed | `exact` |
+| `geometric` | `nodes`, `k`, `cell` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -149,6 +152,9 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `layered`: layers of nodes in rows, and edges that go down, some past several layers. This is the layered drawing of a directed graph (Sugiyama).
   - `lattice-x`: nodes at the corners of a grid, and edges on the diagonals of the cells. A straight drawing has one crossing for each cell with its two diagonals.
   - `arc-row`: one long row of nodes of one height. This is the linear layout of the book-embedding literature. A straight edge between two nodes that are not next to each other goes through the nodes between them.
+  - `nested`: frames in frames, as the containers of a user interface. Only the leaves have edges. An edge between two top frames leaves each frame that holds an end.
+  - `tree`: a tidy tree from the top down. Each parent is at the middle of its first and last child. A cross link joins two nodes of different branches.
+  - `geometric`: nodes at random places in the cells of a grid. Each node joins its `k` nearest nodes, by the distance of the centers.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
@@ -255,7 +261,7 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 | `group` | `sections`, `counts-sum`, `link-ends`, `same-twice` |
 | `curve` | `same-twice` |
 
-The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
+The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. A frame that holds an end of the edge does not count, because a route from a node in a frame must leave that frame. `route.through` uses the same rule. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
 The measure `through` of the link faults reads the true shape of a node with a `shape`. After the box test, it calls `segmentThroughShape` of `layout-contract`.
 

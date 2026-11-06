@@ -21,6 +21,21 @@ describe("checkProperties", () => {
     const v = checkProperties(row, straightRouter.route(row));
     expect(v.map((x) => x.rule)).toEqual(["no-pass-through"]);
   });
+  it("does not count a frame that holds an end, and counts each other frame", () => {
+    const framed: Graph = {
+      nodes: [
+        { id: "f", box: { x: 0, y: 0, w: 100, h: 60 } },
+        { id: "f1", box: { x: 10, y: 10, w: 80, h: 40 }, parent: "f" },
+        { id: "a", box: { x: 20, y: 20, w: 20, h: 20 }, parent: "f1" },
+        { id: "c", box: { x: 240, y: 20, w: 20, h: 20 } },
+      ],
+      edges: [{ id: "ac", source: { node: "a" }, target: { node: "c" } }],
+    };
+    const line: Result = { routes: [{ edge: "ac", points: [{ x: 40, y: 30 }, { x: 240, y: 30 }] }] };
+    expect(checkProperties(framed, line)).toEqual([]);
+    const walled: Graph = { ...framed, nodes: [...framed.nodes, { id: "g", box: { x: 140, y: 0, w: 40, h: 60 } }] };
+    expect(checkProperties(walled, line).map((x) => [x.rule, x.detail])).toEqual([["no-pass-through", "segment 1 goes through g"]]);
+  });
   it("accepts a route around the node", () => {
     const r: Result = { routes: [{ edge: "ac", points: [{ x: 20, y: 10 }, { x: 40, y: 10 }, { x: 40, y: 30 }, { x: 80, y: 30 }, { x: 80, y: 10 }, { x: 100, y: 10 }] }] };
     expect(checkProperties(row, r)).toEqual([]);

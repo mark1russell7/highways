@@ -719,5 +719,186 @@ export const ARC_ROW: HighwaysFamily = caseFamily({
   },
 });
 
+/** The dimensions of `nested`. */
+const NESTED_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("top", 1, 9, 4, "The number of frames at the top level. They are in a grid."),
+  count("depth", 1, 4, 2, "The number of levels of frames. With 1, the frames at the top level hold the leaves."),
+  count("fan", 1, 3, 2, "The number of frames in each frame above the last level."),
+  count("leaves", 1, 6, 3, "The number of leaves in each frame of the last level."),
+  count("edges", 0, 400, 24, "The number of tries for an edge between two leaves."),
+  numberDimension({ name: "local", kind: "real", min: 0, max: 1, default: 0.5, meaning: "The share of the tries for an edge with its two leaves in one frame of the top level." }),
+  count("gap", 8, 80, 16, "The free space between two leaves or two frames, in units."),
+]);
+
+/**
+ * The family `nested`: frames in frames, as the containers of a user interface. Only the leaves have edges.
+ * An edge between two leaves of different frames leaves each frame that holds one end and not the other.
+ */
+export const NESTED: HighwaysFamily = caseFamily({
+  name: "nested",
+  meaning: "Frames in frames, with edges between leaves at different depths: each edge leaves the frames of its ends.",
+  dimensions: NESTED_DIMENSIONS,
+  generator: "family.nested",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const depth = v["depth"]!;
+    const fan = v["fan"]!;
+    const leaves = v["leaves"]!;
+    const gap = v["gap"]!;
+    const pad = 12;
+    const header = 20;
+    // The size of a frame at each level, from the last level up. A frame of an even level puts its frames in a row, and a frame of an odd level in a column.
+    const sizes: [number, number][] = [];
+    sizes[depth] = [2 * pad + leaves * 48 + (leaves - 1) * gap, header + 24 + pad];
+    for (let k = depth - 1; k >= 1; k--) {
+      const [cw, ch] = sizes[k + 1]!;
+      sizes[k] = k % 2 === 0 ? [2 * pad + fan * cw + (fan - 1) * gap, header + ch + pad] : [2 * pad + cw, header + fan * ch + (fan - 1) * gap + pad];
+    }
+    const byTop: string[][] = [];
+    const place = (id: string, x: number, y: number, level: number, top: number, parent?: string): void => {
+      const [w, h] = sizes[level]!;
+      b.node(id, x, y, w, h, parent === undefined ? {} : { parent });
+      if (level === depth) {
+        for (let i = 0; i < leaves; i++) byTop[top]!.push(b.node(`${id}l${i}`, x + pad + i * (48 + gap), y + header, int(random, 32, 48), 24, { parent: id }));
+        return;
+      }
+      const [cw, ch] = sizes[level + 1]!;
+      for (let j = 0; j < fan; j++) {
+        const row = level % 2 === 0;
+        place(`${id}_${j}`, x + pad + (row ? j * (cw + gap) : 0), y + header + (row ? 0 : j * (ch + gap)), level + 1, top, id);
+      }
+    };
+    const [tw, th] = sizes[1]!;
+    const cols = ceilSqrt(v["top"]!);
+    for (let t = 0; t < v["top"]!; t++) {
+      byTop.push([]);
+      place(`t${t}`, (t % cols) * (tw + 3 * gap), Math.floor(t / cols) * (th + 3 * gap), 1, t);
+    }
+    const all = byTop.flat();
+    for (let n = 0; n < v["edges"]!; n++) {
+      const top = int(random, 0, byTop.length - 1);
+      const a = byTop[top]![int(random, 0, byTop[top]!.length - 1)]!;
+      const local = random() < v["local"]!;
+      const c = local ? byTop[top]![int(random, 0, byTop[top]!.length - 1)]! : all[int(random, 0, all.length - 1)]!;
+      b.link({ node: a }, { node: c });
+    }
+    return b.graph();
+  },
+});
+
+/** The dimensions of `tree`. */
+const TREE_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("nodes", 1, 400, 60, "The most nodes of the tree. The tree grows level by level, and it stops at this number."),
+  count("depth", 1, 8, 4, "The most levels below the root."),
+  count("fan", 1, 6, 3, "The most children of a node. Each node above the last level has from 1 to this number of children."),
+  count("cross", 0, 200, 6, "The number of tries for a cross link between two nodes where neither one holds the other in its subtree."),
+  count("rise", 24, 200, 60, "The free space between two levels, in units."),
+  count("gap", 8, 80, 16, "The free space between two slots of the bottom row, in units."),
+]);
+
+/**
+ * The family `tree`: a tidy tree from the top down. Each leaf has its own slot, and each parent is at the middle of its first and last child.
+ * The edges of the tree go from a parent to its children. A cross link joins two nodes of different branches.
+ */
+export const TREE: HighwaysFamily = caseFamily({
+  name: "tree",
+  meaning: "A tidy tree from the top down, with a few cross links between nodes of different branches.",
+  dimensions: TREE_DIMENSIONS,
+  generator: "family.tree",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const parent: number[] = [-1];
+    const level: number[] = [0];
+    const children: number[][] = [[]];
+    for (let i = 0; i < parent.length; i++) {
+      if (level[i]! >= v["depth"]!) continue;
+      const k = int(random, 1, v["fan"]!);
+      for (let j = 0; j < k && parent.length < v["nodes"]!; j++) {
+        children[i]!.push(parent.length);
+        parent.push(i);
+        level.push(level[i]! + 1);
+        children.push([]);
+      }
+    }
+    const pitch = 72 + v["gap"]!;
+    const center: number[] = [];
+    let slot = 0;
+    const lay = (i: number): void => {
+      const kids = children[i]!;
+      if (kids.length === 0) {
+        center[i] = slot * pitch + 36;
+        slot++;
+        return;
+      }
+      for (const c of kids) lay(c);
+      center[i] = Math.floor((center[kids[0]!]! + center[kids[kids.length - 1]!]!) / 2);
+    };
+    lay(0);
+    for (let i = 0; i < parent.length; i++) {
+      const w = int(random, 48, 72);
+      b.node(`n${i}`, center[i]! - Math.floor(w / 2), level[i]! * (36 + v["rise"]!), w, int(random, 24, 36));
+    }
+    for (let i = 1; i < parent.length; i++) b.link({ node: `n${parent[i]}` }, { node: `n${i}` });
+    const holds = (a: number, c: number): boolean => {
+      for (let p = c; p !== -1; p = parent[p]!) if (p === a) return true;
+      return false;
+    };
+    for (let n = 0; n < v["cross"]!; n++) {
+      const a = int(random, 0, parent.length - 1);
+      const c = int(random, 0, parent.length - 1);
+      if (!holds(a, c) && !holds(c, a)) b.link({ node: `n${a}` }, { node: `n${c}` });
+    }
+    return b.graph();
+  },
+});
+
+/** The dimensions of `geometric`. */
+const GEOMETRIC_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("nodes", 2, 300, 40, "The number of nodes. Each node has its own cell of a grid, at a random place in the cell."),
+  count("k", 1, 6, 2, "The number of the nearest nodes that each node joins."),
+  count("cell", 64, 320, 120, "The width and the height of a cell of the grid, in units."),
+]);
+
+/**
+ * The family `geometric`: nodes at random places. Each node has an edge to each of its `k` nearest nodes, by the distance of the centers.
+ * This is the k-nearest-neighbor graph of the literature. The edges are short, and they cross only near their ends.
+ */
+export const GEOMETRIC: HighwaysFamily = caseFamily({
+  name: "geometric",
+  meaning: "Nodes at random places, each one joined to its nearest nodes: short edges with no plan of rows or groups.",
+  dimensions: GEOMETRIC_DIMENSIONS,
+  generator: "family.geometric",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const nodes = v["nodes"]!;
+    const cell = v["cell"]!;
+    const cols = ceilSqrt(nodes);
+    const order = shuffle(random, cols * cols);
+    // The doubled centers keep the distances whole numbers.
+    const centers: [number, number][] = [];
+    for (let i = 0; i < nodes; i++) {
+      const c = order[i]!;
+      const w = int(random, 32, 56);
+      const h = int(random, 20, 32);
+      const x = (c % cols) * cell + int(random, 0, cell - w - 8);
+      const y = Math.floor(c / cols) * cell + int(random, 0, cell - h - 8);
+      b.node(`n${i}`, x, y, w, h);
+      centers.push([2 * x + w, 2 * y + h]);
+    }
+    for (let i = 0; i < nodes; i++) {
+      const [x, y] = centers[i]!;
+      const near = centers
+        .map(([cx, cy], j) => [(cx - x) * (cx - x) + (cy - y) * (cy - y), j] as const)
+        .filter(([, j]) => j !== i)
+        .sort((p, q) => p[0] - q[0] || p[1] - q[1]);
+      for (const [, j] of near.slice(0, v["k"]!)) b.link({ node: `n${i}` }, { node: `n${j}` });
+    }
+    return b.graph();
+  },
+});
+
 /** The families of FAMILIES-WEEKLY, in the order of their batches. */
-export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS, WALLED_LEVEL, LAYERED, LATTICE_X, ARC_ROW]);
+export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS, WALLED_LEVEL, LAYERED, LATTICE_X, ARC_ROW, NESTED, TREE, GEOMETRIC]);
