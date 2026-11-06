@@ -5084,6 +5084,7 @@ export interface ScreenOptions {
   readonly inputs?: readonly LayoutInput[];
   readonly families?: readonly string[];
   readonly baseline?: boolean;
+  readonly baselines?: readonly string[];
   readonly options?: Readonly<Record<string, object>>;
   readonly curveRouter?: string;
   readonly baseRouters?: readonly string[];

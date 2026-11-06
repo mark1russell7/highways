@@ -14,7 +14,10 @@ on:
         description: "The step: group, plugs, router, highway, levels, curve or whole. The value verdict screens the 5 steps of the verdict snapshots in one run, 3 at a time. Use it with no strategy and no paired."
         default: "router"
       strategy:
-        description: "Names of the registry, with commas. Empty: the built-in strategies of the step."
+        description: "Names of the registry, with commas. Empty: the built-in strategies of the step. The screen also runs the baselines."
+        default: ""
+      baselines:
+        description: "The built-in strategies of the baseline, with commas (SCREEN-FILTER). Name the default of the step and the base of paired. Empty: each built-in strategy."
         default: ""
       module:
         description: "Prototype files that export strategies, with commas, relative to the root of the repository. Empty: none."
@@ -63,7 +66,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.members }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
+  group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.baselines }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.members }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
   cancel-in-progress: true
 
 jobs:
@@ -127,6 +130,7 @@ jobs:
       STEP: ${{ matrix.step }}
       STRATEGY: ${{ inputs.strategy || '' }}
       MODULE: ${{ inputs.module || '' }}
+      BASELINES: ${{ inputs.baselines || '' }}
       FAMILIES: ${{ inputs.families || '' }}
       WRAP: ${{ inputs.wrap || '' }}
       SHUFFLES: ${{ inputs.shuffles || '0' }}
@@ -158,6 +162,7 @@ jobs:
             args+=(--module "$modules")
           fi
           [ -n "$FAMILIES" ] && args+=(--families "$FAMILIES")
+          [ -n "$BASELINES" ] && args+=(--baselines "$BASELINES")
           [ -n "$MEMBERS" ] && args+=(--members "$MEMBERS")
           [ -n "$WRAP" ] && args+=(--wrap "$WRAP")
           [ "$SHUFFLES" != "0" ] && args+=(--shuffles "$SHUFFLES")
