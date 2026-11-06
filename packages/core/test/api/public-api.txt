@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1518 names
+## . (build/index.d.ts): 1520 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -1383,6 +1383,7 @@ runPipeline: build/index.d.ts#runPipeline
 runProfile: build/index.d.ts#runProfile
 runSuite: build/index.d.ts#runSuite
 sameData: build/index.d.ts#sameData
+sameKind: build/index.d.ts#sameKind
 sampleCurve: build/index.d.ts#sampleCurve
 samplesOf: build/index.d.ts#samplesOf
 sbebLines: build/index.d.ts#sbebLines
@@ -1520,6 +1521,7 @@ withBends: build/index.d.ts#withBends
 withLaneRoom: build/index.d.ts#withLaneRoom
 withRepair: build/index.d.ts#withRepair
 withStableOrder: build/index.d.ts#withStableOrder
+withoutMixedKinds: build/index.d.ts#withoutMixedKinds
 wspdGroups: build/index.d.ts#wspdGroups
 wspdPlan: build/index.d.ts#wspdPlan
 zipLegs: build/index.d.ts#zipLegs
@@ -3897,6 +3899,7 @@ export interface MeasureInfo {
   readonly placementDependent: boolean;
   readonly minEffect?: MinEffect;
   readonly definition?: string;
+  readonly estimatedBy?: string;
 }
 
 ### build/index.d.ts#MeasuredLink
@@ -4774,6 +4777,8 @@ export interface RoutePairCrossings {
   readonly proper: number;
   readonly contact: number;
   readonly estimated: boolean;
+  readonly low: number;
+  readonly high: number;
 }
 
 ### build/index.d.ts#RoutePairOptions
@@ -8016,6 +8021,9 @@ export declare function runSuite(options?: SuiteOptions): {
 ### build/index.d.ts#sameData
 export declare function sameData(a: unknown, b: unknown): boolean;
 
+### build/index.d.ts#sameKind
+export declare function sameKind(info: MeasureInfo, a: Readonly<Record<string, number>>, b: Readonly<Record<string, number>>): boolean;
+
 ### build/index.d.ts#sampleCurve
 export declare function sampleCurve(segments: readonly CurveSegment[], tolerance?: number): Point[];
 
@@ -8475,6 +8483,13 @@ export declare function withRepair(router: Router, options?: RepairOptions): Rou
 
 ### build/index.d.ts#withStableOrder
 export declare function withStableOrder(router: Router): Router;
+
+### build/index.d.ts#withoutMixedKinds
+export declare function withoutMixedKinds<R extends {
+  readonly input: string;
+  readonly seed: number;
+  readonly measures: Readonly<Record<string, number>>;
+}>(records: readonly R[], info: MeasureInfo): R[];
 
 ### build/index.d.ts#wspdGroups
 export declare function wspdGroups(input: HighwayInput, o: Readonly<WspdOptions>): Map<string, EdgeGroup>;
