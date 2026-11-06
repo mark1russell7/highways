@@ -204,5 +204,7 @@ function joinPoints(points: readonly Point[]): Point[] {
 /** This function tells if b is a stop on the straight line from a to c, in the same direction. */
 function onLine(a: Point, b: Point, c: Point): boolean {
   const [ux, uy, vx, vy] = [b.x - a.x, b.y - a.y, c.x - b.x, c.y - b.y];
-  return Math.abs(ux * vy - uy * vx) <= 1e-9 * Math.hypot(ux, uy) * Math.hypot(vx, vy) && ux * vx + uy * vy > 0;
+  // The test |u × v| ≤ 1e-9·|u|·|v| with squares on both sides, so it needs no square root.
+  const cross = ux * vy - uy * vx;
+  return cross * cross <= 1e-18 * (ux * ux + uy * uy) * (vx * vx + vy * vy) && ux * vx + uy * vy > 0;
 }
