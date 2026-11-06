@@ -28026,8 +28026,8 @@
           "laneCrossings": 100,
           "fullCrossings": 97,
           "polyline": {
-            "points": 97,
-            "beforePoints": 94,
+            "points": 100,
+            "beforePoints": 95,
             "pairs": 75,
             "beforePairs": 73,
             "added": 2,
@@ -28051,7 +28051,7 @@
           "laneCrossings": 48,
           "fullCrossings": 48,
           "polyline": {
-            "points": 43,
+            "points": 44,
             "beforePoints": 43,
             "pairs": 32,
             "beforePairs": 32,
@@ -28184,10 +28184,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 130,
-            "beforePoints": 130,
-            "pairs": 86,
-            "beforePairs": 86,
+            "points": 128,
+            "beforePoints": 128,
+            "pairs": 85,
+            "beforePairs": 85,
             "added": 0,
             "lost": 0
           },
@@ -28201,8 +28201,8 @@
           "laneCrossings": 73,
           "fullCrossings": 73,
           "polyline": {
-            "points": 68,
-            "beforePoints": 68,
+            "points": 66,
+            "beforePoints": 66,
             "pairs": 41,
             "beforePairs": 41,
             "added": 0,
@@ -28334,10 +28334,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 130,
-            "beforePoints": 130,
-            "pairs": 86,
-            "beforePairs": 86,
+            "points": 128,
+            "beforePoints": 128,
+            "pairs": 85,
+            "beforePairs": 85,
             "added": 0,
             "lost": 0
           },
@@ -28351,8 +28351,8 @@
           "laneCrossings": 73,
           "fullCrossings": 73,
           "polyline": {
-            "points": 68,
-            "beforePoints": 68,
+            "points": 66,
+            "beforePoints": 66,
             "pairs": 41,
             "beforePairs": 41,
             "added": 0,
@@ -29659,10 +29659,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 42,
-            "beforePoints": 42,
-            "pairs": 25,
-            "beforePairs": 25,
+            "points": 18,
+            "beforePoints": 18,
+            "pairs": 18,
+            "beforePairs": 18,
             "added": 0,
             "lost": 0
           },
@@ -29684,10 +29684,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 39,
-            "beforePoints": 39,
-            "pairs": 13,
-            "beforePairs": 13,
+            "points": 7,
+            "beforePoints": 7,
+            "pairs": 7,
+            "beforePairs": 7,
             "added": 0,
             "lost": 0
           },
@@ -29709,10 +29709,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 41,
-            "beforePoints": 41,
-            "pairs": 21,
-            "beforePairs": 21,
+            "points": 14,
+            "beforePoints": 14,
+            "pairs": 14,
+            "beforePairs": 14,
             "added": 0,
             "lost": 0
           },
@@ -29809,10 +29809,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 42,
-            "beforePoints": 42,
-            "pairs": 25,
-            "beforePairs": 25,
+            "points": 18,
+            "beforePoints": 18,
+            "pairs": 18,
+            "beforePairs": 18,
             "added": 0,
             "lost": 0
           },
@@ -29834,10 +29834,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 39,
-            "beforePoints": 39,
-            "pairs": 13,
-            "beforePairs": 13,
+            "points": 7,
+            "beforePoints": 7,
+            "pairs": 7,
+            "beforePairs": 7,
             "added": 0,
             "lost": 0
           },
@@ -29859,10 +29859,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 41,
-            "beforePoints": 41,
-            "pairs": 21,
-            "beforePairs": 21,
+            "points": 14,
+            "beforePoints": 14,
+            "pairs": 14,
+            "beforePairs": 14,
             "added": 0,
             "lost": 0
           },
@@ -29959,10 +29959,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 42,
-            "beforePoints": 42,
-            "pairs": 25,
-            "beforePairs": 25,
+            "points": 18,
+            "beforePoints": 18,
+            "pairs": 18,
+            "beforePairs": 18,
             "added": 0,
             "lost": 0
           },
@@ -29984,10 +29984,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 39,
-            "beforePoints": 39,
-            "pairs": 13,
-            "beforePairs": 13,
+            "points": 7,
+            "beforePoints": 7,
+            "pairs": 7,
+            "beforePairs": 7,
             "added": 0,
             "lost": 0
           },
@@ -30009,10 +30009,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 41,
-            "beforePoints": 41,
-            "pairs": 21,
-            "beforePairs": 21,
+            "points": 14,
+            "beforePoints": 14,
+            "pairs": 14,
+            "beforePairs": 14,
             "added": 0,
             "lost": 0
           },
@@ -30109,10 +30109,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 43,
-            "beforePoints": 43,
-            "pairs": 26,
-            "beforePairs": 26,
+            "points": 19,
+            "beforePoints": 19,
+            "pairs": 19,
+            "beforePairs": 19,
             "added": 0,
             "lost": 0
           },
@@ -30134,10 +30134,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 37,
-            "beforePoints": 37,
-            "pairs": 24,
-            "beforePairs": 24,
+            "points": 22,
+            "beforePoints": 22,
+            "pairs": 21,
+            "beforePairs": 21,
             "added": 0,
             "lost": 0
           },
@@ -30159,10 +30159,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 40,
-            "beforePoints": 40,
-            "pairs": 24,
-            "beforePairs": 24,
+            "points": 20,
+            "beforePoints": 20,
+            "pairs": 20,
+            "beforePairs": 20,
             "added": 0,
             "lost": 0
           },
@@ -30560,7 +30560,7 @@
           },
           "painted": {
             "points": 37,
-            "beforePoints": 39,
+            "beforePoints": 38,
             "pairs": 36,
             "beforePairs": 36,
             "added": 0,
@@ -30576,7 +30576,7 @@
           "laneCrossings": 38,
           "fullCrossings": 43,
           "polyline": {
-            "points": 31,
+            "points": 32,
             "beforePoints": 42,
             "pairs": 26,
             "beforePairs": 29,
