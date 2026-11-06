@@ -213,7 +213,8 @@ const V4_FAMILIES = V2_FAMILIES.map(roomFamily);
  * The set compares the routers on boards with room between the boxes. It keeps the 6 families, the member seeds and the split of `screen-v2`.
  *
  * The screen of this set uses the same floor rule as the other sets.
- * This set does not change. The tests compare it with the files in `corpus/screen-v4`.
+ * The room routes the level links, so a change of a router can change the boards of this generator (SCREEN-V4-FILES).
+ * Thus the set is its files in `corpus/screen-v4`. The screen and the tests read the files, not the generator.
  */
 export const SCREEN_V4: ScreenSet = {
   id: "screen-v4",
