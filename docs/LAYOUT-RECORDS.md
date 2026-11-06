@@ -114,6 +114,9 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `escape` | `cols`, `rows`, `pad`, `gap`, `nets`, `margin` | `mulberry32` of the seed | `exact` |
 | `rings` | `rings`, `corridor`, `wall`, `door`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
 | `walled-level` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops`, `knot` | `mulberry32` of the seed | `exact` |
+| `layered` | `layers`, `width`, `edges`, `span`, `long`, `rise`, `gap` | `mulberry32` of the seed | `exact` |
+| `lattice-x` | `cols`, `rows`, `size`, `gap`, `diagonal`, `side` | `mulberry32` of the seed | `exact` |
+| `arc-row` | `nodes`, `edges`, `reach`, `gap` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -143,6 +146,9 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `escape`: a dense grid of pads in a ring of terminals. This is the escape routing problem of chip packages.
   - `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
   - `walled-level`: the board of `maze` with one knot of tiny nodes. The knot deepens the section tree at one place, so a zoom level shows each wall as one item.
+  - `layered`: layers of nodes in rows, and edges that go down, some past several layers. This is the layered drawing of a directed graph (Sugiyama).
+  - `lattice-x`: nodes at the corners of a grid, and edges on the diagonals of the cells. A straight drawing has one crossing for each cell with its two diagonals.
+  - `arc-row`: one long row of nodes of one height. This is the linear layout of the book-embedding literature. A straight edge between two nodes that are not next to each other goes through the nodes between them.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.

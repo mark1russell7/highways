@@ -14,6 +14,7 @@ ANNEALING_DEFAULTS: build/index.d.ts#ANNEALING_DEFAULTS
 ANNEALING_SCHEMA: build/index.d.ts#ANNEALING_SCHEMA
 APPROVAL_DEFAULTS: build/index.d.ts#APPROVAL_DEFAULTS
 APPROVAL_PICKS: build/index.d.ts#APPROVAL_PICKS
+ARC_ROW: build/index.d.ts#ARC_ROW
 ARC_SOURCES: build/index.d.ts#ARC_SOURCES
 AREA_DEFAULTS: build/index.d.ts#AREA_DEFAULTS
 AREA_WIDTHS: build/index.d.ts#AREA_WIDTHS
@@ -347,6 +348,8 @@ LANE_ROOM_LIMIT: build/index.d.ts#LANE_ROOM_LIMIT
 LANE_STRETCH_DEFAULTS: build/index.d.ts#LANE_STRETCH_DEFAULTS
 LANE_STRETCH_ORDERS: build/index.d.ts#LANE_STRETCH_ORDERS
 LANE_TRACKS: build/index.d.ts#LANE_TRACKS
+LATTICE_X: build/index.d.ts#LATTICE_X
+LAYERED: build/index.d.ts#LAYERED
 LEADER_DEFAULTS: build/index.d.ts#LEADER_DEFAULTS
 LEADER_TYPES: build/index.d.ts#LEADER_TYPES
 LEVEL_HIGHWAY_DEFAULTS: build/index.d.ts#LEVEL_HIGHWAY_DEFAULTS
@@ -1548,6 +1551,9 @@ export declare const APPROVAL_DEFAULTS: Readonly<Required<Omit<ApprovalOptions, 
 
 ### build/index.d.ts#APPROVAL_PICKS
 export declare const APPROVAL_PICKS: readonly ApprovalPick[];
+
+### build/index.d.ts#ARC_ROW
+export declare const ARC_ROW: HighwaysFamily;
 
 ### build/index.d.ts#ARC_SOURCES
 export declare const ARC_SOURCES: readonly ArcSource[];
@@ -3379,6 +3385,12 @@ export declare const LANE_STRETCH_ORDERS: readonly LaneStretchOrder[];
 
 ### build/index.d.ts#LANE_TRACKS
 export declare const LANE_TRACKS: readonly LaneTracks[];
+
+### build/index.d.ts#LATTICE_X
+export declare const LATTICE_X: HighwaysFamily;
+
+### build/index.d.ts#LAYERED
+export declare const LAYERED: HighwaysFamily;
 
 ### build/index.d.ts#LEADER_DEFAULTS
 export declare const LEADER_DEFAULTS: Readonly<LeaderOptions>;
