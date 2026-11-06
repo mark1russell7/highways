@@ -1037,7 +1037,7 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
 - Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run.
-- The workflow `Xplat` compares the route hashes of 4 cells, and it reports each difference. Its check `Xplat OK` does not fail on a difference at this time. So no gate holds the rules of this section.
+- The workflow `Xplat` compares the routes of 4 cells. Its check `Xplat OK` fails on a route that differs. This claim holds for `corners`, `shared`, `shared-stretch` and `sections`, on 75 rows, and for no other router.
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 
