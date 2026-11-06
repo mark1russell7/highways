@@ -48,7 +48,8 @@ describe("the record route-pairs/2", () => {
 
   it("states the room of the relation, so that a fault under the room of a row reads no fault", () => {
     const slack = record.rows.map(relationSlack);
-    expect(median(slack)).toBe(54);
+    // ROUTE-TIE: the walk of the corner search breaks a tie by geometry, so the routes of the record change. The median falls from 54 to 53.
+    expect(median(slack)).toBe(53);
     expect(slack.filter((s) => s === 0)).toHaveLength(43);
   });
 

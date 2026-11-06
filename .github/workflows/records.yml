@@ -61,6 +61,11 @@ jobs:
           done
           for record in $RECORDS; do
             SECONDS=0
+            # The job starts from the committed record. A script can keep a part of its file that another script writes (`bisect` of `split-spacing`).
+            if [ -f "packages/core/scripts/data/$record/record.json" ]; then
+              mkdir -p "out/$record"
+              cp "packages/core/scripts/data/$record/record.json" "out/$record/record.json"
+            fi
             node "packages/core/scripts/$record.ts" "out/$record/record.json"
             { echo "## Record $record"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; } >> "$GITHUB_STEP_SUMMARY"
           done
