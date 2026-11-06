@@ -257,6 +257,13 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
+The measure `through` of the link faults reads the true shape of a node with a `shape`. After the box test, it calls `segmentThroughShape` of `layout-contract`.
+
+- A circle reads its disc, made smaller by 0.5. Each other kind reads the bounding box of its shape.
+- The split into `unavoidable` and `avoidable` reads `shapesOverlap` of the contract when a box has a shape.
+- The hard rule `no-pass-through` reads the box, because the routers read only the box.
+- Without shapes, `through` gives the count of `countLinksThroughShapes` of the contract. A test pins it on six fixtures and three routers.
+
 This tolerance lies on the same defect that the rule measures. A route up to 0.5 inside a box reads clear under `no-pass-through`, and the field `through` uses the same test. So the band hid the route `e284` of `case-dense-groups`, on `sections` with the margin of the site and with `outSteps: false`. A stop of that route is 0.42 inside `n138`, and the route has no `through`. The site keeps `outSteps` on, and then that route is out of the band.
 
 The independent check `checkRoutes` in `bench/measures/through-check.ts` has no such band. It takes each route and each box as closed shapes, and it shares no code with the rule. A touch is a contact, and two boxes that touch make a wall.
