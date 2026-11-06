@@ -33,9 +33,29 @@ export interface SnapshotHeader {
   readonly core: string;
 }
 
+/** The stamp of a read of a snapshot on a later core that gave the same rows. A stamp needs no new rows. */
+export interface VerifiedRead {
+  /** The core of the read. */
+  readonly core: string;
+  /** The run of the workflow `Screen` that made the read. */
+  readonly run: number;
+  readonly commit: string;
+  readonly date: string;
+}
+
 /** A verdict snapshot: the header and the rows. */
 export interface Snapshot extends SnapshotHeader {
   readonly rows: readonly SnapshotRow[];
+  /** The last read on a later core with the same rows. The rows stay those of the first run. */
+  readonly verified?: VerifiedRead;
+}
+
+/** The fields of a stamp with their types. */
+const VERIFIED: Readonly<Record<keyof VerifiedRead, "string" | "number">> = { core: "string", run: "number", commit: "string", date: "string" };
+
+/** This function gives the core of the last read of a snapshot: the core of its stamp, or else the core of its run. */
+export function readCore(s: { readonly core: string; readonly verified?: VerifiedRead }): string {
+  return s.verified?.core ?? s.core;
 }
 
 /** The fields of the header with their types. A snapshot without one of them is not valid. */
@@ -57,7 +77,44 @@ export function parseSnapshot(text: string, name = "snapshot"): Snapshot {
     if (typeof value[key] !== type) throw new Error(`The ${name} has no ${type} field "${key}" in its header.`);
   }
   if (!Array.isArray(value["rows"])) throw new Error(`The ${name} has no rows.`);
+  const stamp = value["verified"] as Record<string, unknown> | undefined;
+  if (stamp !== undefined) {
+    for (const [key, type] of Object.entries(VERIFIED)) {
+      if (typeof stamp[key] !== type) throw new Error(`The ${name} has no ${type} field "${key}" in its field "verified".`);
+    }
+  }
   return value as unknown as Snapshot;
+}
+
+/** The fields of a row that the page shows. A read verifies a snapshot when each row has the same values in these fields. */
+export const READ_FIELDS = ["label", "old", "stratified", "pooled", "p", "families", "breadth"] as const;
+
+/** One row that differs between a snapshot and a new read, with the fields that differ. The field `row` tells that one of them has no such row. */
+export interface ReadDiff {
+  readonly key: string;
+  readonly fields: readonly string[];
+}
+
+/**
+ * This function compares the rows of a committed snapshot and of a new read, by strategy, guard and measure.
+ * It gives each row that differs. An empty list tells that the read verifies the snapshot.
+ * It throws an error when the two do not screen the same set, step, base and level.
+ */
+export function compareReads(committed: Snapshot, read: Snapshot): ReadDiff[] {
+  for (const key of ["set", "step", "base", "level"] as const) {
+    if (committed[key] !== read[key]) throw new Error(`The read has ${key} ${String(read[key])}, and the snapshot has ${String(committed[key])}.`);
+  }
+  const keyOf = (r: SnapshotRow): string => `${r.strategy} ${r.guard} ${r.measure}`;
+  const before = new Map(committed.rows.map((r) => [keyOf(r), r]));
+  const after = new Map(read.rows.map((r) => [keyOf(r), r]));
+  const out: ReadDiff[] = [];
+  for (const [key, r] of before) {
+    const n = after.get(key);
+    const fields = n === undefined ? ["row"] : READ_FIELDS.filter((f) => JSON.stringify(r[f]) !== JSON.stringify(n[f]));
+    if (fields.length > 0) out.push({ key, fields });
+  }
+  for (const key of after.keys()) if (!before.has(key)) out.push({ key, fields: ["row"] });
+  return out;
 }
 
 /** The sign of one family as one character: `+` the strategy wins, `-` it loses, `0` a tie. */
@@ -84,6 +141,8 @@ export interface VerdictTable extends SnapshotHeader {
   readonly strategies: readonly { readonly name: string; readonly cells: readonly VerdictCell[] }[];
   /** The families with no key, where the base `shared` has 0 ways. Only a table with that base has this field. */
   readonly keyless?: readonly string[];
+  /** The stamp of the last read on a later core, from the snapshot. */
+  readonly verified?: VerifiedRead;
 }
 
 /** This function gives the verdict grid of a snapshot. It keeps only the fields that the page shows. */
