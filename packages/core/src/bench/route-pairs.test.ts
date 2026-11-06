@@ -228,4 +228,25 @@ describe("routePairCrossings", () => {
       expect(count(...list).pairs, `board ${board}`).toBe(sum);
     }
   });
+
+  it("reads all routes up to the point limit, so the count with the limit equals the full count (BENCH-PAIRS-HEAP)", () => {
+    const routes = walks("route-pairs/limit/full", 30).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    expect(routePairCrossings(routes, { maxPoints: points })).toEqual(routePairCrossings(routes));
+  });
+
+  it("reads a seeded sample of the routes above the point limit, and the mean of the scaled counts is the full count", () => {
+    const routes = walks("route-pairs/limit/sample", 80).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes);
+    const one = routePairCrossings(routes, { maxPoints: points / 2 });
+    expect(one.estimated).toBe(true);
+    expect(one.pairs).toBe(one.proper + one.contact);
+    expect(routePairCrossings(routes, { maxPoints: points / 2 })).toEqual(one);
+    // The scaled count of a sample has no bias. So the mean over 60 seeds comes near the full count.
+    const seeds = Array.from({ length: 60 }, (_, seed) => routePairCrossings(routes, { maxPoints: points / 2, seed }).pairs);
+    const mean = seeds.reduce((sum, v) => sum + v, 0) / seeds.length;
+    expect(full.pairs).toBeGreaterThan(500);
+    expect(Math.abs(mean - full.pairs) / full.pairs).toBeLessThan(0.03);
+  });
 });

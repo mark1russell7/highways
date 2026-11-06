@@ -28,6 +28,12 @@ import { quantile, summarize, type Spread } from "./measures/stats.ts";
 import { measureBoard } from "./room.ts";
 import { benchRun, type BenchRow, type Paired, type TimingEnv } from "./run.ts";
 
+/**
+ * The suite counts the pairs of all routes up to this number of route points (BENCH-PAIRS-HEAP). Above it, the count reads a sample of the routes.
+ * The memory of the count grows with the points. At 100 000 nodes, the full count ran out of the heap of the job.
+ */
+export const PAIR_POINTS = 1_000_000;
+
 // The core runs in any host, so it reads the clock without the types of Node or the browser.
 const now = (): number => (globalThis as { performance?: { now(): number } }).performance?.now() ?? Date.now();
 
@@ -275,7 +281,7 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
   const plugs = plugSpacing(graph, routes);
   const amb = ambiguity(graph, routes);
   const overlap = routeOverlap(routes);
-  const pairs = routePairCrossings(routes);
+  const pairs = routePairCrossings(routes, { maxPoints: PAIR_POINTS });
   return {
     "R1.crossings": row.quality.crossings,
     "R1.perEdge": row.quality.crossings / m,

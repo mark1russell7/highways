@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1516 names
+## . (build/index.d.ts): 1518 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -476,6 +476,7 @@ type OutputGroup: @mark1russell7/layout-contract#OutputGroup (external)
 type Outside: build/index.d.ts#Outside
 OverLimit: build/index.d.ts#OverLimit
 PACKED_GRID: build/index.d.ts#PACKED_GRID
+PAIR_POINTS: build/index.d.ts#PAIR_POINTS
 PARALLEL_EDGES: build/index.d.ts#PARALLEL_EDGES
 PERIMETER_MARGIN: build/index.d.ts#PERIMETER_MARGIN
 type PHubOptions: build/index.d.ts#PHubOptions
@@ -588,6 +589,7 @@ RouteBalance: build/index.d.ts#RouteBalance
 type RouteCrossing: build/index.d.ts#RouteCrossing
 RouteInput: build/index.d.ts#RouteInput
 RoutePairCrossings: build/index.d.ts#RoutePairCrossings
+RoutePairOptions: build/index.d.ts#RoutePairOptions
 type RouteSegment: build/index.d.ts#RouteSegment
 RouteStability: build/index.d.ts#RouteStability
 RouteStabilityOptions: build/index.d.ts#RouteStabilityOptions
@@ -4165,6 +4167,9 @@ export interface OverLimit {
 ### build/index.d.ts#PACKED_GRID
 export declare const PACKED_GRID: HighwaysFamily;
 
+### build/index.d.ts#PAIR_POINTS
+export declare const PAIR_POINTS = 1e6;
+
 ### build/index.d.ts#PARALLEL_EDGES
 export declare const PARALLEL_EDGES: HighwaysFamily;
 
@@ -4769,6 +4774,12 @@ export interface RoutePairCrossings {
   readonly proper: number;
   readonly contact: number;
   readonly estimated: boolean;
+}
+
+### build/index.d.ts#RoutePairOptions
+export interface RoutePairOptions {
+  readonly maxPoints?: number;
+  readonly seed?: number;
 }
 
 ### build/index.d.ts#RouteSegment
@@ -7942,7 +7953,7 @@ export declare function routeMeasures(graph: Graph, result: Result, row: BenchRo
 ### build/index.d.ts#routePairCrossings
 export declare function routePairCrossings(routes: readonly {
   readonly points: readonly Point[];
-}[]): RoutePairCrossings;
+}[], options?: RoutePairOptions): RoutePairCrossings;
 
 ### build/index.d.ts#routePortfolio
 export declare function routePortfolio(graph: Graph, options?: PortfolioRouterOptions): PortfolioRoute;

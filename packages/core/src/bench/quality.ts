@@ -243,8 +243,19 @@ export interface RoutePairCrossings {
   readonly proper: number;
   /** The crossings at a shared vertex, and on a shared stretch that two routes leave on opposite sides. */
   readonly contact: number;
-  /** This value is true when `contact` is an estimate from a sample of the pairs of routes. */
+  /** This value is true when the count is an estimate. The estimate comes from a sample of the routes, or `contact` comes from a sample of the pairs. */
   readonly estimated: boolean;
+}
+
+/** The options of `routePairCrossings` (BENCH-PAIRS-HEAP). */
+export interface RoutePairOptions {
+  /**
+   * The count reads all routes up to this number of route points. The memory of the count grows with the points.
+   * Above the limit, the count reads a seeded sample of the routes and scales the count to all pairs. With no limit, the count reads all routes.
+   */
+  readonly maxPoints?: number;
+  /** The seed of the sample of the routes. The default seed is the number of route points. */
+  readonly seed?: number;
 }
 
 /** The steps of the grid of `routePairCrossings` in one unit. The grid is the tolerance `EPS` of the contract. */
@@ -481,12 +492,44 @@ function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total
  * This function counts the crossings between pairs of routes on the grid `EPS`. `measureQuality` keeps one segment for each pair of ends, so its `crossings` counts two trunks once.
  * This count multiplies a crossing of two trunks by their routes. It also counts two routes that cross at a shared vertex, or that share a stretch and leave it on opposite sides.
  * A crossing of a route with itself does not count.
+ *
+ * The count of a set of routes is the sum of the counts of its pairs. So above `options.maxPoints`, the count of a uniform sample of `m` routes
+ * times `n (n - 1) / (m (m - 1))` is an estimate with no bias, for `n` routes.
  */
-export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[]): RoutePairCrossings {
+export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[], options: RoutePairOptions = {}): RoutePairCrossings {
+  const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+  const limit = options.maxPoints;
+  if (limit !== undefined && points > limit && routes.length > 2) {
+    const n = routes.length;
+    const m = Math.min(n, Math.max(2, Math.floor((n * limit) / points)));
+    const part = countRoutePairs(sampleRoutes(routes, m, options.seed ?? points));
+    const scale = (n * (n - 1)) / (m * (m - 1));
+    const [proper, contact] = [Math.round(part.proper * scale), Math.round(part.contact * scale)];
+    return { pairs: proper + contact, proper, contact, estimated: m < n || part.estimated };
+  }
+  return countRoutePairs(routes);
+}
+
+/** This function counts the crossings between pairs of the routes, with no sample of the routes. */
+function countRoutePairs(routes: readonly { readonly points: readonly Point[] }[]): RoutePairCrossings {
   const paths = splitAtVertices(snapPaths(routes));
   const proper = properPairCrossings(paths);
   const contact = contactPairCrossings(paths);
   return { pairs: proper + contact.total, proper, contact: contact.total, estimated: contact.estimated };
+}
+
+/** This function gives a seeded uniform sample of `m` of the routes, with no route two times, in the order of the routes. */
+function sampleRoutes<R>(routes: readonly R[], m: number, seed: number): R[] {
+  const random = rng(seed);
+  const order = routes.map((_, i) => i);
+  for (let i = 0; i < m; i++) {
+    const j = i + Math.floor(random() * (order.length - i));
+    [order[i], order[j]] = [order[j]!, order[i]!];
+  }
+  return order
+    .slice(0, m)
+    .sort((a, b) => a - b)
+    .map((i) => routes[i]!);
 }
 
 /**
