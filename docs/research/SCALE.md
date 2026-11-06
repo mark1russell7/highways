@@ -122,6 +122,31 @@ These hot spots stay. Each fix is larger than this item, and each fix must keep 
 | `distancesTo` of `bench/exact/index.ts` | approximately 25% of the self time of the steps of `shared`, before the guide cache | Each end point gets one search to all its partners. The guide goes to the nearest partner, so the search opens most of the network. | Use a guide with landmarks (ALT) for a tighter bound. Two paths of the same length can give other last digits, so compare the bits of each distance. |
 | `measureQuality` | approximately 3 s on `shared` | The grid query of each segment walks many cells on a dense board. | Measure the profile of the grid query first. |
 
+## The route time at each size (ROUTER-BUDGET step 1)
+
+An earlier run of the layout cover took 4 to 38 minutes for one route at 1000 nodes on six routers. This run times the same six routers on the released core at five sizes. It also times one packed board of 1000 nodes.
+
+- The run: [Scale 42135842178](https://github.com/mark1russell7/highways/actions/runs/42135842178), on one runner model (AMD EPYC 9V74), Node 26.13.0.
+- The boards: `makeFixture` uniform boards with 4 edges for each node, at 125, 250, 500, 1000 and 2000 nodes. The packed board is `joint-v2/rect-grid.freeHeight.holes.none.bimodal.n1000.e-dense.hubs.none.free.sp-gap/s2`, with 1000 nodes and 4000 edges.
+- The method: 2 rounds, and two arms `a` and `b` in fresh processes for each size. The A/A ratio is `b ÷ a`. The order of the sizes turns each round. The limit is 10 minutes for one route.
+- The records: [`budget/2026-11-06/rows.jsonl`](budget/2026-11-06/rows.jsonl) and its table [`scale.md`](budget/2026-11-06/scale.md).
+
+| router | 125 nodes (s) | 1000 nodes (s) | 2000 nodes (s) | exponent, 1000 to 2000 | packed board (s) | packed ÷ uniform at 1000 |
+|---|---:|---:|---:|---:|---:|---:|
+| `growth` | 0.15 | 1.57 | 4.97 | 1.66 | over 600 | over 380 |
+| `hough` | 0.09 | 0.57 | 1.36 | 1.25 | 72 | 126 |
+| `hub-arcs` | 0.54 | 6.52 | 17.33 | 1.41 | 214 | 33 |
+| `mlseb` | 1.92 | 38.25 | 90.74 | 1.25 | 260 | 6.8 |
+| `ridges` | 0.12 | 0.80 | 1.76 | 1.13 | 385 | 482 |
+| `search` | 1.03 | 12.06 | 32.47 | 1.43 | 594 | 49 |
+
+The times are medians of 4 routes. The A/A ratios are 0.93 to 1.03, except `hough` at 2000 nodes (0.84).
+
+- On the uniform boards, each router stays under the budget of 5 minutes at 2000 nodes. The slowest is `mlseb`, at 91 seconds.
+- The exponent of a doubling grows with the size on five routers. `growth` goes from 0.89 to 1.66.
+- The packed board costs 7 to 480 times the uniform board of the same size. `growth` stops at the limit. `search` and `ridges` are over the budget.
+- So the cost comes from the packed layout, not from the count of nodes or edges. The packed board has one route for each router and no A/A arm. Step 2 profiles each router on it.
+
 ## The tree of sections at 10 000 nodes (H3)
 
 H3 made each router faster at 10 000 nodes with a profile fix. Its old claim, 2 to 2.5 times faster, came from separate jobs.
@@ -192,3 +217,27 @@ So the walk has the same steps, the same buckets, the same items in the same ord
 A new test compares the grid with a copy of the grid of version 0.11.0, on seeded scripts of adds and queries.
 
 The gate run 41712051689 finds the head faster against its parent: ratio 0.964, interval over the A/A arm 0.950 to 0.988, A/A spread 0.019. The head is 0.904 times the fixed base `25a2be4`.
+
+### The H3 remeasure after the fixes (SECTIONS-SLOW step 4)
+
+The workflow `Remeasure` (run 42114442742) timed H3 again on `ad00fff` of `main`. This commit has SEARCH-SPEED (#259), the fix of `SoftGraph.path` (#276) and the fix of the walk (#280).
+The plan is the plan of run 41369331158: the core before `fa1dd82`, the board `large-clustered`, 5 jobs, fresh processes, 3 rounds and an A/A arm.
+The [record](verdicts/remeasure/h3-2026-11-05.json) keeps each job. The A/A band of each job contains 1, so each job counts.
+
+The ratio is the time of the workspace over the old time. The CPU models are EPYC 7763 (2 jobs), Xeon 8370C (1 job) and EPYC 9V74 (2 jobs).
+
+| Router | Interval of the 5 jobs | Old time | Time of `ad00fff` | Before the fixes | Verdict |
+|---|---|---:|---:|---|---|
+| `corners` | 0.264 to 0.287 | 56.9 s | 15.0 s | 0.339 to 0.471 | The claim holds. |
+| `corners-smooth` | 0.291 to 0.314 | 56.2 s | 17.1 s | 0.370 to 0.502 | The claim holds. |
+| `trunks` | 0.294 to 0.315 | 48.3 s | 15.0 s | 0.382 to 0.506 | The claim holds. |
+| `shared` | 0.263 to 0.296 | 123.9 s | 35.0 s | 0.335 to 0.435 | The claim holds. |
+| `shared-all` | 0.149 to 0.173 | 242.6 s | 37.4 s | 0.170 to 0.231 | The claim holds. |
+| `sections` | 0.857 to 0.971 | 39.4 s | 38.1 s | 1.147 to 1.332 | The workspace is not slower. |
+| `sections-tree` | 1.930 to 2.307 | 17.8 s | 37.8 s | 2.667 to 3.211 | The workspace is slower. |
+
+- The times are the medians over the jobs. Each router has a different old time, so compare the ratios, not the times.
+- `sections` is below the A/A band in 4 jobs of 5, and in the band in job 1. So the regression of `sections` is gone.
+- `sections-tree` is slower in each job. Its ratio is near the ratio of 1.92 at `c6af859` in the bisect.
+- So most of the rest comes from the step at `e55dde1` (#7). That change routes the links of a level from box to box around the other items.
+- The next step prices #7 with a profile of `e55dde1` and its parent. Then it fixes the cost, or it keeps the cost as the cost of the feature.
