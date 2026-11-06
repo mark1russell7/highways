@@ -114,6 +114,9 @@ The core registers its generators as families of the shared registry of `@mark1r
 | `escape` | `cols`, `rows`, `pad`, `gap`, `nets`, `margin` | `mulberry32` of the seed | `exact` |
 | `rings` | `rings`, `corridor`, `wall`, `door`, `nodes`, `edges` | `mulberry32` of the seed | `exact` |
 | `walled-level` | `cols`, `rows`, `nodes`, `edges`, `corridor`, `wall`, `loops`, `knot` | `mulberry32` of the seed | `exact` |
+| `layered` | `layers`, `width`, `edges`, `span`, `long`, `rise`, `gap` | `mulberry32` of the seed | `exact` |
+| `lattice-x` | `cols`, `rows`, `size`, `gap`, `diagonal`, `side` | `mulberry32` of the seed | `exact` |
+| `arc-row` | `nodes`, `edges`, `reach`, `gap` | `mulberry32` of the seed | `exact` |
 
 - The name `kind` is reserved, so the dimension of the fixture kind is `layout`. The record keeps it as `params.kind`.
 - Each family of a screen set has the defaults of its screen family. Thus `generate(name, seed)` with no dimension gives the board of the screen set for that seed.
@@ -143,6 +146,9 @@ The core registers its generators as families of the shared registry of `@mark1r
   - `escape`: a dense grid of pads in a ring of terminals. This is the escape routing problem of chip packages.
   - `rings`: closed walls, each one inside the next, with one door on a random side of each wall.
   - `walled-level`: the board of `maze` with one knot of tiny nodes. The knot deepens the section tree at one place, so a zoom level shows each wall as one item.
+  - `layered`: layers of nodes in rows, and edges that go down, some past several layers. This is the layered drawing of a directed graph (Sugiyama).
+  - `lattice-x`: nodes at the corners of a grid, and edges on the diagonals of the cells. A straight drawing has one crossing for each cell with its two diagonals.
+  - `arc-row`: one long row of nodes of one height. This is the linear layout of the book-embedding literature. A straight edge between two nodes that are not next to each other goes through the nodes between them.
 - A new weekly family goes at the end of `WEEKLY_FAMILIES`. A new screen set is a separate item.
 
 The manifest of a corpus is `corpus.json`. `corpusManifest` writes it.
@@ -527,6 +533,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - The columns `through` and `no graph` of the summary are absolute sums over the inputs, with no floor. Thus a strategy at the floor still shows its count of pass-throughs.
 - `route.no-graph` (R17) counts the routes with two points where the corner graph has no way between the facing plugs. The screen reads the routes after the run, thus no output and no hash changes.
 - Each row of `screen-verdict.ts` has `through` and `baseThrough`: the absolute counts of the strategy and of the base. A snapshot from before PASS-GRID has no such fields, and the site reads each form.
+- The header of a verdict snapshot from VERDICT-RUN on has `script`: the commit of the checkout that ran `screen-verdict.ts`. An older snapshot has no such field.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
