@@ -192,3 +192,27 @@ So the walk has the same steps, the same buckets, the same items in the same ord
 A new test compares the grid with a copy of the grid of version 0.11.0, on seeded scripts of adds and queries.
 
 The gate run 41712051689 finds the head faster against its parent: ratio 0.964, interval over the A/A arm 0.950 to 0.988, A/A spread 0.019. The head is 0.904 times the fixed base `25a2be4`.
+
+### The H3 remeasure after the fixes (SECTIONS-SLOW step 4)
+
+The workflow `Remeasure` (run 42114442742) timed H3 again on `ad00fff` of `main`. This commit has SEARCH-SPEED (#259), the fix of `SoftGraph.path` (#276) and the fix of the walk (#280).
+The plan is the plan of run 41369331158: the core before `fa1dd82`, the board `large-clustered`, 5 jobs, fresh processes, 3 rounds and an A/A arm.
+The [record](verdicts/remeasure/h3-2026-11-05.json) keeps each job. The A/A band of each job contains 1, so each job counts.
+
+The ratio is the time of the workspace over the old time. The CPU models are EPYC 7763 (2 jobs), Xeon 8370C (1 job) and EPYC 9V74 (2 jobs).
+
+| Router | Interval of the 5 jobs | Old time | Time of `ad00fff` | Before the fixes | Verdict |
+|---|---|---:|---:|---|---|
+| `corners` | 0.264 to 0.287 | 56.9 s | 15.0 s | 0.339 to 0.471 | The claim holds. |
+| `corners-smooth` | 0.291 to 0.314 | 56.2 s | 17.1 s | 0.370 to 0.502 | The claim holds. |
+| `trunks` | 0.294 to 0.315 | 48.3 s | 15.0 s | 0.382 to 0.506 | The claim holds. |
+| `shared` | 0.263 to 0.296 | 123.9 s | 35.0 s | 0.335 to 0.435 | The claim holds. |
+| `shared-all` | 0.149 to 0.173 | 242.6 s | 37.4 s | 0.170 to 0.231 | The claim holds. |
+| `sections` | 0.857 to 0.971 | 39.4 s | 38.1 s | 1.147 to 1.332 | The workspace is not slower. |
+| `sections-tree` | 1.930 to 2.307 | 17.8 s | 37.8 s | 2.667 to 3.211 | The workspace is slower. |
+
+- The times are the medians over the jobs. Each router has a different old time, so compare the ratios, not the times.
+- `sections` is below the A/A band in 4 jobs of 5, and in the band in job 1. So the regression of `sections` is gone.
+- `sections-tree` is slower in each job. Its ratio is near the ratio of 1.92 at `c6af859` in the bisect.
+- So most of the rest comes from the step at `e55dde1` (#7). That change routes the links of a level from box to box around the other items.
+- The next step prices #7 with a profile of `e55dde1` and its parent. Then it fixes the cost, or it keeps the cost as the cost of the feature.
