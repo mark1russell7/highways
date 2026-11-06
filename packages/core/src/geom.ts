@@ -174,7 +174,9 @@ export function dropStraightStops(points: readonly Point[]): Point[] {
       const a = out[out.length - 2]!;
       const b = out[out.length - 1]!;
       const [ux, uy, vx, vy] = [b.x - a.x, b.y - a.y, p.x - b.x, p.y - b.y];
-      if (Math.abs(ux * vy - uy * vx) <= 1e-9 * Math.hypot(ux, uy) * Math.hypot(vx, vy) && ux * vx + uy * vy > 0) out.pop();
+      // The test |u × v| ≤ 1e-9·|u|·|v| with squares on both sides, so it needs no square root.
+      const cross = ux * vy - uy * vx;
+      if (cross * cross <= 1e-18 * (ux * ux + uy * uy) * (vx * vx + vy * vy) && ux * vx + uy * vy > 0) out.pop();
     }
     out.push(p);
   }
