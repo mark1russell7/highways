@@ -1,9 +1,14 @@
 # The dump of the near inputs of the geometric predicates (PREDICATE-CASES), for the exact predicates of the algebra role.
 # Each job runs `packages/core/scripts/predicate-dump.ts` on one board set. It writes one gzip file of JSON lines and a Markdown summary.
-# The artifact `predicate-dump-<set>` keeps the two files for 30 days. The script header tells the format of the lines.
+# The artifact `predicate-dump-<set>` keeps the two files for 90 days. The script header tells the format of the lines.
+# The schedule dumps all sets on day 1 of each month. The monthly census of the algebra role reads the newest green run on day 4.
+# The 90 days keep a dump when one month fails, so the census still has a run to read.
 name: Predicate dump
 
 on:
+  # The minute 46 is scheduleMinute of conventions for this repository and file (the rule runner-budget).
+  schedule:
+    - cron: "46 2 1 * *"
   workflow_dispatch:
     inputs:
       sets:
@@ -31,7 +36,8 @@ jobs:
     steps:
       - id: plan
         env:
-          SETS: ${{ inputs.sets }}
+          # A scheduled run has no inputs, so it dumps all sets.
+          SETS: ${{ inputs.sets || 'all' }}
         # The limit of each set is an estimate from the dump of exact-v1: 40 boards and 7 steps in 66 s on a local machine.
         # The time of a board grows faster than its count of boxes, and the sink adds the cost of each test. So the limits keep a large margin.
         # The script starts no more boards 25 min before the limit, so the upload gets the boards that the job dumped.
@@ -82,7 +88,7 @@ jobs:
         with:
           name: predicate-dump-${{ matrix.set }}
           path: out/predicate-dump-*
-          retention-days: 30
+          retention-days: 90
           # The file of the lines has gzip already.
           compression-level: 0
           if-no-files-found: warn
