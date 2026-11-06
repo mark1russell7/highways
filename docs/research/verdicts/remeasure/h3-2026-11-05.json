@@ -1,0 +1,611 @@
+{
+  "schema": "remeasure/1",
+  "claim": "h3",
+  "plan": {
+    "claim": "h3",
+    "rows": [
+      "H3"
+    ],
+    "old": "the core of `fa1dd82~1` (`0dff3fd`), in a git worktree",
+    "board": "the fixture `large-clustered` of `fa1dd82~1` (10 000 nodes)",
+    "mode": "fresh",
+    "rounds": 3,
+    "warmup": 0,
+    "targets": [
+      {
+        "id": "corners",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "corners-smooth",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "trunks",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "shared",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "shared-all",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "sections",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      {
+        "id": "sections-tree",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "job": "job1",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9644433238671583,
+        "p90": 1.0179309903000844
+      }
+    },
+    {
+      "job": "job2",
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9777798893088039,
+        "p90": 1.0332272411474284
+      }
+    },
+    {
+      "job": "job3",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9197975615337503,
+        "p90": 1.0319111310140798
+      }
+    },
+    {
+      "job": "job4",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.98225933187646,
+        "p90": 1.0451849160257656
+      }
+    },
+    {
+      "job": "job5",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cores": 4,
+      "mode": "fresh",
+      "floor": {
+        "p10": 0.9854820396625635,
+        "p90": 1.0149113810423482
+      }
+    }
+  ],
+  "targets": [
+    {
+      "target": {
+        "id": "corners",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.2811900692235623,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 58833.627367,
+          "newMs": 16543.431752
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.28746043384561293,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 64171.256389,
+          "newMs": 18446.697202
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.2771798431734098,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 49841.573261000005,
+          "newMs": 13815.079459999999
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.26428032605072965,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 56871.217864,
+          "newMs": 15029.944
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.27418939250776064,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 46351.837862,
+          "newMs": 12709.182265
+        }
+      ],
+      "worst": 0.28746043384561293,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "corners-smooth",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.29092111215158156,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 58940.413235,
+          "newMs": 17147.010569
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.3132091565802071,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 64969.729762,
+          "newMs": 20349.114262
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.31353993029584903,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 49715.978339,
+          "newMs": 15587.944383
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.3071703764076525,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 56200.860329999996,
+          "newMs": 17263.239422000002
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.2917215044884641,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 49125.2341,
+          "newMs": 14330.887200000001
+        }
+      ],
+      "worst": 0.31353993029584903,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "trunks",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.29436582990147514,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 55011.978388999996,
+          "newMs": 16193.646673
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.31528038190900165,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 60040.120080999994,
+          "newMs": 18929.471988999998
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.31445657315663583,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 46201.163820999995,
+          "newMs": 14528.259651
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.3116485737267104,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 48281.251532999995,
+          "newMs": 15046.783178
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.29982916301298407,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 46215.563959,
+          "newMs": 13856.773860000001
+        }
+      ],
+      "worst": 0.31528038190900165,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "shared",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.26300626371617547,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 133113.75494,
+          "newMs": 35009.751336
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.2630682095541389,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 141443.936818,
+          "newMs": 37209.403211000004
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.2957309994829462,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 105112.476681,
+          "newMs": 31085.017787
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.282636367391924,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 123895.32286,
+          "newMs": 35017.32399
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.296449465884746,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 101945.42104100001,
+          "newMs": 30221.665617
+        }
+      ],
+      "worst": 0.296449465884746,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "shared-all",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.15568766939692763,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 250353.68681400002,
+          "newMs": 38976.982025
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.14947309880139303,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 268378.63336399995,
+          "newMs": 40115.385981
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.17290110443758572,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 191362.960784,
+          "newMs": 33086.867268
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.15437651057703392,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 242571.988977,
+          "newMs": 37447.417222
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.16645400978447353,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 188342.365976,
+          "newMs": 31350.342029
+        }
+      ],
+      "worst": 0.17290110443758572,
+      "slower": 0,
+      "verdict": "holds"
+    },
+    {
+      "target": {
+        "id": "sections",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.9709313434796414,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": true,
+          "oldMs": 41302.496459,
+          "newMs": 40101.888376
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 0.8785430868373275,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 47232.985193,
+          "newMs": 41496.212612
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.8572620962170191,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 39147.91143,
+          "newMs": 33560.020615
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 0.9662646116404787,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 39400.389254,
+          "newMs": 38071.201821
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 0.8694373639910794,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 37149.863355,
+          "newMs": 32299.479268
+        }
+      ],
+      "worst": 0.9709313434796414,
+      "slower": 0,
+      "verdict": "inside the noise floor"
+    },
+    {
+      "target": {
+        "id": "sections-tree",
+        "claim": 0.5,
+        "source": "H3: each router 2 to 2.5 times faster at 10 000 nodes"
+      },
+      "jobs": [
+        {
+          "job": "job1",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 2.307492881608689,
+          "floor": {
+            "p10": 0.9644433238671583,
+            "p90": 1.0179309903000844
+          },
+          "inside": false,
+          "oldMs": 17817.583630999998,
+          "newMs": 41113.947395999996
+        },
+        {
+          "job": "job2",
+          "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+          "ratio": 1.930229945392125,
+          "floor": {
+            "p10": 0.9777798893088039,
+            "p90": 1.0332272411474284
+          },
+          "inside": false,
+          "oldMs": 21541.870025,
+          "newMs": 41580.762602
+        },
+        {
+          "job": "job3",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 2.2530084986771453,
+          "floor": {
+            "p10": 0.9197975615337503,
+            "p90": 1.0319111310140798
+          },
+          "inside": false,
+          "oldMs": 14579.165543,
+          "newMs": 32846.983872
+        },
+        {
+          "job": "job4",
+          "cpu": "AMD EPYC 7763 64-Core Processor",
+          "ratio": 2.0341641566044157,
+          "floor": {
+            "p10": 0.98225933187646,
+            "p90": 1.0451849160257656
+          },
+          "inside": false,
+          "oldMs": 18601.405864,
+          "newMs": 37838.313071
+        },
+        {
+          "job": "job5",
+          "cpu": "AMD EPYC 9V74 80-Core Processor",
+          "ratio": 2.012673206744592,
+          "floor": {
+            "p10": 0.9854820396625635,
+            "p90": 1.0149113810423482
+          },
+          "inside": false,
+          "oldMs": 15792.295827999998,
+          "newMs": 31784.730686000003
+        }
+      ],
+      "worst": 2.307492881608689,
+      "slower": 5,
+      "verdict": "smaller"
+    }
+  ],
+  "verdict": "inside the noise floor"
+}
