@@ -96,6 +96,8 @@ export interface LayoutCell {
   readonly edgeShape?: "random" | "clustered" | "hubChain" | "longRange" | "tree" | "bundled";
   readonly groups?: "none" | "flat" | "nested";
   readonly ports?: "free" | "sides" | "fixed";
+  /** The key of each edge in `data.collection`, as the dimension `edgeKey` of the contract gives it. */
+  readonly edgeKey?: "none" | "random" | "cluster";
 }
 
 /** The outer rectangle of a packing. The router ignores it. */

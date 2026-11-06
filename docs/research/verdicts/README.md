@@ -8,6 +8,7 @@ Each file `<set>-<step>.json` holds the verdicts of one screen against the defau
 - `run` is the id of the run of the workflow `Screen` that gave the records. `commit` is the commit of the records.
 - `core` is the version of `@mark1russell7/highways` at that commit.
 - Each line of `rows` is one verdict: a strategy on a guard measure, with its label, its families and its breadth.
+- `verified` is the stamp of the last read on a later core with the same rows. It has `core`, `run`, `commit` and `date`. The rows stay those of the first run.
 - A snapshot with a router that has no lanes also has `limits`. Each line gives the rise of B11 over `corners` on one input, the limit and the label.
 
 ## How to make a snapshot
@@ -19,6 +20,19 @@ Each file `<set>-<step>.json` holds the verdicts of one screen against the defau
 - The script takes the run and the commit from the path of the artifact. `--run` and `--commit` set them.
 - `--date` sets the date. The default is today.
 - `--core` sets the version of the core. The default is the version of the checkout.
+
+## How to read a snapshot on a later core
+
+A new release can leave the verdicts as they are. A read on the new core tells if they changed.
+
+1. Start the workflow `Screen` on the same set and step. The job writes `verdict.json`.
+2. Download the artifact into a new empty folder.
+3. From the root, start `node packages/site/scripts/verdict-verify.ts docs/research/verdicts/<set>-<step>.json <dir>/verdict.json --stamp`.
+
+- The script compares the fields of each row that the page shows: the label, the plain sign, the means, `p`, the families and the breadth.
+- With the same rows, it writes the stamp `verified`. Commit the stamp. The page then tells "measured on" the first core and "verified on" the new core.
+- With a row that differs, it gives the exit code 1 and each row. Then make a new snapshot with its rows, by the rule below.
+- The measure `results-unread` of `kpi.json` counts the snapshots with no read on the minor of the engine. `results-lag` counts the minors from the oldest run, and it ignores the stamps.
 
 ## The rule
 
