@@ -74,7 +74,7 @@ On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less in
 
 `sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39% and the crossings by 2.2 to 3 times. The routes are 20% to 32% longer.
 
-`sections` and `sections-tree` are slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-tree-of-sections-at-10-000-nodes-h3), `sections` takes 1.15 to 1.33 times the old time, and `sections-tree` 2.67 to 3.21 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) finds the change and fixes it.
+`sections-tree` is slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-h3-remeasure-after-the-fixes-sections-slow-step-4), it takes 1.93 to 2.31 times the old time on `main`. `sections` is not slower: 0.86 to 0.97 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) prices and fixes the rest.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline.
 

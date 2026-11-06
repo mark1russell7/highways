@@ -206,8 +206,8 @@ importers:
   packages/core:
     dependencies:
       '@mark1russell7/layout-contract':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.5.1
+        version: 0.5.1
       '@mark1russell7/predicates':
         specifier: ^0.1.0
         version: 0.1.1
@@ -501,8 +501,8 @@ packages:
     resolution: {integrity: sha512-Mls2V7uo5zGS6o5apBCJAKN3T4oZ3A2yuxUJUBzICDzIWT+YiIP+yOcBfVpjf22cPG5GMr+/abC7UJ4u4bXTlA==}
     engines: {node: '>=22.12'}
 
-  '@mark1russell7/layout-contract@0.4.0':
-    resolution: {integrity: sha512-D3WWXDwxHpcZZw9UofHDybMDAaYZFvyuwbswOrK9xl/640QCaNDSk8e3d6RvGBa0+bzwBItBWNl5xLJgWjThlg==}
+  '@mark1russell7/layout-contract@0.5.1':
+    resolution: {integrity: sha512-M0C3O+aOkmTcGFBnOmc0NM9g3QsNoJQnoO3w5niJDzIomaTP7rQpx0DcsK2FXTUzit51JVLQGGtziP8LTMyuTg==}
     engines: {node: '>=22.12'}
 
   '@mark1russell7/predicates@0.1.1':
@@ -1632,7 +1632,7 @@ snapshots:
 
   '@mark1russell7/layout-contract@0.2.21': {}
 
-  '@mark1russell7/layout-contract@0.4.0':
+  '@mark1russell7/layout-contract@0.5.1':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.5
       '@mark1russell7/typeset': 0.1.0
