@@ -288,6 +288,8 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
     "R1.estimated": row.quality.crossingsEstimated ? 1 : 0,
     "R1.pairs": pairs.pairs,
     "R1.pairsEstimated": pairs.estimated ? 1 : 0,
+    "R1.pairsLow": pairs.low,
+    "R1.pairsHigh": pairs.high,
     "R2.angle": ca.mean,
     "R2.min": ca.min,
     "B1.inkSaved": inkSaved(routes),

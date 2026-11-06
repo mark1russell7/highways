@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1russell7/layout-contract";
 import { median as homeMedian } from "@mark1russell7/rigor-statistics";
-import { compareSpec, MEASURES, type MeasureInfo } from "../src/bench/screen/measures.ts";
+import { compareSpec, MEASURES, sameKind, withoutMixedKinds, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
 import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
 
@@ -103,6 +103,8 @@ function ratio(m: MeasureInfo, p: Pair): number | undefined {
   const c = p.c.measures[m.name];
   const b = p.b.measures[m.name];
   if (c === undefined || b === undefined || !Number.isFinite(c) || !Number.isFinite(b)) return undefined;
+  // A pair of an estimate from a sample and a full count does not compare (BENCH-PAIRS-HEAP).
+  if (!sameKind(m, p.c.measures, p.b.measures)) return undefined;
   const floor = FLOORS[m.name];
   if (floor && b === floor.floor) return c - floor.floor <= floor.tol ? 1 : Infinity;
   if (c === b) return 1;
@@ -204,7 +206,7 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
     for (const p of ps) {
       const c = p.c.measures[m.name];
       const b = p.b.measures[m.name];
-      if (c === undefined || b === undefined || Number.isNaN(c) || Number.isNaN(b)) continue;
+      if (c === undefined || b === undefined || Number.isNaN(c) || Number.isNaN(b) || !sameKind(m, p.c.measures, p.b.measures)) continue;
       const k = compareMeasure(c, b, spec);
       if (k === "better") wins++;
       else if (k === "worse") losses++;
@@ -251,10 +253,10 @@ function verdicts(records: readonly Rec[]): VerdictRow[] {
   const recs = records.filter((r) => r.strategy === candidate || r.strategy === baseline);
   const ps = pairs(records);
   const seen = MEASURES.filter((m) => recs.some((r) => r.measures[m.name] !== undefined));
-  const paired = (name: string): boolean => ps.some((p) => p.c.measures[name] !== undefined && p.b.measures[name] !== undefined);
-  const rows = seen.filter((m) => paired(m.name)).map((m) => ({
+  const paired = (m: MeasureInfo): boolean => ps.some((p) => p.c.measures[m.name] !== undefined && p.b.measures[m.name] !== undefined && sameKind(m, p.c.measures, p.b.measures));
+  const rows = seen.filter((m) => paired(m)).map((m) => ({
     m,
-    result: verdict(recs, { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }),
+    result: verdict(withoutMixedKinds(recs, m), { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }),
   }));
   const adjusted = holm(rows.map((r) => r.result.permutation.p));
   const measured = new Map(

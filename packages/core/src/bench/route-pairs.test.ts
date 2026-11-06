@@ -61,7 +61,7 @@ describe("paintedOutsidePairs", () => {
 
 describe("routePairCrossings", () => {
   it("counts a proper crossing of two routes", () => {
-    expect(count([[0, 0], [10, 10]], [[0, 10], [10, 0]])).toEqual({ pairs: 1, proper: 1, contact: 0, estimated: false });
+    expect(count([[0, 0], [10, 10]], [[0, 10], [10, 0]])).toEqual({ pairs: 1, proper: 1, contact: 0, estimated: false, low: 1, high: 1 });
   });
 
   it("counts no crossing of parallel routes, of equal routes or of one route", () => {
@@ -85,7 +85,7 @@ describe("routePairCrossings", () => {
   });
 
   it("counts two routes that cross at a shared vertex", () => {
-    expect(count([[0, 0], [5, 5], [10, 10]], [[0, 10], [5, 5], [10, 0]])).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count([[0, 0], [5, 5], [10, 10]], [[0, 10], [5, 5], [10, 0]])).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1 });
   });
 
   it("does not count two routes that touch at a shared vertex and come back", () => {
@@ -101,7 +101,7 @@ describe("routePairCrossings", () => {
   it("counts a shared stretch that two routes leave on opposite sides", () => {
     const a = [[0, 10], [5, 0], [15, 0], [20, -10]] as const;
     const b = [[0, -10], [5, 0], [15, 0], [20, 10]] as const;
-    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1 });
   });
 
   it("does not count a shared stretch that two routes leave on one side", () => {
@@ -116,7 +116,7 @@ describe("routePairCrossings", () => {
   it("counts a stretch of routes in opposite directions one time", () => {
     const a = [[0, 10], [5, 0], [15, 0], [20, -10]] as const;
     const b = [[20, 10], [15, 0], [5, 0], [0, -10]] as const;
-    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1 });
     expect(count(b, a).pairs).toBe(1);
     // Both ends of this route lie below, and at the right end it passes on the other side of the first route.
     const below = [[22, -10], [15, 0], [5, 0], [-2, -10]] as const;
@@ -233,6 +233,20 @@ describe("routePairCrossings", () => {
     const routes = walks("route-pairs/limit/full", 30).map((w) => route(...w.points));
     const points = routes.reduce((sum, r) => sum + r.points.length, 0);
     expect(routePairCrossings(routes, { maxPoints: points })).toEqual(routePairCrossings(routes));
+    const full = routePairCrossings(routes);
+    expect([full.low, full.high]).toEqual([full.pairs, full.pairs]);
+  });
+
+  it("gives a 95% interval of a sampled count that holds the full count for about 95% of the seeds", () => {
+    const routes = walks("route-pairs/limit/cover", 120).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes).pairs;
+    const runs = Array.from({ length: 200 }, (_, seed) => routePairCrossings(routes, { maxPoints: points / 2, seed }));
+    const inside = runs.filter((r) => r.low <= full && full <= r.high).length / runs.length;
+    expect(runs.every((r) => r.low <= r.pairs && r.pairs <= r.high && r.low < r.high)).toBe(true);
+    // A seeded count of 200 trials has a standard error of 0.015 at 0.95. The bounds are 4 errors below and 2.5 above.
+    expect(inside).toBeGreaterThanOrEqual(0.89);
+    expect(inside).toBeLessThanOrEqual(0.99);
   });
 
   it("reads a seeded sample of the routes above the point limit, and the mean of the scaled counts is the full count", () => {

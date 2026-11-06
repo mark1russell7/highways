@@ -26,6 +26,11 @@ export interface MeasureInfo {
   readonly minEffect?: MinEffect;
   /** The definition of the measure in one or two sentences: what it counts, and when its value is good. The site shows it. */
   readonly definition?: string;
+  /**
+   * The name of the measure of 0 or 1 that tells that this value is an estimate from a sample (BENCH-PAIRS-HEAP).
+   * A gate does not compare an estimate with a full count. `sameKind` applies this rule.
+   */
+  readonly estimatedBy?: string;
 }
 
 /** One rule of `MIN_EFFECTS`: the units, the minimum effect of a measure with one of these units, and the reason. */
@@ -70,6 +75,15 @@ export const MIN_EFFECTS: readonly MinEffectRule[] = Object.freeze([
 
 const MIN_EFFECT_BY_UNIT: ReadonlyMap<string, MinEffectRule> = new Map(MIN_EFFECTS.flatMap((r) => r.units.map((u) => [u, r] as const)));
 
+/** The key of the flag of an estimate for each measure that can come from a sample, by the key of the measure. */
+const ESTIMATED_BY: Readonly<Record<string, string>> = {
+  "R1.crossings": "R1.estimated",
+  "R1.perEdge": "R1.estimated",
+  "R1.pairs": "R1.pairsEstimated",
+  "R1.pairsLow": "R1.pairsEstimated",
+  "R1.pairsHigh": "R1.pairsEstimated",
+};
+
 /** The text of a row of `MEASURES`: the key, the id, the name, the unit, the better side and the placement dependence. */
 type Row = readonly [key: string, id: string, name: string, unit: string, better: "lower" | "higher", placement: boolean, definition?: string];
 
@@ -80,6 +94,8 @@ const ROWS: readonly Row[] = [
   ["R1.estimated", "R1", "route.crossings.estimated", "0 or 1", "lower", true, "This value is 1 when the crossings come from a sample and not from a full count. A ratio across routers does not compare such a row with a full count."],
   ["R1.pairs", "R1", "route.crossings.pairs", "count", "lower", true, "The crossings between pairs of routes, including a shared vertex and a shared stretch that two routes leave on opposite sides. The partner of `route.crossings`: a bundle lowers the count of ink crossings by overlap."],
   ["R1.pairsEstimated", "R1", "route.crossings.pairs.estimated", "0 or 1", "lower", true, "This value is 1 when `route.crossings.pairs` has an estimate from a sample of the pairs of routes."],
+  ["R1.pairsLow", "R1", "route.crossings.pairs.low", "count", "lower", true, "The low end of the 95% interval of `route.crossings.pairs`. It equals the count when the count reads all routes."],
+  ["R1.pairsHigh", "R1", "route.crossings.pairs.high", "count", "lower", true, "The high end of the 95% interval of `route.crossings.pairs`. It equals the count when the count reads all routes."],
   ["R2.angle", "R2", "route.crossing-angle.mean", "0 to 1", "higher", true],
   ["R2.min", "R2", "route.crossing-angle.min", "degrees", "higher", true],
   ["R3.bends", "R3", "route.bends", "count for each route", "lower", false],
@@ -241,7 +257,19 @@ export const MEASURES: readonly MeasureInfo[] = Object.freeze(
   ROWS.map(([key, id, name, unit, better, placementDependent, definition]) => {
     const rule = MIN_EFFECT_BY_UNIT.get(unit);
     if (!rule) throw new Error(`MEASURES: the unit "${unit}" of ${key} has no rule in MIN_EFFECTS`);
-    const info: MeasureInfo = { key, id, name, unit, better, placementDependent, ...(definition === undefined ? {} : { definition }) };
+    const flag = ESTIMATED_BY[key];
+    const estimatedBy = flag === undefined ? undefined : ROWS.find((r) => r[0] === flag)?.[2];
+    if (flag !== undefined && estimatedBy === undefined) throw new Error(`MEASURES: the flag ${flag} of ${key} is not a row`);
+    const info: MeasureInfo = {
+      key,
+      id,
+      name,
+      unit,
+      better,
+      placementDependent,
+      ...(definition === undefined ? {} : { definition }),
+      ...(estimatedBy === undefined ? {} : { estimatedBy }),
+    };
     return Object.freeze(rule.minEffect === undefined ? info : { ...info, minEffect: rule.minEffect });
   }),
 );
@@ -249,6 +277,40 @@ export const MEASURES: readonly MeasureInfo[] = Object.freeze(
 /** This function gives the spec of a compare of a measure: its better side and its minimum effect. */
 export function compareSpec(info: MeasureInfo): CompareSpec {
   return info.minEffect === undefined ? { direction: info.better } : { direction: info.better, minEffect: info.minEffect };
+}
+
+/**
+ * This function tells if two values of the measure `info` are of one kind: two full counts, or two estimates (BENCH-PAIRS-HEAP).
+ * `a` and `b` are the measures of two records by name. A missing flag is a full count.
+ */
+export function sameKind(info: MeasureInfo, a: Readonly<Record<string, number>>, b: Readonly<Record<string, number>>): boolean {
+  if (info.estimatedBy === undefined) return true;
+  return (a[info.estimatedBy] ?? 0) === (b[info.estimatedBy] ?? 0);
+}
+
+/**
+ * This function removes the value of the measure `info` from each record of an input and seed where the records do not have one kind.
+ * Thus a verdict that pairs the records by input and seed does not pair an estimate with a full count.
+ */
+export function withoutMixedKinds<R extends { readonly input: string; readonly seed: number; readonly measures: Readonly<Record<string, number>> }>(
+  records: readonly R[],
+  info: MeasureInfo,
+): R[] {
+  const flag = info.estimatedBy;
+  if (flag === undefined) return [...records];
+  const kinds = new Map<string, Set<number>>();
+  for (const r of records) {
+    if (r.measures[info.name] === undefined) continue;
+    const key = `${r.input}#${r.seed}`;
+    const set = kinds.get(key) ?? new Set<number>();
+    set.add(r.measures[flag] ?? 0);
+    kinds.set(key, set);
+  }
+  return records.map((r) => {
+    if ((kinds.get(`${r.input}#${r.seed}`)?.size ?? 0) < 2) return r;
+    const { [info.name]: _dropped, ...measures } = r.measures;
+    return { ...r, measures };
+  });
 }
 
 const BY_KEY: ReadonlyMap<string, MeasureInfo> = new Map(MEASURES.map((m) => [m.key, m]));
