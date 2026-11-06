@@ -1,6 +1,9 @@
-// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--measures <names>]`.
+// The verdict over families of a screen (SCREEN-WEIGHT): `node scripts/screen-verdict.ts <screen.jsonl> [--default <base>] [--json <out.json>] [--all-json <out.json>] [--snapshot] [--check <snapshot>] [--measures <names>]`.
 // The option `--measures` takes a comma list of measure names of a record, for example the named wins of an idea. They replace the guard measures.
 // It reads the records of one artifact of the workflow `Screen`. For each strategy of the step against the default, it gives the verdict of each guard measure.
+// The rows of a snapshot are the built-in strategies of the step at the checkout, without the base (VERDICT-RUN). The option `--all-json` writes the rows of each strategy of the records.
+// The default base of a step is in `STEP_BASE`. The option `--default` changes it.
+// The option `--check` reads the rows of a snapshot again from these records. A label that moved or a row that is missing gives the exit code 1.
 // The guard measures are the measures of the step in `docs/PROMOTION.md`. The tie is the `minEffect` of the measure, and the level is 0.05.
 // The script also gives the old verdict: the mean of the inputs, as the screen gives it today.
 // It gives the power of the sign test: the least count of families on one side that passes at the level. Each set works, also `screen-v3` with 15 families.
@@ -8,17 +11,65 @@
 // The header of a snapshot has the run of the artifact (`--run`), the commit of the records (`--commit`), the date (`--date`) and the core version (`--core`).
 // With no option, the run and the commit come from the path of the artifact, `<run>/screen-<set>-<step>-...-<sha>/screen.jsonl`.
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
 import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
 import { parseLines, passThroughs, type LayoutRecord } from "../src/bench/screen/forms.ts";
 import { measureByName } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
+import { STRATEGIES } from "../src/strategies/builtins.ts";
+import { listStrategies, type Step } from "../src/strategies/model.ts";
 import { requireGrid } from "./gates/inputs.ts";
 
 /** The significance level of each verdict. */
 const LEVEL = 0.05;
+
+/** The steps that the workflow `Screen` gives a verdict for. A test pins this list against the condition of the step in `screen.yml`. */
+export const VERDICT_STEPS: readonly string[] = ["router", "highway", "plugs", "levels", "whole"];
+
+/** The default base of each step. The committed snapshots of `docs/research/verdicts` use these bases. */
+export const STEP_BASE: Readonly<Record<string, string>> = { router: "shared", highway: "shared", plugs: "facing", levels: "depths", whole: "pipeline" };
+
+/**
+ * This function gives the strategies of a snapshot: the strategies of the records that are built-in strategies of the step, without the base.
+ * The sequence is the sequence of the records. An opt-in strategy of the screen is only in the rows of `--all-json`.
+ * On the 15 snapshots of 2026-11, this rule with the built-in strategies at the commit of each snapshot gives their 1,137 rows exactly.
+ */
+export function snapshotStrategies(inRecords: readonly string[], builtIn: readonly string[], base: string): string[] {
+  const keep = new Set(builtIn);
+  return [...new Set(inRecords)].filter((s) => s !== base && keep.has(s));
+}
+
+/** One row of a snapshot, as `--check` compares it. */
+export interface CheckRow {
+  readonly strategy: string;
+  readonly guard: string;
+  readonly label: string;
+}
+
+/** The result of `--check`: a line for each moved label and each missing row, and a note for each row that the snapshot does not have. */
+export interface CheckResult {
+  readonly moved: readonly string[];
+  readonly missing: readonly string[];
+  readonly added: readonly string[];
+}
+
+/** This function compares the rows of a snapshot with the rows of a new read of the same records. The rows have the key (strategy, guard). */
+export function checkRows(stored: readonly CheckRow[], fresh: readonly CheckRow[]): CheckResult {
+  const key = (r: CheckRow): string => `${r.strategy} ${r.guard}`;
+  const now = new Map(fresh.map((r) => [key(r), r.label]));
+  const was = new Set(stored.map(key));
+  const moved: string[] = [];
+  const missing: string[] = [];
+  for (const r of stored) {
+    const label = now.get(key(r));
+    if (label === undefined) missing.push(`${key(r)}: the row is missing`);
+    else if (label !== r.label) moved.push(`${key(r)}: the label moved from "${r.label}" to "${label}"`);
+  }
+  const added = fresh.filter((r) => !was.has(key(r))).map((r) => `${key(r)}: a row that the snapshot does not have`);
+  return { moved, missing, added };
+}
 
 /** The guard measures of the step `router`, by their names in a record. */
 const ROUTER_GUARDS: readonly { readonly id: string; readonly name: string }[] = [
@@ -97,12 +148,11 @@ function stepOf(records: readonly LayoutRecord[]): string {
   return [...steps].find((s) => s !== "router") ?? "router";
 }
 
-/** This function gives the verdicts of each strategy of the step against the strategy `base`, on each guard measure of the step. */
-function screenVerdicts(records: readonly LayoutRecord[], base: string, measures?: readonly string[]): GuardVerdict[] {
+/** This function gives the verdicts of each strategy in `strategies` against the strategy `base`, on each guard measure of the step. */
+function screenVerdicts(records: readonly LayoutRecord[], base: string, strategies: readonly string[], measures?: readonly string[]): GuardVerdict[] {
   const step = stepOf(records);
   const guards = measures === undefined ? GUARDS[step] : measures.map((name) => ({ id: name, name }));
   if (guards === undefined) throw new Error(`The step "${step}" has no guard measures in this script.`);
-  const strategies = [...new Set(records.filter((r) => r.step === step).map((r) => r.strategy))].filter((s) => s !== base);
   const out: GuardVerdict[] = [];
   for (const strategy of strategies) {
     const pair = records.filter((r) => r.strategy === strategy || r.strategy === base);
@@ -133,6 +183,8 @@ interface SnapshotHeader {
   readonly date: string;
   /** The version of `@mark1russell7/highways` at the commit of the records. */
   readonly core: string;
+  /** The commit of the checkout that ran this script, or null outside git. A snapshot from before VERDICT-RUN has no such field. */
+  readonly script: string | null;
 }
 
 /** This function gives the JSON text of a snapshot, with one row on each line. Thus a diff shows each changed verdict. */
@@ -171,17 +223,36 @@ function main(): void {
   };
   const file = args[0];
   if (file === undefined || file.startsWith("--")) {
-    console.error("Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default shared] [--json <out.json>] [--snapshot] [--measures <names>] [--run <id>] [--commit <sha>] [--date <YYYY-MM-DD>] [--core <version>]");
+    console.error(
+      "Usage: node scripts/screen-verdict.ts <screen.jsonl> [--default <base>] [--json <out.json>] [--all-json <out.json>] [--snapshot] [--check <snapshot>] [--measures <names>] [--run <id>] [--commit <sha>] [--date <YYYY-MM-DD>] [--core <version>]",
+    );
     process.exit(2);
   }
-  const base = opt("--default") ?? "shared";
   const records = parseLines<LayoutRecord>(readFileSync(file, "utf8"));
   // FAIL-CLOSED: a verdict needs records, and each strategy needs a record on each input. A file of a failed run holds fewer.
   requireGrid(`screen-verdict ${file}`, records);
-  const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
-  const rows = screenVerdicts(records, base, measures);
-  const limits = overlapLimitRows(records, (input) => familyOfRecord({ input } as LayoutRecord));
   const step = stepOf(records);
+  const checkFile = opt("--check");
+  const stored = checkFile === undefined ? undefined : (JSON.parse(readFileSync(checkFile, "utf8")) as { readonly base: string; readonly rows: readonly CheckRow[] });
+  const base = opt("--default") ?? stored?.base ?? STEP_BASE[step] ?? "shared";
+  const measures = opt("--measures")?.split(",").filter((m) => m.length > 0);
+  const inRecords = records.filter((r) => r.step === step).map((r) => r.strategy);
+  // A check reads the strategies of the snapshot, so a built-in strategy that was added or removed later does not move a row.
+  const strategies =
+    stored !== undefined
+      ? [...new Set(stored.rows.map((r) => r.strategy))]
+      : snapshotStrategies(inRecords, listStrategies(STRATEGIES, step as Step).map((s) => s.name), base);
+  const rows = screenVerdicts(records, base, strategies.filter((s) => inRecords.includes(s)), measures);
+  if (stored !== undefined) {
+    const result = checkRows(stored.rows, rows);
+    for (const line of [...result.moved, ...result.missing]) console.log(line);
+    for (const line of result.added) console.log(`note: ${line}`);
+    const bad = result.moved.length + result.missing.length;
+    console.log(bad === 0 ? `The labels hold: ${stored.rows.length} rows of ${checkFile}.` : `The check fails: ${result.moved.length} moved and ${result.missing.length} missing of ${stored.rows.length} rows of ${checkFile}.`);
+    if (bad > 0) process.exitCode = 1;
+    return;
+  }
+  const limits = overlapLimitRows(records, (input) => familyOfRecord({ input } as LayoutRecord));
   const set = records[0]?.set;
   const path = fromPath(file);
   const run = opt("--run");
@@ -194,9 +265,15 @@ function main(): void {
     commit: opt("--commit") ?? path.commit ?? headCommit(),
     date: opt("--date") ?? new Date().toISOString().slice(0, 10),
     core: opt("--core") ?? (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version,
+    script: headCommit(),
   };
   const snapshot = args.includes("--snapshot") ? fileURLToPath(new URL(`../../../docs/research/verdicts/${set}-${step}.json`, import.meta.url)) : undefined;
   for (const out of [opt("--json"), snapshot]) if (out !== undefined) writeFileSync(out, snapshotText(header, rows, limits));
+  const allOut = opt("--all-json");
+  if (allOut !== undefined) {
+    const all = [...new Set(inRecords)].filter((s) => s !== base);
+    writeFileSync(allOut, snapshotText(header, screenVerdicts(records, base, all, measures), limits));
+  }
   for (const l of limits) console.log(`${l.strategy} ${l.guard}: ${l.label}, rise over ${l.base} ${f3(l.worst)} at most ${l.limit}, ${l.over} of ${l.of} inputs over, worst ${l.worstInput}`);
   const families = rows[0]?.families.map((f) => f.family) ?? [];
   console.log(`## The verdicts of the step \`${step}\` on \`${records[0]?.set}\` against \`${base}\`\n`);
@@ -217,4 +294,4 @@ function main(): void {
   }
 }
 
-main();
+if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) main();
