@@ -1,0 +1,45 @@
+2026-11-06T06:16:13.2002891Z The level links of 8 levels of sections-tree on large-clustered (10000 nodes, 30000 edges): 34540 ms
+2026-11-06T06:16:13.2004262Z | self % | function |
+2026-11-06T06:16:13.2004778Z |---:|---|
+2026-11-06T06:16:13.2019243Z | 26.0 | #search visibility.ts:578 |
+2026-11-06T06:16:13.2020133Z | 16.3 | #walk grid.ts:126 |
+2026-11-06T06:16:13.2020862Z | 7.3 | path visibility.ts:927 |
+2026-11-06T06:16:13.2021637Z | 7.2 | #down visibility.ts:1084 |
+2026-11-06T06:16:13.2022368Z | 4.6 | set visibility.ts:1045 |
+2026-11-06T06:16:13.2023085Z | 4.1 | estimate visibility.ts:638 |
+2026-11-06T06:16:13.2023903Z | 4.0 | #down visibility.ts:1172 |
+2026-11-06T06:16:13.2024671Z | 3.3 | square levels.ts:548 |
+2026-11-06T06:16:13.2025315Z | 3.1 | dist geom.ts:19 |
+2026-11-06T06:16:13.2025947Z | 3.0 | hitsRect geom.ts:97 |
+2026-11-06T06:16:13.2026683Z | 2.6 | #nearestVisible visibility.ts:459 |
+2026-11-06T06:16:13.2027449Z | 1.7 | (garbage collector) :0 |
+2026-11-06T06:16:13.2028096Z | 1.6 | #slot grid.ts:33 |
+2026-11-06T06:16:13.2029039Z | 1.3 | (anonymous) visibility.ts:52 |
+2026-11-06T06:16:13.2029735Z | 1.1 | inflate geom.ts:36 |
+2026-11-06T06:16:13.2030430Z | 0.7 | pop visibility.ts:1075 |
+2026-11-06T06:16:13.2031134Z | 0.7 | #ends visibility.ts:747 |
+2026-11-06T06:16:13.2031875Z | 0.6 | (anonymous) visibility.ts:600 |
+2026-11-06T06:16:13.2032579Z | 0.6 | steps grid.ts:226 |
+2026-11-06T06:16:13.2033259Z | 0.6 | someSegment grid.ts:213 |
+2026-11-06T06:16:13.2033966Z | 0.5 | push visibility.ts:1122 |
+2026-11-06T06:16:13.2034625Z | 0.5 | #key grid.ts:27 |
+2026-11-06T06:16:13.2035242Z | 0.4 | #take grid.ts:101 |
+2026-11-06T06:16:13.2035936Z | 0.4 | pullThrough levels.ts:260 |
+2026-11-06T06:16:13.2036679Z | 0.4 | querySegment grid.ts:203 |
+2026-11-06T06:16:13.2037331Z | 0.3 | (program) :0 |
+2026-11-06T06:16:13.2038003Z | 0.3 | get topKey visibility.ts:1033 |
+2026-11-06T06:16:13.2038972Z | 0.3 | hit visibility.ts:27 |
+2026-11-06T06:16:13.2039673Z | 0.3 | (anonymous) profile.ts:0 |
+2026-11-06T06:16:13.2040511Z | 0.3 | (anonymous) grid.ts:204 |
+2026-11-06T08:21:26.2145731Z | source | route ms | level links ms |
+2026-11-06T08:21:26.2146224Z |---|---:|---:|
+2026-11-06T08:21:26.2148785Z | e55dde1~1 | 107889 | - |
+2026-11-06T08:21:26.2150613Z | e55dde1 | 146448 | 62311 |
+2026-11-06T08:21:26.2159346Z | this commit | 59738 | 37042 |
+2026-11-06T08:21:26.2164365Z | arm | input | ratio over `e55dde1~1` | A/A rounds | A/A band of the rounds | verdict |
+2026-11-06T08:21:26.2164810Z |---|---|---:|---:|---|---|
+2026-11-06T08:21:26.2165215Z | `e55dde1` | large-clustered | 1.357 | 5 | 0.940 to 1.060 | slower |
+2026-11-06T08:21:26.2165750Z | `this commit` | large-clustered | 0.554 | 5 | 0.940 to 1.060 | faster |
+2026-11-06T08:21:26.2169475Z | arm | input | ratio over `e55dde1` | A/A rounds | A/A band of the rounds | verdict |
+2026-11-06T08:21:26.2169907Z |---|---|---:|---:|---|---|
+2026-11-06T08:21:26.2170371Z | `this commit` | large-clustered | 0.594 | 5 | 0.932 to 1.068 | faster |

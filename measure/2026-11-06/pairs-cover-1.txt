@@ -1,0 +1,13 @@
+# probe-pairs-cover.ts, 2026-11-06, trunks,plugs 300 nodes 100 seeds, branch fix/pairs-heap (uncommitted interval), local, headroom 1 core
+{"kind":"clustered","router":"trunks","routes":600,"points":3942,"full":10363,"share":0.5,"coverage":0.96,"meanWidth":0.348,"bias":-0.0066,"msEach":13}
+{"kind":"clustered","router":"trunks","routes":600,"points":3942,"full":10363,"share":0.25,"coverage":0.93,"meanWidth":0.602,"bias":-0.0114,"msEach":5}
+{"kind":"clustered","router":"trunks","routes":600,"points":3942,"full":10363,"share":0.1,"coverage":0.94,"meanWidth":1.088,"bias":-0.0038,"msEach":2}
+{"kind":"clustered","router":"plugs","routes":600,"points":15000,"full":8979,"share":0.5,"coverage":0.97,"meanWidth":0.371,"bias":-0.0031,"msEach":21}
+{"kind":"clustered","router":"plugs","routes":600,"points":15000,"full":8979,"share":0.25,"coverage":0.94,"meanWidth":0.638,"bias":-0.0095,"msEach":9}
+{"kind":"clustered","router":"plugs","routes":600,"points":15000,"full":8979,"share":0.1,"coverage":0.94,"meanWidth":1.146,"bias":-0.0051,"msEach":4}
+{"kind":"grid","router":"trunks","routes":600,"points":3703,"full":9730,"share":0.5,"coverage":0.94,"meanWidth":0.371,"bias":0.0117,"msEach":11}
+{"kind":"grid","router":"trunks","routes":600,"points":3703,"full":9730,"share":0.25,"coverage":0.9,"meanWidth":0.649,"bias":0.0168,"msEach":5}
+{"kind":"grid","router":"trunks","routes":600,"points":3703,"full":9730,"share":0.1,"coverage":0.95,"meanWidth":1.188,"bias":0.0529,"msEach":2}
+{"kind":"grid","router":"plugs","routes":600,"points":15000,"full":8581,"share":0.5,"coverage":0.93,"meanWidth":0.399,"bias":0.0074,"msEach":22}
+{"kind":"grid","router":"plugs","routes":600,"points":15000,"full":8581,"share":0.25,"coverage":0.93,"meanWidth":0.7,"bias":0.0207,"msEach":10}
+{"kind":"grid","router":"plugs","routes":600,"points":15000,"full":8581,"share":0.1,"coverage":0.94,"meanWidth":1.285,"bias":0.06,"msEach":5}
