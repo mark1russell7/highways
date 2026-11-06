@@ -253,6 +253,11 @@ export interface RoutePairCrossings {
   readonly low: number;
   /** The high end of the 95% interval of `pairs`. It equals `pairs` when the count reads all routes. */
   readonly high: number;
+  /**
+   * This value is true when `contact` comes from a seeded sample of the pairs at shared vertices, above 20 000 000 reads.
+   * Then the interval of `low` and `high` is too narrow, because it does not include the error of that sample.
+   */
+  readonly contactSampled: boolean;
 }
 
 /** The options of `routePairCrossings` (BENCH-PAIRS-HEAP). */
@@ -546,7 +551,8 @@ export function routePairCrossings(routes: readonly { readonly points: readonly 
     const all = totals.reduce((s, t) => s + t, 0);
     const spread = Math.sqrt(1 - m / n) * scale;
     const interval = bootstrap([...totals], (drawn) => pairs + spread * (drawn.reduce((s, t) => s + t, 0) - all), { runs: PAIR_RUNS, seed });
-    return { pairs, proper, contact, estimated: m < n || part.estimated, low: Math.max(0, Math.floor(interval.low)), high: Math.ceil(interval.high) };
+    const [low, high] = [Math.max(0, Math.floor(interval.low)), Math.ceil(interval.high)];
+    return { pairs, proper, contact, estimated: m < n || part.estimated, low, high, contactSampled: part.contactSampled };
   }
   return countRoutePairs(routes);
 }
@@ -560,7 +566,7 @@ function countRoutePairs(routes: readonly { readonly points: readonly Point[] }[
   const proper = properPairCrossings(paths, totals);
   const contact = contactPairCrossings(paths, totals);
   const pairs = proper + contact.total;
-  return { pairs, proper, contact: contact.total, estimated: contact.estimated, low: pairs, high: pairs };
+  return { pairs, proper, contact: contact.total, estimated: contact.estimated, low: pairs, high: pairs, contactSampled: contact.estimated };
 }
 
 /** This function gives a seeded uniform sample of `m` of the routes, with no route two times, in the order of the routes. */

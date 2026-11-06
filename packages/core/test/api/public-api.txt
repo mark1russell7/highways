@@ -4779,6 +4779,7 @@ export interface RoutePairCrossings {
   readonly estimated: boolean;
   readonly low: number;
   readonly high: number;
+  readonly contactSampled: boolean;
 }
 
 ### build/index.d.ts#RoutePairOptions
