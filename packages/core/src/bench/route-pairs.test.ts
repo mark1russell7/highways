@@ -33,6 +33,18 @@ describe("paintedOutsidePairs", () => {
     expect(count(ending, line).pairs).toBe(0);
   });
 
+  it("reads outside the relation when a second route nearly draws a segment of a route that crosses itself", () => {
+    // The ends (10, 0) and (9.95, 0) round to one key of the painted segments. So that segment has two owners, and the crossing at x 9.97 is not `self`.
+    // The second route stops before x 9.97, so the pair count reads no crossing of the two routes.
+    const crossing = [[0, 0], [10, 0], [10, -5], [9.97, -5], [9.97, 5]] as const;
+    const near = [[0, 0], [9.95, 0]] as const;
+    expect(read(crossing, near)).toEqual({ crossings: 1, self: 0, touch: 0 });
+    expect(count(crossing, near).pairs).toBe(0);
+    // The copy with no second route stays inside the relation.
+    expect(read(crossing)).toEqual({ crossings: 1, self: 1, touch: 0 });
+    expect(count(crossing).pairs).toBe(0);
+  });
+
   it("gives the painted count of `countCrossings` and holds the relation on seeded routes", () => {
     const random = mulberry32(seedOf("paintedOutsidePairs"));
     const point = (): Xy => [Math.round(random() * 200), Math.round(random() * 200)];

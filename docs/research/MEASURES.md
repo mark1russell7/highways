@@ -159,14 +159,21 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 
 ### The relation of the two crossing counts
 
-`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The exact relation is this one, for one result with no sample:
+`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The relation is this bound, for one result with no sample:
 
 `crossings - self - touch <= pairs`
 
 - `self` counts the crossings of two segments that one route alone draws. The pair count leaves out a route that crosses itself.
 - `touch` counts the other crossings that are not strict on the grid `EPS`: the segments touch, or an end of one lies on the other. The float test can read such a place as a strict crossing.
 
+The class `touch` became wider after the first read of the `packed-grid` rows. It first held the segments that touch. An end of one segment on the other joined it after those 3 rows were in view. So the relation in this form is a fit to those rows, and the table below lists them by name.
+
 The function `paintedOutsidePairs` reads the two classes, and the record `route-pairs/2` holds them on each of its 375 rows. A test holds the relation on each row. A later row outside the relation is a finding, and it is not noise.
+
+Two limits apply to this check:
+
+- **It is not an identity.** Real functions can read outside it. The painted count joins two segments when their ends round to one key on a grid of 1/8. So a second route that nearly draws a segment takes the crossing out of `self`. The pair count reads the exact points, and it leaves that crossing out. A test in `src/bench/route-pairs.test.ts` builds this case on two made-up routes, and it reads 1 painted crossing outside the relation against 0 pairs. No row of the record reads this.
+- **It is a one-sided bound with room.** The room of a row is `pairs - (crossings - self - touch)`. The median room is 54 over the 375 rows, and the room is 0 on 43 rows. A fault that lowers the pair count by less than the room of a row reads no fault. So this check holds the classes, and it does not hold the size of either count.
 
 The pair count is under the painted count on 5 of the 375 rows:
 
