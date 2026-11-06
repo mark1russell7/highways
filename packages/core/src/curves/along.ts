@@ -18,7 +18,7 @@ type Piece =
   | { readonly kind: "arc"; readonly center: Point; readonly radius: number; readonly start: number; readonly sweep: number; readonly length: number }
   | { readonly kind: "cubic"; readonly p: readonly [Point, Point, Point, Point]; readonly t0: number; readonly t1: number; readonly from: Point; readonly to: Point; readonly length: number };
 
-const len = (a: Point, b: Point): number => Math.hypot(b.x - a.x, b.y - a.y);
+const len = (a: Point, b: Point): number => Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 
 /** This function gives the derivative of a cubic Bezier curve at the parameter `t`, divided by 3. */
 function slope(p: readonly [Point, Point, Point, Point], t: number): Point {
@@ -46,7 +46,7 @@ function cubicLength(p: readonly [Point, Point, Point, Point], a: number, b: num
   let sum = 0;
   for (const [x, w] of GAUSS) {
     const d = slope(p, mid + half * x);
-    sum += w * Math.hypot(d.x, d.y);
+    sum += w * Math.sqrt(d.x * d.x + d.y * d.y);
   }
   return 3 * half * sum;
 }
@@ -89,7 +89,7 @@ function piecesOf(line: readonly Point[] | readonly CurveSegment[], tolerance: n
 
 /** This function gives the unit vector of `v`, or (0, 0) for a vector of length 0. */
 function unit(v: Point): Point {
-  const l = Math.hypot(v.x, v.y);
+  const l = Math.sqrt(v.x * v.x + v.y * v.y);
   return l === 0 ? { x: 0, y: 0 } : { x: v.x / l, y: v.y / l };
 }
 
@@ -102,7 +102,9 @@ function onPiece(piece: Piece, u: number): PointAlong {
   if (piece.kind === "arc") {
     const a = piece.start + piece.sweep * u;
     const s = Math.sign(piece.sweep);
-    return { point: { x: piece.center.x + piece.radius * Math.cos(a), y: piece.center.y + piece.radius * Math.sin(a) }, tangent: { x: -Math.sin(a) * s, y: Math.cos(a) * s } };
+    // The cosine and the sine give only the drawn point and the tangent. No choice of the router reads them.
+    const [cos, sin] = [Math.cos(a), Math.sin(a)];
+    return { point: { x: piece.center.x + piece.radius * cos, y: piece.center.y + piece.radius * sin }, tangent: { x: -sin * s, y: cos * s } };
   }
   const [p0, p1, p2, p3] = piece.p;
   // The parameter at the length u × length from the start of the step, by bisection. The length grows with the parameter.
@@ -117,7 +119,7 @@ function onPiece(piece: Piece, u: number): PointAlong {
   const t = u >= 1 ? piece.t1 : lo;
   const d = slope(piece.p, t);
   // A control point on an end gives a derivative of 0 at that end. Then the chord of the step gives the direction.
-  const tangent = Math.hypot(d.x, d.y) > 1e-12 * (1 + piece.length) ? unit(d) : unit({ x: piece.to.x - piece.from.x, y: piece.to.y - piece.from.y });
+  const tangent = d.x * d.x + d.y * d.y > (1e-12 * (1 + piece.length)) ** 2 ? unit(d) : unit({ x: piece.to.x - piece.from.x, y: piece.to.y - piece.from.y });
   return { point: t === 1 ? p3 : t === 0 ? p0 : cubicAt(p0, p1, p2, p3, t), tangent };
 }
 
