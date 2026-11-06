@@ -1,4 +1,4 @@
-import { portPoint } from "@mark1russell7/layout-contract";
+import { portPoint, type Region } from "@mark1russell7/layout-contract";
 import type { Box, Point } from "./geom.ts";
 
 /** A side of a node box. */
@@ -52,6 +52,11 @@ export interface Node {
    * A parent that names no node, or a cycle of parents, makes each router throw a `RangeError`.
    */
   readonly parent?: string;
+  /**
+   * The true shape of the node, relative to the top-left corner of its box. It lies inside the box.
+   * The routers read only the box. The measure `through` reads the shape (`segmentThroughShape` of the contract).
+   */
+  readonly shape?: Region;
 }
 
 /** One end of an edge: a node, and optionally one plug of that node. */

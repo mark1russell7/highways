@@ -558,7 +558,7 @@ ROUTE_SPACE_MISFITS: build/index.d.ts#ROUTE_SPACE_MISFITS
 RadiusOptions: build/index.d.ts#RadiusOptions
 RecordTrace: build/index.d.ts#RecordTrace
 RectScatteredParams: build/index.d.ts#RectScatteredParams
-Region: build/index.d.ts#Region
+type Region: @mark1russell7/layout-contract#Region (external)
 RegionPoint: build/index.d.ts#RegionPoint
 Registry: build/index.d.ts#Registry
 type RelaxOptions: build/index.d.ts#RelaxOptions
@@ -3794,6 +3794,7 @@ interface LinkEdge {
 ### build/index.d.ts#LinkFaultOptions
 export interface LinkFaultOptions {
   readonly slack?: number;
+  readonly shapes?: ReadonlyMap<string, Region$1>;
 }
 
 ### build/index.d.ts#LinkFaults
@@ -4045,6 +4046,7 @@ export interface Node {
   readonly ports?: readonly Port[];
   readonly data?: Readonly<Record<string, unknown>>;
   readonly parent?: string;
+  readonly shape?: Region$1;
 }
 
 ### build/index.d.ts#NodeKey
@@ -4544,30 +4546,6 @@ export interface RecordTrace {
 export interface RectScatteredParams {
   readonly count: number;
 }
-
-### build/index.d.ts#Region
-export type Region = {
-  readonly kind: "rect";
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-} | {
-  readonly kind: "polygon";
-  readonly points: readonly RegionPoint[];
-  readonly holes?: readonly (readonly RegionPoint[])[];
-} | {
-  readonly kind: "circle";
-  readonly cx: number;
-  readonly cy: number;
-  readonly r: number;
-} | {
-  readonly kind: "ellipse";
-  readonly cx: number;
-  readonly cy: number;
-  readonly rx: number;
-  readonly ry: number;
-};
 
 ### build/index.d.ts#RegionPoint
 export type RegionPoint = readonly [number, number];
