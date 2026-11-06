@@ -1,0 +1,16 @@
+headroom: lease c8350b7c for pairs-heap-probe, granted.
+headroom: the job cannot use more than 1 core (--limit).
+{"nodes":1000,"router":"trunks","routes":2000,"points":17225,"qualityMs":121,"qualityHeapMb":13.5,"pairsMs":85,"pairsHeapAfterMb":17.1,"pairs":92209,"estimated":false}
+{"nodes":1000,"router":"shared","routes":2000,"points":26335,"qualityMs":97,"qualityHeapMb":49.2,"pairsMs":79,"pairsHeapAfterMb":61.4,"pairs":123026,"estimated":false}
+{"nodes":1000,"router":"shared-all","routes":2000,"points":30071,"qualityMs":100,"qualityHeapMb":57.3,"pairsMs":267,"pairsHeapAfterMb":59.3,"pairs":92568,"estimated":false}
+{"nodes":1000,"router":"corners","routes":2000,"points":16438,"qualityMs":88,"qualityHeapMb":66.2,"pairsMs":320,"pairsHeapAfterMb":38.5,"pairs":88909,"estimated":false}
+{"nodes":2000,"router":"trunks","routes":4000,"points":40789,"qualityMs":207,"qualityHeapMb":39.6,"pairsMs":440,"pairsHeapAfterMb":57.1,"pairs":364970,"estimated":false}
+{"nodes":2000,"router":"shared","routes":4000,"points":67431,"qualityMs":367,"qualityHeapMb":25.9,"pairsMs":222,"pairsHeapAfterMb":43.7,"pairs":471131,"estimated":false}
+{"nodes":2000,"router":"shared-all","routes":4000,"points":80403,"qualityMs":475,"qualityHeapMb":6.9,"pairsMs":419,"pairsHeapAfterMb":45.9,"pairs":389543,"estimated":false}
+{"nodes":2000,"router":"corners","routes":4000,"points":39279,"qualityMs":228,"qualityHeapMb":29.7,"pairsMs":297,"pairsHeapAfterMb":44,"pairs":353772,"estimated":false}
+{"nodes":4000,"router":"trunks","routes":8000,"points":99085,"qualityMs":579,"qualityHeapMb":31.9,"pairsMs":972,"pairsHeapAfterMb":75,"pairs":1136573,"estimated":false}
+{"nodes":4000,"router":"shared","routes":8000,"points":166112,"qualityMs":637,"qualityHeapMb":21.6,"pairsMs":658,"pairsHeapAfterMb":98.1,"pairs":1530480,"estimated":false}
+{"nodes":4000,"router":"shared-all","routes":8000,"points":202805,"qualityMs":1011,"qualityHeapMb":42.5,"pairsMs":1042,"pairsHeapAfterMb":81.7,"pairs":1183175,"estimated":false}
+{"nodes":4000,"router":"corners","routes":8000,"points":95869,"qualityMs":480,"qualityHeapMb":75.8,"pairsMs":745,"pairsHeapAfterMb":80.5,"pairs":1099429,"estimated":false}
+headroom: the job used at most 231 MB of its lease of 600 MB. It started 1 process, and used 1 core on average.
+exit 0

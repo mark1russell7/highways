@@ -1,0 +1,10 @@
+headroom: lease 5a6bc3e6 for pairs-heap-probe, granted.
+headroom: the job cannot use more than 1 core (--limit).
+{"nodes":2500,"router":"straight","routes":5000,"points":10000,"ambMs":11,"ambHeapMb":6.9,"pairsMs":153,"pairsHeapMb":8.7}
+{"nodes":2500,"router":"plugs","routes":5000,"points":125000,"ambMs":112,"ambHeapMb":66.6,"pairsMs":1050,"pairsHeapMb":141.4}
+{"nodes":5000,"router":"straight","routes":10000,"points":20000,"ambMs":16,"ambHeapMb":20,"pairsMs":838,"pairsHeapMb":58.7}
+{"nodes":5000,"router":"plugs","routes":10000,"points":250000,"ambMs":302,"ambHeapMb":108.5,"pairsMs":3609,"pairsHeapMb":173.1}
+{"nodes":10000,"router":"straight","routes":20000,"points":40000,"ambMs":328,"ambHeapMb":34.8,"pairsMs":3133,"pairsHeapMb":37.2}
+{"nodes":10000,"router":"plugs","routes":20000,"points":500000,"ambMs":743,"ambHeapMb":181.1,"pairsMs":11386,"pairsHeapMb":378.7}
+headroom: the job used at most 523 MB of its lease of 600 MB. It started 3 processes, and used 1 core on average.
+exit 0
