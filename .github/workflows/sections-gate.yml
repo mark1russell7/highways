@@ -196,7 +196,7 @@ jobs:
 
   sections-gate-ok:
     name: Sections gate OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, gate, retry]
     runs-on: ubuntu-latest
     timeout-minutes: 2

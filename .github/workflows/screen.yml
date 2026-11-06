@@ -66,6 +66,10 @@ concurrency:
   group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.members }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   # The exact solves of MEAS2 run in the workflow `Exact`, in shards.
   changes:
@@ -246,7 +250,7 @@ jobs:
 
   screen-ok:
     name: Screen OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, exact, time, screen, promotion]
     runs-on: ubuntu-latest
     timeout-minutes: 2
