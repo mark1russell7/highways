@@ -210,6 +210,19 @@ export function routerSummary(rows: readonly BoardRow[], name: string) {
   };
 }
 
+/** The fields of a row that the relation of the two crossing counts reads. */
+export type RelationRow = Pick<BoardRow, "family" | "seed" | "router" | "crossings" | "self" | "touch" | "pairs">;
+
+/** This function gives the room of a row in the relation `crossings - self - touch <= pairs`. A value under 0 is outside the relation. */
+export function relationSlack(row: RelationRow): number {
+  return row.pairs - (row.crossings - row.self - row.touch);
+}
+
+/** This function gives the key of each row outside the relation `crossings - self - touch <= pairs`. */
+export function relationFaults(rows: readonly RelationRow[]): string[] {
+  return rows.filter((row) => relationSlack(row) < 0).map((row) => `${row.family}/${row.seed}/${row.router}`);
+}
+
 /** This function gives the record of the rows. */
 export function pairsRecord(rows: readonly BoardRow[]) {
   return {

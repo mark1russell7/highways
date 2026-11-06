@@ -593,5 +593,131 @@ export const WALLED_LEVEL: HighwaysFamily = caseFamily({
   },
 });
 
+/** The dimensions of `layered`. */
+const LAYERED_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("layers", 2, 20, 6, "The number of layers. The layers are rows, from the top down."),
+  count("width", 1, 30, 6, "The most nodes in one layer. A layer has from half of this number to all of it."),
+  count("edges", 0, 400, 30, "The number of tries for an edge from a layer to a lower layer."),
+  count("span", 1, 10, 3, "The most layers that a long edge goes down. With 1, each edge joins two layers that are next to each other."),
+  numberDimension({ name: "long", kind: "real", min: 0, max: 1, default: 0.25, meaning: "The share of the tries for a long edge, which goes down 2 layers or more." }),
+  count("rise", 24, 400, 80, "The free space between two layers, in units."),
+  count("gap", 8, 120, 32, "The free space between two cells of a layer, in units."),
+]);
+
+/**
+ * The family `layered`: the layered drawing of a directed graph (Sugiyama). Each edge goes down from a layer to a lower layer.
+ * A long edge passes the layers between its ends, and the nodes of a layer are not in an order that removes crossings.
+ */
+export const LAYERED: HighwaysFamily = caseFamily({
+  name: "layered",
+  meaning: "Layers of nodes in rows, and edges that go down, some past several layers, as in a layered drawing of a directed graph.",
+  dimensions: LAYERED_DIMENSIONS,
+  generator: "family.layered",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const layers = v["layers"]!;
+    const width = v["width"]!;
+    const span = v["span"]!;
+    const cw = 80 + v["gap"]!;
+    const ch = 36 + v["rise"]!;
+    // Each layer takes its cells from a row with a quarter more cells than `width`, so the layers are not in line.
+    const cells = width + Math.floor(width / 4);
+    const sizes: number[] = [];
+    for (let l = 0; l < layers; l++) {
+      const n = int(random, Math.max(1, width - Math.floor(width / 2)), width);
+      sizes.push(n);
+      choose(random, cells, n).forEach((c, i) => b.node(`l${l}n${i}`, c * cw, l * ch, int(random, 56, 80), int(random, 24, 36)));
+    }
+    for (let n = 0; n < v["edges"]!; n++) {
+      const long = span >= 2 && random() < v["long"]!;
+      const top = int(random, 0, layers - 2);
+      const down = Math.min(long ? int(random, 2, span) : 1, layers - 1 - top);
+      const low = top + down;
+      b.link({ node: `l${top}n${int(random, 0, sizes[top]! - 1)}` }, { node: `l${low}n${int(random, 0, sizes[low]! - 1)}` });
+    }
+    return b.graph();
+  },
+});
+
+/** The dimensions of `lattice-x`. */
+const LATTICE_X_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("cols", 1, 30, 6, "The number of columns of cells. The nodes are at the corners of the cells."),
+  count("rows", 1, 20, 4, "The number of rows of cells."),
+  count("size", 8, 80, 24, "The width and the height of a node, in units."),
+  count("gap", 16, 400, 96, "The free space between two nodes of a row or of a column, in units."),
+  numberDimension({ name: "diagonal", kind: "real", min: 0, max: 1, default: 0.6, meaning: "The chance of each diagonal of a cell. A straight drawing has one crossing for each cell with its two diagonals." }),
+  numberDimension({ name: "side", kind: "real", min: 0, max: 1, default: 0, meaning: "The chance of each side of a cell. A side edge joins two nodes of a row or of a column." }),
+]);
+
+/**
+ * The family `lattice-x`: square nodes at the corners of a grid of cells, and edges on the diagonals of the cells.
+ * The two diagonals of a cell cross at its middle, in free space. A straight drawing has one crossing for each cell with its two diagonals.
+ */
+export const LATTICE_X: HighwaysFamily = caseFamily({
+  name: "lattice-x",
+  meaning: "Nodes at the corners of a grid, and edges on the diagonals of the cells: each cell with two diagonals has one crossing.",
+  dimensions: LATTICE_X_DIMENSIONS,
+  generator: "family.lattice-x",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const cols = v["cols"]!;
+    const rows = v["rows"]!;
+    const size = v["size"]!;
+    const pitch = size + v["gap"]!;
+    const id = (c: number, r: number): string => `n${r}_${c}`;
+    for (let r = 0; r <= rows; r++) for (let c = 0; c <= cols; c++) b.node(id(c, r), c * pitch, r * pitch, size, size);
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++) {
+        if (random() < v["diagonal"]!) b.link({ node: id(c, r) }, { node: id(c + 1, r + 1) });
+        if (random() < v["diagonal"]!) b.link({ node: id(c + 1, r) }, { node: id(c, r + 1) });
+      }
+    for (let r = 0; r <= rows; r++)
+      for (let c = 0; c <= cols; c++) {
+        if (c < cols && random() < v["side"]!) b.link({ node: id(c, r) }, { node: id(c + 1, r) });
+        if (r < rows && random() < v["side"]!) b.link({ node: id(c, r) }, { node: id(c, r + 1) });
+      }
+    return b.graph();
+  },
+});
+
+/** The dimensions of `arc-row`. */
+const ARC_ROW_DIMENSIONS: readonly CorpusDimension[] = Object.freeze([
+  count("nodes", 2, 200, 24, "The number of nodes in the row."),
+  count("edges", 0, 400, 24, "The number of tries for an edge between two nodes of the row."),
+  count("reach", 1, 199, 6, "The most places between the two ends of an edge. With 1, each edge joins two nodes that are next to each other."),
+  count("gap", 4, 120, 24, "The free space between two nodes of the row, in units."),
+]);
+
+/**
+ * The family `arc-row`: one row of nodes of the same height, the linear layout of the book-embedding literature.
+ * The straight line of an edge between two nodes that are not next to each other goes through each node between them.
+ */
+export const ARC_ROW: HighwaysFamily = caseFamily({
+  name: "arc-row",
+  meaning: "One long row of nodes: each edge between two nodes that are not next to each other goes around the nodes between them.",
+  dimensions: ARC_ROW_DIMENSIONS,
+  generator: "family.arc-row",
+  seeding: SEEDING,
+  make: (v, _seed, random) => {
+    const b = new Builder();
+    const nodes = v["nodes"]!;
+    let x = 0;
+    for (let i = 0; i < nodes; i++) {
+      const w = int(random, 40, 80);
+      b.node(`n${i}`, x, 0, w, 32);
+      x += w + v["gap"]!;
+    }
+    for (let n = 0; n < v["edges"]!; n++) {
+      const d = int(random, 1, Math.min(v["reach"]!, nodes - 1));
+      const a = int(random, 0, nodes - 1 - d);
+      if (random() < 0.5) b.link({ node: `n${a}` }, { node: `n${a + d}` });
+      else b.link({ node: `n${a + d}` }, { node: `n${a}` });
+    }
+    return b.graph();
+  },
+});
+
 /** The families of FAMILIES-WEEKLY, in the order of their batches. */
-export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS, WALLED_LEVEL]);
+export const WEEKLY_FAMILIES: readonly HighwaysFamily[] = Object.freeze([BOTTLENECK, PARALLEL_EDGES, MAZE, CHANNEL, COMB, SPIRAL, SWITCHBOX, ESCAPE, RINGS, WALLED_LEVEL, LAYERED, LATTICE_X, ARC_ROW]);

@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1507 names
+## . (build/index.d.ts): 1513 names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -14,6 +14,7 @@ ANNEALING_DEFAULTS: build/index.d.ts#ANNEALING_DEFAULTS
 ANNEALING_SCHEMA: build/index.d.ts#ANNEALING_SCHEMA
 APPROVAL_DEFAULTS: build/index.d.ts#APPROVAL_DEFAULTS
 APPROVAL_PICKS: build/index.d.ts#APPROVAL_PICKS
+ARC_ROW: build/index.d.ts#ARC_ROW
 ARC_SOURCES: build/index.d.ts#ARC_SOURCES
 AREA_DEFAULTS: build/index.d.ts#AREA_DEFAULTS
 AREA_WIDTHS: build/index.d.ts#AREA_WIDTHS
@@ -347,6 +348,8 @@ LANE_ROOM_LIMIT: build/index.d.ts#LANE_ROOM_LIMIT
 LANE_STRETCH_DEFAULTS: build/index.d.ts#LANE_STRETCH_DEFAULTS
 LANE_STRETCH_ORDERS: build/index.d.ts#LANE_STRETCH_ORDERS
 LANE_TRACKS: build/index.d.ts#LANE_TRACKS
+LATTICE_X: build/index.d.ts#LATTICE_X
+LAYERED: build/index.d.ts#LAYERED
 LEADER_DEFAULTS: build/index.d.ts#LEADER_DEFAULTS
 LEADER_TYPES: build/index.d.ts#LEADER_TYPES
 LEVEL_HIGHWAY_DEFAULTS: build/index.d.ts#LEVEL_HIGHWAY_DEFAULTS
@@ -610,6 +613,9 @@ SCREEN_V3_HELD_OUT: build/index.d.ts#SCREEN_V3_HELD_OUT
 SCREEN_V4: build/index.d.ts#SCREEN_V4
 SCREEN_V4_HELD_OUT: build/index.d.ts#SCREEN_V4_HELD_OUT
 SCREEN_V4_ROOM: build/index.d.ts#SCREEN_V4_ROOM
+SCREEN_V5: build/index.d.ts#SCREEN_V5
+SCREEN_V5_HELD_OUT: build/index.d.ts#SCREEN_V5_HELD_OUT
+SCREEN_V5_KEYS: build/index.d.ts#SCREEN_V5_KEYS
 SCREEN_WRAPS: build/index.d.ts#SCREEN_WRAPS
 SEAM_DEFAULTS: build/index.d.ts#SEAM_DEFAULTS
 SEARCH_DEFAULTS: build/index.d.ts#SEARCH_DEFAULTS
@@ -627,6 +633,8 @@ SLOT_KEYS: build/index.d.ts#SLOT_KEYS
 SMALL_CLUSTERED: build/index.d.ts#SMALL_CLUSTERED
 SOFT_KEY_DEFAULTS: build/index.d.ts#SOFT_KEY_DEFAULTS
 SPACING_LIMIT: build/index.d.ts#SPACING_LIMIT
+SPACING_METHOD: build/index.d.ts#SPACING_METHOD
+SPACING_WIDE: build/index.d.ts#SPACING_WIDE
 SPARSE_LONG: build/index.d.ts#SPARSE_LONG
 SPECTRAL_DEFAULTS: build/index.d.ts#SPECTRAL_DEFAULTS
 SPIRAL: build/index.d.ts#SPIRAL
@@ -708,6 +716,7 @@ type SnapOptions: build/index.d.ts#SnapOptions
 SoftGraph: build/index.d.ts#SoftGraph
 SoftGraphOptions: build/index.d.ts#SoftGraphOptions
 type SoftKeyOptions: build/index.d.ts#SoftKeyOptions
+SpacingSample: build/index.d.ts#SpacingSample
 type SpectralOptions: build/index.d.ts#SpectralOptions
 type SpiralNode: build/index.d.ts#SpiralNode
 type SpiralOptions: build/index.d.ts#SpiralOptions
@@ -1540,6 +1549,9 @@ export declare const APPROVAL_DEFAULTS: Readonly<Required<Omit<ApprovalOptions, 
 ### build/index.d.ts#APPROVAL_PICKS
 export declare const APPROVAL_PICKS: readonly ApprovalPick[];
 
+### build/index.d.ts#ARC_ROW
+export declare const ARC_ROW: HighwaysFamily;
+
 ### build/index.d.ts#ARC_SOURCES
 export declare const ARC_SOURCES: readonly ArcSource[];
 
@@ -1597,6 +1609,9 @@ interface AdvectionSettings {
 export interface Ambiguity {
   readonly value: number;
   readonly estimated: boolean;
+  readonly nearPerNode: number;
+  readonly falsePerNode: number;
+  readonly reach: number;
 }
 
 ### build/index.d.ts#AmbiguityGuardOptions
@@ -3043,6 +3058,7 @@ export interface HighwayBenchOptions {
   readonly maxWidth?: number;
   readonly radius?: number;
   readonly minRadius?: number;
+  readonly onSample?: (sample: SpacingSample) => void;
   readonly jogs?: readonly JogStyle[];
   readonly jogPieces?: number;
 }
@@ -3088,6 +3104,7 @@ export interface HighwayMeasureOptions {
   readonly minRadius?: number;
   readonly ends?: number;
   readonly space?: CurveSpace;
+  readonly onSample?: (sample: SpacingSample) => void;
 }
 
 ### build/index.d.ts#HighwayMeasures
@@ -3095,6 +3112,9 @@ export interface HighwayMeasures {
   readonly bundles: number;
   readonly lanes: number;
   readonly samples: number;
+  readonly spacingMethod: typeof SPACING_METHOD;
+  readonly overWide: number;
+  readonly overWidePairs: number;
   readonly worstSpacing: number;
   readonly meanSpacing: number;
   readonly overLimit: number;
@@ -3366,6 +3386,12 @@ export declare const LANE_STRETCH_ORDERS: readonly LaneStretchOrder[];
 ### build/index.d.ts#LANE_TRACKS
 export declare const LANE_TRACKS: readonly LaneTracks[];
 
+### build/index.d.ts#LATTICE_X
+export declare const LATTICE_X: HighwaysFamily;
+
+### build/index.d.ts#LAYERED
+export declare const LAYERED: HighwaysFamily;
+
 ### build/index.d.ts#LEADER_DEFAULTS
 export declare const LEADER_DEFAULTS: Readonly<LeaderOptions>;
 
@@ -3487,6 +3513,7 @@ export interface LayoutCell {
   readonly edgeShape?: "random" | "clustered" | "hubChain" | "longRange" | "tree" | "bundled";
   readonly groups?: "none" | "flat" | "nested";
   readonly ports?: "free" | "sides" | "fixed";
+  readonly edgeKey?: "none" | "random" | "cluster";
 }
 
 ### build/index.d.ts#LayoutChange
@@ -4872,6 +4899,15 @@ export declare const SCREEN_V4_ROOM: Readonly<{
   spacing: number;
 }>;
 
+### build/index.d.ts#SCREEN_V5
+export declare const SCREEN_V5: ScreenSet;
+
+### build/index.d.ts#SCREEN_V5_HELD_OUT
+export declare const SCREEN_V5_HELD_OUT: readonly number[];
+
+### build/index.d.ts#SCREEN_V5_KEYS
+export declare const SCREEN_V5_KEYS: readonly EdgeKey[];
+
 ### build/index.d.ts#SCREEN_WRAPS
 export declare const SCREEN_WRAPS: readonly ScreenWrap[];
 
@@ -4922,6 +4958,12 @@ export declare const SOFT_KEY_DEFAULTS: Readonly<SoftKeyOptions>;
 
 ### build/index.d.ts#SPACING_LIMIT
 export declare const SPACING_LIMIT = .05;
+
+### build/index.d.ts#SPACING_METHOD
+export declare const SPACING_METHOD = "pair-gap";
+
+### build/index.d.ts#SPACING_WIDE
+export declare const SPACING_WIDE = .25;
 
 ### build/index.d.ts#SPARSE_LONG
 export declare const SPARSE_LONG: HighwaysFamily;
@@ -5423,6 +5465,17 @@ interface SoftKeyOptions {
   readonly linkage: Linkage;
   readonly minSize: number;
   readonly spine: GroupSpine;
+}
+
+### build/index.d.ts#SpacingSample
+export interface SpacingSample {
+  readonly edges: readonly [string, string];
+  readonly at: Point;
+  readonly distance: number;
+  readonly gap: number;
+  readonly spacing: number;
+  readonly lanes: number;
+  readonly length: number;
 }
 
 ### build/index.d.ts#SpectralOptions

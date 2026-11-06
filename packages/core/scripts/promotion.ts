@@ -234,27 +234,38 @@ function winTest(ps: readonly Pair[], reading: "literal" | "exercised"): WinTest
   };
 }
 
+/** The verdict of one measure. A measure with no pair has no result, and its label is "not measured" (PROMOTION-NO-PAIR). */
 interface VerdictRow {
   readonly key: string;
-  readonly result: VerdictResult;
-  readonly pHolm: number;
+  readonly result?: VerdictResult;
+  readonly pHolm?: number;
   readonly label: string;
 }
 
-/** The verdict over families of each measure, with the Holm correction of the permutation p over the measures. */
+/**
+ * The verdict over families of each measure, with the Holm correction of the permutation p over the measures.
+ * A measure that a record of a side has, but no pair of records has on the two sides, gets the label "not measured".
+ * Such a measure is not a test, so the Holm correction does not count it.
+ */
 function verdicts(records: readonly Rec[]): VerdictRow[] {
   const recs = records.filter((r) => r.strategy === candidate || r.strategy === baseline);
-  const rows = MEASURES.filter((m) => recs.some((r) => r.measures[m.name] !== undefined)).map((m) => ({
+  const ps = pairs(records);
+  const seen = MEASURES.filter((m) => recs.some((r) => r.measures[m.name] !== undefined));
+  const paired = (name: string): boolean => ps.some((p) => p.c.measures[name] !== undefined && p.b.measures[name] !== undefined);
+  const rows = seen.filter((m) => paired(m.name)).map((m) => ({
     m,
     result: verdict(recs, { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }),
   }));
   const adjusted = holm(rows.map((r) => r.result.permutation.p));
-  return rows.map((r, i) => {
-    const res = r.result;
-    // After the correction, a verdict counts only when the adjusted p is below the level.
-    const label = res.agree && adjusted[i]! >= P.level ? "no verdict (Holm)" : res.label;
-    return { key: r.m.key, result: res, pHolm: adjusted[i]!, label };
-  });
+  const measured = new Map(
+    rows.map((r, i): [string, VerdictRow] => {
+      const res = r.result;
+      // After the correction, a verdict counts only when the adjusted p is below the level.
+      const label = res.agree && adjusted[i]! >= P.level ? "no verdict (Holm)" : res.label;
+      return [r.m.key, { key: r.m.key, result: res, pHolm: adjusted[i]!, label }];
+    }),
+  );
+  return seen.map((m) => measured.get(m.key) ?? { key: m.key, label: "not measured" });
 }
 
 const fmt = (x: number, d = 3): string => (Number.isFinite(x) ? x.toFixed(d) : String(x));
@@ -280,13 +291,19 @@ function winText(name: string, t: WinTest, all: number): string {
 
 function verdictText(rows: readonly VerdictRow[]): string {
   const counted = rows.filter((r) => r.label === "better" || r.label === "worse");
+  const unmeasured = rows.filter((r) => r.result === undefined).length;
   const lines = [
-    `${counted.filter((r) => r.label === "better").length} measures are better and ${counted.filter((r) => r.label === "worse").length} are worse, of ${rows.length}, after the Holm correction.`,
+    `${counted.filter((r) => r.label === "better").length} measures are better and ${counted.filter((r) => r.label === "worse").length} are worse, of ${rows.length}, after the Holm correction.` +
+      (unmeasured > 0 ? ` ${unmeasured} measures have no pair of records, so they are not measured.` : ""),
     "",
     "| Measure | Verdict | Stratified mean | Pooled mean | Holm p | For | Against | Tie |",
     "|---|---|---|---|---|---|---|---|",
   ];
   for (const r of rows) {
+    if (r.result === undefined || r.pHolm === undefined) {
+      lines.push(`| \`${r.key}\` | ${r.label} | - | - | - | - | - | - |`);
+      continue;
+    }
     const f = r.result.families;
     lines.push(
       `| \`${r.key}\` | ${r.label} | ${fmt(r.result.stratified.mean, 4)} | ${fmt(r.result.pooled.mean, 4)} | ${r.pHolm.toExponential(1)} | ${f.filter((x) => x.sign > 0).length} | ${f.filter((x) => x.sign < 0).length} | ${f.filter((x) => x.sign === 0).length} |`,
@@ -322,7 +339,7 @@ for (const s of sets) {
   const vs = verdicts(s.records);
   out.push(`## ${s.name}`, "", `${ps.length} paired inputs in ${new Set(ps.map((p) => p.family)).size} families. The candidate changes the output on ${ex.length} inputs.`, "");
   out.push(winText(s.name, literal, ps.length), "", winText(s.name, exercised, ps.length), "", `### The verdict over families`, "", verdictText(vs), "");
-  (json["sets"] as unknown[]).push({ name: s.name, pairs: ps.length, exercised: ex.length, literal, exercisedTest: exercised, verdicts: vs.map((v) => ({ key: v.key, label: v.label, pHolm: v.pHolm, stratified: v.result.stratified, pooled: v.result.pooled, families: v.result.families })) });
+  (json["sets"] as unknown[]).push({ name: s.name, pairs: ps.length, exercised: ex.length, literal, exercisedTest: exercised, verdicts: vs.map((v) => (v.result === undefined ? { key: v.key, label: v.label } : { key: v.key, label: v.label, pHolm: v.pHolm, stratified: v.result.stratified, pooled: v.result.pooled, families: v.result.families })) });
 }
 const decided = sets.map((s) => winTest(pairs(s.records), "literal").pass);
 out.push(`## The decision`, "", `The literal win test ${decided.every((d) => d) ? "passes on each set, so the candidate can become the default" : "fails on a set, so the default does not change"}.`, "");

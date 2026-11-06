@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { kpiFacts } from "./kpi-files.ts";
-import { KPI_PAGES, minorsBehind, resultsLag, siteKpiInput, type KpiFacts } from "./kpi.ts";
+import { KPI_PAGES, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts } from "./kpi.ts";
 
-const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [] };
+const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
 
 describe("minorsBehind", () => {
@@ -19,6 +19,23 @@ describe("minorsBehind", () => {
   it("gives no count over a major, or for a text that is not a version", () => {
     expect(minorsBehind("0.14.0", "1.0.0")).toBeUndefined();
     expect(minorsBehind("local", "0.14.0")).toBeUndefined();
+  });
+});
+
+describe("resultsUnread", () => {
+  it("counts each verdict whose last read is not on the minor of the engine", () => {
+    expect(resultsUnread(["0.15.0", "0.15.2", "0.9.2", "0.10.0"], "0.15.1")).toBe(2);
+    expect(resultsUnread([], "0.15.0")).toBe(0);
+  });
+
+  it("counts a verdict with no core, or a core of another major, because its read is not known", () => {
+    expect(resultsUnread([undefined, "1.15.0"], "0.15.0")).toBe(2);
+  });
+
+  it("gives the measure in the file, from the stamps and not from the cores of the runs", () => {
+    const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictCores: ["0.9.2", "0.10.0"], verdictReads: ["0.15.0", "0.10.0"] });
+    expect(input?.measures.find((m) => m.id === "results-unread")).toEqual({ id: "results-unread", value: 1, unit: "snapshots" });
+    expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(6);
   });
 });
 
@@ -84,5 +101,7 @@ describe("kpiFacts", () => {
     expect(facts.coverageCells).toBeGreaterThan(0);
     expect(facts.verdictCores.length).toBeGreaterThan(0);
     expect(facts.verdictCores).not.toContain(undefined);
+    expect(facts.verdictReads).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReads).not.toContain(undefined);
   });
 });

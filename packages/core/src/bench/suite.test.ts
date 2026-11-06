@@ -29,7 +29,7 @@ describe("runSuite (MEAS1)", () => {
   it("gives each measure of the short list of MEAS0", () => {
     const keys = (step: string) => new Set(rows(step).flatMap((r) => Object.keys(r.values)));
     const router = keys("router");
-    for (const k of ["R2.angle", "B1.inkSaved", "R5.median", "R4.turn", "Z10.mean", "R11.min", "B4.ambiguity", "Z7.position", "Z8.order", "G1.modularity", "G2.cut", "G8.treeCost"])
+    for (const k of ["R2.angle", "B1.inkSaved", "R5.median", "R4.turn", "Z10.mean", "R11.min", "B4.ambiguity", "B4.reach", "Z7.position", "Z8.order", "G1.modularity", "G2.cut", "G8.treeCost"])
       expect(router.has(k), k).toBe(true);
     for (const k of ["C1.share", "C2.median", "C3.median"]) expect(keys("curve").has(k), k).toBe(true);
     expect(keys("group").has("G9.ari")).toBe(true);
