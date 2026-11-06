@@ -216,6 +216,9 @@ The output is a list of segments: `move`, `line`, `cubic` and `arc`. A renderer 
 - `curveOf(points, options)` gives the segments of a curve. The `type` of `options` selects the curve type.
 - `toSvgPath(segments, digits = 2)` writes the segments as SVG path data.
 - `sampleCurve(segments, tolerance = 0.5)` gives a polyline within `tolerance` of the curve, for hit tests and measures.
+- `pointAtFraction(line, t)` gives the point and the unit tangent at the share `t` of the length of a polyline or a curve.
+  - A renderer uses it to put a label or an arrow along a route. The share 0.5 gives the middle.
+  - The lengths of lines and arcs are exact. The Gauss-Legendre rule gives the length of each cubic step.
 - `curveSpace(boxes)` makes the free space of a board one time. With `space`, a curve goes through no box that its polyline avoids.
 
 Where the full curve goes through a box, the free space makes the curve smaller. It shrinks the radius of a corner, or the tangents of a piece of a spline. A corner with no clear radius stays sharp. A piece of a spline with no clear tangent is its straight leg.
