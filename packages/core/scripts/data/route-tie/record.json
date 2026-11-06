@@ -11,115 +11,115 @@
   "shift-d",
   "shift-e"
  ],
- "boards": 75,
+ "boards": 84,
  "choice": "The distance 1e-9 is a choice from the table. It stands far above the rounding of a sum of lengths, and each row of the table on each side of it reads the law.",
  "predictionNote": "The outcome routes-moved-under-8pct-of-routes named no router, so it reads against the widest row and misses on shared-all. It should have named a router. The rows of this record give the moves of each router.",
  "tolerances": [
   {
    "tie": 0,
-   "movedFromChosen": 46,
-   "law": 9,
-   "work": 845035,
-   "length": 2248989.603558433,
-   "pairs": 32181,
-   "shiftMoves": 275
+   "movedFromChosen": 47,
+   "law": 11,
+   "work": 857184,
+   "length": 2303794.3137565427,
+   "pairs": 32416,
+   "shiftMoves": 376
   },
   {
    "tie": 1e-13,
-   "movedFromChosen": 18,
+   "movedFromChosen": 19,
    "law": 0,
-   "work": 842037,
-   "length": 2249003.707899162,
-   "pairs": 32165,
-   "shiftMoves": 147
+   "work": 854172,
+   "length": 2303800.5346807507,
+   "pairs": 32397,
+   "shiftMoves": 249
   },
   {
    "tie": 1e-12,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 1e-11,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 1e-10,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 1e-9,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 1e-8,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 1e-7,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 0.000001,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 0.00001,
    "movedFromChosen": 0,
    "law": 0,
-   "work": 841423,
-   "length": 2249002.3593876027,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
   },
   {
    "tie": 0.001,
    "movedFromChosen": 1,
    "law": 0,
-   "work": 841716,
-   "length": 2248996.6738462294,
-   "pairs": 32149,
-   "shiftMoves": 70
+   "work": 853922,
+   "length": 2303794.849139377,
+   "pairs": 32383,
+   "shiftMoves": 178
   }
  ],
  "routers": [
   {
    "router": "corners",
-   "routes": 6065,
-   "moved": 102,
+   "routes": 6307,
+   "moved": 100,
    "lawBefore": [
     37,
     48
@@ -128,31 +128,31 @@
     0,
     0
    ],
-   "workBefore": 693135,
-   "workAfter": 841423,
-   "lengthBefore": 2249122.9148186455,
-   "lengthAfter": 2249002.3593876027,
-   "pairsBefore": 32194,
-   "pairsAfter": 32149,
+   "workBefore": 701843,
+   "workAfter": 853636,
+   "lengthBefore": 2303895.8585235937,
+   "lengthAfter": 2303800.5346807507,
+   "pairsBefore": 32433,
+   "pairsAfter": 32383,
    "shiftBefore": [
     59,
-    35,
     48,
-    33,
-    47
+    77,
+    84,
+    64
    ],
    "shiftAfter": [
     15,
-    10,
-    14,
-    13,
-    18
+    23,
+    43,
+    64,
+    33
    ]
   },
   {
    "router": "shared",
-   "routes": 6065,
-   "moved": 95,
+   "routes": 6307,
+   "moved": 100,
    "lawBefore": [
     16,
     19
@@ -161,31 +161,31 @@
     0,
     0
    ],
-   "workBefore": 2648713,
-   "workAfter": 2804330,
-   "lengthBefore": 2280169.0427664327,
-   "lengthAfter": 2280040.972455026,
-   "pairsBefore": 34191,
-   "pairsAfter": 34123,
+   "workBefore": 2670619,
+   "workAfter": 2828843,
+   "lengthBefore": 2334941.986471381,
+   "lengthAfter": 2334794.0512769558,
+   "pairsBefore": 34430,
+   "pairsAfter": 34363,
    "shiftBefore": [
     75,
-    62,
-    74,
-    44,
-    69
+    75,
+    103,
+    95,
+    86
    ],
    "shiftAfter": [
     30,
-    40,
-    44,
-    28,
-    38
+    53,
+    73,
+    79,
+    53
    ]
   },
   {
    "router": "shared-all",
-   "routes": 6065,
-   "moved": 513,
+   "routes": 6307,
+   "moved": 524,
    "lawBefore": [
     108,
     117
@@ -194,31 +194,31 @@
     0,
     0
    ],
-   "workBefore": 1911695,
-   "workAfter": 2108003,
-   "lengthBefore": 2443309.1200697026,
-   "lengthAfter": 2444436.4939732477,
-   "pairsBefore": 35608,
-   "pairsAfter": 35624,
+   "workBefore": 1927580,
+   "workAfter": 2131092,
+   "lengthBefore": 2499134.6503354134,
+   "lengthAfter": 2499954.650929842,
+   "pairsBefore": 35860,
+   "pairsAfter": 35878,
    "shiftBefore": [
-    186,
-    204,
-    220,
-    158,
-    230
+    193,
+    224,
+    256,
+    213,
+    252
    ],
    "shiftAfter": [
-    42,
-    129,
-    129,
-    107,
-    170
+    59,
+    149,
+    165,
+    158,
+    190
    ]
   },
   {
    "router": "sections",
-   "routes": 6065,
-   "moved": 60,
+   "routes": 6307,
+   "moved": 82,
    "lawBefore": [
     54,
     55
@@ -227,31 +227,31 @@
     0,
     0
    ],
-   "workBefore": 1070221,
-   "workAfter": 1355089,
-   "lengthBefore": 2747516.3810321484,
-   "lengthAfter": 2747423.8098549764,
-   "pairsBefore": 44032,
-   "pairsAfter": 44060,
+   "workBefore": 1079182,
+   "workAfter": 1374733,
+   "lengthBefore": 2812497.155855309,
+   "lengthAfter": 2809073.3053141665,
+   "pairsBefore": 44326,
+   "pairsAfter": 44287,
    "shiftBefore": [
     566,
-    465,
-    573,
-    418,
-    327
+    478,
+    602,
+    469,
+    347
    ],
    "shiftAfter": [
-    551,
-    450,
-    563,
-    404,
-    304
+    547,
+    462,
+    589,
+    454,
+    322
    ]
   },
   {
    "router": "trunks",
-   "routes": 6065,
-   "moved": 102,
+   "routes": 6307,
+   "moved": 100,
    "lawBefore": [
     37,
     48
@@ -260,64 +260,894 @@
     0,
     0
    ],
-   "workBefore": 692138,
-   "workAfter": 841401,
-   "lengthBefore": 2260264.930038932,
-   "lengthAfter": 2260144.3746078885,
-   "pairsBefore": 32923,
-   "pairsAfter": 32878,
+   "workBefore": 700846,
+   "workAfter": 853614,
+   "lengthBefore": 2315037.87374388,
+   "lengthAfter": 2314942.5499010365,
+   "pairsBefore": 33162,
+   "pairsAfter": 33112,
    "shiftBefore": [
     59,
-    35,
     48,
-    37,
-    51
+    77,
+    88,
+    68
    ],
    "shiftAfter": [
     15,
-    10,
-    14,
-    17,
-    22
+    23,
+    43,
+    68,
+    37
    ]
   },
   {
    "router": "sections-site",
-   "routes": 6065,
-   "moved": 47,
+   "routes": 6307,
+   "moved": 55,
    "lawBefore": [
-    61,
-    65
+    71,
+    75
    ],
    "lawAfter": [
     0,
     0
    ],
-   "workBefore": 1860129,
-   "workAfter": 2221309,
-   "lengthBefore": 3538996.2921623727,
-   "lengthAfter": 3535019.5211604824,
-   "pairsBefore": 69817,
-   "pairsAfter": 69685,
+   "workBefore": 1871346,
+   "workAfter": 2240374,
+   "lengthBefore": 3625249.624936149,
+   "lengthAfter": 3621191.9375241487,
+   "pairsBefore": 70192,
+   "pairsAfter": 70062,
    "shiftBefore": [
-    643,
-    609,
-    621,
-    443,
-    499
+    670,
+    631,
+    658,
+    502,
+    528
    ],
    "shiftAfter": [
-    642,
-    610,
-    619,
-    439,
-    488
+    669,
+    632,
+    656,
+    498,
+    517
    ]
   }
  ],
+ "keys": {
+  "before": [
+   {
+    "router": "corners",
+    "moved": 0,
+    "law": [
+     37,
+     48
+    ],
+    "shift": [
+     59,
+     48,
+     77,
+     84,
+     64
+    ],
+    "work": 701843,
+    "length": 2303895.8585235937,
+    "pairs": 32433,
+    "measures": {
+     "R1.crossings": 20654,
+     "R1.perEdge": 195.8963004811438,
+     "R1.estimated": 0,
+     "R1.pairs": 32433,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.01127704065064,
+     "R2.min": 1271.6503237460388,
+     "B1.inkSaved": 12.98652198582809,
+     "B11.share": 11.089223906628389,
+     "B11.peak": 384,
+     "R4.turn": 87.49017092620446,
+     "R4.max": 6636.456020859755,
+     "R5.median": 115.68426901529271,
+     "R5.q95": 216.56851319659728,
+     "R5.mean": 129.9952128510779,
+     "R6.worstDetour": 254.9394913261683,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.619416420975124,
+     "B4.reach": 2.438402218193494
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 0,
+    "law": [
+     16,
+     19
+    ],
+    "shift": [
+     75,
+     75,
+     103,
+     95,
+     86
+    ],
+    "work": 2670619,
+    "length": 2334941.986471381,
+    "pairs": 34430,
+    "measures": {
+     "R1.crossings": 16750,
+     "R1.perEdge": 180.7494894786968,
+     "R1.estimated": 0,
+     "R1.pairs": 34430,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.12588249238791,
+     "R2.min": 1274.333868391651,
+     "B1.inkSaved": 14.225408207717862,
+     "B11.share": 11.380444771901695,
+     "B11.peak": 411,
+     "R4.turn": 89.08858976125595,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.7520271741429,
+     "R5.q95": 217.46999659646684,
+     "R5.mean": 130.2151644509766,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.235397044876688,
+     "B4.reach": 2.922494807552994
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 0,
+    "law": [
+     108,
+     117
+    ],
+    "shift": [
+     193,
+     224,
+     256,
+     213,
+     252
+    ],
+    "work": 1927580,
+    "length": 2499134.6503354134,
+    "pairs": 35860,
+    "measures": {
+     "R1.crossings": 6991,
+     "R1.perEdge": 90.44336677278658,
+     "R1.estimated": 0,
+     "R1.pairs": 35860,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 51.36698305969311,
+     "R2.min": 2020.1882207598535,
+     "B1.inkSaved": 31.93964937104802,
+     "B11.share": 18.605080754862307,
+     "B11.peak": 907,
+     "R4.turn": 115.63165112665774,
+     "R4.max": 9854.303220221285,
+     "R5.median": 119.8107969236227,
+     "R5.q95": 230.80137713876928,
+     "R5.mean": 135.28652160434078,
+     "R6.worstDetour": 273.16541686454764,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.104443764723776,
+     "B4.reach": 9.739530689504095
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 0,
+    "law": [
+     54,
+     55
+    ],
+    "shift": [
+     566,
+     478,
+     602,
+     469,
+     347
+    ],
+    "work": 1079182,
+    "length": 2812497.155855309,
+    "pairs": 44326,
+    "measures": {
+     "R1.crossings": 12947,
+     "R1.perEdge": 114.67408595418767,
+     "R1.estimated": 0,
+     "R1.pairs": 44326,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.618843143637754,
+     "R2.min": 1320.9349716654772,
+     "B1.inkSaved": 27.74316764660097,
+     "B11.share": 17.214872041180474,
+     "B11.peak": 605,
+     "R4.turn": 145.24667430567473,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.67636023937938,
+     "R5.q95": 256.2793232256512,
+     "R5.mean": 143.24581508026367,
+     "R6.worstDetour": 302.7297803682562,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.83229954409979,
+     "B4.reach": 6.50978491581227,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 0,
+    "law": [
+     37,
+     48
+    ],
+    "shift": [
+     59,
+     48,
+     77,
+     88,
+     68
+    ],
+    "work": 700846,
+    "length": 2315037.87374388,
+    "pairs": 33162,
+    "measures": {
+     "R1.crossings": 20747,
+     "R1.perEdge": 196.09630048114383,
+     "R1.estimated": 0,
+     "R1.pairs": 33162,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.902112767238066,
+     "R2.min": 1262.7313366706264,
+     "B1.inkSaved": 13.305789024461024,
+     "B11.share": 11.151821724236632,
+     "B11.peak": 387,
+     "R4.turn": 88.14391634798058,
+     "R4.max": 6700.491569961691,
+     "R5.median": 115.76928967544005,
+     "R5.q95": 218.05708077294068,
+     "R5.mean": 130.27813608071426,
+     "R6.worstDetour": 257.28076813214864,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.106256064195257,
+     "B4.reach": 2.5071355515268268
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 0,
+    "law": [
+     71,
+     75
+    ],
+    "shift": [
+     670,
+     631,
+     658,
+     502,
+     528
+    ],
+    "work": 1871346,
+    "length": 3625249.624936149,
+    "pairs": 70192,
+    "measures": {
+     "R1.crossings": 21290,
+     "R1.perEdge": 228.65161816368405,
+     "R1.estimated": 0,
+     "R1.pairs": 70192,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.249730299854605,
+     "R2.min": 827.2502442608841,
+     "B1.inkSaved": 27.50115971335183,
+     "B11.share": 18.18020025069176,
+     "B11.peak": 752,
+     "R4.turn": 186.77668238386912,
+     "R4.max": 14631.060572806293,
+     "R5.median": 147.32624062714828,
+     "R5.q95": 400.62351004238184,
+     "R5.mean": 189.7234160117404,
+     "R6.worstDetour": 683.0202891929403,
+     "R7.backtrack": 10.891463994347255,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.25463972836392,
+     "B4.reach": 7.69215523857956,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ],
+  "index": [
+   {
+    "router": "corners",
+    "moved": 102,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     64,
+     35
+    ],
+    "work": 853410,
+    "length": 2303775.303092551,
+    "pairs": 32388,
+    "measures": {
+     "R1.crossings": 20634,
+     "R1.perEdge": 195.34860393026713,
+     "R1.estimated": 0,
+     "R1.pairs": 32388,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.07340749072494,
+     "R2.min": 1272.1464524673977,
+     "B1.inkSaved": 12.998614977990565,
+     "B11.share": 11.235947730114807,
+     "B11.peak": 380,
+     "R4.turn": 87.43731797684379,
+     "R4.max": 6636.119311664904,
+     "R5.median": 115.68336635864954,
+     "R5.q95": 216.56934726189598,
+     "R5.mean": 129.98655653123276,
+     "R6.worstDetour": 254.94035145053675,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.85610604373228,
+     "B4.reach": 2.443502035656421
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 95,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     30,
+     53,
+     73,
+     79,
+     55
+    ],
+    "work": 2828952,
+    "length": 2334813.9161599744,
+    "pairs": 34362,
+    "measures": {
+     "R1.crossings": 16764,
+     "R1.perEdge": 180.5669372636005,
+     "R1.estimated": 0,
+     "R1.pairs": 34362,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.18210711830768,
+     "R2.min": 1274.223939167931,
+     "B1.inkSaved": 14.215840235399742,
+     "B11.share": 11.465994699832345,
+     "B11.peak": 407,
+     "R4.turn": 89.03309501983175,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.74099594047071,
+     "R5.q95": 217.47082313797756,
+     "R5.mean": 130.20603026824662,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.357290013244373,
+     "B4.reach": 2.9241020356564214
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 545,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     49,
+     149,
+     165,
+     158,
+     192
+    ],
+    "work": 2127266,
+    "length": 2500110.044041398,
+    "pairs": 35878,
+    "measures": {
+     "R1.crossings": 6977,
+     "R1.perEdge": 90.36131241710171,
+     "R1.estimated": 0,
+     "R1.pairs": 35878,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 50.80292186743587,
+     "R2.min": 2024.9567638541564,
+     "B1.inkSaved": 32.114707865309164,
+     "B11.share": 18.75164043699303,
+     "B11.peak": 916,
+     "R4.turn": 115.35180785963009,
+     "R4.max": 9870.991090075257,
+     "R5.median": 119.42845278061804,
+     "R5.q95": 230.82836104600975,
+     "R5.mean": 135.21116429203775,
+     "R6.worstDetour": 273.4759367525948,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.299910834159874,
+     "B4.reach": 9.792402362693718
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 60,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     551,
+     463,
+     592,
+     455,
+     324
+    ],
+    "work": 1370596,
+    "length": 2812404.584678137,
+    "pairs": 44354,
+    "measures": {
+     "R1.crossings": 12991,
+     "R1.perEdge": 115.06874127719409,
+     "R1.estimated": 0,
+     "R1.pairs": 44354,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.77962766341162,
+     "R2.min": 1328.8295188256343,
+     "B1.inkSaved": 27.66260654800283,
+     "B11.share": 17.110926526610587,
+     "B11.peak": 604,
+     "R4.turn": 145.20507060119138,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.68494524919167,
+     "R5.q95": 256.2797549726893,
+     "R5.mean": 143.2377959049707,
+     "R6.worstDetour": 302.73064049262456,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.80664418647287,
+     "B4.reach": 6.488688363963695,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 102,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     68,
+     39
+    ],
+    "work": 853388,
+    "length": 2314917.318312837,
+    "pairs": 33117,
+    "measures": {
+     "R1.crossings": 20727,
+     "R1.perEdge": 195.54860393026712,
+     "R1.estimated": 0,
+     "R1.pairs": 33117,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.96424321731236,
+     "R2.min": 1263.2274653919853,
+     "B1.inkSaved": 13.317882016623502,
+     "B11.share": 11.29854554772305,
+     "B11.peak": 383,
+     "R4.turn": 88.09106339861992,
+     "R4.max": 6700.15486076684,
+     "R5.median": 115.76838701879686,
+     "R5.q95": 218.0579148382394,
+     "R5.mean": 130.2694797608691,
+     "R6.worstDetour": 257.2816282565171,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.342945686952408,
+     "B4.reach": 2.5122353689897543
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 47,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     669,
+     632,
+     656,
+     498,
+     517
+    ],
+    "work": 2240161,
+    "length": 3621272.8539342587,
+    "pairs": 70060,
+    "measures": {
+     "R1.crossings": 21254,
+     "R1.perEdge": 228.30823073868166,
+     "R1.estimated": 0,
+     "R1.pairs": 70060,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.25094831400279,
+     "R2.min": 829.666028157524,
+     "B1.inkSaved": 27.6092547698973,
+     "B11.share": 18.12578869609719,
+     "B11.peak": 747,
+     "R4.turn": 186.7080572514105,
+     "R4.max": 14631.060572806293,
+     "R5.median": 147.22996403228544,
+     "R5.q95": 400.5821695784526,
+     "R5.mean": 189.64608655158742,
+     "R6.worstDetour": 682.6866059585134,
+     "R7.backtrack": 10.874935068727419,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.40945224491037,
+     "B4.reach": 7.693971895892734,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ],
+  "straight": [
+   {
+    "router": "corners",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     64,
+     33
+    ],
+    "work": 853636,
+    "length": 2303800.5346807507,
+    "pairs": 32383,
+    "measures": {
+     "R1.crossings": 20652,
+     "R1.perEdge": 195.6600547091862,
+     "R1.estimated": 0,
+     "R1.pairs": 32383,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.071222260903305,
+     "R2.min": 1280.8024810677434,
+     "B1.inkSaved": 12.983049276219042,
+     "B11.share": 11.132974638662258,
+     "B11.peak": 379,
+     "R4.turn": 87.42997225884841,
+     "R4.max": 6636.119311664904,
+     "R5.median": 115.68391834317919,
+     "R5.q95": 216.56968614471572,
+     "R5.mean": 129.9903967524068,
+     "R6.worstDetour": 254.94035145053675,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.942214244821148,
+     "B4.reach": 2.437886146344946
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     30,
+     53,
+     73,
+     79,
+     53
+    ],
+    "work": 2828843,
+    "length": 2334794.0512769558,
+    "pairs": 34363,
+    "measures": {
+     "R1.crossings": 16777,
+     "R1.perEdge": 180.86005470918622,
+     "R1.estimated": 0,
+     "R1.pairs": 34363,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.178234718974025,
+     "R2.min": 1282.8799677682766,
+     "B1.inkSaved": 14.202646397826376,
+     "B11.share": 11.362763233866406,
+     "B11.peak": 406,
+     "R4.turn": 89.02063804521067,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.74154792500036,
+     "R5.q95": 217.4711620207973,
+     "R5.mean": 130.20966469624446,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.444724422456748,
+     "B4.reach": 2.9182194796782794
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 524,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     59,
+     149,
+     165,
+     158,
+     190
+    ],
+    "work": 2131092,
+    "length": 2499954.650929842,
+    "pairs": 35878,
+    "measures": {
+     "R1.crossings": 6955,
+     "R1.perEdge": 90.15459996188304,
+     "R1.estimated": 0,
+     "R1.pairs": 35878,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 50.65705203344274,
+     "R2.min": 2043.3990311572134,
+     "B1.inkSaved": 32.137302229586055,
+     "B11.share": 18.8357046561766,
+     "B11.peak": 917,
+     "R4.turn": 115.277723738941,
+     "R4.max": 9860.547342607442,
+     "R5.median": 119.4239352579797,
+     "R5.q95": 230.86792054698222,
+     "R5.mean": 135.21836154692198,
+     "R6.worstDetour": 273.2536102854824,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.32154883622277,
+     "B4.reach": 9.805160372052775
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 82,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     547,
+     462,
+     589,
+     454,
+     322
+    ],
+    "work": 1374733,
+    "length": 2809073.3053141665,
+    "pairs": 44287,
+    "measures": {
+     "R1.crossings": 13015,
+     "R1.perEdge": 115.2336080983002,
+     "R1.estimated": 0,
+     "R1.pairs": 44287,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.80026468149347,
+     "R2.min": 1310.8626719012984,
+     "B1.inkSaved": 27.53950833088315,
+     "B11.share": 17.038161152435862,
+     "B11.peak": 603,
+     "R4.turn": 145.16553537263175,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.67124116688946,
+     "R5.q95": 256.17011594215626,
+     "R5.mean": 143.21993563085843,
+     "R6.worstDetour": 302.6565830396201,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.691912822596095,
+     "B4.reach": 6.477244317555203,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     68,
+     37
+    ],
+    "work": 853614,
+    "length": 2314942.5499010365,
+    "pairs": 33112,
+    "measures": {
+     "R1.crossings": 20745,
+     "R1.perEdge": 195.8600547091862,
+     "R1.estimated": 0,
+     "R1.pairs": 33112,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.96205798749073,
+     "R2.min": 1271.8834939923313,
+     "B1.inkSaved": 13.302316314851977,
+     "B11.share": 11.1955724562705,
+     "B11.peak": 382,
+     "R4.turn": 88.08371768062455,
+     "R4.max": 6700.15486076684,
+     "R5.median": 115.76893900332651,
+     "R5.q95": 218.05825372105915,
+     "R5.mean": 130.27331998204318,
+     "R6.worstDetour": 257.2816282565171,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.429053888041278,
+     "B4.reach": 2.506619479678279
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 55,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     669,
+     632,
+     656,
+     498,
+     517
+    ],
+    "work": 2240374,
+    "length": 3621191.9375241487,
+    "pairs": 70062,
+    "measures": {
+     "R1.crossings": 21262,
+     "R1.perEdge": 228.40710810887865,
+     "R1.estimated": 0,
+     "R1.pairs": 70062,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.273675095027784,
+     "R2.min": 832.8184889019274,
+     "B1.inkSaved": 27.598888192153108,
+     "B11.share": 18.102446942624844,
+     "B11.peak": 747,
+     "R4.turn": 186.67704298009255,
+     "R4.max": 14632.780004808465,
+     "R5.median": 147.22996403228544,
+     "R5.q95": 400.564717384026,
+     "R5.mean": 189.64456630831305,
+     "R6.worstDetour": 682.6866059585134,
+     "R7.backtrack": 10.874935068727419,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.394635988279354,
+     "B4.reach": 7.687385984072975,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ]
+ },
  "shiftKinds": {
-  "graph": 64,
-  "search": 6,
+  "graph": 171,
+  "search": 7,
   "other": 0
  },
  "floors": [
@@ -329,8 +1159,8 @@
     0,
     1.1102230246251565e-16
    ],
-   "largest": 0.022869045496557106,
-   "boardsMoved": 31
+   "largest": 0.01691742114918182,
+   "boardsMoved": 33
   },
   {
    "router": "corners",
@@ -349,10 +1179,10 @@
    "floor": 0,
    "interval": [
     0,
-    6.938893903907228e-18
+    1.734723475976807e-18
    ],
    "largest": 0.18719066919027405,
-   "boardsMoved": 33
+   "boardsMoved": 35
   },
   {
    "router": "corners",
@@ -363,6 +1193,17 @@
     0
    ],
    "largest": 0.00919318325461671,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0007999999999999986,
    "boardsMoved": 1
   },
   {
@@ -417,7 +1258,7 @@
     0,
     0
    ],
-   "largest": 0.15384615384615374,
+   "largest": 0.15384615384615397,
    "boardsMoved": 14
   },
   {
@@ -440,7 +1281,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 5
+   "boardsMoved": 6
   },
   {
    "router": "corners",
@@ -456,13 +1297,13 @@
   {
    "router": "corners",
    "measure": "R2.angle",
-   "floor": 8.326672684688674e-17,
+   "floor": 5.551115123125783e-17,
    "interval": [
     0,
     1.1102230246251565e-16
    ],
    "largest": 0.11252638663544118,
-   "boardsMoved": 42
+   "boardsMoved": 46
   },
   {
    "router": "corners",
@@ -473,7 +1314,7 @@
     0
    ],
    "largest": 0.476995435717102,
-   "boardsMoved": 17
+   "boardsMoved": 19
   },
   {
    "router": "corners",
@@ -484,7 +1325,7 @@
     0
    ],
    "largest": 18.39505572403754,
-   "boardsMoved": 12
+   "boardsMoved": 14
   },
   {
    "router": "corners",
@@ -494,8 +1335,8 @@
     0,
     1.1102230246251565e-16
    ],
-   "largest": 0.008053983914378282,
-   "boardsMoved": 35
+   "largest": 0.008505779795998036,
+   "boardsMoved": 38
   },
   {
    "router": "corners",
@@ -505,8 +1346,8 @@
     0,
     0
    ],
-   "largest": 0.006709370734594877,
-   "boardsMoved": 10
+   "largest": 0.006709370734595765,
+   "boardsMoved": 16
   },
   {
    "router": "corners",
@@ -517,7 +1358,7 @@
     0
    ],
    "largest": 0.00022680100098249056,
-   "boardsMoved": 15
+   "boardsMoved": 18
   },
   {
    "router": "corners",
@@ -539,7 +1380,7 @@
     0
    ],
    "largest": 0.011602508317247517,
-   "boardsMoved": 12
+   "boardsMoved": 13
   },
   {
    "router": "corners",
@@ -569,10 +1410,10 @@
    "floor": 0,
    "interval": [
     0,
-    1.1102230246251565e-16
+    0
    ],
-   "largest": 0.022869045496557106,
-   "boardsMoved": 30
+   "largest": 0.01691742114918182,
+   "boardsMoved": 32
   },
   {
    "router": "shared",
@@ -591,10 +1432,10 @@
    "floor": 0,
    "interval": [
     0,
-    6.938893903907228e-18
+    3.469446951953614e-18
    ],
    "largest": 0.18719066919027405,
-   "boardsMoved": 34
+   "boardsMoved": 36
   },
   {
    "router": "shared",
@@ -605,6 +1446,17 @@
     0
    ],
    "largest": 0.002722060599874121,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0023999999999999855,
    "boardsMoved": 2
   },
   {
@@ -659,7 +1511,7 @@
     0,
     0
    ],
-   "largest": 0.15384615384615374,
+   "largest": 0.15384615384615397,
    "boardsMoved": 13
   },
   {
@@ -682,7 +1534,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 5
+   "boardsMoved": 6
   },
   {
    "router": "shared",
@@ -698,13 +1550,13 @@
   {
    "router": "shared",
    "measure": "R2.angle",
-   "floor": 1.1102230246251565e-16,
+   "floor": 6.938893903907228e-17,
    "interval": [
     0,
     1.1102230246251565e-16
    ],
    "largest": 0.11252638663544118,
-   "boardsMoved": 43
+   "boardsMoved": 47
   },
   {
    "router": "shared",
@@ -715,7 +1567,7 @@
     0
    ],
    "largest": 0.476995435717102,
-   "boardsMoved": 15
+   "boardsMoved": 17
   },
   {
    "router": "shared",
@@ -726,7 +1578,7 @@
     0
    ],
    "largest": 18.39505572403754,
-   "boardsMoved": 11
+   "boardsMoved": 13
   },
   {
    "router": "shared",
@@ -737,7 +1589,7 @@
     1.1102230246251565e-16
    ],
    "largest": 0.013151591287649644,
-   "boardsMoved": 34
+   "boardsMoved": 38
   },
   {
    "router": "shared",
@@ -747,8 +1599,8 @@
     0,
     0
    ],
-   "largest": 0.006709370734594877,
-   "boardsMoved": 10
+   "largest": 0.006709370734595765,
+   "boardsMoved": 17
   },
   {
    "router": "shared",
@@ -759,7 +1611,7 @@
     0
    ],
    "largest": 0.002507952489858578,
-   "boardsMoved": 16
+   "boardsMoved": 19
   },
   {
    "router": "shared",
@@ -781,7 +1633,7 @@
     0
    ],
    "largest": 0.011602508317247517,
-   "boardsMoved": 14
+   "boardsMoved": 15
   },
   {
    "router": "shared",
@@ -814,7 +1666,7 @@
     1.1102230246251565e-16
    ],
    "largest": 0.023968092265133523,
-   "boardsMoved": 29
+   "boardsMoved": 35
   },
   {
    "router": "shared-all",
@@ -833,10 +1685,10 @@
    "floor": 0,
    "interval": [
     0,
-    2.7755575615628914e-17
+    1.3877787807814457e-17
    ],
    "largest": 0.1842062471689504,
-   "boardsMoved": 37
+   "boardsMoved": 39
   },
   {
    "router": "shared-all",
@@ -851,6 +1703,17 @@
   },
   {
    "router": "shared-all",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0262,
+   "boardsMoved": 4
+  },
+  {
+   "router": "shared-all",
    "measure": "R1.crossings",
    "floor": 0,
    "interval": [
@@ -858,7 +1721,7 @@
     0
    ],
    "largest": 22,
-   "boardsMoved": 12
+   "boardsMoved": 13
   },
   {
    "router": "shared-all",
@@ -880,7 +1743,7 @@
     0
    ],
    "largest": 95,
-   "boardsMoved": 4
+   "boardsMoved": 5
   },
   {
    "router": "shared-all",
@@ -902,7 +1765,7 @@
     0
    ],
    "largest": 0.15625,
-   "boardsMoved": 12
+   "boardsMoved": 13
   },
   {
    "router": "shared-all",
@@ -924,7 +1787,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 5
+   "boardsMoved": 6
   },
   {
    "router": "shared-all",
@@ -946,7 +1809,7 @@
     1.1102230246251565e-16
    ],
    "largest": 0.22338041968464445,
-   "boardsMoved": 37
+   "boardsMoved": 40
   },
   {
    "router": "shared-all",
@@ -957,7 +1820,7 @@
     0
    ],
    "largest": 16.244661624410405,
-   "boardsMoved": 15
+   "boardsMoved": 16
   },
   {
    "router": "shared-all",
@@ -968,18 +1831,18 @@
     0
    ],
    "largest": 32.59982017524813,
-   "boardsMoved": 14
+   "boardsMoved": 13
   },
   {
    "router": "shared-all",
    "measure": "R4.turn",
-   "floor": 5.551115123125783e-17,
+   "floor": 6.938893903907228e-18,
    "interval": [
     0,
     2.220446049250313e-16
    ],
    "largest": 0.07343698559068113,
-   "boardsMoved": 42
+   "boardsMoved": 43
   },
   {
    "router": "shared-all",
@@ -990,7 +1853,7 @@
     0
    ],
    "largest": 0.016348929168666926,
-   "boardsMoved": 15
+   "boardsMoved": 19
   },
   {
    "router": "shared-all",
@@ -1001,7 +1864,7 @@
     0
    ],
    "largest": 0.018296292675402226,
-   "boardsMoved": 20
+   "boardsMoved": 23
   },
   {
    "router": "shared-all",
@@ -1023,7 +1886,7 @@
     0
    ],
    "largest": 0.299209049864666,
-   "boardsMoved": 25
+   "boardsMoved": 28
   },
   {
    "router": "shared-all",
@@ -1053,10 +1916,10 @@
    "floor": 1.1102230246251565e-16,
    "interval": [
     1.1102230246251565e-16,
-    0.0001617256534217626
+    0.000148510677942304
    ],
-   "largest": 0.04492550948976348,
-   "boardsMoved": 51
+   "largest": 0.06212068356536038,
+   "boardsMoved": 58
   },
   {
    "router": "sections",
@@ -1067,18 +1930,18 @@
     0
    ],
    "largest": 2,
-   "boardsMoved": 9
+   "boardsMoved": 11
   },
   {
    "router": "sections",
    "measure": "B11.share",
-   "floor": 0.0000036405354358840653,
+   "floor": 4.841384098138064e-7,
    "interval": [
-    2.7755575615628914e-17,
-    0.0026110424182313186
+    2.0816681711721685e-17,
+    0.00037582807202085275
    ],
    "largest": 0.18719066919027405,
-   "boardsMoved": 57
+   "boardsMoved": 61
   },
   {
    "router": "sections",
@@ -1088,8 +1951,19 @@
     0,
     0
    ],
-   "largest": 0.04537815126050421,
-   "boardsMoved": 17
+   "largest": 0.03848684210526315,
+   "boardsMoved": 18
+  },
+  {
+   "router": "sections",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0125732421875,
+   "boardsMoved": 18
   },
   {
    "router": "sections",
@@ -1143,8 +2017,8 @@
     0,
     0
    ],
-   "largest": 61,
-   "boardsMoved": 25
+   "largest": 58,
+   "boardsMoved": 26
   },
   {
    "router": "sections",
@@ -1165,7 +2039,7 @@
     0,
     0
    ],
-   "largest": 126,
+   "largest": 94,
    "boardsMoved": 25
   },
   {
@@ -1188,7 +2062,7 @@
     0
    ],
    "largest": 0.5757575757575757,
-   "boardsMoved": 25
+   "boardsMoved": 26
   },
   {
    "router": "sections",
@@ -1210,7 +2084,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 5
+   "boardsMoved": 6
   },
   {
    "router": "sections",
@@ -1228,11 +2102,11 @@
    "measure": "R2.angle",
    "floor": 1.1102230246251565e-16,
    "interval": [
-    1.1102230246251565e-16,
-    0.0006217409640716931
+    5.551115123125783e-17,
+    2.220446049250313e-16
    ],
    "largest": 0.08333333333333337,
-   "boardsMoved": 53
+   "boardsMoved": 54
   },
   {
    "router": "sections",
@@ -1243,7 +2117,7 @@
     0
    ],
    "largest": 20.100514059371662,
-   "boardsMoved": 23
+   "boardsMoved": 24
   },
   {
    "router": "sections",
@@ -1254,18 +2128,18 @@
     0
    ],
    "largest": 18.61016472782734,
-   "boardsMoved": 6
+   "boardsMoved": 8
   },
   {
    "router": "sections",
    "measure": "R4.turn",
-   "floor": 4.440892098500626e-16,
+   "floor": 2.220446049250313e-16,
    "interval": [
     5.551115123125783e-17,
-    0.0032826871359414866
+    0.0021152499565804533
    ],
    "largest": 0.19826333968113774,
-   "boardsMoved": 49
+   "boardsMoved": 53
   },
   {
    "router": "sections",
@@ -1273,10 +2147,10 @@
    "floor": 2.220446049250313e-16,
    "interval": [
     0,
-    0.0006083224940962584
+    0.0005882572059976443
    ],
    "largest": 0.03920354519395586,
-   "boardsMoved": 40
+   "boardsMoved": 43
   },
   {
    "router": "sections",
@@ -1284,7 +2158,7 @@
    "floor": 0,
    "interval": [
     0,
-    2.220446049250313e-16
+    0
    ],
    "largest": 0.2701561317290424,
    "boardsMoved": 31
@@ -1295,10 +2169,10 @@
    "floor": 2.220446049250313e-16,
    "interval": [
     2.220446049250313e-16,
-    8.881784197001252e-16
+    4.440892098500626e-16
    ],
    "largest": 0.1146454100864982,
-   "boardsMoved": 52
+   "boardsMoved": 55
   },
   {
    "router": "sections",
@@ -1309,7 +2183,7 @@
     4.440892098500626e-16
    ],
    "largest": 0.2871521814079021,
-   "boardsMoved": 39
+   "boardsMoved": 44
   },
   {
    "router": "sections",
@@ -1353,7 +2227,7 @@
     0
    ],
    "largest": 0.07070465845285961,
-   "boardsMoved": 26
+   "boardsMoved": 29
   },
   {
    "router": "sections",
@@ -1363,8 +2237,8 @@
     0,
     0
    ],
-   "largest": 0.05278640450004213,
-   "boardsMoved": 28
+   "largest": 0.0550695573466109,
+   "boardsMoved": 31
   },
   {
    "router": "sections",
@@ -1385,8 +2259,8 @@
     0,
     1.1102230246251565e-16
    ],
-   "largest": 0.022869045496557106,
-   "boardsMoved": 32
+   "largest": 0.01691742114918182,
+   "boardsMoved": 34
   },
   {
    "router": "trunks",
@@ -1405,10 +2279,10 @@
    "floor": 0,
    "interval": [
     0,
-    6.938893903907228e-18
+    3.469446951953614e-18
    ],
    "largest": 0.18719066919027405,
-   "boardsMoved": 33
+   "boardsMoved": 35
   },
   {
    "router": "trunks",
@@ -1419,6 +2293,17 @@
     0
    ],
    "largest": 0.007086418878219869,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0007999999999999986,
    "boardsMoved": 1
   },
   {
@@ -1496,7 +2381,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 6
+   "boardsMoved": 7
   },
   {
    "router": "trunks",
@@ -1512,13 +2397,13 @@
   {
    "router": "trunks",
    "measure": "R2.angle",
-   "floor": 8.326672684688674e-17,
+   "floor": 5.551115123125783e-17,
    "interval": [
     0,
     1.1102230246251565e-16
    ],
    "largest": 0.11252638663544118,
-   "boardsMoved": 41
+   "boardsMoved": 45
   },
   {
    "router": "trunks",
@@ -1529,7 +2414,7 @@
     0
    ],
    "largest": 0.476995435717102,
-   "boardsMoved": 17
+   "boardsMoved": 19
   },
   {
    "router": "trunks",
@@ -1540,7 +2425,7 @@
     0
    ],
    "largest": 18.39505572403754,
-   "boardsMoved": 12
+   "boardsMoved": 14
   },
   {
    "router": "trunks",
@@ -1550,8 +2435,8 @@
     0,
     1.1102230246251565e-16
    ],
-   "largest": 0.008053983914378282,
-   "boardsMoved": 35
+   "largest": 0.008505779795998036,
+   "boardsMoved": 38
   },
   {
    "router": "trunks",
@@ -1561,8 +2446,8 @@
     0,
     0
    ],
-   "largest": 0.006709370734594877,
-   "boardsMoved": 11
+   "largest": 0.006709370734595765,
+   "boardsMoved": 17
   },
   {
    "router": "trunks",
@@ -1573,7 +2458,7 @@
     0
    ],
    "largest": 0.00014325538592752096,
-   "boardsMoved": 15
+   "boardsMoved": 18
   },
   {
    "router": "trunks",
@@ -1595,7 +2480,7 @@
     0
    ],
    "largest": 0.011602508317247517,
-   "boardsMoved": 13
+   "boardsMoved": 14
   },
   {
    "router": "trunks",
@@ -1622,13 +2507,13 @@
   {
    "router": "sections-site",
    "measure": "B1.inkSaved",
-   "floor": 2.220446049250313e-16,
+   "floor": 0.000018899722624976523,
    "interval": [
     1.1102230246251565e-16,
-    0.0004757187297862453
+    0.0003832349774942623
    ],
    "largest": 0.06797739944690351,
-   "boardsMoved": 49
+   "boardsMoved": 56
   },
   {
    "router": "sections-site",
@@ -1644,13 +2529,13 @@
   {
    "router": "sections-site",
    "measure": "B11.share",
-   "floor": 0.001084148937108509,
+   "floor": 0.0008656243726296517,
    "interval": [
-    0.0003073822369796253,
-    0.0035717480585742423
+    0.00006569734791856893,
+    0.002691263691497664
    ],
    "largest": 0.16813043334132438,
-   "boardsMoved": 56
+   "boardsMoved": 59
   },
   {
    "router": "sections-site",
@@ -1661,7 +2546,18 @@
     0
    ],
    "largest": 0.08087557603686635,
-   "boardsMoved": 21
+   "boardsMoved": 22
+  },
+  {
+   "router": "sections-site",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.01241782322863405,
+   "boardsMoved": 22
   },
   {
    "router": "sections-site",
@@ -1716,7 +2612,7 @@
     1
    ],
    "largest": 347,
-   "boardsMoved": 36
+   "boardsMoved": 40
   },
   {
    "router": "sections-site",
@@ -1735,10 +2631,10 @@
    "floor": 0,
    "interval": [
     0,
-    2
+    1
    ],
    "largest": 371,
-   "boardsMoved": 32
+   "boardsMoved": 36
   },
   {
    "router": "sections-site",
@@ -1757,10 +2653,10 @@
    "floor": 0,
    "interval": [
     0,
-    0.033333333333333215
+    0.03000000000000025
    ],
    "largest": 1.9715909090909092,
-   "boardsMoved": 36
+   "boardsMoved": 40
   },
   {
    "router": "sections-site",
@@ -1782,7 +2678,7 @@
     0
    ],
    "largest": 5.551115123125783e-16,
-   "boardsMoved": 5
+   "boardsMoved": 6
   },
   {
    "router": "sections-site",
@@ -1798,13 +2694,13 @@
   {
    "router": "sections-site",
    "measure": "R2.angle",
-   "floor": 0.0003210003206621792,
+   "floor": 0.0003579332538412028,
    "interval": [
     1.1102230246251565e-16,
-    0.0037131576671968203
+    0.004688160874628755
    ],
    "largest": 0.05348804755077907,
-   "boardsMoved": 55
+   "boardsMoved": 60
   },
   {
    "router": "sections-site",
@@ -1812,10 +2708,10 @@
    "floor": 0,
    "interval": [
     0,
-    1.4210854715202004e-14
+    1.7763568394002505e-14
    ],
-   "largest": 8.094745631380533,
-   "boardsMoved": 29
+   "largest": 11.309932474020226,
+   "boardsMoved": 33
   },
   {
    "router": "sections-site",
@@ -1826,29 +2722,29 @@
     0
    ],
    "largest": 48.012787504183336,
-   "boardsMoved": 6
+   "boardsMoved": 8
   },
   {
    "router": "sections-site",
    "measure": "R4.turn",
-   "floor": 0.0002651310428916087,
+   "floor": 0.0002708947612152235,
    "interval": [
     4.440892098500626e-16,
-    0.01281195877315211
+    0.01306460535955889
    ],
    "largest": 0.3120093760241627,
-   "boardsMoved": 49
+   "boardsMoved": 56
   },
   {
    "router": "sections-site",
    "measure": "R5.mean",
-   "floor": 0.0007560008547740082,
+   "floor": 0.0009682011589602357,
    "interval": [
     4.440892098500626e-16,
-    0.004299202185803486
+    0.0047022894741231
    ],
    "largest": 1.151220051539755,
-   "boardsMoved": 54
+   "boardsMoved": 59
   },
   {
    "router": "sections-site",
@@ -1856,10 +2752,10 @@
    "floor": 0,
    "interval": [
     0,
-    2.220446049250313e-16
+    0
    ],
    "largest": 0.13593621262517463,
-   "boardsMoved": 30
+   "boardsMoved": 32
   },
   {
    "router": "sections-site",
@@ -1867,10 +2763,10 @@
    "floor": 8.881784197001252e-16,
    "interval": [
     4.440892098500626e-16,
-    2.6645352591003757e-15
+    3.9968028886505635e-15
    ],
    "largest": 7.3065601610199415,
-   "boardsMoved": 49
+   "boardsMoved": 55
   },
   {
    "router": "sections-site",
@@ -1881,7 +2777,7 @@
     8.881784197001252e-16
    ],
    "largest": 0.4706896742245248,
-   "boardsMoved": 36
+   "boardsMoved": 40
   },
   {
    "router": "sections-site",
@@ -1925,7 +2821,7 @@
     2.7755575615628914e-17
    ],
    "largest": 0.015210274323835427,
-   "boardsMoved": 31
+   "boardsMoved": 34
   },
   {
    "router": "sections-site",
@@ -1933,10 +2829,10 @@
    "floor": 0,
    "interval": [
     0,
-    0.000027393676125919697
+    0.000025223587999612107
    ],
-   "largest": 0.05278640450004213,
-   "boardsMoved": 30
+   "largest": 0.056490312964097567,
+   "boardsMoved": 33
   },
   {
    "router": "sections-site",
@@ -1955,19 +2851,19 @@
    "family": "hub-chain",
    "seed": 0,
    "router": "corners",
-   "digest": 3723009865
+   "digest": 212048615
   },
   {
    "family": "hub-chain",
    "seed": 0,
    "router": "shared",
-   "digest": 3723009865
+   "digest": 212048615
   },
   {
    "family": "hub-chain",
    "seed": 0,
    "router": "sections",
-   "digest": 1113670094
+   "digest": 3431543602
   },
   {
    "family": "maze",
