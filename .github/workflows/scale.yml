@@ -213,7 +213,8 @@ jobs:
 
   screen:
     needs: changes
-    if: needs.changes.outputs.match == 'true'
+    # A run of the sizes times the routers only, so it does not start the screen.
+    if: needs.changes.outputs.match == 'true' && (inputs.sizes || '') == ''
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
