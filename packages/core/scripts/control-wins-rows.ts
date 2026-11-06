@@ -49,6 +49,8 @@ export const CONTROL_PARTNERS: Readonly<Record<(typeof CONTROLS)[number], Readon
       "route.detour.q95",
       "route.detour.mean",
       "route.detour.max",
+      // A straight line is the shortest way, so the control wins the length. It goes through the boxes for it.
+      "route.length",
       "route.overlap.share",
       "route.overlap.peak",
       "route.bundle.ambiguity",
