@@ -66,6 +66,10 @@ The folder [`remeasure/`](remeasure/) holds the record `remeasure.json` of each 
 - `h3.json` is run 41369331158. `portfolio-speed.json` is run 41455276356, in mode `fresh`. `route-scale.json` is run 41382862417.
 - The results page does not read these files. The [roadmap](../../ROADMAP.md) gives the verdicts.
 
+## The atlas
+
+The folder [`../atlas/`](../atlas/) holds one weekly record of the leader of each region of these snapshots. Its [README](../atlas/README.md) tells the format and how to write the next record.
+
 ## The benchmark snapshot
 
 The folder [`../bench/`](../bench/) holds `bench.json` and `bench-meta.json` of one run of the workflow `Bench`. The Pages build copies them into the site and does not start the benchmark. To make a new snapshot, download the artifact `bench-<sha>` of a finished run on `main`. Then write its rows into `bench.json`, one row on each line, and its run, commit and date into `bench-meta.json`.
