@@ -19,7 +19,7 @@
     "ideas": "pnpm --filter @mark1russell7/highways ideas",
     "queue": "pnpm --filter @mark1russell7/highways queue",
     "check:conventions": "conventions check",
-    "check:boundaries": "depcruise --config .dependency-cruiser.mjs packages",
+    "check:boundaries": "depcruise --config .dependency-cruiser.ts packages",
     "check:api": "api-report check"
   },
   "devDependencies": {
