@@ -1,6 +1,7 @@
 // The data of the atlas of solved regions (SOLVED-ATLAS). The build and the script `atlas-week.ts` give the committed files to these functions.
 // This module has no access to the file system and to the network, so the page, the script and the tests use the same rules.
-import { readCore, type Snapshot } from "./results-data.ts";
+import type { WeekGap, WeekSource } from "./atlas-weeks.ts";
+import { parseSnapshot, readCore, type Snapshot } from "./results-data.ts";
 
 /** The format of a weekly record of the leaders. */
 export const ATLAS_WEEK_FORMAT = "atlas-week/1";
@@ -102,6 +103,21 @@ export function weekLeaders(snapshots: readonly Snapshot[], date: string): Atlas
   return { format: ATLAS_WEEK_FORMAT, date, regions: regions.sort(byRegion) };
 }
 
+/** One snapshot file: its name in the folder of verdicts and its text. */
+export interface SnapshotFile {
+  readonly name: string;
+  readonly text: string;
+}
+
+/**
+ * This function gives the weekly record of the snapshot files.
+ * The script `atlas-week.ts` gives it the files on disk. The build gives it the files of a commit of the history.
+ *
+ * @param files - The snapshot files, in the order of their names.
+ * @param date - The date of the record, as `YYYY-MM-DD`.
+ */
+export const weekFromFiles = (files: readonly SnapshotFile[], date: string): AtlasWeek => weekLeaders(files.map((f) => parseSnapshot(f.text, f.name)), date);
+
 /** This function reads the JSON text of a weekly record. It throws an error when the format or the date is not valid. */
 export function parseWeek(text: string, name = "record"): AtlasWeek {
   const value = JSON.parse(text) as Partial<AtlasWeek>;
@@ -153,11 +169,15 @@ export interface AtlasView {
   readonly regions: readonly AtlasRegion[];
 }
 
-/** The data of the module `virtual:atlas`: the view, the text sections of `content/atlas.md` as HTML, and the core of the build. */
+/** The data of the module `virtual:atlas`. It has the view, the text sections of `content/atlas.md` as HTML, the core of the build and the source of each week. */
 export interface AtlasPage {
   readonly view: AtlasView;
   readonly text: Readonly<Record<string, string>>;
   readonly core: string;
+  /** The source of each weekly record, in the order of the dates. */
+  readonly sources: readonly WeekSource[];
+  /** Each week that the build did not derive, with the reason. */
+  readonly skipped: readonly WeekGap[];
 }
 
 /** This function gives the count of days from `from` to `to`. */
