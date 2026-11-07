@@ -1,5 +1,6 @@
 // The numbers of the file `kpi.json` of the site. Each value comes from a committed file of the build.
 // So no reader copies a number from a page, and no number has a person as its source.
+import { parseResponseRecord } from "@mark1russell7/rigor-statistics";
 import type { BenchMeta } from "./bench-label.ts";
 
 /** The name of the project in the file. */
@@ -20,51 +21,62 @@ export interface KpiFacts {
   readonly verdictReads: readonly (string | undefined)[];
   /** The date of the last read of each verdict: the date of its stamp `verified`, or else the date of its run. */
   readonly verdictReadDates?: readonly (string | undefined)[];
-  /** The committed sweep records of the strategy cards (CARD-CURVES). */
-  readonly sweeps?: readonly unknown[];
+  /** The committed sweep records of the strategy cards (CARD-CURVES), in the form `response-records/1`. */
+  readonly sweeps?: readonly SweepFile[];
   /** The date of the commit of the build. A page is live from the date of its commit. */
   readonly commitDate?: string;
 }
 
-/** The format of a sweep record: the curves of one strategy card, with one option changed at a time. */
-export const SWEEP_FORMAT = "sweep/1";
-
 /** The folder of the sweep records, relative to the root of the repository. */
 export const SWEEP_DIR = "docs/research/sweeps";
 
+/** The two categorical dimensions that name a card in a sweep record. */
+export const CARD_DIMENSIONS = ["step", "strategy"] as const;
+
 /** The things that the count `cards-with-curves` does not read. */
-export const CARDS_NOT_COUNTED = `A sweep that is not a committed record of ${SWEEP_DIR}, and a curve with fewer than 2 points.`;
+export const CARDS_NOT_COUNTED = `A file of ${SWEEP_DIR} that is not a good record of response-records/1, a record with no dimensions step and strategy, and a card with fewer than 2 values of an option.`;
 
-/** One curve of a sweep record: the values of the measures at each value of one option. */
-export interface SweepCurve {
-  readonly option: string;
-  readonly points: readonly { readonly value: number | string; readonly measures: Readonly<Record<string, number>> }[];
-}
-
-/** One sweep record: the curves of one strategy of one step. */
-export interface SweepRecord {
-  readonly format: typeof SWEEP_FORMAT;
-  readonly step: string;
-  readonly strategy: string;
-  /** The ISO date of the run of the sweep. */
-  readonly date: string;
-  readonly curves: readonly SweepCurve[];
-}
-
-/** This function tells if a value is a sweep record with a curve of 2 points or more. */
-export function hasCurve(value: unknown): value is SweepRecord {
-  const r = value as Partial<SweepRecord> | null;
-  if (typeof r !== "object" || r === null || r.format !== SWEEP_FORMAT) return false;
-  if (typeof r.step !== "string" || typeof r.strategy !== "string" || !Array.isArray(r.curves)) return false;
-  return r.curves.some((c) => Array.isArray(c?.points) && c.points.length >= 2);
+/** One committed sweep record and the date of its last commit. */
+export interface SweepFile {
+  /** The parsed JSON of the file. The count reads it only through `parseResponseRecord`. */
+  readonly record: unknown;
+  /** The date of the last commit of the file, in the form `YYYY-MM-DD`. */
+  readonly date?: string;
 }
 
 /**
- * This function counts the strategy cards with a response curve. A card counts when its sweep record has a curve of 2 points or more.
- * Two records of one card count once.
+ * This function gives the cards of a sweep record that have a response curve. A card is a pair of a step and a strategy.
+ * The card has a curve when its measured points have 2 or more values of one option that is not categorical.
+ * A record that `parseResponseRecord` refuses gives no card.
  */
-export function cardsWithCurves(records: readonly unknown[]): number {
-  return new Set(records.filter(hasCurve).map((r) => `${r.step}\u0000${r.strategy}`)).size;
+export function curveCards(value: unknown): string[] {
+  const parsed = parseResponseRecord(value);
+  if (!parsed.ok) return [];
+  const { dimensions, points } = parsed.record;
+  const named = CARD_DIMENSIONS.every((id) => dimensions.some((d) => d.id === id && d.kind === "categorical"));
+  if (!named) return [];
+  const options = dimensions.filter((d) => d.kind !== "categorical").map((d) => d.id);
+  const values = new Map<string, Map<string, Set<string>>>();
+  for (const point of points) {
+    if (!Object.values(point.measures).some((m) => m !== null)) continue;
+    const card = CARD_DIMENSIONS.map((id) => String(point.values[id])).join("/");
+    const byOption = values.get(card) ?? new Map<string, Set<string>>();
+    values.set(card, byOption);
+    for (const option of options) {
+      const v = point.values[option];
+      if (v === null || v === undefined) continue;
+      byOption.set(option, (byOption.get(option) ?? new Set<string>()).add(String(v)));
+    }
+  }
+  return [...values].filter(([, byOption]) => [...byOption.values()].some((s) => s.size >= 2)).map(([card]) => card);
+}
+
+/**
+ * This function counts the strategy cards with a response curve in the committed sweep records.
+ * A card in two records counts once.
+ */
+export function cardsWithCurves(files: readonly SweepFile[]): number {
+  return new Set(files.flatMap((f) => curveCards(f.record))).size;
 }
 
 /** This function gives the time of the latest date of a list, or `undefined` for a list with no date. */
@@ -156,7 +168,7 @@ export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: stri
         value: cardsWithCurves(facts.sweeps ?? []),
         unit: "cards",
         notCounted: CARDS_NOT_COUNTED,
-        ...dated(latestAt((facts.sweeps ?? []).filter(hasCurve).map((r) => r.date))),
+        ...dated(latestAt((facts.sweeps ?? []).filter((f) => curveCards(f.record).length > 0).map((f) => f.date))),
       },
     ],
   };

@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { demoComplete, pageCoverage } from "./demo-data.ts";
-import { SWEEP_DIR, type KpiFacts } from "./kpi.ts";
+import { SWEEP_DIR, type KpiFacts, type SweepFile } from "./kpi.ts";
 import { coverageView } from "./results-data.ts";
 import { RESULT_FILES, snapshotFiles } from "./results-files.ts";
 
@@ -27,20 +27,25 @@ export function kpiFacts(root: string): KpiFacts {
   };
 }
 
-/** This function reads each JSON file of the folder of the sweep records. A missing folder gives no record. */
-export function sweepRecords(root: string): unknown[] {
+/**
+ * This function reads each JSON file of the folder of the sweep records, with the date of its last commit.
+ * A missing folder gives no record.
+ */
+export function sweepRecords(root: string): SweepFile[] {
   const dir = join(root, SWEEP_DIR);
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((f) => f.endsWith(".json"))
     .sort()
-    .map((f) => JSON.parse(readFileSync(join(dir, f), "utf8")) as unknown);
+    .map((f) => ({ record: JSON.parse(readFileSync(join(dir, f), "utf8")) as unknown, ...commitDateOf(root, `${SWEEP_DIR}/${f}`) }))
+    .map(({ commitDate, ...rest }) => (commitDate === undefined ? rest : { ...rest, date: commitDate }));
 }
 
-/** This function gives the date of the commit of the build, or no field outside a git checkout. */
-function commitDateOf(root: string): { commitDate?: string } {
+/** This function gives the date of the last commit of the build or of one file, or no field outside a git checkout. */
+function commitDateOf(root: string, file?: string): { commitDate?: string } {
   try {
-    const date = execFileSync("git", ["log", "-1", "--format=%cs"], { cwd: root, encoding: "utf8" }).trim();
+    const args = ["log", "-1", "--format=%cs", ...(file === undefined ? [] : ["--", file])];
+    const date = execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
     return /^\d{4}-\d{2}-\d{2}$/.test(date) ? { commitDate: date } : {};
   } catch {
     return {};

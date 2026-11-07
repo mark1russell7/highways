@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { kpiFacts } from "./kpi-files.ts";
-import { cardsWithCurves, KPI_PAGES, latestAt, minorsBehind, resultsLag, resultsUnread, siteKpiInput, SWEEP_FORMAT, type KpiFacts } from "./kpi.ts";
+import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
+import { cardsWithCurves, KPI_PAGES, latestAt, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -83,20 +84,33 @@ describe("siteKpiInput", () => {
 });
 
 describe("cardsWithCurves", () => {
-  const record = (strategy: string, points: number) => ({
-    format: SWEEP_FORMAT,
-    step: "router",
-    strategy,
-    date: "2026-11-11",
-    curves: [{ option: "gap", points: Array.from({ length: points }, (_, i) => ({ value: i, measures: { "route.crossings": i } })) }],
+  // A made-up sweep of the option gap for each strategy. Each point has its own seed group.
+  const data = (strategies: Record<string, number>): ResponseData => ({
+    schema: RESPONSE_RECORDS_SCHEMA,
+    name: "made-up sweep",
+    dimensions: [
+      { id: "step", label: "Step", unit: "", kind: "categorical", levels: ["router"] },
+      { id: "strategy", label: "Strategy", unit: "", kind: "categorical", levels: Object.keys(strategies) },
+      { id: "gap", label: "Gap", unit: "px", kind: "continuous", range: [0, 16] },
+    ],
+    measures: [{ id: "crossings", label: "Crossings", unit: "", direction: "lower" }],
+    points: Object.entries(strategies).flatMap(([strategy, n]) =>
+      Array.from({ length: 4 }, (_, i) => ({
+        id: `${strategy}-${i}`,
+        group: `${strategy}-${i}`,
+        values: { step: "router", strategy, gap: n === 1 ? 4 : 4 * (i % n) + 1 },
+        measures: { crossings: 10 + i + strategy.length },
+      })),
+    ),
+  });
+  const file = (strategies: Record<string, number>, date?: string): SweepFile => ({ record: fitResponse(data(strategies)), ...(date ? { date } : {}) });
+
+  it("counts each card with 2 values of an option or more", () => {
+    expect(cardsWithCurves([file({ alpha: 2, beta: 4, gamma: 1 })])).toBe(2);
   });
 
-  it("counts each card with a curve of 2 points or more", () => {
-    expect(cardsWithCurves([record("alpha", 2), record("beta", 5), record("gamma", 1)])).toBe(2);
-  });
-
-  it("counts a card once, and skips a record of another form", () => {
-    expect(cardsWithCurves([record("alpha", 3), record("alpha", 4), { format: "other", step: "router", strategy: "beta", curves: [] }, null])).toBe(1);
+  it("counts a card once, and skips a record that parseResponseRecord refuses", () => {
+    expect(cardsWithCurves([file({ alpha: 3, delta: 1, gamma: 1 }), file({ alpha: 4, delta: 1, gamma: 1 }), { record: data({ beta: 2, delta: 1, gamma: 1 }) }, { record: null }])).toBe(1);
   });
 
   it("gives 0 with no record, and the measure in the file says what it does not count", () => {
@@ -104,12 +118,13 @@ describe("cardsWithCurves", () => {
     const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, FACTS);
     const m = input?.measures.find((x) => x.id === "cards-with-curves");
     expect(m).toMatchObject({ value: 0, unit: "cards" });
-    expect(m?.notCounted).toContain("docs/research/sweeps");
+    expect(m?.notCounted).toContain("response-records/1");
     expect(m?.at).toBeUndefined();
   });
 
-  it("takes the time of the measure from the latest record", () => {
-    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps: [record("alpha", 2), { ...record("beta", 2), date: "2026-11-12" }] });
+  it("takes the time of the measure from the latest commit of a record with a curve", () => {
+    const sweeps = [file({ alpha: 2, delta: 1, gamma: 1 }, "2026-11-10"), file({ beta: 2, delta: 1, gamma: 1 }, "2026-11-12"), file({ delta: 1, gamma: 1, zeta: 1 }, "2026-11-13")];
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps });
     expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
   });
 });
