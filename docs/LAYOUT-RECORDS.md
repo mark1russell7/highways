@@ -655,6 +655,18 @@ The set `screen-v5` (COLLECTION-KEY) has the 150 boards of `screen-v3` under eac
 - The generator of each input has the name `edge-key`, version 1. Its `params` hold `edgeKey` and the generator of the `screen-v3` board in `base`.
 - The split file [`corpus/splits/screen-v5.82066dd4b30c5449.json`](../corpus/splits/screen-v5.82066dd4b30c5449.json) holds out the seeds 7 to 9 of each family.
 
+### The screen set `screen-v6`
+
+The set `screen-v6` (SCREEN-INNER) has 20 boards of `frame-rows` with inner edges. Its files are in [`corpus/screen-v6`](../corpus/screen-v6). `SCREEN_V6` of `bench/screen/set.ts` makes them.
+
+- The sets `screen-v1` to `screen-v5` have no board with inner routes. Thus a screen of those sets does not read the routes inside a frame.
+- The set has two families: `frame-rows.inner-4` and `frame-rows.inner-12`, each with the 10 members 0 to 9.
+- The dimension `inner` of `frame-rows` sets the tries for an inner edge from a row to a wall plug of its card.
+- The boxes and the cell of the member `k` are those of the member `k` of `frame-rows` in `screen-v3`. Only the inner edges are new.
+- The router `corners` gives 30 inner routes or more on each board. A test holds this count.
+- The generator of each input is `family.frame-rows`, with the parameter `inner`.
+- The split file [`corpus/splits/screen-v6.742626a676f29f5e.json`](../corpus/splits/screen-v6.742626a676f29f5e.json) holds out the seeds 7 to 9 of each family.
+
 ### The screen set `exact-v1`
 
 The set `exact-v1` (MEAS2) has small boards with a known optimum of the exact model. Its files are in [`corpus/exact-v1`](../corpus/exact-v1). `EXACT_V1` of `bench/screen/exact-set.ts` makes them.

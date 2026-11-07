@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "The step: group, plugs, router, highway, levels, curve or whole. The value verdict screens the 5 steps of the verdict snapshots in one run, 3 at a time. Use it with no strategy and no paired."
+        description: "The step: group, plugs, router, highway, levels, curve or whole. A JSON list, for example [\"router\",\"whole\"], runs each step in its own job (SCREEN-MATRIX). Not with paired."
         default: "router"
       strategy:
         description: "Names of the registry, with commas. Empty: the built-in strategies of the step."
@@ -35,7 +35,7 @@ on:
         description: "The time limit of the job, in minutes. With exact: the time limit of each shard. With paired: 60 or more. With time: 150 or more."
         default: "15"
       set:
-        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), screen-v4 (the boards of screen-v2 after makeRoom, PASS-GRID), screen-v5 (the boards of screen-v3 under each key of the edges, COLLECTION-KEY), exact-v1, exact-v1-bounds or moves-v1 (the small boards of REBUILD-SILENT). The set exact-v1 also gives the gap closed (MEAS2)."
+        description: "The screen set: screen-v1, screen-v2 (10 seeds of each family, CORPUS-SEEDS), screen-v3 (15 families, CORPUS-FAMILIES), screen-v4 (the boards of screen-v2 after makeRoom, PASS-GRID), screen-v5 (the boards of screen-v3 under each key of the edges, COLLECTION-KEY), screen-v6 (frame-rows with inner edges, SCREEN-INNER), exact-v1, exact-v1-bounds or moves-v1 (the small boards of REBUILD-SILENT). The set exact-v1 also gives the gap closed (MEAS2). A JSON list runs each set in its own job (SCREEN-MATRIX). Not with paired."
         default: "screen-v1"
       members:
         description: "The members of each family, as from-to, for example 10-23, in place of the members of the set (PROMO-CANALS). Empty: the members of the set."
@@ -66,6 +66,10 @@ concurrency:
   group: screen-${{ github.ref }}-${{ inputs.step }}-${{ inputs.strategy }}-${{ inputs.families }}-${{ inputs.wrap }}-${{ inputs.shuffles }}-${{ inputs.edits }}-${{ inputs.module }}-${{ inputs.set }}-${{ inputs.members }}-${{ inputs.activation }}-${{ inputs.exact }}-${{ inputs.time }}-${{ inputs.report }}-${{ inputs.node }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   # The exact solves of MEAS2 run in the workflow `Exact`, in shards.
   changes:
@@ -78,7 +82,7 @@ jobs:
       match: ${{ steps.changes.outputs.match }}
     steps:
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+        uses: mark1russell7/template/.github/actions/changes@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
         with:
           paths: |
             packages/core/src/**
@@ -119,8 +123,10 @@ jobs:
       # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
       max-parallel: 3
       matrix:
-        # A pull request screens both steps. A dispatch screens its own step. The value verdict screens the 5 steps of the verdict snapshots (RESULTS-READ): one run in place of 5 runs in the queue.
-        step: ${{ fromJSON(github.event_name == 'pull_request' && '["router","highway"]' || inputs.step == 'verdict' && '["router","highway","plugs","levels","whole"]' || format('["{0}"]', inputs.step || 'router')) }}
+        # A pull request screens both steps. A dispatch screens its own step, or each step of a JSON list (SCREEN-MATRIX).
+        step: ${{ fromJSON(github.event_name == 'pull_request' && '["router","highway"]' || (startsWith(inputs.step, '[') && inputs.step || format('["{0}"]', inputs.step || 'router'))) }}
+        # A dispatch screens its set, or each set of a JSON list (SCREEN-MATRIX). Thus one run reads each snapshot again after a release.
+        set: ${{ fromJSON(startsWith(inputs.set, '[') && inputs.set || format('["{0}"]', inputs.set || 'screen-v1')) }}
         # A paired screen runs 5 jobs, because the promotion time test reads 5 reports (MEASURE-ISOLATE). Each job is a full screen with its own report.
         job: ${{ fromJSON(inputs.paired && '[1,2,3,4,5]' || '[1]') }}
     env:
@@ -131,12 +137,18 @@ jobs:
       WRAP: ${{ inputs.wrap || '' }}
       SHUFFLES: ${{ inputs.shuffles || '0' }}
       EDITS: ${{ inputs.edits || '0' }}
-      SET: ${{ inputs.set || 'screen-v1' }}
+      SET: ${{ matrix.set }}
       ACTIVATION: ${{ inputs.activation || '' }}
       MEMBERS: ${{ inputs.members || '' }}
       PAIRED: ${{ inputs.paired || '' }}
       JOB: ${{ matrix.job }}
     steps:
+      # The promotion job reads the reports of one set and one step. So a paired screen of a list fails here (SCREEN-MATRIX).
+      - name: A paired screen takes one set and one step
+        if: ${{ inputs.paired && (startsWith(inputs.set, '[') || startsWith(inputs.step, '[')) }}
+        run: |
+          echo "::error::A paired screen takes one set and one step, not a JSON list."
+          exit 1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -183,7 +195,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: screen-${{ inputs.set || 'screen-v1' }}-${{ matrix.step }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}${{ inputs.paired && format('-job{0}', matrix.job) || '' }}
+          name: screen-${{ matrix.set }}-${{ matrix.step }}-${{ inputs.wrap || 'none' }}-${{ inputs.shuffles || '0' }}-${{ inputs.edits || '0' }}-${{ github.sha }}${{ inputs.paired && format('-job{0}', matrix.job) || '' }}
           path: |
             screen.jsonl
             screen.md
@@ -246,13 +258,13 @@ jobs:
 
   screen-ok:
     name: Screen OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, exact, time, screen, promotion]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
     steps:
-      - uses: mark1russell7/template/.github/actions/gate-summary@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+      - uses: mark1russell7/template/.github/actions/gate-summary@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
         with:
           needs: ${{ toJSON(needs) }}
           allow-skip: exact time screen promotion

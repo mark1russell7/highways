@@ -70,6 +70,9 @@ const HEADER: Readonly<Record<keyof SnapshotHeader, "string" | "number">> = {
   core: "string",
 };
 
+/** This function tells if a file of the folder of verdicts is a snapshot. Each JSON file of the folder is a snapshot. */
+export const isSnapshotFile = (name: string): boolean => name.endsWith(".json");
+
 /** This function reads the JSON text of a snapshot. It throws an error when a header field is missing or has the wrong type. */
 export function parseSnapshot(text: string, name = "snapshot"): Snapshot {
   const value = JSON.parse(text) as Record<string, unknown>;
