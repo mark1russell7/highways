@@ -18,14 +18,16 @@ import { withoutRoom } from "./without-room.ts";
  * Those links go through the groups now, not around the outer edge.
  * CORNER-REACH added the field `through`, which the digest leaves out. So each digest stays, and the routes did not change.
  * PLUG-OUT-BLOCKED changed three digests of the options `site`: `LADDER_DIGESTS` gives them. With `outSteps: false`, each digest of this list stays.
+ * ROUTE-TIE changed the four digests of `case-hub-chain` and `case-many-groups`, and the digest of `case-many-groups` in `LADDER_DIGESTS`.
+ * The walk back of the corner search breaks a tie by geometry.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
   "case-dense-groups/site": "c7dad0bc5c890c06d4d2c318d94209b5afaafc3a66f1278dd298b68a3659c654",
   "case-dense-groups/sections": "a638f60af7058efa5987786dab7801ffeeab99025de4798a41320e6305e607e9",
-  "case-hub-chain/site": "92941d1b3c12943b6594e57b4dca3702a16feb6bdf3a61176ba4d0e2e957fbd1",
-  "case-hub-chain/sections": "3e2d3a656488a21d0aadc0edd5a932e2fcdfdd29be9d891794b005306f0ca696",
-  "case-many-groups/site": "da54d7c45c647ac070c24692f1d82e372dae17efcc044ee378f0a5278197f418",
-  "case-many-groups/sections": "ea75b3af84bf1bf7aff23040a79660b423c5ac47d7cf3ee5c6940dba4576cb02",
+  "case-hub-chain/site": "865ad107a81344683a6bd57793c7154e23dd6860c286163f03652d12c3f75f2e",
+  "case-hub-chain/sections": "a835718eed2fc3f68f76b0efa0a61fcc91514ebe45367fb382471ae2c9cc64c8",
+  "case-many-groups/site": "11a3ddae261c96011c7d5f9f7ed169a541c2fb8086c5057edf54ac182964084a",
+  "case-many-groups/sections": "9b28030972c3d867504b706f4e7c797276bd832c55fb235c401cff396c4a0a17",
   "small-clustered/site": "6be966b0b4b9aa74fab2e4d75a0183fba159d29410e5ab5d6ad6ee9cfb111b51",
   "small-clustered/sections": "e9a0ee8fb9ba1785b0fb1aa5f60d3cc3af989f9b096be81e35c44e7febf654ba",
 };
@@ -36,7 +38,7 @@ const DIGESTS: Readonly<Record<string, string>> = {
  */
 const LADDER_DIGESTS: Readonly<Record<string, string>> = {
   "case-dense-groups/site": "ec0773151f8a1e14d47a02f5721e26ec2904b0f4f13828161199fae6719543f9",
-  "case-many-groups/site": "ad3cc6391a9d0f9bbee939f6fed83677742138403b9e2aa1c6fb9b23273e7963",
+  "case-many-groups/site": "0c6dfbabbb99aee2e62966dab7813de785d511b0c9c9c41881d084079c832ff4",
   "small-clustered/site": "00218ff3bb4b8e208167b79f007790bd0ec78c27c9b9ebbe0d00bd6ed753fe93",
 };
 

@@ -10,6 +10,8 @@ const v6 = screenInputs(SCREEN_V6);
 const v3 = screenInputs(SCREEN_V3);
 const root = new URL("../../../../../corpus/", import.meta.url);
 const readJson = (path: string): unknown => JSON.parse(readFileSync(new URL(path, root), "utf8"));
+/** The sets whose generator reads a router. Their files, not their generator, keep their boards. */
+const ROUTED_SETS: ReadonlySet<string> = new Set(["screen-v4"]);
 
 describe("the screen set screen-v6 (SCREEN-INNER)", () => {
   it("has frame-rows at inner 4 and at inner 12, each with the 10 seeds 0 to 9", () => {
@@ -57,7 +59,11 @@ describe("the screen set screen-v6 (SCREEN-INNER)", () => {
     expect(checkSplit(split, manifest, "by-member")).toEqual([]);
     for (const id of ["screen-v1", "screen-v2", "screen-v3", "screen-v4", "screen-v5"]) {
       const set = SCREEN_SETS[id]!;
-      expect(manifestHash(setManifest(set)), id).toBe(manifestHash(readJson(`${id}/corpus.json`) as LayoutCorpus));
+      const files = readJson(`${id}/corpus.json`) as LayoutCorpus;
+      // The generator of screen-v4 routes the level links (makeRoom), so a change of a router changes its boards.
+      // Its files keep the set (SCREEN-V4-FILES). So the manifest of screen-v4 comes from its files, not from its generator.
+      const inputs = ROUTED_SETS.has(id) ? files.inputs.map((entry) => readJson(`${entry.id}.json`) as LayoutInput) : undefined;
+      expect(manifestHash(setManifest(set, inputs)), id).toBe(manifestHash(files));
     }
   });
 

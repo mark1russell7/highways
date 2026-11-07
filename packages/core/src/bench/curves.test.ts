@@ -41,18 +41,19 @@ describe("benchHighways", () => {
     const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
     const [, run] = benchHighways(sharedRouter({ name: "shared-all", laneOrder: "run" }), "case-many-groups", graph);
     const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", graph);
-    // Version 2 of the bundle counter reads 0 in the body of this board. The values above 0 of version 1 were crossings at the ends, in the wrong class.
-    // So the gain of the lane order shows at the ends of the bundles.
-    expect(bundle!.crossings).toBe(0);
+    // Version 2 of the bundle counter puts the crossings at the ends in their own class. So the gain of the lane order shows at the ends of the bundles.
+    // After ROUTE-TIE, two routes cross once in the body of a bundle, with each lane order (0 before). No lane order removes a crossing of the routes.
+    expect(bundle!.crossings).toBe(1);
+    expect(run!.crossings).toBe(1);
     expect(bundle!.endCrossings).toBeLessThan(run!.endCrossings / 2);
   });
 
-  it("keeps 0 in the body of that board under a harmless shift of the boxes", () => {
+  it("keeps the count in the body of that board under a harmless shift of the boxes", () => {
     const graph = CASES.find((c) => c.name === "case-many-groups")!.make();
     for (const [dx, dy] of [[1e-12, -1e-12], [-1e-10, 1e-10], [1e-8, 1e-8], [-1e-7, -1e-7]] as const) {
       const nodes = graph.nodes.map((n) => ({ ...n, box: { ...n.box, x: n.box.x + dx, y: n.box.y + dy } }));
       const [, bundle] = benchHighways(sharedRouter({ name: "shared-all" }), "case-many-groups", { ...graph, nodes });
-      expect(bundle!.crossings, `shift ${dx}, ${dy}`).toBe(0);
+      expect(bundle!.crossings, `shift ${dx}, ${dy}`).toBe(1);
     }
   });
 });

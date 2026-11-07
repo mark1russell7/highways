@@ -81,6 +81,7 @@ describe("the inputs of the workflow", () => {
   it("reads the routers, and refuses an unknown or a repeated router", () => {
     expect(parseRouters(BISECT_ROUTERS.join(","))).toEqual(["sections-tree", "sections"]);
     expect(parseRouters(" sections , sections-tree ")).toEqual(["sections", "sections-tree"]);
+    expect(parseRouters("corners,sections,sections-site")).toEqual(["corners", "sections", "sections-site"]);
     expect(() => parseRouters("")).toThrow(RangeError);
     expect(() => parseRouters("sections,nope")).toThrow(RangeError);
     expect(() => parseRouters("sections,sections")).toThrow(RangeError);

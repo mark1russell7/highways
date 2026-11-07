@@ -1,6 +1,7 @@
 # This workflow writes one record of `packages/core/scripts` in one normal CI job, and it keeps the record as an artifact.
 # A record that takes minutes of memory runs here, so that it leaves a run and it does not wait for a lease on a shared machine.
 # The summary states the real time of the job. The record goes into the branch by a commit of its owner.
+# With the input `records`, the job writes each named record in turn. A change of the routes makes several records stale at one time.
 name: Records
 
 on:
@@ -15,14 +16,18 @@ on:
           - through-floor
           - through-check
           - paint-tie
+          - route-tie
           - joint-win
+      records:
+        description: "Several records in turn, separated by spaces (for example route-tie route-pairs). It replaces the choice above."
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
   # One run for each record and ref (RUNNER-SLOTS).
-  group: ${{ github.workflow }}-${{ inputs.record }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ inputs.records || inputs.record }}-${{ github.ref }}
   cancel-in-progress: false
 
 defaults:
@@ -33,9 +38,10 @@ jobs:
   record:
     runs-on: ubuntu-latest
     # The slowest record, `paint-tie`, took 23 min on a shared machine. The limit is 2 times that, and more for the install.
-    timeout-minutes: 60
+    # Several records in one job get 120 minutes.
+    timeout-minutes: ${{ inputs.records != '' && 120 || 60 }}
     env:
-      RECORD: ${{ inputs.record }}
+      RECORDS: ${{ inputs.records || inputs.record }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -46,14 +52,28 @@ jobs:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Write the record
+      - name: Write the records
         run: |
           set -o pipefail
-          SECONDS=0
-          node "packages/core/scripts/$RECORD.ts" "out/$RECORD/record.json"
-          { echo "## Record $RECORD"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; } >> "$GITHUB_STEP_SUMMARY"
+          for record in $RECORDS; do
+            # A name is a script of packages/core/scripts, so a wrong name stops the job before it starts a script.
+            [[ "$record" =~ ^[a-z0-9-]+$ && -f "packages/core/scripts/$record.ts" ]] || { echo "::error::$record is not a script of a record."; exit 1; }
+          done
+          for record in $RECORDS; do
+            SECONDS=0
+            # The job starts from the committed record. A script can keep a part of its file that another script writes (`bisect` of `split-spacing`).
+            if [ -f "packages/core/scripts/data/$record/record.json" ]; then
+              mkdir -p "out/$record"
+              cp "packages/core/scripts/data/$record/record.json" "out/$record/record.json"
+            fi
+            node "packages/core/scripts/$record.ts" "out/$record/record.json"
+            { echo "## Record $record"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; } >> "$GITHUB_STEP_SUMMARY"
+          done
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        # After a failed record, the artifact keeps the records before it.
+        if: ${{ !cancelled() }}
         with:
-          name: record-${{ inputs.record }}
-          path: out/${{ inputs.record }}/record.json
+          # One record keeps the name of its artifact. Several records go into one artifact, one folder each.
+          name: ${{ inputs.records != '' && 'records' || format('record-{0}', inputs.record) }}
+          path: ${{ inputs.records != '' && 'out' || format('out/{0}/record.json', inputs.record) }}
           if-no-files-found: error

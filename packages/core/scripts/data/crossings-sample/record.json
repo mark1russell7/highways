@@ -6,20 +6,20 @@
    "router": "corners-smooth",
    "nodes": 400,
    "edges": 800,
-   "segments": 20789,
+   "segments": 20794,
    "full": 12614,
-   "estimate": 12364,
-   "error": 0.019819,
+   "estimate": 11364,
+   "error": 0.099096,
    "draws": [
-    10997,
-    12068,
-    12551,
-    11808,
-    12473
+    12508,
+    14577,
+    12055,
+    11894,
+    12892
    ],
-   "low": 10997,
-   "high": 12551,
-   "worstDraw": 0.128191
+   "low": 11894,
+   "high": 14577,
+   "worstDraw": 0.155621
   },
   {
    "board": "mid-uniform",
@@ -46,20 +46,20 @@
    "router": "corners-smooth",
    "nodes": 1000,
    "edges": 2000,
-   "segments": 56182,
-   "full": 44087,
-   "estimate": 42431,
-   "error": 0.037562,
+   "segments": 56156,
+   "full": 43984,
+   "estimate": 49698,
+   "error": 0.129911,
    "draws": [
-    43808,
-    50451,
-    46757,
-    45339,
-    41181
+    43717,
+    44602,
+    42608,
+    40460,
+    35701
    ],
-   "low": 41181,
-   "high": 50451,
-   "worstDraw": 0.144351
+   "low": 35701,
+   "high": 44602,
+   "worstDraw": 0.188318
   },
   {
    "board": "mid-clustered",
@@ -86,20 +86,20 @@
    "router": "corners-smooth",
    "nodes": 1000,
    "edges": 3000,
-   "segments": 79750,
-   "full": 79788,
-   "estimate": 75962,
-   "error": 0.047952,
+   "segments": 79755,
+   "full": 79789,
+   "estimate": 78798,
+   "error": 0.01242,
    "draws": [
-    69442,
-    71077,
-    83239,
-    89041,
-    79890
+    75408,
+    73594,
+    89385,
+    88388,
+    73375
    ],
-   "low": 69442,
-   "high": 89041,
-   "worstDraw": 0.129669
+   "low": 73375,
+   "high": 89385,
+   "worstDraw": 0.120267
   },
   {
    "board": "mid-hubs",
@@ -166,20 +166,20 @@
    "router": "corners-smooth",
    "nodes": 1000,
    "edges": 2000,
-   "segments": 56396,
-   "full": 72057,
-   "estimate": 83607,
-   "error": 0.16029,
+   "segments": 56374,
+   "full": 72014,
+   "estimate": 66465,
+   "error": 0.077054,
    "draws": [
-    72441,
-    69156,
-    69663,
-    67436,
-    71101
+    75626,
+    73145,
+    67902,
+    76936,
+    75513
    ],
-   "low": 67436,
-   "high": 72441,
-   "worstDraw": 0.06413
+   "low": 67902,
+   "high": 76936,
+   "worstDraw": 0.068348
   },
   {
    "board": "large-clustered",

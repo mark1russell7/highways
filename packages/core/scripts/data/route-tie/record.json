@@ -1,0 +1,2887 @@
+{
+ "schema": "route-tie/1",
+ "regenerate": "node packages/core/scripts/route-tie.ts packages/core/scripts/data/route-tie/record.json",
+ "before": "0896104fb0ebceab108d069218c56f72b7917f84",
+ "chosen": 1e-9,
+ "shift": 1e-12,
+ "vectors": [
+  "shift-a",
+  "shift-b",
+  "shift-c",
+  "shift-d",
+  "shift-e"
+ ],
+ "boards": 84,
+ "choice": "The distance 1e-9 is a choice from the table. It stands far above the rounding of a sum of lengths, and each row of the table on each side of it reads the law.",
+ "predictionNote": "The outcome routes-moved-under-8pct-of-routes named no router, so it reads against the widest row and misses on shared-all. It should have named a router. The rows of this record give the moves of each router.",
+ "tolerances": [
+  {
+   "tie": 0,
+   "movedFromChosen": 47,
+   "law": 11,
+   "work": 857184,
+   "length": 2303794.3137565427,
+   "pairs": 32416,
+   "shiftMoves": 376
+  },
+  {
+   "tie": 1e-13,
+   "movedFromChosen": 19,
+   "law": 0,
+   "work": 854172,
+   "length": 2303800.5346807507,
+   "pairs": 32397,
+   "shiftMoves": 249
+  },
+  {
+   "tie": 1e-12,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 1e-11,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 1e-10,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 1e-9,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 1e-8,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 1e-7,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 0.000001,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 0.00001,
+   "movedFromChosen": 0,
+   "law": 0,
+   "work": 853636,
+   "length": 2303800.5346807507,
+   "pairs": 32383,
+   "shiftMoves": 178
+  },
+  {
+   "tie": 0.001,
+   "movedFromChosen": 1,
+   "law": 0,
+   "work": 853922,
+   "length": 2303794.849139377,
+   "pairs": 32383,
+   "shiftMoves": 178
+  }
+ ],
+ "routers": [
+  {
+   "router": "corners",
+   "routes": 6307,
+   "moved": 100,
+   "lawBefore": [
+    37,
+    48
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 701843,
+   "workAfter": 853636,
+   "lengthBefore": 2303895.8585235937,
+   "lengthAfter": 2303800.5346807507,
+   "pairsBefore": 32433,
+   "pairsAfter": 32383,
+   "shiftBefore": [
+    59,
+    48,
+    77,
+    84,
+    64
+   ],
+   "shiftAfter": [
+    15,
+    23,
+    43,
+    64,
+    33
+   ]
+  },
+  {
+   "router": "shared",
+   "routes": 6307,
+   "moved": 100,
+   "lawBefore": [
+    16,
+    19
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 2670619,
+   "workAfter": 2828843,
+   "lengthBefore": 2334941.986471381,
+   "lengthAfter": 2334794.0512769558,
+   "pairsBefore": 34430,
+   "pairsAfter": 34363,
+   "shiftBefore": [
+    75,
+    75,
+    103,
+    95,
+    86
+   ],
+   "shiftAfter": [
+    30,
+    53,
+    73,
+    79,
+    53
+   ]
+  },
+  {
+   "router": "shared-all",
+   "routes": 6307,
+   "moved": 524,
+   "lawBefore": [
+    108,
+    117
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1927580,
+   "workAfter": 2131092,
+   "lengthBefore": 2499134.6503354134,
+   "lengthAfter": 2499954.650929842,
+   "pairsBefore": 35860,
+   "pairsAfter": 35878,
+   "shiftBefore": [
+    193,
+    224,
+    256,
+    213,
+    252
+   ],
+   "shiftAfter": [
+    59,
+    149,
+    165,
+    158,
+    190
+   ]
+  },
+  {
+   "router": "sections",
+   "routes": 6307,
+   "moved": 82,
+   "lawBefore": [
+    54,
+    55
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1079182,
+   "workAfter": 1374733,
+   "lengthBefore": 2812497.155855309,
+   "lengthAfter": 2809073.3053141665,
+   "pairsBefore": 44326,
+   "pairsAfter": 44287,
+   "shiftBefore": [
+    566,
+    478,
+    602,
+    469,
+    347
+   ],
+   "shiftAfter": [
+    547,
+    462,
+    589,
+    454,
+    322
+   ]
+  },
+  {
+   "router": "trunks",
+   "routes": 6307,
+   "moved": 100,
+   "lawBefore": [
+    37,
+    48
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 700846,
+   "workAfter": 853614,
+   "lengthBefore": 2315037.87374388,
+   "lengthAfter": 2314942.5499010365,
+   "pairsBefore": 33162,
+   "pairsAfter": 33112,
+   "shiftBefore": [
+    59,
+    48,
+    77,
+    88,
+    68
+   ],
+   "shiftAfter": [
+    15,
+    23,
+    43,
+    68,
+    37
+   ]
+  },
+  {
+   "router": "sections-site",
+   "routes": 6307,
+   "moved": 55,
+   "lawBefore": [
+    71,
+    75
+   ],
+   "lawAfter": [
+    0,
+    0
+   ],
+   "workBefore": 1871346,
+   "workAfter": 2240374,
+   "lengthBefore": 3625249.624936149,
+   "lengthAfter": 3621191.9375241487,
+   "pairsBefore": 70192,
+   "pairsAfter": 70062,
+   "shiftBefore": [
+    670,
+    631,
+    658,
+    502,
+    528
+   ],
+   "shiftAfter": [
+    669,
+    632,
+    656,
+    498,
+    517
+   ]
+  }
+ ],
+ "keys": {
+  "before": [
+   {
+    "router": "corners",
+    "moved": 0,
+    "law": [
+     37,
+     48
+    ],
+    "shift": [
+     59,
+     48,
+     77,
+     84,
+     64
+    ],
+    "work": 701843,
+    "length": 2303895.8585235937,
+    "pairs": 32433,
+    "measures": {
+     "R1.crossings": 20654,
+     "R1.perEdge": 195.8963004811438,
+     "R1.estimated": 0,
+     "R1.pairs": 32433,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.01127704065064,
+     "R2.min": 1271.6503237460388,
+     "B1.inkSaved": 12.98652198582809,
+     "B11.share": 11.089223906628389,
+     "B11.peak": 384,
+     "R4.turn": 87.49017092620446,
+     "R4.max": 6636.456020859755,
+     "R5.median": 115.68426901529271,
+     "R5.q95": 216.56851319659728,
+     "R5.mean": 129.9952128510779,
+     "R6.worstDetour": 254.9394913261683,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.619416420975124,
+     "B4.reach": 2.438402218193494
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 0,
+    "law": [
+     16,
+     19
+    ],
+    "shift": [
+     75,
+     75,
+     103,
+     95,
+     86
+    ],
+    "work": 2670619,
+    "length": 2334941.986471381,
+    "pairs": 34430,
+    "measures": {
+     "R1.crossings": 16750,
+     "R1.perEdge": 180.7494894786968,
+     "R1.estimated": 0,
+     "R1.pairs": 34430,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.12588249238791,
+     "R2.min": 1274.333868391651,
+     "B1.inkSaved": 14.225408207717862,
+     "B11.share": 11.380444771901695,
+     "B11.peak": 411,
+     "R4.turn": 89.08858976125595,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.7520271741429,
+     "R5.q95": 217.46999659646684,
+     "R5.mean": 130.2151644509766,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.235397044876688,
+     "B4.reach": 2.922494807552994
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 0,
+    "law": [
+     108,
+     117
+    ],
+    "shift": [
+     193,
+     224,
+     256,
+     213,
+     252
+    ],
+    "work": 1927580,
+    "length": 2499134.6503354134,
+    "pairs": 35860,
+    "measures": {
+     "R1.crossings": 6991,
+     "R1.perEdge": 90.44336677278658,
+     "R1.estimated": 0,
+     "R1.pairs": 35860,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 51.36698305969311,
+     "R2.min": 2020.1882207598535,
+     "B1.inkSaved": 31.93964937104802,
+     "B11.share": 18.605080754862307,
+     "B11.peak": 907,
+     "R4.turn": 115.63165112665774,
+     "R4.max": 9854.303220221285,
+     "R5.median": 119.8107969236227,
+     "R5.q95": 230.80137713876928,
+     "R5.mean": 135.28652160434078,
+     "R6.worstDetour": 273.16541686454764,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.104443764723776,
+     "B4.reach": 9.739530689504095
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 0,
+    "law": [
+     54,
+     55
+    ],
+    "shift": [
+     566,
+     478,
+     602,
+     469,
+     347
+    ],
+    "work": 1079182,
+    "length": 2812497.155855309,
+    "pairs": 44326,
+    "measures": {
+     "R1.crossings": 12947,
+     "R1.perEdge": 114.67408595418767,
+     "R1.estimated": 0,
+     "R1.pairs": 44326,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.618843143637754,
+     "R2.min": 1320.9349716654772,
+     "B1.inkSaved": 27.74316764660097,
+     "B11.share": 17.214872041180474,
+     "B11.peak": 605,
+     "R4.turn": 145.24667430567473,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.67636023937938,
+     "R5.q95": 256.2793232256512,
+     "R5.mean": 143.24581508026367,
+     "R6.worstDetour": 302.7297803682562,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.83229954409979,
+     "B4.reach": 6.50978491581227,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 0,
+    "law": [
+     37,
+     48
+    ],
+    "shift": [
+     59,
+     48,
+     77,
+     88,
+     68
+    ],
+    "work": 700846,
+    "length": 2315037.87374388,
+    "pairs": 33162,
+    "measures": {
+     "R1.crossings": 20747,
+     "R1.perEdge": 196.09630048114383,
+     "R1.estimated": 0,
+     "R1.pairs": 33162,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.902112767238066,
+     "R2.min": 1262.7313366706264,
+     "B1.inkSaved": 13.305789024461024,
+     "B11.share": 11.151821724236632,
+     "B11.peak": 387,
+     "R4.turn": 88.14391634798058,
+     "R4.max": 6700.491569961691,
+     "R5.median": 115.76928967544005,
+     "R5.q95": 218.05708077294068,
+     "R5.mean": 130.27813608071426,
+     "R6.worstDetour": 257.28076813214864,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.106256064195257,
+     "B4.reach": 2.5071355515268268
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 0,
+    "law": [
+     71,
+     75
+    ],
+    "shift": [
+     670,
+     631,
+     658,
+     502,
+     528
+    ],
+    "work": 1871346,
+    "length": 3625249.624936149,
+    "pairs": 70192,
+    "measures": {
+     "R1.crossings": 21290,
+     "R1.perEdge": 228.65161816368405,
+     "R1.estimated": 0,
+     "R1.pairs": 70192,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.249730299854605,
+     "R2.min": 827.2502442608841,
+     "B1.inkSaved": 27.50115971335183,
+     "B11.share": 18.18020025069176,
+     "B11.peak": 752,
+     "R4.turn": 186.77668238386912,
+     "R4.max": 14631.060572806293,
+     "R5.median": 147.32624062714828,
+     "R5.q95": 400.62351004238184,
+     "R5.mean": 189.7234160117404,
+     "R6.worstDetour": 683.0202891929403,
+     "R7.backtrack": 10.891463994347255,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.25463972836392,
+     "B4.reach": 7.69215523857956,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ],
+  "index": [
+   {
+    "router": "corners",
+    "moved": 102,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     64,
+     35
+    ],
+    "work": 853410,
+    "length": 2303775.303092551,
+    "pairs": 32388,
+    "measures": {
+     "R1.crossings": 20634,
+     "R1.perEdge": 195.34860393026713,
+     "R1.estimated": 0,
+     "R1.pairs": 32388,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.07340749072494,
+     "R2.min": 1272.1464524673977,
+     "B1.inkSaved": 12.998614977990565,
+     "B11.share": 11.235947730114807,
+     "B11.peak": 380,
+     "R4.turn": 87.43731797684379,
+     "R4.max": 6636.119311664904,
+     "R5.median": 115.68336635864954,
+     "R5.q95": 216.56934726189598,
+     "R5.mean": 129.98655653123276,
+     "R6.worstDetour": 254.94035145053675,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.85610604373228,
+     "B4.reach": 2.443502035656421
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 95,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     30,
+     53,
+     73,
+     79,
+     55
+    ],
+    "work": 2828952,
+    "length": 2334813.9161599744,
+    "pairs": 34362,
+    "measures": {
+     "R1.crossings": 16764,
+     "R1.perEdge": 180.5669372636005,
+     "R1.estimated": 0,
+     "R1.pairs": 34362,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.18210711830768,
+     "R2.min": 1274.223939167931,
+     "B1.inkSaved": 14.215840235399742,
+     "B11.share": 11.465994699832345,
+     "B11.peak": 407,
+     "R4.turn": 89.03309501983175,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.74099594047071,
+     "R5.q95": 217.47082313797756,
+     "R5.mean": 130.20603026824662,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.357290013244373,
+     "B4.reach": 2.9241020356564214
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 545,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     49,
+     149,
+     165,
+     158,
+     192
+    ],
+    "work": 2127266,
+    "length": 2500110.044041398,
+    "pairs": 35878,
+    "measures": {
+     "R1.crossings": 6977,
+     "R1.perEdge": 90.36131241710171,
+     "R1.estimated": 0,
+     "R1.pairs": 35878,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 50.80292186743587,
+     "R2.min": 2024.9567638541564,
+     "B1.inkSaved": 32.114707865309164,
+     "B11.share": 18.75164043699303,
+     "B11.peak": 916,
+     "R4.turn": 115.35180785963009,
+     "R4.max": 9870.991090075257,
+     "R5.median": 119.42845278061804,
+     "R5.q95": 230.82836104600975,
+     "R5.mean": 135.21116429203775,
+     "R6.worstDetour": 273.4759367525948,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.299910834159874,
+     "B4.reach": 9.792402362693718
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 60,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     551,
+     463,
+     592,
+     455,
+     324
+    ],
+    "work": 1370596,
+    "length": 2812404.584678137,
+    "pairs": 44354,
+    "measures": {
+     "R1.crossings": 12991,
+     "R1.perEdge": 115.06874127719409,
+     "R1.estimated": 0,
+     "R1.pairs": 44354,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.77962766341162,
+     "R2.min": 1328.8295188256343,
+     "B1.inkSaved": 27.66260654800283,
+     "B11.share": 17.110926526610587,
+     "B11.peak": 604,
+     "R4.turn": 145.20507060119138,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.68494524919167,
+     "R5.q95": 256.2797549726893,
+     "R5.mean": 143.2377959049707,
+     "R6.worstDetour": 302.73064049262456,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.80664418647287,
+     "B4.reach": 6.488688363963695,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 102,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     68,
+     39
+    ],
+    "work": 853388,
+    "length": 2314917.318312837,
+    "pairs": 33117,
+    "measures": {
+     "R1.crossings": 20727,
+     "R1.perEdge": 195.54860393026712,
+     "R1.estimated": 0,
+     "R1.pairs": 33117,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.96424321731236,
+     "R2.min": 1263.2274653919853,
+     "B1.inkSaved": 13.317882016623502,
+     "B11.share": 11.29854554772305,
+     "B11.peak": 383,
+     "R4.turn": 88.09106339861992,
+     "R4.max": 6700.15486076684,
+     "R5.median": 115.76838701879686,
+     "R5.q95": 218.0579148382394,
+     "R5.mean": 130.2694797608691,
+     "R6.worstDetour": 257.2816282565171,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.342945686952408,
+     "B4.reach": 2.5122353689897543
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 47,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     669,
+     632,
+     656,
+     498,
+     517
+    ],
+    "work": 2240161,
+    "length": 3621272.8539342587,
+    "pairs": 70060,
+    "measures": {
+     "R1.crossings": 21254,
+     "R1.perEdge": 228.30823073868166,
+     "R1.estimated": 0,
+     "R1.pairs": 70060,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.25094831400279,
+     "R2.min": 829.666028157524,
+     "B1.inkSaved": 27.6092547698973,
+     "B11.share": 18.12578869609719,
+     "B11.peak": 747,
+     "R4.turn": 186.7080572514105,
+     "R4.max": 14631.060572806293,
+     "R5.median": 147.22996403228544,
+     "R5.q95": 400.5821695784526,
+     "R5.mean": 189.64608655158742,
+     "R6.worstDetour": 682.6866059585134,
+     "R7.backtrack": 10.874935068727419,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.40945224491037,
+     "B4.reach": 7.693971895892734,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ],
+  "straight": [
+   {
+    "router": "corners",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     64,
+     33
+    ],
+    "work": 853636,
+    "length": 2303800.5346807507,
+    "pairs": 32383,
+    "measures": {
+     "R1.crossings": 20652,
+     "R1.perEdge": 195.6600547091862,
+     "R1.estimated": 0,
+     "R1.pairs": 32383,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.071222260903305,
+     "R2.min": 1280.8024810677434,
+     "B1.inkSaved": 12.983049276219042,
+     "B11.share": 11.132974638662258,
+     "B11.peak": 379,
+     "R4.turn": 87.42997225884841,
+     "R4.max": 6636.119311664904,
+     "R5.median": 115.68391834317919,
+     "R5.q95": 216.56968614471572,
+     "R5.mean": 129.9903967524068,
+     "R6.worstDetour": 254.94035145053675,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 27.942214244821148,
+     "B4.reach": 2.437886146344946
+    }
+   },
+   {
+    "router": "shared",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     30,
+     53,
+     73,
+     79,
+     53
+    ],
+    "work": 2828843,
+    "length": 2334794.0512769558,
+    "pairs": 34363,
+    "measures": {
+     "R1.crossings": 16777,
+     "R1.perEdge": 180.86005470918622,
+     "R1.estimated": 0,
+     "R1.pairs": 34363,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 44.178234718974025,
+     "R2.min": 1282.8799677682766,
+     "B1.inkSaved": 14.202646397826376,
+     "B11.share": 11.362763233866406,
+     "B11.peak": 406,
+     "R4.turn": 89.02063804521067,
+     "R4.max": 6915.9252878443285,
+     "R5.median": 115.74154792500036,
+     "R5.q95": 217.4711620207973,
+     "R5.mean": 130.20966469624446,
+     "R6.worstDetour": 255.58122725418502,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 30.444724422456748,
+     "B4.reach": 2.9182194796782794
+    }
+   },
+   {
+    "router": "shared-all",
+    "moved": 524,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     59,
+     149,
+     165,
+     158,
+     190
+    ],
+    "work": 2131092,
+    "length": 2499954.650929842,
+    "pairs": 35878,
+    "measures": {
+     "R1.crossings": 6955,
+     "R1.perEdge": 90.15459996188304,
+     "R1.estimated": 0,
+     "R1.pairs": 35878,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 50.65705203344274,
+     "R2.min": 2043.3990311572134,
+     "B1.inkSaved": 32.137302229586055,
+     "B11.share": 18.8357046561766,
+     "B11.peak": 917,
+     "R4.turn": 115.277723738941,
+     "R4.max": 9860.547342607442,
+     "R5.median": 119.4239352579797,
+     "R5.q95": 230.86792054698222,
+     "R5.mean": 135.21836154692198,
+     "R6.worstDetour": 273.2536102854824,
+     "R7.backtrack": 7.269224910564952,
+     "R9.through": 292,
+     "R13.outside": 0,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 48.32154883622277,
+     "B4.reach": 9.805160372052775
+    }
+   },
+   {
+    "router": "sections",
+    "moved": 82,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     547,
+     462,
+     589,
+     454,
+     322
+    ],
+    "work": 1374733,
+    "length": 2809073.3053141665,
+    "pairs": 44287,
+    "measures": {
+     "R1.crossings": 13015,
+     "R1.perEdge": 115.2336080983002,
+     "R1.estimated": 0,
+     "R1.pairs": 44287,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 45.80026468149347,
+     "R2.min": 1310.8626719012984,
+     "B1.inkSaved": 27.53950833088315,
+     "B11.share": 17.038161152435862,
+     "B11.peak": 603,
+     "R4.turn": 145.16553537263175,
+     "R4.max": 13789.289832275374,
+     "R5.median": 124.67124116688946,
+     "R5.q95": 256.17011594215626,
+     "R5.mean": 143.21993563085843,
+     "R6.worstDetour": 302.6565830396201,
+     "R7.backtrack": 7.029534307500409,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.691912822596095,
+     "B4.reach": 6.477244317555203,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.627484829950617,
+     "Z8.order": 78.42984928194784,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.66739288230755
+    }
+   },
+   {
+    "router": "trunks",
+    "moved": 100,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     15,
+     23,
+     43,
+     68,
+     37
+    ],
+    "work": 853614,
+    "length": 2314942.5499010365,
+    "pairs": 33112,
+    "measures": {
+     "R1.crossings": 20745,
+     "R1.perEdge": 195.8600547091862,
+     "R1.estimated": 0,
+     "R1.pairs": 33112,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 43.96205798749073,
+     "R2.min": 1271.8834939923313,
+     "B1.inkSaved": 13.302316314851977,
+     "B11.share": 11.1955724562705,
+     "B11.peak": 382,
+     "R4.turn": 88.08371768062455,
+     "R4.max": 6700.15486076684,
+     "R5.median": 115.76893900332651,
+     "R5.q95": 218.05825372105915,
+     "R5.mean": 130.27331998204318,
+     "R6.worstDetour": 257.2816282565171,
+     "R7.backtrack": 7.037867640833743,
+     "R9.through": 292,
+     "R13.outside": 2,
+     "R11.min": 26.808363175391957,
+     "R11.q05": 30.440630748930143,
+     "B4.ambiguity": 28.429053888041278,
+     "B4.reach": 2.506619479678279
+    }
+   },
+   {
+    "router": "sections-site",
+    "moved": 55,
+    "law": [
+     0,
+     0
+    ],
+    "shift": [
+     669,
+     632,
+     656,
+     498,
+     517
+    ],
+    "work": 2240374,
+    "length": 3621191.9375241487,
+    "pairs": 70062,
+    "measures": {
+     "R1.crossings": 21262,
+     "R1.perEdge": 228.40710810887865,
+     "R1.estimated": 0,
+     "R1.pairs": 70062,
+     "R1.pairsEstimated": 0,
+     "R2.angle": 56.273675095027784,
+     "R2.min": 832.8184889019274,
+     "B1.inkSaved": 27.598888192153108,
+     "B11.share": 18.102446942624844,
+     "B11.peak": 747,
+     "R4.turn": 186.67704298009255,
+     "R4.max": 14632.780004808465,
+     "R5.median": 147.22996403228544,
+     "R5.q95": 400.564717384026,
+     "R5.mean": 189.64456630831305,
+     "R6.worstDetour": 682.6866059585134,
+     "R7.backtrack": 10.874935068727419,
+     "R9.through": 296,
+     "R13.outside": 7,
+     "R11.min": 26.752709769486394,
+     "R11.q05": 30.419972823554875,
+     "B4.ambiguity": 47.394635988279354,
+     "B4.reach": 7.687385984072975,
+     "level-nesting": 0,
+     "Z4.farItems": 329,
+     "Z7.position": 23.59513572296931,
+     "Z8.order": 78.71958654252555,
+     "G1.modularity": 7.0825648868182025,
+     "G2.cut": 52.055981907400465,
+     "G6.balance": 82.39172057177446,
+     "G8.treeCost": 58.46747654348967
+    }
+   }
+  ]
+ },
+ "shiftKinds": {
+  "graph": 171,
+  "search": 7,
+  "other": 0
+ },
+ "floors": [
+  {
+   "router": "corners",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.01691742114918182,
+   "boardsMoved": 33
+  },
+  {
+   "router": "corners",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    1.734723475976807e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 35
+  },
+  {
+   "router": "corners",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00919318325461671,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0007999999999999986,
+   "boardsMoved": 1
+  },
+  {
+   "router": "corners",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 30,
+   "boardsMoved": 14
+  },
+  {
+   "router": "corners",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15384615384615397,
+   "boardsMoved": 14
+  },
+  {
+   "router": "corners",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "corners",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "corners",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R2.angle",
+   "floor": 5.551115123125783e-17,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 46
+  },
+  {
+   "router": "corners",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 19
+  },
+  {
+   "router": "corners",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 14
+  },
+  {
+   "router": "corners",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.008505779795998036,
+   "boardsMoved": 38
+  },
+  {
+   "router": "corners",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734595765,
+   "boardsMoved": 16
+  },
+  {
+   "router": "corners",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00022680100098249056,
+   "boardsMoved": 18
+  },
+  {
+   "router": "corners",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0031112877813319617,
+   "boardsMoved": 18
+  },
+  {
+   "router": "corners",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 13
+  },
+  {
+   "router": "corners",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.01691742114918182,
+   "boardsMoved": 32
+  },
+  {
+   "router": "shared",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 3,
+   "boardsMoved": 3
+  },
+  {
+   "router": "shared",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    3.469446951953614e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 36
+  },
+  {
+   "router": "shared",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.002722060599874121,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0023999999999999855,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 46,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15384615384615397,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "shared",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R2.angle",
+   "floor": 6.938893903907228e-17,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 47
+  },
+  {
+   "router": "shared",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 17
+  },
+  {
+   "router": "shared",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.013151591287649644,
+   "boardsMoved": 38
+  },
+  {
+   "router": "shared",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734595765,
+   "boardsMoved": 17
+  },
+  {
+   "router": "shared",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.002507952489858578,
+   "boardsMoved": 19
+  },
+  {
+   "router": "shared",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006625192696611215,
+   "boardsMoved": 20
+  },
+  {
+   "router": "shared",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 15
+  },
+  {
+   "router": "shared",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.023968092265133523,
+   "boardsMoved": 35
+  },
+  {
+   "router": "shared-all",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 3,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared-all",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    1.3877787807814457e-17
+   ],
+   "largest": 0.1842062471689504,
+   "boardsMoved": 39
+  },
+  {
+   "router": "shared-all",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.01449275362318836,
+   "boardsMoved": 4
+  },
+  {
+   "router": "shared-all",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0262,
+   "boardsMoved": 4
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 22,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 95,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.15625,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared-all",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "shared-all",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "shared-all",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R2.angle",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.22338041968464445,
+   "boardsMoved": 40
+  },
+  {
+   "router": "shared-all",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16.244661624410405,
+   "boardsMoved": 16
+  },
+  {
+   "router": "shared-all",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 32.59982017524813,
+   "boardsMoved": 13
+  },
+  {
+   "router": "shared-all",
+   "measure": "R4.turn",
+   "floor": 6.938893903907228e-18,
+   "interval": [
+    0,
+    2.220446049250313e-16
+   ],
+   "largest": 0.07343698559068113,
+   "boardsMoved": 43
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.016348929168666926,
+   "boardsMoved": 19
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.018296292675402226,
+   "boardsMoved": 23
+  },
+  {
+   "router": "shared-all",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.016727819664097643,
+   "boardsMoved": 26
+  },
+  {
+   "router": "shared-all",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.299209049864666,
+   "boardsMoved": 28
+  },
+  {
+   "router": "shared-all",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "B1.inkSaved",
+   "floor": 1.1102230246251565e-16,
+   "interval": [
+    1.1102230246251565e-16,
+    0.000148510677942304
+   ],
+   "largest": 0.06212068356536038,
+   "boardsMoved": 58
+  },
+  {
+   "router": "sections",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 11
+  },
+  {
+   "router": "sections",
+   "measure": "B11.share",
+   "floor": 4.841384098138064e-7,
+   "interval": [
+    2.0816681711721685e-17,
+    0.00037582807202085275
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 61
+  },
+  {
+   "router": "sections",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.03848684210526315,
+   "boardsMoved": 18
+  },
+  {
+   "router": "sections",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0125732421875,
+   "boardsMoved": 18
+  },
+  {
+   "router": "sections",
+   "measure": "G1.modularity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0021856430571682243,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "G2.cut",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "G6.balance",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.008478496230469701,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "G8.treeCost",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0017869108778199028,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 58,
+   "boardsMoved": 26
+  },
+  {
+   "router": "sections",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 94,
+   "boardsMoved": 25
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.5757575757575757,
+   "boardsMoved": 26
+  },
+  {
+   "router": "sections",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "sections",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R2.angle",
+   "floor": 1.1102230246251565e-16,
+   "interval": [
+    5.551115123125783e-17,
+    2.220446049250313e-16
+   ],
+   "largest": 0.08333333333333337,
+   "boardsMoved": 54
+  },
+  {
+   "router": "sections",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20.100514059371662,
+   "boardsMoved": 24
+  },
+  {
+   "router": "sections",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.61016472782734,
+   "boardsMoved": 8
+  },
+  {
+   "router": "sections",
+   "measure": "R4.turn",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    5.551115123125783e-17,
+    0.0021152499565804533
+   ],
+   "largest": 0.19826333968113774,
+   "boardsMoved": 53
+  },
+  {
+   "router": "sections",
+   "measure": "R5.mean",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    0,
+    0.0005882572059976443
+   ],
+   "largest": 0.03920354519395586,
+   "boardsMoved": 43
+  },
+  {
+   "router": "sections",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.2701561317290424,
+   "boardsMoved": 31
+  },
+  {
+   "router": "sections",
+   "measure": "R5.q95",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    2.220446049250313e-16,
+    4.440892098500626e-16
+   ],
+   "largest": 0.1146454100864982,
+   "boardsMoved": 55
+  },
+  {
+   "router": "sections",
+   "measure": "R6.worstDetour",
+   "floor": 2.220446049250313e-16,
+   "interval": [
+    0,
+    4.440892098500626e-16
+   ],
+   "largest": 0.2871521814079021,
+   "boardsMoved": 44
+  },
+  {
+   "router": "sections",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "Z4.farItems",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "Z7.position",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.07070465845285961,
+   "boardsMoved": 29
+  },
+  {
+   "router": "sections",
+   "measure": "Z8.order",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0550695573466109,
+   "boardsMoved": 31
+  },
+  {
+   "router": "sections",
+   "measure": "level-nesting",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "B1.inkSaved",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.01691742114918182,
+   "boardsMoved": 34
+  },
+  {
+   "router": "trunks",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 2,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "B11.share",
+   "floor": 0,
+   "interval": [
+    0,
+    3.469446951953614e-18
+   ],
+   "largest": 0.18719066919027405,
+   "boardsMoved": 35
+  },
+  {
+   "router": "trunks",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.007086418878219869,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0007999999999999986,
+   "boardsMoved": 1
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 32,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 5
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.16000000000000014,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 4.85722573273506e-16,
+   "boardsMoved": 2
+  },
+  {
+   "router": "trunks",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 7
+  },
+  {
+   "router": "trunks",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R2.angle",
+   "floor": 5.551115123125783e-17,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.11252638663544118,
+   "boardsMoved": 45
+  },
+  {
+   "router": "trunks",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.476995435717102,
+   "boardsMoved": 19
+  },
+  {
+   "router": "trunks",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 18.39505572403754,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R4.turn",
+   "floor": 0,
+   "interval": [
+    0,
+    1.1102230246251565e-16
+   ],
+   "largest": 0.008505779795998036,
+   "boardsMoved": 38
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.mean",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.006709370734595765,
+   "boardsMoved": 17
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.00014325538592752096,
+   "boardsMoved": 18
+  },
+  {
+   "router": "trunks",
+   "measure": "R5.q95",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0031112877813319617,
+   "boardsMoved": 19
+  },
+  {
+   "router": "trunks",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.011602508317247517,
+   "boardsMoved": 14
+  },
+  {
+   "router": "trunks",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "B1.inkSaved",
+   "floor": 0.000018899722624976523,
+   "interval": [
+    1.1102230246251565e-16,
+    0.0003832349774942623
+   ],
+   "largest": 0.06797739944690351,
+   "boardsMoved": 56
+  },
+  {
+   "router": "sections-site",
+   "measure": "B11.peak",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 6,
+   "boardsMoved": 11
+  },
+  {
+   "router": "sections-site",
+   "measure": "B11.share",
+   "floor": 0.0008656243726296517,
+   "interval": [
+    0.00006569734791856893,
+    0.002691263691497664
+   ],
+   "largest": 0.16813043334132438,
+   "boardsMoved": 59
+  },
+  {
+   "router": "sections-site",
+   "measure": "B4.ambiguity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.08087557603686635,
+   "boardsMoved": 22
+  },
+  {
+   "router": "sections-site",
+   "measure": "B4.reach",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.01241782322863405,
+   "boardsMoved": 22
+  },
+  {
+   "router": "sections-site",
+   "measure": "G1.modularity",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0021856430571682243,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "G2.cut",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "G6.balance",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.008478496230469701,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "G8.treeCost",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.0017869108778199028,
+   "boardsMoved": 3
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.crossings",
+   "floor": 0,
+   "interval": [
+    0,
+    1
+   ],
+   "largest": 347,
+   "boardsMoved": 40
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.estimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairs",
+   "floor": 0,
+   "interval": [
+    0,
+    1
+   ],
+   "largest": 371,
+   "boardsMoved": 36
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairsEstimated",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.perEdge",
+   "floor": 0,
+   "interval": [
+    0,
+    0.03000000000000025
+   ],
+   "largest": 1.9715909090909092,
+   "boardsMoved": 40
+  },
+  {
+   "router": "sections-site",
+   "measure": "R11.min",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 9.742207041085749e-15,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections-site",
+   "measure": "R11.q05",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 5.551115123125783e-16,
+   "boardsMoved": 6
+  },
+  {
+   "router": "sections-site",
+   "measure": "R13.outside",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R2.angle",
+   "floor": 0.0003579332538412028,
+   "interval": [
+    1.1102230246251565e-16,
+    0.004688160874628755
+   ],
+   "largest": 0.05348804755077907,
+   "boardsMoved": 60
+  },
+  {
+   "router": "sections-site",
+   "measure": "R2.min",
+   "floor": 0,
+   "interval": [
+    0,
+    1.7763568394002505e-14
+   ],
+   "largest": 11.309932474020226,
+   "boardsMoved": 33
+  },
+  {
+   "router": "sections-site",
+   "measure": "R4.max",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 48.012787504183336,
+   "boardsMoved": 8
+  },
+  {
+   "router": "sections-site",
+   "measure": "R4.turn",
+   "floor": 0.0002708947612152235,
+   "interval": [
+    4.440892098500626e-16,
+    0.01306460535955889
+   ],
+   "largest": 0.3120093760241627,
+   "boardsMoved": 56
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.mean",
+   "floor": 0.0009682011589602357,
+   "interval": [
+    4.440892098500626e-16,
+    0.0047022894741231
+   ],
+   "largest": 1.151220051539755,
+   "boardsMoved": 59
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.median",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.13593621262517463,
+   "boardsMoved": 32
+  },
+  {
+   "router": "sections-site",
+   "measure": "R5.q95",
+   "floor": 8.881784197001252e-16,
+   "interval": [
+    4.440892098500626e-16,
+    3.9968028886505635e-15
+   ],
+   "largest": 7.3065601610199415,
+   "boardsMoved": 55
+  },
+  {
+   "router": "sections-site",
+   "measure": "R6.worstDetour",
+   "floor": 0,
+   "interval": [
+    0,
+    8.881784197001252e-16
+   ],
+   "largest": 0.4706896742245248,
+   "boardsMoved": 40
+  },
+  {
+   "router": "sections-site",
+   "measure": "R7.backtrack",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0.034090909090909116,
+   "boardsMoved": 2
+  },
+  {
+   "router": "sections-site",
+   "measure": "R9.through",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z4.farItems",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z7.position",
+   "floor": 0,
+   "interval": [
+    0,
+    2.7755575615628914e-17
+   ],
+   "largest": 0.015210274323835427,
+   "boardsMoved": 34
+  },
+  {
+   "router": "sections-site",
+   "measure": "Z8.order",
+   "floor": 0,
+   "interval": [
+    0,
+    0.000025223587999612107
+   ],
+   "largest": 0.056490312964097567,
+   "boardsMoved": 33
+  },
+  {
+   "router": "sections-site",
+   "measure": "level-nesting",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  }
+ ],
+ "slice": [
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "corners",
+   "digest": 212048615
+  },
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "shared",
+   "digest": 212048615
+  },
+  {
+   "family": "hub-chain",
+   "seed": 0,
+   "router": "sections",
+   "digest": 3431543602
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "corners",
+   "digest": 3601317167
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "shared",
+   "digest": 3601317167
+  },
+  {
+   "family": "maze",
+   "seed": 0,
+   "router": "sections",
+   "digest": 3601317167
+  }
+ ]
+}

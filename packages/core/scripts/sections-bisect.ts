@@ -10,7 +10,7 @@
 //   It reads each file `bisect-shard<n>.json` below `<dir>`. It writes the record, and exits with the code 1 when the record is not complete.
 // - A check: `node scripts/sections-bisect.ts --check --tree <dir> --routers <a,b>`. It loads the core of a worktree and finds the routers.
 // - A child of mode `fresh`: `node scripts/sections-bisect.ts --child --tree <dir> --board <file>`. `measureIsolated` appends `--input <router> --warmup <n>`.
-// - The plan of the confirm mode: `node scripts/sections-bisect.ts --plan <pairs> [--rounds <n>]`. It prints the pairs as the JSON of a matrix.
+// - The plan of the confirm mode: `node scripts/sections-bisect.ts --plan <pairs> [--rounds <n>] [--routers <names>]`. It prints the pairs as the JSON of a matrix.
 // - One job of the confirm mode: `node scripts/sections-bisect.ts --confirm --pair <n> --commit <ref> --parent <ref> --trees <dir> --out <dir> [--routers <a,b>] [--rounds <n>]`.
 //   It makes a git worktree of the base, the commit and the parent. `confirmPair` times the commit, the parent and the A/A arm of the parent on the board of the base.
 //   It writes `<dir>/confirm-pair<n>.json` and prints the table of the pair.
@@ -85,6 +85,7 @@ import {
 /** The parts of a version of the core that the arms call. Each candidate has the list `ROUTERS`, and the base has the fixtures. */
 interface Core {
   readonly ROUTERS?: readonly { readonly name: string; route(graph: unknown): unknown }[];
+  readonly sectionsRouter?: (options: { readonly name: string; readonly margin: number; readonly stretch: number; readonly cap: number }) => { readonly name: string; route(graph: unknown): unknown };
   readonly FIXTURES?: readonly { readonly name: string }[];
   readonly makeFixture?: (spec: unknown) => unknown;
 }
@@ -111,7 +112,8 @@ async function loadCore(tree: string): Promise<Core> {
 
 /** This function gives the route of a router of a core, or throws an error that names the router. */
 function routerOf(core: Core, name: string, tree: string): (graph: unknown) => unknown {
-  const router = core.ROUTERS?.find((r) => r.name === name);
+  // The router `sections-site` is not in the list. It is the router `sections` with the settings of a site.
+  const router = name === "sections-site" ? core.sectionsRouter?.({ name, margin: 20, stretch: 3, cap: 6 }) : core.ROUTERS?.find((r) => r.name === name);
   if (router === undefined) throw new RangeError(`The core of ${tree} has no router "${name}".`);
   return (graph) => router.route(graph);
 }
@@ -297,6 +299,7 @@ if (args.includes("--child")) {
 } else if (opt("--plan") !== undefined) {
   // The plan job checks the rounds too, so a bad input fails before the matrix starts.
   if (opt("--rounds") !== undefined) parseRounds(opt("--rounds"));
+  if (opt("--routers") !== undefined) parseRouters(opt("--routers"));
   console.log(JSON.stringify(parsePairs(opt("--plan"))));
 } else if (args.includes("--gate")) {
   const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));

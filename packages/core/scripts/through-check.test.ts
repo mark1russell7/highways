@@ -15,13 +15,13 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33533, 31341, 0, 0, 0, 0],
-  "trunks": [34318, 31893, 0, 0, 0, 1],
-  "shared": [36185, 32645, 274, 42, 1, 531],
-  "sections": [54359, 40555, 816, 501, 144, 2067],
-  "sections-site": [84287, 47330, 121, 68, 441, 2365],
-  "sections-site-no-ladder": [82209, 46576, 128, 120, 435, 2445],
-  "shared-all": [43668, 36267, 1423, 459, 0, 12061],
+  "corners": [33542, 31370, 0, 0, 0, 0],
+  "trunks": [34327, 31922, 0, 0, 0, 1],
+  "shared": [36168, 32660, 272, 42, 1, 524],
+  "sections": [54353, 40570, 809, 517, 144, 2072],
+  "sections-site": [84176, 47236, 121, 67, 442, 2364],
+  "sections-site-no-ladder": [82090, 46479, 128, 119, 436, 2444],
+  "shared-all": [44015, 36310, 1465, 469, 0, 12066],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 

@@ -29,14 +29,17 @@ export const SHARD_SCHEMA = "sections-bisect-shard/1";
 /** The schema of the joined record. */
 export const RECORD_SCHEMA = "sections-bisect/1";
 
-/** This function reads the input `routers`: names with commas between them. Each name must be a router of H3. */
+/** The routers that the input `routers` takes: the routers of H3 and the settings of the site. */
+export const TIMED_ROUTERS = [...H3_ROUTERS, "sections-site"] as const;
+
+/** This function reads the input `routers`: names with commas between them. Each name must be in `TIMED_ROUTERS`. */
 export function parseRouters(text: string | undefined): string[] {
   const names = (text ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
   if (names.length === 0) throw new RangeError("The input routers names no router.");
-  for (const name of names) if (!(H3_ROUTERS as readonly string[]).includes(name)) throw new RangeError(`There is no router "${name}". The routers are ${H3_ROUTERS.join(", ")}.`);
+  for (const name of names) if (!(TIMED_ROUTERS as readonly string[]).includes(name)) throw new RangeError(`There is no router "${name}". The routers are ${TIMED_ROUTERS.join(", ")}.`);
   if (new Set(names).size !== names.length) throw new RangeError(`The input routers names a router two times: ${names.join(", ")}.`);
   return names;
 }

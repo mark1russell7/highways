@@ -135,6 +135,12 @@ export interface CornerGraphOptions {
  */
 export const JOIN_WORK: number = 3 * 2048 * 2048;
 
+/** Two costs of a path within this distance tie. The distance is far above the rounding of a sum of lengths, and far below a real difference. */
+const TIE = 1e-9;
+
+/** The walk back from the goal takes the straightest corner among the corners within the limit. With `false`, the smallest index wins. The record route-tie reads both keys. */
+const STRAIGHT = true;
+
 /**
  * A sparse visibility graph. Its vertices are the corners of the boxes, made larger by `margin`.
  * Each corner links to its `k` nearest corners that it can see. A lattice of free points links the groups of nodes.
@@ -665,19 +671,18 @@ export class CornerGraph {
       }
     });
     let best = Infinity;
-    let bestEnd = -1;
     let settled = 0;
     while (heap.size > 0) {
-      if (heap.topKey >= best) break;
+      if (heap.topKey > best + TIE) break;
       const i = heap.pop();
       closed[i] = stamp;
       const m0 = start[i]!;
       const m1 = start[i + 1]!;
       settled += 1 + (m1 - m0);
       const gi = G[i]!;
-      if (goalAt[i] === stamp && gi + goalTail[i]! < best) {
-        best = gi + goalTail[i]!;
-        bestEnd = i;
+      if (goalAt[i] === stamp) {
+        const end = gi + goalTail[i]!;
+        if (end < best) best = end;
       }
       for (let m = m0; m < m1; m++) {
         const j = next[m]!;
@@ -685,7 +690,7 @@ export class CornerGraph {
         const d = length[m]!;
         const g = gi + (cost ? cost(i, j, d) : d);
         if (open[j] === stamp) {
-          if (G[j]! <= g) continue;
+          if (g >= G[j]!) continue;
         } else {
           open[j] = stamp;
           H[j] = estimate(j);
@@ -695,18 +700,73 @@ export class CornerGraph {
         heap.set(g + H[j]!, j);
       }
     }
-    WORK.corner += settled;
-    if (bestEnd < 0) return undefined;
-    const k = goalOf.get(bestEnd)!;
-    const out: Point[] = [to[k]!.point];
-    for (let i = bestEnd; ; i = parentOf[i]!) {
-      out.push(points[i]!);
-      if (parentOf[i]! < 0) {
-        const f = -1 - parentOf[i]!;
-        out.push(from[f]!.point);
-        return { points: out.reverse(), from: f, to: k, cost: best };
-      }
+    if (best === Infinity) {
+      WORK.corner += settled;
+      return undefined;
     }
+    // Each test of the walk reads one number, the limit. So the route depends on the graph and the limit, and not on the order of the search.
+    // The search stops above the limit. A corner on a path within the limit has a key within the limit at each floor, so the search closed it.
+    const limit = best + TIE;
+    let end = -1;
+    for (const [j, tail] of goal) {
+      if (closed[j] === stamp && G[j]! + tail <= limit && (end < 0 || j < end)) end = j;
+    }
+    const k = goalOf.get(end)!;
+    const out: Point[] = [to[k]!.point];
+    let at = end;
+    let rest = goalTail[end]!;
+    for (let steps = 0; steps <= n; steps++) {
+      const here = points[at]!;
+      out.push(here);
+      let first = -1;
+      for (let f = 0; f < from.length && first < 0; f++) {
+        if (from[f]!.cost + dist(from[f]!.point, here) + rest <= limit && starts[f]!.includes(at)) first = f;
+      }
+      let back = -1;
+      let step = 0;
+      if (first < 0) {
+        const m0 = start[at]!;
+        const m1 = start[at + 1]!;
+        settled += 1 + (m1 - m0);
+        // Among the corners within the limit, the walk takes the straightest continuation of the leg after this corner.
+        // The score is the dot product of the two legs over the length of the new leg. A score within `near` of the best ties, and then the smaller index wins.
+        const after = out[out.length - 2]!;
+        const [ax, ay] = [after.x - here.x, after.y - here.y];
+        const near = TIE * (Math.abs(ax) + Math.abs(ay) + 1);
+        let score = -Infinity;
+        for (let m = m0; m < m1; m++) {
+          const i = next[m]!;
+          // G falls at each step of this rule, so a link of no length cannot start a loop.
+          if (closed[i] !== stamp || G[i]! >= G[at]!) continue;
+          const c = cost ? cost(i, at, length[m]!) : length[m]!;
+          if (G[i]! + c + rest > limit) continue;
+          const p = points[i]!;
+          const s = STRAIGHT && length[m]! > 0 ? ((here.x - p.x) * ax + (here.y - p.y) * ay) / length[m]! : 0;
+          if (back < 0 || s > score + near || (s >= score - near && i < back)) {
+            if (back < 0 || s > score + near) score = s;
+            back = i;
+            step = c;
+          }
+        }
+        if (back < 0) {
+          // Only a link of no cost, or noise at the limit, leaves no corner. The parent of the search closed before this corner, so this rule has no loop.
+          const parent = parentOf[at]!;
+          if (parent < 0) first = -1 - parent;
+          else {
+            back = parent;
+            step = G[at]! - G[parent]!;
+          }
+        }
+      }
+      if (first >= 0) {
+        out.push(from[first]!.point);
+        WORK.corner += settled;
+        return { points: out.reverse(), from: first, to: k, cost: best };
+      }
+      rest += step;
+      at = back;
+    }
+    throw new Error("The walk of the corner search did not reach a start.");
   }
 
   /** This method tells if a corner of `starts` and a corner of `goal` are in one connected part of the graph. */

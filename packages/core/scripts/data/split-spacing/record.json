@@ -200,11 +200,11 @@
    "router": "trunks-all",
    "board": "case-many-groups",
    "leave": "part",
-   "samples": 2071,
+   "samples": 2055,
    "pairGap": {
     "method": "pair-gap",
     "worst": 0.475513,
-    "mean": 0.001528,
+    "mean": 0.001516,
     "overWide": 4,
     "overWidePairs": 1,
     "overDouble": 0
@@ -212,7 +212,7 @@
    "fixed": {
     "method": "fixed-spacing",
     "worst": 0.475513,
-    "mean": 0.001528,
+    "mean": 0.001516,
     "overWide": 4,
     "overWidePairs": 1,
     "overDouble": 0
