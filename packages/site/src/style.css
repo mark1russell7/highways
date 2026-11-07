@@ -1975,3 +1975,16 @@ pre code {
   white-space: nowrap;
   font-size: clamp(1.15rem, 4.6vw, 2.2rem);
 }
+
+/* The explorer page (EXPLORER-1). The explorer of site-pages reads these tokens, so its colors follow the road map by day and by night. */
+.explorer-host {
+  --card: var(--map);
+  --sunken: var(--panel);
+  --accent: var(--sign);
+  margin-top: 20px;
+}
+
+.res-tiles dd.ex-date {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  white-space: nowrap;
+}
