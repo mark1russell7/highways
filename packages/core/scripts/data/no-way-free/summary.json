@@ -1,0 +1,81 @@
+{
+  "probe": "NO-WAY-FREE",
+  "question": "Is there a way in the free space for each of the 292 routes of corners that cross a box on packed-grid?",
+  "cases": 292,
+  "boards": [
+    {
+      "family": "packed-grid",
+      "seed": 0,
+      "boxes": 96,
+      "nearestGaps": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "facingPairs": 864,
+      "pairsWithGapOver1": 692
+    },
+    {
+      "family": "packed-grid",
+      "seed": 1,
+      "boxes": 96,
+      "nearestGaps": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "facingPairs": 864,
+      "pairsWithGapOver1": 692
+    },
+    {
+      "family": "packed-grid",
+      "seed": 2,
+      "boxes": 96,
+      "nearestGaps": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "facingPairs": 864,
+      "pairsWithGapOver1": 692
+    }
+  ],
+  "byD": {
+    "0": {
+      "way": 292,
+      "noWay": 0,
+      "wayThatTheCounterPasses": 292,
+      "stretchOfTheWays": {
+        "min": 0.39,
+        "median": 0.5,
+        "max": 1.18
+      }
+    },
+    "1": {
+      "way": 46,
+      "noWay": 246,
+      "wayThatTheCounterPasses": 46,
+      "stretchOfTheWays": {
+        "min": 0.83,
+        "median": 1.29,
+        "max": 2.81
+      }
+    },
+    "-0.5": {
+      "way": 292,
+      "noWay": 0,
+      "wayThatTheCounterPasses": 292,
+      "stretchOfTheWays": {
+        "min": 0.39,
+        "median": 0.5,
+        "max": 1.18
+      }
+    }
+  }
+}
