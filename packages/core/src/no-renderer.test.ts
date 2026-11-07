@@ -1,4 +1,4 @@
-// The core knows no renderer (CORE-IMPORT-GATE). The rule core-knows-no-renderer of `.dependency-cruiser.mjs` holds the imports.
+// The core knows no renderer (CORE-IMPORT-GATE). The rule core-knows-no-renderer of `.dependency-cruiser.ts` holds the imports.
 // This test holds the types: the config of the core gives no DOM library, so the source cannot name a type of a browser.
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
