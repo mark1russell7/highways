@@ -170,7 +170,7 @@ export function resultsUnread(reads: readonly (string | undefined)[], engine: st
 export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: string) => boolean, facts: KpiFacts): SiteKpi | undefined {
   if (meta.date === undefined) return undefined;
   // The lag reads the last read of each snapshot: its stamp `verified`, or else its run. A read with the same rows is a current result.
-  // The target is at most 1 minor. The workflow `Read on release` holds it.
+  // The target is at most 1 minor. The workflow `Read on release` starts the reads after a release.
   const reads = [meta.core, ...facts.verdictReads];
   const lag = resultsLag(reads, core);
   // The lag has the date of the oldest read that gives it.
