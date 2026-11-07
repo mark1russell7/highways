@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways atlas: the solved regions</title>
+    <meta name="description" content="The atlas of highways: the leader of each region of the screens, how long it holds, and the regions that one leader solves." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body class="results atlas">
+    <a class="skip" href="#map">Skip to the map of the regions</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <p class="wordmark wordmark-small"><a href="./">highways</a></p>
+          <h1 class="tagline">Atlas: the solved regions</h1>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="./">Live demo</a>
+          <a href="examples.html">Examples</a>
+          <a href="compare.html">Compare</a>
+          <a href="./#bench">Benchmark</a>
+          <a href="results.html">Results</a>
+          <a href="strategies.html">Strategies</a>
+          <a href="atlas.html" aria-current="page">Atlas</a>
+          <a href="https://mark1russell7.github.io/layout-contract/">Joint bench with packing</a>
+          <a href="status/">Status</a>
+          <a href="releases/">Releases</a>
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-intro" id="intro"></div>
+      <dl class="res-tiles" id="tiles"></dl>
+      <p class="atl-wait" id="wait"></p>
+
+      <section class="prose wide" id="map" aria-labelledby="map-title">
+        <h2 id="map-title">The map of the regions</h2>
+        <div id="map-body"></div>
+        <div class="res-controls" role="group" aria-label="Filters">
+          <div class="field">
+            <span class="res-label" id="set-label">Set</span>
+            <div class="seg" role="radiogroup" aria-labelledby="set-label" id="sets"></div>
+          </div>
+          <div class="field">
+            <span class="res-label" id="step-label">Step</span>
+            <div class="seg" role="radiogroup" aria-labelledby="step-label" id="steps"></div>
+          </div>
+          <fieldset class="field res-labels">
+            <legend>State</legend>
+            <div class="res-chips" id="states"></div>
+          </fieldset>
+        </div>
+        <p class="res-summary" id="summary" role="status" aria-live="polite"></p>
+        <div class="res-split">
+          <div id="grids"></div>
+          <aside class="panel res-detail" id="detail" aria-live="polite"></aside>
+        </div>
+      </section>
+
+      <section class="prose wide" id="rules" aria-labelledby="rules-title">
+        <h2 id="rules-title">The rules</h2>
+        <div id="rules-body"></div>
+      </section>
+
+      <section class="prose wide" id="weeks" aria-labelledby="weeks-title">
+        <h2 id="weeks-title">The weekly records</h2>
+        <div id="weeks-body"></div>
+        <p class="hint" id="age"></p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The boards of the screens have made-up data.
+      </p>
+      <p class="data-line"><!--data-line--></p>
+    </footer>
+    <script type="module" src="/src/atlas.ts"></script>
+  </body>
+</html>
