@@ -2,11 +2,10 @@
 // They do not read files, so the page and the tests use them.
 import { parseResponseRecord } from "@mark1russell7/rigor-statistics";
 
-/** The folder of the sweep records, relative to the root of the repository. */
-export const SWEEP_DIR = "docs/research/sweeps";
+import { CARD_DIMENSIONS, SWEEP_DIR } from "./kpi.ts";
 
-/** The two categorical dimensions that name a strategy card in a sweep record. */
-export const CARD_DIMENSIONS = ["step", "strategy"] as const;
+// The count `cards-with-curves` of `kpi.ts` owns the folder and the dimensions of a card. The page uses the same ones.
+export { CARD_DIMENSIONS, SWEEP_DIR };
 
 /** The size and the date of one sweep record. The page shows them, so a small record does not look like the full space. */
 export interface SweepFacts {
