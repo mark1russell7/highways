@@ -10,7 +10,7 @@ export * from "./model.ts";
 export { DENSE_GROUPS, FIXTURE_LAYOUTS, FIXTURE_LOCALITY, fixtureParams, fixtureSpecOf, SMALL_CLUSTERED, TINY_UNIFORM } from "./fixtures.ts";
 export { HUB_CHAIN, MANY_GROUPS, PACKED_GRID } from "./cases.ts";
 export { BIPARTITE, BIPARTITE_LAYOUTS, COVERAGE_FAMILIES, FAN_OUT, FRAME_ROWS, LOCAL_MESH, PIPELINE, SPARSE_LONG, THIN_BARS, TWO_HUBS, UNEVEN_SIZES } from "./coverage.ts";
-export { BOTTLENECK, CHANNEL, COMB, ESCAPE, MAZE, PARALLEL_EDGES, RINGS, SPIRAL, SWITCHBOX, WALLED_LEVEL, WEEKLY_FAMILIES } from "./weekly.ts";
+export { ARC_ROW, BOTTLENECK, CHANNEL, COMB, ESCAPE, LATTICE_X, LAYERED, MAZE, PARALLEL_EDGES, RINGS, SPIRAL, SWITCHBOX, WALLED_LEVEL, WEEKLY_FAMILIES } from "./weekly.ts";
 // The parts of the shared registry that a host of the families uses. The site imports only `@mark1russell7/highways`.
 export {
   createFamilyRegistry,
@@ -37,6 +37,9 @@ export {
  * An import registers nothing. A host makes a registry with `createFamilyRegistry(HIGHWAYS_FAMILIES)`, or with the lists of other engines too.
  */
 export const HIGHWAYS_FAMILIES: readonly HighwaysFamily[] = Object.freeze([TINY_UNIFORM, SMALL_CLUSTERED, DENSE_GROUPS, HUB_CHAIN, MANY_GROUPS, PACKED_GRID, ...COVERAGE_FAMILIES, ...WEEKLY_FAMILIES]);
+
+/** This list names the families whose edges carry the key `data.collection`. With no key, `shared` has 0 ways, and it is `corners` with other tie breaks. */
+export const KEYED_FAMILIES: readonly string[] = Object.freeze(["tiny-uniform", "small-clustered", "dense-groups"]);
 
 /** This function gives a new registry of `HIGHWAYS_FAMILIES`. */
 export function highwaysRegistry(): FamilyRegistry<HighwaysBoard> {

@@ -3,6 +3,9 @@
 # of one more route and of its steps as an artifact. The job summary joins the rows of the cells.
 # The job screen runs the router screen of the base commit and of this commit in turn on one runner, and compares the records and the times.
 # Each round of the job screen also runs the base a second time as the A/A arm, so the times have a noise floor (MEASURE-ISOLATE).
+# With "sizes", each cell routes boards of `makeFixture` at each size, and then the fixture once, in fresh processes (ROUTER-BUDGET).
+# Each round routes each size in the arms a and b, so the times have an A/A ratio. Odd rounds go from the largest size down.
+# A route over the limit "cap" stops, and the larger sizes of that round do not start. Its row has `over: true`.
 # The note `docs/research/SCALE.md` gives the result.
 name: Scale
 
@@ -25,6 +28,15 @@ on:
       rounds:
         description: "The number of rounds of the router screen of each commit in the job screen."
         default: "5"
+      sizes:
+        description: "Node counts with commas. Each cell then times its router at each size, not the fixture only (ROUTER-BUDGET)."
+        default: ""
+      size-rounds:
+        description: "The number of rounds of the sizes. Each round routes each size in two fresh processes, the arms a and b."
+        default: "2"
+      cap:
+        description: "The time limit of one route of the sizes, in minutes."
+        default: "10"
   # Each pull request starts this workflow, so its summary check is always there. The job changes skips the
   # work when the pull request changes no file of the gate (CI.md of the template, "A gate with paths").
   pull_request:
@@ -52,12 +64,13 @@ jobs:
       match: ${{ steps.changes.outputs.match }}
     steps:
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+        uses: mark1russell7/template/.github/actions/changes@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
         with:
           paths: |
             .github/workflows/scale.yml
             packages/core/scripts/scale.ts
             packages/core/scripts/scale-summary.ts
+            packages/core/scripts/scale-sizes.ts
             packages/core/scripts/scale-screen.ts
             packages/core/scripts/data/scale/**
 
@@ -89,6 +102,9 @@ jobs:
       ROUTER: ${{ matrix.router }}
       REPEAT: ${{ inputs.repeat || '3' }}
       PROFILE: ${{ github.event_name == 'pull_request' || inputs.profile }}
+      SIZES: ${{ inputs.sizes || '' }}
+      SIZE_ROUNDS: ${{ inputs['size-rounds'] || '2' }}
+      CAP: ${{ inputs.cap || '10' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -100,13 +116,46 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Time the router
+        if: env.SIZES == ''
         run: |
           set -o pipefail
           mkdir -p "$GITHUB_WORKSPACE/out"
           cd packages/core
           node scripts/scale.ts --router "$ROUTER" --repeat "$REPEAT" --out "$GITHUB_WORKSPACE/out/rows.jsonl" | tee "$GITHUB_WORKSPACE/out/time.log"
+      - name: Time the router at each size
+        if: env.SIZES != ''
+        run: |
+          set -o pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          rows="$GITHUB_WORKSPACE/out/rows.jsonl"
+          cd packages/core
+          IFS=, read -ra up <<< "$SIZES"
+          down=(); for (( i=${#up[@]}-1; i>=0; i-- )); do down+=("${up[i]}"); done
+          # This function routes one board in a fresh process. A route over the limit gives a row with `over: true`, and the function gives 1.
+          # FAIL-CLOSED: another failure of the process stops the job.
+          route() {
+            local nodes=$1 round=$2 arm=$3 st=0; shift 3
+            timeout "${CAP}m" node scripts/scale.ts --router "$ROUTER" --route-only --round "$round" --arm "$arm" --out "$rows" "$@" | tee -a "$GITHUB_WORKSPACE/out/time.log" || st=$?
+            if [ "$st" = 0 ]; then return 0; fi
+            if [ "$st" != 124 ]; then echo "The route of $ROUTER at $nodes nodes failed with the code $st."; exit "$st"; fi
+            jq -nc --arg r "$ROUTER" --argjson n "$nodes" --argjson round "$round" --arg arm "$arm" --argjson cap "$CAP" '{router: $r, nodes: $n, round: $round, arm: $arm, over: true, capMinutes: $cap}' >> "$rows"
+            return 1
+          }
+          for (( round=0; round<SIZE_ROUNDS; round++ )); do
+            if (( round % 2 == 0 )); then list=("${up[@]}"); else list=("${down[@]}"); fi
+            stop=
+            for n in "${list[@]}"; do
+              n=$(echo "$n" | tr -d ' ')
+              # After a route over the limit, a larger size of this round is over the limit too, so it does not start.
+              if [ -n "$stop" ] && (( n > stop )); then continue; fi
+              for arm in a b; do
+                route "$n" "$round" "$arm" --nodes "$n" || { stop=$n; break; }
+              done
+            done
+          done
+          route 1000 0 fixture || true
       - name: Profile one more route
-        if: env.PROFILE == 'true'
+        if: env.PROFILE == 'true' && env.SIZES == ''
         run: |
           set -o pipefail
           cd packages/core
@@ -127,9 +176,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        if: inputs.sizes != ''
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 26
+      # The summary of the sizes imports the statistics package, so it needs the install.
+      - if: inputs.sizes != ''
+        run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: scale-*
@@ -144,9 +198,11 @@ jobs:
           if [ "$got" = "cells/rows.jsonl" ] && [ "$(jq length <<< "$ROUTERS")" = 1 ]; then got=$(jq -r '.[0]' <<< "$ROUTERS"); fi
           node packages/core/scripts/gates/inputs.ts "scale cells" --expect "$(jq -r 'join(",")' <<< "$ROUTERS")" --got "$got"
       - name: Write the summary
+        env:
+          SIZES: ${{ inputs.sizes || '' }}
         run: |
           find cells -name rows.jsonl | sort | xargs cat > rows.jsonl
-          node packages/core/scripts/scale-summary.ts rows.jsonl > scale.md
+          if [ -n "$SIZES" ]; then node packages/core/scripts/scale-sizes.ts rows.jsonl > scale.md; else node packages/core/scripts/scale-summary.ts rows.jsonl > scale.md; fi
           cat scale.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -157,7 +213,8 @@ jobs:
 
   screen:
     needs: changes
-    if: needs.changes.outputs.match == 'true'
+    # A run of the sizes times the routers only, so it does not start the screen.
+    if: needs.changes.outputs.match == 'true' && (inputs.sizes || '') == ''
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -203,13 +260,14 @@ jobs:
 
   scale-ok:
     name: Scale OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, routers, time, summary, screen]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
     steps:
-      - uses: mark1russell7/template/.github/actions/gate-summary@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+      - uses: mark1russell7/template/.github/actions/gate-summary@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
         with:
           needs: ${{ toJSON(needs) }}
-          allow-skip: summary
+          # A run of the sizes skips the job screen on purpose.
+          allow-skip: ${{ inputs.sizes != '' && 'summary screen' || 'summary' }}

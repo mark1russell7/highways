@@ -50,6 +50,7 @@ import {
 } from "../src/bench/screen/index.ts";
 import { isRoutedStep, stepRouterStrategy, type RoutedStep } from "../src/bench/compare.ts";
 import { graphInput, HIGHWAY_BASE_ROUTERS, inputGraph, inputId, screenInputs } from "../src/bench/screen/index.ts";
+import { corpusInputs } from "./corpus-files.ts";
 import type { Graph, Router } from "../src/model.ts";
 import { highwayStrategies, STRATEGIES } from "../src/strategies/builtins.ts";
 import { asRouter, getStrategy, type Strategy } from "../src/strategies/model.ts";
@@ -101,7 +102,7 @@ const options = optionsFile ? (JSON.parse(readFileSync(optionsFile, "utf8")) as 
 const predictionsFile = opt("--predictions");
 const predictions = predictionsFile ? parseLines<LayoutPrediction>(readFileSync(predictionsFile, "utf8")) : undefined;
 
-// `--inputs` reads the input files of a folder, at any depth, in the order of their paths. Without it, the screen makes the files of `screen-v1`.
+// `--inputs` reads the input files of a folder, at any depth, in the order of their paths. Without it, the screen reads the files of the set.
 const inputsDir = opt("--inputs");
 const files = (dir: string): string[] =>
   readdirSync(dir)
@@ -130,6 +131,10 @@ const set: ScreenSet = (() => {
     ...(declared ? { claims: { ...named.claims, declared: { ...declared, minCount: count, counts: Object.fromEntries(families.map((f) => [f.name, count])) } } } : {}),
   };
 })();
+// The boards of the screen: the files of `--inputs`, else the files of the set in `corpus/<set>/` (SCREEN-V4-FILES).
+// With `--members`, the generator makes the boards, because the files hold only the members of the set.
+const boards = inputs ?? (members === undefined ? corpusInputs(named.id) : undefined);
+
 // The optima of the set: the file of `--optima`, or the file `optima-<set>.json` of `src/bench/exact` when it exists.
 const optimaPath = opt("--optima") ?? join(dirname(fileURLToPath(import.meta.url)), `../src/bench/exact/optima-${set.id}.json`);
 const optima = optimaPath !== "none" && existsSync(optimaPath) ? (JSON.parse(readFileSync(optimaPath, "utf8")) as ExactOptimaFile).optima : undefined;
@@ -167,9 +172,9 @@ function routerOf(name: string): Router {
 
 /** This function gives the graph of one input of the paired time by its id. It makes only that board, with the same steps as `screenInputs`. */
 function pairedGraph(id: string): Graph {
-  if (inputs !== undefined) {
-    const input = inputs.find((i) => i.id === id);
-    if (input === undefined) throw new Error(`The folder of --inputs has no input "${id}".`);
+  if (boards !== undefined) {
+    const input = boards.find((i) => i.id === id);
+    if (input === undefined) throw new Error(`The input files of the screen have no input "${id}".`);
     return inputGraph(input);
   }
   for (const f of set.families)
@@ -195,7 +200,7 @@ async function runScreen(): Promise<void> {
   const report = screen(step, strategies, {
     set,
     ...(optima ? { optima } : {}),
-    ...(inputs ? { inputs } : {}),
+    ...(boards ? { inputs: boards } : {}),
     ...(list("--families") ? { families: list("--families")! } : {}),
     baseline: !args.includes("--no-baseline"),
     ...(options ? { options } : {}),
@@ -239,7 +244,7 @@ async function runScreen(): Promise<void> {
     const mode = (opt("--paired-mode") ?? "fresh") as Mode;
     if (mode !== "fresh" && mode !== "process") throw new Error(`There is no paired mode "${String(mode)}". The modes are fresh and process.`);
     // Mode fresh gives each input only its id: each child makes its own board. Mode process makes each board here.
-    const pairedInputs = (inputs ?? screenInputs(set))
+    const pairedInputs = (boards ?? screenInputs(set))
       .filter((i) => (families?.includes(i.family) ?? true) && screened.has(i.id) && names.every((n) => !skipped.has(`${n}|${i.id}`)))
       .map((i) => ({ id: i.id, group: i.family, ...(mode === "process" ? { value: inputGraph(i) } : {}) }));
     if (pairedInputs.length === 0) throw new Error("The paired time has no input where each arm runs.");

@@ -89,7 +89,7 @@ On the fixtures from 400 to 1 000 nodes, `sections-tree` uses 37% to 50% less in
 
 `sections` uses the hubs only when that way is at most 2 times as long as the line. Else the edge goes directly around the nodes. Then the ink goes down by 28% to 39%, and `route.crossings` by 2.2 to 3 times. The routes are 20% to 32% longer. On the 75 boards of the table, `route.crossings.pairs` of `sections` is above `corners`.
 
-`sections` and `sections-tree` are slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-tree-of-sections-at-10-000-nodes-h3), `sections` takes 1.15 to 1.33 times the old time, and `sections-tree` 2.67 to 3.21 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) finds the change and fixes it.
+`sections-tree` is slower than in the core before `fa1dd82`. [At 10 000 nodes](docs/research/SCALE.md#the-h3-remeasure-after-the-fixes-sections-slow-step-4), it takes 1.93 to 2.31 times the old time on `main`. `sections` is not slower: 0.86 to 0.97 times. The open item SECTIONS-SLOW of the [roadmap](docs/ROADMAP.md) prices and fixes the rest.
 
 The metric `bends` counts each vertex of a curve, because a route is a polyline.
 
@@ -201,11 +201,20 @@ The benchmark also races the routers on three case boards of made-up data. Each 
 
 The examples page has a tab `Generator`. Pick a family of `HIGHWAYS_FAMILIES`, a seed and a value for each dimension of the family. A web worker generates the board and routes it with the default pipeline. The URL keeps the board, for example `#family=hub-chain&seed=12&rows=6`. The list "Named examples" sets the controls to a known board.
 
-The generator has 25 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
+The generator has 28 families. The 9 families of CORPUS-FAMILIES add cards with rows, a long pipeline, a wide fan-out and two hubs. They also add uneven sizes, thin bars, a sparse board, a dense local mesh and a complete bipartite part.
 
-The 10 families of FAMILIES-WEEKLY add worst cases. They are one narrow door in a long wall, many edges between the same two boxes, and a closed maze. The next 3 are a channel between two rows, two combs that reach into each other, and a square spiral of wall. The last 3 are pins around a box, a grid of pads in a ring of terminals, and closed walls with one door each. The tenth is a maze with one tiny knot of nodes. These 10 families are in no screen set.
+The 10 families of FAMILIES-WEEKLY add worst cases. They are one narrow door in a long wall, many edges between the same two boxes, and a closed maze. The next 3 are a channel between two rows, two combs that reach into each other, and a square spiral of wall. The last 3 are pins around a box, a grid of pads in a ring of terminals, and closed walls with one door each. The tenth is a maze with one tiny knot of nodes. Batch 5 adds layers of a directed graph, edges on the diagonals of a grid, and one long row of nodes. These 13 families are in no screen set.
 
 The compare page and the live demo have the choice "Generated", with the same controls and the same keys of the URL. The screen sets make their boards with the same families.
+
+### The explorer page
+
+The page `explorer.html` shows the newest sweep record of `docs/research/sweeps/`. A sweep changes one number option of a strategy at a time, and the other options keep their defaults. The page states the size and the commit date of its record. Each measure also has a ratio to the defaults of its strategy on the same board. Thus the size of the board does not hide the effect of an option.
+
+- The script `packages/core/scripts/sweep.ts` writes a record of the format `response-records/1`. Start it in `packages/core`, for example `node scripts/sweep.ts --strategy corners,trunks --families tiny-uniform --out sweep.json`.
+- Locally, sweep only one or two small families. Start a large sweep in CI.
+- The workflow `Sweep` has the inputs `step`, `strategies` and `families`. It keeps the record as the artifact `sweep`.
+- Commit the record to `docs/research/sweeps/`. The build of the site reads it, and the test `explorer-data.test.ts` examines it.
 
 ## Development
 

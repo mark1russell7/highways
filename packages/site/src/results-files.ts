@@ -4,9 +4,9 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { MEASURES } from "@mark1russell7/highways";
+import { KEYED_FAMILIES, MEASURES } from "@mark1russell7/highways";
 import { marked } from "marked";
-import { resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
+import { isSnapshotFile, resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
 
 /** The folders of the committed files, relative to the root of the repository. */
 export const RESULT_FILES = {
@@ -29,7 +29,7 @@ export const RESULT_FILES = {
 export function snapshotFiles(root: string): { readonly name: string; readonly text: string }[] {
   const dir = join(root, RESULT_FILES.verdicts);
   return readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
+    .filter(isSnapshotFile)
     .sort()
     .map((name) => ({ name, text: readFileSync(join(dir, name), "utf8") }));
 }
@@ -74,6 +74,7 @@ export function readResults(root: string): ResultsData {
     measures: measureRows(),
     core: (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version,
     coverage: { record: readFileSync(join(root, RESULT_FILES.coverage), "utf8"), trend: readFileSync(join(root, RESULT_FILES.coverageTrend), "utf8") },
+    keyed: KEYED_FAMILIES,
   });
 }
 
@@ -84,7 +85,10 @@ export interface BuildInfo {
   readonly date: string;
 }
 
-/** This function gives the facts of the build. In CI, `GITHUB_SHA` gives the commit. Outside git, the commit is empty. */
+/**
+ * This function gives the facts of the build. In CI, `GITHUB_SHA` gives the commit. Outside git, the commit is empty.
+ * The date is today in UTC. The variable `SITE_BUILD_DATE` (`YYYY-MM-DD`) sets a different date, for a test of the weeks of the atlas.
+ */
 export function buildInfo(root: string, env: Readonly<Record<string, string | undefined>>): BuildInfo {
   const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
   let commit = env["GITHUB_SHA"] ?? "";
@@ -95,7 +99,9 @@ export function buildInfo(root: string, env: Readonly<Record<string, string | un
       commit = "";
     }
   }
-  return { core, commit, date: new Date().toISOString().slice(0, 10) };
+  const date = env["SITE_BUILD_DATE"] || new Date().toISOString().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) throw new Error(`SITE_BUILD_DATE "${date}" is not a date YYYY-MM-DD.`);
+  return { core, commit, date };
 }
 
 /** This function gives the data line of a page as HTML: the core release, the commit and the date of the build. */

@@ -33,9 +33,29 @@ export interface SnapshotHeader {
   readonly core: string;
 }
 
+/** The stamp of a read of a snapshot on a later core that gave the same rows. A stamp needs no new rows. */
+export interface VerifiedRead {
+  /** The core of the read. */
+  readonly core: string;
+  /** The run of the workflow `Screen` that made the read. */
+  readonly run: number;
+  readonly commit: string;
+  readonly date: string;
+}
+
 /** A verdict snapshot: the header and the rows. */
 export interface Snapshot extends SnapshotHeader {
   readonly rows: readonly SnapshotRow[];
+  /** The last read on a later core with the same rows. The rows stay those of the first run. */
+  readonly verified?: VerifiedRead;
+}
+
+/** The fields of a stamp with their types. */
+const VERIFIED: Readonly<Record<keyof VerifiedRead, "string" | "number">> = { core: "string", run: "number", commit: "string", date: "string" };
+
+/** This function gives the core of the last read of a snapshot: the core of its stamp, or else the core of its run. */
+export function readCore(s: { readonly core: string; readonly verified?: VerifiedRead }): string {
+  return s.verified?.core ?? s.core;
 }
 
 /** The fields of the header with their types. A snapshot without one of them is not valid. */
@@ -50,6 +70,9 @@ const HEADER: Readonly<Record<keyof SnapshotHeader, "string" | "number">> = {
   core: "string",
 };
 
+/** This function tells if a file of the folder of verdicts is a snapshot. Each JSON file of the folder is a snapshot. */
+export const isSnapshotFile = (name: string): boolean => name.endsWith(".json");
+
 /** This function reads the JSON text of a snapshot. It throws an error when a header field is missing or has the wrong type. */
 export function parseSnapshot(text: string, name = "snapshot"): Snapshot {
   const value = JSON.parse(text) as Record<string, unknown>;
@@ -57,7 +80,44 @@ export function parseSnapshot(text: string, name = "snapshot"): Snapshot {
     if (typeof value[key] !== type) throw new Error(`The ${name} has no ${type} field "${key}" in its header.`);
   }
   if (!Array.isArray(value["rows"])) throw new Error(`The ${name} has no rows.`);
+  const stamp = value["verified"] as Record<string, unknown> | undefined;
+  if (stamp !== undefined) {
+    for (const [key, type] of Object.entries(VERIFIED)) {
+      if (typeof stamp[key] !== type) throw new Error(`The ${name} has no ${type} field "${key}" in its field "verified".`);
+    }
+  }
   return value as unknown as Snapshot;
+}
+
+/** The fields of a row that the page shows. A read verifies a snapshot when each row has the same values in these fields. */
+export const READ_FIELDS = ["label", "old", "stratified", "pooled", "p", "families", "breadth"] as const;
+
+/** One row that differs between a snapshot and a new read, with the fields that differ. The field `row` tells that one of them has no such row. */
+export interface ReadDiff {
+  readonly key: string;
+  readonly fields: readonly string[];
+}
+
+/**
+ * This function compares the rows of a committed snapshot and of a new read, by strategy, guard and measure.
+ * It gives each row that differs. An empty list tells that the read verifies the snapshot.
+ * It throws an error when the two do not screen the same set, step, base and level.
+ */
+export function compareReads(committed: Snapshot, read: Snapshot): ReadDiff[] {
+  for (const key of ["set", "step", "base", "level"] as const) {
+    if (committed[key] !== read[key]) throw new Error(`The read has ${key} ${String(read[key])}, and the snapshot has ${String(committed[key])}.`);
+  }
+  const keyOf = (r: SnapshotRow): string => `${r.strategy} ${r.guard} ${r.measure}`;
+  const before = new Map(committed.rows.map((r) => [keyOf(r), r]));
+  const after = new Map(read.rows.map((r) => [keyOf(r), r]));
+  const out: ReadDiff[] = [];
+  for (const [key, r] of before) {
+    const n = after.get(key);
+    const fields = n === undefined ? ["row"] : READ_FIELDS.filter((f) => JSON.stringify(r[f]) !== JSON.stringify(n[f]));
+    if (fields.length > 0) out.push({ key, fields });
+  }
+  for (const key of after.keys()) if (!before.has(key)) out.push({ key, fields: ["row"] });
+  return out;
 }
 
 /** The sign of one family as one character: `+` the strategy wins, `-` it loses, `0` a tie. */
@@ -73,6 +133,8 @@ export interface VerdictCell {
   /** The sign of each family, in the sequence of `families` of the table. */
   readonly signs: string;
   readonly p: number;
+  /** The count of family marks of the run that `keylessTies` changed to a tie. A cell of another strategy does not have this field. */
+  readonly tiedByCause?: number;
 }
 
 /** The verdict grid of one set and one step: the strategy rows and the guard columns. */
@@ -80,6 +142,10 @@ export interface VerdictTable extends SnapshotHeader {
   readonly families: readonly string[];
   readonly guards: readonly { readonly id: string; readonly measure: string }[];
   readonly strategies: readonly { readonly name: string; readonly cells: readonly VerdictCell[] }[];
+  /** The families with no key, where the base `shared` has 0 ways. Only a table with that base has this field. */
+  readonly keyless?: readonly string[];
+  /** The stamp of the last read on a later core, from the snapshot. */
+  readonly verified?: VerifiedRead;
 }
 
 /** This function gives the verdict grid of a snapshot. It keeps only the fields that the page shows. */
@@ -373,6 +439,31 @@ export interface MeasureRow {
   readonly definition: string;
 }
 
+/** The base that makes ways only from a key. */
+const KEY_BASE = "shared";
+/** The strategy that the base `shared` equals on a board with no key, but for its tie breaks. */
+const KEY_TWIN = "corners";
+
+/**
+ * This function marks the families with no key on a table with the base `shared`.
+ * With no key, `shared` is `corners` with other tie breaks. So each mark of the row `corners` on such a family is a tie by cause.
+ * The label of a cell does not change, because the run read it over all the families.
+ */
+export function keylessTies(t: VerdictTable, keyed: readonly string[]): VerdictTable {
+  if (t.base !== KEY_BASE) return t;
+  const tieCell = (c: VerdictCell): VerdictCell => {
+    const signs = [...c.signs].map((sign, i) => (keyed.includes(t.families[i] ?? "") ? sign : SIGN_CHAR[0]));
+    const count = (sign: string): number => signs.filter((s) => s === sign).length;
+    const against = c.label === "better" ? count(SIGN_CHAR[-1]) : c.label === "worse" ? count(SIGN_CHAR[1]) : c.against;
+    return { ...c, signs: signs.join(""), against, ties: count(SIGN_CHAR[0]), tiedByCause: signs.filter((s, i) => s !== c.signs[i]).length };
+  };
+  return {
+    ...t,
+    keyless: t.families.filter((f) => !keyed.includes(f)),
+    strategies: t.strategies.map((s) => (s.name === KEY_TWIN ? { name: s.name, cells: s.cells.map(tieCell) } : s)),
+  };
+}
+
 /** The inputs of `resultsData`: the texts of the committed files. */
 export interface ResultsInput {
   readonly snapshots: readonly { readonly name: string; readonly text: string }[];
@@ -389,6 +480,8 @@ export interface ResultsInput {
   readonly core?: string;
   /** The text of `record.json` and of `trend.json` of `docs/research/space-coverage`. */
   readonly coverage?: { readonly record: string; readonly trend: string };
+  /** The families whose edges carry a key, from `KEYED_FAMILIES` of the core. With no list, the page marks no family. */
+  readonly keyed?: readonly string[];
 }
 
 /** The number of Shipped rows that the page shows. */
@@ -419,7 +512,7 @@ export function resultsData(input: ResultsInput): ResultsData {
   const betterCount = snapshots.filter((s) => s.set === splitSet).reduce((n, s) => n + s.rows.filter((r) => r.label === "better").length, 0);
   const shipped = shippedRows(input.roadmap);
   return {
-    tables: snapshots.map(verdictTable),
+    tables: snapshots.map(verdictTable).map((t) => (input.keyed ? keylessTies(t, input.keyed) : t)),
     splitSet,
     split,
     betterCount,

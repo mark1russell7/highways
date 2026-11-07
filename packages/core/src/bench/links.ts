@@ -1,4 +1,4 @@
-import { overlapOf } from "@mark1russell7/layout-contract";
+import { overlapOf, segmentThroughShape, shapesOverlap, type LayoutBox, type Region } from "@mark1russell7/layout-contract";
 import { dist, inflate, pointSegmentDistance, polylineLength, segmentHitsBox, type Box, type Point } from "../geom.ts";
 import { Grid } from "../grid.ts";
 import type { Graph, Level, Result } from "../model.ts";
@@ -52,6 +52,12 @@ export interface LevelFaults extends LinkFaults {
 export interface LinkFaultOptions {
   /** A link that goes farther than this distance outside the bounding box of all the boxes counts in `outside`. The default is 24. */
   readonly slack?: number;
+  /**
+   * The true shape of each box that has one, relative to the top-left corner of the box. The shape lies inside the box.
+   * A link goes through a box with a shape only when `segmentThroughShape` of the contract says so.
+   * Two boxes with a shape overlap only when `shapesOverlap` of the contract says so.
+   */
+  readonly shapes?: ReadonlyMap<string, Region>;
 }
 
 /** A link goes out and back when its distance to its target grows by more than this share of the distance between its ends. */
@@ -97,6 +103,7 @@ export function goesOutAndBack(p: readonly Point[]): boolean {
  */
 export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly MeasuredLink[], options: LinkFaultOptions = {}): LinkFaults {
   const slack = options.slack ?? OUTSIDE_SLACK;
+  const shapes = options.shapes !== undefined && options.shapes.size > 0 ? options.shapes : undefined;
   let size = 0;
   let x0 = Infinity;
   let y0 = Infinity;
@@ -123,7 +130,12 @@ export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly Me
     // The test stops at the first box that overlaps neither end. Before it, a box that overlaps an end only marks the link.
     let hit = false;
     let far = false;
-    const ends = [boxes.get(l.source), boxes.get(l.target)].filter((b): b is Box => b !== undefined);
+    const ends = [l.source, l.target].flatMap((id) => {
+      const box = boxes.get(id);
+      return box === undefined ? [] : [{ id, box, shape: shapes?.get(id) }];
+    });
+    const endsOverlap = (e: (typeof ends)[number], box: Box, shape: Region | undefined): boolean =>
+      e.shape === undefined && shape === undefined ? boxesOverlap(e.box, box) : shapesOverlap(shapedBox(e.id, e.box, e.shape), shapedBox("", box, shape), TOLERANCE);
     for (let i = 1; i < p.length && !far; i++) {
       const a = p[i - 1]!;
       const b = p[i]!;
@@ -131,8 +143,11 @@ export function measureLinks(boxes: ReadonlyMap<string, Box>, links: readonly Me
         if (far || id === l.source || id === l.target) return;
         const box = boxes.get(id)!;
         if (!segmentHitsBox(a, b, inflate(box, -TOLERANCE), TOLERANCE)) return;
+        // The box test comes first. A shape lies inside its box, so a route that misses the box misses the shape.
+        const shape = shapes?.get(id);
+        if (shape !== undefined && !segmentThroughShape(a, b, shapedBox(id, box, shape), TOLERANCE)) return;
         hit = true;
-        if (!ends.some((e) => boxesOverlap(e, box))) far = true;
+        if (!ends.some((e) => endsOverlap(e, box, shape))) far = true;
       });
     }
     if (hit) through++;
@@ -151,16 +166,25 @@ export function boxesOverlap(a: Box, b: Box): boolean {
   return x > TOLERANCE && y > TOLERANCE;
 }
 
-/** This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge. */
+/** This function gives a box of the contract: the box at its place, with its true shape when it has one. */
+function shapedBox(id: string, box: Box, shape: Region | undefined): LayoutBox {
+  return { id, x: box.x, y: box.y, w: box.w, h: box.h, ...(shape !== undefined ? { shape } : {}) };
+}
+
+/**
+ * This function measures the faults of the routes of a result. The ends of a route are the nodes of its edge.
+ * The `shape` of each node goes to `measureLinks`, unless the options give `shapes`.
+ */
 export function measureRouteFaults(graph: Graph, result: Result, options: LinkFaultOptions = {}): LinkFaults {
   const boxes = new Map(graph.nodes.map((n) => [n.id, n.box]));
+  const shapes = options.shapes ?? new Map(graph.nodes.flatMap((n) => (n.shape !== undefined ? [[n.id, n.shape] as const] : [])));
   const edges = new Map(graph.edges.map((e) => [e.id, e]));
   const links: MeasuredLink[] = [];
   for (const r of result.routes) {
     const e = edges.get(r.edge);
     if (e) links.push({ source: e.source.node, target: e.target.node, points: r.points });
   }
-  return measureLinks(boxes, links, options);
+  return measureLinks(boxes, links, { ...options, shapes });
 }
 
 /** This function counts the pairs of boxes that overlap by more than `TOLERANCE` on each axis. */

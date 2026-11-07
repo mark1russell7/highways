@@ -1,10 +1,63 @@
 import { mulberry32, seedOf } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
-import { routePairCrossings } from "./quality.ts";
+import { countCrossings, paintedOutsidePairs, routePairCrossings } from "./quality.ts";
 
 type Xy = readonly [number, number];
 const route = (...points: readonly Xy[]) => ({ points: points.map(([x, y]) => ({ x, y })) });
 const count = (...routes: readonly (readonly Xy[])[]) => routePairCrossings(routes.map((p) => route(...p)));
+
+describe("paintedOutsidePairs", () => {
+  const read = (...routes: readonly (readonly Xy[])[]) => paintedOutsidePairs(routes.map((p) => route(...p)));
+
+  it("reads a proper crossing of two routes in neither class", () => {
+    expect(read([[0, 0], [10, 10]], [[0, 10], [10, 0]])).toEqual({ crossings: 1, self: 0, touch: 0 });
+  });
+
+  it("reads a route that crosses itself in the class `self`, and the pair count leaves it out", () => {
+    const loop = [[0, 0], [10, 10], [0, 10], [10, 0]] as const;
+    expect(read(loop)).toEqual({ crossings: 1, self: 1, touch: 0 });
+    expect(count(loop).pairs).toBe(0);
+  });
+
+  it("does not read a crossing in the class `self` when a second route draws one of the segments", () => {
+    const loop = [[0, 0], [10, 10], [0, 10], [10, 0]] as const;
+    expect(read(loop, [[0, 0], [10, 10]])).toEqual({ crossings: 1, self: 0, touch: 0 });
+    expect(count(loop, [[0, 0], [10, 10]]).pairs).toBeGreaterThan(0);
+  });
+
+  it("reads a route that ends on another route, up to rounding, in the class `touch`, and the pair count leaves it out", () => {
+    // The float test reads a strict crossing, because the end lies 1e-9 past the line. The grid `EPS` reads the end on the line.
+    const ending = [[0, 0], [10 + 1e-9, 5]] as const;
+    const line = [[10, 0], [10, 10]] as const;
+    expect(read(ending, line)).toEqual({ crossings: 1, self: 0, touch: 1 });
+    expect(count(ending, line).pairs).toBe(0);
+  });
+
+  it("reads outside the relation when a second route nearly draws a segment of a route that crosses itself", () => {
+    // The ends (10, 0) and (9.95, 0) round to one key of the painted segments. So that segment has two owners, and the crossing at x 9.97 is not `self`.
+    // The second route stops before x 9.97, so the pair count reads no crossing of the two routes.
+    const crossing = [[0, 0], [10, 0], [10, -5], [9.97, -5], [9.97, 5]] as const;
+    const near = [[0, 0], [9.95, 0]] as const;
+    expect(read(crossing, near)).toEqual({ crossings: 1, self: 0, touch: 0 });
+    expect(count(crossing, near).pairs).toBe(0);
+    // The copy with no second route stays inside the relation.
+    expect(read(crossing)).toEqual({ crossings: 1, self: 1, touch: 0 });
+    expect(count(crossing).pairs).toBe(0);
+  });
+
+  it("gives the painted count of `countCrossings` and holds the relation on seeded routes", () => {
+    const random = mulberry32(seedOf("paintedOutsidePairs"));
+    const point = (): Xy => [Math.round(random() * 200), Math.round(random() * 200)];
+    for (let round = 0; round < 25; round++) {
+      const routes = Array.from({ length: 12 }, () => route(point(), point(), point()));
+      const outside = paintedOutsidePairs(routes);
+      const segments = routes.flatMap((r) => r.points.slice(1).map((p, i) => [r.points[i]!, p] as const));
+      const distinct = [...new Map(segments.filter(([a, b]) => a.x !== b.x || a.y !== b.y).map(([a, b]) => [[a, b].map((p) => `${p.x},${p.y}`).sort().join("|"), [a, b] as const])).values()];
+      expect(outside.crossings).toBe(countCrossings(distinct)[0]);
+      expect(outside.crossings - outside.self - outside.touch).toBeLessThanOrEqual(routePairCrossings(routes).pairs);
+    }
+  });
+});
 
 describe("routePairCrossings", () => {
   it("counts a proper crossing of two routes", () => {

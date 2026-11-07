@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, ageText, coverageView, keptRows, linkHtml, parseSnapshot, QUEUE_TOP, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import type { VerdictTable } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -38,6 +39,29 @@ describe("results data", () => {
     expect(() => parseSnapshot(JSON.stringify({ set: "s", step: "router", rows: [] }))).toThrow(/base/);
   });
 
+  const HEAD = { set: "s", step: "router", base: "shared", level: 0.05, run: 1, commit: "c", date: "2026-11-05", core: "0.9.2" };
+  const ROW = { strategy: "a", guard: "R1", measure: "route.crossings", label: "worse", old: "worse", stratified: -2, pooled: -3, p: 0.01, families: [{ family: "f", n: 3, mean: -2, sign: -1 }], breadth: { against: 0, of: 1, ties: 0 } };
+
+  it("reads the stamp of a later read, and refuses a stamp without its fields", () => {
+    const stamp = { core: "0.15.0", run: 2, commit: "d", date: "2026-11-06" };
+    const s = parseSnapshot(JSON.stringify({ ...HEAD, verified: stamp, rows: [] }));
+    expect([readCore(s), readCore({ core: "0.9.2" })]).toEqual(["0.15.0", "0.9.2"]);
+    expect(() => parseSnapshot(JSON.stringify({ ...HEAD, verified: { core: "0.15.0" }, rows: [] }))).toThrow(/"run" in its field "verified"/);
+  });
+
+  it("verifies a read with the same rows, and gives each row that differs with its fields", () => {
+    const snap = parseSnapshot(JSON.stringify({ ...HEAD, rows: [ROW, { ...ROW, strategy: "b" }] }));
+    const same = parseSnapshot(JSON.stringify({ ...HEAD, core: "0.15.0", run: 2, rows: [{ ...ROW, strategy: "b", through: 4 }, { ...ROW }] }));
+    expect(compareReads(snap, same)).toEqual([]);
+    const moved = parseSnapshot(JSON.stringify({ ...HEAD, rows: [{ ...ROW, label: "no verdict", p: 0.2 }, { ...ROW, strategy: "c" }] }));
+    expect(compareReads(snap, moved)).toEqual([
+      { key: "a R1 route.crossings", fields: ["label", "p"] },
+      { key: "b R1 route.crossings", fields: ["row"] },
+      { key: "c R1 route.crossings", fields: ["row"] },
+    ]);
+    expect(() => compareReads(snap, { ...same, step: "plugs" })).toThrow(/step plugs/);
+  });
+
   it("counts the stages in the sequence of the page", () => {
     expect(stageCounts([{ stage: "cataloged" }, { stage: "kept" }, { stage: "cataloged" }] as never)).toEqual([
       { stage: "kept", count: 1 },
@@ -69,7 +93,64 @@ describe("the view of the coverage", () => {
   });
 });
 
+describe("the marks of the families with no key", () => {
+  const table: VerdictTable = {
+    set: "s",
+    step: "router",
+    base: "shared",
+    level: 0.05,
+    run: 1,
+    commit: "c",
+    date: "2026-11-05",
+    core: "0.1.0",
+    families: ["keyed-a", "plain-b", "plain-c", "plain-d"],
+    guards: [{ id: "R1", measure: "route.crossings" }],
+    strategies: [
+      { name: "corners", cells: [{ guard: "R1", label: "worse", against: 1, of: 4, ties: 1, signs: "-+-0", p: 0.01 }] },
+      { name: "other", cells: [{ guard: "R1", label: "worse", against: 1, of: 4, ties: 1, signs: "-+-0", p: 0.01 }] },
+    ],
+  };
+
+  it("changes each mark of the row `corners` with no key to a tie, and it keeps the label", () => {
+    const [corners, other] = keylessTies(table, ["keyed-a"]).strategies;
+    expect(corners!.cells[0]).toEqual({ guard: "R1", label: "worse", against: 0, of: 4, ties: 3, signs: "-000", p: 0.01, tiedByCause: 2 });
+    expect(other).toEqual(table.strategies[1]);
+  });
+
+  it("states the families with no key, and it leaves a table with another base as it is", () => {
+    expect(keylessTies(table, ["keyed-a"]).keyless).toEqual(["plain-b", "plain-c", "plain-d"]);
+    const other = { ...table, base: "pipeline" };
+    expect(keylessTies(other, ["keyed-a"])).toBe(other);
+  });
+});
+
 describe("the committed files of the results page", () => {
+  it("reads the row `corners` of `screen-v3` with a tie by cause on the 12 families with no key", () => {
+    const t = readResults(root).tables.find((x) => x.set === "screen-v3" && x.step === "router")!;
+    expect(t.keyless).toHaveLength(12);
+    const r1 = t.strategies.find((s) => s.name === "corners")!.cells.find((c) => c.guard === "R1")!;
+    expect(r1).toMatchObject({ label: "worse", against: 0, of: 15, ties: 12, tiedByCause: 4 });
+  });
+
+  it("states on the page the counts of the list of the moved labels, and the list holds the labels of the snapshots", () => {
+    const list = JSON.parse(readFileSync(join(root, "docs/research/key-split/moved.json"), "utf8")) as {
+      schema: string;
+      labels: number;
+      moved: number;
+      rows: { step: string; strategy: string; guard: string; shared: string; corners: string }[];
+    };
+    const flips = list.rows.filter((r) => [r.shared, r.corners].sort().join() === "better,worse").length;
+    expect([list.schema, list.labels, list.moved, list.rows.length, flips]).toEqual(["key-split-moved/1", 299, 92, 92, 33]);
+    const text = readFileSync(join(root, "packages/site/content/results.md"), "utf8");
+    expect(text).toContain(`${list.moved} of ${list.labels} labels of \`screen-v3\` move, and ${flips} of them`);
+    expect(text).toContain("blob/main/docs/research/key-split/moved.json");
+    const { tables } = readResults(root);
+    for (const r of list.rows) {
+      const cell = tables.find((t) => t.set === "screen-v3" && t.step === r.step)!.strategies.find((s) => s.name === r.strategy)!.cells.find((c) => c.guard === r.guard)!;
+      expect(cell.label, `${r.strategy} ${r.guard}`).toBe(r.shared);
+    }
+  });
+
   it("has the run, the date and the core of each verdict snapshot", () => {
     const { tables, core } = readResults(root);
     expect(tables.length).toBeGreaterThanOrEqual(15);

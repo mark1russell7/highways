@@ -1,4 +1,4 @@
-import { checkDeclared, corpusHashOf, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
+import { checkDeclared, corpusHashOf, EDGE_KEY_STEP_VERSION, edgeKeyStep, SPLIT_SCHEMA, splitFileName, type ClaimBreak, type CorpusSplit, type DeclaredClaim, type EdgeKey, type FamilyBy, type FamilyCell } from "@mark1russell7/layout-contract";
 import { highwaysRegistry, type HighwaysBoard } from "../../families/index.ts";
 import type { Graph } from "../../model.ts";
 import { makeRoom, roomLinks } from "../../room/index.ts";
@@ -50,16 +50,17 @@ export interface ScreenSet {
 const REGISTRY = highwaysRegistry();
 
 /**
- * This function gives a screen family of a corpus family at its defaults. The member `k` has the input seed `base + 1009 * k`, the rule of `familySeed`.
+ * This function gives a screen family of a corpus family. The member `k` has the input seed `base + 1009 * k`, the rule of `familySeed`.
  * The family keeps the board of its last member, so `make(k)` and `generator(k)` of one member generate one time.
+ * The family uses the defaults of the corpus family. With `dims`, it sets those dimensions, and the screen family has the name `id`.
  */
-function registryFamily(name: string, base: number, shows: string, seeds: number, cell: LayoutCell): ScreenFamily {
+function registryFamily(name: string, base: number, shows: string, seeds: number, cell: LayoutCell, dims?: Readonly<Record<string, number | string>>, id = name): ScreenFamily {
   let last: { readonly k: number; readonly board: HighwaysBoard } | undefined;
   const board = (k: number): HighwaysBoard => {
-    if (last?.k !== k) last = { k, board: REGISTRY.generate(name, caseSeed(base, k)) };
+    if (last?.k !== k) last = { k, board: dims === undefined ? REGISTRY.generate(name, caseSeed(base, k)) : REGISTRY.generate(name, caseSeed(base, k), dims) };
     return last.board;
   };
-  return { name, shows, seeds, cell, make: (k) => board(k).graph, generator: (k) => board(k).generator };
+  return { name: id, shows, seeds, cell, make: (k) => board(k).graph, generator: (k) => board(k).generator };
 }
 
 /** The cell dimensions that each family of `screen-v1` shares. */
@@ -128,10 +129,13 @@ export const SCREEN_V2: ScreenSet = {
   heldOut: SCREEN_V2_HELD_OUT,
 };
 
+/** The cell of `frame-rows`: cards with full-width rows as nested groups, and fixed plugs. */
+const FRAME_ROWS_CELL: LayoutCell = { ...BASE, count: "100", edgeDensity: "sparse", edgeShape: "random", groups: "nested", ports: "fixed" };
+
 /** This function gives the 9 families of CORPUS-FAMILIES, each with `seeds` members. Their base seeds are the primes from 13 to 43. */
 function coverageFamilies(seeds: number): ScreenFamily[] {
   return [
-    registryFamily("frame-rows", 13, "Cards with full-width rows and fixed plugs on their walls.", seeds, { ...BASE, count: "100", edgeDensity: "sparse", edgeShape: "random", groups: "nested", ports: "fixed" }),
+    registryFamily("frame-rows", 13, "Cards with full-width rows and fixed plugs on their walls.", seeds, FRAME_ROWS_CELL),
     registryFamily("pipeline", 17, "A long chain of stages in rows that turn.", seeds, { ...BASE, count: "100", edgeDensity: "sparse", edgeShape: "tree", ports: "free" }),
     registryFamily("fan-out", 19, "A wide fan-out from one hub to the rings around it.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "bundled", ports: "free" }),
     registryFamily("two-hubs", 23, "Two hubs with many shared targets.", seeds, { ...BASE, count: "100", edgeDensity: "medium", edgeShape: "bundled", ports: "free" }),
@@ -213,7 +217,8 @@ const V4_FAMILIES = V2_FAMILIES.map(roomFamily);
  * The set compares the routers on boards with room between the boxes. It keeps the 6 families, the member seeds and the split of `screen-v2`.
  *
  * The screen of this set uses the same floor rule as the other sets.
- * This set does not change. The tests compare it with the files in `corpus/screen-v4`.
+ * The room routes the level links, so a change of a router can change the boards of this generator (SCREEN-V4-FILES).
+ * Thus the set is its files in `corpus/screen-v4`. The screen and the tests read the files, not the generator.
  */
 export const SCREEN_V4: ScreenSet = {
   id: "screen-v4",
@@ -222,9 +227,93 @@ export const SCREEN_V4: ScreenSet = {
   heldOut: SCREEN_V4_HELD_OUT,
 };
 
+/** The arms of `screen-v5`: the values of the dimension `edgeKey` of the contract. */
+export const SCREEN_V5_KEYS: readonly EdgeKey[] = Object.freeze(["none", "random", "cluster"] as const);
+
+/** The member seeds of each family of `screen-v5` that the split `default` holds out. */
+export const SCREEN_V5_HELD_OUT: readonly number[] = [7, 8, 9];
+
+/**
+ * This function gives a family with the boards of `family` under one value of `edgeKey`. The function `edgeKeyStep` of the contract writes the keys.
+ * Only the field `data.collection` of the edges changes. The seed of the step is the seed of the generator of the member.
+ */
+function keyFamily(family: ScreenFamily, edgeKey: EdgeKey): ScreenFamily {
+  return {
+    ...family,
+    name: `${family.name}.key-${edgeKey}`,
+    shows: `${family.shows} The key of the edges is ${edgeKey}.`,
+    make: (k) => {
+      const graph = family.make(k);
+      const seed = family.generator(k).seed;
+      const input = graphInput(graph, { id: family.name, set: "screen-v5", family: family.name, seed });
+      const keyed = edgeKeyStep(input as Parameters<typeof edgeKeyStep>[0], { edgeKey }, seed);
+      const data = new Map((keyed.edges ?? []).map((e) => [e.id, e.data]));
+      const edges = graph.edges.map((e) => {
+        const { data: _old, ...plain } = e;
+        const d = data.get(e.id);
+        return d === undefined ? plain : { ...plain, data: d };
+      });
+      return { ...graph, edges };
+    },
+    generator: (k) => {
+      const { seed, ...base } = family.generator(k);
+      return { name: "edge-key", version: EDGE_KEY_STEP_VERSION, params: { edgeKey, base }, seed };
+    },
+    cell: { ...family.cell, edgeKey },
+  };
+}
+
+const V5_FAMILIES = SCREEN_V5_KEYS.flatMap((key) => V3_FAMILIES.map((f) => keyFamily(f, key)));
+
+/**
+ * The screen set `screen-v5` (COLLECTION-KEY): the 150 boards of `screen-v3` under each value of `edgeKey`, thus 450 boards in 45 families.
+ * The base `shared` makes ways only from the key `data.collection`. So the arm `none` compares the routers with no key, and the arms `random` and `cluster` with a key on each edge.
+ * The name of a family is the name of its family of `screen-v3` and `.key-<edgeKey>`. A screen of one arm names its 15 families.
+ *
+ * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
+ * This set does not change. The tests compare it with the files in `corpus/screen-v5`.
+ */
+export const SCREEN_V5: ScreenSet = {
+  id: "screen-v5",
+  families: V5_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V5_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V5_HELD_OUT,
+};
+
+/** The values of the dimension `inner` of `frame-rows` in `screen-v6`: the number of tries for an inner edge of each card. */
+export const SCREEN_V6_INNER: readonly number[] = Object.freeze([4, 12]);
+
+/** The member seeds of each family of `screen-v6` that the split `default` holds out. */
+export const SCREEN_V6_HELD_OUT: readonly number[] = [7, 8, 9];
+
+const V6_FAMILIES = SCREEN_V6_INNER.map((inner) =>
+  registryFamily("frame-rows", 13, `Cards with full-width rows and fixed plugs. Each card has ${inner} tries for an inner edge from a row to a wall plug.`, 10, FRAME_ROWS_CELL, { inner }, `frame-rows.inner-${inner}`),
+);
+
+/**
+ * The screen set `screen-v6` (SCREEN-INNER) has `frame-rows` with inner edges, at `inner` 4 and at `inner` 12.
+ * Each family has the 10 members 0 to 9, thus the set has 20 boards.
+ * The other sets have no board with inner routes, so a screen of those sets does not read the routes inside a frame.
+ * The member `k` has the seed of the member `k` of `frame-rows` in `screen-v3`. Only the inner edges are new.
+ *
+ * The name of a family is `frame-rows.inner-<inner>`. The generator of each input is `family.frame-rows` with the parameter `inner`.
+ *
+ * The manifest declares 10 inputs for each family. The split `default` holds out the members 7 to 9 of each family.
+ * This set does not change. The tests compare it with the files in `corpus/screen-v6`.
+ */
+export const SCREEN_V6: ScreenSet = {
+  id: "screen-v6",
+  families: V6_FAMILIES,
+  claims: { declared: { minCount: 10, thin: [], counts: Object.fromEntries(V6_FAMILIES.map((f) => [f.name, f.seeds])), familyBy: SCREEN_FAMILY_BY, familyMin: 10 } },
+  heldOut: SCREEN_V6_HELD_OUT,
+};
+
 /**
  * The screen sets by id. `screen-v1`, its larger version `screen-v2` (CORPUS-SEEDS) and `screen-v3` with 15 families (CORPUS-FAMILIES) have the boards of the screen.
  * `screen-v4` has the boards of `screen-v2` after `makeRoom` (PASS-GRID).
+ * `screen-v5` has the boards of `screen-v3` under each value of the key of the edges (COLLECTION-KEY).
+ *
+ * `screen-v6` has boards of `frame-rows` with inner edges (SCREEN-INNER).
  * `exact-v1` has small boards with a known optimum (MEAS2). `exact-v1-bounds` has larger boards with bounds (EXACT-BOUNDS).
  * `moves-v1` has one small board for each reason of REBUILD-SILENT.
  */
@@ -233,6 +322,8 @@ export const SCREEN_SETS: Readonly<Record<string, ScreenSet>> = {
   [SCREEN_V2.id]: SCREEN_V2,
   [SCREEN_V3.id]: SCREEN_V3,
   [SCREEN_V4.id]: SCREEN_V4,
+  [SCREEN_V5.id]: SCREEN_V5,
+  [SCREEN_V6.id]: SCREEN_V6,
   [EXACT_V1.id]: EXACT_V1,
   [EXACT_V1_BOUNDS.id]: EXACT_V1_BOUNDS,
   [MOVES_V1.id]: MOVES_V1,

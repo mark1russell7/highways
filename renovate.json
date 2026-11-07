@@ -1,4 +1,35 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>mark1russell7/template//renovate/default"]
+  "extends": [
+    "github>mark1russell7/template//renovate/default"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "The node versions of the cells of xplat.yml. Each major keeps its own line.",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/xplat\\.yml$/"
+      ],
+      "matchStrings": [
+        "(?<currentValue>\\d+\\.\\d+\\.\\d+) # (?<depName>node-\\d+)"
+      ],
+      "packageNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "versioningTemplate": "node"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": [
+        "node-24"
+      ],
+      "allowedVersions": "24.x"
+    },
+    {
+      "matchDepNames": [
+        "node-26"
+      ],
+      "allowedVersions": "26.x"
+    }
+  ]
 }

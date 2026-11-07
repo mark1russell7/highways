@@ -1,11 +1,11 @@
 /**
- * This module makes the rows of the record `route-pairs/1` (ROUTE-PAIRS).
+ * This module makes the rows of the record `route-pairs/2` (ROUTE-PAIRS).
  * Each row reads one board and one router: the ink crossings `R1`, the crossings between pairs of routes, and the moves of that count under small shifts.
  * The script `route-pairs.ts` writes the record, and the gate `route-pairs.test.ts` compares a part of it with fresh rows.
  */
 import { mulberry32, seedOf } from "@mark1russell7/rigor-generators";
 import { bootstrapMedian, median } from "@mark1russell7/rigor-statistics";
-import { measureQuality, routePairCrossings } from "../src/bench/quality.ts";
+import { measureQuality, paintedOutsidePairs, routePairCrossings } from "../src/bench/quality.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
 import type { Graph, Route, Router } from "../src/model.ts";
 import { ROUTERS, sectionsRouter } from "../src/routers/index.ts";
@@ -13,7 +13,7 @@ import { ROUTERS, sectionsRouter } from "../src/routers/index.ts";
 /** The command that writes the record again. */
 export const REGENERATE = "node packages/core/scripts/route-pairs.ts packages/core/scripts/data/route-pairs/record.json";
 /** The version of the record. */
-export const SCHEMA = "route-pairs/1";
+export const SCHEMA = "route-pairs/2";
 /** The sizes of a shift on each axis. */
 export const MOVES = [1e-12, 1e-10, 1e-8, 1e-7] as const;
 /** The size of the control shift. This size is far over the grid, so a count that does not change here tells that the shift test cannot fail. */
@@ -58,6 +58,10 @@ export interface BoardRow {
   readonly proper: number;
   readonly contact: number;
   readonly pairsEstimated: boolean;
+  /** The painted crossings that one route alone draws. */
+  readonly self: number;
+  /** The other painted crossings that are not strict on the grid `EPS`. */
+  readonly touch: number;
   readonly shifts: readonly ShiftRow[];
 }
 
@@ -120,6 +124,7 @@ export function boardRow(family: string, seed: number, board: Graph, name: strin
   const result = routerOf(name).route(board);
   const quality = measureQuality(board, result);
   const count = routePairCrossings(result.routes);
+  const outside = paintedOutsidePairs(result.routes);
   return {
     family,
     seed,
@@ -132,6 +137,8 @@ export function boardRow(family: string, seed: number, board: Graph, name: strin
     proper: count.proper,
     contact: count.contact,
     pairsEstimated: count.estimated,
+    self: outside.self,
+    touch: outside.touch,
     shifts: shiftRows(result.routes, count.pairs, `${family}/${seed}/${name}`),
   };
 }
@@ -182,6 +189,8 @@ export function routerSummary(rows: readonly BoardRow[], name: string) {
     contact: sum((r) => r.contact),
     vertices: sum((r) => r.vertices),
     gridsDiffer: sum((r) => r.gridsDiffer),
+    self: sum((r) => r.self),
+    touch: sum((r) => r.touch),
     pairsUnderCrossings: own.filter((r) => r.pairs < r.crossings).length,
     estimated: own.filter((r) => r.crossingsEstimated || r.pairsEstimated).length,
     crossingsAgainstCorners: of(ratios((r) => r.crossings), "crossings"),
@@ -199,6 +208,19 @@ export function routerSummary(rows: readonly BoardRow[], name: string) {
       return { move, one: side((s) => s.one), each: side((s) => s.each) };
     }),
   };
+}
+
+/** The fields of a row that the relation of the two crossing counts reads. */
+export type RelationRow = Pick<BoardRow, "family" | "seed" | "router" | "crossings" | "self" | "touch" | "pairs">;
+
+/** This function gives the room of a row in the relation `crossings - self - touch <= pairs`. A value under 0 is outside the relation. */
+export function relationSlack(row: RelationRow): number {
+  return row.pairs - (row.crossings - row.self - row.touch);
+}
+
+/** This function gives the key of each row outside the relation `crossings - self - touch <= pairs`. */
+export function relationFaults(rows: readonly RelationRow[]): string[] {
+  return rows.filter((row) => relationSlack(row) < 0).map((row) => `${row.family}/${row.seed}/${row.router}`);
 }
 
 /** This function gives the record of the rows. */

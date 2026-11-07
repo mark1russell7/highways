@@ -306,11 +306,22 @@ The router `trunks` gives each group one trunk from the plug to a split point. T
 
 The benchmark measures the lanes of `highwayCurves` on the case boards, with each value of `leave`.
 
-| Router | Board | Worst lane spacing error, `split` → `part` | Body crossings, `split` → `part` |
-|---|---|---:|---:|
-| `trunks` | `case-dense-groups` | 45.6% → 0.6% | 0 → 0 |
-| `trunks-all` | `case-dense-groups` | 133.2% → 0.8% | 2 → 0 |
-| `trunks-all` | `case-many-groups` | 102.8% → 47.6% | 0 → 0 |
+| Router | Board | Samples with an error over 25%, `split` → `part` | Lane pairs in those samples, `split` → `part` | Mean error, `split` → `part` | Body crossings, `split` → `part` |
+|---|---|---:|---:|---:|---:|
+| `trunks` | `case-dense-groups` | 2 → 0 | 1 → 0 | 0.13% → 0.04% | 0 → 0 |
+| `trunks-all` | `case-dense-groups` | 6 → 0 | 1 → 0 | 1.41% → 0.16% | 2 → 0 |
+| `trunks-all` | `case-many-groups` | 6 → 4 | 3 → 1 | 0.45% → 0.15% | 0 → 0 |
+
+The worst error is one sample, so this table does not show it as a headline. The worst errors, `split` → `part`, in the order of the rows, are 45.6% → 0.6%, 133.2% → 0.8% and 102.7% → 47.6%.
+
+This table reads each pair of lanes against the gap of that pair, the method `pair-gap` (`SPACING_METHOD`). Before LANE-ROOM, each pair read against the fixed spacing of its segment, the method `fixed-spacing`. Errors of two methods do not compare, and each row states its method.
+
+Each method answers a different question. The gap of the pair tells if a lane holds its assigned room. The fixed spacing tells what a reader sees between the lanes. Neither method alone is the claim:
+
+- `trunks-all` with `part` on `case-dense-groups` reads 0.8% on the gap and 33.5% on the fixed spacing 3.2, with 0 and 40 samples over 25%. The lanes hold their gap of 2.15, and that gap is narrower than the fixed spacing.
+- `trunks-all` with `split` on `case-many-groups` reads 102.7% on the gap and 62.7% on the fixed spacing 4. The table of 2026-10-27 read 68.2% in this cell, on the fixed spacing. The worst sample is on the same two lanes at each commit. Their distance fell from 6.73 to 6.51, and the denominator fell from 4 to 3.21. So the rise comes from the method. That sample is the only one of the 1,008 samples over 100% on the gap, and the fixed spacing reads none. Those lanes are too far apart at one sample, and they do not touch. This opening is older than LANE-ROOM.
+
+Each figure reads one board. The record `scripts/data/split-spacing/record.json` holds both methods on each row and the rows of the bisect. `scripts/split-spacing-bisect.ts` repeats the bisect.
 
 This table reads version 2 of the bundle counter, at the head of LANE-ROOM. `BUNDLE_COUNTER` gives the version. Version 1 read the middle of a sampled piece, so its body counts were a fault of the counter. The counts of two versions do not compare.
 
@@ -1003,7 +1014,7 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape`, `rings` and `walled-level`. They are in no screen set.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape`, `rings`, `walled-level`, `layered`, `lattice-x` and `arc-row`. They are in no screen set.
 - The screen set `screen-v3` has the first 15 families, each with 10 seeds.
 - The screen set `screen-v4` has the 60 boards of `screen-v2`, each after `makeRoom`.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.
@@ -1025,7 +1036,8 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - For a new decision, use exact arithmetic: a cross product, a dot product or a squared length.
 - A compare function of a sort must be a total order. Otherwise, two engines can give two orders.
 - The lane order of a run comes from a merge sort of the package, so each engine gives the same order (LANE-ORDER).
-- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run. Thus the 4 cells of `Xplat` agree.
+- Each sort of the stretch orders (LANE-STRETCH) has a total order. Its ties break by the key of the edge or of the run.
+- The workflow `Xplat` compares the routes of 4 cells. Its check `Xplat OK` fails on a route that differs. This claim holds for `corners`, `shared`, `shared-stretch` and `sections`, on 75 rows, and for no other router.
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 

@@ -82,9 +82,12 @@ check("the board routes with no failure", await until(() => stat("Time") !== "" 
 // The site publishes its measures, with the time of the data.
 const kpi = (await fetch("kpi.json")
   .then((response) => (response.ok ? response.json() : undefined))
-  .catch(() => undefined)) as { project?: string; at?: string; measures?: unknown[] } | undefined;
+  .catch(() => undefined)) as { project?: string; at?: string; measures?: { id?: string }[] } | undefined;
 check("the file of measures names this project", kpi?.project === "highways", kpi?.project);
 check("the file of measures has a data time", !Number.isNaN(Date.parse(kpi?.at ?? "")), kpi?.at);
-check("the file of measures has 5 measures", kpi?.measures?.length === 5, kpi?.measures?.length);
+// The measures of the milestones. The measure results-lag is not in this list, because it drops out when a release is not known.
+const MEASURE_IDS = ["results-unread", "playground-live", "coverage-shown", "atlas-live", "explorer-live", "cards-with-curves"];
+const ids = (kpi?.measures ?? []).map((m) => m.id);
+check("the file of measures has each measure of the milestones", MEASURE_IDS.every((id) => ids.includes(id)), ids.join(", "));
 
 export {};
