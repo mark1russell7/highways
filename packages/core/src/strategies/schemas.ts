@@ -421,6 +421,7 @@ export const LEVEL_ROOM_SCHEMA: OptionSchema<LevelRoomPreset> = {
 export const KEY_SCHEMA: OptionSchema<KeyOptions> = {
   key: { type: "function", describe: "This function gives the key of the group of each node." },
   split: { type: "object", describe: "With these limits of the quadtree, a large group splits into cells. Without them, each group is one leaf." },
+  nest: { type: "boolean", default: false, describe: "With `true`, each `/` of a key starts a group in a group, so a key path gives nested groups." },
 };
 
 /** The declarations of the limits of the tree of the grouping rules `kd` and `cut`. */
