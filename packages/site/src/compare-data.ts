@@ -116,7 +116,7 @@ const TIME: MeasureColumn = { key: "ms", label: "Time", describe: "The time of t
 /** The measures of the routes, for the steps `router`, `highway`, `plugs`, `levels` and `whole`. */
 const ROUTE_COLUMNS: readonly MeasureColumn[] = [
   { key: "R9.through", label: "Through", describe: "Routes that go through a box that is not an end.", better: "min", kind: "count" },
-  { key: "R1.crossings", label: "Crossings", describe: "Points where two routes cross.", better: "min", kind: "count" },
+  { key: "R1.crossings", label: "Crossings", describe: "Points where two drawn lines cross. A stretch that routes share counts one time, so this count alone is no win.", better: "min", kind: "count" },
   { key: "R6.worstDetour", label: "Worst detour", describe: "The longest route, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
   { key: "ink", label: "Total length", describe: "The length of all routes. A shared part counts one time.", better: "min", kind: "number", digits: 0 },
   { key: "R5.median", label: "Median detour", describe: "The median route length, divided by the straight line between its ends.", better: "min", kind: "number", digits: 2 },
