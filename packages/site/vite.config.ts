@@ -44,7 +44,7 @@ const ATLAS_ID = "virtual:atlas";
 const EXPLORER_ID = "virtual:explorer";
 
 /**
- * This plugin gives the data of the results page, of the strategies page, of the atlas page and of the explorer page from the committed files, at build time. The page reads no file and no network at run time.
+ * This plugin gives the data of four pages from the committed files, at build time: the results, the strategies, the atlas and the explorer. The page reads no file and no network at run time.
  * It also puts the data line (the core release, the commit and the date of the build) in each page.
  * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
  */
