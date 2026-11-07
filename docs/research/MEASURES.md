@@ -112,7 +112,7 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 | No value gives the shape of a curve. | closed | C1 to C4 and C8 of the suite read the joints, the energy and the deviation. C5 has no code, and the table below states this. |
 | No value gives the quality of a group. | open | 2026-11-11, COLLECTION-KEY. AMBIGUITY-FLAT read `route.bundle.ambiguity` (B4) on keyed inputs: it keeps a range over routers, and it hides a large change at its top. `route.bundle.reach` (B4) joins it. Neither reads if a group has a meaning. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
 | No value compares two zoom levels. | closed | Z6 to Z9 read the nesting, the positions, the order and the agreement of the levels. |
-| No value compares two results of inputs with a small change. | open | 2026-11-14, ROUTE-TIE. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. No value reads a shift with no meaning, and ROUTE-TIE gives the floor of each route measure. |
+| No value compares two results of inputs with a small change. | open | 2026-11-28, GRAPH-SHIFT. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. The record `route-tie/1` gives the floor of each route measure of 6 routers under 5 shifts of 1e-12, and the routes that move. No measure of the bench reads a shift. |
 
 ### What rests on `route.crossings`
 
