@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { kpiFacts } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
-import { cardsWithCurves, KPI_PAGES, latestAt, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
+import { cardsWithCurves, KPI_PAGES, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -37,6 +37,13 @@ describe("resultsUnread", () => {
     const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictCores: ["0.9.2", "0.10.0"], verdictReads: ["0.15.0", "0.10.0"] });
     expect(input?.measures.find((m) => m.id === "results-unread")).toEqual({ id: "results-unread", value: 1, unit: "snapshots" });
     expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(6);
+  });
+
+  it("gives the lag the date of the oldest run that gives it, and tells that it does not read the stamps", () => {
+    const facts = { ...FACTS, verdictCores: ["0.9.2", "0.9.2", "0.10.0"], verdictDates: ["2026-10-29", "2026-10-28", "2026-10-20"], verdictReads: ["0.15.0", "0.15.0", "0.15.0"] };
+    const lag = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, facts)?.measures.find((m) => m.id === "results-lag");
+    expect(lag).toEqual({ id: "results-lag", value: 6, unit: "releases", notCounted: LAG_NOT_COUNTED, at: "2026-10-28T00:00:00Z" });
+    expect(resultsLagAt(["0.15.0"], [undefined], "0.15.0")).toBeUndefined();
   });
 });
 

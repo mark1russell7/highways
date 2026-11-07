@@ -20,6 +20,7 @@ export function kpiFacts(root: string): KpiFacts {
     demoComplete: demoComplete(pageCoverage()),
     coverageCells: coverageView(text(RESULT_FILES.coverage), text(RESULT_FILES.coverageTrend)).cells,
     verdictCores: verdicts.map((s) => s.core),
+    verdictDates: verdicts.map((s) => s.date),
     verdictReads: verdicts.map((s) => s.verified?.core ?? s.core),
     verdictReadDates: verdicts.map((s) => s.verified?.date ?? s.date),
     sweeps: sweepRecords(root),
