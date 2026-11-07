@@ -1893,3 +1893,85 @@ pre code {
   color: var(--muted);
   font-size: 0.88rem;
 }
+
+/* The atlas page (SOLVED-ATLAS): the tiles, a grid of regions for each step, and the detail of one region. */
+.atl-wait {
+  margin: 12px 0 0;
+  max-width: 70ch;
+  color: var(--muted);
+}
+
+.atl-wait b {
+  color: var(--lab-mix);
+}
+
+.atl-step {
+  margin: 1.4rem 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.atl-step small {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.atl-grid thead th {
+  min-width: 7.5rem;
+}
+
+.atl-grid tbody th {
+  font-size: 0.88rem;
+}
+
+.atl-cell .res-lab {
+  white-space: nowrap;
+}
+
+.atl-cell.atl-base {
+  --lab: var(--lab-none);
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.atl-cell.atl-base .res-lab b {
+  color: var(--lab-mix);
+}
+
+.atl-days {
+  display: block;
+  height: 4px;
+  margin-top: 4px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.atl-days i {
+  display: block;
+  height: 100%;
+  background: var(--lab);
+}
+
+.atl-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.atl-facts dt {
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.atl-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.res-tiles .atl-date dd {
+  white-space: nowrap;
+  font-size: clamp(1.15rem, 4.6vw, 2.2rem);
+}
