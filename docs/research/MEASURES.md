@@ -160,7 +160,7 @@ The record `paint-tie/1` reads 3 routers on 84 boards, with 5 drawn vectors for 
 
 These floors are sums of moved pairs, and they count both directions. So a floor divided by the boards is not a value for `resolution` of `checkMeasures`, which reads a median net change on one board. The read of joint wins reads that net change on each board.
 
-**Two routers on one board.** This direct read compares each router on the frame of the boxes and on its own low corner. It answers how far a shared frame matters. The moved pairs of a router are 0.04 % to 2.50 % of its pairs on the frame. The sign of the gap between two routers changes on 2 of 504 pairs of routers on a board, and both are in one row of polylines.
+**Two routers on one board.** This direct read compares each router on the frame of the boxes and on its own low corner. It answers how far a shared frame matters. The moved pairs of a router are 0.04 % to 2.50 % of its pairs on the frame. On 2 of 504 boards of a pair of routers, the sign of the gap between them changes. Both are in one row of polylines.
 
 **What the grid removes.** On painted lines, the totals fall by 41, 285 and 276 points against float, or 0.09 %, 0.52 % and 0.33 %. On polylines the totals rise by 218, 113 and 102.
 
