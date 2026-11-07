@@ -3,7 +3,7 @@
  "regenerate": "node packages/core/scripts/paint-tie.ts packages/core/scripts/data/paint-tie/record.json",
  "paintCounter": 2,
  "grid": 0.000001,
- "boards": 75,
+ "boards": 84,
  "seeds": 3,
  "pairsOnBoard": [
   {
@@ -12,18 +12,18 @@
     "sections"
    ],
    "kind": "painted",
-   "boards": 75,
-   "cornersDiffer": 42,
+   "boards": 84,
+   "cornersDiffer": 45,
    "moved": [
     14,
-    393
+    394
    ],
    "pairs": [
-    35982,
-    40262
+    36243,
+    40506
    ],
    "signFlips": 0,
-   "gapChange": 59
+   "gapChange": 60
   },
   {
    "routers": [
@@ -31,15 +31,15 @@
     "sections"
    ],
    "kind": "polyline",
-   "boards": 75,
-   "cornersDiffer": 40,
+   "boards": 84,
+   "cornersDiffer": 43,
    "moved": [
     986,
     269
    ],
    "pairs": [
-    39169,
-    39295
+    39419,
+    39542
    ],
    "signFlips": 2,
    "gapChange": 55
@@ -50,18 +50,18 @@
     "sections-site"
    ],
    "kind": "painted",
-   "boards": 75,
-   "cornersDiffer": 62,
+   "boards": 84,
+   "cornersDiffer": 71,
    "moved": [
-    393,
-    477
+    394,
+    483
    ],
    "pairs": [
-    40262,
-    46959
+    40506,
+    47308
    ],
    "signFlips": 0,
-   "gapChange": 66
+   "gapChange": 68
   },
   {
    "routers": [
@@ -69,15 +69,15 @@
     "sections-site"
    ],
    "kind": "polyline",
-   "boards": 75,
-   "cornersDiffer": 62,
+   "boards": 84,
+   "cornersDiffer": 71,
    "moved": [
     269,
     511
    ],
    "pairs": [
-    39295,
-    48082
+    39542,
+    48392
    ],
    "signFlips": 0,
    "gapChange": 24
@@ -88,18 +88,18 @@
     "sections-site"
    ],
    "kind": "painted",
-   "boards": 75,
-   "cornersDiffer": 57,
+   "boards": 84,
+   "cornersDiffer": 66,
    "moved": [
     14,
-    477
+    483
    ],
    "pairs": [
-    35982,
-    46959
+    36243,
+    47308
    ],
    "signFlips": 0,
-   "gapChange": 29
+   "gapChange": 30
   },
   {
    "routers": [
@@ -107,15 +107,15 @@
     "sections-site"
    ],
    "kind": "polyline",
-   "boards": 75,
-   "cornersDiffer": 58,
+   "boards": 84,
+   "cornersDiffer": 67,
    "moved": [
     986,
     511
    ],
    "pairs": [
-    39169,
-    48082
+    39419,
+    48392
    ],
    "signFlips": 0,
    "gapChange": 47
@@ -147,240 +147,240 @@
    "kind": "painted",
    "vector": "shift-a",
    "moved": 7,
-   "points": 43357,
-   "share": 0.00016145028484443113
+   "points": 43627,
+   "share": 0.00016045109679785455
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-b",
    "moved": 28,
-   "points": 43357,
-   "share": 0.0006458011393777245
+   "points": 43627,
+   "share": 0.0006418043871914182
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-c",
    "moved": 41,
-   "points": 43357,
-   "share": 0.0009456373826602394
+   "points": 43627,
+   "share": 0.0009397849955302908
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-d",
    "moved": 37,
-   "points": 43357,
-   "share": 0.0008533800770348502
+   "points": 43627,
+   "share": 0.0008480986545029455
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-e",
    "moved": 47,
-   "points": 43357,
-   "share": 0.0010840233410983231
+   "points": 43627,
+   "share": 0.001077314507071309
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-a",
    "moved": 594,
-   "points": 78491,
-   "share": 0.007567746620631665
+   "points": 78768,
+   "share": 0.007541133455210238
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-b",
    "moved": 2063,
-   "points": 78491,
-   "share": 0.026283268145392464
+   "points": 78768,
+   "share": 0.026190838919358115
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 2492,
-   "points": 78491,
-   "share": 0.031748862926959776
+   "moved": 2494,
+   "points": 78768,
+   "share": 0.031662604103189114
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 1883,
-   "points": 78491,
-   "share": 0.0239900115936859
+   "moved": 1884,
+   "points": 78768,
+   "share": 0.023918342474101156
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-e",
-   "moved": 2605,
-   "points": 78491,
-   "share": 0.03318851842886446
+   "moved": 2606,
+   "points": 78768,
+   "share": 0.03308450132033313
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-a",
    "moved": 301,
-   "points": 53790,
-   "share": 0.005595835657185351
+   "points": 54074,
+   "share": 0.005566445981432851
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 980,
-   "points": 53790,
-   "share": 0.01821899981409184
+   "moved": 982,
+   "points": 54074,
+   "share": 0.018160298849724452
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 1148,
-   "points": 53790,
-   "share": 0.02134225692507901
+   "moved": 1150,
+   "points": 54074,
+   "share": 0.02126715242075674
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-d",
-   "moved": 937,
-   "points": 53790,
-   "share": 0.017419594720208216
+   "moved": 940,
+   "points": 54074,
+   "share": 0.017383585456966378
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-e",
-   "moved": 1242,
-   "points": 53790,
-   "share": 0.02308979364194088
+   "moved": 1244,
+   "points": 54074,
+   "share": 0.02300551096645338
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-a",
-   "moved": 204,
-   "points": 58000,
-   "share": 0.003517241379310345
+   "moved": 205,
+   "points": 58315,
+   "share": 0.003515390551316128
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-b",
-   "moved": 714,
-   "points": 58000,
-   "share": 0.012310344827586207
+   "moved": 717,
+   "points": 58315,
+   "share": 0.012295292806310554
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 843,
-   "points": 58000,
-   "share": 0.01453448275862069
+   "moved": 846,
+   "points": 58315,
+   "share": 0.014507416616650948
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 557,
-   "points": 58000,
-   "share": 0.009603448275862068
+   "moved": 560,
+   "points": 58315,
+   "share": 0.009603018091400154
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-e",
-   "moved": 806,
-   "points": 58000,
-   "share": 0.01389655172413793
+   "moved": 810,
+   "points": 58315,
+   "share": 0.013890079739346651
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-a",
-   "moved": 391,
-   "points": 83528,
-   "share": 0.004681065032085049
+   "moved": 394,
+   "points": 84011,
+   "share": 0.004689862041875469
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 1362,
-   "points": 83528,
-   "share": 0.016305909395651758
+   "moved": 1365,
+   "points": 84011,
+   "share": 0.016247872302436586
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 1542,
-   "points": 83528,
-   "share": 0.0184608753950771
+   "moved": 1546,
+   "points": 84011,
+   "share": 0.01840235207294283
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-d",
    "moved": 1191,
-   "points": 83528,
-   "share": 0.014258691696197682
+   "points": 84011,
+   "share": 0.01417671495399412
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-e",
-   "moved": 1607,
-   "points": 83528,
-   "share": 0.019239057561536252
+   "moved": 1608,
+   "points": 84011,
+   "share": 0.019140350668364857
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-a",
-   "moved": 364,
-   "points": 96371,
-   "share": 0.0037770698654159447
+   "moved": 366,
+   "points": 96842,
+   "share": 0.003779351934078189
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-b",
-   "moved": 1294,
-   "points": 96371,
-   "share": 0.013427275840242397
+   "moved": 1299,
+   "points": 96842,
+   "share": 0.01341360153652341
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 1391,
-   "points": 96371,
-   "share": 0.01443380269998236
+   "moved": 1395,
+   "points": 96842,
+   "share": 0.014404906961855393
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 1090,
-   "points": 96371,
-   "share": 0.011310456465119174
+   "moved": 1091,
+   "points": 96842,
+   "share": 0.011265773114970777
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-e",
    "moved": 1443,
-   "points": 96371,
-   "share": 0.014973384109327494
+   "points": 96842,
+   "share": 0.014900559674521386
   }
  ],
  "rates": [
@@ -388,96 +388,96 @@
    "kind": "painted",
    "move": 1e-12,
    "moved": 0,
-   "crossingsUnderGrid": 7145,
-   "pairsUnderGrid": 85330,
+   "crossingsUnderGrid": 7450,
+   "pairsUnderGrid": 88985,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
-   "low": 0,
-   "high": 0.0005373540374089972,
+   "low": 5.421010862427522e-20,
+   "high": 0.0005153663170751018,
    "formula": 0.0000014546000589616598
   },
   {
    "kind": "painted",
    "move": 1e-10,
    "moved": 9,
-   "crossingsUnderGrid": 7145,
-   "pairsUnderGrid": 85330,
-   "rateOfCrossings": 0.0012596221133659902,
-   "rateOfPairs": 0.0001054728700339857,
-   "low": 0.0006628480094627461,
-   "high": 0.002392396528621778,
+   "crossingsUnderGrid": 7450,
+   "pairsUnderGrid": 88985,
+   "rateOfCrossings": 0.0012080536912751677,
+   "rateOfPairs": 0.00010114064168118223,
+   "low": 0.0006357059192233857,
+   "high": 0.0022945226000386488,
    "formula": 0.00014982915515545755
   },
   {
    "kind": "painted",
    "move": 1e-8,
-   "moved": 495,
-   "crossingsUnderGrid": 7145,
-   "pairsUnderGrid": 85330,
-   "rateOfCrossings": 0.06927921623512946,
-   "rateOfPairs": 0.005801007851869214,
-   "low": 0.063619830045004,
-   "high": 0.07540150152955898,
+   "moved": 497,
+   "crossingsUnderGrid": 7450,
+   "pairsUnderGrid": 88985,
+   "rateOfCrossings": 0.06671140939597316,
+   "rateOfPairs": 0.005585210990616396,
+   "low": 0.06126575374264505,
+   "high": 0.07260366973964179,
    "formula": 0.016036978301359344
   },
   {
    "kind": "painted",
    "move": 1e-7,
-   "moved": 4704,
-   "crossingsUnderGrid": 7145,
-   "pairsUnderGrid": 85330,
-   "rateOfCrossings": 0.6583624912526242,
-   "rateOfPairs": 0.05512715340442986,
-   "low": 0.6472833224173468,
-   "high": 0.6692714666398042,
+   "moved": 4716,
+   "crossingsUnderGrid": 7450,
+   "pairsUnderGrid": 88985,
+   "rateOfCrossings": 0.6330201342281879,
+   "rateOfPairs": 0.05299769624093949,
+   "low": 0.6220095874523226,
+   "high": 0.6438935728107051,
    "formula": 0.1514481009845622
   },
   {
    "kind": "polyline",
    "move": 1e-12,
    "moved": 0,
-   "crossingsUnderGrid": 7420,
-   "pairsUnderGrid": 15965,
+   "crossingsUnderGrid": 7435,
+   "pairsUnderGrid": 16065,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
    "low": 0,
-   "high": 0.0005174489301801922,
+   "high": 0.0005164055238923086,
    "formula": 0.0000014546000589616598
   },
   {
    "kind": "polyline",
    "move": 1e-10,
    "moved": 12,
-   "crossingsUnderGrid": 7420,
-   "pairsUnderGrid": 15965,
-   "rateOfCrossings": 0.0016172506738544475,
-   "rateOfPairs": 0.0007516442217350455,
-   "low": 0.0009254029268232974,
-   "high": 0.0028248736618037514,
+   "crossingsUnderGrid": 7435,
+   "pairsUnderGrid": 16065,
+   "rateOfCrossings": 0.0016139878950907868,
+   "rateOfPairs": 0.0007469654528478057,
+   "low": 0.0009235354707113841,
+   "high": 0.0028191788988334576,
    "formula": 0.00014982915515545755
   },
   {
    "kind": "polyline",
    "move": 1e-8,
    "moved": 576,
-   "crossingsUnderGrid": 7420,
-   "pairsUnderGrid": 15965,
-   "rateOfCrossings": 0.07762803234501348,
-   "rateOfPairs": 0.03607892264328218,
-   "low": 0.07175576697013601,
-   "high": 0.0839374095654933,
+   "crossingsUnderGrid": 7435,
+   "pairsUnderGrid": 16065,
+   "rateOfCrossings": 0.07747141896435776,
+   "rateOfPairs": 0.035854341736694675,
+   "low": 0.07161056045675925,
+   "high": 0.08376866965845466,
    "formula": 0.016036978301359344
   },
   {
    "kind": "polyline",
    "move": 1e-7,
-   "moved": 6330,
-   "crossingsUnderGrid": 7420,
-   "pairsUnderGrid": 15965,
-   "rateOfCrossings": 0.8530997304582211,
-   "rateOfPairs": 0.39649232696523645,
-   "low": 0.8448621833442663,
-   "high": 0.8609718554166309,
+   "moved": 6340,
+   "crossingsUnderGrid": 7435,
+   "pairsUnderGrid": 16065,
+   "rateOfCrossings": 0.8527236045729657,
+   "rateOfPairs": 0.39464674758792406,
+   "low": 0.8444862396762258,
+   "high": 0.8605966726340883,
    "formula": 0.1514481009845622
   }
  ],
@@ -492,23 +492,23 @@
   },
   {
    "router": "sections-site",
-   "laneOrderFlips": 469
+   "laneOrderFlips": 470
   }
  ],
  "rows": [
   {
    "router": "shared-all",
    "kind": "painted",
-   "floatPoints": 43398,
-   "snapPoints": 43357,
-   "exactPoints": 43401,
-   "anchoredPoints": 43353,
-   "framedPoints": 43357,
-   "floatPairs": 36006,
-   "snapPairs": 35982,
-   "exactPairs": 36008,
-   "anchoredPairs": 35982,
-   "framedPairs": 35982,
+   "floatPoints": 43668,
+   "snapPoints": 43627,
+   "exactPoints": 43671,
+   "anchoredPoints": 43623,
+   "framedPoints": 43627,
+   "floatPairs": 36267,
+   "snapPairs": 36243,
+   "exactPairs": 36269,
+   "anchoredPairs": 36243,
+   "framedPairs": 36243,
    "lost": {
     "count": 94,
     "widest": 2.2737367544323206e-13,
@@ -1309,35 +1309,35 @@
   {
    "router": "shared-all",
    "kind": "polyline",
-   "floatPoints": 78274,
-   "snapPoints": 78491,
-   "exactPoints": 78280,
-   "anchoredPoints": 78562,
-   "framedPoints": 78494,
-   "floatPairs": 39140,
-   "snapPairs": 39169,
-   "exactPairs": 39140,
-   "anchoredPairs": 39188,
-   "framedPairs": 39169,
+   "floatPoints": 78550,
+   "snapPoints": 78768,
+   "exactPoints": 78556,
+   "anchoredPoints": 78839,
+   "framedPoints": 78771,
+   "floatPairs": 39390,
+   "snapPairs": 39419,
+   "exactPairs": 39390,
+   "anchoredPairs": 39438,
+   "framedPairs": 39419,
    "lost": {
-    "count": 2128,
+    "count": 2130,
     "widest": 4.602649920770331e-13,
     "widestToEnd": 3.5371042909228083e-12,
     "overGrid": 0,
-    "under1e9": 2128,
-    "under1e6": 2128,
+    "under1e9": 2130,
+    "under1e6": 2130,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
     "farWidest": []
    },
    "added": {
-    "count": 2345,
+    "count": 2348,
     "widest": 4.602649920770331e-13,
     "widestToEnd": 6.752653646307179e-12,
     "overGrid": 0,
-    "under1e9": 2345,
-    "under1e6": 2345,
+    "under1e9": 2348,
+    "under1e6": 2348,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
@@ -1367,7 +1367,7 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 1774,
+   "near": 1789,
    "nearCrossings": 859,
    "shifts": [
     {
@@ -1385,7 +1385,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 911,
+     "floatMoved": 912,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1425,7 +1425,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 898,
+     "floatMoved": 900,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1445,7 +1445,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 924,
+     "floatMoved": 926,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1705,7 +1705,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 952,
+     "floatMoved": 953,
      "snapMoved": 47,
      "anchoredMoved": 84,
      "framedMoved": 46
@@ -1725,7 +1725,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 954,
+     "floatMoved": 955,
      "snapMoved": 70,
      "anchoredMoved": 104,
      "framedMoved": 67
@@ -1745,7 +1745,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 939,
+     "floatMoved": 940,
      "snapMoved": 73,
      "anchoredMoved": 113,
      "framedMoved": 69
@@ -1776,7 +1776,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 1960,
+     "snapMoved": 1961,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1786,7 +1786,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 9,
-     "snapMoved": 2396,
+     "snapMoved": 2398,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1796,7 +1796,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 5,
-     "snapMoved": 2522,
+     "snapMoved": 2524,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1806,7 +1806,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 1565,
+     "snapMoved": 1566,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1816,7 +1816,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 1620,
+     "snapMoved": 1621,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1846,7 +1846,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 35,
-     "snapMoved": 2492,
+     "snapMoved": 2494,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1856,7 +1856,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 35,
-     "snapMoved": 1883,
+     "snapMoved": 1884,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1866,7 +1866,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 2605,
+     "snapMoved": 2606,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1958,7 +1958,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2064
+     "framedMoved": 2065
     },
     {
      "move": 0.3,
@@ -1967,7 +1967,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2601,
+     "anchoredMoved": 2603,
      "framedMoved": 0
     },
     {
@@ -1978,7 +1978,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2579
+     "framedMoved": 2580
     },
     {
      "move": 0.3,
@@ -1987,7 +1987,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2118,
+     "anchoredMoved": 2119,
      "framedMoved": 0
     },
     {
@@ -1998,7 +1998,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1846
+     "framedMoved": 1847
     },
     {
      "move": 0.3,
@@ -2007,7 +2007,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2620,
+     "anchoredMoved": 2622,
      "framedMoved": 0
     },
     {
@@ -2018,31 +2018,31 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2435
+     "framedMoved": 2436
     }
    ]
   },
   {
    "router": "sections",
    "kind": "painted",
-   "floatPoints": 54016,
-   "snapPoints": 53790,
-   "exactPoints": 54099,
-   "anchoredPoints": 53806,
-   "framedPoints": 53791,
-   "floatPairs": 40297,
-   "snapPairs": 40261,
-   "exactPairs": 40317,
-   "anchoredPairs": 40275,
-   "framedPairs": 40262,
+   "floatPoints": 54359,
+   "snapPoints": 54074,
+   "exactPoints": 54442,
+   "anchoredPoints": 54091,
+   "framedPoints": 54075,
+   "floatPairs": 40555,
+   "snapPairs": 40505,
+   "exactPairs": 40575,
+   "anchoredPairs": 40520,
+   "framedPairs": 40506,
    "lost": {
-    "count": 1133,
+    "count": 1192,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 99.72578266071761,
     "overGrid": 0,
-    "under1e9": 1133,
-    "under1e6": 1133,
-    "farFromEnd": 425,
+    "under1e9": 1192,
+    "under1e6": 1192,
+    "farFromEnd": 483,
     "widestFarSine": 3.797180885561183e-13,
     "farWithAngle": 0,
     "farWidest": [
@@ -2072,48 +2072,48 @@
      {
       "points": [
        {
-        "x": 1050.0753536528928,
-        "y": 255.93380311231232
+        "x": 1471.9121909493608,
+        "y": 14.51899388614095
        },
        {
-        "x": 1050.8645888725912,
-        "y": 256.93185147918035
+        "x": 1471.346286500016,
+        "y": 15.032709015182329
        },
        {
-        "x": 1050.864588872591,
-        "y": 256.93185147918035
+        "x": 1471.3462865000158,
+        "y": 15.032709015182354
        },
        {
-        "x": 1050.0753536528928,
-        "y": 255.9338031123123
+        "x": 1471.9121909493608,
+        "y": 14.51899388614098
        }
       ],
-      "touch": 0,
-      "toEnd": 0.11443636988496883,
-      "sine": 1.5401927373598494e-13
+      "touch": 1.5987211554602254e-14,
+      "toEnd": 0.10316770444712997,
+      "sine": 2.0345656960637353e-13
      },
      {
       "points": [
        {
-        "x": 1077.135411127409,
-        "y": 256.93185147918035
+        "x": 1207.0878090506392,
+        "y": 14.51899388614095
        },
        {
-        "x": 1077.9246463471072,
-        "y": 255.9338031123123
+        "x": 1207.653713499984,
+        "y": 15.032709015182329
        },
        {
-        "x": 1077.9246463471072,
-        "y": 255.93380311231232
+        "x": 1207.6537134999842,
+        "y": 15.032709015182354
        },
        {
-        "x": 1077.1354111274088,
-        "y": 256.93185147918035
+        "x": 1207.0878090506392,
+        "y": 14.51899388614098
        }
       ],
-      "touch": 0,
-      "toEnd": 0.11443636988496883,
-      "sine": 1.5401927373598494e-13
+      "touch": 1.5987211554602254e-14,
+      "toEnd": 0.10316770444712997,
+      "sine": 2.0345656960637353e-13
      }
     ]
    },
@@ -2293,8 +2293,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 7608,
-   "nearCrossings": 520,
+   "near": 8111,
+   "nearCrossings": 579,
    "shifts": [
     {
      "move": 1e-12,
@@ -2662,7 +2662,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 11,
-     "snapMoved": 391,
+     "snapMoved": 393,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2702,7 +2702,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 994,
+     "snapMoved": 996,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2712,7 +2712,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 3,
-     "snapMoved": 1158,
+     "snapMoved": 1160,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2722,7 +2722,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 1169,
+     "snapMoved": 1171,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2732,7 +2732,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 702,
+     "snapMoved": 703,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2742,7 +2742,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 823,
+     "snapMoved": 826,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2762,7 +2762,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 42,
-     "snapMoved": 980,
+     "snapMoved": 982,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2772,7 +2772,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 11,
-     "snapMoved": 1148,
+     "snapMoved": 1150,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2782,7 +2782,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 11,
-     "snapMoved": 937,
+     "snapMoved": 940,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2792,7 +2792,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 3,
-     "snapMoved": 1242,
+     "snapMoved": 1244,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2853,7 +2853,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 274,
+     "anchoredMoved": 275,
      "framedMoved": 0
     },
     {
@@ -2864,7 +2864,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 272
+     "framedMoved": 275
     },
     {
      "move": 0.3,
@@ -2873,7 +2873,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1028,
+     "anchoredMoved": 1031,
      "framedMoved": 0
     },
     {
@@ -2884,7 +2884,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1049
+     "framedMoved": 1052
     },
     {
      "move": 0.3,
@@ -2893,7 +2893,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1184,
+     "anchoredMoved": 1187,
      "framedMoved": 0
     },
     {
@@ -2904,7 +2904,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1149
+     "framedMoved": 1151
     },
     {
      "move": 0.3,
@@ -2913,7 +2913,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 942,
+     "anchoredMoved": 945,
      "framedMoved": 0
     },
     {
@@ -2924,7 +2924,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 950
+     "framedMoved": 952
     },
     {
      "move": 0.3,
@@ -2933,7 +2933,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1173,
+     "anchoredMoved": 1176,
      "framedMoved": 0
     },
     {
@@ -2944,23 +2944,23 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1188
+     "framedMoved": 1191
     }
    ]
   },
   {
    "router": "sections",
    "kind": "polyline",
-   "floatPoints": 57891,
-   "snapPoints": 58000,
-   "exactPoints": 57891,
-   "anchoredPoints": 57998,
-   "framedPoints": 58003,
-   "floatPairs": 39281,
-   "snapPairs": 39295,
-   "exactPairs": 39281,
-   "anchoredPairs": 39299,
-   "framedPairs": 39295,
+   "floatPoints": 58202,
+   "snapPoints": 58315,
+   "exactPoints": 58202,
+   "anchoredPoints": 58313,
+   "framedPoints": 58318,
+   "floatPairs": 39528,
+   "snapPairs": 39542,
+   "exactPairs": 39528,
+   "anchoredPairs": 39546,
+   "framedPairs": 39542,
    "lost": {
     "count": 463,
     "widest": 2.085575717305321e-7,
@@ -3044,12 +3044,12 @@
     ]
    },
    "added": {
-    "count": 572,
+    "count": 576,
     "widest": 2.5421149729252077e-13,
     "widestToEnd": 3.2713300124373386,
     "overGrid": 0,
-    "under1e9": 572,
-    "under1e6": 572,
+    "under1e9": 576,
+    "under1e6": 576,
     "farFromEnd": 7,
     "widestFarSine": 4.198056767293094e-14,
     "farWithAngle": 0,
@@ -3149,7 +3149,7 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 518,
+   "near": 519,
    "nearCrossings": 227,
    "shifts": [
     {
@@ -3167,7 +3167,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 520,
+     "floatMoved": 523,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3187,7 +3187,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 503,
+     "floatMoved": 507,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3207,7 +3207,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 527,
+     "floatMoved": 531,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3227,7 +3227,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 523,
+     "floatMoved": 527,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3247,7 +3247,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 474,
+     "floatMoved": 477,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3267,7 +3267,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 502,
+     "floatMoved": 506,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3287,7 +3287,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 482,
+     "floatMoved": 486,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3307,7 +3307,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 512,
+     "floatMoved": 516,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3327,7 +3327,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 474,
+     "floatMoved": 478,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3347,7 +3347,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 482,
+     "floatMoved": 485,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3357,7 +3357,7 @@
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 7.608067183755338e-9,
-     "floatMoved": 6,
+     "floatMoved": 7,
      "snapMoved": 24,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3367,7 +3367,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 529,
+     "floatMoved": 531,
      "snapMoved": 16,
      "anchoredMoved": 5,
      "framedMoved": 12
@@ -3387,7 +3387,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 518,
+     "floatMoved": 519,
      "snapMoved": 6,
      "anchoredMoved": 6,
      "framedMoved": 6
@@ -3407,7 +3407,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 476,
+     "floatMoved": 478,
      "snapMoved": 9,
      "anchoredMoved": 8,
      "framedMoved": 5
@@ -3417,7 +3417,7 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 8.89773343282286e-9,
-     "floatMoved": 15,
+     "floatMoved": 16,
      "snapMoved": 34,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3458,7 +3458,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 26,
-     "snapMoved": 221,
+     "snapMoved": 222,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3467,7 +3467,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 534,
+     "floatMoved": 538,
      "snapMoved": 58,
      "anchoredMoved": 48,
      "framedMoved": 54
@@ -3487,9 +3487,9 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 570,
+     "floatMoved": 575,
      "snapMoved": 42,
-     "anchoredMoved": 45,
+     "anchoredMoved": 46,
      "framedMoved": 42
     },
     {
@@ -3507,9 +3507,9 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 566,
+     "floatMoved": 571,
      "snapMoved": 27,
-     "anchoredMoved": 31,
+     "anchoredMoved": 32,
      "framedMoved": 27
     },
     {
@@ -3518,7 +3518,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 4,
-     "snapMoved": 253,
+     "snapMoved": 255,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3527,9 +3527,9 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 540,
+     "floatMoved": 545,
      "snapMoved": 57,
-     "anchoredMoved": 38,
+     "anchoredMoved": 39,
      "framedMoved": 57
     },
     {
@@ -3547,9 +3547,9 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 532,
+     "floatMoved": 537,
      "snapMoved": 38,
-     "anchoredMoved": 46,
+     "anchoredMoved": 47,
      "framedMoved": 36
     },
     {
@@ -3558,7 +3558,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 601,
+     "snapMoved": 603,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3568,7 +3568,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 724,
+     "snapMoved": 727,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3578,7 +3578,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 835,
+     "snapMoved": 840,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3588,7 +3588,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 598,
+     "snapMoved": 600,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3598,7 +3598,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 519,
+     "snapMoved": 521,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3608,7 +3608,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 8,
-     "snapMoved": 204,
+     "snapMoved": 205,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3618,7 +3618,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 11,
-     "snapMoved": 714,
+     "snapMoved": 717,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3627,8 +3627,8 @@
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 0.20951690531219355,
-     "floatMoved": 12,
-     "snapMoved": 843,
+     "floatMoved": 13,
+     "snapMoved": 846,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3637,8 +3637,8 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 0.2338216556876432,
-     "floatMoved": 12,
-     "snapMoved": 557,
+     "floatMoved": 13,
+     "snapMoved": 560,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3648,7 +3648,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 806,
+     "snapMoved": 810,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3709,7 +3709,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 256,
+     "anchoredMoved": 257,
      "framedMoved": 0
     },
     {
@@ -3720,7 +3720,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 205
+     "framedMoved": 206
     },
     {
      "move": 0.3,
@@ -3729,7 +3729,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 718,
+     "anchoredMoved": 720,
      "framedMoved": 0
     },
     {
@@ -3740,7 +3740,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 636
+     "framedMoved": 640
     },
     {
      "move": 0.3,
@@ -3749,7 +3749,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 865,
+     "anchoredMoved": 870,
      "framedMoved": 0
     },
     {
@@ -3760,7 +3760,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 874
+     "framedMoved": 878
     },
     {
      "move": 0.3,
@@ -3769,7 +3769,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 603,
+     "anchoredMoved": 605,
      "framedMoved": 0
     },
     {
@@ -3780,7 +3780,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 562
+     "framedMoved": 563
     },
     {
      "move": 0.3,
@@ -3789,7 +3789,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 861,
+     "anchoredMoved": 866,
      "framedMoved": 0
     },
     {
@@ -3800,30 +3800,30 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 799
+     "framedMoved": 802
     }
    ]
   },
   {
    "router": "sections-site",
    "kind": "painted",
-   "floatPoints": 83802,
-   "snapPoints": 83528,
-   "exactPoints": 83900,
-   "anchoredPoints": 83546,
-   "framedPoints": 83545,
-   "floatPairs": 46980,
-   "snapPairs": 46957,
-   "exactPairs": 46984,
-   "anchoredPairs": 46954,
-   "framedPairs": 46959,
+   "floatPoints": 84287,
+   "snapPoints": 84011,
+   "exactPoints": 84386,
+   "anchoredPoints": 84029,
+   "framedPoints": 84028,
+   "floatPairs": 47330,
+   "snapPairs": 47306,
+   "exactPairs": 47334,
+   "anchoredPairs": 47304,
+   "framedPairs": 47308,
    "lost": {
-    "count": 1674,
+    "count": 1678,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 224.1571871058832,
     "overGrid": 0,
-    "under1e9": 1673,
-    "under1e6": 1674,
+    "under1e9": 1677,
+    "under1e6": 1678,
     "farFromEnd": 571,
     "widestFarSine": 4.315891810432604e-13,
     "farWithAngle": 0,
@@ -3900,13 +3900,13 @@
     ]
    },
    "added": {
-    "count": 1400,
+    "count": 1402,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 9993.60324960657,
     "overGrid": 0,
-    "under1e9": 1399,
-    "under1e6": 1400,
-    "farFromEnd": 273,
+    "under1e9": 1401,
+    "under1e6": 1402,
+    "farFromEnd": 274,
     "widestFarSine": 1.1004300930050837e-12,
     "farWithAngle": 0,
     "farWidest": [
@@ -3982,13 +3982,13 @@
     ]
    },
    "exactAdded": {
-    "count": 102,
+    "count": 103,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 248.1554437521914,
     "overGrid": 0,
-    "under1e9": 102,
-    "under1e6": 102,
-    "farFromEnd": 35,
+    "under1e9": 103,
+    "under1e6": 103,
+    "farFromEnd": 36,
     "widestFarSine": 1.330803139554369e-15,
     "farWithAngle": 0,
     "farWidest": [
@@ -4075,8 +4075,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 9210,
-   "nearCrossings": 837,
+   "near": 9438,
+   "nearCrossings": 839,
    "shifts": [
     {
      "move": 1e-12,
@@ -4344,7 +4344,7 @@
      "form": "lines",
      "meanMove": 8.89773343282286e-9,
      "floatMoved": 32,
-     "snapMoved": 67,
+     "snapMoved": 69,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4384,7 +4384,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 66,
-     "snapMoved": 532,
+     "snapMoved": 534,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4404,7 +4404,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 46,
-     "snapMoved": 573,
+     "snapMoved": 575,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4424,7 +4424,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 35,
-     "snapMoved": 574,
+     "snapMoved": 576,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4444,7 +4444,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 12,
-     "snapMoved": 634,
+     "snapMoved": 636,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4464,7 +4464,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 35,
-     "snapMoved": 405,
+     "snapMoved": 407,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4484,7 +4484,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 1329,
+     "snapMoved": 1332,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4494,7 +4494,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 1435,
+     "snapMoved": 1436,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4504,7 +4504,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 1542,
+     "snapMoved": 1545,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4514,7 +4514,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 966,
+     "snapMoved": 972,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4524,7 +4524,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 1100,
+     "snapMoved": 1103,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4534,7 +4534,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 43,
-     "snapMoved": 391,
+     "snapMoved": 394,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4544,7 +4544,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 47,
-     "snapMoved": 1362,
+     "snapMoved": 1365,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4554,7 +4554,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 20,
-     "snapMoved": 1542,
+     "snapMoved": 1546,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4574,7 +4574,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 1607,
+     "snapMoved": 1608,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4593,7 +4593,7 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 6,
-     "floatMoved": 32,
+     "floatMoved": 33,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4613,7 +4613,7 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 5,
-     "floatMoved": 32,
+     "floatMoved": 33,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4623,7 +4623,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 4.5,
-     "floatMoved": 23,
+     "floatMoved": 24,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4646,7 +4646,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 366
+     "framedMoved": 368
     },
     {
      "move": 0.3,
@@ -4655,7 +4655,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1370,
+     "anchoredMoved": 1374,
      "framedMoved": 0
     },
     {
@@ -4666,7 +4666,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1304
+     "framedMoved": 1308
     },
     {
      "move": 0.3,
@@ -4675,7 +4675,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1530,
+     "anchoredMoved": 1534,
      "framedMoved": 0
     },
     {
@@ -4686,7 +4686,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1506
+     "framedMoved": 1510
     },
     {
      "move": 0.3,
@@ -4695,7 +4695,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1230,
+     "anchoredMoved": 1232,
      "framedMoved": 0
     },
     {
@@ -4706,7 +4706,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1281
+     "framedMoved": 1282
     },
     {
      "move": 0.3,
@@ -4715,7 +4715,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1583,
+     "anchoredMoved": 1589,
      "framedMoved": 0
     },
     {
@@ -4726,30 +4726,30 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1517
+     "framedMoved": 1521
     }
    ]
   },
   {
    "router": "sections-site",
    "kind": "polyline",
-   "floatPoints": 96267,
-   "snapPoints": 96371,
-   "exactPoints": 96277,
-   "anchoredPoints": 96459,
-   "framedPoints": 96358,
-   "floatPairs": 48072,
-   "snapPairs": 48084,
-   "exactPairs": 48073,
-   "anchoredPairs": 48086,
-   "framedPairs": 48082,
+   "floatPoints": 96740,
+   "snapPoints": 96842,
+   "exactPoints": 96750,
+   "anchoredPoints": 96930,
+   "framedPoints": 96829,
+   "floatPairs": 48382,
+   "snapPairs": 48394,
+   "exactPairs": 48383,
+   "anchoredPairs": 48396,
+   "framedPairs": 48392,
    "lost": {
-    "count": 987,
+    "count": 990,
     "widest": 2.3437142008433856e-13,
     "widestToEnd": 30.238925469708963,
     "overGrid": 0,
-    "under1e9": 987,
-    "under1e6": 987,
+    "under1e9": 990,
+    "under1e6": 990,
     "farFromEnd": 46,
     "widestFarSine": 7.03098180273014e-14,
     "farWithAngle": 0,
@@ -4826,12 +4826,12 @@
     ]
    },
    "added": {
-    "count": 1091,
+    "count": 1092,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 2194.9999999999204,
     "overGrid": 0,
-    "under1e9": 1091,
-    "under1e6": 1091,
+    "under1e9": 1092,
+    "under1e6": 1092,
     "farFromEnd": 42,
     "widestFarSine": 6.777053542320553e-14,
     "farWithAngle": 0,
@@ -4955,8 +4955,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 901,
-   "nearCrossings": 398,
+   "near": 905,
+   "nearCrossings": 401,
    "shifts": [
     {
      "move": 1e-12,
@@ -5264,7 +5264,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 22,
-     "snapMoved": 363,
+     "snapMoved": 365,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5284,7 +5284,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 29,
-     "snapMoved": 414,
+     "snapMoved": 416,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5324,7 +5324,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 16,
-     "snapMoved": 481,
+     "snapMoved": 482,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5344,7 +5344,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 20,
-     "snapMoved": 312,
+     "snapMoved": 314,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5364,7 +5364,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 1,
-     "snapMoved": 1182,
+     "snapMoved": 1187,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5374,7 +5374,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 1329,
+     "snapMoved": 1332,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5384,7 +5384,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 1,
-     "snapMoved": 1497,
+     "snapMoved": 1500,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5394,7 +5394,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 1,
-     "snapMoved": 1014,
+     "snapMoved": 1016,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5404,7 +5404,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 1,
-     "snapMoved": 1139,
+     "snapMoved": 1142,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5414,7 +5414,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 29,
-     "snapMoved": 364,
+     "snapMoved": 366,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5424,7 +5424,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 29,
-     "snapMoved": 1294,
+     "snapMoved": 1299,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5434,7 +5434,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 13,
-     "snapMoved": 1391,
+     "snapMoved": 1395,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5444,7 +5444,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 13,
-     "snapMoved": 1090,
+     "snapMoved": 1091,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5515,7 +5515,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 492,
+     "anchoredMoved": 494,
      "framedMoved": 0
     },
     {
@@ -5526,7 +5526,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 433
+     "framedMoved": 434
     },
     {
      "move": 0.3,
@@ -5535,7 +5535,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1335,
+     "anchoredMoved": 1339,
      "framedMoved": 0
     },
     {
@@ -5546,7 +5546,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1239
+     "framedMoved": 1244
     },
     {
      "move": 0.3,
@@ -5566,7 +5566,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1497
+     "framedMoved": 1500
     },
     {
      "move": 0.3,
@@ -5575,7 +5575,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1218,
+     "anchoredMoved": 1220,
      "framedMoved": 0
     },
     {
@@ -5586,7 +5586,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1116
+     "framedMoved": 1118
     },
     {
      "move": 0.3,
@@ -5606,7 +5606,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1534
+     "framedMoved": 1536
     }
    ]
   }

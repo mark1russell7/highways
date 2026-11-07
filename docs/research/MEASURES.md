@@ -116,11 +116,11 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 
 ### The read of the painted count
 
-The record `paint-tie/1` reads 3 routers on 75 boards, with 5 drawn vectors for each move. `node packages/core/scripts/paint-tie.ts` writes it. Each figure of this section is of counter version 2, the value of `PAINT_COUNTER`.
+The record `paint-tie/1` reads 3 routers on 84 boards, with 5 drawn vectors for each move. `node packages/core/scripts/paint-tie.ts` writes it. Each figure of this section is of counter version 2, the value of `PAINT_COUNTER`.
 
 **The one count.** `crossingPairs` reads lines, and `routePairCrossings` reads routes. Both read each point on the grid `EPS_STEPS`, which comes from `EPS` of the contract. A property test pins equal counts on lines with no shared vertex. These counts answer other questions and keep their own rules: R1 of `measureQuality`, `measureHighways`, `drawnSegments`, `tracing` and `curriculum`. `route.bundle.lane-crossings` (B5) reads the order of lanes in a bundle.
 
-**An exact predicate does not end the tie.** An exact predicate decides the bits that it gets. A shift changes those bits, so the answer can change. The grid changes the bits before the test. The exact arm adds 3, 83 and 98 points over the float arm on `shared-all`, `sections` and `sections-site`. That is the size of what float rounding hides.
+**An exact predicate does not end the tie.** An exact predicate decides the bits that it gets. A shift changes those bits, so the answer can change. The grid changes the bits before the test. The exact arm adds 3, 83 and 99 points over the float arm on `shared-all`, `sections` and `sections-site`. That is the size of what float rounding hides.
 
 **What a shift moves.** Each cell is the sum over the 3 routers, 2 kinds of line and 5 vectors. A moved point is one crossing more or fewer for a pair of edges.
 
@@ -128,47 +128,47 @@ The record `paint-tie/1` reads 3 routers on 75 boards, with 5 drawn vectors for 
 |---|---|---:|---:|---:|---:|
 | All lines | 1e-12 | 0 | 786 | 0 | 0 |
 | All lines | 1e-10 | 21 | 838 | 0 | 0 |
-| All lines | 1e-8 | 1,071 | 551 | 0 | 0 |
-| All lines | 1e-7 | 11,034 | 722 | 0 | 0 |
-| All lines | 0.3 | 29,204 | 495 | 0 | 0 |
-| All lines | 0.5 | 30,864 | 21 | 0 | 0 |
-| All lines | 7 | 61 | 421 | 0 | 0 |
-| Rooms | 1e-12 | 0 | 10,309 | 0 | 0 |
-| Rooms | 1e-10 | 0 | 10,307 | 0 | 0 |
-| Rooms | 1e-8 | 121 | 10,501 | 147 | 109 |
-| Rooms | 1e-7 | 1,019 | 10,817 | 1,085 | 995 |
-| One line added at the low corner | 0.3 | 0 | 0 | 30,680 | 0 |
-| One box added at the low corner | 0.3 | 0 | 0 | 0 | 29,113 |
+| All lines | 1e-8 | 1,073 | 553 | 0 | 0 |
+| All lines | 1e-7 | 11,056 | 722 | 0 | 0 |
+| All lines | 0.3 | 29,254 | 497 | 0 | 0 |
+| All lines | 0.5 | 30,927 | 21 | 0 | 0 |
+| All lines | 7 | 61 | 424 | 0 | 0 |
+| Rooms | 1e-12 | 0 | 10,332 | 0 | 0 |
+| Rooms | 1e-10 | 0 | 10,326 | 0 | 0 |
+| Rooms | 1e-8 | 121 | 10,506 | 147 | 109 |
+| Rooms | 1e-7 | 1,019 | 10,844 | 1,089 | 995 |
+| One line added at the low corner | 0.3 | 0 | 0 | 30,737 | 0 |
+| One box added at the low corner | 0.3 | 0 | 0 | 0 | 29,171 |
 
 - The move 0.5 gives a shift that float addition does not round. So the float cell 21 is no control for the grid at that move. The move 0.3 is the fair control.
 - A form with its origin at a low corner passes each row of a shift of all lines, because the origin moves with them.
-- The form at the low corner of the lines fails the rule of one grid for each board. Two routers on one board read different grids, on 40 to 62 of the 75 boards.
-- The form at the low corner of the boxes keeps one grid for each board. But one box that moves that corner moves 29,113 points, the same size as a shift of the grid at origin 0.
+- The form at the low corner of the lines fails the rule of one grid for each board. Two routers on one board read different grids, on 43 to 71 of the 84 boards.
+- The form at the low corner of the boxes keeps one grid for each board. But one box that moves that corner moves 29,171 points, the same size as a shift of the grid at origin 0.
 
-**The choice.** The grid at origin 0 stays. Each form moves near 1.4 % of the points under one stated change, so the frame does not remove the noise. The frame needs the boxes in each count, and a change at one corner reads the whole board again. With origin 0, a change moves the count only where the lines moved. A shift by a multiple of the grid moves nothing beyond rounding: the move 7 reads 61 points of near 2.07 million.
+**The choice.** The grid at origin 0 stays. Each form moves near 1.4 % of the points under one stated change, so the frame does not remove the noise. The frame needs the boxes in each count, and a change at one corner reads the whole board again. With origin 0, a change moves the count only where the lines moved. A shift by a multiple of the grid moves nothing beyond rounding: the move 7 reads 61 points of near 2.08 million.
 
 **The floor of a claim.** A gain on this count that is smaller than the moved share of the largest vector is no gain. This table reads the move 0.3. The mean is over the 5 vectors, and the field `floors` of the record holds each vector.
 
 | Router | Kind | Mean moved points | Largest moved points | Points | Mean share | Largest share |
 |---|---|---:|---:|---:|---:|---:|
-| `shared-all` | painted | 32 | 47 | 43,357 | 0.07 % | 0.11 % |
-| `shared-all` | polyline | 1,927 | 2,605 | 78,491 | 2.46 % | 3.32 % |
-| `sections` | painted | 922 | 1,242 | 53,790 | 1.71 % | 2.31 % |
-| `sections` | polyline | 625 | 843 | 58,000 | 1.08 % | 1.45 % |
-| `sections-site` | painted | 1,219 | 1,607 | 83,528 | 1.46 % | 1.92 % |
-| `sections-site` | polyline | 1,116 | 1,443 | 96,371 | 1.16 % | 1.50 % |
+| `shared-all` | painted | 32 | 47 | 43,627 | 0.07 % | 0.11 % |
+| `shared-all` | polyline | 1,928 | 2,606 | 78,768 | 2.45 % | 3.31 % |
+| `sections` | painted | 923 | 1,244 | 54,074 | 1.71 % | 2.30 % |
+| `sections` | polyline | 628 | 846 | 58,315 | 1.08 % | 1.45 % |
+| `sections-site` | painted | 1,221 | 1,608 | 84,011 | 1.45 % | 1.91 % |
+| `sections-site` | polyline | 1,119 | 1,443 | 96,842 | 1.16 % | 1.49 % |
 
 These floors are sums of moved pairs, and they count both directions. So a floor divided by the boards is not a value for `resolution` of `checkMeasures`, which reads a median net change on one board. The read of joint wins reads that net change on each board.
 
-**Two routers on one board.** This direct read compares each router on the frame of the boxes and on its own low corner. It answers how far a shared frame matters. The moved share is 0.03 % to 1.26 % of the points. The sign of the gap between two routers changes on 2 of 450 pairs of routers on a board, and both are in one row of polylines.
+**Two routers on one board.** This direct read compares each router on the frame of the boxes and on its own low corner. It answers how far a shared frame matters. The moved pairs of a router are 0.04 % to 2.50 % of its pairs on the frame. The sign of the gap between two routers changes on 2 of 504 pairs of routers on a board, and both are in one row of polylines.
 
-**What the grid removes.** On painted lines, the totals fall by 41, 226 and 274 points against float, or 0.09 %, 0.42 % and 0.33 %. On polylines the totals rise by 217, 109 and 104.
+**What the grid removes.** On painted lines, the totals fall by 41, 285 and 276 points against float, or 0.09 %, 0.52 % and 0.33 %. On polylines the totals rise by 218, 113 and 102.
 
 - Each point that the grid removes has its touch under the grid. The count over the grid is 0 on each row.
-- 3, 425 and 571 removed painted points have a crossing point over 1e-6 from the nearest end, and up to 224 units from it. Their sine is at most 4.3e-13, so these are parallel lines with a touch. No removed point has a real angle.
+- 3, 483 and 571 removed painted points have a crossing point over 1e-6 from the nearest end, and up to 224 units from it. Their sine is at most 4.3e-13, so these are parallel lines with a touch. No removed point has a real angle.
 - One point that the grid adds has a real angle, with sine 0.073, on `sections`. A hand read shows an end of a segment 2.8e-7 from the other segment. The crossing point is 3.8e-6 from that end only because the angle is small.
 
-**The rate of a flip.** The estimate 2 x move / grid reads low by 4.3 to 5.6 times. The rate here is the moved points over the crossings with a touch under the grid. On painted lines it is 65.8 % at move 1e-7, and the estimate is 15.1 %. At move 1e-8 it is 6.9 %, and the estimate is 1.6 %. Over all pairs with a touch under the grid, the same moved points are 5.5 % and 0.58 %. An inference names the cause: a pair has 4 ends with 2 coordinates each, and any of them can round to another place. No shift of 1e-12 moved a point, with a high limit of 0.054 % for a flip.
+**The rate of a flip.** The estimate 2 x move / grid reads low by 4.2 to 5.6 times. The rate here is the moved points over the crossings with a touch under the grid. On painted lines it is 63.3 % at move 1e-7, and the estimate is 15.1 %. At move 1e-8 it is 6.7 %, and the estimate is 1.6 %. Over all pairs with a touch under the grid, the same moved points are 5.3 % and 0.56 %. An inference names the cause: a pair has 4 ends with 2 coordinates each, and any of them can round to another place. No shift of 1e-12 moved a point, with a high limit of 0.052 % for a flip.
 
 ### What rests on `route.crossings`
 
