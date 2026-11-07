@@ -1,7 +1,8 @@
 # The read of each verdict snapshot after a release of the engine (SCREEN-ON-RELEASE).
 # A new minor of packages/core makes each snapshot unread: `results-unread` of kpi.json counts it.
 # So each run of Release that changes the version of packages/core starts one Screen run of 3 sets and 5 steps.
-# That run gives one artifact for each snapshot. The steps of docs/research/verdicts/README.md then stamp each one.
+# That run gives one artifact for each snapshot. Its job `stamps` stamps each snapshot with the same rows, in the artifact stamps-<sha> (STAMP-ON-RELEASE).
+# A row that differs, or a snapshot with no read, fails that job. The CI test of results-lag stops the next minor release until the stamps are on main.
 # A run of Release that changes no version of the core starts no read.
 # The schedule also starts the read each week. The stamps of the Results page have an age limit of 14 days, and this schedule meets it.
 name: Read on release
