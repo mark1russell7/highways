@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>highways explorer: the response of the strategy options</title>
+    <meta name="description" content="The explorer of highways: a measured sweep of the number options of the routers, with a fitted curve and its held-out error." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300684a'/%3E%3Cpath d='M6 24 C12 24 12 8 26 8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23f2c230'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body class="results explorer">
+    <a class="skip" href="#sweep">Skip to the explorer</a>
+    <header class="top">
+      <div class="sign">
+        <div class="sign-face">
+          <p class="wordmark wordmark-small"><a href="./">highways</a></p>
+          <h1 class="tagline">Explorer: the response of the options</h1>
+        </div>
+        <nav class="sign-links" aria-label="Links">
+          <a href="./">Live demo</a>
+          <a href="examples.html">Examples</a>
+          <a href="compare.html">Compare</a>
+          <a href="./#bench">Benchmark</a>
+          <a href="results.html">Results</a>
+          <a href="strategies.html">Strategies</a>
+          <a href="explorer.html" aria-current="page">Explorer</a>
+          <a href="https://mark1russell7.github.io/layout-contract/">Joint bench with packing</a>
+          <a href="status/">Status</a>
+          <a href="releases/">Releases</a>
+          <a href="https://github.com/mark1russell7/highways">Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-intro prose wide">
+        <p>A sweep changes one number option of a strategy at a time. The other options keep their defaults. Each point is one route of one board.</p>
+        <p>
+          Pick a measure and an option. The chart shows the measured points, the fitted curve and its band. The text under the chart tells the held-out error of the fit. Each board stays in one fold, so the error comes from boards that the fit did not see.
+        </p>
+      </div>
+      <dl class="res-tiles" id="tiles"></dl>
+
+      <section class="prose wide" id="sweep" aria-labelledby="sweep-title">
+        <h2 id="sweep-title">The sweep record</h2>
+        <p id="size"></p>
+        <p class="hint" id="measures"></p>
+        <p class="hint">A ratio measure divides each value by the value of the same strategy at its defaults on the same board. The ratio removes the size of the board, so it shows the effect of one option.</p>
+        <p class="hint">The time comes from one process on one computer. It is not a paired time, so compare the times only inside one record.</p>
+        <div class="explorer-host" id="explorer"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        <a href="https://github.com/mark1russell7/highways">mark1russell7/highways</a> on GitHub. The boards of the screens have made-up data. The script
+        <a href="https://github.com/mark1russell7/highways/blob/main/packages/core/scripts/sweep.ts"><code>sweep.ts</code></a> writes the records, and the workflow <code>Sweep</code> starts it in CI.
+      </p>
+      <p class="data-line"><!--data-line--></p>
+      <p class="data-line" id="sources"></p>
+    </footer>
+    <script type="module" src="/src/explorer.ts"></script>
+  </body>
+</html>

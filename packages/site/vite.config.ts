@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { siteKpi } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
 import type { BenchMeta } from "./src/bench-label.ts";
+import { SWEEP_DIR } from "./src/explorer-data.ts";
+import { explorerPage } from "./src/explorer-files.ts";
 import { kpiFacts } from "./src/kpi-files.ts";
 import { siteKpiInput } from "./src/kpi.ts";
 import { buildInfo, dataLineHtml, readResults, RESULT_FILES } from "./src/results-files.ts";
@@ -33,8 +35,11 @@ const RESULTS_ID = "virtual:results";
 /** The module id of the data of the strategies page. */
 const STRATEGIES_ID = "virtual:strategies";
 
+/** The module id of the data of the explorer page. */
+const EXPLORER_ID = "virtual:explorer";
+
 /**
- * This plugin gives the data of the results page and of the strategies page from the committed files, at build time. The page reads no file and no network at run time.
+ * This plugin gives the data of the results page, of the strategies page and of the explorer page from the committed files, at build time. The page reads no file and no network at run time.
  * It also puts the data line (the core release, the commit and the date of the build) in each page.
  * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
  */
@@ -43,8 +48,13 @@ function committedResults(): Plugin {
   const line = dataLineHtml(info);
   return {
     name: "highways-committed-results",
-    resolveId: (id) => (id === RESULTS_ID || id === STRATEGIES_ID ? `\0${id}` : undefined),
+    resolveId: (id) => (id === RESULTS_ID || id === STRATEGIES_ID || id === EXPLORER_ID ? `\0${id}` : undefined),
     load(id) {
+      if (id === `\0${EXPLORER_ID}`) {
+        // The newest sweep record of the folder, with its size and its date. The explorer reads the record only through parseResponseRecord.
+        this.addWatchFile(join(root, SWEEP_DIR));
+        return `export default ${JSON.stringify(explorerPage(root))};`;
+      }
       if (id === `\0${STRATEGIES_ID}`) {
         // The cards come from the registry of the core and the committed files, so a new strategy gets a card with no change to the page.
         for (const f of [...Object.values(RESULT_FILES), BUILT_FILE]) this.addWatchFile(join(root, f));
@@ -70,7 +80,7 @@ function committedResults(): Plugin {
   };
 }
 
-// The site has five pages: the live demo, the examples, the compare page, the results and the strategy cards.
+// The site has six pages: the live demo, the examples, the compare page, the results, the strategy cards and the explorer.
 export default defineConfig({
   base,
   plugins: [committedResults(), siteKpi(kpiInput, env)],
@@ -78,7 +88,7 @@ export default defineConfig({
   build: {
     target: "es2022",
     rolldownOptions: {
-      input: { main: page("./index.html"), examples: page("./examples.html"), compare: page("./compare.html"), results: page("./results.html"), strategies: page("./strategies.html") },
+      input: { main: page("./index.html"), examples: page("./examples.html"), compare: page("./compare.html"), results: page("./results.html"), strategies: page("./strategies.html"), explorer: page("./explorer.html") },
     },
   },
 });

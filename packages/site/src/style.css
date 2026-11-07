@@ -1893,3 +1893,11 @@ pre code {
   color: var(--muted);
   font-size: 0.88rem;
 }
+
+/* The explorer page (EXPLORER-1). The explorer of site-pages reads these tokens, so its colors follow the road map by day and by night. */
+.explorer-host {
+  --card: var(--map);
+  --sunken: var(--panel);
+  --accent: var(--sign);
+  margin-top: 20px;
+}
