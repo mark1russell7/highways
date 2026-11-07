@@ -40,6 +40,7 @@ A new release can leave the verdicts as they are. A read on the new core tells i
 One run can read all 15 snapshots (SCREEN-MATRIX). Give `set` and `step` as JSON lists, with `-f set=["screen-v1","screen-v2","screen-v3"]` and `-f step=["router","highway","plugs","levels","whole"]`.
 
 - Each set and step gets its own job and its own artifact. The matrix runs 3 jobs at one time.
+- The input `minutes` is the time limit of each job. On 2026-11-07, the job of `highway` on `screen-v3` took 33 minutes. Give 60 or more.
 - A paired screen takes one set and one step. A paired screen of a list fails in its first step.
 
 - The script compares the fields of each row that the page shows: the label, the plain sign, the means, `p`, the families and the breadth.

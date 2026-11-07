@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| SCREEN-MATRIX | The workflow `Screen` takes JSON lists for `set` and `step`. One run reads all 15 verdict snapshots, one job and one artifact for each. | 2026-11-07 | [#375](https://github.com/mark1russell7/highways/pull/375) |
 | ATLAS-WEEKLY | The build of the site derives the record of each week after the newest committed record from the git history, with the same function as the script. No person writes the weekly record. A past week cannot change: the build compares each final week with the live `atlas-weeks.json`. | 2026-11-07 | [#380](https://github.com/mark1russell7/highways/pull/380) |
 | KPI-CARDS | The file `kpi.json` has the measure `cards-with-curves`: the strategy cards with a response curve in a [sweep record](research/sweeps/README.md). It reads 0 until the first sweep. The reads of the verdicts and the pages have their own date, not the date of the benchmark. | 2026-11-07 | [#376](https://github.com/mark1russell7/highways/pull/376) |
 | SOLVED-ATLAS-1 | The [atlas page](https://mark1russell7.github.io/highways/atlas.html) shows the leader of each of 648 regions: a family of a guard measure of a step of a set. [`research/atlas/`](research/atlas/README.md) keeps one record of the leaders each week. One leader for 28 days solves a region, so the count stays 0 until 2026-12-05. | 2026-11-07 | [#378](https://github.com/mark1russell7/highways/pull/378) |
