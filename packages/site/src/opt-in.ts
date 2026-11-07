@@ -23,7 +23,7 @@ export const OPT_IN_NOTES: Readonly<Record<string, OptInNote>> = {
   adam: {
     source: "docs/research/CATALOG.md",
     stage: "screened",
-    text: "Recorded on `screen-v2`: crossings (R1) are `better` with 0 families against, and 3 of 6 families tie. The time is 7.17 times `shared`.",
+    text: "Recorded on `screen-v2`: crossings (R1) are `better` with 0 families against, and 3 of 6 families tie. The time is 7.17 times `shared`. This screen does not read the partner `route.crossings.pairs`, so it is no win.",
   },
   annealing: {
     source: "docs/research/CATALOG.md",
@@ -33,12 +33,12 @@ export const OPT_IN_NOTES: Readonly<Record<string, OptInNote>> = {
   attraction: {
     source: "docs/research/CATALOG.md",
     stage: "screened",
-    text: "Recorded on `screen-v2`: ink saved (B1) and crossings (R1) are `better`, with 0 families against. The B1 gain is 0.003. The run count (B8) is `worse`. The time is 2.76 times `shared`.",
+    text: "Recorded on `screen-v2`: ink saved (B1) and crossings (R1) are `better`, with 0 families against. The B1 gain is 0.003. The run count (B8) is `worse`. The time is 2.76 times `shared`. This screen does not read the partner `route.crossings.pairs`, so it is no win.",
   },
   canals: {
     source: "docs/research/CATALOG.md",
     stage: "kept",
-    text: "Recorded on `screen-v2`: crossings (R1) and ink saved (B1) are `better`, with 0 families against. The detour spread (R5) is `worse`. The time is 0.83 times `shared`.",
+    text: "Recorded on `screen-v2`: crossings (R1) and ink saved (B1) are `better`, with 0 families against. The detour spread (R5) is `worse`. The time is 0.83 times `shared`. This screen does not read the partner `route.crossings.pairs`, so it is no win.",
   },
   nudge: {
     source: "docs/research/CATALOG.md",
@@ -76,7 +76,7 @@ export const OPT_IN_NOTES: Readonly<Record<string, OptInNote>> = {
   tight: {
     source: "docs/research/CATALOG.md",
     stage: "screened",
-    text: "Recorded on `screen-v2`: the detour spread (R5 q95) is `better` with 0 families against, and 4 of 6 families tie. The time is 1.21 times `shared`.",
+    text: "Recorded on `screen-v2`: the detour spread (R5 q95) is `better` with 0 families against, and 4 of 6 families tie. The time is 1.21 times `shared`. This note does not state the partner `route.through`, so it is no win.",
   },
 };
 
