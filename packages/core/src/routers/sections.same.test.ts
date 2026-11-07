@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { checkRoutes, falseThrough } from "../bench/measures/through-check.ts";
 import { CASES } from "../cases.ts";
 import { FIXTURES, makeFixture } from "../fixtures.ts";
+import { highwaysRegistry } from "../families/index.ts";
 import type { Graph } from "../model.ts";
 import { laneRoutes, runKey, segmentsOf } from "../segments.ts";
 import { sectionsRouter, type SectionsOptions } from "./sections.ts";
@@ -15,9 +16,11 @@ import { withoutRoom } from "./without-room.ts";
  * Those links went through other groups before. The routes, the runs, the run keys and the lane routes did not change.
  * ER3b changed the routes of the boards whose edges took the hubs out and back.
  * ER3c changed only the points of the level links of each digest except `small-clustered` with the options `site`.
- * Those links go through the groups now, not around the outer edge.
+ * Those links go through the groups, not around the outer edge.
  * CORNER-REACH added the field `through`, which the digest leaves out. So each digest stays, and the routes did not change.
  * PLUG-OUT-BLOCKED changed three digests of the options `site`: `LADDER_DIGESTS` gives them. With `outSteps: false`, each digest of this list stays.
+ *
+ * SITE-HUB-THROUGH changed 4 routes of the options `site` on the boards of the families, and no digest of this file.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
   "case-dense-groups/site": "c7dad0bc5c890c06d4d2c318d94209b5afaafc3a66f1278dd298b68a3659c654",
@@ -80,5 +83,21 @@ describe("the output of the sections router", () => {
     };
     expect(GRAPHS.map(([, make]) => through(make(), false))).toEqual([19, 0, 66, 5]);
     expect(GRAPHS.map(([, make]) => through(make(), true))).toEqual([0, 0, 0, 0]);
+  });
+
+  it("gives a hub way that goes through a box the direct way, when the direct way goes through none (SITE-HUB-THROUGH)", () => {
+    // On these boards, the hub way of each edge went through a box with the options `site`. The direct way goes through none.
+    const cases: readonly [string, number, string][] = [
+      ["thin-bars", 1, "e12"],
+      ["thin-bars", 2, "e16"],
+      ["comb", 0, "e11"],
+      ["comb", 2, "e1"],
+    ];
+    const registry = highwaysRegistry();
+    for (const [family, seed, edge] of cases) {
+      const graph = registry.generate(family, seed).graph;
+      const checks = checkRoutes(graph, sectionsRouter(OPTIONS[0]!).route(graph).routes);
+      expect(checks.find((c) => c.edge === edge)?.marked, `${family}/${seed} ${edge}`).toBe(false);
+    }
   });
 });
