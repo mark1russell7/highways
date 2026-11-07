@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-02",
-  "commit": "1c6fa5a8fa14c3f072dc5be4def25917743eca5e",
+  "date": "2026-11-07",
+  "commit": "e928f11d6098d79e52dc9f08ffeb1c31a2a36b85",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -65,7 +65,7 @@
     {
       "set": "screen-v3",
       "step": "whole",
-      "run": 41505291190
+      "run": 42386833828
     }
   ],
   "counts": {
