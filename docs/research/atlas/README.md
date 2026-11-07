@@ -2,6 +2,8 @@
 
 Each file `<date>.json` holds the leader of each region of the committed verdict snapshots on that date. The [atlas page](https://mark1russell7.github.io/highways/atlas.html) of the site reads all the records at build time.
 
+No person writes the weekly record. The build of the site derives each week after the newest file of this folder from the git history. The section [The derived weeks](#the-derived-weeks) tells how.
+
 ## The fields
 
 - The record has `format`, `date` and `regions`. The format is `atlas-week/1`.
@@ -22,9 +24,39 @@ Each file `<date>.json` holds the leader of each region of the committed verdict
 - A region that is not in a record starts a new run after that record.
 - The rule of the proven lower bound is a later slice. Each region tells "no bound yet".
 
-## How to write the next record
+## The derived weeks
 
-Write one record each week, from the root of the repository:
+The build of the site (`packages/site/src/atlas-history.ts`) makes the records after the newest file of this folder:
+
+- The first date is 7 days after the newest file. Each next date is 7 days later. The last date is at or before the build date in UTC.
+- For each date, the build finds the last commit of `main` at or before `<date>T23:59:59Z`. It starts `git rev-list --first-parent -1 --before=<date>T23:59:59Z HEAD`.
+- The option `--before` compares the committer date. A rebase keeps the old author date, so the author date does not count.
+- The first-parent history is the sequence of merges to `main`. A commit of a branch counts only after its merge.
+- The build reads the snapshot files of that commit with `git ls-tree` and `git cat-file`. It makes the record with `weekFromFiles`, the same function as the script `atlas-week.ts`.
+- The rules `non_fast_forward` and `deletion` of `main` stop a change of the history. So a derived week stays the same.
+
+The Pages workflow starts each Sunday at 01:32 UTC. So the record of each Saturday is on the page soon after the end of that day.
+
+### The file of the weeks and the gate
+
+The build writes `atlas-weeks.json` to the site. Each week has its date, its source, the commit that the build read, the value `final` and the SHA-256 of its text.
+
+- The source is `committed` for a file of this folder, or `derived` for a week of the history.
+- A derived week is final when the history of the build has a commit after the end of its date. A committed week is always final.
+- The build fetches the live `atlas-weeks.json`. Each final week of the live file must have the same SHA-256 in the build. Else the build fails.
+- A 404 passes only at the first deploy: the live `atlas.html` answers 200 and has no link to `atlas-weeks.json`. Each other answer fails the build.
+- For a local build with no network, set `ATLAS_LIVE_CHECK=off`. CI does not set it.
+- To see a derived week before its date, set `SITE_BUILD_DATE=<YYYY-MM-DD>` for the build.
+
+A checkout with no full history does not stop the build. Each week that the build cannot derive goes to `skipped` with its reason, and the page shows it.
+
+## The gate test
+
+The test `atlas-history.test.ts` derives the week of the newest file of this folder at the commit that added the file. It expects the same bytes as the file. So the derivation and the script give the same record.
+
+## A record by hand
+
+The script writes a record from the snapshots on disk. The weekly sequence does not need it. It is for a first record of a new folder, or for a test:
 
 ```sh
 node packages/site/scripts/atlas-week.ts --date <YYYY-MM-DD>
@@ -32,4 +64,4 @@ node packages/site/scripts/atlas-week.ts --date <YYYY-MM-DD>
 
 - The default date is today in UTC.
 - The script does not write over a record that exists. To write a record again after a change of a snapshot, remove the file first.
-- Commit the new record. The test `atlas-data.test.ts` compares the latest record with the snapshots that it read.
+- A new file moves the start of the derived weeks. Then the gate of the build fails for each derived week that the file removes from the page.
