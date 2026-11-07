@@ -192,6 +192,21 @@ function age(): void {
   $("age").textContent = summary.latest === "" ? "No record exists." : `${summary.weeks} ${summary.weeks === 1 ? "record" : "records"}. The latest record is from ${summary.latest}, ${ageText(Math.max(0, daysFrom(summary.latest, TODAY)))}.`;
 }
 
+// The source of the latest record, and each week that the build did not derive.
+function source(): void {
+  const last = data.sources.at(-1);
+  let text = "";
+  if (last?.source === "committed") text = `The latest record is the committed file <a href="${REPO}/blob/main/docs/research/atlas/${esc(last.date)}.json"><code>docs/research/atlas/${esc(last.date)}.json</code></a>.`;
+  else if (last?.source === "derived") {
+    const commit = `<a href="${REPO}/commit/${esc(last.commit)}"><code>${esc(last.commit.slice(0, 7))}</code></a>`;
+    const state = last.final ? "The record is final, because the history has a commit after the end of its date." : "The record stays open until the history has a commit after the end of its date.";
+    text = `The build derived the latest record from the commit ${commit}, the last commit of <code>main</code> on ${esc(last.date)}. ${state}`;
+  }
+  const gaps = data.skipped.map((g) => `<li>${esc(g.date)}: ${esc(g.reason)}</li>`).join("");
+  const missing = gaps === "" ? "" : `<p>The build did not derive ${data.skipped.length === 1 ? "1 week" : `${data.skipped.length} weeks`}:</p><ul>${gaps}</ul>`;
+  $("source").innerHTML = `<p>${text}</p>${missing}`;
+}
+
 function draw(): void {
   controls();
   grids();
@@ -200,3 +215,4 @@ function draw(): void {
 tiles();
 draw();
 age();
+source();

@@ -3,8 +3,10 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteKpi } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
-import { atlasData } from "./src/atlas-data.ts";
-import { ATLAS_FILES, atlasWeeks } from "./src/atlas-files.ts";
+import { atlasData, type AtlasPage } from "./src/atlas-data.ts";
+import { ATLAS_FILES } from "./src/atlas-files.ts";
+import { atlasHistory, liveGate, type AtlasHistory } from "./src/atlas-history.ts";
+import { ATLAS_WEEKS_FILE } from "./src/atlas-weeks.ts";
 import type { BenchMeta } from "./src/bench-label.ts";
 import { SWEEP_DIR } from "./src/explorer-data.ts";
 import { explorerPage } from "./src/explorer-files.ts";
@@ -47,19 +49,26 @@ const EXPLORER_ID = "virtual:explorer";
  * This plugin gives the data of four pages from the committed files, at build time: the results, the strategies, the atlas and the explorer. The page reads no file and no network at run time.
  * It also puts the data line (the core release, the commit and the date of the build) in each page.
  * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
+ *
+ * It writes the source of each week of the atlas to `atlas-weeks.json`, and it compares these weeks with the weeks of the live site.
+ * The variable `ATLAS_LIVE_CHECK=off` stops the comparison, for a local build with no network. CI does not set it.
  */
 function committedResults(): Plugin {
   const info = buildInfo(root, env);
   const line = dataLineHtml(info);
+  // The build derives each week after the newest committed record from the git history. It reads the history one time.
+  let history: AtlasHistory | undefined;
+  const weeks = (): AtlasHistory => (history ??= atlasHistory(root, info.date));
   return {
     name: "highways-committed-results",
     resolveId: (id) => (id === RESULTS_ID || id === STRATEGIES_ID || id === ATLAS_ID || id === EXPLORER_ID ? `\0${id}` : undefined),
     load(id) {
       if (id === `\0${ATLAS_ID}`) {
-        // The weekly records give the leaders. The page reads the date of the viewer for the age of the latest record.
+        // The committed records and the derived records give the leaders. The page reads the date of the viewer for the age of the latest record.
         this.addWatchFile(join(root, ATLAS_FILES.weeks));
         this.addWatchFile(join(root, ATLAS_FILES.text));
-        const atlas = { view: atlasData(atlasWeeks(root), info.date), text: textSections(readFileSync(join(root, ATLAS_FILES.text), "utf8")), core: info.core };
+        const h = weeks();
+        const atlas: AtlasPage = { view: atlasData(h.weeks, info.date), text: textSections(readFileSync(join(root, ATLAS_FILES.text), "utf8")), core: info.core, sources: h.file.weeks, skipped: h.file.skipped };
         return `export default ${JSON.stringify(atlas)};`;
       }
       if (id === `\0${EXPLORER_ID}`) {
@@ -80,14 +89,30 @@ function committedResults(): Plugin {
     transformIndexHtml: (html) => html.replace("<!--data-line-->", line).replace("<!--build-date-->", info.date),
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
+        if (req.url === `${base}${ATLAS_WEEKS_FILE}`) {
+          res.setHeader("content-type", "application/json");
+          res.end(JSON.stringify(weeks().file, null, 2));
+          return;
+        }
         const name = BENCH_FILES.find((f) => req.url === `${base}${f}`);
         if (name === undefined) return next();
         res.setHeader("content-type", "application/json");
         res.end(readFileSync(join(root, RESULT_FILES.bench, name)));
       });
     },
-    generateBundle() {
+    async generateBundle() {
       for (const fileName of BENCH_FILES) this.emitFile({ type: "asset", fileName, source: readFileSync(join(root, RESULT_FILES.bench, fileName)) });
+      const file = weeks().file;
+      this.emitFile({ type: "asset", fileName: ATLAS_WEEKS_FILE, source: `${JSON.stringify(file, null, 2)}\n` });
+      for (const gap of file.skipped) this.warn(`The atlas has no record of the week ${gap.date}. ${gap.reason}`);
+      // A past week of the live site does not change. A week that changes stops the deploy.
+      if (env["ATLAS_LIVE_CHECK"] === "off") {
+        console.log("ATLAS_LIVE_CHECK=off: the build does not compare the weeks of the atlas with the live site.");
+        return;
+      }
+      const verdict = await liveGate(file);
+      if (!verdict.ok) this.error(verdict.line);
+      console.log(verdict.line);
     },
   };
 }
