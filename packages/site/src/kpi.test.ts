@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { kpiFacts } from "./kpi-files.ts";
-import { KPI_PAGES, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts } from "./kpi.ts";
+import { cardsWithCurves, KPI_PAGES, latestAt, minorsBehind, resultsLag, resultsUnread, siteKpiInput, SWEEP_FORMAT, type KpiFacts } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -82,6 +82,56 @@ describe("siteKpiInput", () => {
   });
 });
 
+describe("cardsWithCurves", () => {
+  const record = (strategy: string, points: number) => ({
+    format: SWEEP_FORMAT,
+    step: "router",
+    strategy,
+    date: "2026-11-11",
+    curves: [{ option: "gap", points: Array.from({ length: points }, (_, i) => ({ value: i, measures: { "route.crossings": i } })) }],
+  });
+
+  it("counts each card with a curve of 2 points or more", () => {
+    expect(cardsWithCurves([record("alpha", 2), record("beta", 5), record("gamma", 1)])).toBe(2);
+  });
+
+  it("counts a card once, and skips a record of another form", () => {
+    expect(cardsWithCurves([record("alpha", 3), record("alpha", 4), { format: "other", step: "router", strategy: "beta", curves: [] }, null])).toBe(1);
+  });
+
+  it("gives 0 with no record, and the measure in the file says what it does not count", () => {
+    expect(cardsWithCurves([])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, FACTS);
+    const m = input?.measures.find((x) => x.id === "cards-with-curves");
+    expect(m).toMatchObject({ value: 0, unit: "cards" });
+    expect(m?.notCounted).toContain("docs/research/sweeps");
+    expect(m?.at).toBeUndefined();
+  });
+
+  it("takes the time of the measure from the latest record", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps: [record("alpha", 2), { ...record("beta", 2), date: "2026-11-12" }] });
+    expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
+  });
+});
+
+describe("the time of each measure", () => {
+  it("gives the latest date, or no time with no date", () => {
+    expect(latestAt(["2026-11-05", undefined, "2026-11-07T10:00:00Z", "local"])).toBe("2026-11-07T00:00:00Z");
+    expect(latestAt([])).toBeUndefined();
+  });
+
+  it("gives the reads the time of the last stamp, not of the benchmark", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, verdictReads: ["0.15.0"], verdictReadDates: ["2026-10-30", "2026-11-07"] });
+    expect(input?.at).toBe("2026-11-05T00:00:00Z");
+    expect(input?.measures.find((m) => m.id === "results-unread")?.at).toBe("2026-11-07T00:00:00Z");
+  });
+
+  it("gives a page the time of the commit of the build", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => true, { ...FACTS, commitDate: "2026-11-07" });
+    expect(input?.measures.find((m) => m.id === "atlas-live")).toMatchObject({ value: 1, at: "2026-11-07T00:00:00Z" });
+  });
+});
+
 describe("resultsLag", () => {
   it("gives the largest count over the records", () => {
     expect(resultsLag(["0.14.0", "0.10.0", "0.13.1"], "0.14.0")).toBe(4);
@@ -103,5 +153,9 @@ describe("kpiFacts", () => {
     expect(facts.verdictCores).not.toContain(undefined);
     expect(facts.verdictReads).toHaveLength(facts.verdictCores.length);
     expect(facts.verdictReads).not.toContain(undefined);
+    expect(facts.verdictReadDates).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReadDates).not.toContain(undefined);
+    expect(Array.isArray(facts.sweeps)).toBe(true);
+    expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });
