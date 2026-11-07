@@ -1,0 +1,504 @@
+{
+ "schema": "through-floor/1",
+ "counter": "measureRouteFaults(graph, result).through: routes with a segment that crosses a box that is not an end, shrunk by TOLERANCE",
+ "boards": 84,
+ "totals": {
+  "corners": {
+   "routes": 6307,
+   "counter": 292,
+   "passRule": 292,
+   "marked": 292,
+   "checkContacts": 345,
+   "mismatch": 0
+  },
+  "shared": {
+   "routes": 6307,
+   "counter": 292,
+   "passRule": 292,
+   "marked": 292,
+   "checkContacts": 345,
+   "mismatch": 0
+  },
+  "shared-all": {
+   "routes": 6307,
+   "counter": 292,
+   "passRule": 292,
+   "marked": 292,
+   "checkContacts": 345,
+   "mismatch": 0
+  },
+  "sections": {
+   "routes": 6307,
+   "counter": 292,
+   "passRule": 292,
+   "marked": 292,
+   "checkContacts": 345,
+   "mismatch": 0
+  },
+  "sections-site": {
+   "routes": 6307,
+   "counter": 296,
+   "passRule": 296,
+   "marked": 296,
+   "checkContacts": 391,
+   "mismatch": 0
+  }
+ },
+ "classes": {
+  "corners": {
+   "no-way-straight": 292
+  },
+  "shared": {
+   "no-way-straight": 292
+  },
+  "shared-all": {
+   "no-way-straight": 292
+  },
+  "sections": {
+   "no-way-straight": 245,
+   "bent-no-way": 47
+  },
+  "sections-site": {
+   "no-way-straight": 193,
+   "bent-no-way": 99,
+   "bent-with-way": 4
+  }
+ },
+ "families": {
+  "corners": {
+   "packed-grid": 292
+  },
+  "shared": {
+   "packed-grid": 292
+  },
+  "shared-all": {
+   "packed-grid": 292
+  },
+  "sections": {
+   "packed-grid": 292
+  },
+  "sections-site": {
+   "packed-grid": 292,
+   "thin-bars": 2,
+   "comb": 2
+  }
+ },
+ "checkClasses": {
+  "corners": {
+   "deep": 292
+  },
+  "shared": {
+   "deep": 292
+  },
+  "shared-all": {
+   "deep": 292
+  },
+  "sections": {
+   "deep": 292
+  },
+  "sections-site": {
+   "deep": 296
+  }
+ },
+ "siteOnly": [
+  "thin-bars/1/e12",
+  "thin-bars/2/e16",
+  "comb/0/e11",
+  "comb/2/e1"
+ ],
+ "othersOnly": [
+  {
+   "router": "corners",
+   "keys": []
+  },
+  {
+   "router": "shared",
+   "keys": []
+  },
+  {
+   "router": "shared-all",
+   "keys": []
+  },
+  {
+   "router": "sections",
+   "keys": []
+  }
+ ],
+ "siteOnlyDiagnosis": [
+  {
+   "key": "thin-bars/1/e12",
+   "source": "t10-3",
+   "target": "t12-3",
+   "segments": [
+    {
+     "segment": 1,
+     "from": {
+      "x": 1183.3214285714287,
+      "y": 292
+     },
+     "to": {
+      "x": 1183.3214285714287,
+      "y": 312
+     },
+     "length": 20,
+     "boxes": [
+      "t11-3"
+     ],
+     "stub": true,
+     "outStep": 0,
+     "wayBetweenEnds": null
+    }
+   ],
+   "direct": {
+    "points": 6,
+    "hits": []
+   },
+   "variants": [
+    {
+     "variant": "site",
+     "through": 1,
+     "points": 5
+    },
+    {
+     "variant": "site-stretch-2",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "site-margin-5",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "site-cap-default",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "margin-20-only",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "stretch-3-only",
+     "through": 0,
+     "points": 6
+    }
+   ],
+   "others": [
+    {
+     "router": "corners",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "shared",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "shared-all",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "sections",
+     "points": 6,
+     "counted": false
+    }
+   ]
+  },
+  {
+   "key": "thin-bars/2/e16",
+   "source": "t3-0",
+   "target": "t1-0",
+   "segments": [
+    {
+     "segment": 4,
+     "from": {
+      "x": 199,
+      "y": 64
+     },
+     "to": {
+      "x": 136.98214285714286,
+      "y": 60
+     },
+     "length": 62.14671837347356,
+     "boxes": [
+      "t2-0"
+     ],
+     "stub": false,
+     "outStep": null,
+     "wayBetweenEnds": "none"
+    }
+   ],
+   "direct": {
+    "points": 6,
+    "hits": []
+   },
+   "variants": [
+    {
+     "variant": "site",
+     "through": 1,
+     "points": 6
+    },
+    {
+     "variant": "site-stretch-2",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "site-margin-5",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "site-cap-default",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "margin-20-only",
+     "through": 0,
+     "points": 6
+    },
+    {
+     "variant": "stretch-3-only",
+     "through": 0,
+     "points": 6
+    }
+   ],
+   "others": [
+    {
+     "router": "corners",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "shared",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "shared-all",
+     "points": 6,
+     "counted": false
+    },
+    {
+     "router": "sections",
+     "points": 6,
+     "counted": false
+    }
+   ]
+  },
+  {
+   "key": "comb/0/e11",
+   "source": "n4",
+   "target": "n3",
+   "segments": [
+    {
+     "segment": 1,
+     "from": {
+      "x": 70,
+      "y": 122.94805194805195
+     },
+     "to": {
+      "x": 90,
+      "y": 122.94805194805195
+     },
+     "length": 20,
+     "boxes": [
+      "low0"
+     ],
+     "stub": true,
+     "outStep": 0,
+     "wayBetweenEnds": null
+    },
+    {
+     "segment": 2,
+     "from": {
+      "x": 90,
+      "y": 122.94805194805195
+     },
+     "to": {
+      "x": 244,
+      "y": 44
+     },
+     "length": 173.0572012555164,
+     "boxes": [
+      "up1"
+     ],
+     "stub": false,
+     "outStep": null,
+     "wayBetweenEnds": "none"
+    }
+   ],
+   "direct": {
+    "points": 11,
+    "hits": []
+   },
+   "variants": [
+    {
+     "variant": "site",
+     "through": 1,
+     "points": 34
+    },
+    {
+     "variant": "site-stretch-2",
+     "through": 0,
+     "points": 11
+    },
+    {
+     "variant": "site-margin-5",
+     "through": 0,
+     "points": 40
+    },
+    {
+     "variant": "site-cap-default",
+     "through": 1,
+     "points": 34
+    },
+    {
+     "variant": "margin-20-only",
+     "through": 0,
+     "points": 11
+    },
+    {
+     "variant": "stretch-3-only",
+     "through": 0,
+     "points": 39
+    }
+   ],
+   "others": [
+    {
+     "router": "corners",
+     "points": 12,
+     "counted": false
+    },
+    {
+     "router": "shared",
+     "points": 12,
+     "counted": false
+    },
+    {
+     "router": "shared-all",
+     "points": 12,
+     "counted": false
+    },
+    {
+     "router": "sections",
+     "points": 12,
+     "counted": false
+    }
+   ]
+  },
+  {
+   "key": "comb/2/e1",
+   "source": "n6",
+   "target": "n1",
+   "segments": [
+    {
+     "segment": 1,
+     "from": {
+      "x": 334,
+      "y": 193.32231404958677
+     },
+     "to": {
+      "x": 354,
+      "y": 193.32231404958677
+     },
+     "length": 20,
+     "boxes": [
+      "up2"
+     ],
+     "stub": true,
+     "outStep": 0,
+     "wayBetweenEnds": null
+    },
+    {
+     "segment": 2,
+     "from": {
+      "x": 354,
+      "y": 193.32231404958677
+     },
+     "to": {
+      "x": 948,
+      "y": 44
+     },
+     "length": 612.481145402145,
+     "boxes": [
+      "low2",
+      "up3",
+      "low3",
+      "up4",
+      "low4",
+      "up5"
+     ],
+     "stub": false,
+     "outStep": null,
+     "wayBetweenEnds": "none"
+    }
+   ],
+   "direct": {
+    "points": 19,
+    "hits": []
+   },
+   "variants": [
+    {
+     "variant": "site",
+     "through": 1,
+     "points": 21
+    },
+    {
+     "variant": "site-stretch-2",
+     "through": 0,
+     "points": 19
+    },
+    {
+     "variant": "site-margin-5",
+     "through": 0,
+     "points": 32
+    },
+    {
+     "variant": "site-cap-default",
+     "through": 1,
+     "points": 12
+    },
+    {
+     "variant": "margin-20-only",
+     "through": 1,
+     "points": 12
+    },
+    {
+     "variant": "stretch-3-only",
+     "through": 0,
+     "points": 31
+    }
+   ],
+   "others": [
+    {
+     "router": "corners",
+     "points": 29,
+     "counted": false
+    },
+    {
+     "router": "shared",
+     "points": 29,
+     "counted": false
+    },
+    {
+     "router": "shared-all",
+     "points": 20,
+     "counted": false
+    },
+    {
+     "router": "sections",
+     "points": 29,
+     "counted": false
+    }
+   ]
+  }
+ ],
+ "sameSetAmongOthers": true,
+ "maxRssMb": 260
+}
