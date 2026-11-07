@@ -1901,3 +1901,8 @@ pre code {
   --accent: var(--sign);
   margin-top: 20px;
 }
+
+.res-tiles dd.ex-date {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  white-space: nowrap;
+}

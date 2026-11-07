@@ -29,7 +29,8 @@ $("tiles").innerHTML = (
     [facts.date ?? "no commit", "date of the record"],
   ] as const
 )
-  .map(([n, t]) => `<div><dt>${t}</dt><dd>${esc(n)}</dd></div>`)
+  // The date is a long value, so its tile has a smaller font that keeps it on one line.
+  .map(([n, t]) => `<div><dt>${t}</dt><dd${t.startsWith("date") ? ' class="ex-date"' : ""}>${esc(n)}</dd></div>`)
   .join("");
 
 // The size line: a small record is a sample, not the full space of the options.
@@ -38,7 +39,7 @@ $("size").innerHTML =
     ? `The record ${fileLink(facts.file)} has ${count(facts.faults)} faults. The explorer below shows them.`
     : `This record is ${fileLink(facts.file)}: <q>${esc(facts.name)}</q>. It has ${count(facts.points)} points on ${count(facts.inputs)} inputs, for the strategies ${facts.strategies.map((s) => `<code>${esc(s)}</code>`).join(", ")} of the step ${facts.steps.map((s) => `<code>${esc(s)}</code>`).join(", ")}. It is a sample of the space of the options, not the full space.`;
 
-$("measures").textContent = facts.measures.length === 0 ? "" : `The measures are ${facts.measures.join(", ")}. A lower value is better for each measure.`;
+$("measures").textContent = facts.measures.length === 0 ? "" : `The record has ${count(facts.measures.length)} measures. A lower value is better for each measure.`;
 
 const first = firstOption(data.record);
 mountExplorer($("explorer"), data.record, first === undefined ? {} : { initial: { x: first } });
