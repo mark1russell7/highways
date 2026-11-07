@@ -1,10 +1,16 @@
-// The times of the dense board (ROUTE-SCALE): `node scripts/scale.ts --router <name> [--fixture <file>] [--repeat <n>] [--out <file>] [--profile <file>]`.
+// The times of the dense board (ROUTE-SCALE): `node scripts/scale.ts --router <name> [--fixture <file> | --nodes <n>] [--repeat <n>] [--out <file>] [--profile <file>]`.
 // It routes the fixture with one router and writes the wall time of the route and of each step that the bench runs after the route.
 // The workflow `Scale` (.github/workflows/scale.yml) starts it for each router. Times run in CI only, not on a local machine.
 //
 // The fixture is a `.json.gz` file with `{ manifestId, pack, env, graph }`. The default is `data/scale/route-scale-fixture.json.gz`.
 // The router is `asRouter(routerStrategies[name])` with the default options, or `portfolioRouter()` for the name `portfolio`, as the joint runner of
 // layout-contract calls them. The name `attraction` gives the opt-in router `attractionStrategy` (HWY-044).
+// The name of a highway strategy, for example `growth` or `hub-arcs`, gives `highwayRouterStrategy` of it, as the joint runner does (ROUTER-BUDGET).
+//
+// With `--nodes <n>`, the board is `makeFixture` of `n` nodes, not the fixture file (ROUTER-BUDGET). Thus one router gives a time at each size.
+// The options `--kind` (default `uniform`), `--edges-per-node` (default 4, as the dense board) and `--seed` (default 1) give the other fields of the board.
+// The options `--round <r>` and `--arm <name>` write the round and the arm in the row. The workflow starts one process for each size, round and arm.
+// With `--route-only`, the script times only the route, not the steps after it.
 //
 // The steps:
 // - `route`: each run of the route. The first run is cold. With `--repeat 3`, the script also gives the warm median of the later runs.
@@ -25,7 +31,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { median } from "@mark1russell7/rigor-statistics";
-import { OPT_IN_STRATEGIES, asRouter, checkProperties, exactStretches, measureQuality, routePortfolio, routerStrategies, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { OPT_IN_STRATEGIES, STRATEGIES, asRouter, checkProperties, exactStretches, getStrategy, highwayRouterStrategy, listStrategies, makeFixture, measureQuality, routePortfolio, routerStrategies, type FixtureKind, type Graph, type Result, type Strategy } from "../src/index.ts";
 import { envOf } from "./gates/paired.ts";
 import { exactLines, routeHash } from "./xplat.ts";
 
@@ -65,7 +71,9 @@ function routerOf(name: string): (graph: Graph) => Routed {
   }
   // The opt-in routers are not in the registry `STRATEGIES`. The name gives them here too.
   const optIn: Readonly<Record<string, unknown>> = Object.fromEntries(OPT_IN_STRATEGIES.map((r) => [r.name, r]));
-  const s = (optIn[name] ?? (routerStrategies as unknown as Readonly<Record<string, unknown>>)[name]) as Strategy<"router", object> | undefined;
+  const highways = listStrategies(STRATEGIES, "highway").map((x) => x.name);
+  const highway = highways.includes(name) ? highwayRouterStrategy(getStrategy(STRATEGIES, "highway", name) as Strategy<"highway", object>) : undefined;
+  const s = (optIn[name] ?? (routerStrategies as unknown as Readonly<Record<string, unknown>>)[name] ?? highway) as Strategy<"router", object> | undefined;
   if (s === undefined) throw new RangeError(`There is no router "${name}".`);
   const router = asRouter(s);
   return (graph) => {
@@ -73,6 +81,25 @@ function routerOf(name: string): (graph: Graph) => Routed {
     const result = router.route(graph);
     return { result, ms: performance.now() - t0 };
   };
+}
+
+/** A board of the script: its id and its graph. */
+interface Board {
+  readonly manifestId?: string;
+  readonly graph: Graph;
+}
+
+/** This function reads a fixture file, as JSON or as gzip of JSON. */
+function readBoard(file: string): Board {
+  const bytes = readFileSync(file);
+  return JSON.parse((file.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8")) as Board;
+}
+
+/** This function gives the board of `nodes` nodes of a kind of `makeFixture` (ROUTER-BUDGET). The id names the kind, the size, the edges per node and the seed. */
+function sizeBoard(nodes: number, kind: FixtureKind, edgesPerNode: number, seed: number): Board {
+  if (!Number.isInteger(nodes) || nodes < 2) throw new RangeError(`The option --nodes needs a whole number of 2 or more, not "${nodes}".`);
+  const name = `${kind}-n${nodes}-e${edgesPerNode}-s${seed}`;
+  return { manifestId: name, graph: makeFixture({ name, kind, nodes, edgesPerNode, seed }) };
 }
 
 /** This function gives the 25 functions with the most self time of a CPU profile, as Markdown rows. */
@@ -99,12 +126,15 @@ async function main(): Promise<void> {
     return i >= 0 ? args[i + 1] : undefined;
   };
   const name = opt("--router") ?? "shared";
+  const nodes = opt("--nodes");
+  const round = opt("--round");
+  const arm = opt("--arm");
+  const routeOnly = args.includes("--route-only");
   const file = resolve(opt("--fixture") ?? fileURLToPath(new URL("./data/scale/route-scale-fixture.json.gz", import.meta.url)));
   const repeat = Math.max(1, Number(opt("--repeat") ?? "1"));
   const out = opt("--out");
   const profileFile = opt("--profile");
-  const bytes = readFileSync(file);
-  const doc = JSON.parse((file.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8")) as { manifestId?: string; graph: Graph };
+  const doc = nodes === undefined ? readBoard(file) : sizeBoard(Number(nodes), (opt("--kind") ?? "uniform") as FixtureKind, Number(opt("--edges-per-node") ?? 4), Number(opt("--seed") ?? 1));
   const graph = doc.graph;
   const route = routerOf(name);
   const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
@@ -153,12 +183,15 @@ async function main(): Promise<void> {
     console.log(`scale: ${name}: ${step}: ${steps[step]} ms.`);
     return v;
   };
-  const stopSteps = profileFile === undefined ? undefined : await profiler();
-  const violations = time("checkProperties", () => checkProperties(graph, result, 1_000_000)).length;
-  time("measureQuality", () => measureQuality(graph, result));
-  const stretches = time("exactStretches.build", () => exactStretches(graph));
-  time("exactStretches.use", () => stretches(result.routes));
-  if (stopSteps !== undefined) keep(profileFile!.replace(/\.cpuprofile$/, "") + ".steps.cpuprofile", `the steps of ${name}, with the profiler`, await stopSteps());
+  let violations: number | null = null;
+  if (!routeOnly) {
+    const stopSteps = profileFile === undefined ? undefined : await profiler();
+    violations = time("checkProperties", () => checkProperties(graph, result, 1_000_000)).length;
+    time("measureQuality", () => measureQuality(graph, result));
+    const stretches = time("exactStretches.build", () => exactStretches(graph));
+    time("exactStretches.use", () => stretches(result.routes));
+    if (stopSteps !== undefined) keep(profileFile!.replace(/\.cpuprofile$/, "") + ".steps.cpuprofile", `the steps of ${name}, with the profiler`, await stopSteps());
+  }
   if (first.key !== undefined) steps["portfolio.key"] = ms(first.key);
 
   const row = {
@@ -166,6 +199,8 @@ async function main(): Promise<void> {
     manifestId: doc.manifestId ?? null,
     nodes: graph.nodes.length,
     edges: graph.edges.length,
+    ...(round === undefined ? {} : { round: Number(round) }),
+    ...(arm === undefined ? {} : { arm }),
     hash,
     exact,
     same: [...hashes].every((h) => h === hash),

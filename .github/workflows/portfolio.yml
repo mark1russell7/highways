@@ -59,6 +59,10 @@ concurrency:
   group: portfolio-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   plan:
     if: ${{ !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}

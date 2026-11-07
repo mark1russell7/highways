@@ -257,6 +257,13 @@ Each run writes one line of JSON Lines: one line for each strategy, input and se
 
 The rules `no-pass-through` and the overlap of boxes use a tolerance of 0.5 units, `TOLERANCE` in `bench/properties.ts`. A segment goes through a box when a part of it longer than 0.5 is inside the box made smaller by 0.5. Two boxes with a common edge do not overlap. The geometry of the levels uses `1e-6`. A route can not go between two boxes with a common edge. Thus the boxes of a packed input break `no-pass-through` when an edge must pass between them.
 
+The measure `through` of the link faults reads the true shape of a node with a `shape`. After the box test, it calls `segmentThroughShape` of `layout-contract`.
+
+- A circle reads its disc, made smaller by 0.5. Each other kind reads the bounding box of its shape.
+- The split into `unavoidable` and `avoidable` reads `shapesOverlap` of the contract when a box has a shape.
+- The hard rule `no-pass-through` reads the box, because the routers read only the box.
+- Without shapes, `through` gives the count of `countLinksThroughShapes` of the contract. A test pins it on six fixtures and three routers.
+
 This tolerance lies on the same defect that the rule measures. A route up to 0.5 inside a box reads clear under `no-pass-through`, and the field `through` uses the same test. So the band hid the route `e284` of `case-dense-groups`, on `sections` with the margin of the site and with `outSteps: false`. A stop of that route is 0.42 inside `n138`, and the route has no `through`. The site keeps `outSteps` on, and then that route is out of the band.
 
 The independent check `checkRoutes` in `bench/measures/through-check.ts` has no such band. It takes each route and each box as closed shapes, and it shares no code with the rule. A touch is a contact, and two boxes that touch make a wall.
@@ -533,6 +540,7 @@ The packer measures are the measures of `packing`. Its [measure note](https://gi
 - The columns `through` and `no graph` of the summary are absolute sums over the inputs, with no floor. Thus a strategy at the floor still shows its count of pass-throughs.
 - `route.no-graph` (R17) counts the routes with two points where the corner graph has no way between the facing plugs. The screen reads the routes after the run, thus no output and no hash changes.
 - Each row of `screen-verdict.ts` has `through` and `baseThrough`: the absolute counts of the strategy and of the base. A snapshot from before PASS-GRID has no such fields, and the site reads each form.
+- The header of a verdict snapshot from VERDICT-RUN on has `script`: the commit of the checkout that ran `screen-verdict.ts`. An older snapshot has no such field.
 - The step `highway` makes the plan of each strategy and routes it with `follow`. The routers of `baseRouters` run too: `corners`, `shared` and `trunks` by default.
 - The option `wrap` adds a wrapped copy of each router as a new strategy. `stable` routes the edges in a stable order of their ids (WILD-053). `repair` runs the repair step of RULE-046 after the router.
 - The option `shuffles` measures the order fragility of each router. Each router routes each input `shuffles` times more.
@@ -645,6 +653,18 @@ The set `screen-v5` (COLLECTION-KEY) has the 150 boards of `screen-v3` under eac
 - The name of a family is the name of its family of `screen-v3` and `.key-<edgeKey>`. The cell has the field `edgeKey`. A screen of one arm names its 15 families.
 - The generator of each input has the name `edge-key`, version 1. Its `params` hold `edgeKey` and the generator of the `screen-v3` board in `base`.
 - The split file [`corpus/splits/screen-v5.82066dd4b30c5449.json`](../corpus/splits/screen-v5.82066dd4b30c5449.json) holds out the seeds 7 to 9 of each family.
+
+### The screen set `screen-v6`
+
+The set `screen-v6` (SCREEN-INNER) has 20 boards of `frame-rows` with inner edges. Its files are in [`corpus/screen-v6`](../corpus/screen-v6). `SCREEN_V6` of `bench/screen/set.ts` makes them.
+
+- The sets `screen-v1` to `screen-v5` have no board with inner routes. Thus a screen of those sets does not read the routes inside a frame.
+- The set has two families: `frame-rows.inner-4` and `frame-rows.inner-12`, each with the 10 members 0 to 9.
+- The dimension `inner` of `frame-rows` sets the tries for an inner edge from a row to a wall plug of its card.
+- The boxes and the cell of the member `k` are those of the member `k` of `frame-rows` in `screen-v3`. Only the inner edges are new.
+- The router `corners` gives 30 inner routes or more on each board. A test holds this count.
+- The generator of each input is `family.frame-rows`, with the parameter `inner`.
+- The split file [`corpus/splits/screen-v6.742626a676f29f5e.json`](../corpus/splits/screen-v6.742626a676f29f5e.json) holds out the seeds 7 to 9 of each family.
 
 ### The screen set `exact-v1`
 

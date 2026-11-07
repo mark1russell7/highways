@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { STRATEGIES } from "../../strategies/builtins.ts";
+import { ROUTERS } from "../../routers/index.ts";
 import { defineStrategy, findStrategy, getStrategy } from "../../strategies/model.ts";
 import { canonicalJson, documentHash, fnv1a32, mulberry32, round3, sha256Hex, stepSeed } from "./hash.ts";
 import { createFamilyRegistry, RECT_SCATTERED } from "@mark1russell7/layout-contract";
@@ -126,7 +127,7 @@ describe("the input files (layout-input/1)", () => {
     expect(() => inputGraph({ ...tiny, boxes: [loose, ...tiny.boxes.slice(1)] })).toThrow(/no position/);
   });
 
-  it("gives the router each obstacle as a box without edges, and ignores the shapes", () => {
+  it("gives the router each obstacle as a box without edges, keeps each shape on its node, and routes as without the shapes", () => {
     const shaped: LayoutInput = {
       ...tiny,
       container: { fixed: "none", aspect: 1.5, shape: { kind: "circle", cx: 0, cy: 0, r: 900 } },
@@ -138,12 +139,21 @@ describe("the input files (layout-input/1)", () => {
     };
     const graph = inputGraph(shaped);
     const plain = inputGraph(tiny);
-    expect(graph.nodes.slice(0, plain.nodes.length)).toEqual(plain.nodes);
+    const boxes = graph.nodes.slice(0, plain.nodes.length);
+    expect(boxes.map(({ shape: _shape, ...rest }) => rest)).toEqual(plain.nodes);
+    expect(boxes.map((n) => n.shape)).toEqual(shaped.boxes.map((b) => b.shape));
+    // The shape of an obstacle is relative to the top-left corner of its box, as the shape of a box.
     expect(graph.nodes.slice(plain.nodes.length)).toEqual([
-      { id: "lake", box: { x: 10, y: 5, w: 50, h: 65 } },
-      { id: "rock", box: { x: 95, y: 95, w: 10, h: 10 } },
+      { id: "lake", box: { x: 10, y: 5, w: 50, h: 65 }, shape: { kind: "polygon", points: [[0, 15], [50, 0], [30, 65]], holes: [[[20, 25], [25, 25], [22, 30]]] } },
+      { id: "rock", box: { x: 95, y: 95, w: 10, h: 10 }, shape: { kind: "circle", cx: 5, cy: 5, r: 5 } },
     ]);
     expect(graph.edges).toEqual(plain.edges);
+    // The routers read only the boxes: the routes of the graph with the shapes equal the routes without them.
+    const unshaped = { ...graph, nodes: graph.nodes.map(({ shape: _shape, ...rest }) => rest) };
+    for (const name of ["corners", "straight"]) {
+      const router = ROUTERS.find((r) => r.name === name)!;
+      expect(router.route(graph).routes, name).toEqual(router.route(unshaped).routes);
+    }
   });
 
   it("matches the files in corpus/screen-v1", () => {

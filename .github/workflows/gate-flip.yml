@@ -5,7 +5,7 @@
 # - On a dispatch. The input `checks` selects `quick`, `sections` or `all`.
 # - Each week on its own minute, because a gate that proves itself only when its code changes misses a drift of the runners and the bench.
 # - On a push to main that changes gate code. The job `which` selects the jobs from the changed files:
-#   - `quick` reads `scripts/heap.ts`, `scripts/data/heap/`, `scripts/search-work.ts`, `gates/same-stops.ts` and `search-work.yml`.
+#   - `quick` reads `scripts/heap.ts`, `scripts/data/heap/`, `scripts/search-work.ts`, `gates/same-stops.ts`, `scripts/screen-verdict.ts` and `search-work.yml`.
 #   - `sections` reads `scripts/sections-bisect.ts`, `scripts/sections-gate-verdict.ts`, the time gates of `gates/`, `scripts/data/sections-gate/` and `sections-gate.yml`.
 #   - Both read `gates/flip.ts`, `gates/flip-memory.ts` and this file.
 #   - A change of the lock file does not start a job, because the release train changes it often. The weekly run reads it.
@@ -30,6 +30,7 @@ on:
       - "packages/core/scripts/heap.ts"
       - "packages/core/scripts/data/heap/**"
       - "packages/core/scripts/search-work.ts"
+      - "packages/core/scripts/screen-verdict.ts"
       - "packages/core/scripts/sections-bisect.ts"
       - "packages/core/scripts/sections-gate-verdict.ts"
       - "packages/core/scripts/gates/**"
@@ -72,7 +73,7 @@ jobs:
           quick=false
           sections=false
           both='^(packages/core/scripts/gates/flip(-memory)?\.ts|\.github/workflows/gate-flip\.yml)$'
-          quickFiles='^(packages/core/scripts/heap\.ts|packages/core/scripts/data/heap/|packages/core/scripts/search-work\.ts|packages/core/scripts/gates/same-stops\.ts|\.github/workflows/search-work\.yml)'
+          quickFiles='^(packages/core/scripts/heap\.ts|packages/core/scripts/data/heap/|packages/core/scripts/search-work\.ts|packages/core/scripts/screen-verdict\.ts|packages/core/scripts/gates/same-stops\.ts|\.github/workflows/search-work\.yml)'
           sectionsFiles='^(packages/core/scripts/sections-bisect\.ts|packages/core/scripts/sections-gate-verdict\.ts|packages/core/scripts/gates/(commits|home-verdict|pair-confirm|paired|scope|time-gate)\.ts|packages/core/scripts/data/sections-gate/|\.github/workflows/sections-gate\.yml)'
           if [ "$EVENT" = push ]; then
             # A base that the checkout does not hold starts both jobs, so a push does not skip a flip.
@@ -114,6 +115,9 @@ jobs:
       - name: The flip of gate (b) of Search work
         if: ${{ !cancelled() }}
         run: node packages/core/scripts/gates/flip.ts --check work --out out/gate-flip
+      - name: The flip of the verdict step of Screen
+        if: ${{ !cancelled() }}
+        run: node packages/core/scripts/gates/flip.ts --check verdict --out out/gate-flip
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
