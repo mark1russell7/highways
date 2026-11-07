@@ -1,11 +1,11 @@
 /**
- * This module makes the rows of the record `through-check/5`, with no side effect (THROUGH-CHECK).
+ * This module makes the rows of the record `through-check/6`, with no side effect (THROUGH-CHECK).
  * The script `through-check.ts` writes them, and the gate `through-check.test.ts` makes them again and compares them with the record.
  * It keeps the routers and the lanes out of `src/bench/measures/through-check.ts`, so the imports of that module stay types only.
- * Each family of `highwaysRegistry()` runs at its defaults, for each router of `SCORED`, `OUTSIDE` and `SITE_ROUTERS`.
+ * Each family of `highwaysRegistry()` runs at its defaults, for each router of `SCORED`, `SITE_ROUTERS`, `REPORT_ROUTERS` and `CONTROLS`.
  * The board `INNER_BOARDS` is one more family, because no family has inner routes at its defaults.
  * A row of `lanes` holds the routes of `laneRoutes`, with each shared segment open, at the lane settings of the site, so it shows what `keepThrough` copies.
- * The routers of `OUTSIDE` do not mark `through`, so the record keeps them in `unmarkedRows`, apart from `rows`.
+ * The controls `straight` and `plugs` mark `through` since UNMARKED-THROUGH, so `rows` holds them. They make no highways, so they have no row of `lanes`.
  * The routers of `SITE_ROUTERS` and `REPORT_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
  */
 import { BUNDLE_COUNTER, measureHighways } from "../src/bench/curves.ts";
@@ -23,7 +23,8 @@ import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../src/segmen
 /** The command that writes the record again, from the repository root. */
 export const REGENERATE = "node packages/core/scripts/through-check.ts packages/core/scripts/data/through-check/record.json";
 export const SCORED = ["corners", "trunks", "shared", "sections"];
-export const OUTSIDE = ["straight", "plugs"];
+/** The controls of the benchmark. Their routes go through boxes by design, and the field `through` names those boxes. */
+export const CONTROLS = ["straight", "plugs"];
 /** The routers with a report row on the families. `shared-all` has the most lanes in a bundle, so it shows the largest cost of the room. */
 export const REPORT_ROUTERS = ["shared-all"];
 /** The settings of the router of the site (`packages/site/src/examples.ts`). The ladder of plugs is on. */
@@ -49,7 +50,6 @@ export const INNER_BOARDS = [
 /** The seeds of each inner board. The inner routes are few, so these boards take more seeds than the families. */
 export const INNER_SEEDS = 10;
 const SAMPLE = 3;
-const UNMARKED_NOTE = "The routers straight and plugs do not mark through. Their flagged counts are outside each claim on through, and rows does not hold them.";
 
 export interface ClassRow {
   routes: number;
@@ -279,13 +279,12 @@ export interface ThroughScope {
   readonly log?: (line: string) => void;
 }
 
-/** This function gives the record `through-check/5` over `seeds` seeds. The counts are deterministic, and it reads no time. */
+/** This function gives the record `through-check/6` over `seeds` seeds. The counts are deterministic, and it reads no time. */
 export function throughRecord(seeds: number, scope: ThroughScope = {}) {
   const reg = highwaysRegistry();
-  const wanted = [...(scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name), ...REPORT_ROUTERS]), ...OUTSIDE];
+  const wanted = scope.routers ?? [...SCORED, ...SITE_ROUTERS.map((r) => r.name), ...REPORT_ROUTERS, ...CONTROLS];
   const families = scope.families ?? [...HIGHWAYS_FAMILIES.map((f) => f.name), ...INNER_BOARDS.map((b) => b.name)];
   const rows: Row[] = [];
-  const unmarkedRows: Row[] = [];
   for (const family of families) {
     const graphs: Graph[] = [];
     const innerBoard = INNER_BOARDS.find((b) => b.name === family);
@@ -297,7 +296,7 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
       const row = blank(name, family, "routes");
       const lanes = blank(name, family, "lanes");
       // A lane route has no field `frame`, so the board of inner routes has no row of lanes.
-      const hasLanes = !OUTSIDE.includes(name) && innerBoard === undefined;
+      const hasLanes = !CONTROLS.includes(name) && innerBoard === undefined;
       graphs.forEach((graph, seed) => {
         const result = router.route(graph);
         const closed = checkRoutes(graph, result.routes);
@@ -310,27 +309,25 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
           addLaneShape(lanes, seed, graph, result, view, checks, closed);
         }
       });
-      (OUTSIDE.includes(name) ? unmarkedRows : rows).push(row);
+      rows.push(row);
       if (hasLanes) rows.push(lanes);
       scope.log?.(JSON.stringify({ router: name, family, routes: row.routes, marked: row.marked, flagged: row.flagged, falseThrough: row.falseThrough, lanesFlagged: lanes.flagged, lanesFalse: lanes.falseThrough }));
     }
   }
   return {
-    schema: "through-check/5",
+    schema: "through-check/6",
     bundleCounter: BUNDLE_COUNTER,
     seeds,
     size: "default",
     classes: THROUGH_CLASSES,
     hairline: HAIRLINE,
     scored: SCORED,
-    unmarked: OUTSIDE,
-    unmarkedNote: UNMARKED_NOTE,
+    controls: CONTROLS,
     site: SITE.name,
     siteNoLadder: SITE_NO_LADDER.name,
     innerBoards: INNER_BOARDS,
     innerSeeds: INNER_SEEDS,
     lanes: LANES,
     rows,
-    unmarkedRows,
   };
 }
