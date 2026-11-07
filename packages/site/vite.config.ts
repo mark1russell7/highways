@@ -3,12 +3,14 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteKpi } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
+import { atlasData } from "./src/atlas-data.ts";
+import { ATLAS_FILES, atlasWeeks } from "./src/atlas-files.ts";
 import type { BenchMeta } from "./src/bench-label.ts";
 import { SWEEP_DIR } from "./src/explorer-data.ts";
 import { explorerPage } from "./src/explorer-files.ts";
 import { kpiFacts } from "./src/kpi-files.ts";
 import { siteKpiInput } from "./src/kpi.ts";
-import { buildInfo, dataLineHtml, readResults, RESULT_FILES } from "./src/results-files.ts";
+import { buildInfo, dataLineHtml, readResults, RESULT_FILES, textSections } from "./src/results-files.ts";
 import { BUILT_FILE, readStrategies } from "./src/strategies-files.ts";
 
 // The Pages workflow sets SITE_BASE to "/highways". A local build uses the root.
@@ -35,11 +37,14 @@ const RESULTS_ID = "virtual:results";
 /** The module id of the data of the strategies page. */
 const STRATEGIES_ID = "virtual:strategies";
 
+/** The module id of the data of the atlas page. */
+const ATLAS_ID = "virtual:atlas";
+
 /** The module id of the data of the explorer page. */
 const EXPLORER_ID = "virtual:explorer";
 
 /**
- * This plugin gives the data of the results page, of the strategies page and of the explorer page from the committed files, at build time. The page reads no file and no network at run time.
+ * This plugin gives the data of the results page, of the strategies page, of the atlas page and of the explorer page from the committed files, at build time. The page reads no file and no network at run time.
  * It also puts the data line (the core release, the commit and the date of the build) in each page.
  * It copies the committed benchmark snapshot to `bench.json` and `bench-meta.json` of the site. The Pages build does not start the benchmark.
  */
@@ -48,8 +53,15 @@ function committedResults(): Plugin {
   const line = dataLineHtml(info);
   return {
     name: "highways-committed-results",
-    resolveId: (id) => (id === RESULTS_ID || id === STRATEGIES_ID || id === EXPLORER_ID ? `\0${id}` : undefined),
+    resolveId: (id) => (id === RESULTS_ID || id === STRATEGIES_ID || id === ATLAS_ID || id === EXPLORER_ID ? `\0${id}` : undefined),
     load(id) {
+      if (id === `\0${ATLAS_ID}`) {
+        // The weekly records give the leaders. The page reads the date of the viewer for the age of the latest record.
+        this.addWatchFile(join(root, ATLAS_FILES.weeks));
+        this.addWatchFile(join(root, ATLAS_FILES.text));
+        const atlas = { view: atlasData(atlasWeeks(root), info.date), text: textSections(readFileSync(join(root, ATLAS_FILES.text), "utf8")), core: info.core };
+        return `export default ${JSON.stringify(atlas)};`;
+      }
       if (id === `\0${EXPLORER_ID}`) {
         // The newest sweep record of the folder, with its size and its date. The explorer reads the record only through parseResponseRecord.
         this.addWatchFile(join(root, SWEEP_DIR));
@@ -80,7 +92,7 @@ function committedResults(): Plugin {
   };
 }
 
-// The site has six pages: the live demo, the examples, the compare page, the results, the strategy cards and the explorer.
+// The site has seven pages: the live demo, the examples, the compare page, the results, the strategy cards, the atlas and the explorer.
 export default defineConfig({
   base,
   plugins: [committedResults(), siteKpi(kpiInput, env)],
@@ -88,7 +100,7 @@ export default defineConfig({
   build: {
     target: "es2022",
     rolldownOptions: {
-      input: { main: page("./index.html"), examples: page("./examples.html"), compare: page("./compare.html"), results: page("./results.html"), strategies: page("./strategies.html"), explorer: page("./explorer.html") },
+      input: { main: page("./index.html"), examples: page("./examples.html"), compare: page("./compare.html"), results: page("./results.html"), strategies: page("./strategies.html"), atlas: page("./atlas.html"), explorer: page("./explorer.html") },
     },
   },
 });
