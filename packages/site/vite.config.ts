@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { siteKpi } from "@mark1russell7/site-pages/vite";
+import { siteKpi, siteStamps } from "@mark1russell7/site-pages/vite";
 import { defineConfig, type Plugin } from "vite";
 import { atlasData, type AtlasPage } from "./src/atlas-data.ts";
 import { ATLAS_FILES } from "./src/atlas-files.ts";
@@ -12,7 +12,8 @@ import { SWEEP_DIR } from "./src/explorer-data.ts";
 import { explorerPage } from "./src/explorer-files.ts";
 import { kpiFacts } from "./src/kpi-files.ts";
 import { siteKpiInput } from "./src/kpi.ts";
-import { buildInfo, dataLineHtml, readResults, RESULT_FILES, textSections } from "./src/results-files.ts";
+import { buildInfo, dataLineHtml, readResults, RESULT_FILES, snapshotFiles, textSections } from "./src/results-files.ts";
+import { verdictStamps, type VerdictHeader } from "./src/stamps.ts";
 import { BUILT_FILE, readStrategies } from "./src/strategies-files.ts";
 
 // The Pages workflow sets SITE_BASE to "/highways". A local build uses the root.
@@ -120,7 +121,8 @@ function committedResults(): Plugin {
 // The site has seven pages: the live demo, the examples, the compare page, the results, the strategy cards, the atlas and the explorer.
 export default defineConfig({
   base,
-  plugins: [committedResults(), siteKpi(kpiInput, env)],
+  // The freshness gate of the Pages workflow reads the stamps of the verdicts (VERDICT-STAMPS).
+  plugins: [committedResults(), siteKpi(kpiInput, env), siteStamps(() => verdictStamps(snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader), "mark1russell7/highways"))],
   worker: { format: "es" },
   build: {
     target: "es2022",
