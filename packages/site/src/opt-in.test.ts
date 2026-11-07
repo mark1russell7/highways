@@ -23,6 +23,12 @@ describe("the opt-in routers on the compare page (PHYSICAL-VISIBLE)", () => {
     }
   });
 
+  it("gives its partner to each note that calls a won measure `better`, so that no such line reads as a win", () => {
+    const won = Object.entries(OPT_IN_NOTES).filter(([, note]) => /\((R1|B1|R5 q95)\)[^.]*`better`/.test(note.text));
+    expect(won.map(([name]) => name).sort()).toEqual(["adam", "attraction", "canals", "tight"]);
+    for (const [name, note] of won) expect(note.text, name).toMatch(/partner `route\.[a-z.]+`, so it is no win\./);
+  });
+
   it("states the time of each router, and the time of `repel` is 52.1 times `shared`", () => {
     for (const [name, note] of Object.entries(OPT_IN_NOTES)) expect(note.text, name).toMatch(/time is [\d.]+ times `shared`|takes \d+ to \d+ ms/);
     expect(OPT_IN_NOTES["repel"]!.text).toContain("52.1 times `shared`");
