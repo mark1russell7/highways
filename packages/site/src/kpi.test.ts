@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { kpiFacts } from "./kpi-files.ts";
-import { KPI_PAGES, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts } from "./kpi.ts";
+import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
+import { cardsWithCurves, KPI_PAGES, latestAt, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -82,6 +83,70 @@ describe("siteKpiInput", () => {
   });
 });
 
+describe("cardsWithCurves", () => {
+  // A made-up sweep of the option gap for each strategy. Each point has its own seed group.
+  const data = (strategies: Record<string, number>): ResponseData => ({
+    schema: RESPONSE_RECORDS_SCHEMA,
+    name: "made-up sweep",
+    dimensions: [
+      { id: "step", label: "Step", unit: "", kind: "categorical", levels: ["router"] },
+      { id: "strategy", label: "Strategy", unit: "", kind: "categorical", levels: Object.keys(strategies) },
+      { id: "gap", label: "Gap", unit: "px", kind: "continuous", range: [0, 16] },
+    ],
+    measures: [{ id: "crossings", label: "Crossings", unit: "", direction: "lower" }],
+    points: Object.entries(strategies).flatMap(([strategy, n]) =>
+      Array.from({ length: 4 }, (_, i) => ({
+        id: `${strategy}-${i}`,
+        group: `${strategy}-${i}`,
+        values: { step: "router", strategy, gap: n === 1 ? 4 : 4 * (i % n) + 1 },
+        measures: { crossings: 10 + i + strategy.length },
+      })),
+    ),
+  });
+  const file = (strategies: Record<string, number>, date?: string): SweepFile => ({ record: fitResponse(data(strategies)), ...(date ? { date } : {}) });
+
+  it("counts each card with 2 values of an option or more", () => {
+    expect(cardsWithCurves([file({ alpha: 2, beta: 4, gamma: 1 })])).toBe(2);
+  });
+
+  it("counts a card once, and skips a record that parseResponseRecord refuses", () => {
+    expect(cardsWithCurves([file({ alpha: 3, delta: 1, gamma: 1 }), file({ alpha: 4, delta: 1, gamma: 1 }), { record: data({ beta: 2, delta: 1, gamma: 1 }) }, { record: null }])).toBe(1);
+  });
+
+  it("gives 0 with no record, and the measure in the file says what it does not count", () => {
+    expect(cardsWithCurves([])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, FACTS);
+    const m = input?.measures.find((x) => x.id === "cards-with-curves");
+    expect(m).toMatchObject({ value: 0, unit: "cards" });
+    expect(m?.notCounted).toContain("response-records/1");
+    expect(m?.at).toBeUndefined();
+  });
+
+  it("takes the time of the measure from the latest commit of a record with a curve", () => {
+    const sweeps = [file({ alpha: 2, delta: 1, gamma: 1 }, "2026-11-10"), file({ beta: 2, delta: 1, gamma: 1 }, "2026-11-12"), file({ delta: 1, gamma: 1, zeta: 1 }, "2026-11-13")];
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps });
+    expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
+  });
+});
+
+describe("the time of each measure", () => {
+  it("gives the latest date, or no time with no date", () => {
+    expect(latestAt(["2026-11-05", undefined, "2026-11-07T10:00:00Z", "local"])).toBe("2026-11-07T00:00:00Z");
+    expect(latestAt([])).toBeUndefined();
+  });
+
+  it("gives the reads the time of the last stamp, not of the benchmark", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, verdictReads: ["0.15.0"], verdictReadDates: ["2026-10-30", "2026-11-07"] });
+    expect(input?.at).toBe("2026-11-05T00:00:00Z");
+    expect(input?.measures.find((m) => m.id === "results-unread")?.at).toBe("2026-11-07T00:00:00Z");
+  });
+
+  it("gives a page the time of the commit of the build", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => true, { ...FACTS, commitDate: "2026-11-07" });
+    expect(input?.measures.find((m) => m.id === "atlas-live")).toMatchObject({ value: 1, at: "2026-11-07T00:00:00Z" });
+  });
+});
+
 describe("resultsLag", () => {
   it("gives the largest count over the records", () => {
     expect(resultsLag(["0.14.0", "0.10.0", "0.13.1"], "0.14.0")).toBe(4);
@@ -103,5 +168,9 @@ describe("kpiFacts", () => {
     expect(facts.verdictCores).not.toContain(undefined);
     expect(facts.verdictReads).toHaveLength(facts.verdictCores.length);
     expect(facts.verdictReads).not.toContain(undefined);
+    expect(facts.verdictReadDates).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReadDates).not.toContain(undefined);
+    expect(Array.isArray(facts.sweeps)).toBe(true);
+    expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

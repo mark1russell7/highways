@@ -61,6 +61,6 @@ jobs:
       # The check opens each page in a browser at each width, in light and dark. The probe drives the map of the home
       # page with the real routers. The check reads the TypeScript source and removes its types.
       site-check: true
-      site-check-pages: /,/compare.html,/examples.html,/results.html,/strategies.html,/releases/,/status/
+      site-check-pages: /,/compare.html,/examples.html,/results.html,/strategies.html,/atlas.html,/releases/,/status/
       site-check-probe: packages/site/src/check-probe.ts
       timeout-minutes: 15
