@@ -342,7 +342,7 @@ These options of `shared` and `trunks` are off by default. With the defaults, th
 - `splitAt: gilbert` of `trunks` puts the split point where the flow cost is least, with the exponent `alpha` (EDA-030).
 - `fan: tree` of `trunks` grows a balancing-factor tree for each group, with the factor `bf` (NAT-017). 0 gives the least ink.
 
-The screen `screen-v1` compares the options with the defaults on the boards `small-clustered`, `dense-groups`, `hub-chain` and `many-groups`.
+The screen `screen-v1` compares the options with the defaults on the boards `small-clustered`, `dense-groups`, `hub-chain` and `many-groups`. It has no control and it does not read the pair count, so no row of this table is a win.
 
 | Option | Router | Result |
 |---|---|---|
