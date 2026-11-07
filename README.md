@@ -192,6 +192,15 @@ The 10 families of FAMILIES-WEEKLY add worst cases. They are one narrow door in 
 
 The compare page and the live demo have the choice "Generated", with the same controls and the same keys of the URL. The screen sets make their boards with the same families.
 
+### The explorer page
+
+The page `explorer.html` shows the newest sweep record of `docs/research/sweeps/`. A sweep changes one number option of a strategy at a time, and the other options keep their defaults. The page states the size and the commit date of its record. Each measure also has a ratio to the defaults of its strategy on the same board. Thus the size of the board does not hide the effect of an option.
+
+- The script `packages/core/scripts/sweep.ts` writes a record of the format `response-records/1`. Start it in `packages/core`, for example `node scripts/sweep.ts --strategy corners,trunks --families tiny-uniform --out sweep.json`.
+- Locally, sweep only one or two small families. Start a large sweep in CI.
+- The workflow `Sweep` has the inputs `step`, `strategies` and `families`. It keeps the record as the artifact `sweep`.
+- Commit the record to `docs/research/sweeps/`. The build of the site reads it, and the test `explorer-data.test.ts` examines it.
+
 ## Development
 
 - `pnpm install` installs the workspace.
