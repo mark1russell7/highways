@@ -1,0 +1,77 @@
+# The read of each verdict snapshot after a release of the engine (SCREEN-ON-RELEASE).
+# A new minor of packages/core makes each snapshot unread: `results-unread` of kpi.json counts it.
+# So each run of Release that changes the version of packages/core starts one Screen run of 3 sets and 5 steps.
+# That run gives one artifact for each snapshot. The steps of docs/research/verdicts/README.md then stamp each one.
+# A run of Release that changes no version of the core starts no read.
+name: Read on release
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "The commit of main to examine. The default is the head of main."
+        required: false
+        default: ""
+      dry-run:
+        description: "Give the command of the read, but do not start it."
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: read-on-release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  read:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.sha }}
+      DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+      GH_TOKEN: ${{ github.token }}
+      SETS: '["screen-v1","screen-v2","screen-v3"]'
+      STEPS: '["router","highway","plugs","levels","whole"]'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.sha || 'main' }}
+          fetch-depth: 2
+      - name: The version of the core
+        id: version
+        run: |
+          now=$(jq -r .version packages/core/package.json)
+          before=$(git show HEAD^:packages/core/package.json 2>/dev/null | jq -r .version || echo "")
+          echo "The core is $now at $(git rev-parse --short HEAD), and $before at its parent."
+          echo "now=$now" >> "$GITHUB_OUTPUT"
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+      - name: Start the read
+        if: ${{ steps.version.outputs.now != steps.version.outputs.before }}
+        env:
+          VERSION: ${{ steps.version.outputs.now }}
+        run: |
+          cmd=(gh workflow run screen.yml --repo "$GITHUB_REPOSITORY" --ref main -f "set=$SETS" -f "step=$STEPS" -f minutes=30)
+          echo "The core changed to $VERSION. The read: ${cmd[*]}"
+          echo "The core changed to $VERSION. The read of the 15 snapshots: \`${cmd[*]}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$DRY" = "true" ]; then
+            echo "A dry run starts no read."
+            exit 0
+          fi
+          "${cmd[@]}"
+      - name: No read
+        if: ${{ steps.version.outputs.now == steps.version.outputs.before }}
+        run: echo "The version of the core did not change, so no read starts." >> "$GITHUB_STEP_SUMMARY"
