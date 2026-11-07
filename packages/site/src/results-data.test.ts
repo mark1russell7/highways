@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts } from "./results-data.ts";
+import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts, stampSnapshots } from "./results-data.ts";
 import type { VerdictTable } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
@@ -60,6 +60,37 @@ describe("results data", () => {
       { key: "c R1 route.crossings", fields: ["row"] },
     ]);
     expect(() => compareReads(snap, { ...same, step: "plugs" })).toThrow(/step plugs/);
+  });
+
+  it("stamps a snapshot with the same rows, and leaves a snapshot that differs or has no read (STAMP-ON-RELEASE)", () => {
+    // The text of a committed snapshot: one field on each line of the header, as the files of the repository.
+    const file = (set: string, rows: unknown[], verified?: object): string =>
+      [
+        "{",
+        ...Object.entries({ ...HEAD, set }).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`),
+        ...(verified === undefined ? [] : [`  "verified": ${JSON.stringify(verified)},`]),
+        `  "rows": ${JSON.stringify(rows)}`,
+        "}",
+        "",
+      ].join("\n");
+    const files = [
+      { name: "equal.json", text: file("equal", [ROW], { core: "0.14.0", run: 3, commit: "e", date: "2026-11-01" }) },
+      { name: "moved.json", text: file("moved", [ROW]) },
+      { name: "unread.json", text: file("unread", [ROW]) },
+    ];
+    const read = (set: string, rows: unknown[]) => parseSnapshot(JSON.stringify({ ...HEAD, set, core: "0.16.0", run: 9, commit: "f", date: "2026-11-08", rows }));
+    const out = stampSnapshots(files, [read("equal", [ROW]), read("moved", [{ ...ROW, label: "better" }])]);
+    expect(out.map((o) => [o.name, o.status])).toEqual([
+      ["equal.json", "stamped"],
+      ["moved.json", "differ"],
+      ["unread.json", "unread"],
+    ]);
+    const stamped = out[0]!.status === "stamped" ? out[0]!.text : "";
+    // The new stamp replaces the old one, and the rows keep their bytes.
+    expect(parseSnapshot(stamped).verified).toEqual({ core: "0.16.0", run: 9, commit: "f", date: "2026-11-08" });
+    expect(stamped.match(/"verified"/g)).toHaveLength(1);
+    expect(stamped.split("\n").at(-2)).toBe(files[0]!.text.split("\n").at(-2));
+    expect(out[1]).toMatchObject({ status: "differ", diffs: [{ key: "a R1 route.crossings", fields: ["label"] }] });
   });
 
   it("counts the stages in the sequence of the page", () => {

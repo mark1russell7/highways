@@ -256,6 +256,40 @@ jobs:
           path: out/
           if-no-files-found: warn
 
+  # The stamps of a read of the verdict snapshots (STAMP-ON-RELEASE). It runs after a dispatch with a list of sets and a list of steps.
+  # The workflow `Read on release` starts that dispatch. The job reads each committed snapshot against the verdict of its set and step.
+  # The artifact `stamps-<sha>` holds each snapshot with the same rows and its new stamp. A row that differs, or a snapshot with no read, fails the job.
+  # Apply the artifact on a branch: `gh run download <run> -n stamps-<sha> -D docs/research/verdicts`. Then open a pull request.
+  stamps:
+    needs: [changes, screen]
+    if: ${{ always() && needs.changes.outputs.match == 'true' && github.event_name == 'workflow_dispatch' && startsWith(inputs.set, '[') && startsWith(inputs.step, '[') && !inputs.strategy && !inputs.module && !inputs.members && !inputs.families && !inputs.paired && !inputs.wrap && !inputs.activation && (inputs.shuffles || '0') == '0' && (inputs.edits || '0') == '0' && !inputs.exact && !inputs.time && !inputs.report }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ inputs.node || '26' }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: screen-*-none-0-0-${{ github.sha }}
+          path: reads
+      - name: Stamp each snapshot with the same rows
+        run: |
+          set -o pipefail
+          node packages/site/scripts/verdict-stamps.ts reads | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: stamps-${{ github.sha }}
+          path: docs/research/verdicts/*.json
+          if-no-files-found: error
+
   screen-ok:
     name: Screen OK
     if: ${{ !cancelled() }}
