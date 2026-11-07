@@ -3,8 +3,8 @@
 // They read the repository on disk. They do not use the network.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseWeek, type AtlasWeek } from "./atlas-data.ts";
-import { parseSnapshot, type Snapshot } from "./results-data.ts";
+import { parseWeek, type AtlasWeek, type SnapshotFile } from "./atlas-data.ts";
+import { isSnapshotFile, parseSnapshot, type Snapshot } from "./results-data.ts";
 
 /** The folders and the files of the atlas, relative to the root of the repository. */
 export const ATLAS_FILES = {
@@ -19,14 +19,17 @@ export const ATLAS_FILES = {
 /** The name of a weekly record: its date and `.json`. */
 const WEEK_FILE = /^\d{4}-\d{2}-\d{2}\.json$/;
 
-/** This function gives the verdict snapshots of the repository: each JSON file of the folder of verdicts, in the order of the names. */
-export function verdictSnapshots(root: string): Snapshot[] {
+/** This function gives the snapshot files of the repository on disk: each JSON file of the folder of verdicts, in the order of the names. */
+export function verdictFiles(root: string): SnapshotFile[] {
   const dir = join(root, ATLAS_FILES.verdicts);
   return readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
+    .filter(isSnapshotFile)
     .sort()
-    .map((f) => parseSnapshot(readFileSync(join(dir, f), "utf8"), f));
+    .map((name) => ({ name, text: readFileSync(join(dir, name), "utf8") }));
 }
+
+/** This function gives the verdict snapshots of the repository on disk, in the order of the names of the files. */
+export const verdictSnapshots = (root: string): Snapshot[] => verdictFiles(root).map((f) => parseSnapshot(f.text, f.name));
 
 /** This function gives the path of the weekly record of a date. */
 export const weekPath = (root: string, date: string): string => join(root, ATLAS_FILES.weeks, `${date}.json`);
