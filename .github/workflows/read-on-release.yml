@@ -68,7 +68,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.now }}
           EVENT: ${{ github.event_name }}
         run: |
-          cmd=(gh workflow run screen.yml --repo "$GITHUB_REPOSITORY" --ref main -f "set=$SETS" -f "step=$STEPS" -f minutes=30)
+          cmd=(gh workflow run screen.yml --repo "$GITHUB_REPOSITORY" --ref main -f "set=$SETS" -f "step=$STEPS" -f minutes=60)
           why="The core changed to $VERSION."
           if [ "$EVENT" = schedule ]; then why="The weekly read, on core $VERSION."; fi
           echo "$why The read: ${cmd[*]}"
