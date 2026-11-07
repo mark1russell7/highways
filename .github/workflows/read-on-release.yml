@@ -3,6 +3,7 @@
 # So each run of Release that changes the version of packages/core starts one Screen run of 3 sets and 5 steps.
 # That run gives one artifact for each snapshot. The steps of docs/research/verdicts/README.md then stamp each one.
 # A run of Release that changes no version of the core starts no read.
+# The schedule also starts the read each week. The stamps of the Results page have an age limit of 14 days, and this schedule meets it.
 name: Read on release
 
 on:
@@ -10,6 +11,8 @@ on:
     workflows: [Release]
     types: [completed]
     branches: [main]
+  schedule:
+    - cron: "23 3 * * 1"
   workflow_dispatch:
     inputs:
       sha:
@@ -33,7 +36,7 @@ defaults:
 
 jobs:
   read:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -60,18 +63,21 @@ jobs:
           echo "now=$now" >> "$GITHUB_OUTPUT"
           echo "before=$before" >> "$GITHUB_OUTPUT"
       - name: Start the read
-        if: ${{ steps.version.outputs.now != steps.version.outputs.before }}
+        if: ${{ github.event_name == 'schedule' || steps.version.outputs.now != steps.version.outputs.before }}
         env:
           VERSION: ${{ steps.version.outputs.now }}
+          EVENT: ${{ github.event_name }}
         run: |
           cmd=(gh workflow run screen.yml --repo "$GITHUB_REPOSITORY" --ref main -f "set=$SETS" -f "step=$STEPS" -f minutes=30)
-          echo "The core changed to $VERSION. The read: ${cmd[*]}"
-          echo "The core changed to $VERSION. The read of the 15 snapshots: \`${cmd[*]}\`" >> "$GITHUB_STEP_SUMMARY"
+          why="The core changed to $VERSION."
+          if [ "$EVENT" = schedule ]; then why="The weekly read, on core $VERSION."; fi
+          echo "$why The read: ${cmd[*]}"
+          echo "$why The read of the 15 snapshots: \`${cmd[*]}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ "$DRY" = "true" ]; then
             echo "A dry run starts no read."
             exit 0
           fi
           "${cmd[@]}"
       - name: No read
-        if: ${{ steps.version.outputs.now == steps.version.outputs.before }}
+        if: ${{ github.event_name != 'schedule' && steps.version.outputs.now == steps.version.outputs.before }}
         run: echo "The version of the core did not change, so no read starts." >> "$GITHUB_STEP_SUMMARY"
