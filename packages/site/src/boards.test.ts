@@ -9,9 +9,10 @@ import { BOARDS, EXAMPLE_BOARDS, ordersBoard } from "./boards.ts";
  * ER3b changed the routes of the three boards, because their edges took the hubs out and back.
  * ER3c changed only the points of the level links of the board `courses`. Those links go through the groups now, not around the outer edge.
  * LANE-ROOM added the field `room` to each way. The digest leaves that field out, because a faster read moved its last bits. A room that moves a lane shows in `lanes`.
+ * ROUTE-TIE changed the routes of the board `delivery`. Two paths of equal cost go by a fixed order, not by the order of the search.
  */
 const DIGESTS: Readonly<Record<string, string>> = {
-  delivery: "6ed6c5d4875e531d3fb182313c5fde5b794f177dda2c80d1b41bfe4c30d7e7c0",
+  delivery: "9df98b4ccf05f4662ad5e23b30a09cc811df810b554849347fd5bf803484e9ad",
   services: "db7dfedbdf302d726add19839ebf0bfebd83414ec4c0e3a101e7a2f7062884dd",
   courses: "e497e24c5f35ba4beee8547c4427e4a3f27632696cd49516026442c93761c3de",
 };
