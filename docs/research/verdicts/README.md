@@ -37,6 +37,12 @@ A new release can leave the verdicts as they are. A read on the new core tells i
 2. Download the artifact into a new empty folder.
 3. From the root, start `node packages/site/scripts/verdict-verify.ts docs/research/verdicts/<set>-<step>.json <dir>/verdict.json --stamp`.
 
+One run can read all 15 snapshots (SCREEN-MATRIX). Give `set` and `step` as JSON lists, with `-f set=["screen-v1","screen-v2","screen-v3"]` and `-f step=["router","highway","plugs","levels","whole"]`.
+
+- Each set and step gets its own job and its own artifact. The matrix runs 3 jobs at one time.
+- The input `minutes` is the time limit of each job. On 2026-11-07, the job of `highway` on `screen-v3` took 33 minutes. Give 60 or more.
+- A paired screen takes one set and one step. A paired screen of a list fails in its first step.
+
 - The script compares the fields of each row that the page shows: the label, the plain sign, the means, `p`, the families and the breadth.
 - With the same rows, it writes the stamp `verified`. Commit the stamp. The page then tells "measured on" the first core and "verified on" the new core.
 - With a row that differs, it gives the exit code 1 and each row. Then make a new snapshot with its rows, by the rule below.
@@ -65,6 +71,10 @@ The folder [`remeasure/`](remeasure/) holds the record `remeasure.json` of each 
 
 - `h3.json` is run 41369331158. `portfolio-speed.json` is run 41455276356, in mode `fresh`. `route-scale.json` is run 41382862417.
 - The results page does not read these files. The [roadmap](../../ROADMAP.md) gives the verdicts.
+
+## The atlas
+
+The folder [`../atlas/`](../atlas/) holds one weekly record of the leader of each region of these snapshots. Its [README](../atlas/README.md) tells the format and how to write the next record.
 
 ## The benchmark snapshot
 

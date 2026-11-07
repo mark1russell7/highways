@@ -11,9 +11,11 @@ import { formatScreen, screen } from "./screen.ts";
 import { checkFamilies, familyCell, manifestHash, SCREEN_FAMILY_BY, SCREEN_SETS, SCREEN_V1, SCREEN_V2, SCREEN_V3, SCREEN_V4, SCREEN_V4_ROOM, screenInputs, screenSplit, setManifest, splitPath, type LayoutCorpus } from "./set.ts";
 
 const v2 = screenInputs(SCREEN_V2);
-const v4 = screenInputs(SCREEN_V4);
 const root = new URL("../../../../../corpus/", import.meta.url);
 const readJson = (path: string): unknown => JSON.parse(readFileSync(new URL(path, root), "utf8"));
+const manifest = readJson("screen-v4/corpus.json") as LayoutCorpus;
+// The set is its files (SCREEN-V4-FILES). The generator routes the level links in `makeRoom`, so a change of a router changes its boards.
+const v4 = manifest.inputs.map((entry) => readJson(`${entry.id}.json`) as LayoutInput);
 const old = (id: string): LayoutInput => v2.find((i) => i.id === id)!;
 const corners = asRouter(getStrategy(STRATEGIES, "router", "corners"));
 
@@ -37,16 +39,15 @@ describe("the screen set screen-v4 (PASS-GRID)", () => {
     }
   });
 
-  it("matches the files in corpus/screen-v4 and its split file, and keeps the hashes of the other sets", () => {
-    for (const input of v4) {
-      const file = readJson(`screen-v4/${input.family}/s${input.seed}.json`) as LayoutInput;
-      expect(file, input.id).toEqual(input);
+  it("keeps its files: the hash of each file is the hash of the manifest, and the split file matches", () => {
+    for (const [i, input] of v4.entries()) {
+      expect(input.id).toBe(manifest.inputs[i]!.id);
+      expect(documentHash(input), input.id).toBe(manifest.inputs[i]!.hash);
       expect(JSON.parse(formatInput(input))).toEqual(input);
     }
-    const manifest = readJson("screen-v4/corpus.json") as LayoutCorpus;
     expect(manifest).toEqual(setManifest(SCREEN_V4, v4));
     expect(manifestHash(manifest)).toBe("c439a5c1a0afcd39");
-    const split = screenSplit(SCREEN_V4)!;
+    const split = screenSplit(SCREEN_V4, manifest)!;
     expect(splitPath(split)).toBe("splits/screen-v4.c439a5c1a0afcd39.json");
     expect(readJson(splitPath(split))).toEqual(split);
     expect(checkSplit(split, manifest, "default")).toEqual([]);
@@ -57,7 +58,6 @@ describe("the screen set screen-v4 (PASS-GRID)", () => {
   });
 
   it("passes the claim declared of its manifest, and gives each input the key of its family", () => {
-    const manifest = readJson("screen-v4/corpus.json") as LayoutCorpus;
     expect(declaredClaimOf(manifest)).toMatchObject({ minCount: 10, familyMin: 10 });
     expect(checkFamilies(manifest, v4)).toEqual([]);
     for (const input of v4) expect(familyOf(familyCell(input), SCREEN_FAMILY_BY), input.id).toBe(input.family);
