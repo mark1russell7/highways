@@ -1013,7 +1013,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "board-portfolio",
    "label": "better",
    "ink": "more"
@@ -1023,7 +1023,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "curriculum",
    "label": "better",
    "ink": "more"
@@ -1033,7 +1033,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "preferences",
    "label": "better",
    "ink": "more"
@@ -1043,7 +1043,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "fireflies",
    "label": "better",
    "ink": "more"
@@ -1053,7 +1053,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "tracing",
    "label": "no verdict",
    "ink": "not more"
@@ -1063,7 +1063,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "crops",
    "label": "better",
    "ink": "more"
@@ -1073,7 +1073,7 @@
    "set": "screen-v1",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "choice",
    "label": "better",
    "ink": "more"
@@ -1903,7 +1903,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "board-portfolio",
    "label": "better",
    "ink": "more"
@@ -1913,7 +1913,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "curriculum",
    "label": "better",
    "ink": "more"
@@ -1923,7 +1923,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "preferences",
    "label": "better",
    "ink": "more"
@@ -1933,7 +1933,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "fireflies",
    "label": "better",
    "ink": "more"
@@ -1943,7 +1943,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "tracing",
    "label": "better",
    "ink": "more"
@@ -1953,7 +1953,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "crops",
    "label": "better",
    "ink": "more"
@@ -1963,7 +1963,7 @@
    "set": "screen-v2",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "choice",
    "label": "better",
    "ink": "more"
@@ -2793,7 +2793,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "board-portfolio",
    "label": "better",
    "ink": "more"
@@ -2803,7 +2803,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "curriculum",
    "label": "better",
    "ink": "more"
@@ -2813,7 +2813,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "preferences",
    "label": "better",
    "ink": "more"
@@ -2823,7 +2823,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "fireflies",
    "label": "better",
    "ink": "more"
@@ -2833,7 +2833,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "tracing",
    "label": "better",
    "ink": "more"
@@ -2843,7 +2843,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "crops",
    "label": "better",
    "ink": "more"
@@ -2853,7 +2853,7 @@
    "set": "screen-v3",
    "step": "whole",
    "base": "pipeline",
-   "core": "0.10.0",
+   "core": "0.15.0",
    "strategy": "choice",
    "label": "better",
    "ink": "more"
