@@ -46,7 +46,9 @@ One run can read all 15 snapshots (SCREEN-MATRIX). Give `set` and `step` as JSON
 - The script compares the fields of each row that the page shows: the label, the plain sign, the means, `p`, the families and the breadth.
 - With the same rows, it writes the stamp `verified`. Commit the stamp. The page then tells "measured on" the first core and "verified on" the new core.
 - With a row that differs, it gives the exit code 1 and each row. Then make a new snapshot with its rows, by the rule below.
-- The measure `results-unread` of `kpi.json` counts the snapshots with no read on the minor of the engine. `results-lag` counts the minors from the oldest run, and it ignores the stamps.
+- The measure `results-unread` of `kpi.json` counts the snapshots with no read on the minor of the engine.
+- The measure `results-lag` gives the most minors that the last read of a snapshot is behind the engine. A stamp is a read. The target is at most 1.
+- The field `core` of a snapshot names the core of its first run. It tells the source of the rows, and no measure reads it.
 
 ## The rule
 
