@@ -54,6 +54,8 @@ jobs:
       # The package has no changelog file. The Releases page takes the versions from npm.
       site-pages: true
       roadmap: docs/ROADMAP.md
+      # The freshness gate of the Results page: each verdict has a read of at most 14 days (VERDICT-STAMPS).
+      data-stamps: packages/site/dist/data-stamps.json
       packages: "@mark1russell7/highways"
       site-name: highways
       # The check opens each page in a browser at each width, in light and dark. The probe drives the map of the home
