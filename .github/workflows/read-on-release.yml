@@ -12,7 +12,7 @@ on:
     types: [completed]
     branches: [main]
   schedule:
-    - cron: "23 3 * * 1"
+    - cron: "43 3 * * 1"
   workflow_dispatch:
     inputs:
       sha:
