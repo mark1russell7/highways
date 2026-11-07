@@ -35,7 +35,8 @@ import type { Graph } from "../src/model.ts";
 import { callSiteRuleOf, setPredicateSink, type PredicateSink } from "../src/predicate-sink.ts";
 import { OPT_IN_STRATEGIES } from "../src/strategies/opt-in.ts";
 import type { Strategy } from "../src/strategies/model.ts";
-import { graphInput, screen, SCREEN_SETS, SCREEN_STEPS, screenInputs, type LayoutInput, type ScreenSet, type ScreenStep } from "../src/bench/screen/index.ts";
+import { graphInput, screen, SCREEN_SETS, SCREEN_STEPS, type LayoutInput, type ScreenSet, type ScreenStep } from "../src/bench/screen/index.ts";
+import { setInputs } from "./corpus-files.ts";
 
 const SCRIPT = fileURLToPath(import.meta.url);
 /** The dense board of ROUTE-SCALE: 1 000 boxes and 4 000 edges (`data/scale/README.md`). */
@@ -327,7 +328,7 @@ function boardInput(set: string, name: string, graph: Graph): LayoutInput {
 }
 
 /**
- * The board sets of the dump. The 6 screen sets run each step of the screen.
+ * The board sets of the dump. The screen sets run each step of the screen, on the files of each set in `corpus/<set>/`.
  * The set `fixtures` has the fixtures of the benchmark up to 1 000 nodes (seed 0) and its 3 case boards.
  * The set `fixtures-large` has the fixture of 10 000 nodes, with the steps `router` and `group`, as the large parts of the workflow `Bench`.
  * The set `dense-board` has the dense board of ROUTE-SCALE, with the steps `router` and `highway`.
@@ -335,7 +336,7 @@ function boardInput(set: string, name: string, graph: Graph): LayoutInput {
  */
 export const DUMP_SETS: Readonly<Record<string, DumpSet>> = Object.fromEntries(
   ([
-    ...Object.keys(SCREEN_SETS).map((id): DumpSet => ({ id, inputs: () => screenInputs(SCREEN_SETS[id]!), steps: SCREEN_STEPS, optIn: true })),
+    ...Object.keys(SCREEN_SETS).map((id): DumpSet => ({ id, inputs: () => setInputs(SCREEN_SETS[id]!), steps: SCREEN_STEPS, optIn: true })),
     {
       id: "fixtures",
       inputs: () => [
