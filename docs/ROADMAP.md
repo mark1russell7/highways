@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| KPI-CARDS | The file `kpi.json` has the measure `cards-with-curves`: the strategy cards with a response curve in a [sweep record](research/sweeps/README.md). It reads 0 until the first sweep. The reads of the verdicts and the pages have their own date, not the date of the benchmark. | 2026-11-07 | [#376](https://github.com/mark1russell7/highways/pull/376) |
 | SOLVED-ATLAS-1 | The [atlas page](https://mark1russell7.github.io/highways/atlas.html) shows the leader of each of 648 regions: a family of a guard measure of a step of a set. [`research/atlas/`](research/atlas/README.md) keeps one record of the leaders each week. One leader for 28 days solves a region, so the count stays 0 until 2026-12-05. | 2026-11-07 | [#378](https://github.com/mark1russell7/highways/pull/378) |
 | PROMOTION-NO-PAIR | The promotion test gives "not measured" for a measure with no pairs. Before, the verdict threw for a candidate with no lanes. The Holm correction counts only the measured tests. | 2026-11-06 | [#363](https://github.com/mark1russell7/highways/pull/363) |
 | RESULTS-READ | A read on a later core stamps a verdict snapshot when its rows are the same. The Results page tells "measured on" and "verified on". `kpi.json` counts the snapshots with no read on the minor of the engine (`results-unread`). `router` `screen-v1` on 0.15.0 gives the same 40 rows as on 0.9.2. | 2026-11-05 | [#356](https://github.com/mark1russell7/highways/pull/356) |
