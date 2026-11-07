@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { boardWins, compareMeasure, minEffectOf, type CompareSpec } from "./compare.ts";
 import { RECORD_EPS } from "./hash.ts";
-import { compareSpec, MEASURES, MIN_EFFECTS, measureByKey } from "./measures.ts";
+import { compareSpec, MEASURES, MIN_EFFECTS, measureByKey, sameKind, withoutMixedKinds } from "./measures.ts";
 
 const LOWER: CompareSpec = { direction: "lower" };
 const HIGHER: CompareSpec = { direction: "higher" };
@@ -119,5 +119,31 @@ describe("compareMeasure, minEffectOf and the text of docs/PROMOTION.md agree (W
       const units = r.units.map((u) => `\`${u}\``).join(", ");
       expect(text).toContain(`| ${units} |`);
     }
+  });
+});
+
+describe("sameKind and withoutMixedKinds (BENCH-PAIRS-HEAP)", () => {
+  const pairs = measureByKey("R1.pairs")!;
+  const flag = "route.crossings.pairs.estimated";
+  const rec = (strategy: string, input: string, value: number, estimated: number) => ({ strategy, input, seed: 0, measures: { "route.crossings.pairs": value, [flag]: estimated } });
+
+  it("links each count that can come from a sample to its flag", () => {
+    expect(pairs.estimatedBy).toBe(flag);
+    expect(measureByKey("R1.pairsHigh")!.estimatedBy).toBe(flag);
+    expect(measureByKey("R1.crossings")!.estimatedBy).toBe("route.crossings.estimated");
+    expect(measureByKey("R5.median")!.estimatedBy).toBeUndefined();
+  });
+
+  it("compares two full counts and two estimates, but not an estimate with a full count", () => {
+    expect(sameKind(pairs, { [flag]: 0 }, {})).toBe(true);
+    expect(sameKind(pairs, { [flag]: 1 }, { [flag]: 1 })).toBe(true);
+    expect(sameKind(pairs, { [flag]: 1 }, { [flag]: 0 })).toBe(false);
+    expect(sameKind(measureByKey("R5.median")!, { [flag]: 1 }, {})).toBe(true);
+  });
+
+  it("removes the value from both records of an input with a mixed pair, and keeps the other inputs", () => {
+    const out = withoutMixedKinds([rec("a", "x", 10, 0), rec("b", "x", 12, 1), rec("a", "y", 5, 1), rec("b", "y", 6, 1)], pairs);
+    expect(out.map((r) => r.measures["route.crossings.pairs"])).toEqual([undefined, undefined, 5, 6]);
+    expect(out[0]!.measures[flag]).toBe(0);
   });
 });
