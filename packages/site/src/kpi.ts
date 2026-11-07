@@ -15,10 +15,6 @@ export interface KpiFacts {
   readonly demoComplete: boolean;
   /** The number of cells of the coverage record. The page shows the coverage over them. */
   readonly coverageCells: number;
-  /** The core of each verdict of the Results page. An entry is `undefined` when a verdict does not name its core. */
-  readonly verdictCores: readonly (string | undefined)[];
-  /** The date of the run of each verdict, at the same position as `verdictCores`. A stamp `verified` does not change it. */
-  readonly verdictDates?: readonly (string | undefined)[];
   /** The core of the last read of each verdict: the core of its stamp `verified`, or else the core of its run. */
   readonly verdictReads: readonly (string | undefined)[];
   /** The date of the last read of each verdict: the date of its stamp `verified`, or else the date of its run. */
@@ -35,8 +31,8 @@ export const SWEEP_DIR = "docs/research/sweeps";
 /** The two categorical dimensions that name a card in a sweep record. */
 export const CARD_DIMENSIONS = ["step", "strategy"] as const;
 
-/** The things that the count `results-lag` does not read. The count `results-unread` reads them. */
-export const LAG_NOT_COUNTED = "The stamps verified. A read on a newer core with the same rows does not lower this count. The count results-unread reads the stamps.";
+/** The things that the count `results-lag` does not read. */
+export const LAG_NOT_COUNTED = "The core of the first run of a snapshot. A stamp verified is a read, and the first core stays in the snapshot only as its source.";
 
 /** The things that the count `cards-with-curves` does not read. */
 export const CARDS_NOT_COUNTED = `A file of ${SWEEP_DIR} that is not a good record of response-records/1, a record with no dimensions step and strategy, and a card with fewer than 2 values of an option.`;
@@ -139,11 +135,11 @@ export function resultsLag(cores: readonly (string | undefined)[], engine: strin
 }
 
 /**
- * This function gives the date of the oldest run with the largest count of `minorsBehind`.
- * It gives `undefined` when no such run has a date.
+ * This function gives the date of the oldest read with the largest count of `minorsBehind`.
+ * It gives `undefined` when no such read has a date.
  *
- * @param cores - The core of each run.
- * @param dates - The date of each run, at the same position.
+ * @param cores - The core of each read.
+ * @param dates - The date of each read, at the same position.
  * @param engine - The version of the engine.
  */
 export function resultsLagAt(cores: readonly (string | undefined)[], dates: readonly (string | undefined)[], engine: string): string | undefined {
@@ -173,10 +169,12 @@ export function resultsUnread(reads: readonly (string | undefined)[], engine: st
  */
 export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: string) => boolean, facts: KpiFacts): SiteKpi | undefined {
   if (meta.date === undefined) return undefined;
-  const cores = [meta.core, ...facts.verdictCores];
-  const lag = resultsLag(cores, core);
-  // The lag has the date of the oldest run that gives it, so a reader sees how old the rows are.
-  const lagAt = resultsLagAt(cores, [meta.date, ...(facts.verdictDates ?? [])], core);
+  // The lag reads the last read of each snapshot: its stamp `verified`, or else its run. A read with the same rows is a current result.
+  // The target is at most 1 minor. The workflow `Read on release` holds it.
+  const reads = [meta.core, ...facts.verdictReads];
+  const lag = resultsLag(reads, core);
+  // The lag has the date of the oldest read that gives it.
+  const lagAt = resultsLagAt(reads, [meta.date, ...(facts.verdictReadDates ?? [])], core);
   return {
     project: KPI_PROJECT,
     at: `${meta.date}T00:00:00Z`,

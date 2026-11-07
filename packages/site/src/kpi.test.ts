@@ -4,7 +4,7 @@ import { kpiFacts } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
 import { cardsWithCurves, KPI_PAGES, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
-const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
+const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
 
 describe("minorsBehind", () => {
@@ -33,16 +33,16 @@ describe("resultsUnread", () => {
     expect(resultsUnread([undefined, "1.15.0"], "0.15.0")).toBe(2);
   });
 
-  it("gives the measure in the file, from the stamps and not from the cores of the runs", () => {
-    const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictCores: ["0.9.2", "0.10.0"], verdictReads: ["0.15.0", "0.10.0"] });
+  it("gives the measures in the file, from the stamps and not from the cores of the first runs", () => {
+    const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictReads: ["0.15.0", "0.10.0"] });
     expect(input?.measures.find((m) => m.id === "results-unread")).toEqual({ id: "results-unread", value: 1, unit: "snapshots" });
-    expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(6);
+    expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(5);
   });
 
-  it("gives the lag the date of the oldest run that gives it, and tells that it does not read the stamps", () => {
-    const facts = { ...FACTS, verdictCores: ["0.9.2", "0.9.2", "0.10.0"], verdictDates: ["2026-10-29", "2026-10-28", "2026-10-20"], verdictReads: ["0.15.0", "0.15.0", "0.15.0"] };
+  it("gives the lag the date of the oldest read that gives it, and a stamp is a read", () => {
+    const facts = { ...FACTS, verdictReads: ["0.14.0", "0.14.0", "0.15.0"], verdictReadDates: ["2026-11-02", "2026-11-01", "2026-11-07"] };
     const lag = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, facts)?.measures.find((m) => m.id === "results-lag");
-    expect(lag).toEqual({ id: "results-lag", value: 6, unit: "releases", notCounted: LAG_NOT_COUNTED, at: "2026-10-28T00:00:00Z" });
+    expect(lag).toEqual({ id: "results-lag", value: 1, unit: "releases", notCounted: LAG_NOT_COUNTED, at: "2026-11-01T00:00:00Z" });
     expect(resultsLagAt(["0.15.0"], [undefined], "0.15.0")).toBeUndefined();
   });
 });
@@ -79,13 +79,13 @@ describe("siteKpiInput", () => {
     expect(value(with_(0), "coverage-shown")).toBe(0);
   });
 
-  it("takes the lag of the oldest verdict, so a current snapshot does not hide it", () => {
-    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictCores: ["0.10.0", "0.9.2"] });
+  it("takes the lag of the oldest read, so a current snapshot does not hide it", () => {
+    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictReads: ["0.10.0", "0.9.2"] });
     expect(value(input, "results-lag")).toBe(5);
   });
 
   it("leaves out the lag when a verdict does not name its core", () => {
-    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictCores: ["0.10.0", undefined] });
+    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictReads: ["0.10.0", undefined] });
     expect(value(input, "results-lag")).toBeUndefined();
   });
 });
@@ -171,11 +171,9 @@ describe("kpiFacts", () => {
     const facts = kpiFacts(root);
     expect(facts.demoComplete).toBe(true);
     expect(facts.coverageCells).toBeGreaterThan(0);
-    expect(facts.verdictCores.length).toBeGreaterThan(0);
-    expect(facts.verdictCores).not.toContain(undefined);
-    expect(facts.verdictReads).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReads.length).toBeGreaterThan(0);
     expect(facts.verdictReads).not.toContain(undefined);
-    expect(facts.verdictReadDates).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReadDates).toHaveLength(facts.verdictReads.length);
     expect(facts.verdictReadDates).not.toContain(undefined);
     expect(Array.isArray(facts.sweeps)).toBe(true);
     expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
