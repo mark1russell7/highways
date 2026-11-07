@@ -147,7 +147,8 @@ describe("runBenchmark", () => {
     const over = benchOne(slow, "x", graph, 3, 1);
     expect(routes).toBe(1);
     expect(over.overLimit).toEqual({ limit: 1, runs: 1 });
-    expect(over.deterministic).toBe(true);
+    // One run has no second result, so the row makes no claim of same twice (BENCH-ONE-RUN).
+    expect(over.deterministic).toBeNull();
     const line = formatTable([over]).split("\n")[2]!;
     expect(line).toContain("over the limit");
     expect(line.split("|")[6]!.trim()).toBe("-");
