@@ -36,6 +36,17 @@ export const SWEEP_DIR = "docs/research/sweeps";
 /** The two categorical dimensions that name a card in a sweep record. */
 export const CARD_DIMENSIONS = ["step", "strategy"] as const;
 
+/** The categorical dimension of a sweep record with the family of each input. An input dimension of a drawn input has a `when` on it (SPACE-INPUTS). */
+export const FAMILY_DIMENSION = "family";
+
+/**
+ * This function tells if a dimension of a sweep record is an option of a strategy. An option is not categorical, and it is not an input dimension.
+ * An input dimension has its `when` on the dimension `family`. Its values come from the input, so it gives no curve of a strategy.
+ */
+export function isOptionDimension(d: { readonly kind: string; readonly when?: { readonly dimension: string } | undefined }): boolean {
+  return d.kind !== "categorical" && d.when?.dimension !== FAMILY_DIMENSION;
+}
+
 /** The things that the count `results-lag` does not read. */
 export const LAG_NOT_COUNTED = "The core of the first run of a snapshot. A stamp verified is a read, and the first core stays in the snapshot only as its source.";
 
@@ -68,7 +79,7 @@ export interface SweepFile {
 
 /**
  * This function gives the cards of a sweep record that have a response curve. A card is a pair of a step and a strategy.
- * The card has a curve when its measured points have 2 or more values of one option that is not categorical.
+ * The card has a curve when its measured points have 2 or more values of one option (`isOptionDimension`). An input dimension gives no curve.
  * A record that `parseResponseRecord` refuses gives no card.
  */
 export function curveCards(value: unknown): string[] {
@@ -77,7 +88,7 @@ export function curveCards(value: unknown): string[] {
   const { dimensions, points } = parsed.record;
   const named = CARD_DIMENSIONS.every((id) => dimensions.some((d) => d.id === id && d.kind === "categorical"));
   if (!named) return [];
-  const options = dimensions.filter((d) => d.kind !== "categorical").map((d) => d.id);
+  const options = dimensions.filter(isOptionDimension).map((d) => d.id);
   const values = new Map<string, Map<string, Set<string>>>();
   for (const point of points) {
     if (!Object.values(point.measures).some((m) => m !== null)) continue;

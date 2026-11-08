@@ -2,7 +2,7 @@
 // They do not read files, so the page and the tests use them.
 import { parseResponseRecord } from "@mark1russell7/rigor-statistics";
 
-import { CARD_DIMENSIONS, SWEEP_DIR } from "./kpi.ts";
+import { CARD_DIMENSIONS, isOptionDimension, SWEEP_DIR } from "./kpi.ts";
 
 // The count `cards-with-curves` of `kpi.ts` owns the folder and the dimensions of a card. The page uses the same ones.
 export { CARD_DIMENSIONS, SWEEP_DIR };
@@ -52,14 +52,13 @@ export function sweepFacts(file: string, value: unknown, date?: string): SweepFa
   const when = date === undefined ? {} : { date };
   if (!parsed.ok) return { file, name: "", ...when, steps: [], strategies: [], options: 0, points: 0, inputs: 0, measures: [], faults: parsed.faults.length };
   const { name, dimensions, points, measures } = parsed.record;
-  const named: readonly string[] = CARD_DIMENSIONS;
   return {
     file,
     name,
     ...when,
     steps: levelsOf(dimensions, "step"),
     strategies: levelsOf(dimensions, "strategy"),
-    options: dimensions.filter((d) => !named.includes(d.id)).length,
+    options: dimensions.filter(isOptionDimension).length,
     points: points.length,
     inputs: new Set(points.map((p) => p.group ?? p.id)).size,
     measures: measures.map((m) => m.label),
@@ -77,6 +76,5 @@ export function isSweepRecord(value: unknown): boolean {
 export function firstOption(value: unknown): string | undefined {
   const parsed = parseResponseRecord(value);
   if (!parsed.ok) return undefined;
-  const named: readonly string[] = CARD_DIMENSIONS;
-  return parsed.record.dimensions.find((d) => !named.includes(d.id))?.id;
+  return parsed.record.dimensions.find(isOptionDimension)?.id;
 }

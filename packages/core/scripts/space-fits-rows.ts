@@ -2,7 +2,8 @@
 // For each measure of a record, the fit takes the held-out skill of each fold. A fit that passes the fold rule also gets its Sobol indices.
 import { createHash } from "node:crypto";
 import { fitResponse, heldOutError, sobolIndices, type ResponseData, type ResponseRecord } from "@mark1russell7/rigor-statistics";
-import { fitCounts, FIT_EFFECT_BAR, FIT_MIN_FOLDS, type SpaceFit } from "../src/bench/space-coverage.ts";
+import { fitCounts, FIT_EFFECT_BAR, FIT_MIN_FOLDS, isInputDimensionId, type SpaceFit } from "../src/bench/space-coverage.ts";
+import { FAMILY_DIMENSION } from "./sweep-inputs.ts";
 import { measureNameOf } from "./sweep-measures.ts";
 
 /** The form of the file of the fits. */
@@ -20,7 +21,8 @@ export const SOBOL_SAMPLES = 4096;
 /** The note of the file. It tells how a dimension of a sweep becomes a dimension of the space. */
 export const SPACE_FITS_NOTE =
   "Each level of the dimension strategy of a record gets the total Sobol index of that dimension. " +
-  "An option dimension gets its own total index. The dimension step has one level, so it is not a dimension of a fit.";
+  "An option dimension gets its own total index. An input dimension of a drawn input has the id of the space, and it gets its own total index. " +
+  "The dimension step has one level, so it is not a dimension of a fit. The dimension family helps the model, but the space has no dimension for it.";
 
 /** A measure of a record with no fit, and the reason. */
 export interface SkippedMeasure {
@@ -70,10 +72,12 @@ const STEP = "step";
 
 /**
  * This function gives the dimensions of the space for one dimension of a sweep record of the step `step`.
- * The dimension `strategy` gives one dimension for each level. The dimension `step` gives none.
+ * The dimension `strategy` gives one dimension for each level. The dimensions `step` and `family` give none.
+ * An input dimension has the id of the space already, of the form `input:<family>.<dimension>`.
  */
 export function spaceIdsOf(record: Pick<ResponseData, "dimensions">, step: string, dimension: string): string[] {
-  if (dimension === STEP) return [];
+  if (dimension === STEP || dimension === FAMILY_DIMENSION) return [];
+  if (isInputDimensionId(dimension)) return [dimension];
   if (dimension === STRATEGY) {
     const d = record.dimensions.find((x) => x.id === STRATEGY);
     return d?.kind === "categorical" ? d.levels.map((name) => `strategy:${step}/${name}`) : [];

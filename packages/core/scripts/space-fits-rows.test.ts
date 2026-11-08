@@ -40,6 +40,41 @@ describe("the fits of the sweep records", () => {
     expect(spaceIdsOf(data, "router", "step")).toEqual([]);
   });
 
+  it("maps an input dimension to its own id in the space, and the dimension family to nothing (SPACE-INPUTS)", () => {
+    expect(spaceIdsOf(data, "router", "input:fam.nodes")).toEqual(["input:fam.nodes"]);
+    expect(spaceIdsOf(data, "router", "family")).toEqual([]);
+  });
+
+  it("fits a raw measure that follows the size of its input only when the record has the input dimension (SPACE-INPUTS)", () => {
+    // 10 drawn inputs of one family. The raw crossings follow the nodes of the input, and the option adds a little.
+    const nodes = [12, 150, 40, 300, 25, 90, 200, 60, 18, 120];
+    const raw = nodes.flatMap((n, g) =>
+      [0, 5, 10].map((k, j) => ({
+        id: `a/${k}/${g}`,
+        group: `in-${g}`,
+        values: { step: "router", strategy: "a", family: "fam", "a.k": k, "input:fam.nodes": n },
+        measures: { crossings: 0.5 * n + 0.2 * k + 0.1 * noise(g * 3 + j) },
+      })),
+    );
+    const head = [
+      { id: "step", label: "Step", unit: "", kind: "categorical", levels: ["router"] },
+      { id: "strategy", label: "Strategy", unit: "", kind: "categorical", levels: ["a"] },
+      { id: "family", label: "Family", unit: "", kind: "categorical", levels: ["fam"] },
+      { id: "a.k", label: "k (a)", unit: "", kind: "continuous", range: [0, 10], when: { dimension: "strategy", levels: ["a"] } },
+    ];
+    const input = { id: "input:fam.nodes", label: "nodes (fam)", unit: "", kind: "continuous", range: [2, 400], log: true, when: { dimension: "family", levels: ["fam"] } };
+    const measures = [{ id: "crossings", label: "crossings", unit: "", direction: "lower" as const }];
+    const known = new Set(["strategy:router/a", "option:router/a.k", "input:fam.nodes"]);
+    const withInput = { schema: "response-records/1", name: "made-up", dimensions: [...head, input], measures, points: raw } as ResponseData;
+    const without = { ...withInput, dimensions: head, points: raw.map((p) => ({ ...p, values: Object.fromEntries(Object.entries(p.values).filter(([k]) => k !== "input:fam.nodes")) })) } as ResponseData;
+    const fit = recordFits(withInput, "made-up", MEASURE_KEYS, known).fits[0]!;
+    expect(fit.foldSkill).toHaveLength(10);
+    expect(fitCounts(fit)).toBe(true);
+    expect(fit.dimensions).toContain("input:fam.nodes");
+    expect(fit.sobol["input:fam.nodes"]!).toBeGreaterThan(0.9);
+    expect(fitCounts(recordFits(without, "made-up", MEASURE_KEYS, known).fits[0]!)).toBe(false);
+  });
+
   it("refuses a record whose dimension step has more than one level", () => {
     const two = { dimensions: [{ id: "step", label: "", unit: "", kind: "categorical", levels: ["router", "curve"] }] } as unknown as ResponseData;
     expect(() => stepOf(two)).toThrow(/one level/);
