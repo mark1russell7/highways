@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| NO-READ-LINE | A gate that cannot read a case writes "No read" to the check line of the pull request, with the count, the cases and the CPU model. The sections gate, the heap gate, the time test and the verdicts of a promotion, the screen verdicts, the exact solves, the work fit and the scale routes each do it. `gateLine` of `@mark1russell7/rigor-bench` gives each line of a script. | 2026-11-08 | |
 | CARDS-SHARE | The measure `cards-curve-share` gives the cards with a curve over the built-in strategies with a number option. The sweep records of the 8 steps give each of the 101 cards a curve, so the share reads 100 %. `NO_CURVE` gives the 6 strategies with no number option. | 2026-11-08 | [#391](https://github.com/mark1russell7/highways/pull/391) |
 | ROOM-SWEEP | The sweep takes the step `room`. It starts each room strategy in the strategy `pipeline` of `whole`, and its record also has the 3 measures of the board. The record `room-screen-v1.json` gives the 3 room cards. | 2026-11-08 | [#392](https://github.com/mark1russell7/highways/pull/392) |
 | WON-LINES | Each page line that quotes a measure that a control wins has its partner, or says that no partner is read. A table of the README gives the medians of the controls and the real routers. A test holds the notes of the site. | 2026-11-07 | [#340](https://github.com/mark1russell7/highways/pull/340) |

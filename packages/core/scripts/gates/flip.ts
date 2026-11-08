@@ -217,7 +217,7 @@ function cellFolders(root: string): Map<string, string> {
   return out;
 }
 
-/** This function gives the rows of a `routes.jsonl` text with a changed route on the first row: all of its hashes differ, so its repeats agree. */
+/** This function gives the rows of a `routes.jsonl` text with a changed route on the first row. All of its hashes differ, so its repeats agree. */
 export function changeOneRoute(rows: readonly string[]): string[] {
   const [first, ...rest] = rows;
   const row = JSON.parse(first!) as { hash: string; again: string; traced: string | null };
@@ -351,7 +351,8 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   writeFileSync(join(out, `gate-flip-${record.check}.md`), table);
   console.log(table);
   const summary = process.env["GITHUB_STEP_SUMMARY"];
-  if (summary !== undefined) appendFileSync(summary, table + "\n");
+  // An empty name is no file, as in `writeGateLine` of `@mark1russell7/rigor-bench`.
+  if (summary !== undefined && summary !== "") appendFileSync(summary, table + "\n");
   rmSync(dir, { recursive: true, force: true });
   if (!record.passed) process.exitCode = 1;
 }
