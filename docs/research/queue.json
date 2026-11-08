@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-07",
-  "commit": "e928f11d6098d79e52dc9f08ffeb1c31a2a36b85",
+  "date": "2026-11-08",
+  "commit": "f5589f719c00f252ce3efbf7e83c7493713fc0b7",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -60,7 +60,7 @@
     {
       "set": "screen-v3",
       "step": "router",
-      "run": 40804553123
+      "run": 42495997353
     },
     {
       "set": "screen-v3",
