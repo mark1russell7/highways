@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { BenchMeta } from "./bench-label.ts";
 import { kpiFacts } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
+import { RESULT_FILES } from "./results-files.ts";
 import { cardsWithCurves, KPI_PAGES, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
@@ -177,5 +181,18 @@ describe("kpiFacts", () => {
     expect(facts.verdictReadDates).not.toContain(undefined);
     expect(Array.isArray(facts.sweeps)).toBe(true);
     expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("the results lag of the repository (STAMP-ON-RELEASE)", () => {
+  const root = fileURLToPath(new URL("../../../", import.meta.url));
+
+  // This test is the gate of the target: a change of the version of the core fails it while a snapshot is 2 or more minors behind.
+  // Then the snapshots need a read on the new core first: the workflow `Read on release`, and the stamps of its job `stamps`.
+  it("has each snapshot at most 1 minor behind the version of the core", () => {
+    const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+    const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
+    const lag = siteKpiInput(meta, core, () => true, kpiFacts(root))?.measures.find((m) => m.id === "results-lag");
+    expect(lag?.value, `results-lag on core ${core}, from the read at ${lag?.at}`).toBeLessThanOrEqual(1);
   });
 });

@@ -120,6 +120,45 @@ export function compareReads(committed: Snapshot, read: Snapshot): ReadDiff[] {
   return out;
 }
 
+/**
+ * This function writes the stamp `verified` of a read into the text of a snapshot.
+ * The stamp goes after the line of the core, and it replaces an older stamp. The rows of the text stay as they are.
+ * It throws an error when the text has no line of the core at the top level.
+ */
+export function stampText(text: string, snapshot: Snapshot, read: Snapshot): string {
+  const stamp = `  "verified": ${JSON.stringify({ core: read.core, run: read.run, commit: read.commit, date: read.date })},\n`;
+  const kept = text.replace(/^ {2}"verified": .*\n/m, "");
+  const core = `  "core": ${JSON.stringify(snapshot.core)},\n`;
+  if (!kept.includes(core)) throw new Error(`The snapshot has no line ${core.trim()}.`);
+  return kept.replace(core, core + stamp);
+}
+
+/** The result of the read of one committed snapshot (STAMP-ON-RELEASE). */
+export type StampOutcome =
+  | { readonly name: string; readonly status: "stamped"; readonly text: string; readonly run: number; readonly core: string }
+  | { readonly name: string; readonly status: "differ"; readonly diffs: readonly ReadDiff[]; readonly run: number; readonly core: string }
+  | { readonly name: string; readonly status: "unread" };
+
+/**
+ * This function reads each committed snapshot against the read of the same set and step.
+ * A read with the same rows gives the stamped text. A read with a row that differs gives the rows, and no stamp.
+ * A snapshot with no read of its set and step is `unread`.
+ *
+ * @param files - The name and the text of each committed snapshot.
+ * @param reads - The verdicts of one run of the workflow `Screen`.
+ */
+export function stampSnapshots(files: readonly { readonly name: string; readonly text: string }[], reads: readonly Snapshot[]): StampOutcome[] {
+  const byKey = new Map(reads.map((r) => [`${r.set} ${r.step}`, r]));
+  return files.map(({ name, text }) => {
+    const snapshot = parseSnapshot(text, name);
+    const read = byKey.get(`${snapshot.set} ${snapshot.step}`);
+    if (read === undefined) return { name, status: "unread" };
+    const diffs = compareReads(snapshot, read);
+    if (diffs.length > 0) return { name, status: "differ", diffs, run: read.run, core: read.core };
+    return { name, status: "stamped", text: stampText(text, snapshot, read), run: read.run, core: read.core };
+  });
+}
+
 /** The sign of one family as one character: `+` the strategy wins, `-` it loses, `0` a tie. */
 const SIGN_CHAR = { 1: "+", 0: "0", [-1]: "-" } as const;
 
