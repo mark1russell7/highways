@@ -25,6 +25,7 @@ The format `response-records/1` refuses a field that it does not have. Thus a re
 | File | The workflow `Sweep` | Commit | Inputs |
 |---|---|---|---|
 | `router-screen-v1-sample.json` | [42424232256](https://github.com/mark1russell7/highways/actions/runs/42424232256) | `1db7ef7` | `corners`, `trunks` and `shared` on `tiny-uniform` and `small-clustered` |
+| `room-screen-v1.json` | [42431741520](https://github.com/mark1russell7/highways/actions/runs/42431741520) | `3c8cd4b` | The room strategies `routes`, `lines` and `levels` in the pipeline of the step `whole`, on `tiny-uniform` and `small-clustered`. It gives 3 cards. |
 
 - The first copy of this file came from a local machine. The record of the run has the same route measures on each of the 588 points. Only `ms` and `ms.ratio` differ, because they are times.
 - To add a record, start `Sweep` and download its artifact `sweep` into a new empty folder. Copy `sweep.json` here with its bytes, and add its row to this table.
