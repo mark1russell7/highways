@@ -10,7 +10,8 @@ const STALE = `The record through-check/5 is stale. Write it again with: ${REGEN
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 /**
- * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
+ * The painted crossings of the lanes of each router, at the time of LANE-ROOM.
+ * Each list has the crossing points, the pairs of the board, the pairs added, the pairs lost and the two counts of the bundles.
  * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
@@ -19,7 +20,8 @@ const PAINTED: Record<string, readonly number[]> = {
   "trunks": [34318, 31893, 0, 0, 0, 1],
   "shared": [36185, 32645, 274, 42, 1, 531],
   "sections": [54359, 40555, 816, 501, 144, 2067],
-  "sections-site": [84287, 47330, 121, 68, 441, 2365],
+  // SITE-HUB-THROUGH: no route of the site setting goes through a box. Thus it has 25 fewer painted points and 8 fewer pairs.
+  "sections-site": [84262, 47322, 121, 68, 441, 2365],
   "sections-site-no-ladder": [82209, 46576, 128, 120, 435, 2445],
   "shared-all": [43668, 36267, 1423, 459, 0, 12061],
 };
