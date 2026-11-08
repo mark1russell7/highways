@@ -58,7 +58,7 @@
    ],
    "pairs": [
     40506,
-    47308
+    47300
    ],
    "signFlips": 0,
    "gapChange": 68
@@ -77,7 +77,7 @@
    ],
    "pairs": [
     39542,
-    48392
+    48384
    ],
    "signFlips": 0,
    "gapChange": 24
@@ -96,7 +96,7 @@
    ],
    "pairs": [
     36243,
-    47308
+    47300
    ],
    "signFlips": 0,
    "gapChange": 30
@@ -115,7 +115,7 @@
    ],
    "pairs": [
     39419,
-    48392
+    48384
    ],
    "signFlips": 0,
    "gapChange": 47
@@ -307,80 +307,80 @@
    "kind": "painted",
    "vector": "shift-a",
    "moved": 394,
-   "points": 84011,
-   "share": 0.004689862041875469
+   "points": 83959,
+   "share": 0.004692766707559642
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 1365,
-   "points": 84011,
-   "share": 0.016247872302436586
+   "moved": 1370,
+   "points": 83959,
+   "share": 0.01631748829785967
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 1546,
-   "points": 84011,
-   "share": 0.01840235207294283
+   "moved": 1547,
+   "points": 83959,
+   "share": 0.01842566014364154
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-d",
-   "moved": 1191,
-   "points": 84011,
-   "share": 0.01417671495399412
+   "moved": 1194,
+   "points": 83959,
+   "share": 0.014221227027477697
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-e",
    "moved": 1608,
-   "points": 84011,
-   "share": 0.019140350668364857
+   "points": 83959,
+   "share": 0.019152205243035292
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-a",
    "moved": 366,
-   "points": 96842,
-   "share": 0.003779351934078189
+   "points": 96791,
+   "share": 0.003781343306712401
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-b",
    "moved": 1299,
-   "points": 96842,
-   "share": 0.01341360153652341
+   "points": 96791,
+   "share": 0.01342066927710221
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-c",
    "moved": 1395,
-   "points": 96842,
-   "share": 0.014404906961855393
+   "points": 96791,
+   "share": 0.014412497029682511
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-d",
    "moved": 1091,
-   "points": 96842,
-   "share": 0.011265773114970777
+   "points": 96791,
+   "share": 0.011271709146511556
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-e",
    "moved": 1443,
-   "points": 96842,
-   "share": 0.014900559674521386
+   "points": 96791,
+   "share": 0.014908410905972662
   }
  ],
  "rates": [
@@ -388,48 +388,48 @@
    "kind": "painted",
    "move": 1e-12,
    "moved": 0,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
+   "crossingsUnderGrid": 7485,
+   "pairsUnderGrid": 89640,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
    "low": 5.421010862427522e-20,
-   "high": 0.0005153663170751018,
+   "high": 0.000512957690694531,
    "formula": 0.0000014546000589616598
   },
   {
    "kind": "painted",
    "move": 1e-10,
    "moved": 9,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.0012080536912751677,
-   "rateOfPairs": 0.00010114064168118223,
-   "low": 0.0006357059192233857,
-   "high": 0.0022945226000386488,
+   "crossingsUnderGrid": 7485,
+   "pairsUnderGrid": 89640,
+   "rateOfCrossings": 0.0012024048096192384,
+   "rateOfPairs": 0.00010040160642570282,
+   "low": 0.0006327327621090433,
+   "high": 0.00228380098223512,
    "formula": 0.00014982915515545755
   },
   {
    "kind": "painted",
    "move": 1e-8,
    "moved": 497,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.06671140939597316,
-   "rateOfPairs": 0.005585210990616396,
-   "low": 0.06126575374264505,
-   "high": 0.07260366973964179,
+   "crossingsUnderGrid": 7485,
+   "pairsUnderGrid": 89640,
+   "rateOfCrossings": 0.06639946559786239,
+   "rateOfPairs": 0.005544399821508255,
+   "low": 0.06097847993826225,
+   "high": 0.07226528871508422,
    "formula": 0.016036978301359344
   },
   {
    "kind": "painted",
    "move": 1e-7,
-   "moved": 4716,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.6330201342281879,
-   "rateOfPairs": 0.05299769624093949,
-   "low": 0.6220095874523226,
-   "high": 0.6438935728107051,
+   "moved": 4717,
+   "crossingsUnderGrid": 7485,
+   "pairsUnderGrid": 89640,
+   "rateOfCrossings": 0.6301937207748831,
+   "rateOfPairs": 0.05262159750111557,
+   "low": 0.6191930884425237,
+   "high": 0.6410607853665392,
    "formula": 0.1514481009845622
   },
   {
@@ -437,7 +437,7 @@
    "move": 1e-12,
    "moved": 0,
    "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
+   "pairsUnderGrid": 16070,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
    "low": 0,
@@ -449,9 +449,9 @@
    "move": 1e-10,
    "moved": 12,
    "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
+   "pairsUnderGrid": 16070,
    "rateOfCrossings": 0.0016139878950907868,
-   "rateOfPairs": 0.0007469654528478057,
+   "rateOfPairs": 0.00074673304293715,
    "low": 0.0009235354707113841,
    "high": 0.0028191788988334576,
    "formula": 0.00014982915515545755
@@ -461,9 +461,9 @@
    "move": 1e-8,
    "moved": 576,
    "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
+   "pairsUnderGrid": 16070,
    "rateOfCrossings": 0.07747141896435776,
-   "rateOfPairs": 0.035854341736694675,
+   "rateOfPairs": 0.0358431860609832,
    "low": 0.07161056045675925,
    "high": 0.08376866965845466,
    "formula": 0.016036978301359344
@@ -473,9 +473,9 @@
    "move": 1e-7,
    "moved": 6340,
    "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
+   "pairsUnderGrid": 16070,
    "rateOfCrossings": 0.8527236045729657,
-   "rateOfPairs": 0.39464674758792406,
+   "rateOfPairs": 0.39452395768512755,
    "low": 0.8444862396762258,
    "high": 0.8605966726340883,
    "formula": 0.1514481009845622
@@ -3807,24 +3807,24 @@
   {
    "router": "sections-site",
    "kind": "painted",
-   "floatPoints": 84287,
-   "snapPoints": 84011,
-   "exactPoints": 84386,
-   "anchoredPoints": 84029,
-   "framedPoints": 84028,
-   "floatPairs": 47330,
-   "snapPairs": 47306,
-   "exactPairs": 47334,
-   "anchoredPairs": 47304,
-   "framedPairs": 47308,
+   "floatPoints": 84262,
+   "snapPoints": 83959,
+   "exactPoints": 84361,
+   "anchoredPoints": 83977,
+   "framedPoints": 83976,
+   "floatPairs": 47322,
+   "snapPairs": 47298,
+   "exactPairs": 47326,
+   "anchoredPairs": 47296,
+   "framedPairs": 47300,
    "lost": {
-    "count": 1678,
+    "count": 1699,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 224.1571871058832,
     "overGrid": 0,
-    "under1e9": 1677,
-    "under1e6": 1678,
-    "farFromEnd": 571,
+    "under1e9": 1698,
+    "under1e6": 1699,
+    "farFromEnd": 585,
     "widestFarSine": 4.315891810432604e-13,
     "farWithAngle": 0,
     "farWidest": [
@@ -3900,12 +3900,12 @@
     ]
    },
    "added": {
-    "count": 1402,
+    "count": 1396,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 9993.60324960657,
     "overGrid": 0,
-    "under1e9": 1401,
-    "under1e6": 1402,
+    "under1e9": 1395,
+    "under1e6": 1396,
     "farFromEnd": 274,
     "widestFarSine": 1.1004300930050837e-12,
     "farWithAngle": 0,
@@ -4075,8 +4075,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 9438,
-   "nearCrossings": 839,
+   "near": 9569,
+   "nearCrossings": 846,
    "shifts": [
     {
      "move": 1e-12,
@@ -4444,7 +4444,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 12,
-     "snapMoved": 636,
+     "snapMoved": 637,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4484,7 +4484,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 1332,
+     "snapMoved": 1337,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4494,7 +4494,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 1436,
+     "snapMoved": 1438,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4504,7 +4504,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 1545,
+     "snapMoved": 1549,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4514,7 +4514,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 972,
+     "snapMoved": 973,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4524,7 +4524,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 1103,
+     "snapMoved": 1109,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4544,7 +4544,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 47,
-     "snapMoved": 1365,
+     "snapMoved": 1370,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4554,7 +4554,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 20,
-     "snapMoved": 1546,
+     "snapMoved": 1547,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4564,7 +4564,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 20,
-     "snapMoved": 1191,
+     "snapMoved": 1194,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4593,7 +4593,7 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 6,
-     "floatMoved": 33,
+     "floatMoved": 40,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4613,7 +4613,7 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 5,
-     "floatMoved": 33,
+     "floatMoved": 34,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4623,7 +4623,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 4.5,
-     "floatMoved": 24,
+     "floatMoved": 25,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4646,7 +4646,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 368
+     "framedMoved": 369
     },
     {
      "move": 0.3,
@@ -4655,7 +4655,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1374,
+     "anchoredMoved": 1379,
      "framedMoved": 0
     },
     {
@@ -4666,7 +4666,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1308
+     "framedMoved": 1311
     },
     {
      "move": 0.3,
@@ -4675,7 +4675,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1534,
+     "anchoredMoved": 1535,
      "framedMoved": 0
     },
     {
@@ -4686,7 +4686,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1510
+     "framedMoved": 1514
     },
     {
      "move": 0.3,
@@ -4695,7 +4695,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1232,
+     "anchoredMoved": 1234,
      "framedMoved": 0
     },
     {
@@ -4706,7 +4706,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1282
+     "framedMoved": 1287
     },
     {
      "move": 0.3,
@@ -4715,7 +4715,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1589,
+     "anchoredMoved": 1588,
      "framedMoved": 0
     },
     {
@@ -4726,23 +4726,23 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1521
+     "framedMoved": 1522
     }
    ]
   },
   {
    "router": "sections-site",
    "kind": "polyline",
-   "floatPoints": 96740,
-   "snapPoints": 96842,
-   "exactPoints": 96750,
-   "anchoredPoints": 96930,
-   "framedPoints": 96829,
-   "floatPairs": 48382,
-   "snapPairs": 48394,
-   "exactPairs": 48383,
-   "anchoredPairs": 48396,
-   "framedPairs": 48392,
+   "floatPoints": 96689,
+   "snapPoints": 96791,
+   "exactPoints": 96699,
+   "anchoredPoints": 96879,
+   "framedPoints": 96778,
+   "floatPairs": 48374,
+   "snapPairs": 48386,
+   "exactPairs": 48375,
+   "anchoredPairs": 48388,
+   "framedPairs": 48384,
    "lost": {
     "count": 990,
     "widest": 2.3437142008433856e-13,
@@ -4955,7 +4955,7 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 905,
+   "near": 906,
    "nearCrossings": 401,
    "shifts": [
     {
