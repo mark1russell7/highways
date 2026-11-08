@@ -4,6 +4,8 @@
 # The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/
 # or the newer record of the branch bench-data, which the job `land` of Bench pushes,
 # the verdict snapshots of docs/research/verdicts/, the idea records and the roadmap (SITE-LIVE).
+# The atlas page derives each week after the newest committed record from the git history (ATLAS-WEEKLY). The shared
+# workflow checks out the whole history (fetch-depth 0, its default). The build compares the weeks with the live atlas-weeks.json.
 # The shared site-pages action adds the Status page (from docs/ROADMAP.md) and the Releases page (from npm).
 # A pull request builds and checks the site in a browser, with no deploy.
 name: Pages
@@ -11,8 +13,18 @@ name: Pages
 on:
   push:
     branches: [main]
+  # After a release, so that the Releases page has the new version
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
   pull_request:
+  # Each day, in case a release fails after it publishes
+  schedule:
+    - cron: "32 5 * * *"
+    # Each Sunday soon after the end of Saturday in UTC, so the atlas page gets the record of the week (ATLAS-WEEKLY)
+    - cron: "32 1 * * 0"
 
 permissions: {}
 
@@ -24,7 +36,7 @@ concurrency:
 
 jobs:
   pages:
-    uses: mark1russell7/template/.github/workflows/reusable-pages.yml@5ff05c26ff13af7db53ecc45fce714efff36c7b5 # main
+    uses: mark1russell7/template/.github/workflows/reusable-pages.yml@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
     # The build job of the shared workflow gets only the read permissions. Only its deploy job,
     # which runs no code of the repository, writes to Pages.
     permissions:
@@ -46,11 +58,13 @@ jobs:
       # The package has no changelog file. The Releases page takes the versions from npm.
       site-pages: true
       roadmap: docs/ROADMAP.md
+      # The freshness gate of the Results page: each verdict has a read of at most 14 days (VERDICT-STAMPS).
+      data-stamps: packages/site/dist/data-stamps.json
       packages: "@mark1russell7/highways"
       site-name: highways
       # The check opens each page in a browser at each width, in light and dark. The probe drives the map of the home
       # page with the real routers. The check reads the TypeScript source and removes its types.
       site-check: true
-      site-check-pages: /,/compare.html,/examples.html,/results.html,/strategies.html,/releases/,/status/
+      site-check-pages: /,/compare.html,/examples.html,/results.html,/strategies.html,/atlas.html,/explorer.html,/releases/,/status/
       site-check-probe: packages/site/src/check-probe.ts
       timeout-minutes: 15

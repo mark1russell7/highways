@@ -10,7 +10,7 @@ export * from "./model.ts";
 export { DENSE_GROUPS, FIXTURE_LAYOUTS, FIXTURE_LOCALITY, fixtureParams, fixtureSpecOf, SMALL_CLUSTERED, TINY_UNIFORM } from "./fixtures.ts";
 export { HUB_CHAIN, MANY_GROUPS, PACKED_GRID } from "./cases.ts";
 export { BIPARTITE, BIPARTITE_LAYOUTS, COVERAGE_FAMILIES, FAN_OUT, FRAME_ROWS, LOCAL_MESH, PIPELINE, SPARSE_LONG, THIN_BARS, TWO_HUBS, UNEVEN_SIZES } from "./coverage.ts";
-export { BOTTLENECK, CHANNEL, COMB, ESCAPE, MAZE, PARALLEL_EDGES, RINGS, SPIRAL, SWITCHBOX, WALLED_LEVEL, WEEKLY_FAMILIES } from "./weekly.ts";
+export { ARC_ROW, BOTTLENECK, CHANNEL, COMB, ESCAPE, LATTICE_X, LAYERED, MAZE, PARALLEL_EDGES, RINGS, SPIRAL, SWITCHBOX, WALLED_LEVEL, WEEKLY_FAMILIES } from "./weekly.ts";
 // The parts of the shared registry that a host of the families uses. The site imports only `@mark1russell7/highways`.
 export {
   createFamilyRegistry,

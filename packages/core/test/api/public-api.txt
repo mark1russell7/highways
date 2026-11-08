@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 1513 names
+## . (build/index.d.ts): names
 
 ADAM_DEFAULTS: build/index.d.ts#ADAM_DEFAULTS
 ADAM_SCHEMA: build/index.d.ts#ADAM_SCHEMA
@@ -14,6 +14,7 @@ ANNEALING_DEFAULTS: build/index.d.ts#ANNEALING_DEFAULTS
 ANNEALING_SCHEMA: build/index.d.ts#ANNEALING_SCHEMA
 APPROVAL_DEFAULTS: build/index.d.ts#APPROVAL_DEFAULTS
 APPROVAL_PICKS: build/index.d.ts#APPROVAL_PICKS
+ARC_ROW: build/index.d.ts#ARC_ROW
 ARC_SOURCES: build/index.d.ts#ARC_SOURCES
 AREA_DEFAULTS: build/index.d.ts#AREA_DEFAULTS
 AREA_WIDTHS: build/index.d.ts#AREA_WIDTHS
@@ -185,6 +186,7 @@ type DividedOptions: build/index.d.ts#DividedOptions
 DrawnSegment: build/index.d.ts#DrawnSegment
 EDGE_DISTANCES: build/index.d.ts#EDGE_DISTANCES
 EDGE_PATH_DEFAULTS: build/index.d.ts#EDGE_PATH_DEFAULTS
+EPS_STEPS: build/index.d.ts#EPS_STEPS
 ESCAPE: build/index.d.ts#ESCAPE
 ESCAPE_DEFAULTS: build/index.d.ts#ESCAPE_DEFAULTS
 ESCAPE_METHODS: build/index.d.ts#ESCAPE_METHODS
@@ -347,6 +349,8 @@ LANE_ROOM_LIMIT: build/index.d.ts#LANE_ROOM_LIMIT
 LANE_STRETCH_DEFAULTS: build/index.d.ts#LANE_STRETCH_DEFAULTS
 LANE_STRETCH_ORDERS: build/index.d.ts#LANE_STRETCH_ORDERS
 LANE_TRACKS: build/index.d.ts#LANE_TRACKS
+LATTICE_X: build/index.d.ts#LATTICE_X
+LAYERED: build/index.d.ts#LAYERED
 LEADER_DEFAULTS: build/index.d.ts#LEADER_DEFAULTS
 LEADER_TYPES: build/index.d.ts#LEADER_TYPES
 LEVEL_HIGHWAY_DEFAULTS: build/index.d.ts#LEVEL_HIGHWAY_DEFAULTS
@@ -473,6 +477,7 @@ type OutputGroup: @mark1russell7/layout-contract#OutputGroup (external)
 type Outside: build/index.d.ts#Outside
 OverLimit: build/index.d.ts#OverLimit
 PACKED_GRID: build/index.d.ts#PACKED_GRID
+PAIR_POINTS: build/index.d.ts#PAIR_POINTS
 PARALLEL_EDGES: build/index.d.ts#PARALLEL_EDGES
 PERIMETER_MARGIN: build/index.d.ts#PERIMETER_MARGIN
 type PHubOptions: build/index.d.ts#PHubOptions
@@ -553,7 +558,7 @@ ROUTE_SPACE_MISFITS: build/index.d.ts#ROUTE_SPACE_MISFITS
 RadiusOptions: build/index.d.ts#RadiusOptions
 RecordTrace: build/index.d.ts#RecordTrace
 RectScatteredParams: build/index.d.ts#RectScatteredParams
-Region: build/index.d.ts#Region
+type Region: @mark1russell7/layout-contract#Region (external)
 RegionPoint: build/index.d.ts#RegionPoint
 Registry: build/index.d.ts#Registry
 type RelaxOptions: build/index.d.ts#RelaxOptions
@@ -585,6 +590,7 @@ RouteBalance: build/index.d.ts#RouteBalance
 type RouteCrossing: build/index.d.ts#RouteCrossing
 RouteInput: build/index.d.ts#RouteInput
 RoutePairCrossings: build/index.d.ts#RoutePairCrossings
+RoutePairOptions: build/index.d.ts#RoutePairOptions
 type RouteSegment: build/index.d.ts#RouteSegment
 RouteStability: build/index.d.ts#RouteStability
 RouteStabilityOptions: build/index.d.ts#RouteStabilityOptions
@@ -613,6 +619,9 @@ SCREEN_V4_ROOM: build/index.d.ts#SCREEN_V4_ROOM
 SCREEN_V5: build/index.d.ts#SCREEN_V5
 SCREEN_V5_HELD_OUT: build/index.d.ts#SCREEN_V5_HELD_OUT
 SCREEN_V5_KEYS: build/index.d.ts#SCREEN_V5_KEYS
+SCREEN_V6: build/index.d.ts#SCREEN_V6
+SCREEN_V6_HELD_OUT: build/index.d.ts#SCREEN_V6_HELD_OUT
+SCREEN_V6_INNER: build/index.d.ts#SCREEN_V6_INNER
 SCREEN_WRAPS: build/index.d.ts#SCREEN_WRAPS
 SEAM_DEFAULTS: build/index.d.ts#SEAM_DEFAULTS
 SEARCH_DEFAULTS: build/index.d.ts#SEARCH_DEFAULTS
@@ -1378,6 +1387,7 @@ runPipeline: build/index.d.ts#runPipeline
 runProfile: build/index.d.ts#runProfile
 runSuite: build/index.d.ts#runSuite
 sameData: build/index.d.ts#sameData
+sameKind: build/index.d.ts#sameKind
 sampleCurve: build/index.d.ts#sampleCurve
 samplesOf: build/index.d.ts#samplesOf
 sbebLines: build/index.d.ts#sbebLines
@@ -1430,6 +1440,7 @@ slotPlan: build/index.d.ts#slotPlan
 slotsOf: build/index.d.ts#slotsOf
 smoothCurve: build/index.d.ts#smoothCurve
 snapPlan: build/index.d.ts#snapPlan
+snapToEps: build/index.d.ts#snapToEps
 softDistance: build/index.d.ts#softDistance
 softKeyClusters: build/index.d.ts#softKeyClusters
 softKeyPlan: build/index.d.ts#softKeyPlan
@@ -1515,6 +1526,7 @@ withBends: build/index.d.ts#withBends
 withLaneRoom: build/index.d.ts#withLaneRoom
 withRepair: build/index.d.ts#withRepair
 withStableOrder: build/index.d.ts#withStableOrder
+withoutMixedKinds: build/index.d.ts#withoutMixedKinds
 wspdGroups: build/index.d.ts#wspdGroups
 wspdPlan: build/index.d.ts#wspdPlan
 zipLegs: build/index.d.ts#zipLegs
@@ -1545,6 +1557,9 @@ export declare const APPROVAL_DEFAULTS: Readonly<Required<Omit<ApprovalOptions, 
 
 ### build/index.d.ts#APPROVAL_PICKS
 export declare const APPROVAL_PICKS: readonly ApprovalPick[];
+
+### build/index.d.ts#ARC_ROW
+export declare const ARC_ROW: HighwaysFamily;
 
 ### build/index.d.ts#ARC_SOURCES
 export declare const ARC_SOURCES: readonly ArcSource[];
@@ -2502,6 +2517,9 @@ export declare const EDGE_DISTANCES: readonly EdgeDistance[];
 ### build/index.d.ts#EDGE_PATH_DEFAULTS
 export declare const EDGE_PATH_DEFAULTS: Readonly<Required<Omit<EdgePathOptions, "margin" | "k">>>;
 
+### build/index.d.ts#EPS_STEPS
+export declare const EPS_STEPS: number;
+
 ### build/index.d.ts#ESCAPE
 export declare const ESCAPE: HighwaysFamily;
 
@@ -3380,6 +3398,12 @@ export declare const LANE_STRETCH_ORDERS: readonly LaneStretchOrder[];
 ### build/index.d.ts#LANE_TRACKS
 export declare const LANE_TRACKS: readonly LaneTracks[];
 
+### build/index.d.ts#LATTICE_X
+export declare const LATTICE_X: HighwaysFamily;
+
+### build/index.d.ts#LAYERED
+export declare const LAYERED: HighwaysFamily;
+
 ### build/index.d.ts#LEADER_DEFAULTS
 export declare const LEADER_DEFAULTS: Readonly<LeaderOptions>;
 
@@ -3775,6 +3799,7 @@ interface LinkEdge {
 ### build/index.d.ts#LinkFaultOptions
 export interface LinkFaultOptions {
   readonly slack?: number;
+  readonly shapes?: ReadonlyMap<string, Region$1>;
 }
 
 ### build/index.d.ts#LinkFaults
@@ -3882,6 +3907,7 @@ export interface MeasureInfo {
   readonly placementDependent: boolean;
   readonly minEffect?: MinEffect;
   readonly definition?: string;
+  readonly estimatedBy?: string;
 }
 
 ### build/index.d.ts#MeasuredLink
@@ -4022,6 +4048,7 @@ export interface Node {
   readonly ports?: readonly Port[];
   readonly data?: Readonly<Record<string, unknown>>;
   readonly parent?: string;
+  readonly shape?: Region$1;
 }
 
 ### build/index.d.ts#NodeKey
@@ -4150,6 +4177,9 @@ export interface OverLimit {
 
 ### build/index.d.ts#PACKED_GRID
 export declare const PACKED_GRID: HighwaysFamily;
+
+### build/index.d.ts#PAIR_POINTS
+export declare const PAIR_POINTS = 1e6;
 
 ### build/index.d.ts#PARALLEL_EDGES
 export declare const PARALLEL_EDGES: HighwaysFamily;
@@ -4522,30 +4552,6 @@ export interface RectScatteredParams {
   readonly count: number;
 }
 
-### build/index.d.ts#Region
-export type Region = {
-  readonly kind: "rect";
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-} | {
-  readonly kind: "polygon";
-  readonly points: readonly RegionPoint[];
-  readonly holes?: readonly (readonly RegionPoint[])[];
-} | {
-  readonly kind: "circle";
-  readonly cx: number;
-  readonly cy: number;
-  readonly r: number;
-} | {
-  readonly kind: "ellipse";
-  readonly cx: number;
-  readonly cy: number;
-  readonly rx: number;
-  readonly ry: number;
-};
-
 ### build/index.d.ts#RegionPoint
 export type RegionPoint = readonly [number, number];
 
@@ -4779,6 +4785,15 @@ export interface RoutePairCrossings {
   readonly proper: number;
   readonly contact: number;
   readonly estimated: boolean;
+  readonly low: number;
+  readonly high: number;
+  readonly contactSampled: boolean;
+}
+
+### build/index.d.ts#RoutePairOptions
+export interface RoutePairOptions {
+  readonly maxPoints?: number;
+  readonly seed?: number;
 }
 
 ### build/index.d.ts#RouteSegment
@@ -4895,6 +4910,15 @@ export declare const SCREEN_V5_HELD_OUT: readonly number[];
 
 ### build/index.d.ts#SCREEN_V5_KEYS
 export declare const SCREEN_V5_KEYS: readonly EdgeKey[];
+
+### build/index.d.ts#SCREEN_V6
+export declare const SCREEN_V6: ScreenSet;
+
+### build/index.d.ts#SCREEN_V6_HELD_OUT
+export declare const SCREEN_V6_HELD_OUT: readonly number[];
+
+### build/index.d.ts#SCREEN_V6_INNER
+export declare const SCREEN_V6_INNER: readonly number[];
 
 ### build/index.d.ts#SCREEN_WRAPS
 export declare const SCREEN_WRAPS: readonly ScreenWrap[];
@@ -7952,7 +7976,7 @@ export declare function routeMeasures(graph: Graph, result: Result, row: BenchRo
 ### build/index.d.ts#routePairCrossings
 export declare function routePairCrossings(routes: readonly {
   readonly points: readonly Point[];
-}[]): RoutePairCrossings;
+}[], options?: RoutePairOptions): RoutePairCrossings;
 
 ### build/index.d.ts#routePortfolio
 export declare function routePortfolio(graph: Graph, options?: PortfolioRouterOptions): PortfolioRoute;
@@ -8014,6 +8038,9 @@ export declare function runSuite(options?: SuiteOptions): {
 
 ### build/index.d.ts#sameData
 export declare function sameData(a: unknown, b: unknown): boolean;
+
+### build/index.d.ts#sameKind
+export declare function sameKind(info: MeasureInfo, a: Readonly<Record<string, number>>, b: Readonly<Record<string, number>>): boolean;
 
 ### build/index.d.ts#sampleCurve
 export declare function sampleCurve(segments: readonly CurveSegment[], tolerance?: number): Point[];
@@ -8185,6 +8212,9 @@ export declare function smoothCurve(points: readonly Point[], options?: SmoothOp
 
 ### build/index.d.ts#snapPlan
 export declare function snapPlan(input: HighwayInput, lines: readonly SnapLine[], o: Readonly<SnapOptions>): HighwayPlan;
+
+### build/index.d.ts#snapToEps
+export declare function snapToEps(p: Point): Point;
 
 ### build/index.d.ts#softDistance
 export declare function softDistance(geom: number, keyA: string | undefined, keyB: string | undefined, lambda: number, attributes: number): number;
@@ -8474,6 +8504,13 @@ export declare function withRepair(router: Router, options?: RepairOptions): Rou
 
 ### build/index.d.ts#withStableOrder
 export declare function withStableOrder(router: Router): Router;
+
+### build/index.d.ts#withoutMixedKinds
+export declare function withoutMixedKinds<R extends {
+  readonly input: string;
+  readonly seed: number;
+  readonly measures: Readonly<Record<string, number>>;
+}>(records: readonly R[], info: MeasureInfo): R[];
 
 ### build/index.d.ts#wspdGroups
 export declare function wspdGroups(input: HighwayInput, o: Readonly<WspdOptions>): Map<string, EdgeGroup>;

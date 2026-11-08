@@ -343,7 +343,7 @@ These options of `shared` and `trunks` are off by default. With the defaults, th
 - `splitAt: gilbert` of `trunks` puts the split point where the flow cost is least, with the exponent `alpha` (EDA-030).
 - `fan: tree` of `trunks` grows a balancing-factor tree for each group, with the factor `bf` (NAT-017). 0 gives the least ink.
 
-The screen `screen-v1` compares the options with the defaults on the boards `small-clustered`, `dense-groups`, `hub-chain` and `many-groups`.
+The screen `screen-v1` compares the options with the defaults on the boards `small-clustered`, `dense-groups`, `hub-chain` and `many-groups`. It has no control and it does not read the pair count, so no row of this table is a win.
 
 | Option | Router | Result |
 |---|---|---|
@@ -1015,7 +1015,7 @@ const lanes = compareStep("curve", graph, { curveRouter: "shared", lanes: { widt
 
 - The first 6 families make the boards of `screen-v1` and `screen-v2`.
 - `COVERAGE_FAMILIES` adds 9 families: `frame-rows`, `pipeline`, `fan-out`, `two-hubs`, `uneven-sizes`, `thin-bars`, `sparse-long`, `local-mesh` and `bipartite`.
-- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape`, `rings` and `walled-level`. They are in no screen set.
+- `WEEKLY_FAMILIES` adds worst cases: `bottleneck`, `parallel-edges`, `maze`, `channel`, `comb`, `spiral`, `switchbox`, `escape`, `rings`, `walled-level`, `layered`, `lattice-x` and `arc-row`. They are in no screen set.
 - The screen set `screen-v3` has the first 15 families, each with 10 seeds.
 - The screen set `screen-v4` has the 60 boards of `screen-v2`, each after `makeRoom`.
 - `signTestPower(n)` gives the least count of families out of `n` that passes a two-sided sign test at the level 0.05. For 15 families, the count is 12.

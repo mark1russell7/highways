@@ -106,13 +106,69 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 | `bends` counts each vertex of a polyline, and it ignores the angle of each turn. | closed | `route.turn.mean` and `route.turn.max` (R4) read the angle, and `route.inflections` (R15) reads the changes of side. `route.bends` stays as a count. |
 | `detour` is a mean, and `worstDetour` is a maximum, so one bad route hides in the mean. | closed | `route.detour.median`, `route.detour.q95` (R5) and `route.detour.max` (R6) read the spread. |
 | `crossings` counts each crossing of two shared stretches one time. | closed by ROUTE-PAIRS | `route.crossings.pairs` counts the pairs of routes that cross. R1 stays, because a bundle can want few ink crossings. Each one has a partner measure: read them together across routers that share segments. |
-| The crossing count with open lanes is different. | open | 2026-11-08, PAINT-TIE. The painted count lives only in the record `through-check`. PAINT-TIE names one count and reads `route.bundle.lane-crossings` (B5) against it. |
+| The crossing count with open lanes is different. | closed by PAINT-TIE | `crossingPairs` is the one count of lines, and `routePairCrossings` is the one count of routes. They read one grid. `route.bundle.lane-crossings` (B5) stays a different question, and the record `paint-tie/1` reads it beside the count. |
 | No value gives the angle of a crossing. | closed | `route.crossing-angle.mean` and `route.crossing-angle.min` (R2). |
 | No value gives the space between plugs. | closed | `route.plug-spacing.min` and `route.plug-spacing.q05` (R11). |
 | No value gives the shape of a curve. | closed | C1 to C4 and C8 of the suite read the joints, the energy and the deviation. C5 has no code, and the table below states this. |
 | No value gives the quality of a group. | open | 2026-11-11, COLLECTION-KEY. AMBIGUITY-FLAT read `route.bundle.ambiguity` (B4) on keyed inputs: it keeps a range over routers, and it hides a large change at its top. `route.bundle.reach` (B4) joins it. Neither reads if a group has a meaning. `route.overlap.share` and `route.overlap.peak` (B11) stay. |
 | No value compares two zoom levels. | closed | Z6 to Z9 read the nesting, the positions, the order and the agreement of the levels. |
 | No value compares two results of inputs with a small change. | open | 2026-11-14, ROUTE-TIE. `route.stability.edits.mean` and `route.stability.seed.mean` (Z10, Z12) read an edit and a seed. No value reads a shift with no meaning, and ROUTE-TIE gives the floor of each route measure. |
+
+### The read of the painted count
+
+The record `paint-tie/1` reads 3 routers on 84 boards, with 5 drawn vectors for each move. `node packages/core/scripts/paint-tie.ts` writes it. Each figure of this section is of counter version 2, the value of `PAINT_COUNTER`.
+
+**The one count.** `crossingPairs` reads lines, and `routePairCrossings` reads routes. Both read each point on the grid `EPS_STEPS`, which comes from `EPS` of the contract. A property test pins equal counts on lines with no shared vertex. These counts answer other questions and keep their own rules: R1 of `measureQuality`, `measureHighways`, `drawnSegments`, `tracing` and `curriculum`. `route.bundle.lane-crossings` (B5) reads the order of lanes in a bundle.
+
+**An exact predicate does not end the tie.** An exact predicate decides the bits that it gets. A shift changes those bits, so the answer can change. The grid changes the bits before the test. The exact arm adds 3, 83 and 99 points over the float arm on `shared-all`, `sections` and `sections-site`. That is the size of what float rounding hides.
+
+**What a shift moves.** Each cell is the sum over the 3 routers, 2 kinds of line and 5 vectors. A moved point is one crossing more or fewer for a pair of edges.
+
+| Shift | Move | Grid at origin 0 | Float | Grid at the low corner of the lines | Grid at the low corner of the boxes |
+|---|---|---:|---:|---:|---:|
+| All lines | 1e-12 | 0 | 786 | 0 | 0 |
+| All lines | 1e-10 | 21 | 838 | 0 | 0 |
+| All lines | 1e-8 | 1,073 | 553 | 0 | 0 |
+| All lines | 1e-7 | 11,056 | 722 | 0 | 0 |
+| All lines | 0.3 | 29,254 | 497 | 0 | 0 |
+| All lines | 0.5 | 30,927 | 21 | 0 | 0 |
+| All lines | 7 | 61 | 424 | 0 | 0 |
+| Rooms | 1e-12 | 0 | 10,332 | 0 | 0 |
+| Rooms | 1e-10 | 0 | 10,326 | 0 | 0 |
+| Rooms | 1e-8 | 121 | 10,506 | 147 | 109 |
+| Rooms | 1e-7 | 1,019 | 10,844 | 1,089 | 995 |
+| One line added at the low corner | 0.3 | 0 | 0 | 30,737 | 0 |
+| One box added at the low corner | 0.3 | 0 | 0 | 0 | 29,171 |
+
+- The move 0.5 gives a shift that float addition does not round. So the float cell 21 is no control for the grid at that move. The move 0.3 is the fair control.
+- A form with its origin at a low corner passes each row of a shift of all lines, because the origin moves with them.
+- The form at the low corner of the lines fails the rule of one grid for each board. Two routers on one board read different grids, on 43 to 71 of the 84 boards.
+- The form at the low corner of the boxes keeps one grid for each board. But one box that moves that corner moves 29,171 points, the same size as a shift of the grid at origin 0.
+
+**The choice.** The grid at origin 0 stays. Each form moves near 1.4 % of the points under one stated change, so the frame does not remove the noise. The frame needs the boxes in each count, and a change at one corner reads the whole board again. With origin 0, a change moves the count only where the lines moved. A shift by a multiple of the grid moves nothing beyond rounding: the move 7 reads 61 points of near 2.08 million.
+
+**The floor of a claim.** A gain on this count that is smaller than the moved share of the largest vector is no gain. This table reads the move 0.3. The mean is over the 5 vectors, and the field `floors` of the record holds each vector.
+
+| Router | Kind | Mean moved points | Largest moved points | Points | Mean share | Largest share |
+|---|---|---:|---:|---:|---:|---:|
+| `shared-all` | painted | 32 | 47 | 43,627 | 0.07 % | 0.11 % |
+| `shared-all` | polyline | 1,928 | 2,606 | 78,768 | 2.45 % | 3.31 % |
+| `sections` | painted | 923 | 1,244 | 54,074 | 1.71 % | 2.30 % |
+| `sections` | polyline | 628 | 846 | 58,315 | 1.08 % | 1.45 % |
+| `sections-site` | painted | 1,221 | 1,608 | 84,011 | 1.45 % | 1.91 % |
+| `sections-site` | polyline | 1,119 | 1,443 | 96,842 | 1.16 % | 1.49 % |
+
+These floors are sums of moved pairs, and they count both directions. So a floor divided by the boards is not a value for `resolution` of `checkMeasures`, which reads a median net change on one board. The read of joint wins reads that net change on each board.
+
+**Two routers on one board.** This direct read compares each router on the frame of the boxes and on its own low corner. It answers how far a shared frame matters. The moved pairs of a router are 0.04 % to 2.50 % of its pairs on the frame. On 2 of 504 boards of a pair of routers, the sign of the gap between them changes. Both are in one row of polylines.
+
+**What the grid removes.** On painted lines, the totals fall by 41, 285 and 276 points against float, or 0.09 %, 0.52 % and 0.33 %. On polylines the totals rise by 218, 113 and 102.
+
+- Each point that the grid removes has its touch under the grid. The count over the grid is 0 on each row.
+- 3, 483 and 571 removed painted points have a crossing point over 1e-6 from the nearest end, and up to 224 units from it. Their sine is at most 4.3e-13, so these are parallel lines with a touch. No removed point has a real angle.
+- One point that the grid adds has a real angle, with sine 0.073, on `sections`. A hand read shows an end of a segment 2.8e-7 from the other segment. The crossing point is 3.8e-6 from that end only because the angle is small.
+
+**The rate of a flip.** The estimate 2 x move / grid reads low by 4.2 to 5.6 times. The rate here is the moved points over the crossings with a touch under the grid. On painted lines it is 63.3 % at move 1e-7, and the estimate is 15.1 %. At move 1e-8 it is 6.7 %, and the estimate is 1.6 %. Over all pairs with a touch under the grid, the same moved points are 5.3 % and 0.56 %. An inference names the cause: a pair has 4 ends with 2 coordinates each, and any of them can round to another place. No shift of 1e-12 moved a point, with a high limit of 0.052 % for a flip.
 
 ### What rests on `route.crossings`
 
@@ -159,14 +215,21 @@ Each gap has a date or a reason. A gap with a reason has a measure in the screen
 
 ### The relation of the two crossing counts
 
-`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The exact relation is this one, for one result with no sample:
+`route.crossings` counts each crossing of two painted segments one time. `route.crossings.pairs` counts each crossing of two different routes. So the pair count is usually the larger count. The relation is this bound, for one result with no sample:
 
 `crossings - self - touch <= pairs`
 
 - `self` counts the crossings of two segments that one route alone draws. The pair count leaves out a route that crosses itself.
 - `touch` counts the other crossings that are not strict on the grid `EPS`: the segments touch, or an end of one lies on the other. The float test can read such a place as a strict crossing.
 
+The class `touch` became wider after the first read of the `packed-grid` rows. It first held the segments that touch. An end of one segment on the other joined it after those 3 rows were in view. So the relation in this form is a fit to those rows, and the table below lists them by name.
+
 The function `paintedOutsidePairs` reads the two classes, and the record `route-pairs/2` holds them on each of its 375 rows. A test holds the relation on each row. A later row outside the relation is a finding, and it is not noise.
+
+Two limits apply to this check:
+
+- **It is not an identity.** Real functions can read outside it. The painted count joins two segments when their ends round to one key on a grid of 1/8. So a second route that nearly draws a segment takes the crossing out of `self`. The pair count reads the exact points, and it leaves that crossing out. A test in `src/bench/route-pairs.test.ts` builds this case on two made-up routes, and it reads 1 painted crossing outside the relation against 0 pairs. No row of the record reads this.
+- **It is a one-sided bound with room.** The room of a row is `pairs - (crossings - self - touch)`. The median room is 54 over the 375 rows, and the room is 0 on 43 rows. A fault that lowers the pair count by less than the room of a row reads no fault. So this check holds the classes, and it does not hold the size of either count.
 
 The pair count is under the painted count on 5 of the 375 rows:
 

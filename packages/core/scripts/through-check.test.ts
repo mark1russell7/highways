@@ -5,22 +5,23 @@ import { CONTROLS, REGENERATE, SCORED, throughRecord, type Row } from "./through
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/6 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/7 is stale. Write it again with: ${REGENERATE}`;
 /** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 /**
  * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
+ * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33271, 31144, 0, 0, 0, 0],
-  "trunks": [34056, 31696, 0, 0, 0, 1],
-  "shared": [35923, 32448, 274, 42, 1, 531],
-  "sections": [54016, 40297, 815, 501, 144, 2055],
-  "sections-site": [83802, 46980, 121, 68, 441, 2340],
-  "sections-site-no-ladder": [81724, 46226, 128, 120, 435, 2420],
-  "shared-all": [43398, 36006, 1421, 459, 0, 12027],
+  "corners": [33260, 31244, 0, 0, 0, 0],
+  "trunks": [34052, 31785, 0, 0, 0, 1],
+  "shared": [35908, 32548, 273, 40, 1, 531],
+  "sections": [54074, 40505, 815, 489, 144, 2067],
+  "sections-site": [84011, 47306, 121, 68, 441, 2365],
+  "sections-site-no-ladder": [82002, 46559, 127, 119, 435, 2445],
+  "shared-all": [43627, 36243, 1426, 453, 0, 12061],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
@@ -31,7 +32,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/6", () => {
+describe("the gate through-check/7", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 

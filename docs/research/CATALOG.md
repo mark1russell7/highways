@@ -1534,9 +1534,9 @@ The runs are [router on `screen-v3`](https://github.com/mark1russell7/highways/a
 | `preferences` | fresh | 70 of 210 | Fail: no gain, time 3.42, 4 tails | Fail: time 4.44, 4 tails |
 
 - The hard rules pass for the two candidates on each set.
-- `canals` changes only the families `dense-groups` and `small-clustered`. There it removes 6% of the crossings, and it saves more ink. The two gains pass the sign test and the bootstrap.
+- `canals` changes only the families `dense-groups` and `small-clustered`. There it removes 6% of the crossings, and it saves more ink. The two gains pass the sign test and the bootstrap. This read has no control and no pair count, so it is no win.
 - But on these inputs, `canals` adds 4% of turn, and its routes move more on a change. As a rule of the selector for clustered inputs, it also fails the guard `R4.turn`.
-- `preferences` changes a third of the inputs. It removes 2% to 3% of the crossings, but the median time ratio is 3.4 against the limit of 1.5.
+- `preferences` changes a third of the inputs. It removes 2% to 3% of the crossings, but the median time ratio is 3.4 against the limit of 1.5. This read has no control and no pair count, so it is no win.
 - The tails of `preferences` fail on `R4.turn`, `Z10.mean`, `B3.q95` and `B6.max`. Its `Z10.mean` verdict is `worse` on 6 families with 0 for it.
 - The verdicts agree in sign between `screen-v3` and the fresh set on each measure with a verdict on the two sets.
 
@@ -1609,7 +1609,7 @@ The values are of round 2. A paired value is the median ratio to `shared` on the
   - The side flips of the chords and the routes of `corners` also add jumps.
 - `springs` removes 55% of the turn, but its curves cross 80% more, and R12 is worse.
 - `nudge` lowers R16.cv by 6%. Its R16.low does not change, and it adds 13% of crossings.
-- The second target of the strategist was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
+- The second target of the review was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
 
 Thus no default changes, and no router goes to the promotion test. Each router fails the guard R1, and `repel` also fails the time test.
 
@@ -1618,7 +1618,7 @@ Thus no default changes, and no router goes to the promotion test. Each router f
 These ideas come from the results. Each one needs a screen before a verdict.
 
 - A crossing force for `repel`: two legs that cross push their points apart along the normal of the other leg.
-- A Z11 that does not count a route that follows its box. The strategist decides if the measure changes.
+- A Z11 that does not count a route that follows its box. A review decides if the measure changes.
 - A border walk for boxes that touch: a route goes along the shared side, within the tolerance of the rule.
 - A faster `repel`: fewer steps on the long free legs, or a projection only near the boxes.
 - `nudge` with a test of the crossings: a group whose move adds a crossing stays where it is.
@@ -1727,7 +1727,7 @@ A gain is a mean over the seeds that is better than the mean of the default by m
 | `crossingWeight` 0.3, half penalties | 14, 0 | 20, 0 | 0, 6 | 0.002, below 0.0001, 0.41 |
 
 - 0 evaluations is within the floor of the default on 92% of the inputs. Thus the annealing of the default changes little.
-- `crossingWeight` 0.3 with half penalties gains on ink and R1 with no drop. Its R4 has 6 drops, but Holm does not find them significant.
+- `crossingWeight` 0.3 with half penalties gains on ink and R1 with no drop. Its R4 has 6 drops, but Holm does not find them significant. This read has no control and no pair count, so it is no win.
 - The effect of the best variant is small: the median ratio of R1 is 0.962, and p10 is 0.863. It takes 1.18 times the time of the default.
 - The work counters do not count the crossing term yet. A change of the default needs that counter.
 
@@ -1873,7 +1873,7 @@ The time ratio is the median time over the median time of the baseline on `scree
   - The lane order changes the routes of 21 of 60 inputs of `screen-v2` for `two-way`, and of 20 of 60 for `global-order`. The median time is 1.07 and 1.01 times `shared-ways`.
 - `approval` gets B1 `better` on each set with 0 families against, and B2 `better` with 1 family against on `screen-v2`.
   - B3 q95 has no verdict on `screen-v2` and is `worse` on `screen-v3`. The guard B6 max is `worse` on `screen-v2` and `screen-v3`.
-  - The median crossings of each edge are 1.288 on `screen-v3`, against 2.079 of `shared`. The median turn R4 is 0.888, against 0.545.
+  - The median crossings of each edge are 1.288 on `screen-v3`, against 2.079 of `shared`. The median turn R4 is 0.888, against 0.545. This read has no control and no pair count, so it is no win.
   - The variants `approval-eps0.05` and `approval-budget0.5` also get B1 and B2 `better` with 0 families against on `screen-v2`. B3 has no verdict for them.
 - `escape` gets R11 min `better` on each set, but R1 is `worse` on each set. R10 is `worse` on `screen-v2` and `screen-v3`, and B5 is a tie on each family.
 - `crops` gets B1 `better` and R5 q95 `worse` against `pipeline`. Against `board-portfolio`, B1 is `worse` and R5 is `better` on `screen-v3`, each with 2 families against.

@@ -1,6 +1,6 @@
 # The CI of this repository. The job ci is the shared CI of mark1russell7 (reusable-ci.yml, CI.md)
 # with its default inputs: it runs each standard script that package.json has (format:check,
-# typecheck, lint, test, build in each package that has it, and lint:ste).
+# typecheck, lint, test, build in each package that has it, and lint:ste). Only fetch-depth is not the default.
 name: CI
 
 on:
@@ -19,9 +19,16 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@21c4cb628bc2e0e1be5b21fa92fd3c688400ecab # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@e077054e0f2ebb8441e4bc525b56cf2acc2afb6f # main
+    # The gate test of the atlas (atlas-history.test.ts) reads the commit that added the newest weekly record, so the checkout gets the whole history.
+    with:
+      fetch-depth: 0
 
   # The heap gate (HEAP-GATE, packages/core/scripts/heap.ts). Each router of the joint bench routes the dense board in its own process,
   # with a heap cap from its measure in packages/core/scripts/data/heap/budgets.json. A memory regression of a router fails here.
@@ -55,7 +62,7 @@ jobs:
   # The cells of Xplat have their own check "Xplat OK" in xplat.yml.
   ci-ok:
     name: CI OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [ci, heap, presets]
     runs-on: ubuntu-latest
     timeout-minutes: 2

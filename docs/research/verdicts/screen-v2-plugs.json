@@ -7,6 +7,7 @@
   "commit": "557e3ac5bd8e6c35f1d2314636a7e96ec6af1435",
   "date": "2026-11-02",
   "core": "0.10.0",
+  "verified": {"core":"0.15.0","run":42386833828,"commit":"e985b3ce138dba2bba50c6d0a01753a3b9357b26","date":"2026-11-07"},
   "rows": [
     {"strategy":"side","guard":"R1","measure":"route.crossings","label":"better","old":"better","stratified":27.516666666666666,"pooled":27.516666666666666,"p":0.00004999750012499375,"families":[{"family":"dense-groups","n":10,"mean":94.3,"sign":1},{"family":"hub-chain","n":10,"mean":14.1,"sign":1},{"family":"many-groups","n":10,"mean":8.5,"sign":1},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"small-clustered","n":10,"mean":47.7,"sign":1},{"family":"tiny-uniform","n":10,"mean":0.5,"sign":1}],"breadth":{"against":0,"of":6,"ties":1}},
     {"strategy":"side","guard":"R4","measure":"route.turn.mean","label":"better","old":"better","stratified":0.054473399419437275,"pooled":0.054473399419437275,"p":0.00004999750012499375,"families":[{"family":"dense-groups","n":10,"mean":0.07061987736337687,"sign":1},{"family":"hub-chain","n":10,"mean":0.027802316872260185,"sign":1},{"family":"many-groups","n":10,"mean":0.03940176566982849,"sign":1},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"small-clustered","n":10,"mean":0.06015302649144853,"sign":1},{"family":"tiny-uniform","n":10,"mean":0.12886341011970961,"sign":1}],"breadth":{"against":0,"of":6,"ties":1}},

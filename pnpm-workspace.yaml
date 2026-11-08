@@ -5,6 +5,7 @@ packages:
 # A git-hosted package is approved by its repository URL, so a new commit of cue needs no new approval.
 allowBuilds:
   "@mark1russell7/cue@git+https://github.com/mark1russell7/cue.git": true
+  '@swc/core': false
   esbuild: true
 
 # Our own packages: the release train updates them, so the release age check of pnpm does not apply to them.

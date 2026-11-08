@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { kpiFacts } from "./kpi-files.ts";
-import { KPI_PAGES, minorsBehind, resultsLag, resultsUnread, siteKpiInput, type KpiFacts } from "./kpi.ts";
+import type { BenchMeta } from "./bench-label.ts";
+import { BUILT_IN_STRATEGIES } from "@mark1russell7/highways";
+import { cardStrategies, kpiFacts, strategiesWithoutNumberOption } from "./kpi-files.ts";
+import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
+import { RESULT_FILES } from "./results-files.ts";
+import { cardShare, cardsWithCurves, cardsWithoutCurve, KPI_PAGES, NO_CURVE, percentDown, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
-const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictCores: [], verdictReads: [] };
+const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
 
 describe("minorsBehind", () => {
@@ -32,10 +38,17 @@ describe("resultsUnread", () => {
     expect(resultsUnread([undefined, "1.15.0"], "0.15.0")).toBe(2);
   });
 
-  it("gives the measure in the file, from the stamps and not from the cores of the runs", () => {
-    const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictCores: ["0.9.2", "0.10.0"], verdictReads: ["0.15.0", "0.10.0"] });
+  it("gives the measures in the file, from the stamps and not from the cores of the first runs", () => {
+    const input = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, { ...FACTS, verdictReads: ["0.15.0", "0.10.0"] });
     expect(input?.measures.find((m) => m.id === "results-unread")).toEqual({ id: "results-unread", value: 1, unit: "snapshots" });
-    expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(6);
+    expect(input?.measures.find((m) => m.id === "results-lag")?.value).toBe(5);
+  });
+
+  it("gives the lag the date of the oldest read that gives it, and a stamp is a read", () => {
+    const facts = { ...FACTS, verdictReads: ["0.14.0", "0.14.0", "0.15.0"], verdictReadDates: ["2026-11-02", "2026-11-01", "2026-11-07"] };
+    const lag = siteKpiInput({ date: "2026-11-05", core: "0.15.0" }, "0.15.0", () => false, facts)?.measures.find((m) => m.id === "results-lag");
+    expect(lag).toEqual({ id: "results-lag", value: 1, unit: "releases", notCounted: LAG_NOT_COUNTED, at: "2026-11-01T00:00:00Z" });
+    expect(resultsLagAt(["0.15.0"], [undefined], "0.15.0")).toBeUndefined();
   });
 });
 
@@ -71,14 +84,110 @@ describe("siteKpiInput", () => {
     expect(value(with_(0), "coverage-shown")).toBe(0);
   });
 
-  it("takes the lag of the oldest verdict, so a current snapshot does not hide it", () => {
-    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictCores: ["0.10.0", "0.9.2"] });
+  it("takes the lag of the oldest read, so a current snapshot does not hide it", () => {
+    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictReads: ["0.10.0", "0.9.2"] });
     expect(value(input, "results-lag")).toBe(5);
   });
 
   it("leaves out the lag when a verdict does not name its core", () => {
-    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictCores: ["0.10.0", undefined] });
+    const input = siteKpiInput({ date: "2026-11-04", core: "0.14.0" }, "0.14.0", () => false, { ...FACTS, verdictReads: ["0.10.0", undefined] });
     expect(value(input, "results-lag")).toBeUndefined();
+  });
+});
+
+describe("cardsWithCurves", () => {
+  // A made-up sweep of the option gap for each strategy. Each point has its own seed group.
+  const data = (strategies: Record<string, number>): ResponseData => ({
+    schema: RESPONSE_RECORDS_SCHEMA,
+    name: "made-up sweep",
+    dimensions: [
+      { id: "step", label: "Step", unit: "", kind: "categorical", levels: ["router"] },
+      { id: "strategy", label: "Strategy", unit: "", kind: "categorical", levels: Object.keys(strategies) },
+      { id: "gap", label: "Gap", unit: "px", kind: "continuous", range: [0, 16] },
+    ],
+    measures: [{ id: "crossings", label: "Crossings", unit: "", direction: "lower" }],
+    points: Object.entries(strategies).flatMap(([strategy, n]) =>
+      Array.from({ length: 4 }, (_, i) => ({
+        id: `${strategy}-${i}`,
+        group: `${strategy}-${i}`,
+        values: { step: "router", strategy, gap: n === 1 ? 4 : 4 * (i % n) + 1 },
+        measures: { crossings: 10 + i + strategy.length },
+      })),
+    ),
+  });
+  const file = (strategies: Record<string, number>, date?: string): SweepFile => ({ record: fitResponse(data(strategies)), ...(date ? { date } : {}) });
+
+  it("counts each card with 2 values of an option or more", () => {
+    expect(cardsWithCurves([file({ alpha: 2, beta: 4, gamma: 1 })])).toBe(2);
+  });
+
+  it("counts a card once, and skips a record that parseResponseRecord refuses", () => {
+    expect(cardsWithCurves([file({ alpha: 3, delta: 1, gamma: 1 }), file({ alpha: 4, delta: 1, gamma: 1 }), { record: data({ beta: 2, delta: 1, gamma: 1 }) }, { record: null }])).toBe(1);
+  });
+
+  it("gives 0 with no record, and the measure in the file says what it does not count", () => {
+    expect(cardsWithCurves([])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, FACTS);
+    const m = input?.measures.find((x) => x.id === "cards-with-curves");
+    expect(m).toMatchObject({ value: 0, unit: "cards" });
+    expect(m?.notCounted).toContain("response-records/1");
+    expect(m?.at).toBeUndefined();
+  });
+
+  it("takes the time of the measure from the latest commit of a record with a curve", () => {
+    const sweeps = [file({ alpha: 2, delta: 1, gamma: 1 }, "2026-11-10"), file({ beta: 2, delta: 1, gamma: 1 }, "2026-11-12"), file({ delta: 1, gamma: 1, zeta: 1 }, "2026-11-13")];
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps });
+    expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
+  });
+
+  it("gives the share of the cards of the list with a curve, and reads no card off the list (CARDS-SHARE)", () => {
+    const sweeps = [file({ alpha: 2, beta: 4, gamma: 1, omega: 2 })];
+    const list = ["router/alpha", "router/beta", "router/gamma"];
+    expect(cardsWithoutCurve(sweeps, list)).toEqual(["router/gamma"]);
+    expect(cardShare(sweeps, list)).toBe(66.6);
+    expect(cardShare(sweeps, list.slice(0, 2))).toBe(100);
+    expect(cardShare([], [])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps, cardStrategies: list });
+    const m = input?.measures.find((x) => x.id === "cards-curve-share");
+    expect(m).toMatchObject({ value: 66.6, unit: "%" });
+    expect(m?.notCounted).toContain("NO_CURVE");
+  });
+
+  it("does not read 100 while one card of many has no curve", () => {
+    // Math.round gives 100 for 1999 of 2000. The share rounds down.
+    expect(percentDown(1999, 2000)).toBe(99.9);
+    expect(percentDown(2000, 2000)).toBe(100);
+    expect(percentDown(0, 0)).toBe(0);
+  });
+});
+
+describe("the cards of the registry (CARDS-SHARE)", () => {
+  it("gives each built-in strategy a card, or a reason in NO_CURVE", () => {
+    expect(strategiesWithoutNumberOption().sort()).toEqual(Object.keys(NO_CURVE).sort());
+    expect(cardStrategies().length + Object.keys(NO_CURVE).length).toBe(BUILT_IN_STRATEGIES.length);
+  });
+
+  it("holds the count of the cards, so a new strategy shows in this test", () => {
+    // A new built-in strategy with a number option raises this count and lowers the share until its sweep.
+    expect(cardStrategies()).toHaveLength(101);
+  });
+});
+
+describe("the time of each measure", () => {
+  it("gives the latest date, or no time with no date", () => {
+    expect(latestAt(["2026-11-05", undefined, "2026-11-07T10:00:00Z", "local"])).toBe("2026-11-07T00:00:00Z");
+    expect(latestAt([])).toBeUndefined();
+  });
+
+  it("gives the reads the time of the last stamp, not of the benchmark", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, verdictReads: ["0.15.0"], verdictReadDates: ["2026-10-30", "2026-11-07"] });
+    expect(input?.at).toBe("2026-11-05T00:00:00Z");
+    expect(input?.measures.find((m) => m.id === "results-unread")?.at).toBe("2026-11-07T00:00:00Z");
+  });
+
+  it("gives a page the time of the commit of the build", () => {
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => true, { ...FACTS, commitDate: "2026-11-07" });
+    expect(input?.measures.find((m) => m.id === "atlas-live")).toMatchObject({ value: 1, at: "2026-11-07T00:00:00Z" });
   });
 });
 
@@ -99,9 +208,24 @@ describe("kpiFacts", () => {
     const facts = kpiFacts(root);
     expect(facts.demoComplete).toBe(true);
     expect(facts.coverageCells).toBeGreaterThan(0);
-    expect(facts.verdictCores.length).toBeGreaterThan(0);
-    expect(facts.verdictCores).not.toContain(undefined);
-    expect(facts.verdictReads).toHaveLength(facts.verdictCores.length);
+    expect(facts.verdictReads.length).toBeGreaterThan(0);
     expect(facts.verdictReads).not.toContain(undefined);
+    expect(facts.verdictReadDates).toHaveLength(facts.verdictReads.length);
+    expect(facts.verdictReadDates).not.toContain(undefined);
+    expect(Array.isArray(facts.sweeps)).toBe(true);
+    expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("the results lag of the repository (STAMP-ON-RELEASE)", () => {
+  const root = fileURLToPath(new URL("../../../", import.meta.url));
+
+  // This test is the gate of the target: a change of the version of the core fails it while a snapshot is 2 or more minors behind.
+  // Then the snapshots need a read on the new core first: the workflow `Read on release`, and the stamps of its job `stamps`.
+  it("has each snapshot at most 1 minor behind the version of the core", () => {
+    const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+    const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
+    const lag = siteKpiInput(meta, core, () => true, kpiFacts(root))?.measures.find((m) => m.id === "results-lag");
+    expect(lag?.value, `results-lag on core ${core}, from the read at ${lag?.at}`).toBeLessThanOrEqual(1);
   });
 });
