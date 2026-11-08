@@ -20,7 +20,7 @@ on:
         description: "Empty: the inputs of screen-v1. A number n: n drawn inputs of each family, each with its own values of the dimensions of its family (SPACE-INPUTS)."
         default: ""
       minutes:
-        description: "The limit of the job in minutes. A draw of 10 inputs of each family takes about 3 times the time of the 6 inputs of screen-v1."
+        description: "The limit of the job in minutes. A draw takes inputs of each size in the range of its family, so time a small draw first."
         default: "20"
 
 permissions: {}
@@ -65,8 +65,9 @@ jobs:
           args=(--step "$STEP" --strategy "$STRATEGIES" --out "$GITHUB_WORKSPACE/out/sweep.json")
           if [ -n "$FAMILIES" ]; then args+=(--families "$FAMILIES"); fi
           if [ -n "$DRAW" ]; then args+=(--draw "$DRAW"); fi
-          node scripts/sweep.ts "${args[@]}" 2>&1 | tail -n 20 | tee "$RUNNER_TEMP/sweep.log"
-          { echo "## Sweep of $STEP"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; echo '```'; cat "$RUNNER_TEMP/sweep.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          # The log streams each progress line, so a run that ends at its limit still shows the time of each setting.
+          node scripts/sweep.ts "${args[@]}" 2>&1 | tee "$RUNNER_TEMP/sweep.log"
+          { echo "## Sweep of $STEP"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; echo '```'; tail -n 20 "$RUNNER_TEMP/sweep.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sweep
