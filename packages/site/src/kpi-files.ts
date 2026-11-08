@@ -2,6 +2,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { BUILT_IN_STRATEGIES, type AnyOption } from "@mark1russell7/highways";
 import { demoComplete, pageCoverage } from "./demo-data.ts";
 import { SWEEP_DIR, type KpiFacts, type SweepFile } from "./kpi.ts";
 import { coverageView } from "./results-data.ts";
@@ -22,8 +23,23 @@ export function kpiFacts(root: string): KpiFacts {
     verdictReads: verdicts.map((s) => s.verified?.core ?? s.core),
     verdictReadDates: verdicts.map((s) => s.verified?.date ?? s.date),
     sweeps: sweepRecords(root),
+    cardStrategies: cardStrategies(),
     ...commitDateOf(root),
   };
+}
+
+/**
+ * This function gives the card of each built-in strategy with a number option, in the form `step/name`.
+ * A number option has the type `number` or `integer`, as in the sweep of `packages/core/scripts/sweep.ts`.
+ */
+export function cardStrategies(): string[] {
+  return BUILT_IN_STRATEGIES.filter((s) => Object.values((s.schema ?? {}) as Record<string, AnyOption>).some((d) => d.type === "number" || d.type === "integer")).map((s) => `${s.step}/${s.name}`);
+}
+
+/** This function gives the card of each built-in strategy with no number option, in the form `step/name`. */
+export function strategiesWithoutNumberOption(): string[] {
+  const cards = new Set(cardStrategies());
+  return BUILT_IN_STRATEGIES.map((s) => `${s.step}/${s.name}`).filter((c) => !cards.has(c));
 }
 
 /**

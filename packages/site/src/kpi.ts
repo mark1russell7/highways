@@ -21,6 +21,8 @@ export interface KpiFacts {
   readonly verdictReadDates?: readonly (string | undefined)[];
   /** The committed sweep records of the strategy cards (CARD-CURVES), in the form `response-records/1`. */
   readonly sweeps?: readonly SweepFile[];
+  /** The card of each built-in strategy with a number option, in the form `step/name`. The share of the cards reads these cards (CARDS-SHARE). */
+  readonly cardStrategies?: readonly string[];
   /** The date of the commit of the build. A page is live from the date of its commit. */
   readonly commitDate?: string;
 }
@@ -36,6 +38,22 @@ export const LAG_NOT_COUNTED = "The core of the first run of a snapshot. A stamp
 
 /** The things that the count `cards-with-curves` does not read. */
 export const CARDS_NOT_COUNTED = `A file of ${SWEEP_DIR} that is not a good record of response-records/1, a record with no dimensions step and strategy, and a card with fewer than 2 values of an option.`;
+
+/** The things that the share `cards-curve-share` does not read. */
+export const CARDS_SHARE_NOT_COUNTED = "A card of a strategy that is not built in, and a built-in strategy with no number option. The list NO_CURVE of kpi.ts gives each of those with its reason.";
+
+/**
+ * The built-in strategies with no number option, with the reason that each has no response curve.
+ * A test holds this list against the registry, so a new strategy with no number option needs its reason here.
+ */
+export const NO_CURVE: Readonly<Record<string, string>> = {
+  "group/keys": "Its options are the function that gives the key and an object of splits. No option is a number.",
+  "router/straight": "It is the control of the routers: one straight line for each edge. It has no option.",
+  "router/plugs": "Each edge follows the curve of the inflection rule from its plug. It has no option.",
+  "curve/straight": "It keeps the polyline as it is. It has no option.",
+  "plugs/facing": "Each free plug faces the other end of its edge. It has no option.",
+  "whole/pipeline": "Its options are the strategies of the other steps and their options. The cards of those strategies have their curves.",
+};
 
 /** One committed sweep record and the date of its last commit. */
 export interface SweepFile {
@@ -78,6 +96,25 @@ export function curveCards(value: unknown): string[] {
  */
 export function cardsWithCurves(files: readonly SweepFile[]): number {
   return new Set(files.flatMap((f) => curveCards(f.record))).size;
+}
+
+/** This function gives the cards of a list that no committed sweep record gives a curve. */
+export function cardsWithoutCurve(files: readonly SweepFile[], strategies: readonly string[]): string[] {
+  const cards = new Set(files.flatMap((f) => curveCards(f.record)));
+  return strategies.filter((s) => !cards.has(s));
+}
+
+/**
+ * This function gives a share in percent, to one decimal. The value rounds down, so a share with a gap does not read 100.
+ * A total of 0 reads 0.
+ */
+export function percentDown(done: number, total: number): number {
+  return total === 0 ? 0 : Math.floor((1000 * done) / total) / 10;
+}
+
+/** This function gives the share of the cards of a list with a curve, in percent, to one decimal. It rounds down. */
+export function cardShare(files: readonly SweepFile[], strategies: readonly string[]): number {
+  return percentDown(strategies.length - cardsWithoutCurve(files, strategies).length, strategies.length);
 }
 
 /** This function gives the time of the latest date of a list, or `undefined` for a list with no date. */
@@ -190,6 +227,14 @@ export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: stri
         value: cardsWithCurves(facts.sweeps ?? []),
         unit: "cards",
         notCounted: CARDS_NOT_COUNTED,
+        ...dated(latestAt((facts.sweeps ?? []).filter((f) => curveCards(f.record).length > 0).map((f) => f.date))),
+      },
+      // The share has the built-in strategies with a number option as its base, so a new strategy without a card lowers it (CARDS-SHARE).
+      {
+        id: "cards-curve-share",
+        value: cardShare(facts.sweeps ?? [], facts.cardStrategies ?? []),
+        unit: "%",
+        notCounted: CARDS_SHARE_NOT_COUNTED,
         ...dated(latestAt((facts.sweeps ?? []).filter((f) => curveCards(f.record).length > 0).map((f) => f.date))),
       },
     ],

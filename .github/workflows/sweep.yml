@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "The step of the strategies: group, plugs, router, highway, levels, curve or whole."
+        description: "The step of the strategies: group, plugs, router, highway, levels, curve, room or whole. A room strategy runs in the strategy pipeline of whole."
         default: "router"
       strategies:
         description: "Names of the registry, with commas. A strategy with no number option gets a line in the log, and the sweep continues."
