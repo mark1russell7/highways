@@ -44,7 +44,7 @@
     "placementDependent": true,
     "screen": "On `case-dense-groups` and `mid-clustered`, after `corner`: keep it if the median R8 rises by 30% with R9 = 0 and R1 up by 5% or less.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "RULE-005",
       "RULE-022",
