@@ -43,6 +43,8 @@ export const CONTROL_PARTNERS: Readonly<Record<(typeof CONTROLS)[number], Readon
   straight: Object.fromEntries(
     [
       "route.crossings.pairs",
+      "route.crossings.pairs.low",
+      "route.crossings.pairs.high",
       "route.turn.mean",
       "route.turn.max",
       "route.detour.median",
