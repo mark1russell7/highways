@@ -88,7 +88,7 @@ export const SPACE_NOT_COUNTED = {
   screened: "A strategy that a screen ran with no committed verdict snapshot.",
   measuredFull: "A strategy of a screen set without each family of the corpus. The benchmark has 12 fixtures and not the families, so it does not count.",
   families: "A generator outside the corpus registry of the core.",
-  fitted: "A fit with no held-out error. The record space-coverage/1 counts each cell: one measure on one dimension of the space.",
+  fitted: "A fit that does not beat the mean on each held-out input, or has a mean skill below 0.05. A cell is one measure on one dimension.",
   views: "The cards and the pages, because each card shows one strategy. This measure counts each view of a measure over a dimension of the whole space.",
   solved: "Each part of the space, because no part has a verdict that a solver proves.",
 } as const;

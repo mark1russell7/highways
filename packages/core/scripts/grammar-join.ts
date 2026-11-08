@@ -61,9 +61,6 @@ export interface GrammarScreen {
   readonly points: readonly JoinedPoint[];
 }
 
-/** This function gives the median of a list of finite numbers, or `undefined` for an empty list. */
-const medianOf = (values: readonly number[]): number | undefined => (values.length === 0 ? undefined : median(values));
-
 /**
  * This function joins the shards of a grammar screen into one record, in the order of the points.
  *
@@ -90,12 +87,13 @@ export function joinShards(file: GrammarPointsFile, shards: ReadonlyMap<number, 
       if (rows.length !== inputs) throw new Error(`The point ${p.index} has ${rows.length} records, and the shard has ${inputs} inputs.`);
       const ran = rows.filter((r) => r.skipped === undefined);
       const medians: Record<string, number> = {};
+      // A measure with no finite value on any input has no median, so it stays out of the record.
       for (const name of GRAMMAR_MEASURES) {
-        const m = medianOf(ran.map((r) => r.measures?.[name]).filter((v): v is number => typeof v === "number" && Number.isFinite(v)));
-        if (m !== undefined) medians[name] = m;
+        const values = ran.map((r) => r.measures?.[name]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+        if (values.length > 0) medians[name] = median(values);
       }
-      const ms = medianOf(ran.map((r) => r.ms).filter((v): v is number => typeof v === "number" && Number.isFinite(v)));
-      if (ms !== undefined) medians["ms"] = ms;
+      const times = ran.map((r) => r.ms).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+      if (times.length > 0) medians["ms"] = median(times);
       const outputs = Object.fromEntries(ran.filter((r) => r.outputHash !== undefined).map((r) => [r.input, r.outputHash!]).sort(([a], [b]) => (a! < b! ? -1 : 1)));
       const hard = ran.reduce((sum, r) => sum + Object.values(r.hard ?? {}).reduce((s, x) => s + x, 0), 0);
       points.push({ index: p.index, id: p.id, stage: GRAMMAR_STAGE, outputs, skipped: rows.length - ran.length, hard, medians });

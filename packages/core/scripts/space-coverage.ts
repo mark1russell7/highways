@@ -5,6 +5,7 @@ import { MEASURES } from "../src/bench/screen/measures.ts";
 import { spaceCoverage, spaceDimensions, type SpaceCoverage, type SpaceFit } from "../src/bench/space-coverage.ts";
 import { HIGHWAYS_FAMILIES } from "../src/families/index.ts";
 import { KEYED_STRATEGIES } from "../src/strategies/opt-in.ts";
+import { FITS_PATH, SPACE_FITS_FILE } from "./space-fits.ts";
 
 /** The folder of the committed files. */
 const FOLDER = new URL("../../../docs/research/space-coverage/", import.meta.url);
@@ -16,13 +17,13 @@ export const TREND_FILE = new URL("trend.json", FOLDER);
 /** The form of the record. */
 export const SCHEMA = "space-coverage/1";
 
-/** The fits of the record. No fitted model exists at this time, so the true value is 0. A new fit adds a row here, with its run. */
-export const FITS: readonly SpaceFit[] = [];
+/** The fits of the record: each fit of the file `fits.json`. The rule of `fitCounts` tells which fits count. */
+export const FITS: readonly SpaceFit[] = (JSON.parse(readFileSync(SPACE_FITS_FILE, "utf8")) as { readonly fits: readonly SpaceFit[] }).fits;
 
-/** The record: the result of `spaceCoverage` from the registries, and the fits that it counted. */
+/** The record: the result of `spaceCoverage` from the registries, and the path of the file of the fits that it counted. */
 export interface CoverageRecord extends SpaceCoverage {
   readonly schema: string;
-  readonly fits: readonly SpaceFit[];
+  readonly fits: string;
 }
 
 /** One point of the trend. A row with a lower value than the row before it has a `reason`. */
@@ -38,7 +39,7 @@ export interface TrendPoint {
 /** This function makes the record from the registries of this commit. */
 export function coverageRecord(): CoverageRecord {
   const measures = MEASURES.map((m) => m.key);
-  return { schema: SCHEMA, ...spaceCoverage(measures, spaceDimensions(KEYED_STRATEGIES, HIGHWAYS_FAMILIES), FITS), fits: FITS };
+  return { schema: SCHEMA, ...spaceCoverage(measures, spaceDimensions(KEYED_STRATEGIES, HIGHWAYS_FAMILIES), FITS), fits: FITS_PATH };
 }
 
 /** This function gives the text of a JSON file of this folder. */
@@ -47,7 +48,7 @@ const json = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 if (process.argv[1]?.endsWith("space-coverage.ts")) {
   const record = coverageRecord();
   writeFileSync(RECORD_FILE, json(record));
-  console.log(`${record.fitted} of ${record.cells} cells: ${record.measures} measures on ${record.strategies} strategies, ${record.options} options and ${record.inputs} input dimensions.`);
+  console.log(`${record.fitted} of ${record.cells} cells, from ${record.tested} fits with ${record.expectedFalse.toFixed(2)} expected passes by chance: ${record.measures} measures on ${record.strategies} strategies, ${record.options} options and ${record.inputs} input dimensions.`);
   if (process.argv.includes("--point")) {
     const core = (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version;
     const trend = JSON.parse(readFileSync(TREND_FILE, "utf8")) as TrendPoint[];
