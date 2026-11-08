@@ -83,12 +83,12 @@ export interface SpaceFacts {
 /** The things that each layout space measure does not count, by its id. */
 export const SPACE_NOT_COUNTED = {
   operators: "A param value, a preset and a variant of an operator. The registry gives each operator once, with its step.",
-  variants: "Each variant. A variant counts only when the gate `scripts/distinct.ts` of the core gives it the verdict `distinct`. No screen gives the gate its hashes yet.",
+  variants: "Each variant. A variant counts only when the gate `distinctness` of `strategy-space` gives it the verdict `distinct`. The grammar screen gives the gate its hashes.",
   grammar: "A combinator of two or more strategies, because the space has none. Each numeric param has a few levels, so most configs differ only in a param value.",
   screened: "A strategy that a screen ran with no committed verdict snapshot.",
   measuredFull: "A strategy of a screen set without each family of the corpus. The benchmark has 12 fixtures and not the families, so it does not count.",
   families: "A generator outside the corpus registry of the core.",
-  fitted: "A fit with no held-out error. The record space-coverage/1 counts each cell: one measure on one dimension of the space.",
+  fitted: "A fit that does not beat the mean on each held-out input, or has a mean skill below 0.05. A cell is one measure on one dimension.",
   views: "The cards and the pages, because each card shows one strategy. This measure counts each view of a measure over a dimension of the whole space.",
   solved: "Each part of the space, because no part has a verdict that a solver proves.",
 } as const;

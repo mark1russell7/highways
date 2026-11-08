@@ -5,7 +5,9 @@
   "options": 797,
   "inputs": 149,
   "cells": 128160,
-  "fitted": 0,
-  "value": 0,
-  "fits": []
+  "fitted": 1077,
+  "tested": 60,
+  "expectedFalse": 0.9375,
+  "value": 0.008403558052434456,
+  "fits": "docs/research/space-coverage/fits.json"
 }
