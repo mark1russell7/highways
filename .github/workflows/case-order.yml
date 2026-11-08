@@ -85,7 +85,7 @@ jobs:
 
   join:
     needs: measure
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:

@@ -272,10 +272,10 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 |---|---|---|---|
 | `CI OK` | The tests, the types, the lint and the heap gate. A router with no budget fails as a no read. | Time. | `heap`: a fault of 150 MB, and a budget of `null`. |
 | `Sections gate OK` | The time of `sections-tree` at 10 000 nodes, against the parent and against the fixed base. A second run that cannot decide fails. | The time of other routers. | `sections`: a spin of 20% of the route time. |
-| `Search work OK` | Gate (b): the stops of Linux and Windows differ. | Gate (a), the fit of the work to the time. This fit is text in the summary at this time. | `work`: a copy with one stop changed. |
-| `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. | None at this time. |
+| `Search work OK` | Gate (b): the stops of Linux and Windows differ. | Gate (a), the fit of the work to the time. A fail of this fit, or a fit with no point, writes a warning to the check line. | `work`: a copy with one stop changed. |
+| `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. A route over the time limit writes a warning "No read". | None at this time. |
 | `Search objective OK` | A missing set or input, or a job that stops. | The correlation, the variants and the time. The tables only report them. | None at this time. |
-| `Screen OK` | A missing input, or a job that stops. | Each measure. A screen writes records, and `promotion.ts` writes the win test as text. | None at this time. |
+| `Screen OK` | A missing input, or a job that stops. | Each measure. A screen writes records, and `promotion.ts` writes the win test as text. A time test or a verdict with no read of a case writes a warning. | None at this time. |
 | `Xplat OK` | A route, an exact result or a repeat that differs between the cells. A cell that does not hold the stated rows. A failed download of the inputs. A missing cell, or a job that stops. | The time and the quality. The tables only report them. | `xplat`: a route, an exact result and a repeat that differ, one short cell and 4 short cells, against a copy with no fault. |
 | `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
 
@@ -312,3 +312,17 @@ The workflow `Verdict check` reads each committed snapshot again from the record
 The header of a new verdict snapshot names the run and the commit of the records, and the commit of the script in `script`.
 
 The dates of the open rows are in `docs/ROADMAP.md`, items GATE-FLIP and VERDICT-RUN.
+
+### A no read is not a pass
+
+A gate that cannot read a case writes the line "no read" to the check of the pull request, not only to the log (NO-READ-LINE). `gateLine` of `@mark1russell7/rigor-bench` gives the line. `writeGateLine` writes it as an annotation and as a line of the step summary.
+
+The line gives the count of the cases, the name of each case, the reason and the jobs on each CPU model. A block of a case goes in the same line. A report-only check writes the line as a warning, so a green check shows the gap. A gate that decides its check writes it as an error. `scripts/gates/lines.ts` gives the case reads of the gates of this repository.
+
+- `Sections gate`: a first run that cannot decide writes a warning with the case, the A/A spread, the noise cap, the rounds and the CPU model. A pass of the retry does not hide it.
+- The heap gate: one error names each router that breaks, with the reason, the cap and the CPU model.
+- The time test of `promotion.ts` writes a warning for too few jobs, or a check that cannot decide. A tail with no input above the floor, or a fail, also writes a warning.
+- The verdicts of `screen-verdict.ts` and `promotion.ts`: an input whose records pair an estimate with a full count writes a warning.
+- `exact.ts`: a solve that stops with an error writes a warning, and the summary gives the same line.
+- Gate (a) of `search-work.ts`: a fit with no point, an R² below 0.95 or a window off the slope writes a warning.
+- `Scale`: the step of the workflow writes a warning for each route over the time limit.

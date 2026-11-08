@@ -5,6 +5,7 @@
 # A dispatch with `-f head=<sha>` times that commit against its first parent. A name that does not resolve fails the job.
 # Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`.
 # A run with an A/A spread above the noise cap log(1.06) on |log r| cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
+# Such a run writes a warning "No read" to the check, with the case, the rounds and the CPU model, so the pass of the retry does not hide it.
 # A second run that cannot decide fails, so a noisy run does not pass.
 # The check against the parent uses `timeVerdict` of `@mark1russell7/rigor-bench`, with the margin log(1.05) and the pool of `packages/core/scripts/data/sections-gate/aa-pool.json`.
 # The check against the fixed base fails above 1.10.
@@ -135,9 +136,11 @@ jobs:
           status=0
           node packages/core/scripts/sections-bisect.ts --gate --attempt 1 --head "$HEAD_SHA" --head-input "$HEAD_INPUT" --parent "$PARENT_SHA" --parent-input "$PARENT_INPUT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
+          # The script writes the line of a run that does not pass to the check, with the case, the rounds and the CPU model (NO-READ-LINE).
+          # A script that stops before its record writes no line, so this step writes it.
+          [ "$status" -eq 0 ] || [ -f out/sections-gate.json ] || echo "::error title=Sections gate::run 1 of 2: No read: the script stopped with the code $status before its record."
           if [ "$status" -eq 3 ]; then
             echo "decided=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::The A/A spread of this run is above the noise cap, so the run cannot decide. The job retry runs the gate on a fresh runner."
             exit 0
           fi
           echo "decided=true" >> "$GITHUB_OUTPUT"
@@ -183,7 +186,8 @@ jobs:
           status=0
           node packages/core/scripts/sections-bisect.ts --gate --attempt 2 --head "$HEAD_SHA" --head-input "$HEAD_INPUT" --parent "$PARENT_SHA" --parent-input "$PARENT_INPUT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"
-          if [ "$status" -ne 0 ] && [ -f out/sections-gate.md ]; then echo "::error::$(sed -n 3p out/sections-gate.md)"; fi
+          # The script writes the line of a run that does not pass to the check (NO-READ-LINE). A script that stops before its record writes no line.
+          [ "$status" -eq 0 ] || [ -f out/sections-gate.json ] || echo "::error title=Sections gate::run 2 of 2: No read: the script stopped with the code $status before its record."
           exit "$status"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

@@ -90,7 +90,7 @@ jobs:
 
   merge:
     needs: [plan, solve]
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     env:
       ARGS: ${{ inputs.args }}

@@ -82,7 +82,7 @@ jobs:
   join:
     needs: measure
     # The join also runs when a job fails. Then it writes the record with the gaps, and it fails.
-    if: ${{ always() && inputs.pairs == '' }}
+    if: ${{ !cancelled() && inputs.pairs == '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -182,7 +182,7 @@ jobs:
   confirm-join:
     needs: confirm
     # The join also runs when a job fails. Then it writes the record with the gaps, and it fails.
-    if: ${{ always() && inputs.pairs != '' }}
+    if: ${{ !cancelled() && inputs.pairs != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

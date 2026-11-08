@@ -209,7 +209,7 @@ jobs:
   # A missing report fails this job (FAIL-CLOSED). The records of the job 1 are the corpus of the win test.
   promotion:
     needs: [changes, screen]
-    if: ${{ needs.changes.outputs.match == 'true' && (always() && github.event_name == 'workflow_dispatch' && inputs.paired != '' && inputs.strategy != '' && !inputs.exact && !inputs.time && !inputs.report) }}
+    if: ${{ needs.changes.outputs.match == 'true' && (!cancelled() && github.event_name == 'workflow_dispatch' && inputs.paired != '' && inputs.strategy != '' && !inputs.exact && !inputs.time && !inputs.report) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -262,7 +262,7 @@ jobs:
   # Apply the artifact on a branch: `gh run download <run> -n stamps-<sha> -D docs/research/verdicts`. Then open a pull request.
   stamps:
     needs: [changes, screen]
-    if: ${{ always() && needs.changes.outputs.match == 'true' && github.event_name == 'workflow_dispatch' && startsWith(inputs.set, '[') && startsWith(inputs.step, '[') && !inputs.strategy && !inputs.module && !inputs.members && !inputs.families && !inputs.paired && !inputs.wrap && !inputs.activation && (inputs.shuffles || '0') == '0' && (inputs.edits || '0') == '0' && !inputs.exact && !inputs.time && !inputs.report }}
+    if: ${{ !cancelled() && needs.changes.outputs.match == 'true' && github.event_name == 'workflow_dispatch' && startsWith(inputs.set, '[') && startsWith(inputs.step, '[') && !inputs.strategy && !inputs.module && !inputs.members && !inputs.families && !inputs.paired && !inputs.wrap && !inputs.activation && (inputs.shuffles || '0') == '0' && (inputs.edits || '0') == '0' && !inputs.exact && !inputs.time && !inputs.report }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

@@ -112,6 +112,8 @@ The A/A arm of the same jobs gives the resolution of the time test, not a fixed 
 CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default in one job, with a fresh process for each arm, each input and each round. The order of the arms rotates by the round.
 <!-- /shared:win-test -->
 
+In this repository, an empty tail set gives the summary "pass on the median" and "no read" of the tail. The job also writes a warning to the check line with `gateLine` of `@mark1russell7/rigor-bench` (NO-READ-LINE).
+
 <!-- shared:noise-guard -->
 ### The noise guard
 

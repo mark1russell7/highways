@@ -145,7 +145,7 @@ jobs:
 
   locate:
     needs: [changes, trace]
-    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -211,7 +211,7 @@ jobs:
 
   summary:
     needs: [changes, near]
-    if: ${{ always() && needs.changes.outputs.xplat == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -263,7 +263,7 @@ jobs:
   # Only a run that reads the whole check writes that name. A dispatch with another `all`, `run` or `fault` writes `Xplat partial`, so it cannot satisfy the ruleset on any commit.
   xplat-ok:
     name: ${{ ((inputs.all || 'true') == 'true' && (inputs.run || '40688908137') == '40688908137' && (inputs.fault || 'none') == 'none') && 'Xplat OK' || 'Xplat partial' }}
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, inputs, trace, locate, near, summary]
     runs-on: ubuntu-latest
     timeout-minutes: 2

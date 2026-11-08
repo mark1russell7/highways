@@ -229,7 +229,7 @@ function prepare(sides: readonly Side[], treeOf: (sha: string) => string, router
   return null;
 }
 
-/** This function times one pair of the confirm mode: the commit, the parent and the A/A arm of the parent, in fresh processes, on the board of the base. */
+/** This function times one pair of the confirm mode: the commit, the parent and the A/A arm of the parent. Each arm is a fresh process on the board of the base. */
 async function runPair(pair: number, commitRef: string, parentRef: string, treesDir: string, out: string, routers: readonly string[], rounds: number): Promise<PairRecord> {
   const { root, base, head } = refsOfRun();
   const commit = sideOf(root, head, commitRef);
@@ -249,7 +249,7 @@ async function runPair(pair: number, commitRef: string, parentRef: string, trees
 }
 
 /**
- * This function runs the sections time gate: the parent, the checkout, the fixed base and the A/A arm of the parent, in fresh processes, on the board of the base.
+ * This function times the sections gate: the parent, the checkout, the fixed base and the A/A arm of the parent. Each arm is a fresh process on the board of the base.
  * The head and the parent are full hashes that the job resolved one time (`scripts/gates/commits.ts`). The input texts go into the record.
  * The fixed base comes from the file `BASE_FILE` of the checkout, and the pool of the home verdict comes from the file `POOL_FILE`.
  */
@@ -315,6 +315,10 @@ if (args.includes("--child")) {
   const text = gateText(record).join("\n") + "\n";
   writeFileSync(join(out, "sections-gate.md"), text);
   console.log(text);
+  // A run that does not pass writes its line to the check of the pull request (NO-READ-LINE). The job sends the standard output to /dev/null, so the line goes to the standard error.
+  // The line needs the installed packages, as the home does, so the other modes of this script start with no install.
+  const [{ checkLine }, { writeGateLine }] = await Promise.all([import("./gates/lines.ts"), import("@mark1russell7/rigor-bench")]);
+  writeGateLine(checkLine(record), { log: (l) => console.error(l) });
   process.exitCode = gateExit(record);
 } else if (args.includes("--confirm")) {
   const pair = Number(need("--pair"));
