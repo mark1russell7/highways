@@ -1,5 +1,5 @@
 // The command line of the sweep (EXPLORER-1): `node scripts/sweep.ts [--step router|room|...] [--strategy <name,...>] [--families <a,b>] [--set screen-v1]
-// [--values <n>] [--name <text>] [--out sweep.json]`.
+// [--values <n>] [--draw <n>] [--seed <s>] [--name <text>] [--out sweep.json]`.
 // The sweep changes one number option of a strategy at a time. The other options keep their defaults.
 // The default strategies are `corners`, `trunks` and `shared`. Without `--families`, the sweep takes each family of the set.
 // The values of an option come from its declaration: its marks, else `--values` values on its range (5 by default). The default value is also a value.
@@ -13,6 +13,10 @@
 // The screen has no step `room`. With `--step room`, each setting starts the strategy `pipeline` of the step `whole` with the room strategy and its options (ROOM-SWEEP).
 // The pipeline routes with its default router `corners`. The points have the step `room` and the name of the room strategy, so a card is `room/<name>`.
 // A room record also has the 3 measures of the board of the step `whole`: the faults of the order, the displacement and the distortion of the boxes.
+// Each point has the family of its input in the categorical dimension `family`.
+// With `--draw <n>`, the sweep draws n inputs of each family instead of the inputs of the set (SPACE-INPUTS). The seed of the draw is `--seed`, 1 by default.
+// Each drawn input has its own values of the number dimensions of its family, and each point keeps them as the input dimensions `input:<family>.<dimension>`.
+// Thus a model can explain a raw measure by the size and the density of the input, and the folds of 10 inputs or more hold out whole inputs.
 // The workflow `Sweep` starts it in CI. Locally, start it only on one or two small families, for example `--families tiny-uniform`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -30,7 +34,9 @@ import { screen, SCREEN_SETS, SCREEN_STEPS, type LayoutRecord, type ScreenStep }
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { getStrategy, type Step, type Strategy } from "../src/strategies/model.ts";
 import { optionDefaults, sweepValues, type AnyOption, type NumberOption } from "../src/strategies/options.ts";
-import { corpusInputs } from "./corpus-files.ts";
+import { highwaysRegistry } from "../src/families/index.ts";
+import { setInputs } from "./corpus-files.ts";
+import { drawInputs, FAMILY_DIMENSION, inputDimensions } from "./sweep-inputs.ts";
 import { BOARD_MEASURES, RATIO_SUFFIX, ROUTE_MEASURES, type SweepMeasure } from "./sweep-measures.ts";
 
 const args = process.argv.slice(2);
@@ -89,6 +95,11 @@ const countText = opt("--values");
 const count = countText === undefined ? undefined : Number(countText);
 if (count !== undefined && (!Number.isInteger(count) || count < 2)) throw new Error(`The value of --values is not a whole number of 2 or more.`);
 const out = opt("--out") ?? "sweep.json";
+const drawText = opt("--draw");
+const draw = drawText === undefined || drawText === "" ? undefined : Number(drawText);
+if (draw !== undefined && (!Number.isInteger(draw) || draw < 1)) throw new Error(`The value of --draw is not a whole number of 1 or more.`);
+const drawSeed = Number(opt("--seed") ?? "1");
+if (!Number.isInteger(drawSeed)) throw new Error(`The value of --seed is not a whole number.`);
 
 const isNumber = (d: AnyOption): d is NumberOption => d.type === "number" || d.type === "integer";
 const inRange = (d: NumberOption, v: number): boolean => Number.isFinite(v) && v >= d.min && v <= d.max;
@@ -173,6 +184,9 @@ function pointsOf(setting: Setting, records: readonly LayoutRecord[]): ResponseP
     for (const o of s.options) values[dimensionId(s.name, o.key)] = s === setting.strategy ? (setting.options[o.key] ?? o.base) : null;
   const changed = Object.entries(setting.options).map(([k, v]) => `${k}=${v}`);
   return records.map((record) => {
+    const drawnValues = inputValues.get(record.input);
+    const own: Record<string, number | string | null> = { ...values, [FAMILY_DIMENSION]: inputFamily.get(record.input) ?? null };
+    for (const d of drawnDimensionsOfRecord) own[d.id] = drawnValues?.[d.id] ?? null;
     const measures: Record<string, number | null> = {};
     const absent: Record<string, string> = {};
     for (const m of MEASURES) {
@@ -189,7 +203,7 @@ function pointsOf(setting: Setting, records: readonly LayoutRecord[]): ResponseP
     }
     return {
       id: `${setting.strategy.name}/${changed.length === 0 ? "defaults" : changed.join(",")}/${record.input}`,
-      values,
+      values: own,
       measures,
       group: record.input,
       ...(Object.keys(absent).length > 0 ? { absent } : {}),
@@ -206,7 +220,15 @@ function recordText(record: ResponseRecord): string {
 }
 
 const start = performance.now();
-const inputs = corpusInputs(set.id);
+const registry = highwaysRegistry();
+// A draw takes the families of `--families`, else each family of the set.
+const drawn = draw === undefined ? undefined : drawInputs(registry, families ?? set.families.map((f) => f.name), draw, drawSeed);
+const inputs = (drawn ? drawn.map((d) => d.input) : setInputs(set)).filter((i) => families?.includes(i.family) ?? true);
+const inputFamily = new Map(inputs.map((i) => [i.id, i.family]));
+const inputValues = new Map(drawn?.map((d) => [d.input.id, d.values]) ?? []);
+const familyNames = [...new Set(inputs.map((i) => i.family))];
+// The first entry of `inputDimensions` is the dimension `family`. The record has it with or without a draw.
+const drawnDimensionsOfRecord: readonly ResponseDimension[] = drawn ? inputDimensions(registry, familyNames).slice(1) : [];
 const points: ResponsePoint[] = [];
 const all = settings();
 /** This function gives the step, the strategy and the options of the screen of one setting. A room setting starts the strategy `pipeline`. */
@@ -221,8 +243,7 @@ for (const [i, setting] of all.entries()) {
   const call = screenCall(setting);
   const report = screen(call.step, [call.name], {
     set,
-    ...(inputs ? { inputs } : {}),
-    ...(families ? { families } : {}),
+    inputs,
     baseline: false,
     options: call.options,
   });
@@ -259,6 +280,7 @@ const keptPoints = points.map((p): ResponsePoint => {
 const dimensions: ResponseDimension[] = [
   { id: "step", label: "Step", unit: "", kind: "categorical", levels: [step] },
   { id: "strategy", label: "Strategy", unit: "", kind: "categorical", levels: strategies.map((s) => s.name) },
+  { id: FAMILY_DIMENSION, label: "Family", unit: "", kind: "categorical", levels: familyNames },
   ...strategies.flatMap((s) =>
     s.options.map(
       (o): ResponseDimension => ({
@@ -272,11 +294,12 @@ const dimensions: ResponseDimension[] = [
       }),
     ),
   ),
+  ...drawnDimensionsOfRecord,
 ];
 
 const data: ResponseData = {
   schema: RESPONSE_RECORDS_SCHEMA,
-  name: opt("--name") ?? `${step} ${strategies.map((s) => s.name).join(", ")} on ${set.id}${families ? ` (${families.join(", ")})` : ""}`,
+  name: opt("--name") ?? `${step} ${strategies.map((s) => s.name).join(", ")} on ${drawn ? `${draw} drawn inputs of each family (seed ${drawSeed})` : set.id}${families ? ` (${families.join(", ")})` : ""}`,
   dimensions,
   measures,
   reasons: REASONS,
@@ -288,4 +311,4 @@ mkdirSync(dirname(out), { recursive: true });
 // The record has one point on each line, so a change of a record gives a short diff.
 writeFileSync(out, recordText(record));
 const seconds = ((performance.now() - start) / 1000).toFixed(1);
-warn(`The sweep wrote ${out}: ${strategies.length} strategies, ${dimensions.length - 2} options, ${keptPoints.length} points, ${measures.length} measures, in ${seconds} s.`);
+warn(`The sweep wrote ${out}: ${strategies.length} strategies, ${dimensions.length - 3 - drawnDimensionsOfRecord.length} options, ${drawnDimensionsOfRecord.length} input dimensions, ${inputs.length} inputs, ${keptPoints.length} points, ${measures.length} measures, in ${seconds} s.`);

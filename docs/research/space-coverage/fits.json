@@ -1,6 +1,6 @@
 {
   "schema": "space-fits/1",
-  "note": "Each level of the dimension strategy of a record gets the total Sobol index of that dimension. An option dimension gets its own total index. The dimension step has one level, so it is not a dimension of a fit.",
+  "note": "Each level of the dimension strategy of a record gets the total Sobol index of that dimension. An option dimension gets its own total index. An input dimension of a drawn input has the id of the space, and it gets its own total index. The dimension step has one level, so it is not a dimension of a fit. The dimension family helps the model, but the space has no dimension for it.",
   "folds": 10,
   "seed": 1,
   "samples": 4096,

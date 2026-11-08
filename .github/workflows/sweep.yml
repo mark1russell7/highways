@@ -16,6 +16,12 @@ on:
       families:
         description: "Families of screen-v1, with commas. Empty: each family."
         default: "tiny-uniform,small-clustered"
+      draw:
+        description: "Empty: the inputs of screen-v1. A number n: n drawn inputs of each family, each with its own values of the dimensions of its family (SPACE-INPUTS)."
+        default: ""
+      minutes:
+        description: "The limit of the job in minutes. A draw of 10 inputs of each family takes about 3 times the time of the 6 inputs of screen-v1."
+        default: "20"
 
 permissions: {}
 
@@ -32,13 +38,15 @@ jobs:
   sweep:
     runs-on: ubuntu-latest
     # The sweep of 3 routers on 2 families took 46 s on a shared local machine. The limit keeps a large margin for the install and more families.
-    timeout-minutes: 20
+    # A large draw or a long list of strategies sets a higher limit with the input minutes.
+    timeout-minutes: ${{ fromJSON(inputs.minutes || '20') }}
     permissions:
       contents: read
     env:
       STEP: ${{ inputs.step }}
       STRATEGIES: ${{ inputs.strategies }}
       FAMILIES: ${{ inputs.families }}
+      DRAW: ${{ inputs.draw }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -56,6 +64,7 @@ jobs:
           SECONDS=0
           args=(--step "$STEP" --strategy "$STRATEGIES" --out "$GITHUB_WORKSPACE/out/sweep.json")
           if [ -n "$FAMILIES" ]; then args+=(--families "$FAMILIES"); fi
+          if [ -n "$DRAW" ]; then args+=(--draw "$DRAW"); fi
           node scripts/sweep.ts "${args[@]}" 2>&1 | tail -n 20 | tee "$RUNNER_TEMP/sweep.log"
           { echo "## Sweep of $STEP"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; echo '```'; cat "$RUNNER_TEMP/sweep.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -7,7 +7,7 @@ import { BUILT_IN_STRATEGIES } from "@mark1russell7/highways";
 import { cardStrategies, kpiFacts, strategiesWithoutNumberOption } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
 import { RESULT_FILES } from "./results-files.ts";
-import { cardShare, cardsWithCurves, cardsWithoutCurve, KPI_PAGES, NO_CURVE, percentDown, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
+import { cardShare, cardsWithCurves, cardsWithoutCurve, isOptionDimension, KPI_PAGES, NO_CURVE, percentDown, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -119,6 +119,23 @@ describe("cardsWithCurves", () => {
 
   it("counts each card with 2 values of an option or more", () => {
     expect(cardsWithCurves([file({ alpha: 2, beta: 4, gamma: 1 })])).toBe(2);
+  });
+
+  it("gives no curve for an input dimension, which has its when on the dimension family (SPACE-INPUTS)", () => {
+    // Each point has one value of gap, and its own value of the input dimension nodes.
+    const base = data({ alpha: 1 });
+    const drawn: ResponseData = {
+      ...base,
+      dimensions: [
+        ...base.dimensions,
+        { id: "family", label: "Family", unit: "", kind: "categorical", levels: ["fam"] },
+        { id: "input:fam.nodes", label: "nodes (fam)", unit: "", kind: "continuous", range: [2, 400], when: { dimension: "family", levels: ["fam"] } },
+      ],
+      points: base.points.map((p, i) => ({ ...p, values: { ...p.values, family: "fam", "input:fam.nodes": 10 * (i + 1) } })),
+    };
+    expect(cardsWithCurves([{ record: fitResponse(drawn) }])).toBe(0);
+    expect(isOptionDimension(drawn.dimensions[2]!)).toBe(true);
+    expect(isOptionDimension(drawn.dimensions[4]!)).toBe(false);
   });
 
   it("counts a card once, and skips a record that parseResponseRecord refuses", () => {

@@ -64,6 +64,16 @@ export interface SpaceCoverage {
   readonly value: number;
 }
 
+/** This function gives the id of the dimension `dimension` of the input family `family` in the space: `input:<family>.<dimension>`. A sweep record uses the same id. */
+export function inputDimensionId(family: string, dimension: string): string {
+  return `input:${family}.${dimension}`;
+}
+
+/** This function tells if an id is the id of an input dimension of the space, of the form of `inputDimensionId`. */
+export function isInputDimensionId(id: string): boolean {
+  return id.startsWith("input:");
+}
+
 /** This function gives the dimensions of the space from the registries. A new strategy, option or family dimension adds to the list with no edit of this function. */
 export function spaceDimensions(registry: Registry, families: readonly SpaceFamily[]): SpaceDimension[] {
   const out: SpaceDimension[] = [];
@@ -73,7 +83,7 @@ export function spaceDimensions(registry: Registry, families: readonly SpaceFami
     for (const name of Object.keys(strategy.schema ?? {})) out.push({ id: `option:${key}.${name}`, kind: "option" });
   }
   for (const family of families) {
-    for (const dimension of family.dimensions) out.push({ id: `input:${family.name}.${dimension.name}`, kind: "input" });
+    for (const dimension of family.dimensions) out.push({ id: inputDimensionId(family.name, dimension.name), kind: "input" });
   }
   return out;
 }
