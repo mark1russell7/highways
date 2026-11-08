@@ -8,6 +8,7 @@ This version is a MINOR before 1.0: the routes of two routers change in their la
 
 - `inflectionCurve` takes its powers as products, not with `**` (POW-PORTABLE). In Node.js, `x ** 3` and `x ** 4` give different last bits on Linux and on Windows.
 - The routers `plugs` and `corners` with `smooth` give the same points on each system. The points of their curves move by at most 6e-12. No route changes its count of points.
+- The record of the gate `through-check/7` changes in 6 rows of `plugs`. In 5 rows, a depth moves by less than 2e-13. In `packed-grid`, the route `0:e115` had a depth of 0, and it has a depth of 6e-14. Thus its class changes from `wall` to `band`.
 
 ## 0.15.2
 
