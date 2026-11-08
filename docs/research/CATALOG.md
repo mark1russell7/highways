@@ -1609,7 +1609,7 @@ The values are of round 2. A paired value is the median ratio to `shared` on the
   - The side flips of the chords and the routes of `corners` also add jumps.
 - `springs` removes 55% of the turn, but its curves cross 80% more, and R12 is worse.
 - `nudge` lowers R16.cv by 6%. Its R16.low does not change, and it adds 13% of crossings.
-- The second target of the strategist was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
+- The second target of the review was the spill of the bundlers `cubu` and `territories` on the clustered families. These routers are not bundlers, so the target stays open.
 
 Thus no default changes, and no router goes to the promotion test. Each router fails the guard R1, and `repel` also fails the time test.
 
@@ -1618,7 +1618,7 @@ Thus no default changes, and no router goes to the promotion test. Each router f
 These ideas come from the results. Each one needs a screen before a verdict.
 
 - A crossing force for `repel`: two legs that cross push their points apart along the normal of the other leg.
-- A Z11 that does not count a route that follows its box. The strategist decides if the measure changes.
+- A Z11 that does not count a route that follows its box. A review decides if the measure changes.
 - A border walk for boxes that touch: a route goes along the shared side, within the tolerance of the rule.
 - A faster `repel`: fewer steps on the long free legs, or a projection only near the boxes.
 - `nudge` with a test of the crossings: a group whose move adds a crossing stays where it is.

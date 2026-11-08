@@ -153,7 +153,7 @@ jobs:
   join:
     needs: [plan, part]
     # The join also runs when a part fails or passes the time limit of its job. The table of the parts tells which part did not finish.
-    if: always() && needs.plan.result == 'success'
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

@@ -1,8 +1,10 @@
+import { mulberry32 } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
 import { highwaysRegistry } from "../../families/index.ts";
+import { EPS_STEPS, snapToEps } from "../../geom.ts";
 import { ROUTERS } from "../../routers/index.ts";
-import { measureQuality } from "../quality.ts";
-import { crossingPairs, splitPairs, type EdgeLine } from "./crossing-pairs.ts";
+import { measureQuality, routePairCrossings } from "../quality.ts";
+import { crossingPairs, eachCrossing, snapLines, splitPairs, type EdgeLine } from "./crossing-pairs.ts";
 
 const line = (edge: string, ...xy: readonly (readonly [number, number])[]): EdgeLine => ({ edge, points: xy.map(([x, y]) => ({ x, y })) });
 
@@ -33,6 +35,46 @@ describe("crossingPairs", () => {
     const points = [...crossingPairs(result.routes).values()].reduce((sum, n) => sum + n, 0);
     expect(points).toBeGreaterThan(0);
     expect(points).toBe(measureQuality(graph, result).crossings);
+  });
+});
+
+describe("crossingPairs on the grid", () => {
+  const wall = line("wall", [0, 0], [10, 0]);
+  const stub = (end: number): EdgeLine => line("stub", [5, -5], [5, end]);
+  const floatCount = (lines: readonly EdgeLine[]): number => {
+    let count = 0;
+    eachCrossing(lines, () => count++);
+    return count;
+  };
+
+  it("gives one answer for a touch, while the floats flip it at a shift of 1e-12", () => {
+    expect(floatCount([wall, stub(0)])).toBe(0);
+    expect(floatCount([wall, stub(1e-12)])).toBe(1);
+    expect(crossingPairs([wall, stub(0)]).size).toBe(0);
+    expect(crossingPairs([wall, stub(1e-12)]).size).toBe(0);
+  });
+
+  it("keeps a crossing that reaches over the grid", () => {
+    expect([...crossingPairs([wall, stub(2 / EPS_STEPS)])]).toEqual([["stub|wall", 1]]);
+  });
+
+  it("does not change the lines that it gets", () => {
+    const lines = [line("a", [0.1234567891, 0]), line("b", [1, 1], [2, 2])];
+    expect(snapLines(lines)[0]!.points[0]).toEqual({ x: 0.123457, y: 0 });
+    expect(lines[0]!.points[0]).toEqual({ x: 0.1234567891, y: 0 });
+  });
+
+  it("rounds a point to the nearest place of the grid", () => {
+    expect(snapToEps({ x: 0.4 / EPS_STEPS, y: 0.6 / EPS_STEPS })).toEqual({ x: 0, y: 1 / EPS_STEPS });
+  });
+
+  it("gives the count of `routePairCrossings` on lines that share no vertex, so the two counts read one grid", () => {
+    const next = mulberry32(20261104);
+    for (let round = 0; round < 25; round++) {
+      const lines = Array.from({ length: 12 }, (_, i): EdgeLine => ({ edge: `e${i}`, points: Array.from({ length: 4 }, () => ({ x: next() * 100, y: next() * 100 })) }));
+      const points = [...crossingPairs(lines).values()].reduce((sum, n) => sum + n, 0);
+      expect(routePairCrossings(lines).pairs).toBe(points);
+    }
   });
 });
 

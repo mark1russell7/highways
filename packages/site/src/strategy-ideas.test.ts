@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { ALL_STRATEGIES, listStrategies, STEPS } from "@mark1russell7/highways";
 import { describe, expect, it } from "vitest";
-import { EXTRA_LINKS, OPTION_LINKS, strategyIdeas } from "../../core/scripts/strategy-ideas.ts";
+import { EXTRA_LINKS, OPTION_LINKS, strategyIdeas } from "@mark1russell7/highways/strategy-ideas";
 import { ideaRecords } from "./results-files.ts";
 import { IDEA_ID } from "./strategies-data.ts";
 import { builtMap, strategyInputs } from "./strategies-files.ts";

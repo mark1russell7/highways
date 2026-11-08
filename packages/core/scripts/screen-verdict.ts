@@ -14,12 +14,14 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
+import { writeGateLine } from "@mark1russell7/rigor-bench";
 import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
 import { parseLines, passThroughs, type LayoutRecord } from "../src/bench/screen/forms.ts";
-import { measureByName } from "../src/bench/screen/measures.ts";
+import { measureByName, withoutMixedKinds } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, type Step } from "../src/strategies/model.ts";
+import { droppedLine } from "./gates/lines.ts";
 import { requireGrid } from "./gates/inputs.ts";
 
 /** The significance level of each verdict. */
@@ -48,7 +50,7 @@ export interface CheckRow {
   readonly label: string;
 }
 
-/** The result of `--check`: a line for each moved label and each missing row, and a note for each row that the snapshot does not have. */
+/** The result of `--check` has a line for each moved label and each missing row. It has a note for each row that the snapshot does not have. */
 export interface CheckResult {
   readonly moved: readonly string[];
   readonly missing: readonly string[];
@@ -148,6 +150,9 @@ function stepOf(records: readonly LayoutRecord[]): string {
   return [...steps].find((s) => s !== "router") ?? "router";
 }
 
+/** The titles of the check lines that the script wrote. */
+const written = new Set<string>();
+
 /** This function gives the verdicts of each strategy in `strategies` against the strategy `base`, on each guard measure of the step. */
 function screenVerdicts(records: readonly LayoutRecord[], base: string, strategies: readonly string[], measures?: readonly string[]): GuardVerdict[] {
   const step = stepOf(records);
@@ -160,8 +165,17 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string, strategi
       const info = measureByName(guard.name);
       if (info === undefined) throw new Error(`The measure ${guard.name} is not in MEASURES.`);
       const tie = info.minEffect ?? 0;
-      const v = verdict(pair, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
-      const values = (s: string): number[] => pair.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
+      // A verdict does not pair an estimate from a sample with a full count (BENCH-PAIRS-HEAP).
+      const kept = withoutMixedKinds(pair, info);
+      // A drop of a value is a "no read" of its input and seed, so the check line names it (NO-READ-LINE).
+      // The verdict only reports, so the line is a warning. The script reads a pair two times with `--all-json`, so it writes each line one time.
+      const line = droppedLine(pair, kept, guard.name, `Screen verdict ${strategy} on ${guard.name}`);
+      if (line !== undefined && !written.has(line.title)) {
+        written.add(line.title);
+        writeGateLine(line, { log: (l) => console.error(l) });
+      }
+      const v = verdict(kept, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
+      const values = (s: string): number[] => kept.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
       const old = compareMeasure(mean(values(strategy)), mean(values(base)), { direction: info.better, minEffect: tie });
       out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v), through: passThroughs(pair, strategy), baseThrough: passThroughs(pair, base) });
     }

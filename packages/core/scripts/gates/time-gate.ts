@@ -216,7 +216,8 @@ export function timeText(t: TimeTest, q: number): string {
   if (t.status === "noise") return `${head}: cannot decide (noise). ${undecided.map((c) => `The ${c.check} check cannot decide: ${c.why}.`).join(" ")} This is not a pass.`;
   const failed = t.checks.filter((c) => c.verdict === "fail");
   if (t.status === "fail") return `${head}: fail. ${failed.map((c) => `The ${c.check} ${fmt(c.worst)} is above ${c.limit}.`).join(" ")}`;
-  return `${head}: ${t.faster ? "pass, and faster than the baseline" : "pass"}.${t.note === undefined ? "" : ` The record has the line \`${t.note}\`.`}`;
+  if (t.note !== undefined) return `${head}: pass on the median${t.faster ? ", and faster than the baseline" : ""}. The tail check has no read (\`${t.note}\`), so this is not a pass of the tail.`;
+  return `${head}: ${t.faster ? "pass, and faster than the baseline" : "pass"}.`;
 }
 
 /** The verdict of the median ratio of one arm against the noise floor. */

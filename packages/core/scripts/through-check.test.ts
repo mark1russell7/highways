@@ -1,29 +1,27 @@
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { HIGHWAYS_FAMILIES } from "../src/families/index.ts";
-import { REGENERATE, SCORED, throughRecord, type Row } from "./through-check-rows.ts";
+import { CONTROLS, REGENERATE, SCORED, throughRecord, type Row } from "./through-check-rows.ts";
 
 /** The record on disk. */
 const record = JSON.parse(readFileSync(new URL("./data/through-check/record.json", import.meta.url), "utf8")) as ReturnType<typeof throughRecord>;
-const STALE = `The record through-check/5 is stale. Write it again with: ${REGENERATE}`;
+const STALE = `The record through-check/7 is stale. Write it again with: ${REGENERATE}`;
 /** The classes of the flagged routes of the site settings, at the time of LANE-ROOM. A change of a count fails until this list changes too. */
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 /**
- * The painted crossings of the lanes of each router, at the time of LANE-ROOM.
- * Each list has the crossing points, the pairs of the board, the pairs added, the pairs lost and the two counts of the bundles.
+ * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
  * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33533, 31341, 0, 0, 0, 0],
-  "trunks": [34318, 31893, 0, 0, 0, 1],
-  "shared": [36185, 32645, 274, 42, 1, 531],
-  "sections": [54359, 40555, 816, 501, 144, 2067],
-  // SITE-HUB-THROUGH: no route of the site setting goes through a box. Thus it has 25 fewer painted points and 8 fewer pairs.
-  "sections-site": [84262, 47322, 121, 68, 441, 2365],
-  "sections-site-no-ladder": [82209, 46576, 128, 120, 435, 2445],
-  "shared-all": [43668, 36267, 1423, 459, 0, 12061],
+  "corners": [33260, 31244, 0, 0, 0, 0],
+  "trunks": [34052, 31785, 0, 0, 0, 1],
+  "shared": [35908, 32548, 273, 40, 1, 531],
+  "sections": [54074, 40505, 815, 489, 144, 2067],
+  "sections-site": [84011, 47306, 121, 68, 441, 2365],
+  "sections-site-no-ladder": [82002, 46559, 127, 119, 435, 2445],
+  "shared-all": [43627, 36243, 1426, 453, 0, 12061],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
@@ -34,7 +32,7 @@ function changed(fresh: readonly Row[], saved: readonly Row[]): string[] {
   return [...new Set([...a.keys(), ...b.keys()])].filter((key) => a.get(key) !== b.get(key));
 }
 
-describe("the gate through-check/5", () => {
+describe("the gate through-check/7", () => {
   let fresh: ReturnType<typeof throughRecord>;
   const families = HIGHWAYS_FAMILIES.map((f) => f.name);
 
@@ -48,9 +46,8 @@ describe("the gate through-check/5", () => {
 
   it("has a record with the counts of the code of today", () => {
     expect(changed(fresh.rows, record.rows), STALE).toEqual([]);
-    expect(changed(fresh.unmarkedRows, record.unmarkedRows), STALE).toEqual([]);
-    const { rows: _rows, unmarkedRows: _unmarked, ...settings } = fresh;
-    const { rows: _savedRows, unmarkedRows: _savedUnmarked, ...saved } = record;
+    const { rows: _rows, ...settings } = fresh;
+    const { rows: _savedRows, ...saved } = record;
     expect(JSON.parse(JSON.stringify(settings)), STALE).toEqual(saved);
   });
 
@@ -80,7 +77,7 @@ describe("the gate through-check/5", () => {
   });
 
   it("has no inner route with the shape spike (INNER-SPIKE)", () => {
-    const rows = [...fresh.rows, ...fresh.unmarkedRows].filter((r) => r.inner > 0);
+    const rows = fresh.rows.filter((r) => r.inner > 0);
     expect(rows.reduce((sum, r) => sum + r.inner, 0)).toBe(1322);
     expect(rows.filter((r) => r.innerSpikes > 0).map(keyOf)).toEqual([]);
   });
@@ -132,13 +129,14 @@ describe("the gate through-check/5", () => {
     expect(sum("lanes")).toEqual(SITE_LANES);
   });
 
-  it("keeps the routers that do not mark through on their own rows", () => {
-    expect(record.unmarked).toEqual(["straight", "plugs"]);
-    expect(record.rows.filter((r) => record.unmarked.includes(r.router))).toEqual([]);
-    for (const name of record.unmarked) {
-      const rows = record.unmarkedRows.filter((r) => r.router === name);
+  it("marks through on the routes of the controls straight and plugs, and names no box that a route does not meet (UNMARKED-THROUGH)", () => {
+    expect(record.controls).toEqual(["straight", "plugs"]);
+    for (const name of CONTROLS) {
+      const rows = record.rows.filter((r) => r.router === name);
       expect(rows.map((r) => r.family)).toEqual(expect.arrayContaining(families));
-      for (const r of rows) expect([r.family, r.routes > 0, r.marked]).toEqual([r.family, true, 0]);
+      expect(rows.every((r) => r.view === "routes")).toBe(true);
+      expect(rows.reduce((sum, r) => sum + r.marked, 0)).toBeGreaterThan(0);
+      for (const r of rows) expect([r.family, r.routes > 0, r.falseThrough]).toEqual([r.family, true, 0]);
     }
   });
 });

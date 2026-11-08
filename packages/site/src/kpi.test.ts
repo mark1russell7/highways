@@ -3,10 +3,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { BenchMeta } from "./bench-label.ts";
-import { kpiFacts } from "./kpi-files.ts";
+import { BUILT_IN_STRATEGIES } from "@mark1russell7/highways";
+import { cardStrategies, kpiFacts, strategiesWithoutNumberOption } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
 import { RESULT_FILES } from "./results-files.ts";
-import { cardsWithCurves, KPI_PAGES, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
+import { cardShare, cardsWithCurves, cardsWithoutCurve, KPI_PAGES, NO_CURVE, percentDown, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -137,6 +138,38 @@ describe("cardsWithCurves", () => {
     const sweeps = [file({ alpha: 2, delta: 1, gamma: 1 }, "2026-11-10"), file({ beta: 2, delta: 1, gamma: 1 }, "2026-11-12"), file({ delta: 1, gamma: 1, zeta: 1 }, "2026-11-13")];
     const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps });
     expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
+  });
+
+  it("gives the share of the cards of the list with a curve, and reads no card off the list (CARDS-SHARE)", () => {
+    const sweeps = [file({ alpha: 2, beta: 4, gamma: 1, omega: 2 })];
+    const list = ["router/alpha", "router/beta", "router/gamma"];
+    expect(cardsWithoutCurve(sweeps, list)).toEqual(["router/gamma"]);
+    expect(cardShare(sweeps, list)).toBe(66.6);
+    expect(cardShare(sweeps, list.slice(0, 2))).toBe(100);
+    expect(cardShare([], [])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps, cardStrategies: list });
+    const m = input?.measures.find((x) => x.id === "cards-curve-share");
+    expect(m).toMatchObject({ value: 66.6, unit: "%" });
+    expect(m?.notCounted).toContain("NO_CURVE");
+  });
+
+  it("does not read 100 while one card of many has no curve", () => {
+    // Math.round gives 100 for 1999 of 2000. The share rounds down.
+    expect(percentDown(1999, 2000)).toBe(99.9);
+    expect(percentDown(2000, 2000)).toBe(100);
+    expect(percentDown(0, 0)).toBe(0);
+  });
+});
+
+describe("the cards of the registry (CARDS-SHARE)", () => {
+  it("gives each built-in strategy a card, or a reason in NO_CURVE", () => {
+    expect(strategiesWithoutNumberOption().sort()).toEqual(Object.keys(NO_CURVE).sort());
+    expect(cardStrategies().length + Object.keys(NO_CURVE).length).toBe(BUILT_IN_STRATEGIES.length);
+  });
+
+  it("holds the count of the cards, so a new strategy shows in this test", () => {
+    // A new built-in strategy with a number option raises this count and lowers the share until its sweep.
+    expect(cardStrategies()).toHaveLength(101);
   });
 });
 

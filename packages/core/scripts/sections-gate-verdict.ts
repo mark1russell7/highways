@@ -30,11 +30,11 @@ export const GATE_SCHEMA = "sections-gate/3";
 /** The schemas of the records that the pool reads. */
 export const GATE_SCHEMAS: readonly string[] = ["sections-gate/1", "sections-gate/2", GATE_SCHEMA];
 /**
- * The noise cap on the A/A spread of the run, on the log scale of the home: `Math.log(1.06)`, about 0.058.
+ * The noise cap on the A/A spread of the run, on the log scale of the home: `Math.log(1.06)`, approximately 0.058.
  * Slice 2 had the cap 0.06 on |r - 1|. A ratio of 1.06 has |log r| = 0.058, so the cap keeps the rule of slice 2.
  */
 export const NOISE_CAP = Math.log(1.06);
-/** The floor of the pooled band and the margin of the rule `difference`, on the log scale: `Math.log(1.05)`, about 0.049. */
+/** The floor of the pooled band and the margin of the rule `difference`, on the log scale: `Math.log(1.05)`, approximately 0.049. */
 export const PARENT_FLOOR = Math.log(1.05);
 /** The quantile of the A/A spread of the noise cap and of the pool: p90. */
 export const SPREAD_LEVEL = 0.9;
@@ -144,7 +144,7 @@ export function ratioTimes(ratios: readonly number[], name: string): PairedTime[
 /** This function gives the run of a record of `ratioTimes`: the case name before ` #`. */
 const runOfCase = (record: PairedTime): string => record.case.slice(0, record.case.lastIndexOf(" #"));
 
-/** This function gives the pooled band of the home for a pool: the A/A records of each run, the floor `PARENT_FLOOR` and the run of each record. */
+/** This function gives the pooled band of the home for a pool. It uses the A/A records of each run, the floor `PARENT_FLOOR` and the run of each record. */
 export function poolOptions(pool: AaPool): PoolOptions {
   return { records: pool.runs.flatMap((r) => ratioTimes(r.ratios, poolRunName(r))), floor: PARENT_FLOOR, run: runOfCase };
 }
@@ -373,7 +373,7 @@ export function recordVerdict(record: GateRecord): GateResult {
 /** The exit code of the script for the first run that cannot decide. The workflow then starts the job `retry`. */
 export const EXIT_CANNOT_DECIDE = 3;
 
-/** This function gives the exit code of the script for a record: 0 for a pass, 1 for a fail, 3 for the first run that cannot decide. */
+/** This function gives the exit code of the script for a record. The code is 0 for a pass, 1 for a fail and 3 for a first run that cannot decide. */
 export function gateExit(record: GateRecord): 0 | 1 | typeof EXIT_CANNOT_DECIDE {
   const g = recordVerdict(record);
   if (g.outcome === "pass") return 0;

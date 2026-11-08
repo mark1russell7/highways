@@ -186,6 +186,7 @@ type DividedOptions: build/index.d.ts#DividedOptions
 DrawnSegment: build/index.d.ts#DrawnSegment
 EDGE_DISTANCES: build/index.d.ts#EDGE_DISTANCES
 EDGE_PATH_DEFAULTS: build/index.d.ts#EDGE_PATH_DEFAULTS
+EPS_STEPS: build/index.d.ts#EPS_STEPS
 ESCAPE: build/index.d.ts#ESCAPE
 ESCAPE_DEFAULTS: build/index.d.ts#ESCAPE_DEFAULTS
 ESCAPE_METHODS: build/index.d.ts#ESCAPE_METHODS
@@ -476,6 +477,7 @@ type OutputGroup: @mark1russell7/layout-contract#OutputGroup (external)
 type Outside: build/index.d.ts#Outside
 OverLimit: build/index.d.ts#OverLimit
 PACKED_GRID: build/index.d.ts#PACKED_GRID
+PAIR_POINTS: build/index.d.ts#PAIR_POINTS
 PARALLEL_EDGES: build/index.d.ts#PARALLEL_EDGES
 PERIMETER_MARGIN: build/index.d.ts#PERIMETER_MARGIN
 type PHubOptions: build/index.d.ts#PHubOptions
@@ -588,6 +590,7 @@ RouteBalance: build/index.d.ts#RouteBalance
 type RouteCrossing: build/index.d.ts#RouteCrossing
 RouteInput: build/index.d.ts#RouteInput
 RoutePairCrossings: build/index.d.ts#RoutePairCrossings
+RoutePairOptions: build/index.d.ts#RoutePairOptions
 type RouteSegment: build/index.d.ts#RouteSegment
 RouteStability: build/index.d.ts#RouteStability
 RouteStabilityOptions: build/index.d.ts#RouteStabilityOptions
@@ -1384,6 +1387,7 @@ runPipeline: build/index.d.ts#runPipeline
 runProfile: build/index.d.ts#runProfile
 runSuite: build/index.d.ts#runSuite
 sameData: build/index.d.ts#sameData
+sameKind: build/index.d.ts#sameKind
 sampleCurve: build/index.d.ts#sampleCurve
 samplesOf: build/index.d.ts#samplesOf
 sbebLines: build/index.d.ts#sbebLines
@@ -1436,6 +1440,7 @@ slotPlan: build/index.d.ts#slotPlan
 slotsOf: build/index.d.ts#slotsOf
 smoothCurve: build/index.d.ts#smoothCurve
 snapPlan: build/index.d.ts#snapPlan
+snapToEps: build/index.d.ts#snapToEps
 softDistance: build/index.d.ts#softDistance
 softKeyClusters: build/index.d.ts#softKeyClusters
 softKeyPlan: build/index.d.ts#softKeyPlan
@@ -1521,6 +1526,7 @@ withBends: build/index.d.ts#withBends
 withLaneRoom: build/index.d.ts#withLaneRoom
 withRepair: build/index.d.ts#withRepair
 withStableOrder: build/index.d.ts#withStableOrder
+withoutMixedKinds: build/index.d.ts#withoutMixedKinds
 wspdGroups: build/index.d.ts#wspdGroups
 wspdPlan: build/index.d.ts#wspdPlan
 zipLegs: build/index.d.ts#zipLegs
@@ -2510,6 +2516,9 @@ export declare const EDGE_DISTANCES: readonly EdgeDistance[];
 
 ### build/index.d.ts#EDGE_PATH_DEFAULTS
 export declare const EDGE_PATH_DEFAULTS: Readonly<Required<Omit<EdgePathOptions, "margin" | "k">>>;
+
+### build/index.d.ts#EPS_STEPS
+export declare const EPS_STEPS: number;
 
 ### build/index.d.ts#ESCAPE
 export declare const ESCAPE: HighwaysFamily;
@@ -3898,6 +3907,7 @@ export interface MeasureInfo {
   readonly placementDependent: boolean;
   readonly minEffect?: MinEffect;
   readonly definition?: string;
+  readonly estimatedBy?: string;
 }
 
 ### build/index.d.ts#MeasuredLink
@@ -4167,6 +4177,9 @@ export interface OverLimit {
 
 ### build/index.d.ts#PACKED_GRID
 export declare const PACKED_GRID: HighwaysFamily;
+
+### build/index.d.ts#PAIR_POINTS
+export declare const PAIR_POINTS = 1e6;
 
 ### build/index.d.ts#PARALLEL_EDGES
 export declare const PARALLEL_EDGES: HighwaysFamily;
@@ -4772,6 +4785,15 @@ export interface RoutePairCrossings {
   readonly proper: number;
   readonly contact: number;
   readonly estimated: boolean;
+  readonly low: number;
+  readonly high: number;
+  readonly contactSampled: boolean;
+}
+
+### build/index.d.ts#RoutePairOptions
+export interface RoutePairOptions {
+  readonly maxPoints?: number;
+  readonly seed?: number;
 }
 
 ### build/index.d.ts#RouteSegment
@@ -7954,7 +7976,7 @@ export declare function routeMeasures(graph: Graph, result: Result, row: BenchRo
 ### build/index.d.ts#routePairCrossings
 export declare function routePairCrossings(routes: readonly {
   readonly points: readonly Point[];
-}[]): RoutePairCrossings;
+}[], options?: RoutePairOptions): RoutePairCrossings;
 
 ### build/index.d.ts#routePortfolio
 export declare function routePortfolio(graph: Graph, options?: PortfolioRouterOptions): PortfolioRoute;
@@ -8016,6 +8038,9 @@ export declare function runSuite(options?: SuiteOptions): {
 
 ### build/index.d.ts#sameData
 export declare function sameData(a: unknown, b: unknown): boolean;
+
+### build/index.d.ts#sameKind
+export declare function sameKind(info: MeasureInfo, a: Readonly<Record<string, number>>, b: Readonly<Record<string, number>>): boolean;
 
 ### build/index.d.ts#sampleCurve
 export declare function sampleCurve(segments: readonly CurveSegment[], tolerance?: number): Point[];
@@ -8187,6 +8212,9 @@ export declare function smoothCurve(points: readonly Point[], options?: SmoothOp
 
 ### build/index.d.ts#snapPlan
 export declare function snapPlan(input: HighwayInput, lines: readonly SnapLine[], o: Readonly<SnapOptions>): HighwayPlan;
+
+### build/index.d.ts#snapToEps
+export declare function snapToEps(p: Point): Point;
 
 ### build/index.d.ts#softDistance
 export declare function softDistance(geom: number, keyA: string | undefined, keyB: string | undefined, lambda: number, attributes: number): number;
@@ -8476,6 +8504,13 @@ export declare function withRepair(router: Router, options?: RepairOptions): Rou
 
 ### build/index.d.ts#withStableOrder
 export declare function withStableOrder(router: Router): Router;
+
+### build/index.d.ts#withoutMixedKinds
+export declare function withoutMixedKinds<R extends {
+  readonly input: string;
+  readonly seed: number;
+  readonly measures: Readonly<Record<string, number>>;
+}>(records: readonly R[], info: MeasureInfo): R[];
 
 ### build/index.d.ts#wspdGroups
 export declare function wspdGroups(input: HighwayInput, o: Readonly<WspdOptions>): Map<string, EdgeGroup>;

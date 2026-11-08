@@ -112,6 +112,8 @@ The A/A arm of the same jobs gives the resolution of the time test, not a fixed 
 CI does the time test, because other jobs on a local machine change the times. CI times the candidate and the default in one job, with a fresh process for each arm, each input and each round. The order of the arms rotates by the round.
 <!-- /shared:win-test -->
 
+In this repository, an empty tail set gives the summary "pass on the median" and "no read" of the tail. The job also writes a warning to the check line with `gateLine` of `@mark1russell7/rigor-bench` (NO-READ-LINE).
+
 <!-- shared:noise-guard -->
 ### The noise guard
 
@@ -318,7 +320,7 @@ The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pul
 | Against the parent | `timeVerdict`, rule `difference`, margin max(log(1.05), the pooled A/A spread) | The outcome `slower` fails. The outcome `cannot decide` starts the second run. The outcomes `same` and `faster` pass. | The home decides with an interval, not with one ratio. The floor log(1.05) keeps the step of 5 % of slice 1 as the band `same`. |
 | Against the fixed base | 1.10 | The check fails when the ratio head/fixed base is above 1.10. | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
 
-- The strategist gave the values of slice 1 on 2026-11-02, and the cap, the second run and the pool on 2026-11-03. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
+- A review gave the values of slice 1 on 2026-11-02, and the cap, the second run and the pool on 2026-11-03. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
 - The summary of each run (`sections-gate.md`) shows the A/A spread of the run, the cap and the pool with its count of runs and cases. It also shows the margin, the interval and the outcome.
 - The record `sections-gate.json` (schema `sections-gate/3`) keeps the same facts in its field `home`.
 - The job resolves the inputs `head` and `parent` to full hashes one time, at the start (GATE-CONFIRM-SHA). Then each job times only these hashes. A name that does not resolve fails the job.

@@ -7,6 +7,7 @@
 // Each line has the input, its hash, the rule, the cap, the status, the proof, the objective, the bound, the MIP gap, the time, and B1 and the largest B3 of the plan.
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { gateLine, writeGateLine } from "@mark1russell7/rigor-bench";
 import highsModule from "highs";
 import { solveExact, planMeasures, type HighsLike } from "../src/bench/exact/solve.ts";
 import type { ExactRule } from "../src/bench/exact/index.ts";
@@ -69,11 +70,18 @@ if (mergeDir !== undefined) {
     return s.length === 0 ? Number.NaN : s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
   };
   const f = (v: number | null | undefined, d = 3): string => (v === null || v === undefined || Number.isNaN(v) ? "-" : v.toFixed(d));
+  // A solve that stops with an error is a "no read" of its input, so the check line names it (NO-READ-LINE).
+  // The line only reports, so it is a warning. The summary of the job has the line in the text of this script, so `writeGateLine` writes only the annotation.
+  const errors = file.optima.filter((o) => o.status.startsWith("error"));
+  const reads = file.optima.map((o) => ({ case: `${o.input} (${o.rule}, cap ${o.cap})`, outcome: o.status.startsWith("error") ? "no read" : "pass" }));
+  const line = errors.length === 0 ? undefined : gateLine(reads, { title: `Exact solves of ${setId}`, enforced: false, reason: `The solve stopped with an error, for example ${errors[0]!.status}` });
+  writeGateLine(line, { log: (l) => console.error(l), summary: undefined });
   const text = [
     `## The exact solves of \`${setId}\``,
     "",
     `${file.optima.length} solves, ${file.optima.filter((o) => o.proven).length} proven, ${seconds} s each at most.`,
     "",
+    ...(line === undefined ? [] : [`${line.text} The table counts these solves as not proven.`, ""]),
     "| nodes | class | rule | cap | solves | proven | median s | max s | largest MIP gap | median binaries | median B1 |",
     "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...[...groups.entries()]

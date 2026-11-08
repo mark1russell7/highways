@@ -1,6 +1,6 @@
 # Changelog of `@mark1russell7/highways`
 
-## 0.16.0
+## 0.17.0
 
 This version is a MINOR before 1.0, because default routes of `sectionsRouter` change. The public API does not change.
 
@@ -9,7 +9,52 @@ This version is a MINOR before 1.0, because default routes of `sectionsRouter` c
 - A way through the hubs that goes through a box gives way to the direct way, when the direct way goes through no box (SITE-HUB-THROUGH).
 - The way goes through a box when a piece between two hubs has no way. A step from a plug into a box does too.
 - The options `margin: 20, stretch: 3, cap: 6` move 4 of 6,307 routes of 84 boards. Their `route.through` goes from 296 to 292.
-- With the default options, no route of these boards moves. The option `outSteps: false` keeps the routes of 0.15.0.
+- With the default options, no route of these boards moves. The option `outSteps: false` keeps the routes of 0.16.0.
+
+## 0.16.0
+
+This version is a MINOR before 1.0: the routes of two routers change in their last bits.
+
+### Routes
+
+- `inflectionCurve` takes its powers as products, not with `**` (POW-PORTABLE). In Node.js, `x ** 3` and `x ** 4` give different last bits on Linux and on Windows.
+- The routers `plugs` and `corners` with `smooth` give the same points on each system. The points of their curves move by at most 6e-12. No route changes its count of points.
+- The record of the gate `through-check/7` changes in 6 rows of `plugs`. In 5 rows, a depth moves by less than 2e-13. In `packed-grid`, the route `0:e115` had a depth of 0, and it has a depth of 6e-14. Thus its class changes from `wall` to `band`.
+
+### Dependencies
+
+- The range of `@mark1russell7/rigor-statistics` is `^0.1.18`. It was `^0.1.5`. The interval of `routePairCrossings` does not change.
+
+## 0.15.2
+
+This version is a PATCH before 1.0: two new exports. No route output changes.
+
+### New
+
+- `EPS_STEPS` is the count of grid steps in one unit, from the tolerance `EPS` of `layout-contract` (PAINT-TIE).
+- `snapToEps(point)` puts a point on that grid.
+
+### Measures
+
+- The painted count of the bench reads its points on the grid `EPS_STEPS`, as `routePairCrossings` does. Thus a shift far under the grid does not move a touch.
+- `PAINT_COUNTER` of the bench is 2. A painted count of version 1 does not compare with a count of version 2.
+
+## 0.15.1
+
+This version is a PATCH before 1.0: a new optional parameter, new fields and new exports. No route output changes.
+
+### Measures
+
+- `routePairCrossings(routes, options)` takes the optional `maxPoints` and `seed` (BENCH-PAIRS-HEAP). Above `maxPoints`, the count reads a seeded sample of the routes, and `estimated` is true.
+- A sampled count gives a 95% interval in `low` and `high`. A full count has `low` and `high` equal to `pairs`.
+- `contactSampled` is true when the contact count comes from a sample of the shared vertices. Then the interval is too narrow.
+- The suite passes `PAIR_POINTS`, 1 000 000. Each board up to 10 000 nodes keeps a full count.
+- The suite rows give `R1.pairsLow`, `R1.pairsHigh` and `R1.pairsContactSampled`.
+
+### New
+
+- `RoutePairOptions`, `PAIR_POINTS`, `sameKind` and `withoutMixedKinds`.
+- `MeasureInfo.estimatedBy` names the flag of a count that can come from a sample. A gate does not pair an estimate with a full count.
 
 ## 0.15.0
 

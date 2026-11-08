@@ -1,5 +1,6 @@
 import { center, type Box, type Point } from "../geom.ts";
 import { fixedPortPoint, nodeIndex, outerGraph, type Graph, type Result, type Route, type Router } from "../model.ts";
+import { markBoard } from "../through.ts";
 
 /** This function gives the point where the ray from the center of the box to `toward` leaves the box. */
 export function boxExit(box: Box, toward: Point): Point {
@@ -16,6 +17,7 @@ export function boxExit(box: Box, toward: Point): Point {
 /**
  * The control of the benchmark: each edge is one straight line between its plugs.
  * A free plug goes where the line between the two centers leaves the box.
+ * A line that goes through a box has the field `through`, as the routes of the other routers do (UNMARKED-THROUGH).
  */
 export const straightRouter: Router = {
   name: "straight",
@@ -33,6 +35,6 @@ export const straightRouter: Router = {
       const b = ft ?? boxExit(t.box, fs ?? center(s.box));
       routes.push({ edge: e.id, points: [a, b] });
     }
-    return { routes };
+    return { routes: markBoard(graph, routes) };
   },
 };

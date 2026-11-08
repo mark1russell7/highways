@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_STRATEGIES, listStrategies, STEPS, type Registry } from "@mark1russell7/highways";
-import { strategyIdeas } from "../../core/scripts/strategy-ideas.ts";
+import { strategyIdeas } from "@mark1russell7/highways/strategy-ideas";
 import { parseSnapshot } from "./results-data.ts";
 import { ideaRecords, RESULT_FILES, snapshotFiles } from "./results-files.ts";
 import { strategiesData, type BuiltMap, type CardRecord, type StrategiesData, type StrategyInput } from "./strategies-data.ts";
