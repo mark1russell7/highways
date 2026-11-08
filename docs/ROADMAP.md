@@ -198,6 +198,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | AMBIGUITY-FLAT | `route.bundle.ambiguity` keeps a range over routers on keyed inputs, so it stays. It hides a change at its top, so `route.bundle.reach` joins it. `straight` wins both. | 2026-11-05 | [#339](https://github.com/mark1russell7/highways/pull/339) |
 | R1-PAIRS-RELATION | `route.crossings` and `route.crossings.pairs` have a relation: `crossings - self - touch <= pairs`. `paintedOutsidePairs` reads the two classes, and a test holds the relation on each of the 375 rows of the record. A later row outside the relation is a finding. | 2026-11-05 | [#332](https://github.com/mark1russell7/highways/pull/332) |
 | R1-RELATION-FLIP | The check of that relation has a flip test: an injected row reads red, and a copy with no fault stays green. `MEASURES.md` states that the relation is not an identity, that `touch` became wider after the `packed-grid` rows were in view, and the room of the bound. | 2026-11-05 | [#347](https://github.com/mark1russell7/highways/pull/347) |
+| STAMP-ON-RELEASE | The job `stamps` of a full read of `Screen` stamps each snapshot with the same rows, in the artifact `stamps-<sha>`. It fails with each snapshot that differs or has no read. A test of `kpi.test.ts` fails when `results-lag` is more than 1. | 2026-11-07 | [#386](https://github.com/mark1russell7/highways/pull/386) |
 
 ## Calibration
 
@@ -237,7 +238,6 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| STAMP-ON-RELEASE | The job `stamps` of a full read of `Screen` stamps each snapshot with the same rows. It fails with each snapshot that differs or has no read. A CI test fails when `results-lag` is more than 1. Due 2026-11-13. | `active` | | P1 |
 | CORE-IMPORT-GATE | The script `check:boundaries` holds the import boundaries of the workspace. Its rule `core-knows-no-renderer` lets the source of the core import only its own files, the modules of Node and its 4 dependencies. A test holds the libraries of the config of the core: no DOM. Due 2026-11-12. | `active` | | P2 |
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
