@@ -9,7 +9,7 @@
  * The routers of `SITE_ROUTERS` and `REPORT_ROUTERS` are report rows, and so are the rows of `INNER_BOARDS` and of `lanes`.
  */
 import { BUNDLE_COUNTER, measureHighways } from "../src/bench/curves.ts";
-import { crossingPairs, splitPairs, type EdgeLine, type PairSplit } from "../src/bench/measures/crossing-pairs.ts";
+import { crossingPairs, PAINT_COUNTER, splitPairs, type EdgeLine, type PairSplit } from "../src/bench/measures/crossing-pairs.ts";
 import { measureQuality } from "../src/bench/quality.ts";
 import { checkRoutes, deciding, falseThrough, flagged, HAIRLINE, THROUGH_CLASSES, type RouteCheck, type ThroughClass, type ThroughContact } from "../src/bench/measures/through-check.ts";
 import { HIGHWAYS_FAMILIES, highwaysRegistry } from "../src/families/index.ts";
@@ -40,7 +40,7 @@ const PAINT = { radius: 12, minRadius: 4 };
  * The tolerance of the samples of a painted curve, for the crossings of the whole board. Over the 75 boards of `sections`, tolerances from 0.005 to 0.1 move the crossing points by 0.6 %.
  * The same tolerances move the pairs of edges by 0.1 %, so a small change of points tells less than the same change of pairs.
  */
-const PAINT_SAMPLE = 0.02;
+export const PAINT_SAMPLE = 0.02;
 export const INNER_BOARDS = [
   { name: "frame-rows+inner", family: "frame-rows", dims: { inner: 4 } },
   { name: "frame-rows+inner12", family: "frame-rows", dims: { inner: 12 } },
@@ -173,7 +173,7 @@ export function laneView(result: Result): readonly Route[] {
 }
 
 /** This function gives the painted curves of a board as sampled lines, and the counts of its bundles. */
-function painted(board: Graph, graph: SegmentGraph, open: ReadonlySet<string>): { readonly lines: EdgeLine[]; readonly body: number; readonly ends: number } {
+export function painted(board: Graph, graph: SegmentGraph, open: ReadonlySet<string>): { readonly lines: EdgeLine[]; readonly body: number; readonly ends: number } {
   const space = curveSpace(board.nodes.map((n) => n.box));
   const curves = highwayCurves(graph, open, LANES.width, { maxWidth: LANES.maxWidth, space });
   const bundle = measureHighways(graph, open, LANES.width, curves, { maxWidth: LANES.maxWidth, minRadius: PAINT.minRadius, ends: PAINT.radius });
@@ -316,8 +316,9 @@ export function throughRecord(seeds: number, scope: ThroughScope = {}) {
     }
   }
   return {
-    schema: "through-check/5",
+    schema: "through-check/6",
     bundleCounter: BUNDLE_COUNTER,
+    paintCounter: PAINT_COUNTER,
     seeds,
     size: "default",
     classes: THROUGH_CLASSES,
