@@ -25,6 +25,7 @@ The format `response-records/1` refuses a field that it does not have. Thus a re
 | File | The workflow `Sweep` | Commit | Inputs |
 |---|---|---|---|
 | `router-screen-v1-sample.json` | [42424232256](https://github.com/mark1russell7/highways/actions/runs/42424232256) | `1db7ef7` | `corners`, `trunks` and `shared` on `tiny-uniform` and `small-clustered` |
+| `highway-screen-v1-part-1.json` | [42429126987](https://github.com/mark1russell7/highways/actions/runs/42429126987) | `4c57061` | The first 22 highway strategies with a number option, from `keys` to `growth`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
 
 - The first copy of this file came from a local machine. The record of the run has the same route measures on each of the 588 points. Only `ms` and `ms.ratio` differ, because they are times.
 - To add a record, start `Sweep` and download its artifact `sweep` into a new empty folder. Copy `sweep.json` here with its bytes, and add its row to this table.
