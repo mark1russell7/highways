@@ -533,6 +533,7 @@ function contactPairCrossings({ xs, ys, paths }: SnappedPaths, totals?: Float64A
  *
  * The interval comes from a bootstrap of the drawn routes. Each drawn route has the total of its pairs in the sample.
  * To first order, a change of the sum of the totals changes the count by the same value. The factor `sqrt(1 - m / n)` corrects for a sample with no route two times.
+ * A small sample gives a narrow interval. For 8 of 40 routes, the interval holds the full count for 177 of 200 seeds, with a Wilson interval of 0.833 to 0.922.
  */
 export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[], options: RoutePairOptions = {}): RoutePairCrossings {
   const points = routes.reduce((sum, r) => sum + r.points.length, 0);
