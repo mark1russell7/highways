@@ -1,5 +1,5 @@
 // The form of the record SPACE-SIZE: the count of the base configs of `routeSpace`, with the digest of the space that it counted.
-// The count takes minutes, so the workflow `Records` writes it. The test `space-size.test.ts` fails when the space changes.
+// The site reads the record, so the site needs no `layout-contract`. The test `space-size.test.ts` fails when the space changes.
 import { createHash } from "node:crypto";
 import type { StrategySpace } from "@mark1russell7/layout-contract";
 
@@ -10,7 +10,7 @@ export const SPACE_SIZE_SCHEMA = "space-size/1";
 export const SPACE_SIZE_LEVELS = 3;
 
 /** The command that writes the record again. */
-export const SPACE_SIZE_REGENERATE = "the workflow Records with the record space-size, then commit its artifact as docs/research/space-size/record.json";
+export const SPACE_SIZE_REGENERATE = "node packages/core/scripts/space-size.ts docs/research/space-size/record.json";
 
 /** The count of the options and params of one stage. */
 export interface StageCount {

@@ -16,7 +16,6 @@ on:
           - through-check
           - paint-tie
           - joint-win
-          - space-size
 
 permissions:
   contents: read

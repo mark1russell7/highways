@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { spaceSize } from "@mark1russell7/layout-contract";
 import { describe, expect, it } from "vitest";
 import { routeSpace } from "../src/route-space.ts";
 import { SPACE_SIZE_LEVELS, SPACE_SIZE_REGENERATE, SPACE_SIZE_SCHEMA, spaceDigest, stageCounts, type SpaceSizeRecord } from "./space-size-rows.ts";
@@ -20,6 +21,14 @@ describe("the record of the count of routeSpace (SPACE-SIZE)", () => {
     const record = JSON.parse(readFileSync(FILE, "utf8")) as SpaceSizeRecord;
     expect(record.stages, STALE).toEqual(stageCounts(routeSpace));
     expect(record.digest, STALE).toBe(spaceDigest(routeSpace));
+  });
+
+  // The count took 1 s in CI on 2026-11-08 (run 42494175371). The limit of the test is 60 times that.
+  it("has the count of spaceSize", { timeout: 60_000 }, () => {
+    const record = JSON.parse(readFileSync(FILE, "utf8")) as SpaceSizeRecord;
+    const size = spaceSize(routeSpace, { levels: record.levels });
+    expect(record.base, STALE).toBe(size.base.toString());
+    expect(record.meta, STALE).toBe(size.meta === null ? null : size.meta.toString());
   });
 });
 

@@ -1,5 +1,5 @@
 // The record SPACE-SIZE: the count of the base configs of `routeSpace` with 3 levels for each numeric param, from `spaceSize` of `layout-contract`.
-// The count takes minutes, so the workflow `Records` writes it: `node packages/core/scripts/space-size.ts <file>`.
+// The count takes 1 s in CI. Write the record from the root of the repository: `node packages/core/scripts/space-size.ts <file>`.
 import { cpus } from "node:os";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";

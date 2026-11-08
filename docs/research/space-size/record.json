@@ -1,0 +1,58 @@
+{
+ "schema": "space-size/1",
+ "space": "highways",
+ "digest": "6452a62aca2dd0bb932c8ea88b3c53d47370028f92f385f1a5f5a7342df497f5",
+ "levels": 3,
+ "stages": [
+  {
+   "name": "grouping",
+   "optional": true,
+   "options": 5,
+   "params": 16
+  },
+  {
+   "name": "plugs",
+   "optional": true,
+   "options": 9,
+   "params": 20
+  },
+  {
+   "name": "routing",
+   "optional": false,
+   "options": 67,
+   "params": 474
+  },
+  {
+   "name": "gate",
+   "optional": true,
+   "options": 5,
+   "params": 8
+  },
+  {
+   "name": "lane-order",
+   "optional": true,
+   "options": 3,
+   "params": 2
+  },
+  {
+   "name": "smoothing",
+   "optional": true,
+   "options": 1,
+   "params": 0
+  },
+  {
+   "name": "levels",
+   "optional": true,
+   "options": 3,
+   "params": 14
+  }
+ ],
+ "constraints": 360,
+ "base": "1016274652058",
+ "meta": "0",
+ "seconds": 0,
+ "cpu": "AMD EPYC 9V74 80-Core Processor",
+ "date": "2026-11-08",
+ "run": "42494175371",
+ "commit": "99e0dc5de34313b83876c30a4e7d4cd1225b1ab0"
+}

@@ -3,7 +3,7 @@
 // This module reads no file. The module `kpi-files.ts` gives it the facts.
 import type { SiteMeasure } from "./kpi.ts";
 
-/** The record of the count of the grammar, relative to the root of the repository. The workflow `Records` writes it. */
+/** The record of the count of the grammar, relative to the root of the repository. The script `space-size.ts` of the core writes it. */
 export const SPACE_SIZE_FILE = "docs/research/space-size/record.json";
 
 /** The least count of operators of a step that the measure `steps-with-20-operators` counts. */
@@ -106,7 +106,7 @@ export function spaceMeasures(facts: SpaceFacts, at?: string): SiteMeasure[] {
     ...steps.map((s) => ({ id: `operators-${s}`, value: facts.operators[s]!, unit: "operators", notCounted: SPACE_NOT_COUNTED.operators, ...dated })),
     { id: "steps-with-20-operators", value: steps.filter((s) => facts.operators[s]! >= STEP_OPERATOR_BAR).length, unit: "steps", ...dated },
     { id: "distinct-variants", value: 0, unit: "variants", notCounted: SPACE_NOT_COUNTED.variants, ...dated },
-    // The count of the grammar has the date of its record, because the workflow `Records` writes it and not the build.
+    // The count of the grammar has the date of its record, because a script writes it and not the build.
     ...(facts.grammar === undefined ? [] : [{ id: "grammar-strategies", value: facts.grammar.points, unit: "configs", notCounted: SPACE_NOT_COUNTED.grammar, at: facts.grammar.date }]),
     { id: "strategies-screened", value: facts.screened, unit: "strategies", notCounted: SPACE_NOT_COUNTED.screened, ...dated },
     { id: "strategies-measured-full", value: facts.measuredFull, unit: "strategies", notCounted: SPACE_NOT_COUNTED.measuredFull, ...dated },
