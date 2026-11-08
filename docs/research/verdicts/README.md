@@ -40,6 +40,9 @@ A new release can leave the verdicts as they are. A read on the new core tells i
 One run can read all 15 snapshots (SCREEN-MATRIX). Give `set` and `step` as JSON lists, with `-f set=["screen-v1","screen-v2","screen-v3"]` and `-f step=["router","highway","plugs","levels","whole"]`.
 
 - Each set and step gets its own job and its own artifact. The matrix runs 3 jobs at one time.
+- The job `stamps` of that run reads each committed snapshot against its verdict (STAMP-ON-RELEASE). Its artifact `stamps-<sha>` holds the snapshots with the same rows and their new stamps.
+- To apply the stamps, start `gh run download <run> -n stamps-<sha> -D docs/research/verdicts` on a branch. Then open a pull request.
+- A row that differs, or a snapshot with no read, fails the job `stamps`. The job does not stamp that snapshot.
 - The input `minutes` is the time limit of each job. On 2026-11-07, the job of `highway` on `screen-v3` took 33 minutes. Give 60 or more.
 - A paired screen takes one set and one step. A paired screen of a list fails in its first step.
 
@@ -48,6 +51,8 @@ One run can read all 15 snapshots (SCREEN-MATRIX). Give `set` and `step` as JSON
 - With a row that differs, it gives the exit code 1 and each row. Then make a new snapshot with its rows, by the rule below.
 - The measure `results-unread` of `kpi.json` counts the snapshots with no read on the minor of the engine.
 - The measure `results-lag` gives the most minors that the last read of a snapshot is behind the engine. A stamp is a read. The target is at most 1.
+- A test of CI holds the target. It reads the committed files, and it fails when `results-lag` on the version of the core is more than 1. Thus a release of a second minor waits for the stamps of the first.
+- The test reads the committed benchmark snapshot. A newer record of the branch `bench-data` counts only after a commit of it to `docs/research/bench/`.
 - The field `core` of a snapshot names the core of its first run. It tells the source of the rows, and no measure reads it.
 
 ## The rule
