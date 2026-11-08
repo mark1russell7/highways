@@ -3565,5 +3565,52 @@
     "rules": "Stability of discrete choices.",
     "hardRules": "No change.",
     "zoom": "Native."
+  },
+  {
+    "id": "RULE-054",
+    "family": "rules",
+    "name": "Charged plugs on a side, with a spring to the facing place",
+    "kind": "ours",
+    "sources": [
+      {
+        "title": "Graph drawing by force-directed placement",
+        "authors": "T. M. J. Fruchterman, E. M. Reingold",
+        "year": 1991,
+        "url": "https://doi.org/10.1002/spe.4380211102"
+      }
+    ],
+    "step": "plugs",
+    "mechanism": "The free plugs of one side push apart as equal charges. A spring pulls each plug to the place where it faces its far end. The plugs move along the side by damped steps and keep their order. A crowded side gets a soft spread, not a hard gap.",
+    "math": "E = sum_i (x_i - ideal_i)^2 / 2 + sum_{i<j} q / |x_i - x_j|, with q = s^3 / 2, so two plugs at one place rest s apart. A Jacobi step divides the force by the curvature 1 + sum 2q / d^3.",
+    "cost": "O(I k^2) for I steps and k plugs on a side.",
+    "params": [
+      "spacing s 4 to 16, default 8",
+      "steps 0 to 200, default 60",
+      "inset 0 to 12, default 6"
+    ],
+    "wins": [
+      "R11",
+      "R1",
+      "R10"
+    ],
+    "risks": [
+      "R5",
+      "R3"
+    ],
+    "placementDependent": true,
+    "screen": "On the plug screen against `facing` and `justify`: keep it if R11.min rises by 20% with R1 up by 5% or less.",
+    "prototype": "S",
+    "stage": "cataloged",
+    "related": [
+      "WILD-002",
+      "NAT-031",
+      "EDA-022",
+      "WILD-001",
+      "RULE-001"
+    ],
+    "wave": 7,
+    "rules": "Even spacing of the plugs of a side, near their facing places.",
+    "hardRules": "A fixed plug does not move. A plug of a port with a range stays in its range, and each plug stays inside the inset of its side.",
+    "zoom": "Native. Each level places its plugs again from its own far ends."
   }
 ]

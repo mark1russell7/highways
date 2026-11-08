@@ -1,5 +1,5 @@
 /**
- * The plug strategy `charges` (D23-PHYSICAL): the free plugs of one side push apart as equal charges.
+ * The plug strategy `charges` (RULE-054): the free plugs of one side push apart as equal charges.
  * A spring pulls each plug to the place where it faces its far end.
  * The plugs move on the side by small steps of gradient descent, and they keep their order. The result has no hard gap: a crowded side gives plugs closer than `spacing`.
  */

@@ -13,7 +13,7 @@ function fan(far: readonly { x: number; y: number }[], ports?: readonly Port[]):
 
 const all = (k: number, v: number): number[] => Array.from({ length: k }, () => v);
 
-describe("chargePlugs (D23-PHYSICAL)", () => {
+describe("chargePlugs (RULE-054)", () => {
   it("rests two plugs with one ideal place at the spacing, around that place", () => {
     const [a, b] = chargePlugs([50, 50], all(2, 0), all(2, 100), { spacing: 8 });
     expect(a).toBeCloseTo(46, 9);
@@ -59,7 +59,7 @@ describe("chargePlugs (D23-PHYSICAL)", () => {
   });
 });
 
-describe("the plug strategy charges (D23-PHYSICAL)", () => {
+describe("the plug strategy charges (RULE-054)", () => {
   // Three far boxes east of the card at almost one height, so `facing` puts the three plugs within 4 of each other.
   const crowd = fan([
     { x: 400, y: 36 },

@@ -1,5 +1,5 @@
 /**
- * The curve `elastic` (D23-PHYSICAL): an elastic band (Quinlan and Khatib, 1993) on the polyline of a route.
+ * The curve `elastic` (NAT-026, the same idea as RULE-001): an elastic band (Quinlan and Khatib, 1993) on the polyline of a route.
  * Springs between samples of the route pull it taut, and the boxes near the route push it away.
  * The curve keeps its ends and a lead along each plug normal. It goes through no box that the polyline avoids.
  */
@@ -27,8 +27,11 @@ export interface ElasticOptions {
   readonly space?: CurveSpace;
 }
 
+/** The options of the curve strategy `elastic`: the options of `elasticCurve` without the context of the route. */
+export type ElasticStrategyOptions = Pick<ElasticOptions, "step" | "rounds" | "clearance" | "lead">;
+
 /** The defaults of `elasticCurve`. */
-export const ELASTIC_DEFAULTS = Object.freeze({ step: 8, rounds: 40, clearance: 12, lead: 12 });
+export const ELASTIC_DEFAULTS: Readonly<Required<ElasticStrategyOptions>> = Object.freeze({ step: 8, rounds: 40, clearance: 12, lead: 12 });
 
 /** The weight of the springs in each step. A Jacobi step of the springs is stable below 0.5. */
 const PULL = 0.25;

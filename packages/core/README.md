@@ -212,6 +212,10 @@ A router gives polylines. The curve layer turns a polyline into a curve of a typ
 
 The curves `smooth` and `clothoid` have no jump of the curvature. The curvature grows from 0 on a leg to `1 / radius` on the arc. A cubic spiral turns by 1 radian or less, so a sharp corner keeps a part of its arc. The free space tests the triangle of each corner of these curves: the start of the corner, the vertex and the end of the corner. The curve stays in this triangle, so the test needs no samples.
 
+The curve strategy `elastic` (NAT-026) is an elastic band on the polyline. It is a strategy of the step `curve`, not a type of `curveOf`. Springs between samples `step` apart pull the route taut. Each box nearer than `clearance` pushes the band away. A centripetal spline goes through the band after `rounds` steps. The band starts and ends at a `lead` along the first and the last legs.
+
+When the spline goes through a box that the polyline avoids, the band moves back toward the polyline. `elasticCurve` and `relaxBand` give the same curve without the registry.
+
 The output is a list of segments: `move`, `line`, `cubic` and `arc`. A renderer maps them to SVG path data, to canvas calls or to the vertices of a mesh.
 
 - `curveOf(points, options)` gives the segments of a curve. The `type` of `options` selects the curve type.
@@ -538,7 +542,7 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `two-way`, `global-order`, `approval`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
-| `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
+| `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway`, `elastic` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 | `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum`, `preferences`, `fireflies`, `tracing`, `crops`, `choice` |
 

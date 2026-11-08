@@ -11,7 +11,7 @@ const ell: Point[] = [
   { x: 100, y: 100 },
 ];
 
-describe("relaxBand (D23-PHYSICAL)", () => {
+describe("relaxBand (NAT-026)", () => {
   it("keeps the two ends, and pulls a corner toward the chord of its neighbors", () => {
     const band = relaxBand([{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 20, y: 0 }], [], 1, 0);
     expect(band[0]).toEqual({ x: 0, y: 0 });
@@ -27,7 +27,7 @@ describe("relaxBand (D23-PHYSICAL)", () => {
   });
 });
 
-describe("the curve elastic (D23-PHYSICAL)", () => {
+describe("the curve elastic (NAT-026)", () => {
   it("keeps the ends, cuts the corner and gives a shorter curve", () => {
     const curve = elasticCurve(ell);
     expect(curve[0]).toEqual({ kind: "move", to: ell[0] });

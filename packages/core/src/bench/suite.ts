@@ -516,8 +516,8 @@ export function runSuite(options: SuiteOptions = {}): { report: SuiteReport; ben
   const curveMax = options.curveMax ?? 1000;
   const curveRouter = options.curveRouter ?? "corners";
   const registry = options.registry ?? STRATEGIES;
-  const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "smooth", "clothoid", "highway"]);
-  const normals = new Set(options.normalCurves ?? ["spline"]);
+  const smooth = new Set(options.smoothCurves ?? ["rounded", "arc", "spline", "smooth", "clothoid", "highway", "elastic"]);
+  const normals = new Set(options.normalCurves ?? ["spline", "elastic"]);
   const log = options.log ?? ((): void => {});
   const shard = options.shard ?? { index: 0, count: 1 };
   if (!Number.isInteger(shard.count) || shard.count < 1 || !Number.isInteger(shard.index) || shard.index < 0 || shard.index >= shard.count)

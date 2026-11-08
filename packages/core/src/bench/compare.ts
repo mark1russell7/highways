@@ -185,8 +185,8 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
     const lanes = options.lanes && laneBoard(result, options.lanes);
     const runs = curveRuns(graph, result, listStrategies(registry, "curve"), {
       ...at,
-      smooth: new Set(["rounded", "arc", "spline", "smooth", "clothoid", "highway"]),
-      normals: new Set(["spline"]),
+      smooth: new Set(["rounded", "arc", "spline", "smooth", "clothoid", "highway", "elastic"]),
+      normals: new Set(["spline", "elastic"]),
       curveOptions: own,
       ...(lanes ? { lanes } : {}),
     });
