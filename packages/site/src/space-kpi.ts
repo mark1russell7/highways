@@ -83,7 +83,7 @@ export interface SpaceFacts {
 /** The things that each layout space measure does not count, by its id. */
 export const SPACE_NOT_COUNTED = {
   operators: "A param value, a preset and a variant of an operator. The registry gives each operator once, with its step.",
-  variants: "Each variant. A variant counts only after a test shows that its routes differ from each operator of its step on a board. That test is not built.",
+  variants: "Each variant. A variant counts only when the gate `scripts/distinct.ts` of the core gives it the verdict `distinct`. No screen gives the gate its hashes yet.",
   grammar: "A combinator of two or more strategies, because the space has none. Each numeric param has a few levels, so most configs differ only in a param value.",
   screened: "A strategy that a screen ran with no committed verdict snapshot.",
   measuredFull: "A strategy of a screen set without each family of the corpus. The benchmark has 12 fixtures and not the families, so it does not count.",
@@ -95,7 +95,7 @@ export const SPACE_NOT_COUNTED = {
 
 /**
  * This function gives the layout space measures of `kpi.json`, in a fixed order.
- * The measures of the variants, the views and the solved share read 0 until their tools exist, and each says so.
+ * The measures of the variants, the views and the solved share read 0 until their tools and records exist, and each says so.
  *
  * @param facts - The facts of the registry and of the committed records.
  * @param at - The time of the data of the registry: the date of the commit of the build.
