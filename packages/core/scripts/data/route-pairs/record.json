@@ -22,11 +22,11 @@
    "router": "corners",
    "boards": 75,
    "routes": 6065,
-   "crossings": 20493,
-   "pairs": 32194,
-   "proper": 27382,
-   "contact": 4812,
-   "vertices": 25662,
+   "crossings": 20491,
+   "pairs": 32144,
+   "proper": 27361,
+   "contact": 4783,
+   "vertices": 25648,
    "gridsDiffer": 48,
    "self": 0,
    "touch": 1,
@@ -221,7 +221,7 @@
        "finite": 10000,
        "seed": 3387994201
       },
-      "totalMoved": 398
+      "totalMoved": 377
      }
     }
    ]
@@ -230,11 +230,11 @@
    "router": "shared",
    "boards": 75,
    "routes": 6065,
-   "crossings": 16589,
-   "pairs": 34191,
-   "proper": 27016,
-   "contact": 7175,
-   "vertices": 25614,
+   "crossings": 16616,
+   "pairs": 34124,
+   "proper": 26912,
+   "contact": 7212,
+   "vertices": 25609,
    "gridsDiffer": 48,
    "self": 0,
    "touch": 1,
@@ -267,14 +267,14 @@
     }
    },
    "crossingsBoards": {
-    "lower": 13,
-    "equal": 58,
-    "higher": 4
+    "lower": 6,
+    "equal": 69,
+    "higher": 0
    },
    "pairsBoards": {
-    "lower": 5,
-    "equal": 59,
-    "higher": 11
+    "lower": 0,
+    "equal": 69,
+    "higher": 6
    },
    "shifts": [
     {
@@ -429,7 +429,7 @@
        "finite": 10000,
        "seed": 1326022572
       },
-      "totalMoved": 425
+      "totalMoved": 426
      }
     }
    ]
@@ -438,11 +438,11 @@
    "router": "shared-all",
    "boards": 75,
    "routes": 6065,
-   "crossings": 6862,
-   "pairs": 35608,
-   "proper": 13985,
-   "contact": 21623,
-   "vertices": 24429,
+   "crossings": 6819,
+   "pairs": 35624,
+   "proper": 13817,
+   "contact": 21807,
+   "vertices": 24462,
    "gridsDiffer": 48,
    "self": 0,
    "touch": 1,
@@ -450,11 +450,11 @@
    "estimated": 0,
    "crossingsAgainstCorners": {
     "boards": 72,
-    "median": 0.4174972314507198,
+    "median": 0.4053472003361698,
     "interval": {
-     "estimate": 0.4174972314507198,
-     "low": 0.31761006289308175,
-     "high": 0.6814608581722896,
+     "estimate": 0.4053472003361698,
+     "low": 0.30940493468795355,
+     "high": 0.6703248254331403,
      "level": 0.95,
      "runs": 10000,
      "finite": 10000,
@@ -476,13 +476,13 @@
    },
    "crossingsBoards": {
     "lower": 53,
-    "equal": 19,
-    "higher": 3
+    "equal": 18,
+    "higher": 4
    },
    "pairsBoards": {
-    "lower": 16,
-    "equal": 20,
-    "higher": 39
+    "lower": 15,
+    "equal": 22,
+    "higher": 38
    },
    "shifts": [
     {
@@ -626,8 +626,8 @@
       "totalMoved": 0
      },
      "each": {
-      "boardsMoved": 57,
-      "worst": 46,
+      "boardsMoved": 54,
+      "worst": 50,
       "medianWorst": {
        "estimate": 4,
        "low": 4,
@@ -637,7 +637,7 @@
        "finite": 10000,
        "seed": 3311814750
       },
-      "totalMoved": 477
+      "totalMoved": 482
      }
     }
    ]
@@ -646,23 +646,23 @@
    "router": "sections",
    "boards": 75,
    "routes": 6065,
-   "crossings": 12814,
-   "pairs": 44032,
-   "proper": 30932,
-   "contact": 13100,
-   "vertices": 26309,
+   "crossings": 12882,
+   "pairs": 43993,
+   "proper": 30985,
+   "contact": 13008,
+   "vertices": 26304,
    "gridsDiffer": 48,
-   "self": 9,
+   "self": 10,
    "touch": 1,
    "pairsUnderCrossings": 0,
    "estimated": 0,
    "crossingsAgainstCorners": {
     "boards": 72,
-    "median": 0.8085701981050818,
+    "median": 0.8328158586099833,
     "interval": {
-     "estimate": 0.8085701981050818,
+     "estimate": 0.8328158586099833,
      "low": 0.6847761194029851,
-     "high": 0.9471507352941176,
+     "high": 0.9666666666666667,
      "level": 0.95,
      "runs": 10000,
      "finite": 10000,
@@ -671,11 +671,11 @@
    },
    "pairsAgainstCorners": {
     "boards": 73,
-    "median": 1.1833333333333333,
+    "median": 1.189827429609446,
     "interval": {
-     "estimate": 1.1833333333333333,
-     "low": 1.103448275862069,
-     "high": 1.2571428571428571,
+     "estimate": 1.189827429609446,
+     "low": 1.0888888888888888,
+     "high": 1.3009708737864079,
      "level": 0.95,
      "runs": 10000,
      "finite": 10000,
@@ -683,14 +683,14 @@
     }
    },
    "crossingsBoards": {
-    "lower": 46,
+    "lower": 45,
     "equal": 16,
-    "higher": 13
+    "higher": 14
    },
    "pairsBoards": {
-    "lower": 6,
+    "lower": 7,
     "equal": 14,
-    "higher": 55
+    "higher": 54
    },
    "shifts": [
     {
@@ -835,17 +835,17 @@
      },
      "each": {
       "boardsMoved": 65,
-      "worst": 130,
+      "worst": 113,
       "medianWorst": {
        "estimate": 14,
-       "low": 12,
-       "high": 24,
+       "low": 11,
+       "high": 21,
        "level": 0.95,
        "runs": 10000,
        "finite": 10000,
        "seed": 3365093733
       },
-      "totalMoved": 1302
+      "totalMoved": 1278
      }
     }
    ]
@@ -854,23 +854,23 @@
    "router": "sections-site",
    "boards": 75,
    "routes": 6065,
-   "crossings": 21170,
-   "pairs": 69817,
-   "proper": 51679,
-   "contact": 18138,
-   "vertices": 25555,
+   "crossings": 21142,
+   "pairs": 69687,
+   "proper": 51630,
+   "contact": 18057,
+   "vertices": 25558,
    "gridsDiffer": 48,
-   "self": 374,
+   "self": 375,
    "touch": 0,
    "pairsUnderCrossings": 2,
    "estimated": 0,
    "crossingsAgainstCorners": {
     "boards": 72,
-    "median": 1.1161695447409734,
+    "median": 1.2223821236066774,
     "interval": {
-     "estimate": 1.1161695447409734,
+     "estimate": 1.2223821236066774,
      "low": 0.8385666347075743,
-     "high": 1.9032931726907631,
+     "high": 1.9318518518518517,
      "level": 0.95,
      "runs": 10000,
      "finite": 10000,
@@ -879,9 +879,9 @@
    },
    "pairsAgainstCorners": {
     "boards": 73,
-    "median": 2.1749696233292832,
+    "median": 2.1828675577156744,
     "interval": {
-     "estimate": 2.1749696233292832,
+     "estimate": 2.1828675577156744,
      "low": 1.6428571428571428,
      "high": 2.473455178416014,
      "level": 0.95,
@@ -1053,7 +1053,7 @@
        "finite": 10000,
        "seed": 821665787
       },
-      "totalMoved": 3100
+      "totalMoved": 3120
      }
     }
    ]
@@ -2919,13 +2919,13 @@
    "seed": 0,
    "router": "sections",
    "routes": 200,
-   "vertices": 917,
+   "vertices": 916,
    "gridsDiffer": 0,
-   "crossings": 706,
+   "crossings": 704,
    "crossingsEstimated": false,
-   "pairs": 1856,
-   "proper": 1396,
-   "contact": 460,
+   "pairs": 1853,
+   "proper": 1394,
+   "contact": 459,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -3008,11 +3008,11 @@
       0
      ],
      "each": [
-      27,
-      29,
-      12,
-      33,
-      49
+      37,
+      36,
+      19,
+      38,
+      52
      ]
     }
    ]
@@ -4773,13 +4773,13 @@
    "seed": 1,
    "router": "shared",
    "routes": 300,
-   "vertices": 1363,
+   "vertices": 1362,
    "gridsDiffer": 8,
-   "crossings": 902,
+   "crossings": 903,
    "crossingsEstimated": false,
    "pairs": 2920,
-   "proper": 2052,
-   "contact": 868,
+   "proper": 2054,
+   "contact": 866,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -4862,11 +4862,11 @@
       0
      ],
      "each": [
-      0,
-      4,
-      9,
+      1,
+      2,
+      2,
       6,
-      4
+      15
      ]
     }
    ]
@@ -5288,13 +5288,13 @@
    "seed": 2,
    "router": "shared",
    "routes": 300,
-   "vertices": 1379,
+   "vertices": 1377,
    "gridsDiffer": 0,
-   "crossings": 1100,
+   "crossings": 1095,
    "crossingsEstimated": false,
-   "pairs": 3167,
-   "proper": 2441,
-   "contact": 726,
+   "pairs": 3165,
+   "proper": 2355,
+   "contact": 810,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -5377,11 +5377,11 @@
       0
      ],
      "each": [
-      10,
-      7,
-      1,
       6,
-      13
+      4,
+      8,
+      6,
+      8
      ]
     }
    ]
@@ -5481,10 +5481,10 @@
      ],
      "each": [
       12,
-      12,
-      9,
+      14,
+      8,
       11,
-      14
+      11
      ]
     }
    ]
@@ -5599,11 +5599,11 @@
    "routes": 300,
    "vertices": 1430,
    "gridsDiffer": 0,
-   "crossings": 1437,
+   "crossings": 1443,
    "crossingsEstimated": false,
-   "pairs": 5857,
-   "proper": 4494,
-   "contact": 1363,
+   "pairs": 5860,
+   "proper": 4505,
+   "contact": 1355,
    "pairsEstimated": false,
    "self": 10,
    "touch": 0,
@@ -5686,11 +5686,11 @@
       0
      ],
      "each": [
-      85,
-      99,
-      93,
-      80,
-      73
+      65,
+      78,
+      70,
+      88,
+      83
      ]
     }
    ]
@@ -5702,11 +5702,11 @@
    "routes": 123,
    "vertices": 554,
    "gridsDiffer": 0,
-   "crossings": 86,
+   "crossings": 69,
    "crossingsEstimated": false,
-   "pairs": 163,
-   "proper": 94,
-   "contact": 69,
+   "pairs": 129,
+   "proper": 75,
+   "contact": 54,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -5789,11 +5789,11 @@
       0
      ],
      "each": [
-      34,
-      46,
-      40,
-      26,
-      38
+      36,
+      42,
+      36,
+      30,
+      60
      ]
     }
    ]
@@ -5805,11 +5805,11 @@
    "routes": 123,
    "vertices": 554,
    "gridsDiffer": 0,
-   "crossings": 86,
+   "crossings": 69,
    "crossingsEstimated": false,
-   "pairs": 163,
-   "proper": 94,
-   "contact": 69,
+   "pairs": 129,
+   "proper": 75,
+   "contact": 54,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -5892,11 +5892,11 @@
       0
      ],
      "each": [
-      42,
-      24,
-      24,
+      36,
       40,
-      30
+      60,
+      48,
+      42
      ]
     }
    ]
@@ -5906,13 +5906,13 @@
    "seed": 0,
    "router": "shared-all",
    "routes": 123,
-   "vertices": 533,
+   "vertices": 530,
    "gridsDiffer": 0,
-   "crossings": 37,
+   "crossings": 33,
    "crossingsEstimated": false,
-   "pairs": 177,
-   "proper": 44,
-   "contact": 133,
+   "pairs": 178,
+   "proper": 38,
+   "contact": 140,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -5996,9 +5996,9 @@
      ],
      "each": [
       6,
-      6,
-      12,
-      0,
+      2,
+      2,
+      2,
       2
      ]
     }
@@ -6009,13 +6009,13 @@
    "seed": 0,
    "router": "sections",
    "routes": 123,
-   "vertices": 570,
+   "vertices": 571,
    "gridsDiffer": 0,
-   "crossings": 69,
+   "crossings": 70,
    "crossingsEstimated": false,
-   "pairs": 183,
+   "pairs": 182,
    "proper": 81,
-   "contact": 102,
+   "contact": 101,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6098,11 +6098,11 @@
       0
      ],
      "each": [
-      33,
+      22,
+      50,
       42,
-      46,
-      38,
-      31
+      32,
+      52
      ]
     }
    ]
@@ -6116,9 +6116,9 @@
    "gridsDiffer": 0,
    "crossings": 89,
    "crossingsEstimated": false,
-   "pairs": 200,
+   "pairs": 196,
    "proper": 108,
-   "contact": 92,
+   "contact": 88,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6201,11 +6201,11 @@
       0
      ],
      "each": [
-      61,
-      58,
+      59,
+      52,
       44,
-      57,
-      72
+      49,
+      60
      ]
     }
    ]
@@ -6215,13 +6215,13 @@
    "seed": 1,
    "router": "corners",
    "routes": 117,
-   "vertices": 520,
+   "vertices": 521,
    "gridsDiffer": 0,
-   "crossings": 59,
+   "crossings": 68,
    "crossingsEstimated": false,
-   "pairs": 98,
-   "proper": 65,
-   "contact": 33,
+   "pairs": 111,
+   "proper": 71,
+   "contact": 40,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6304,11 +6304,11 @@
       0
      ],
      "each": [
-      40,
+      24,
+      34,
+      22,
       38,
-      44,
-      28,
-      24
+      46
      ]
     }
    ]
@@ -6318,13 +6318,13 @@
    "seed": 1,
    "router": "shared",
    "routes": 117,
-   "vertices": 520,
+   "vertices": 521,
    "gridsDiffer": 0,
-   "crossings": 59,
+   "crossings": 68,
    "crossingsEstimated": false,
-   "pairs": 98,
-   "proper": 65,
-   "contact": 33,
+   "pairs": 111,
+   "proper": 71,
+   "contact": 40,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6407,11 +6407,11 @@
       0
      ],
      "each": [
-      32,
       24,
-      38,
-      28,
-      28
+      34,
+      32,
+      10,
+      22
      ]
     }
    ]
@@ -6421,13 +6421,13 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 117,
-   "vertices": 507,
+   "vertices": 505,
    "gridsDiffer": 0,
-   "crossings": 23,
+   "crossings": 15,
    "crossingsEstimated": false,
-   "pairs": 152,
-   "proper": 34,
-   "contact": 118,
+   "pairs": 129,
+   "proper": 16,
+   "contact": 113,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6512,8 +6512,8 @@
      "each": [
       2,
       2,
-      0,
-      0,
+      4,
+      6,
       4
      ]
     }
@@ -6524,13 +6524,13 @@
    "seed": 1,
    "router": "sections",
    "routes": 117,
-   "vertices": 543,
+   "vertices": 545,
    "gridsDiffer": 0,
-   "crossings": 47,
+   "crossings": 59,
    "crossingsEstimated": false,
-   "pairs": 129,
-   "proper": 58,
-   "contact": 71,
+   "pairs": 149,
+   "proper": 81,
+   "contact": 68,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6613,11 +6613,11 @@
       0
      ],
      "each": [
+      79,
+      33,
+      60,
       37,
-      39,
-      49,
-      46,
-      27
+      51
      ]
     }
    ]
@@ -6717,10 +6717,10 @@
      ],
      "each": [
       105,
-      102,
+      97,
       52,
-      88,
-      108
+      100,
+      114
      ]
     }
    ]
@@ -6730,116 +6730,13 @@
    "seed": 2,
    "router": "corners",
    "routes": 116,
-   "vertices": 517,
+   "vertices": 516,
    "gridsDiffer": 0,
-   "crossings": 52,
+   "crossings": 57,
    "crossingsEstimated": false,
-   "pairs": 118,
-   "proper": 60,
-   "contact": 58,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      54,
-      14,
-      60,
-      22,
-      28
-     ]
-    }
-   ]
-  },
-  {
-   "family": "hub-chain",
-   "seed": 2,
-   "router": "shared",
-   "routes": 116,
-   "vertices": 517,
-   "gridsDiffer": 0,
-   "crossings": 52,
-   "crossingsEstimated": false,
-   "pairs": 118,
-   "proper": 60,
-   "contact": 58,
+   "pairs": 91,
+   "proper": 59,
+   "contact": 32,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -6923,10 +6820,113 @@
      ],
      "each": [
       34,
-      32,
-      48,
-      36,
-      36
+      28,
+      20,
+      18,
+      28
+     ]
+    }
+   ]
+  },
+  {
+   "family": "hub-chain",
+   "seed": 2,
+   "router": "shared",
+   "routes": 116,
+   "vertices": 516,
+   "gridsDiffer": 0,
+   "crossings": 57,
+   "crossingsEstimated": false,
+   "pairs": 91,
+   "proper": 59,
+   "contact": 32,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      26,
+      18,
+      34,
+      16,
+      24
      ]
     }
    ]
@@ -6938,11 +6938,11 @@
    "routes": 116,
    "vertices": 501,
    "gridsDiffer": 0,
-   "crossings": 19,
+   "crossings": 23,
    "crossingsEstimated": false,
-   "pairs": 132,
-   "proper": 32,
-   "contact": 100,
+   "pairs": 109,
+   "proper": 33,
+   "contact": 76,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7025,10 +7025,10 @@
       0
      ],
      "each": [
-      4,
-      4,
       0,
-      2,
+      0,
+      0,
+      0,
       0
      ]
     }
@@ -7039,13 +7039,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 116,
-   "vertices": 530,
+   "vertices": 528,
    "gridsDiffer": 0,
-   "crossings": 38,
+   "crossings": 45,
    "crossingsEstimated": false,
-   "pairs": 148,
-   "proper": 49,
-   "contact": 99,
+   "pairs": 145,
+   "proper": 50,
+   "contact": 95,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7128,11 +7128,11 @@
       0
      ],
      "each": [
-      35,
-      24,
       31,
-      46,
-      81
+      16,
+      34,
+      37,
+      37
      ]
     }
    ]
@@ -7142,13 +7142,13 @@
    "seed": 2,
    "router": "sections-site",
    "routes": 116,
-   "vertices": 525,
+   "vertices": 526,
    "gridsDiffer": 0,
-   "crossings": 36,
+   "crossings": 37,
    "crossingsEstimated": false,
-   "pairs": 143,
-   "proper": 50,
-   "contact": 93,
+   "pairs": 140,
+   "proper": 52,
+   "contact": 88,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7231,11 +7231,11 @@
       0
      ],
      "each": [
-      49,
-      19,
-      72,
-      71,
-      26
+      64,
+      33,
+      59,
+      50,
+      19
      ]
     }
    ]
@@ -7245,13 +7245,13 @@
    "seed": 0,
    "router": "corners",
    "routes": 191,
-   "vertices": 920,
+   "vertices": 922,
    "gridsDiffer": 0,
-   "crossings": 937,
+   "crossings": 948,
    "crossingsEstimated": false,
-   "pairs": 1288,
-   "proper": 1065,
-   "contact": 223,
+   "pairs": 1283,
+   "proper": 1056,
+   "contact": 227,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7336,8 +7336,8 @@
      "each": [
       11,
       2,
-      1,
-      15,
+      3,
+      13,
       9
      ]
     }
@@ -7348,13 +7348,425 @@
    "seed": 0,
    "router": "shared",
    "routes": 191,
-   "vertices": 923,
+   "vertices": 922,
    "gridsDiffer": 0,
-   "crossings": 942,
+   "crossings": 948,
    "crossingsEstimated": false,
-   "pairs": 1298,
-   "proper": 1072,
-   "contact": 226,
+   "pairs": 1283,
+   "proper": 1056,
+   "contact": 227,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      6,
+      4,
+      10,
+      1,
+      15
+     ]
+    }
+   ]
+  },
+  {
+   "family": "many-groups",
+   "seed": 0,
+   "router": "shared-all",
+   "routes": 191,
+   "vertices": 819,
+   "gridsDiffer": 0,
+   "crossings": 179,
+   "crossingsEstimated": false,
+   "pairs": 1701,
+   "proper": 318,
+   "contact": 1383,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      16,
+      22,
+      14,
+      20,
+      24
+     ]
+    }
+   ]
+  },
+  {
+   "family": "many-groups",
+   "seed": 0,
+   "router": "sections",
+   "routes": 191,
+   "vertices": 882,
+   "gridsDiffer": 0,
+   "crossings": 367,
+   "crossingsEstimated": false,
+   "pairs": 1544,
+   "proper": 941,
+   "contact": 603,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      81,
+      88,
+      82,
+      100,
+      56
+     ]
+    }
+   ]
+  },
+  {
+   "family": "many-groups",
+   "seed": 0,
+   "router": "sections-site",
+   "routes": 191,
+   "vertices": 718,
+   "gridsDiffer": 0,
+   "crossings": 381,
+   "crossingsEstimated": false,
+   "pairs": 1654,
+   "proper": 938,
+   "contact": 716,
+   "pairsEstimated": false,
+   "self": 2,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      352,
+      284,
+      267,
+      309,
+      296
+     ]
+    }
+   ]
+  },
+  {
+   "family": "many-groups",
+   "seed": 1,
+   "router": "corners",
+   "routes": 188,
+   "vertices": 895,
+   "gridsDiffer": 0,
+   "crossings": 732,
+   "crossingsEstimated": false,
+   "pairs": 1101,
+   "proper": 901,
+   "contact": 200,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7438,422 +7850,10 @@
      ],
      "each": [
       5,
-      3,
       4,
-      11,
-      12
-     ]
-    }
-   ]
-  },
-  {
-   "family": "many-groups",
-   "seed": 0,
-   "router": "shared-all",
-   "routes": 191,
-   "vertices": 817,
-   "gridsDiffer": 0,
-   "crossings": 179,
-   "crossingsEstimated": false,
-   "pairs": 1698,
-   "proper": 318,
-   "contact": 1380,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      24,
-      24,
-      14,
-      20,
-      16
-     ]
-    }
-   ]
-  },
-  {
-   "family": "many-groups",
-   "seed": 0,
-   "router": "sections",
-   "routes": 191,
-   "vertices": 882,
-   "gridsDiffer": 0,
-   "crossings": 345,
-   "crossingsEstimated": false,
-   "pairs": 1535,
-   "proper": 912,
-   "contact": 623,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      115,
-      124,
-      68,
-      106,
-      66
-     ]
-    }
-   ]
-  },
-  {
-   "family": "many-groups",
-   "seed": 0,
-   "router": "sections-site",
-   "routes": 191,
-   "vertices": 720,
-   "gridsDiffer": 0,
-   "crossings": 390,
-   "crossingsEstimated": false,
-   "pairs": 1629,
-   "proper": 952,
-   "contact": 677,
-   "pairsEstimated": false,
-   "self": 2,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      362,
-      289,
-      260,
-      319,
-      289
-     ]
-    }
-   ]
-  },
-  {
-   "family": "many-groups",
-   "seed": 1,
-   "router": "corners",
-   "routes": 188,
-   "vertices": 896,
-   "gridsDiffer": 0,
-   "crossings": 733,
-   "crossingsEstimated": false,
-   "pairs": 1100,
-   "proper": 901,
-   "contact": 199,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      6,
-      3,
       2,
-      6,
-      4
+      4,
+      7
      ]
     }
    ]
@@ -7865,11 +7865,11 @@
    "routes": 188,
    "vertices": 895,
    "gridsDiffer": 0,
-   "crossings": 734,
+   "crossings": 732,
    "crossingsEstimated": false,
-   "pairs": 1100,
-   "proper": 903,
-   "contact": 197,
+   "pairs": 1101,
+   "proper": 901,
+   "contact": 200,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -7966,116 +7966,13 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 188,
-   "vertices": 812,
+   "vertices": 815,
    "gridsDiffer": 0,
-   "crossings": 88,
+   "crossings": 82,
    "crossingsEstimated": false,
-   "pairs": 1326,
-   "proper": 208,
-   "contact": 1118,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      40,
-      21,
-      12,
-      28,
-      28
-     ]
-    }
-   ]
-  },
-  {
-   "family": "many-groups",
-   "seed": 1,
-   "router": "sections",
-   "routes": 188,
-   "vertices": 858,
-   "gridsDiffer": 0,
-   "crossings": 350,
-   "crossingsEstimated": false,
-   "pairs": 1291,
-   "proper": 779,
-   "contact": 512,
+   "pairs": 1338,
+   "proper": 204,
+   "contact": 1134,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8159,10 +8056,10 @@
      ],
      "each": [
       36,
-      47,
-      30,
-      74,
-      22
+      12,
+      28,
+      15,
+      18
      ]
     }
    ]
@@ -8170,15 +8067,15 @@
   {
    "family": "many-groups",
    "seed": 1,
-   "router": "sections-site",
+   "router": "sections",
    "routes": 188,
-   "vertices": 688,
+   "vertices": 856,
    "gridsDiffer": 0,
-   "crossings": 374,
+   "crossings": 368,
    "crossingsEstimated": false,
-   "pairs": 1399,
-   "proper": 880,
-   "contact": 519,
+   "pairs": 1310,
+   "proper": 807,
+   "contact": 503,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8261,11 +8158,114 @@
       0
      ],
      "each": [
-      143,
-      224,
-      249,
-      193,
-      276
+      46,
+      14,
+      47,
+      36,
+      58
+     ]
+    }
+   ]
+  },
+  {
+   "family": "many-groups",
+   "seed": 1,
+   "router": "sections-site",
+   "routes": 188,
+   "vertices": 690,
+   "gridsDiffer": 0,
+   "crossings": 385,
+   "crossingsEstimated": false,
+   "pairs": 1393,
+   "proper": 877,
+   "contact": 516,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      131,
+      292,
+      284,
+      176,
+      280
      ]
     }
    ]
@@ -8277,11 +8277,11 @@
    "routes": 189,
    "vertices": 918,
    "gridsDiffer": 0,
-   "crossings": 917,
+   "crossings": 907,
    "crossingsEstimated": false,
-   "pairs": 1309,
+   "pairs": 1307,
    "proper": 1059,
-   "contact": 250,
+   "contact": 248,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8365,10 +8365,10 @@
      ],
      "each": [
       6,
-      6,
       8,
       6,
-      0
+      4,
+      2
      ]
     }
    ]
@@ -8380,11 +8380,11 @@
    "routes": 189,
    "vertices": 918,
    "gridsDiffer": 0,
-   "crossings": 880,
+   "crossings": 907,
    "crossingsEstimated": false,
-   "pairs": 1306,
-   "proper": 1048,
-   "contact": 258,
+   "pairs": 1307,
+   "proper": 1059,
+   "contact": 248,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8467,11 +8467,11 @@
       0
      ],
      "each": [
-      12,
-      6,
       4,
+      10,
+      8,
       6,
-      12
+      18
      ]
     }
    ]
@@ -8481,13 +8481,13 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 189,
-   "vertices": 810,
+   "vertices": 812,
    "gridsDiffer": 0,
-   "crossings": 192,
+   "crossings": 188,
    "crossingsEstimated": false,
-   "pairs": 1777,
-   "proper": 401,
-   "contact": 1376,
+   "pairs": 1788,
+   "proper": 396,
+   "contact": 1392,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8570,11 +8570,11 @@
       0
      ],
      "each": [
+      34,
       14,
-      8,
-      22,
-      14,
-      12
+      18,
+      16,
+      14
      ]
     }
    ]
@@ -8584,13 +8584,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 189,
-   "vertices": 886,
+   "vertices": 885,
    "gridsDiffer": 0,
-   "crossings": 382,
+   "crossings": 386,
    "crossingsEstimated": false,
-   "pairs": 1595,
-   "proper": 967,
-   "contact": 628,
+   "pairs": 1579,
+   "proper": 965,
+   "contact": 614,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -8673,11 +8673,11 @@
       0
      ],
      "each": [
-      50,
-      124,
-      130,
-      67,
-      107
+      60,
+      64,
+      100,
+      86,
+      113
      ]
     }
    ]
@@ -8689,11 +8689,11 @@
    "routes": 189,
    "vertices": 726,
    "gridsDiffer": 0,
-   "crossings": 468,
+   "crossings": 460,
    "crossingsEstimated": false,
-   "pairs": 1880,
-   "proper": 1110,
-   "contact": 770,
+   "pairs": 1879,
+   "proper": 1100,
+   "contact": 779,
    "pairsEstimated": false,
    "self": 1,
    "touch": 0,
@@ -8776,11 +8776,11 @@
       0
      ],
      "each": [
-      99,
-      202,
-      246,
-      196,
-      266
+      107,
+      183,
+      244,
+      186,
+      248
      ]
     }
    ]
@@ -10339,9 +10339,9 @@
    "gridsDiffer": 0,
    "crossings": 88,
    "crossingsEstimated": false,
-   "pairs": 120,
-   "proper": 95,
-   "contact": 25,
+   "pairs": 122,
+   "proper": 96,
+   "contact": 26,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -10424,10 +10424,10 @@
       0
      ],
      "each": [
-      4,
-      4,
+      2,
       2,
       4,
+      2,
       2
      ]
     }
@@ -10543,11 +10543,11 @@
    "routes": 31,
    "vertices": 102,
    "gridsDiffer": 0,
-   "crossings": 88,
+   "crossings": 90,
    "crossingsEstimated": false,
-   "pairs": 122,
-   "proper": 97,
-   "contact": 25,
+   "pairs": 131,
+   "proper": 98,
+   "contact": 33,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -10632,7 +10632,7 @@
      "each": [
       2,
       4,
-      4,
+      2,
       0,
       2
      ]
@@ -10852,11 +10852,11 @@
    "routes": 32,
    "vertices": 89,
    "gridsDiffer": 0,
-   "crossings": 127,
+   "crossings": 126,
    "crossingsEstimated": false,
-   "pairs": 156,
-   "proper": 130,
-   "contact": 26,
+   "pairs": 165,
+   "proper": 129,
+   "contact": 36,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -11367,11 +11367,11 @@
    "routes": 33,
    "vertices": 109,
    "gridsDiffer": 0,
-   "crossings": 98,
+   "crossings": 97,
    "crossingsEstimated": false,
-   "pairs": 174,
-   "proper": 125,
-   "contact": 49,
+   "pairs": 164,
+   "proper": 122,
+   "contact": 42,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -11454,11 +11454,11 @@
       0
      ],
      "each": [
-      3,
+      7,
+      8,
+      8,
       2,
-      3,
-      2,
-      3
+      6
      ]
     }
    ]
@@ -11571,13 +11571,13 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 33,
-   "vertices": 108,
+   "vertices": 109,
    "gridsDiffer": 0,
-   "crossings": 99,
+   "crossings": 98,
    "crossingsEstimated": false,
-   "pairs": 167,
-   "proper": 115,
-   "contact": 52,
+   "pairs": 171,
+   "proper": 109,
+   "contact": 62,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -11660,11 +11660,11 @@
       0
      ],
      "each": [
+      8,
+      11,
+      9,
       5,
-      6,
-      6,
-      6,
-      2
+      3
      ]
     }
    ]
@@ -11674,13 +11674,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 33,
-   "vertices": 116,
+   "vertices": 115,
    "gridsDiffer": 0,
    "crossings": 47,
    "crossingsEstimated": false,
-   "pairs": 192,
+   "pairs": 178,
    "proper": 71,
-   "contact": 121,
+   "contact": 107,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -11763,11 +11763,11 @@
       0
      ],
      "each": [
-      15,
-      25,
-      35,
-      32,
-      39
+      12,
+      28,
+      38,
+      27,
+      42
      ]
     }
    ]
@@ -12297,10 +12297,10 @@
    "crossings": 12,
    "crossingsEstimated": false,
    "pairs": 13,
-   "proper": 11,
-   "contact": 2,
+   "proper": 12,
+   "contact": 1,
    "pairsEstimated": false,
-   "self": 1,
+   "self": 0,
    "touch": 0,
    "shifts": [
     {
@@ -13720,10 +13720,10 @@
       0
      ],
      "each": [
-      5,
+      3,
       2,
-      9,
-      8,
+      5,
+      6,
       7
      ]
     }
@@ -14352,7 +14352,7 @@
    "seed": 1,
    "router": "sections-site",
    "routes": 103,
-   "vertices": 483,
+   "vertices": 482,
    "gridsDiffer": 0,
    "crossings": 490,
    "crossingsEstimated": false,
@@ -14442,7 +14442,7 @@
      ],
      "each": [
       72,
-      48,
+      46,
       74,
       55,
       68
@@ -14665,9 +14665,9 @@
    "gridsDiffer": 0,
    "crossings": 130,
    "crossingsEstimated": false,
-   "pairs": 337,
+   "pairs": 338,
    "proper": 204,
-   "contact": 133,
+   "contact": 134,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -14750,11 +14750,11 @@
       0
      ],
      "each": [
+      0,
+      8,
       7,
       2,
-      7,
-      8,
-      1
+      7
      ]
     }
    ]
@@ -14970,13 +14970,13 @@
    "seed": 0,
    "router": "corners",
    "routes": 121,
-   "vertices": 537,
+   "vertices": 536,
    "gridsDiffer": 0,
-   "crossings": 285,
+   "crossings": 302,
    "crossingsEstimated": false,
-   "pairs": 363,
-   "proper": 315,
-   "contact": 48,
+   "pairs": 376,
+   "proper": 331,
+   "contact": 45,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -15059,11 +15059,11 @@
       0
      ],
      "each": [
-      18,
-      18,
       17,
       7,
-      4
+      18,
+      0,
+      10
      ]
     }
    ]
@@ -15075,7 +15075,7 @@
    "routes": 121,
    "vertices": 536,
    "gridsDiffer": 0,
-   "crossings": 301,
+   "crossings": 302,
    "crossingsEstimated": false,
    "pairs": 376,
    "proper": 331,
@@ -15163,10 +15163,10 @@
      ],
      "each": [
       11,
-      16,
+      20,
       6,
-      5,
-      6
+      7,
+      10
      ]
     }
    ]
@@ -15176,13 +15176,13 @@
    "seed": 0,
    "router": "shared-all",
    "routes": 121,
-   "vertices": 500,
+   "vertices": 501,
    "gridsDiffer": 0,
-   "crossings": 148,
+   "crossings": 141,
    "crossingsEstimated": false,
-   "pairs": 449,
-   "proper": 183,
-   "contact": 266,
+   "pairs": 439,
+   "proper": 178,
+   "contact": 261,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -15265,11 +15265,11 @@
       0
      ],
      "each": [
-      3,
-      6,
-      4,
-      6,
-      -7
+      12,
+      7,
+      22,
+      9,
+      13
      ]
     }
    ]
@@ -15279,13 +15279,13 @@
    "seed": 0,
    "router": "sections",
    "routes": 121,
-   "vertices": 534,
+   "vertices": 533,
    "gridsDiffer": 0,
-   "crossings": 316,
+   "crossings": 321,
    "crossingsEstimated": false,
-   "pairs": 653,
-   "proper": 426,
-   "contact": 227,
+   "pairs": 607,
+   "proper": 400,
+   "contact": 207,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -15369,10 +15369,10 @@
      ],
      "each": [
       8,
-      48,
-      20,
-      36,
-      21
+      45,
+      42,
+      18,
+      18
      ]
     }
    ]
@@ -15382,13 +15382,13 @@
    "seed": 0,
    "router": "sections-site",
    "routes": 121,
-   "vertices": 529,
+   "vertices": 533,
    "gridsDiffer": 0,
-   "crossings": 1178,
+   "crossings": 1168,
    "crossingsEstimated": false,
-   "pairs": 2175,
-   "proper": 1886,
-   "contact": 289,
+   "pairs": 2092,
+   "proper": 1845,
+   "contact": 247,
    "pairsEstimated": false,
    "self": 1,
    "touch": 0,
@@ -15471,11 +15471,11 @@
       0
      ],
      "each": [
-      155,
-      117,
-      96,
-      135,
-      33
+      85,
+      89,
+      34,
+      85,
+      7
      ]
     }
    ]
@@ -15485,12 +15485,12 @@
    "seed": 1,
    "router": "corners",
    "routes": 121,
-   "vertices": 522,
+   "vertices": 515,
    "gridsDiffer": 0,
-   "crossings": 216,
+   "crossings": 212,
    "crossingsEstimated": false,
-   "pairs": 336,
-   "proper": 283,
+   "pairs": 330,
+   "proper": 277,
    "contact": 53,
    "pairsEstimated": false,
    "self": 0,
@@ -15575,10 +15575,10 @@
      ],
      "each": [
       10,
+      9,
       12,
-      17,
-      16,
-      0
+      11,
+      1
      ]
     }
    ]
@@ -15588,13 +15588,13 @@
    "seed": 1,
    "router": "shared",
    "routes": 121,
-   "vertices": 517,
+   "vertices": 515,
    "gridsDiffer": 0,
-   "crossings": 211,
+   "crossings": 212,
    "crossingsEstimated": false,
-   "pairs": 342,
-   "proper": 287,
-   "contact": 55,
+   "pairs": 330,
+   "proper": 277,
+   "contact": 53,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -15678,10 +15678,10 @@
      ],
      "each": [
       7,
-      4,
-      2,
-      13,
-      4
+      3,
+      3,
+      11,
+      5
      ]
     }
    ]
@@ -15691,13 +15691,13 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 121,
-   "vertices": 494,
+   "vertices": 497,
    "gridsDiffer": 0,
-   "crossings": 77,
+   "crossings": 85,
    "crossingsEstimated": false,
-   "pairs": 343,
-   "proper": 118,
-   "contact": 225,
+   "pairs": 354,
+   "proper": 125,
+   "contact": 229,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -15780,11 +15780,11 @@
       0
      ],
      "each": [
-      7,
-      11,
-      25,
-      9,
-      26
+      29,
+      27,
+      30,
+      26,
+      5
      ]
     }
    ]
@@ -15794,7 +15794,7 @@
    "seed": 1,
    "router": "sections",
    "routes": 121,
-   "vertices": 515,
+   "vertices": 514,
    "gridsDiffer": 0,
    "crossings": 176,
    "crossingsEstimated": false,
@@ -15897,15 +15897,15 @@
    "seed": 1,
    "router": "sections-site",
    "routes": 121,
-   "vertices": 531,
+   "vertices": 528,
    "gridsDiffer": 0,
-   "crossings": 1021,
+   "crossings": 993,
    "crossingsEstimated": false,
-   "pairs": 1866,
-   "proper": 1494,
-   "contact": 372,
+   "pairs": 1806,
+   "proper": 1489,
+   "contact": 317,
    "pairsEstimated": false,
-   "self": 3,
+   "self": 5,
    "touch": 0,
    "shifts": [
     {
@@ -15986,11 +15986,11 @@
       0
      ],
      "each": [
-      63,
-      122,
-      228,
-      128,
-      83
+      116,
+      145,
+      85,
+      234,
+      163
      ]
     }
    ]
@@ -16000,12 +16000,12 @@
    "seed": 2,
    "router": "corners",
    "routes": 121,
-   "vertices": 511,
+   "vertices": 505,
    "gridsDiffer": 0,
-   "crossings": 168,
+   "crossings": 167,
    "crossingsEstimated": false,
-   "pairs": 315,
-   "proper": 226,
+   "pairs": 314,
+   "proper": 225,
    "contact": 89,
    "pairsEstimated": false,
    "self": 0,
@@ -16089,11 +16089,11 @@
       0
      ],
      "each": [
+      16,
       21,
-      18,
-      44,
-      53,
-      57
+      38,
+      41,
+      46
      ]
     }
    ]
@@ -16105,11 +16105,11 @@
    "routes": 121,
    "vertices": 505,
    "gridsDiffer": 0,
-   "crossings": 163,
+   "crossings": 167,
    "crossingsEstimated": false,
    "pairs": 314,
-   "proper": 221,
-   "contact": 93,
+   "proper": 225,
+   "contact": 89,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -16210,9 +16210,9 @@
    "gridsDiffer": 0,
    "crossings": 68,
    "crossingsEstimated": false,
-   "pairs": 305,
+   "pairs": 307,
    "proper": 71,
-   "contact": 234,
+   "contact": 236,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -16296,10 +16296,10 @@
      ],
      "each": [
       45,
-      15,
-      35,
-      38,
-      35
+      12,
+      41,
+      9,
+      44
      ]
     }
    ]
@@ -16309,13 +16309,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 121,
-   "vertices": 519,
+   "vertices": 515,
    "gridsDiffer": 0,
-   "crossings": 221,
+   "crossings": 220,
    "crossingsEstimated": false,
-   "pairs": 559,
-   "proper": 400,
-   "contact": 159,
+   "pairs": 554,
+   "proper": 399,
+   "contact": 155,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -16398,11 +16398,11 @@
       0
      ],
      "each": [
-      52,
-      39,
+      57,
+      33,
       41,
-      21,
-      74
+      25,
+      70
      ]
     }
    ]
@@ -16412,13 +16412,13 @@
    "seed": 2,
    "router": "sections-site",
    "routes": 121,
-   "vertices": 532,
+   "vertices": 534,
    "gridsDiffer": 0,
-   "crossings": 901,
+   "crossings": 906,
    "crossingsEstimated": false,
-   "pairs": 1852,
-   "proper": 1528,
-   "contact": 324,
+   "pairs": 1840,
+   "proper": 1523,
+   "contact": 317,
    "pairsEstimated": false,
    "self": 6,
    "touch": 0,
@@ -16501,11 +16501,11 @@
       0
      ],
      "each": [
-      83,
-      85,
-      91,
-      57,
-      -13
+      87,
+      67,
+      70,
+      45,
+      25
      ]
     }
    ]
@@ -16721,9 +16721,9 @@
    "seed": 0,
    "router": "shared-all",
    "routes": 128,
-   "vertices": 565,
+   "vertices": 566,
    "gridsDiffer": 0,
-   "crossings": 82,
+   "crossings": 81,
    "crossingsEstimated": false,
    "pairs": 2222,
    "proper": 507,
@@ -16810,11 +16810,11 @@
       0
      ],
      "each": [
-      18,
-      14,
-      26,
+      8,
+      32,
       44,
-      16
+      44,
+      24
      ]
     }
    ]
@@ -17751,13 +17751,13 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 131,
-   "vertices": 607,
+   "vertices": 609,
    "gridsDiffer": 0,
-   "crossings": 102,
+   "crossings": 95,
    "crossingsEstimated": false,
-   "pairs": 1936,
-   "proper": 434,
-   "contact": 1502,
+   "pairs": 1949,
+   "proper": 417,
+   "contact": 1532,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -17840,11 +17840,11 @@
       0
      ],
      "each": [
-      46,
-      40,
-      46,
-      24,
-      23
+      8,
+      11,
+      50,
+      22,
+      20
      ]
     }
    ]
@@ -17957,13 +17957,13 @@
    "seed": 2,
    "router": "sections-site",
    "routes": 131,
-   "vertices": 678,
+   "vertices": 679,
    "gridsDiffer": 0,
-   "crossings": 660,
+   "crossings": 664,
    "crossingsEstimated": false,
-   "pairs": 3580,
-   "proper": 2788,
-   "contact": 792,
+   "pairs": 3593,
+   "proper": 2803,
+   "contact": 790,
    "pairsEstimated": false,
    "self": 3,
    "touch": 0,
@@ -18046,11 +18046,11 @@
       0
      ],
      "each": [
-      96,
-      128,
-      129,
-      93,
-      104
+      121,
+      122,
+      112,
+      140,
+      102
      ]
     }
    ]
@@ -18781,13 +18781,13 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 59,
-   "vertices": 297,
+   "vertices": 299,
    "gridsDiffer": 0,
-   "crossings": 20,
+   "crossings": 17,
    "crossingsEstimated": false,
-   "pairs": 108,
-   "proper": 31,
-   "contact": 77,
+   "pairs": 111,
+   "proper": 30,
+   "contact": 81,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -18870,10 +18870,10 @@
       0
      ],
      "each": [
-      10,
-      10,
-      2,
       6,
+      12,
+      10,
+      0,
       6
      ]
     }
@@ -22695,13 +22695,13 @@
    "seed": 0,
    "router": "corners",
    "routes": 57,
-   "vertices": 219,
+   "vertices": 221,
    "gridsDiffer": 0,
-   "crossings": 287,
+   "crossings": 286,
    "crossingsEstimated": false,
-   "pairs": 294,
-   "proper": 287,
-   "contact": 7,
+   "pairs": 292,
+   "proper": 286,
+   "contact": 6,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -22798,13 +22798,13 @@
    "seed": 0,
    "router": "shared",
    "routes": 57,
-   "vertices": 219,
+   "vertices": 221,
    "gridsDiffer": 0,
-   "crossings": 287,
+   "crossings": 286,
    "crossingsEstimated": false,
-   "pairs": 294,
-   "proper": 287,
-   "contact": 7,
+   "pairs": 292,
+   "proper": 286,
+   "contact": 6,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -22901,13 +22901,13 @@
    "seed": 0,
    "router": "shared-all",
    "routes": 57,
-   "vertices": 219,
+   "vertices": 221,
    "gridsDiffer": 0,
    "crossings": 282,
    "crossingsEstimated": false,
-   "pairs": 292,
-   "proper": 286,
-   "contact": 6,
+   "pairs": 290,
+   "proper": 285,
+   "contact": 5,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -23313,9 +23313,9 @@
    "seed": 1,
    "router": "shared",
    "routes": 58,
-   "vertices": 226,
+   "vertices": 227,
    "gridsDiffer": 0,
-   "crossings": 271,
+   "crossings": 272,
    "crossingsEstimated": false,
    "pairs": 292,
    "proper": 272,
@@ -23931,13 +23931,13 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 57,
-   "vertices": 210,
+   "vertices": 209,
    "gridsDiffer": 0,
-   "crossings": 316,
+   "crossings": 304,
    "crossingsEstimated": false,
-   "pairs": 356,
-   "proper": 328,
-   "contact": 28,
+   "pairs": 349,
+   "proper": 304,
+   "contact": 45,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -24020,11 +24020,11 @@
       0
      ],
      "each": [
-      8,
       0,
-      8,
-      8,
-      8
+      0,
+      0,
+      0,
+      0
      ]
     }
    ]
@@ -24446,7 +24446,7 @@
    "seed": 0,
    "router": "shared-all",
    "routes": 45,
-   "vertices": 197,
+   "vertices": 203,
    "gridsDiffer": 4,
    "crossings": 3,
    "crossingsEstimated": false,
@@ -24535,11 +24535,11 @@
       0
      ],
      "each": [
-      9,
-      8,
-      7,
-      6,
-      11
+      16,
+      18,
+      16,
+      10,
+      19
      ]
     }
    ]
@@ -24656,9 +24656,9 @@
    "gridsDiffer": 4,
    "crossings": 80,
    "crossingsEstimated": false,
-   "pairs": 490,
+   "pairs": 488,
    "proper": 163,
-   "contact": 327,
+   "contact": 325,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -25476,7 +25476,7 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 45,
-   "vertices": 193,
+   "vertices": 195,
    "gridsDiffer": 8,
    "crossings": 1,
    "crossingsEstimated": false,
@@ -25565,11 +25565,11 @@
       0
      ],
      "each": [
-      33,
-      11,
+      7,
       9,
-      23,
-      31
+      39,
+      27,
+      19
      ]
     }
    ]
@@ -26508,11 +26508,11 @@
    "routes": 84,
    "vertices": 113,
    "gridsDiffer": 0,
-   "crossings": 12,
+   "crossings": 10,
    "crossingsEstimated": false,
    "pairs": 958,
-   "proper": 223,
-   "contact": 735,
+   "proper": 133,
+   "contact": 825,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -27021,7 +27021,7 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 83,
-   "vertices": 116,
+   "vertices": 117,
    "gridsDiffer": 0,
    "crossings": 10,
    "crossingsEstimated": false,
@@ -28144,7 +28144,7 @@
       0,
       0,
       0,
-      8
+      0
      ]
     }
    ]
@@ -28360,115 +28360,12 @@
    "seed": 2,
    "router": "corners",
    "routes": 15,
-   "vertices": 79,
+   "vertices": 80,
    "gridsDiffer": 0,
    "crossings": 14,
    "crossingsEstimated": false,
-   "pairs": 92,
-   "proper": 58,
-   "contact": 34,
-   "pairsEstimated": false,
-   "self": 0,
-   "touch": 0,
-   "shifts": [
-    {
-     "move": 1e-12,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-10,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-8,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 1e-7,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "move": 0.1,
-     "one": [
-      0,
-      0,
-      0,
-      0,
-      0
-     ],
-     "each": [
-      4,
-      12,
-      10,
-      2,
-      4
-     ]
-    }
-   ]
-  },
-  {
-   "family": "maze",
-   "seed": 2,
-   "router": "shared",
-   "routes": 15,
-   "vertices": 79,
-   "gridsDiffer": 0,
-   "crossings": 14,
-   "crossingsEstimated": false,
-   "pairs": 82,
-   "proper": 47,
+   "pairs": 90,
+   "proper": 55,
    "contact": 35,
    "pairsEstimated": false,
    "self": 0,
@@ -28552,9 +28449,112 @@
       0
      ],
      "each": [
-      4,
+      2,
+      3,
+      1,
+      2,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "family": "maze",
+   "seed": 2,
+   "router": "shared",
+   "routes": 15,
+   "vertices": 80,
+   "gridsDiffer": 0,
+   "crossings": 14,
+   "crossingsEstimated": false,
+   "pairs": 90,
+   "proper": 55,
+   "contact": 35,
+   "pairsEstimated": false,
+   "self": 0,
+   "touch": 0,
+   "shifts": [
+    {
+     "move": 1e-12,
+     "one": [
       0,
-      6,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-10,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-8,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 1e-7,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "move": 0.1,
+     "one": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "each": [
+      5,
+      2,
+      5,
       2,
       0
      ]
@@ -28568,11 +28568,11 @@
    "routes": 15,
    "vertices": 78,
    "gridsDiffer": 0,
-   "crossings": 2,
+   "crossings": 1,
    "crossingsEstimated": false,
    "pairs": 32,
-   "proper": 4,
-   "contact": 28,
+   "proper": 3,
+   "contact": 29,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -28669,13 +28669,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 15,
-   "vertices": 80,
+   "vertices": 81,
    "gridsDiffer": 0,
-   "crossings": 20,
+   "crossings": 22,
    "crossingsEstimated": false,
    "pairs": 98,
-   "proper": 64,
-   "contact": 34,
+   "proper": 63,
+   "contact": 35,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -28758,11 +28758,11 @@
       0
      ],
      "each": [
+      4,
       2,
+      5,
       2,
-      14,
-      2,
-      2
+      4
      ]
     }
    ]
@@ -29184,13 +29184,13 @@
    "seed": 0,
    "router": "sections",
    "routes": 24,
-   "vertices": 112,
+   "vertices": 116,
    "gridsDiffer": 0,
    "crossings": 39,
    "crossingsEstimated": false,
-   "pairs": 105,
+   "pairs": 107,
    "proper": 56,
-   "contact": 49,
+   "contact": 51,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -29273,11 +29273,11 @@
       0
      ],
      "each": [
-      25,
-      45,
-      18,
-      30,
-      39
+      17,
+      41,
+      14,
+      22,
+      37
      ]
     }
    ]
@@ -29699,7 +29699,7 @@
    "seed": 1,
    "router": "sections",
    "routes": 23,
-   "vertices": 106,
+   "vertices": 110,
    "gridsDiffer": 0,
    "crossings": 32,
    "crossingsEstimated": false,
@@ -29788,9 +29788,9 @@
       0
      ],
      "each": [
-      10,
-      24,
-      16,
+      9,
+      20,
+      12,
       20,
       8
      ]
@@ -30214,13 +30214,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 23,
-   "vertices": 107,
+   "vertices": 109,
    "gridsDiffer": 0,
    "crossings": 31,
    "crossingsEstimated": false,
-   "pairs": 102,
+   "pairs": 101,
    "proper": 49,
-   "contact": 53,
+   "contact": 52,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -30303,11 +30303,11 @@
       0
      ],
      "each": [
-      15,
+      13,
+      21,
+      31,
       18,
-      27,
-      14,
-      35
+      25
      ]
     }
    ]
@@ -32686,7 +32686,7 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 14,
-   "vertices": 83,
+   "vertices": 86,
    "gridsDiffer": 0,
    "crossings": 4,
    "crossingsEstimated": false,
@@ -33201,12 +33201,12 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 14,
-   "vertices": 80,
+   "vertices": 81,
    "gridsDiffer": 0,
-   "crossings": 3,
+   "crossings": 1,
    "crossingsEstimated": false,
-   "pairs": 31,
-   "proper": 4,
+   "pairs": 29,
+   "proper": 2,
    "contact": 27,
    "pairsEstimated": false,
    "self": 0,
@@ -33293,7 +33293,7 @@
       0,
       4,
       0,
-      2,
+      4,
       0
      ]
     }
@@ -33922,7 +33922,7 @@
    "seed": 0,
    "router": "sections-site",
    "routes": 16,
-   "vertices": 82,
+   "vertices": 81,
    "gridsDiffer": 0,
    "crossings": 23,
    "crossingsEstimated": false,
@@ -34011,11 +34011,11 @@
       0
      ],
      "each": [
-      25,
-      24,
+      19,
       3,
-      18,
-      30
+      24,
+      20,
+      0
      ]
     }
    ]
@@ -34542,11 +34542,11 @@
    "routes": 16,
    "vertices": 71,
    "gridsDiffer": 0,
-   "crossings": 21,
+   "crossings": 22,
    "crossingsEstimated": false,
    "pairs": 31,
-   "proper": 21,
-   "contact": 10,
+   "proper": 22,
+   "contact": 9,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -34645,11 +34645,11 @@
    "routes": 16,
    "vertices": 71,
    "gridsDiffer": 0,
-   "crossings": 21,
+   "crossings": 22,
    "crossingsEstimated": false,
    "pairs": 31,
-   "proper": 21,
-   "contact": 10,
+   "proper": 22,
+   "contact": 9,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35055,9 +35055,9 @@
    "seed": 0,
    "router": "corners",
    "routes": 30,
-   "vertices": 221,
+   "vertices": 220,
    "gridsDiffer": 0,
-   "crossings": 76,
+   "crossings": 78,
    "crossingsEstimated": false,
    "pairs": 103,
    "proper": 79,
@@ -35158,9 +35158,9 @@
    "seed": 0,
    "router": "shared",
    "routes": 30,
-   "vertices": 221,
+   "vertices": 220,
    "gridsDiffer": 0,
-   "crossings": 76,
+   "crossings": 78,
    "crossingsEstimated": false,
    "pairs": 103,
    "proper": 79,
@@ -35263,11 +35263,11 @@
    "routes": 30,
    "vertices": 176,
    "gridsDiffer": 0,
-   "crossings": 9,
+   "crossings": 11,
    "crossingsEstimated": false,
-   "pairs": 107,
-   "proper": 13,
-   "contact": 94,
+   "pairs": 121,
+   "proper": 14,
+   "contact": 107,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35364,13 +35364,13 @@
    "seed": 0,
    "router": "sections",
    "routes": 30,
-   "vertices": 224,
+   "vertices": 219,
    "gridsDiffer": 0,
-   "crossings": 36,
+   "crossings": 35,
    "crossingsEstimated": false,
-   "pairs": 133,
+   "pairs": 134,
    "proper": 62,
-   "contact": 71,
+   "contact": 72,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35455,9 +35455,9 @@
      "each": [
       10,
       14,
+      16,
       6,
-      0,
-      6
+      4
      ]
     }
    ]
@@ -35570,13 +35570,13 @@
    "seed": 1,
    "router": "corners",
    "routes": 30,
-   "vertices": 220,
+   "vertices": 219,
    "gridsDiffer": 0,
-   "crossings": 97,
+   "crossings": 88,
    "crossingsEstimated": false,
-   "pairs": 134,
+   "pairs": 135,
    "proper": 104,
-   "contact": 30,
+   "contact": 31,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35673,13 +35673,13 @@
    "seed": 1,
    "router": "shared",
    "routes": 30,
-   "vertices": 218,
+   "vertices": 219,
    "gridsDiffer": 0,
-   "crossings": 91,
+   "crossings": 88,
    "crossingsEstimated": false,
-   "pairs": 133,
-   "proper": 103,
-   "contact": 30,
+   "pairs": 135,
+   "proper": 104,
+   "contact": 31,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35776,13 +35776,13 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 30,
-   "vertices": 172,
+   "vertices": 177,
    "gridsDiffer": 0,
-   "crossings": 11,
+   "crossings": 14,
    "crossingsEstimated": false,
-   "pairs": 131,
-   "proper": 14,
-   "contact": 117,
+   "pairs": 144,
+   "proper": 21,
+   "contact": 123,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -35881,13 +35881,13 @@
    "routes": 30,
    "vertices": 211,
    "gridsDiffer": 0,
-   "crossings": 17,
+   "crossings": 19,
    "crossingsEstimated": false,
-   "pairs": 135,
-   "proper": 60,
-   "contact": 75,
+   "pairs": 134,
+   "proper": 65,
+   "contact": 69,
    "pairsEstimated": false,
-   "self": 0,
+   "self": 1,
    "touch": 0,
    "shifts": [
     {
@@ -35970,9 +35970,9 @@
      "each": [
       8,
       6,
-      10,
+      6,
       14,
-      6
+      10
      ]
     }
    ]
@@ -36085,13 +36085,13 @@
    "seed": 2,
    "router": "corners",
    "routes": 30,
-   "vertices": 229,
+   "vertices": 227,
    "gridsDiffer": 0,
-   "crossings": 83,
+   "crossings": 81,
    "crossingsEstimated": false,
    "pairs": 105,
-   "proper": 83,
-   "contact": 22,
+   "proper": 82,
+   "contact": 23,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -36188,13 +36188,13 @@
    "seed": 2,
    "router": "shared",
    "routes": 30,
-   "vertices": 230,
+   "vertices": 227,
    "gridsDiffer": 0,
-   "crossings": 84,
+   "crossings": 81,
    "crossingsEstimated": false,
    "pairs": 105,
-   "proper": 84,
-   "contact": 21,
+   "proper": 82,
+   "contact": 23,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -36293,11 +36293,11 @@
    "routes": 30,
    "vertices": 171,
    "gridsDiffer": 0,
-   "crossings": 18,
+   "crossings": 14,
    "crossingsEstimated": false,
-   "pairs": 114,
-   "proper": 27,
-   "contact": 87,
+   "pairs": 105,
+   "proper": 22,
+   "contact": 83,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -36380,11 +36380,11 @@
       0
      ],
      "each": [
-      4,
-      4,
       0,
-      2,
-      2
+      0,
+      0,
+      0,
+      0
      ]
     }
    ]
@@ -36394,13 +36394,13 @@
    "seed": 2,
    "router": "sections",
    "routes": 30,
-   "vertices": 214,
+   "vertices": 213,
    "gridsDiffer": 0,
-   "crossings": 26,
+   "crossings": 25,
    "crossingsEstimated": false,
    "pairs": 132,
-   "proper": 71,
-   "contact": 61,
+   "proper": 70,
+   "contact": 62,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -36484,10 +36484,10 @@
      ],
      "each": [
       0,
+      22,
+      6,
       26,
-      8,
-      24,
-      12
+      10
      ]
     }
    ]
@@ -36810,9 +36810,9 @@
    "gridsDiffer": 0,
    "crossings": 0,
    "crossingsEstimated": false,
-   "pairs": 21,
+   "pairs": 16,
    "proper": 0,
-   "contact": 21,
+   "contact": 16,
    "pairsEstimated": false,
    "self": 0,
    "touch": 0,
@@ -36896,7 +36896,7 @@
      ],
      "each": [
       2,
-      0,
+      2,
       0,
       2,
       0
@@ -38866,7 +38866,7 @@
    "seed": 1,
    "router": "shared-all",
    "routes": 11,
-   "vertices": 63,
+   "vertices": 64,
    "gridsDiffer": 0,
    "crossings": 0,
    "crossingsEstimated": false,
@@ -38956,10 +38956,10 @@
      ],
      "each": [
       8,
-      12,
       10,
       8,
-      4
+      12,
+      2
      ]
     }
    ]
@@ -39381,7 +39381,7 @@
    "seed": 2,
    "router": "shared-all",
    "routes": 15,
-   "vertices": 80,
+   "vertices": 81,
    "gridsDiffer": 0,
    "crossings": 2,
    "crossingsEstimated": false,
@@ -39470,10 +39470,10 @@
       0
      ],
      "each": [
-      0,
+      2,
       0,
       4,
-      2,
+      4,
       2
      ]
     }

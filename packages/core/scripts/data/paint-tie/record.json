@@ -15,15 +15,15 @@
    "boards": 84,
    "cornersDiffer": 45,
    "moved": [
-    14,
-    394
+    25,
+    397
    ],
    "pairs": [
-    36243,
-    40506
+    36284,
+    40526
    ],
    "signFlips": 0,
-   "gapChange": 60
+   "gapChange": 64
   },
   {
    "routers": [
@@ -34,15 +34,15 @@
    "boards": 84,
    "cornersDiffer": 43,
    "moved": [
-    986,
-    269
+    969,
+    272
    ],
    "pairs": [
-    39419,
-    39542
+    39535,
+    39556
    ],
-   "signFlips": 2,
-   "gapChange": 55
+   "signFlips": 1,
+   "gapChange": 39
   },
   {
    "routers": [
@@ -53,15 +53,15 @@
    "boards": 84,
    "cornersDiffer": 71,
    "moved": [
-    394,
-    483
+    397,
+    471
    ],
    "pairs": [
-    40506,
-    47308
+    40526,
+    47209
    ],
    "signFlips": 0,
-   "gapChange": 68
+   "gapChange": 67
   },
   {
    "routers": [
@@ -72,12 +72,12 @@
    "boards": 84,
    "cornersDiffer": 71,
    "moved": [
-    269,
-    511
+    272,
+    512
    ],
    "pairs": [
-    39542,
-    48392
+    39556,
+    48306
    ],
    "signFlips": 0,
    "gapChange": 24
@@ -91,15 +91,15 @@
    "boards": 84,
    "cornersDiffer": 66,
    "moved": [
-    14,
-    483
+    25,
+    471
    ],
    "pairs": [
-    36243,
-    47308
+    36284,
+    47209
    ],
    "signFlips": 0,
-   "gapChange": 30
+   "gapChange": 31
   },
   {
    "routers": [
@@ -110,15 +110,15 @@
    "boards": 84,
    "cornersDiffer": 67,
    "moved": [
-    986,
-    511
+    969,
+    512
    ],
    "pairs": [
-    39419,
-    48392
+    39535,
+    48306
    ],
    "signFlips": 0,
-   "gapChange": 47
+   "gapChange": 27
   }
  ],
  "moves": [
@@ -146,241 +146,241 @@
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-a",
-   "moved": 7,
-   "points": 43627,
-   "share": 0.00016045109679785455
+   "moved": 14,
+   "points": 43980,
+   "share": 0.0003183265120509322
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 28,
-   "points": 43627,
-   "share": 0.0006418043871914182
+   "moved": 35,
+   "points": 43980,
+   "share": 0.0007958162801273306
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 41,
-   "points": 43627,
-   "share": 0.0009397849955302908
+   "moved": 49,
+   "points": 43980,
+   "share": 0.001114142792178263
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-d",
-   "moved": 37,
-   "points": 43627,
-   "share": 0.0008480986545029455
+   "moved": 40,
+   "points": 43980,
+   "share": 0.0009095043201455207
   },
   {
    "router": "shared-all",
    "kind": "painted",
    "vector": "shift-e",
-   "moved": 47,
-   "points": 43627,
-   "share": 0.001077314507071309
+   "moved": 52,
+   "points": 43980,
+   "share": 0.0011823556161891769
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-a",
-   "moved": 594,
-   "points": 78768,
-   "share": 0.007541133455210238
+   "moved": 573,
+   "points": 79262,
+   "share": 0.007229189271025208
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-b",
-   "moved": 2063,
-   "points": 78768,
-   "share": 0.026190838919358115
+   "moved": 2027,
+   "points": 79262,
+   "share": 0.025573414751078702
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 2494,
-   "points": 78768,
-   "share": 0.031662604103189114
+   "moved": 2473,
+   "points": 79262,
+   "share": 0.031200322979485755
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 1884,
-   "points": 78768,
-   "share": 0.023918342474101156
+   "moved": 1843,
+   "points": 79262,
+   "share": 0.023251999697206732
   },
   {
    "router": "shared-all",
    "kind": "polyline",
    "vector": "shift-e",
-   "moved": 2606,
-   "points": 78768,
-   "share": 0.03308450132033313
+   "moved": 2525,
+   "points": 79262,
+   "share": 0.03185637505992783
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-a",
-   "moved": 301,
-   "points": 54074,
-   "share": 0.005566445981432851
+   "moved": 305,
+   "points": 54068,
+   "share": 0.005641044610490494
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 982,
-   "points": 54074,
-   "share": 0.018160298849724452
+   "moved": 994,
+   "points": 54068,
+   "share": 0.018384256861729675
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 1150,
-   "points": 54074,
-   "share": 0.02126715242075674
+   "moved": 1153,
+   "points": 54068,
+   "share": 0.021324998150477177
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-d",
-   "moved": 940,
-   "points": 54074,
-   "share": 0.017383585456966378
+   "moved": 948,
+   "points": 54068,
+   "share": 0.01753347636309832
   },
   {
    "router": "sections",
    "kind": "painted",
    "vector": "shift-e",
-   "moved": 1244,
-   "points": 54074,
-   "share": 0.02300551096645338
+   "moved": 1258,
+   "points": 54068,
+   "share": 0.023266997114744396
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-a",
-   "moved": 205,
-   "points": 58315,
-   "share": 0.003515390551316128
+   "moved": 206,
+   "points": 58298,
+   "share": 0.0035335689045936395
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-b",
-   "moved": 717,
-   "points": 58315,
-   "share": 0.012295292806310554
+   "moved": 708,
+   "points": 58298,
+   "share": 0.012144498953651927
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 846,
-   "points": 58315,
-   "share": 0.014507416616650948
+   "moved": 838,
+   "points": 58298,
+   "share": 0.014374421077910048
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 560,
-   "points": 58315,
-   "share": 0.009603018091400154
+   "moved": 558,
+   "points": 58298,
+   "share": 0.009571511887200247
   },
   {
    "router": "sections",
    "kind": "polyline",
    "vector": "shift-e",
-   "moved": 810,
-   "points": 58315,
-   "share": 0.013890079739346651
+   "moved": 799,
+   "points": 58298,
+   "share": 0.013705444440632611
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-a",
-   "moved": 394,
-   "points": 84011,
-   "share": 0.004689862041875469
+   "moved": 396,
+   "points": 83887,
+   "share": 0.00472063609379284
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-b",
-   "moved": 1365,
-   "points": 84011,
-   "share": 0.016247872302436586
+   "moved": 1351,
+   "points": 83887,
+   "share": 0.01610499839069224
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-c",
-   "moved": 1546,
-   "points": 84011,
-   "share": 0.01840235207294283
+   "moved": 1534,
+   "points": 83887,
+   "share": 0.01828650446433893
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-d",
-   "moved": 1191,
-   "points": 84011,
-   "share": 0.01417671495399412
+   "moved": 1186,
+   "points": 83887,
+   "share": 0.014138066684945223
   },
   {
    "router": "sections-site",
    "kind": "painted",
    "vector": "shift-e",
-   "moved": 1608,
-   "points": 84011,
-   "share": 0.019140350668364857
+   "moved": 1596,
+   "points": 83887,
+   "share": 0.019025593953771146
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-a",
-   "moved": 366,
-   "points": 96842,
-   "share": 0.003779351934078189
+   "moved": 364,
+   "points": 96716,
+   "share": 0.0037635965093676333
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-b",
-   "moved": 1299,
-   "points": 96842,
-   "share": 0.01341360153652341
+   "moved": 1295,
+   "points": 96716,
+   "share": 0.013389718350634848
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-c",
-   "moved": 1395,
-   "points": 96842,
-   "share": 0.014404906961855393
+   "moved": 1393,
+   "points": 96716,
+   "share": 0.014402994333926134
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-d",
-   "moved": 1091,
-   "points": 96842,
-   "share": 0.011265773114970777
+   "moved": 1087,
+   "points": 96716,
+   "share": 0.011239091773853344
   },
   {
    "router": "sections-site",
    "kind": "polyline",
    "vector": "shift-e",
-   "moved": 1443,
-   "points": 96842,
-   "share": 0.014900559674521386
+   "moved": 1441,
+   "points": 96716,
+   "share": 0.014899292774721866
   }
  ],
  "rates": [
@@ -388,103 +388,103 @@
    "kind": "painted",
    "move": 1e-12,
    "moved": 0,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
+   "crossingsUnderGrid": 7505,
+   "pairsUnderGrid": 88530,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
-   "low": 5.421010862427522e-20,
-   "high": 0.0005153663170751018,
+   "low": 0,
+   "high": 0.0005115914141696964,
    "formula": 0.0000014546000589616598
   },
   {
    "kind": "painted",
    "move": 1e-10,
    "moved": 9,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.0012080536912751677,
-   "rateOfPairs": 0.00010114064168118223,
-   "low": 0.0006357059192233857,
-   "high": 0.0022945226000386488,
+   "crossingsUnderGrid": 7505,
+   "pairsUnderGrid": 88530,
+   "rateOfCrossings": 0.0011992005329780147,
+   "rateOfPairs": 0.00010166045408336157,
+   "low": 0.0006310462682719057,
+   "high": 0.002277719210460742,
    "formula": 0.00014982915515545755
   },
   {
    "kind": "painted",
    "move": 1e-8,
-   "moved": 497,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.06671140939597316,
-   "rateOfPairs": 0.005585210990616396,
-   "low": 0.06126575374264505,
-   "high": 0.07260366973964179,
+   "moved": 517,
+   "crossingsUnderGrid": 7505,
+   "pairsUnderGrid": 88530,
+   "rateOfCrossings": 0.06888740839440373,
+   "rateOfPairs": 0.00583982830678866,
+   "low": 0.06337532670309325,
+   "high": 0.07484059708652598,
    "formula": 0.016036978301359344
   },
   {
    "kind": "painted",
    "move": 1e-7,
-   "moved": 4716,
-   "crossingsUnderGrid": 7450,
-   "pairsUnderGrid": 88985,
-   "rateOfCrossings": 0.6330201342281879,
-   "rateOfPairs": 0.05299769624093949,
-   "low": 0.6220095874523226,
-   "high": 0.6438935728107051,
+   "moved": 4740,
+   "crossingsUnderGrid": 7505,
+   "pairsUnderGrid": 88530,
+   "rateOfCrossings": 0.631578947368421,
+   "rateOfPairs": 0.05354117248390376,
+   "low": 0.6206008493851664,
+   "high": 0.6424224160321573,
    "formula": 0.1514481009845622
   },
   {
    "kind": "polyline",
    "move": 1e-12,
    "moved": 0,
-   "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
+   "crossingsUnderGrid": 7230,
+   "pairsUnderGrid": 15685,
    "rateOfCrossings": 0,
    "rateOfPairs": 0,
    "low": 0,
-   "high": 0.0005164055238923086,
+   "high": 0.0005310399519483502,
    "formula": 0.0000014546000589616598
   },
   {
    "kind": "polyline",
    "move": 1e-10,
    "moved": 12,
-   "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
-   "rateOfCrossings": 0.0016139878950907868,
-   "rateOfPairs": 0.0007469654528478057,
-   "low": 0.0009235354707113841,
-   "high": 0.0028191788988334576,
+   "crossingsUnderGrid": 7230,
+   "pairsUnderGrid": 15685,
+   "rateOfCrossings": 0.0016597510373443983,
+   "rateOfPairs": 0.0007650621613006056,
+   "low": 0.0009497282445045044,
+   "high": 0.0028990509939104073,
    "formula": 0.00014982915515545755
   },
   {
    "kind": "polyline",
    "move": 1e-8,
-   "moved": 576,
-   "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
-   "rateOfCrossings": 0.07747141896435776,
-   "rateOfPairs": 0.035854341736694675,
-   "low": 0.07161056045675925,
-   "high": 0.08376866965845466,
+   "moved": 573,
+   "crossingsUnderGrid": 7230,
+   "pairsUnderGrid": 15685,
+   "rateOfCrossings": 0.07925311203319502,
+   "rateOfPairs": 0.03653171820210392,
+   "low": 0.07324750059057776,
+   "high": 0.08570559029014886,
    "formula": 0.016036978301359344
   },
   {
    "kind": "polyline",
    "move": 1e-7,
-   "moved": 6340,
-   "crossingsUnderGrid": 7435,
-   "pairsUnderGrid": 16065,
-   "rateOfCrossings": 0.8527236045729657,
-   "rateOfPairs": 0.39464674758792406,
-   "low": 0.8444862396762258,
-   "high": 0.8605966726340883,
+   "moved": 6191,
+   "crossingsUnderGrid": 7230,
+   "pairsUnderGrid": 15685,
+   "rateOfCrossings": 0.8562932226832641,
+   "rateOfPairs": 0.39470832005100415,
+   "low": 0.8480180415905547,
+   "high": 0.864189991904267,
    "formula": 0.1514481009845622
   }
  ],
  "laneOrder": [
   {
    "router": "shared-all",
-   "laneOrderFlips": 774
+   "laneOrderFlips": 791
   },
   {
    "router": "sections",
@@ -499,23 +499,23 @@
   {
    "router": "shared-all",
    "kind": "painted",
-   "floatPoints": 43668,
-   "snapPoints": 43627,
-   "exactPoints": 43671,
-   "anchoredPoints": 43623,
-   "framedPoints": 43627,
-   "floatPairs": 36267,
-   "snapPairs": 36243,
-   "exactPairs": 36269,
-   "anchoredPairs": 36243,
-   "framedPairs": 36243,
+   "floatPoints": 44015,
+   "snapPoints": 43980,
+   "exactPoints": 44018,
+   "anchoredPoints": 43979,
+   "framedPoints": 43980,
+   "floatPairs": 36310,
+   "snapPairs": 36284,
+   "exactPairs": 36312,
+   "anchoredPairs": 36288,
+   "framedPairs": 36284,
    "lost": {
-    "count": 94,
+    "count": 97,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 0.7295334004020921,
     "overGrid": 0,
-    "under1e9": 94,
-    "under1e6": 94,
+    "under1e9": 97,
+    "under1e6": 97,
     "farFromEnd": 3,
     "widestFarSine": 5.229774070077316e-14,
     "farWithAngle": 0,
@@ -592,16 +592,39 @@
     ]
    },
    "added": {
-    "count": 53,
+    "count": 62,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 33.629554655870244,
     "overGrid": 0,
-    "under1e9": 53,
-    "under1e6": 53,
-    "farFromEnd": 1,
-    "widestFarSine": 1.6131457733415917e-15,
+    "under1e9": 62,
+    "under1e6": 62,
+    "farFromEnd": 2,
+    "widestFarSine": 1.3520812815809486e-13,
     "farWithAngle": 0,
     "farWidest": [
+     {
+      "points": [
+       {
+        "x": 1024.1852137545961,
+        "y": 161.32950487116508
+       },
+       {
+        "x": 1023.9664637545961,
+        "y": 161.54825487116517
+       },
+       {
+        "x": 1023.6862915010153,
+        "y": 161.8284271247461
+       },
+       {
+        "x": 1024.1625419772658,
+        "y": 161.35217664849546
+       }
+      ],
+      "touch": 0,
+      "toEnd": 0.12221974967926437,
+      "sine": 1.3520812815809486e-13
+     },
      {
       "points": [
        {
@@ -651,15 +674,15 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 248,
-   "nearCrossings": 72,
+   "near": 228,
+   "nearCrossings": 74,
    "shifts": [
     {
      "move": 1e-12,
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 6.41460852115415e-13,
-     "floatMoved": 13,
+     "floatMoved": 15,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -669,7 +692,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 26,
+     "floatMoved": 41,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -679,7 +702,7 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 6.035800299141556e-13,
-     "floatMoved": 9,
+     "floatMoved": 11,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -689,7 +712,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 26,
+     "floatMoved": 43,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -699,7 +722,7 @@
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 7.090400782180949e-13,
-     "floatMoved": 9,
+     "floatMoved": 11,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -709,7 +732,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 25,
+     "floatMoved": 39,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -729,7 +752,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 19,
+     "floatMoved": 40,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -749,7 +772,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 26,
+     "floatMoved": 39,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -759,7 +782,7 @@
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 6.800273273256608e-11,
-     "floatMoved": 10,
+     "floatMoved": 12,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -769,7 +792,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 15,
+     "floatMoved": 35,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -789,7 +812,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 14,
+     "floatMoved": 34,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -809,7 +832,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 18,
+     "floatMoved": 38,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -829,7 +852,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 18,
+     "floatMoved": 31,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -839,7 +862,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 8.303820219589399e-11,
-     "floatMoved": 10,
+     "floatMoved": 12,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -849,7 +872,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 15,
+     "floatMoved": 35,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -869,7 +892,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 27,
+     "floatMoved": 43,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -879,7 +902,7 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 7.297261950443499e-9,
-     "floatMoved": 10,
+     "floatMoved": 12,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -889,7 +912,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 26,
+     "floatMoved": 40,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -909,7 +932,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 14,
+     "floatMoved": 34,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -929,7 +952,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 19,
+     "floatMoved": 35,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -949,7 +972,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 24,
+     "floatMoved": 37,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -959,8 +982,8 @@
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
-     "floatMoved": 16,
-     "snapMoved": 6,
+     "floatMoved": 18,
+     "snapMoved": 12,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -969,7 +992,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 19,
+     "floatMoved": 36,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -980,7 +1003,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 9,
-     "snapMoved": 4,
+     "snapMoved": 10,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -989,7 +1012,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 16,
+     "floatMoved": 32,
      "snapMoved": 0,
      "anchoredMoved": 2,
      "framedMoved": 0
@@ -1000,7 +1023,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 3,
-     "snapMoved": 6,
+     "snapMoved": 10,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1009,7 +1032,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 24,
+     "floatMoved": 40,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1029,7 +1052,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 18,
+     "floatMoved": 36,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1040,7 +1063,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 6,
-     "snapMoved": 4,
+     "snapMoved": 10,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1049,7 +1072,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 19,
+     "floatMoved": 38,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1060,7 +1083,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 26,
+     "snapMoved": 35,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1069,8 +1092,8 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 0.3671150855370797,
-     "floatMoved": 0,
-     "snapMoved": 39,
+     "floatMoved": 4,
+     "snapMoved": 46,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1080,7 +1103,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 36,
+     "snapMoved": 45,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1090,7 +1113,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 21,
+     "snapMoved": 32,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1100,7 +1123,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 23,
+     "snapMoved": 30,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1110,7 +1133,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 7,
-     "snapMoved": 7,
+     "snapMoved": 14,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1120,7 +1143,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 7,
-     "snapMoved": 28,
+     "snapMoved": 35,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1130,7 +1153,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 7,
-     "snapMoved": 41,
+     "snapMoved": 49,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1140,7 +1163,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 7,
-     "snapMoved": 37,
+     "snapMoved": 40,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1149,8 +1172,8 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 0.26969458544044755,
-     "floatMoved": 0,
-     "snapMoved": 47,
+     "floatMoved": 2,
+     "snapMoved": 52,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1160,7 +1183,7 @@
      "form": "lines",
      "meanMove": 6,
      "floatMoved": 0,
-     "snapMoved": 0,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1170,7 +1193,7 @@
      "form": "lines",
      "meanMove": 6,
      "floatMoved": 1,
-     "snapMoved": 0,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1180,7 +1203,7 @@
      "form": "lines",
      "meanMove": 4.5,
      "floatMoved": 0,
-     "snapMoved": 0,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1190,7 +1213,7 @@
      "form": "lines",
      "meanMove": 5,
      "floatMoved": 1,
-     "snapMoved": 0,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1200,7 +1223,7 @@
      "form": "lines",
      "meanMove": 4.5,
      "floatMoved": 1,
-     "snapMoved": 0,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1211,7 +1234,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 11,
+     "anchoredMoved": 18,
      "framedMoved": 0
     },
     {
@@ -1222,7 +1245,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 12
+     "framedMoved": 13
     },
     {
      "move": 0.3,
@@ -1231,7 +1254,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 39,
+     "anchoredMoved": 45,
      "framedMoved": 0
     },
     {
@@ -1242,7 +1265,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 40
+     "framedMoved": 47
     },
     {
      "move": 0.3,
@@ -1251,7 +1274,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 48,
+     "anchoredMoved": 58,
      "framedMoved": 0
     },
     {
@@ -1262,7 +1285,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 41
+     "framedMoved": 50
     },
     {
      "move": 0.3,
@@ -1271,7 +1294,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 36,
+     "anchoredMoved": 38,
      "framedMoved": 0
     },
     {
@@ -1282,7 +1305,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 29
+     "framedMoved": 38
     },
     {
      "move": 0.3,
@@ -1291,7 +1314,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 42,
+     "anchoredMoved": 50,
      "framedMoved": 0
     },
     {
@@ -1302,42 +1325,42 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 39
+     "framedMoved": 46
     }
    ]
   },
   {
    "router": "shared-all",
    "kind": "polyline",
-   "floatPoints": 78550,
-   "snapPoints": 78768,
-   "exactPoints": 78556,
-   "anchoredPoints": 78839,
-   "framedPoints": 78771,
-   "floatPairs": 39390,
-   "snapPairs": 39419,
-   "exactPairs": 39390,
-   "anchoredPairs": 39438,
-   "framedPairs": 39419,
+   "floatPoints": 79077,
+   "snapPoints": 79262,
+   "exactPoints": 79083,
+   "anchoredPoints": 79350,
+   "framedPoints": 79265,
+   "floatPairs": 39517,
+   "snapPairs": 39535,
+   "exactPairs": 39517,
+   "anchoredPairs": 39540,
+   "framedPairs": 39535,
    "lost": {
-    "count": 2130,
-    "widest": 4.602649920770331e-13,
+    "count": 2119,
+    "widest": 2.2737367544323206e-13,
     "widestToEnd": 3.5371042909228083e-12,
     "overGrid": 0,
-    "under1e9": 2130,
-    "under1e6": 2130,
+    "under1e9": 2119,
+    "under1e6": 2119,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
     "farWidest": []
    },
    "added": {
-    "count": 2348,
-    "widest": 4.602649920770331e-13,
+    "count": 2304,
+    "widest": 2.2737367544323206e-13,
     "widestToEnd": 6.752653646307179e-12,
     "overGrid": 0,
-    "under1e9": 2348,
-    "under1e6": 2348,
+    "under1e9": 2304,
+    "under1e6": 2304,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
@@ -1367,8 +1390,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 1789,
-   "nearCrossings": 859,
+   "near": 1708,
+   "nearCrossings": 817,
    "shifts": [
     {
      "move": 1e-12,
@@ -1385,7 +1408,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 912,
+     "floatMoved": 897,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1405,7 +1428,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 909,
+     "floatMoved": 886,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1415,7 +1438,7 @@
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 7.090400782180949e-13,
-     "floatMoved": 17,
+     "floatMoved": 18,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1425,7 +1448,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 900,
+     "floatMoved": 902,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1435,7 +1458,7 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 7.65298846294172e-13,
-     "floatMoved": 35,
+     "floatMoved": 36,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1445,7 +1468,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 926,
+     "floatMoved": 889,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1455,7 +1478,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 9.171203408623113e-13,
-     "floatMoved": 35,
+     "floatMoved": 34,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1465,7 +1488,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 886,
+     "floatMoved": 863,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1475,7 +1498,7 @@
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 6.800273273256608e-11,
-     "floatMoved": 41,
+     "floatMoved": 40,
      "snapMoved": 4,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1485,7 +1508,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 892,
+     "floatMoved": 863,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1505,7 +1528,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 938,
+     "floatMoved": 897,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1525,7 +1548,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 886,
+     "floatMoved": 847,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1535,7 +1558,7 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 7.732763380045071e-11,
-     "floatMoved": 27,
+     "floatMoved": 28,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1545,7 +1568,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 877,
+     "floatMoved": 872,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1565,7 +1588,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 890,
+     "floatMoved": 870,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -1576,7 +1599,7 @@
      "form": "lines",
      "meanMove": 7.608067183755338e-9,
      "floatMoved": 33,
-     "snapMoved": 66,
+     "snapMoved": 67,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1585,10 +1608,10 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 900,
-     "snapMoved": 7,
-     "anchoredMoved": 25,
-     "framedMoved": 7
+     "floatMoved": 894,
+     "snapMoved": 9,
+     "anchoredMoved": 22,
+     "framedMoved": 9
     },
     {
      "move": 1e-8,
@@ -1596,7 +1619,7 @@
      "form": "lines",
      "meanMove": 7.297261950443499e-9,
      "floatMoved": 25,
-     "snapMoved": 43,
+     "snapMoved": 41,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1605,18 +1628,18 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 882,
-     "snapMoved": 9,
-     "anchoredMoved": 15,
-     "framedMoved": 9
+     "floatMoved": 890,
+     "snapMoved": 13,
+     "anchoredMoved": 21,
+     "framedMoved": 13
     },
     {
      "move": 1e-8,
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 9.100245509762317e-9,
-     "floatMoved": 21,
-     "snapMoved": 56,
+     "floatMoved": 22,
+     "snapMoved": 53,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1625,10 +1648,10 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 936,
-     "snapMoved": 6,
-     "anchoredMoved": 13,
-     "framedMoved": 6
+     "floatMoved": 907,
+     "snapMoved": 7,
+     "anchoredMoved": 8,
+     "framedMoved": 7
     },
     {
      "move": 1e-8,
@@ -1645,10 +1668,10 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 938,
-     "snapMoved": 11,
-     "anchoredMoved": 27,
-     "framedMoved": 11
+     "floatMoved": 921,
+     "snapMoved": 9,
+     "anchoredMoved": 24,
+     "framedMoved": 9
     },
     {
      "move": 1e-8,
@@ -1656,7 +1679,7 @@
      "form": "lines",
      "meanMove": 7.189137676614337e-9,
      "floatMoved": 10,
-     "snapMoved": 62,
+     "snapMoved": 63,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1665,18 +1688,18 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 889,
-     "snapMoved": 6,
-     "anchoredMoved": 10,
-     "framedMoved": 6
+     "floatMoved": 902,
+     "snapMoved": 8,
+     "anchoredMoved": 15,
+     "framedMoved": 8
     },
     {
      "move": 1e-7,
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
-     "floatMoved": 47,
-     "snapMoved": 719,
+     "floatMoved": 48,
+     "snapMoved": 713,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1685,10 +1708,10 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 951,
-     "snapMoved": 87,
-     "anchoredMoved": 108,
-     "framedMoved": 82
+     "floatMoved": 929,
+     "snapMoved": 81,
+     "anchoredMoved": 97,
+     "framedMoved": 76
     },
     {
      "move": 1e-7,
@@ -1696,7 +1719,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 20,
-     "snapMoved": 689,
+     "snapMoved": 646,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1705,18 +1728,18 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 953,
-     "snapMoved": 47,
-     "anchoredMoved": 84,
-     "framedMoved": 46
+     "floatMoved": 939,
+     "snapMoved": 44,
+     "anchoredMoved": 73,
+     "framedMoved": 43
     },
     {
      "move": 1e-7,
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
-     "floatMoved": 19,
-     "snapMoved": 631,
+     "floatMoved": 20,
+     "snapMoved": 603,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1725,10 +1748,10 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 955,
-     "snapMoved": 70,
-     "anchoredMoved": 104,
-     "framedMoved": 67
+     "floatMoved": 944,
+     "snapMoved": 69,
+     "anchoredMoved": 99,
+     "framedMoved": 66
     },
     {
      "move": 1e-7,
@@ -1736,7 +1759,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 11,
-     "snapMoved": 671,
+     "snapMoved": 625,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1745,18 +1768,18 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 940,
-     "snapMoved": 73,
-     "anchoredMoved": 113,
-     "framedMoved": 69
+     "floatMoved": 916,
+     "snapMoved": 77,
+     "anchoredMoved": 109,
+     "framedMoved": 73
     },
     {
      "move": 1e-7,
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
-     "floatMoved": 31,
-     "snapMoved": 579,
+     "floatMoved": 32,
+     "snapMoved": 575,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1765,10 +1788,10 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 929,
-     "snapMoved": 76,
-     "anchoredMoved": 107,
-     "framedMoved": 73
+     "floatMoved": 928,
+     "snapMoved": 74,
+     "anchoredMoved": 102,
+     "framedMoved": 71
     },
     {
      "move": 0.5,
@@ -1776,7 +1799,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 1961,
+     "snapMoved": 1868,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1786,7 +1809,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 9,
-     "snapMoved": 2398,
+     "snapMoved": 2334,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1796,7 +1819,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 5,
-     "snapMoved": 2524,
+     "snapMoved": 2437,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1806,7 +1829,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 1566,
+     "snapMoved": 1544,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1816,7 +1839,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 1621,
+     "snapMoved": 1569,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1826,7 +1849,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 22,
-     "snapMoved": 594,
+     "snapMoved": 573,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1836,7 +1859,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 27,
-     "snapMoved": 2063,
+     "snapMoved": 2027,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1845,8 +1868,8 @@
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 0.20951690531219355,
-     "floatMoved": 35,
-     "snapMoved": 2494,
+     "floatMoved": 36,
+     "snapMoved": 2473,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1855,8 +1878,8 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 0.2338216556876432,
-     "floatMoved": 35,
-     "snapMoved": 1884,
+     "floatMoved": 36,
+     "snapMoved": 1843,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1866,7 +1889,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 2606,
+     "snapMoved": 2525,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1886,7 +1909,7 @@
      "form": "lines",
      "meanMove": 6,
      "floatMoved": 38,
-     "snapMoved": 10,
+     "snapMoved": 3,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1896,7 +1919,7 @@
      "form": "lines",
      "meanMove": 4.5,
      "floatMoved": 0,
-     "snapMoved": 2,
+     "snapMoved": 6,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1906,7 +1929,7 @@
      "form": "lines",
      "meanMove": 5,
      "floatMoved": 38,
-     "snapMoved": 5,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1915,8 +1938,8 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 4.5,
-     "floatMoved": 30,
-     "snapMoved": 4,
+     "floatMoved": 29,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -1927,7 +1950,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 917,
+     "anchoredMoved": 903,
      "framedMoved": 0
     },
     {
@@ -1938,7 +1961,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 551
+     "framedMoved": 515
     },
     {
      "move": 0.3,
@@ -1947,7 +1970,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2223,
+     "anchoredMoved": 2195,
      "framedMoved": 0
     },
     {
@@ -1958,7 +1981,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2065
+     "framedMoved": 2045
     },
     {
      "move": 0.3,
@@ -1967,7 +1990,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2603,
+     "anchoredMoved": 2553,
      "framedMoved": 0
     },
     {
@@ -1978,7 +2001,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2580
+     "framedMoved": 2512
     },
     {
      "move": 0.3,
@@ -1987,7 +2010,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2119,
+     "anchoredMoved": 2071,
      "framedMoved": 0
     },
     {
@@ -1998,7 +2021,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1847
+     "framedMoved": 1764
     },
     {
      "move": 0.3,
@@ -2007,7 +2030,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 2622,
+     "anchoredMoved": 2570,
      "framedMoved": 0
     },
     {
@@ -2018,31 +2041,31 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 2436
+     "framedMoved": 2412
     }
    ]
   },
   {
    "router": "sections",
    "kind": "painted",
-   "floatPoints": 54359,
-   "snapPoints": 54074,
-   "exactPoints": 54442,
-   "anchoredPoints": 54091,
-   "framedPoints": 54075,
-   "floatPairs": 40555,
-   "snapPairs": 40505,
-   "exactPairs": 40575,
-   "anchoredPairs": 40520,
-   "framedPairs": 40506,
+   "floatPoints": 54353,
+   "snapPoints": 54068,
+   "exactPoints": 54438,
+   "anchoredPoints": 54092,
+   "framedPoints": 54069,
+   "floatPairs": 40570,
+   "snapPairs": 40525,
+   "exactPairs": 40590,
+   "anchoredPairs": 40540,
+   "framedPairs": 40526,
    "lost": {
-    "count": 1192,
+    "count": 1200,
     "widest": 2.2737367544323206e-13,
     "widestToEnd": 99.72578266071761,
     "overGrid": 0,
-    "under1e9": 1192,
-    "under1e6": 1192,
-    "farFromEnd": 483,
+    "under1e9": 1200,
+    "under1e6": 1200,
+    "farFromEnd": 484,
     "widestFarSine": 3.797180885561183e-13,
     "farWithAngle": 0,
     "farWidest": [
@@ -2118,13 +2141,13 @@
     ]
    },
    "added": {
-    "count": 907,
+    "count": 915,
     "widest": 2.7735010819251407e-7,
     "widestToEnd": 870.5516456940119,
     "overGrid": 0,
-    "under1e9": 906,
-    "under1e6": 907,
-    "farFromEnd": 164,
+    "under1e9": 914,
+    "under1e6": 915,
+    "farFromEnd": 165,
     "widestFarSine": 0.07343416487537498,
     "farWithAngle": 1,
     "farWidest": [
@@ -2200,12 +2223,12 @@
     ]
    },
    "exactAdded": {
-    "count": 83,
+    "count": 85,
     "widest": 5.684341886080802e-14,
     "widestToEnd": 83.33068385845654,
     "overGrid": 0,
-    "under1e9": 83,
-    "under1e6": 83,
+    "under1e9": 85,
+    "under1e6": 85,
     "farFromEnd": 26,
     "widestFarSine": 1.3002779771763857e-15,
     "farWithAngle": 0,
@@ -2293,8 +2316,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 8111,
-   "nearCrossings": 579,
+   "near": 8058,
+   "nearCrossings": 590,
    "shifts": [
     {
      "move": 1e-12,
@@ -2311,7 +2334,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 230,
+     "floatMoved": 235,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2331,7 +2354,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 201,
+     "floatMoved": 206,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2351,7 +2374,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 201,
+     "floatMoved": 204,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2391,7 +2414,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 201,
+     "floatMoved": 208,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2411,7 +2434,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 232,
+     "floatMoved": 238,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2431,7 +2454,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 214,
+     "floatMoved": 222,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2451,7 +2474,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 222,
+     "floatMoved": 224,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2471,7 +2494,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 253,
+     "floatMoved": 260,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2481,7 +2504,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 8.303820219589399e-11,
-     "floatMoved": 53,
+     "floatMoved": 51,
      "snapMoved": 5,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2511,7 +2534,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 201,
+     "floatMoved": 206,
      "snapMoved": 5,
      "anchoredMoved": 2,
      "framedMoved": 5
@@ -2521,7 +2544,7 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 7.297261950443499e-9,
-     "floatMoved": 41,
+     "floatMoved": 39,
      "snapMoved": 35,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2531,7 +2554,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 207,
+     "floatMoved": 211,
      "snapMoved": 3,
      "anchoredMoved": 0,
      "framedMoved": 3
@@ -2551,7 +2574,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 202,
+     "floatMoved": 205,
      "snapMoved": 7,
      "anchoredMoved": 2,
      "framedMoved": 7
@@ -2562,7 +2585,7 @@
      "form": "lines",
      "meanMove": 8.89773343282286e-9,
      "floatMoved": 16,
-     "snapMoved": 67,
+     "snapMoved": 69,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2571,7 +2594,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 187,
+     "floatMoved": 191,
      "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 2
@@ -2581,7 +2604,7 @@
      "vector": "shift-e",
      "form": "lines",
      "meanMove": 7.189137676614337e-9,
-     "floatMoved": 21,
+     "floatMoved": 19,
      "snapMoved": 33,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -2591,7 +2614,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 192,
+     "floatMoved": 197,
      "snapMoved": 2,
      "anchoredMoved": 2,
      "framedMoved": 2
@@ -2602,7 +2625,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 76,
-     "snapMoved": 427,
+     "snapMoved": 429,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2611,10 +2634,10 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 200,
-     "snapMoved": 42,
-     "anchoredMoved": 39,
-     "framedMoved": 42
+     "floatMoved": 204,
+     "snapMoved": 41,
+     "anchoredMoved": 38,
+     "framedMoved": 41
     },
     {
      "move": 1e-7,
@@ -2622,7 +2645,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 43,
-     "snapMoved": 410,
+     "snapMoved": 412,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2631,10 +2654,10 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 204,
-     "snapMoved": 32,
-     "anchoredMoved": 40,
-     "framedMoved": 32
+     "floatMoved": 213,
+     "snapMoved": 29,
+     "anchoredMoved": 37,
+     "framedMoved": 29
     },
     {
      "move": 1e-7,
@@ -2642,7 +2665,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 17,
-     "snapMoved": 400,
+     "snapMoved": 405,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2651,10 +2674,10 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 210,
-     "snapMoved": 34,
-     "anchoredMoved": 46,
-     "framedMoved": 34
+     "floatMoved": 215,
+     "snapMoved": 31,
+     "anchoredMoved": 42,
+     "framedMoved": 31
     },
     {
      "move": 1e-7,
@@ -2662,7 +2685,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 11,
-     "snapMoved": 393,
+     "snapMoved": 395,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2671,10 +2694,10 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 222,
-     "snapMoved": 66,
-     "anchoredMoved": 65,
-     "framedMoved": 66
+     "floatMoved": 225,
+     "snapMoved": 62,
+     "anchoredMoved": 62,
+     "framedMoved": 62
     },
     {
      "move": 1e-7,
@@ -2691,10 +2714,10 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 211,
-     "snapMoved": 27,
-     "anchoredMoved": 36,
-     "framedMoved": 27
+     "floatMoved": 216,
+     "snapMoved": 25,
+     "anchoredMoved": 32,
+     "framedMoved": 25
     },
     {
      "move": 0.5,
@@ -2702,7 +2725,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 996,
+     "snapMoved": 1006,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2712,7 +2735,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 3,
-     "snapMoved": 1160,
+     "snapMoved": 1169,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2722,7 +2745,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 1171,
+     "snapMoved": 1187,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2732,7 +2755,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 703,
+     "snapMoved": 706,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2742,7 +2765,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 826,
+     "snapMoved": 836,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2751,8 +2774,8 @@
      "vector": "shift-a",
      "form": "lines",
      "meanMove": 0.2114434436545707,
-     "floatMoved": 24,
-     "snapMoved": 301,
+     "floatMoved": 22,
+     "snapMoved": 305,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2761,8 +2784,8 @@
      "vector": "shift-b",
      "form": "lines",
      "meanMove": 0.19395822903024962,
-     "floatMoved": 42,
-     "snapMoved": 982,
+     "floatMoved": 40,
+     "snapMoved": 994,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2771,8 +2794,8 @@
      "vector": "shift-c",
      "form": "lines",
      "meanMove": 0.20951690531219355,
-     "floatMoved": 11,
-     "snapMoved": 1150,
+     "floatMoved": 9,
+     "snapMoved": 1153,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2781,8 +2804,8 @@
      "vector": "shift-d",
      "form": "lines",
      "meanMove": 0.2338216556876432,
-     "floatMoved": 11,
-     "snapMoved": 940,
+     "floatMoved": 9,
+     "snapMoved": 948,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2792,7 +2815,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 3,
-     "snapMoved": 1244,
+     "snapMoved": 1258,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -2853,7 +2876,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 275,
+     "anchoredMoved": 277,
      "framedMoved": 0
     },
     {
@@ -2864,7 +2887,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 275
+     "framedMoved": 273
     },
     {
      "move": 0.3,
@@ -2873,7 +2896,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1031,
+     "anchoredMoved": 1048,
      "framedMoved": 0
     },
     {
@@ -2884,7 +2907,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1052
+     "framedMoved": 1060
     },
     {
      "move": 0.3,
@@ -2893,7 +2916,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1187,
+     "anchoredMoved": 1195,
      "framedMoved": 0
     },
     {
@@ -2904,7 +2927,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1151
+     "framedMoved": 1165
     },
     {
      "move": 0.3,
@@ -2913,7 +2936,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 945,
+     "anchoredMoved": 955,
      "framedMoved": 0
     },
     {
@@ -2924,7 +2947,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 952
+     "framedMoved": 964
     },
     {
      "move": 0.3,
@@ -2933,7 +2956,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1176,
+     "anchoredMoved": 1195,
      "framedMoved": 0
     },
     {
@@ -2944,30 +2967,30 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1191
+     "framedMoved": 1209
     }
    ]
   },
   {
    "router": "sections",
    "kind": "polyline",
-   "floatPoints": 58202,
-   "snapPoints": 58315,
-   "exactPoints": 58202,
-   "anchoredPoints": 58313,
-   "framedPoints": 58318,
-   "floatPairs": 39528,
-   "snapPairs": 39542,
-   "exactPairs": 39528,
-   "anchoredPairs": 39546,
-   "framedPairs": 39542,
+   "floatPoints": 58197,
+   "snapPoints": 58298,
+   "exactPoints": 58197,
+   "anchoredPoints": 58299,
+   "framedPoints": 58301,
+   "floatPairs": 39544,
+   "snapPairs": 39556,
+   "exactPairs": 39544,
+   "anchoredPairs": 39560,
+   "framedPairs": 39556,
    "lost": {
-    "count": 463,
+    "count": 462,
     "widest": 2.085575717305321e-7,
     "widestToEnd": 3.1666667343277255,
     "overGrid": 0,
-    "under1e9": 462,
-    "under1e6": 463,
+    "under1e9": 461,
+    "under1e6": 462,
     "farFromEnd": 20,
     "widestFarSine": 1.6591696563016953e-13,
     "farWithAngle": 0,
@@ -3044,12 +3067,12 @@
     ]
    },
    "added": {
-    "count": 576,
+    "count": 563,
     "widest": 2.5421149729252077e-13,
     "widestToEnd": 3.2713300124373386,
     "overGrid": 0,
-    "under1e9": 576,
-    "under1e6": 576,
+    "under1e9": 563,
+    "under1e6": 563,
     "farFromEnd": 7,
     "widestFarSine": 4.198056767293094e-14,
     "farWithAngle": 0,
@@ -3149,7 +3172,7 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 519,
+   "near": 529,
    "nearCrossings": 227,
    "shifts": [
     {
@@ -3167,7 +3190,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 523,
+     "floatMoved": 514,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3207,7 +3230,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 531,
+     "floatMoved": 520,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3227,7 +3250,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 527,
+     "floatMoved": 515,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3247,7 +3270,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 477,
+     "floatMoved": 471,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3267,7 +3290,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 506,
+     "floatMoved": 494,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3287,7 +3310,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 486,
+     "floatMoved": 478,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3307,7 +3330,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 516,
+     "floatMoved": 504,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3327,7 +3350,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 478,
+     "floatMoved": 481,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3347,7 +3370,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 485,
+     "floatMoved": 475,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -3387,7 +3410,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 519,
+     "floatMoved": 514,
      "snapMoved": 6,
      "anchoredMoved": 6,
      "framedMoved": 6
@@ -3407,7 +3430,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 478,
+     "floatMoved": 472,
      "snapMoved": 9,
      "anchoredMoved": 8,
      "framedMoved": 5
@@ -3427,7 +3450,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 484,
+     "floatMoved": 481,
      "snapMoved": 8,
      "anchoredMoved": 12,
      "framedMoved": 6
@@ -3447,7 +3470,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 503,
+     "floatMoved": 502,
      "snapMoved": 9,
      "anchoredMoved": 7,
      "framedMoved": 7
@@ -3458,7 +3481,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 26,
-     "snapMoved": 222,
+     "snapMoved": 220,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3467,10 +3490,10 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 538,
-     "snapMoved": 58,
-     "anchoredMoved": 48,
-     "framedMoved": 54
+     "floatMoved": 530,
+     "snapMoved": 57,
+     "anchoredMoved": 47,
+     "framedMoved": 53
     },
     {
      "move": 1e-7,
@@ -3478,7 +3501,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 16,
-     "snapMoved": 234,
+     "snapMoved": 231,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3487,10 +3510,10 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 575,
-     "snapMoved": 42,
-     "anchoredMoved": 46,
-     "framedMoved": 42
+     "floatMoved": 570,
+     "snapMoved": 39,
+     "anchoredMoved": 43,
+     "framedMoved": 39
     },
     {
      "move": 1e-7,
@@ -3498,7 +3521,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 18,
-     "snapMoved": 217,
+     "snapMoved": 214,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3507,10 +3530,10 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 571,
-     "snapMoved": 27,
-     "anchoredMoved": 32,
-     "framedMoved": 27
+     "floatMoved": 567,
+     "snapMoved": 26,
+     "anchoredMoved": 31,
+     "framedMoved": 26
     },
     {
      "move": 1e-7,
@@ -3518,7 +3541,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 4,
-     "snapMoved": 255,
+     "snapMoved": 251,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3527,10 +3550,10 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 545,
-     "snapMoved": 57,
-     "anchoredMoved": 39,
-     "framedMoved": 57
+     "floatMoved": 540,
+     "snapMoved": 54,
+     "anchoredMoved": 36,
+     "framedMoved": 54
     },
     {
      "move": 1e-7,
@@ -3538,7 +3561,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 12,
-     "snapMoved": 165,
+     "snapMoved": 164,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3547,10 +3570,10 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 537,
-     "snapMoved": 38,
-     "anchoredMoved": 47,
-     "framedMoved": 36
+     "floatMoved": 530,
+     "snapMoved": 37,
+     "anchoredMoved": 46,
+     "framedMoved": 35
     },
     {
      "move": 0.5,
@@ -3558,7 +3581,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 603,
+     "snapMoved": 598,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3568,7 +3591,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 727,
+     "snapMoved": 716,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3578,7 +3601,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 840,
+     "snapMoved": 823,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3588,7 +3611,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 600,
+     "snapMoved": 601,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3598,7 +3621,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 521,
+     "snapMoved": 520,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3608,7 +3631,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 8,
-     "snapMoved": 205,
+     "snapMoved": 206,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3618,7 +3641,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 11,
-     "snapMoved": 717,
+     "snapMoved": 708,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3628,7 +3651,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 13,
-     "snapMoved": 846,
+     "snapMoved": 838,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3638,7 +3661,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 13,
-     "snapMoved": 560,
+     "snapMoved": 558,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3648,7 +3671,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 810,
+     "snapMoved": 799,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3658,7 +3681,7 @@
      "form": "lines",
      "meanMove": 6,
      "floatMoved": 1,
-     "snapMoved": 1,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3678,7 +3701,7 @@
      "form": "lines",
      "meanMove": 4.5,
      "floatMoved": 0,
-     "snapMoved": 1,
+     "snapMoved": 2,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -3709,7 +3732,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 257,
+     "anchoredMoved": 245,
      "framedMoved": 0
     },
     {
@@ -3720,7 +3743,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 206
+     "framedMoved": 207
     },
     {
      "move": 0.3,
@@ -3729,7 +3752,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 720,
+     "anchoredMoved": 714,
      "framedMoved": 0
     },
     {
@@ -3740,7 +3763,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 640
+     "framedMoved": 636
     },
     {
      "move": 0.3,
@@ -3749,7 +3772,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 870,
+     "anchoredMoved": 871,
      "framedMoved": 0
     },
     {
@@ -3760,7 +3783,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 878
+     "framedMoved": 860
     },
     {
      "move": 0.3,
@@ -3769,7 +3792,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 605,
+     "anchoredMoved": 595,
      "framedMoved": 0
     },
     {
@@ -3780,7 +3803,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 563
+     "framedMoved": 558
     },
     {
      "move": 0.3,
@@ -3789,7 +3812,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 866,
+     "anchoredMoved": 860,
      "framedMoved": 0
     },
     {
@@ -3800,31 +3823,31 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 802
+     "framedMoved": 801
     }
    ]
   },
   {
    "router": "sections-site",
    "kind": "painted",
-   "floatPoints": 84287,
-   "snapPoints": 84011,
-   "exactPoints": 84386,
-   "anchoredPoints": 84029,
-   "framedPoints": 84028,
-   "floatPairs": 47330,
-   "snapPairs": 47306,
-   "exactPairs": 47334,
-   "anchoredPairs": 47304,
-   "framedPairs": 47308,
+   "floatPoints": 84176,
+   "snapPoints": 83887,
+   "exactPoints": 84275,
+   "anchoredPoints": 83909,
+   "framedPoints": 83904,
+   "floatPairs": 47236,
+   "snapPairs": 47207,
+   "exactPairs": 47240,
+   "anchoredPairs": 47208,
+   "framedPairs": 47209,
    "lost": {
-    "count": 1678,
+    "count": 1675,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 224.1571871058832,
     "overGrid": 0,
-    "under1e9": 1677,
-    "under1e6": 1678,
-    "farFromEnd": 571,
+    "under1e9": 1674,
+    "under1e6": 1675,
+    "farFromEnd": 568,
     "widestFarSine": 4.315891810432604e-13,
     "farWithAngle": 0,
     "farWidest": [
@@ -3900,13 +3923,13 @@
     ]
    },
    "added": {
-    "count": 1402,
+    "count": 1386,
     "widest": 2.1869434618841006e-8,
     "widestToEnd": 9993.60324960657,
     "overGrid": 0,
-    "under1e9": 1401,
-    "under1e6": 1402,
-    "farFromEnd": 274,
+    "under1e9": 1385,
+    "under1e6": 1386,
+    "farFromEnd": 273,
     "widestFarSine": 1.1004300930050837e-12,
     "farWithAngle": 0,
     "farWidest": [
@@ -4075,8 +4098,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 9438,
-   "nearCrossings": 839,
+   "near": 9420,
+   "nearCrossings": 837,
    "shifts": [
     {
      "move": 1e-12,
@@ -4173,7 +4196,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 110,
+     "floatMoved": 109,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4284,7 +4307,7 @@
      "form": "lines",
      "meanMove": 7.608067183755338e-9,
      "floatMoved": 25,
-     "snapMoved": 41,
+     "snapMoved": 47,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4293,7 +4316,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 112,
+     "floatMoved": 111,
      "snapMoved": 1,
      "anchoredMoved": 1,
      "framedMoved": 1
@@ -4333,7 +4356,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 104,
+     "floatMoved": 103,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4344,7 +4367,7 @@
      "form": "lines",
      "meanMove": 8.89773343282286e-9,
      "floatMoved": 32,
-     "snapMoved": 69,
+     "snapMoved": 75,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4353,7 +4376,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 120,
+     "floatMoved": 119,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4364,7 +4387,7 @@
      "form": "lines",
      "meanMove": 7.189137676614337e-9,
      "floatMoved": 28,
-     "snapMoved": 37,
+     "snapMoved": 43,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4384,7 +4407,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 66,
-     "snapMoved": 534,
+     "snapMoved": 537,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4404,7 +4427,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 46,
-     "snapMoved": 575,
+     "snapMoved": 571,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4413,7 +4436,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 126,
+     "floatMoved": 125,
      "snapMoved": 12,
      "anchoredMoved": 9,
      "framedMoved": 12
@@ -4424,7 +4447,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 35,
-     "snapMoved": 576,
+     "snapMoved": 568,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4444,7 +4467,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 12,
-     "snapMoved": 636,
+     "snapMoved": 632,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4453,7 +4476,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 125,
+     "floatMoved": 124,
      "snapMoved": 6,
      "anchoredMoved": 11,
      "framedMoved": 6
@@ -4464,7 +4487,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 35,
-     "snapMoved": 407,
+     "snapMoved": 411,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4484,7 +4507,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 1332,
+     "snapMoved": 1318,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4494,7 +4517,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 1436,
+     "snapMoved": 1429,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4504,7 +4527,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 1545,
+     "snapMoved": 1515,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4514,7 +4537,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 972,
+     "snapMoved": 960,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4524,7 +4547,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 1103,
+     "snapMoved": 1092,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4534,7 +4557,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 43,
-     "snapMoved": 394,
+     "snapMoved": 396,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4544,7 +4567,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 47,
-     "snapMoved": 1365,
+     "snapMoved": 1351,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4554,7 +4577,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 20,
-     "snapMoved": 1546,
+     "snapMoved": 1534,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4564,7 +4587,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 20,
-     "snapMoved": 1191,
+     "snapMoved": 1186,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4574,7 +4597,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 1608,
+     "snapMoved": 1596,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -4635,7 +4658,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 415,
+     "anchoredMoved": 406,
      "framedMoved": 0
     },
     {
@@ -4646,7 +4669,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 368
+     "framedMoved": 363
     },
     {
      "move": 0.3,
@@ -4655,7 +4678,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1374,
+     "anchoredMoved": 1366,
      "framedMoved": 0
     },
     {
@@ -4666,7 +4689,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1308
+     "framedMoved": 1307
     },
     {
      "move": 0.3,
@@ -4675,7 +4698,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1534,
+     "anchoredMoved": 1520,
      "framedMoved": 0
     },
     {
@@ -4686,7 +4709,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1510
+     "framedMoved": 1490
     },
     {
      "move": 0.3,
@@ -4695,7 +4718,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1232,
+     "anchoredMoved": 1219,
      "framedMoved": 0
     },
     {
@@ -4706,7 +4729,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1282
+     "framedMoved": 1273
     },
     {
      "move": 0.3,
@@ -4715,7 +4738,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1589,
+     "anchoredMoved": 1568,
      "framedMoved": 0
     },
     {
@@ -4726,30 +4749,30 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1521
+     "framedMoved": 1508
     }
    ]
   },
   {
    "router": "sections-site",
    "kind": "polyline",
-   "floatPoints": 96740,
-   "snapPoints": 96842,
-   "exactPoints": 96750,
-   "anchoredPoints": 96930,
-   "framedPoints": 96829,
-   "floatPairs": 48382,
-   "snapPairs": 48394,
-   "exactPairs": 48383,
-   "anchoredPairs": 48396,
-   "framedPairs": 48392,
+   "floatPoints": 96615,
+   "snapPoints": 96716,
+   "exactPoints": 96625,
+   "anchoredPoints": 96805,
+   "framedPoints": 96703,
+   "floatPairs": 48296,
+   "snapPairs": 48308,
+   "exactPairs": 48297,
+   "anchoredPairs": 48310,
+   "framedPairs": 48306,
    "lost": {
-    "count": 990,
+    "count": 991,
     "widest": 2.3437142008433856e-13,
     "widestToEnd": 30.238925469708963,
     "overGrid": 0,
-    "under1e9": 990,
-    "under1e6": 990,
+    "under1e9": 991,
+    "under1e6": 991,
     "farFromEnd": 46,
     "widestFarSine": 7.03098180273014e-14,
     "farWithAngle": 0,
@@ -4955,8 +4978,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 905,
-   "nearCrossings": 401,
+   "near": 900,
+   "nearCrossings": 402,
    "shifts": [
     {
      "move": 1e-12,
@@ -4973,7 +4996,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 325,
+     "floatMoved": 323,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -4993,7 +5016,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 310,
+     "floatMoved": 308,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -5013,7 +5036,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 287,
+     "floatMoved": 285,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -5173,7 +5196,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 381,
+     "floatMoved": 380,
      "snapMoved": 7,
      "anchoredMoved": 6,
      "framedMoved": 7
@@ -5193,7 +5216,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 370,
+     "floatMoved": 374,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -5264,7 +5287,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 22,
-     "snapMoved": 365,
+     "snapMoved": 363,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5273,7 +5296,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 319,
+     "floatMoved": 318,
      "snapMoved": 41,
      "anchoredMoved": 18,
      "framedMoved": 38
@@ -5284,7 +5307,7 @@
      "form": "lines",
      "meanMove": 7.866211563814431e-8,
      "floatMoved": 29,
-     "snapMoved": 416,
+     "snapMoved": 414,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5304,7 +5327,7 @@
      "form": "lines",
      "meanMove": 7.335534832673147e-8,
      "floatMoved": 15,
-     "snapMoved": 381,
+     "snapMoved": 380,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5313,7 +5336,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 303,
+     "floatMoved": 300,
      "snapMoved": 31,
      "anchoredMoved": 13,
      "framedMoved": 32
@@ -5324,7 +5347,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 16,
-     "snapMoved": 482,
+     "snapMoved": 480,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5344,7 +5367,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 20,
-     "snapMoved": 314,
+     "snapMoved": 312,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5353,7 +5376,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 333,
+     "floatMoved": 334,
      "snapMoved": 36,
      "anchoredMoved": 16,
      "framedMoved": 37
@@ -5364,7 +5387,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 1,
-     "snapMoved": 1187,
+     "snapMoved": 1182,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5374,7 +5397,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 1332,
+     "snapMoved": 1331,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5384,7 +5407,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 1,
-     "snapMoved": 1500,
+     "snapMoved": 1497,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5394,7 +5417,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 1,
-     "snapMoved": 1016,
+     "snapMoved": 1014,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5404,7 +5427,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 1,
-     "snapMoved": 1142,
+     "snapMoved": 1139,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5414,7 +5437,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 29,
-     "snapMoved": 366,
+     "snapMoved": 364,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5424,7 +5447,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 29,
-     "snapMoved": 1299,
+     "snapMoved": 1295,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5434,7 +5457,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 13,
-     "snapMoved": 1395,
+     "snapMoved": 1393,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5444,7 +5467,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 13,
-     "snapMoved": 1091,
+     "snapMoved": 1087,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5454,7 +5477,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 1443,
+     "snapMoved": 1441,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -5515,7 +5538,7 @@
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 494,
+     "anchoredMoved": 493,
      "framedMoved": 0
     },
     {
@@ -5526,7 +5549,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 434
+     "framedMoved": 431
     },
     {
      "move": 0.3,
@@ -5535,7 +5558,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1339,
+     "anchoredMoved": 1338,
      "framedMoved": 0
     },
     {
@@ -5546,7 +5569,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1244
+     "framedMoved": 1239
     },
     {
      "move": 0.3,
@@ -5555,7 +5578,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1427,
+     "anchoredMoved": 1422,
      "framedMoved": 0
     },
     {
@@ -5566,7 +5589,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1500
+     "framedMoved": 1497
     },
     {
      "move": 0.3,
@@ -5575,7 +5598,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1220,
+     "anchoredMoved": 1217,
      "framedMoved": 0
     },
     {
@@ -5586,7 +5609,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1118
+     "framedMoved": 1112
     },
     {
      "move": 0.3,
@@ -5595,7 +5618,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 1521,
+     "anchoredMoved": 1518,
      "framedMoved": 0
     },
     {
@@ -5606,7 +5629,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 1536
+     "framedMoved": 1534
     }
    ]
   }
@@ -5620,11 +5643,11 @@
    "exactPoints": 2062,
    "anchoredPoints": 2062,
    "framedPoints": 2062,
-   "floatPairs": 1792,
-   "snapPairs": 1792,
-   "exactPairs": 1792,
-   "anchoredPairs": 1792,
-   "framedPairs": 1792,
+   "floatPairs": 1790,
+   "snapPairs": 1790,
+   "exactPairs": 1790,
+   "anchoredPairs": 1790,
+   "framedPairs": 1790,
    "lost": {
     "count": 0,
     "widest": 0,
@@ -6331,35 +6354,35 @@
   {
    "router": "shared-all",
    "kind": "polyline",
-   "floatPoints": 4348,
-   "snapPoints": 4324,
-   "exactPoints": 4348,
-   "anchoredPoints": 4323,
-   "framedPoints": 4322,
-   "floatPairs": 2080,
-   "snapPairs": 2080,
-   "exactPairs": 2080,
-   "anchoredPairs": 2081,
-   "framedPairs": 2080,
+   "floatPoints": 4352,
+   "snapPoints": 4322,
+   "exactPoints": 4352,
+   "anchoredPoints": 4324,
+   "framedPoints": 4320,
+   "floatPairs": 2090,
+   "snapPairs": 2089,
+   "exactPairs": 2090,
+   "anchoredPairs": 2090,
+   "framedPairs": 2089,
    "lost": {
-    "count": 185,
+    "count": 182,
     "widest": 1.1368683772161603e-13,
     "widestToEnd": 6.915300366811402e-13,
     "overGrid": 0,
-    "under1e9": 185,
-    "under1e6": 185,
+    "under1e9": 182,
+    "under1e6": 182,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
     "farWidest": []
    },
    "added": {
-    "count": 161,
+    "count": 152,
     "widest": 1.1718571004216928e-13,
     "widestToEnd": 1.1718571004216928e-12,
     "overGrid": 0,
-    "under1e9": 161,
-    "under1e6": 161,
+    "under1e9": 152,
+    "under1e6": 152,
     "farFromEnd": 0,
     "widestFarSine": 0,
     "farWithAngle": 0,
@@ -6389,8 +6412,8 @@
     "farWithAngle": 0,
     "farWidest": []
    },
-   "near": 107,
-   "nearCrossings": 56,
+   "near": 98,
+   "nearCrossings": 54,
    "shifts": [
     {
      "move": 1e-12,
@@ -6407,7 +6430,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 53,
+     "floatMoved": 45,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6427,7 +6450,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 57,
+     "floatMoved": 51,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6447,7 +6470,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 61,
+     "floatMoved": 53,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6467,7 +6490,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 54,
+     "floatMoved": 49,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6487,7 +6510,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-12,
-     "floatMoved": 50,
+     "floatMoved": 44,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6507,7 +6530,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 47,
+     "floatMoved": 41,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6527,7 +6550,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 52,
+     "floatMoved": 46,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6547,7 +6570,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 56,
+     "floatMoved": 48,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6567,7 +6590,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 38,
+     "floatMoved": 36,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6587,7 +6610,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-10,
-     "floatMoved": 49,
+     "floatMoved": 45,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6607,7 +6630,7 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 59,
+     "floatMoved": 54,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6627,7 +6650,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 53,
+     "floatMoved": 49,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6647,7 +6670,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 70,
+     "floatMoved": 63,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6667,7 +6690,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 49,
+     "floatMoved": 46,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6687,7 +6710,7 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-8,
-     "floatMoved": 52,
+     "floatMoved": 45,
      "snapMoved": 0,
      "anchoredMoved": 0,
      "framedMoved": 0
@@ -6698,7 +6721,7 @@
      "form": "lines",
      "meanMove": 8.024749835021793e-8,
      "floatMoved": 0,
-     "snapMoved": 32,
+     "snapMoved": 34,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6707,10 +6730,10 @@
      "vector": "shift-a",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 60,
-     "snapMoved": 2,
+     "floatMoved": 53,
+     "snapMoved": 3,
      "anchoredMoved": 0,
-     "framedMoved": 1
+     "framedMoved": 2
     },
     {
      "move": 1e-7,
@@ -6727,7 +6750,7 @@
      "vector": "shift-b",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 60,
+     "floatMoved": 57,
      "snapMoved": 2,
      "anchoredMoved": 1,
      "framedMoved": 1
@@ -6747,7 +6770,7 @@
      "vector": "shift-c",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 53,
+     "floatMoved": 47,
      "snapMoved": 2,
      "anchoredMoved": 1,
      "framedMoved": 1
@@ -6758,7 +6781,7 @@
      "form": "lines",
      "meanMove": 8.470632964745162e-8,
      "floatMoved": 0,
-     "snapMoved": 61,
+     "snapMoved": 60,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6767,7 +6790,7 @@
      "vector": "shift-d",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 62,
+     "floatMoved": 55,
      "snapMoved": 0,
      "anchoredMoved": 1,
      "framedMoved": 0
@@ -6778,7 +6801,7 @@
      "form": "lines",
      "meanMove": 6.16489604988601e-8,
      "floatMoved": 0,
-     "snapMoved": 26,
+     "snapMoved": 28,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6787,10 +6810,10 @@
      "vector": "shift-e",
      "form": "rooms",
      "meanMove": 1e-7,
-     "floatMoved": 53,
-     "snapMoved": 0,
+     "floatMoved": 50,
+     "snapMoved": 1,
      "anchoredMoved": 1,
-     "framedMoved": 0
+     "framedMoved": 1
     },
     {
      "move": 0.5,
@@ -6798,7 +6821,7 @@
      "form": "lines",
      "meanMove": 0.3035272725392133,
      "floatMoved": 0,
-     "snapMoved": 97,
+     "snapMoved": 91,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6808,7 +6831,7 @@
      "form": "lines",
      "meanMove": 0.3671150855370797,
      "floatMoved": 0,
-     "snapMoved": 161,
+     "snapMoved": 153,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6818,7 +6841,7 @@
      "form": "lines",
      "meanMove": 0.353822036908241,
      "floatMoved": 0,
-     "snapMoved": 165,
+     "snapMoved": 155,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6828,7 +6851,7 @@
      "form": "lines",
      "meanMove": 0.2947108348016627,
      "floatMoved": 0,
-     "snapMoved": 144,
+     "snapMoved": 137,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6838,7 +6861,7 @@
      "form": "lines",
      "meanMove": 0.49327552583417855,
      "floatMoved": 0,
-     "snapMoved": 148,
+     "snapMoved": 139,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6848,7 +6871,7 @@
      "form": "lines",
      "meanMove": 0.2114434436545707,
      "floatMoved": 0,
-     "snapMoved": 36,
+     "snapMoved": 33,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6858,7 +6881,7 @@
      "form": "lines",
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
-     "snapMoved": 137,
+     "snapMoved": 131,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6868,7 +6891,7 @@
      "form": "lines",
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
-     "snapMoved": 199,
+     "snapMoved": 194,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6878,7 +6901,7 @@
      "form": "lines",
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
-     "snapMoved": 127,
+     "snapMoved": 125,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6888,7 +6911,7 @@
      "form": "lines",
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
-     "snapMoved": 181,
+     "snapMoved": 173,
      "anchoredMoved": 0,
      "framedMoved": 0
     },
@@ -6960,7 +6983,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 60
+     "framedMoved": 52
     },
     {
      "move": 0.3,
@@ -6969,7 +6992,7 @@
      "meanMove": 0.19395822903024962,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 138,
+     "anchoredMoved": 135,
      "framedMoved": 0
     },
     {
@@ -6980,7 +7003,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 188
+     "framedMoved": 185
     },
     {
      "move": 0.3,
@@ -6989,7 +7012,7 @@
      "meanMove": 0.20951690531219355,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 196,
+     "anchoredMoved": 188,
      "framedMoved": 0
     },
     {
@@ -7000,7 +7023,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 182
+     "framedMoved": 168
     },
     {
      "move": 0.3,
@@ -7009,7 +7032,7 @@
      "meanMove": 0.2338216556876432,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 113,
+     "anchoredMoved": 112,
      "framedMoved": 0
     },
     {
@@ -7020,7 +7043,7 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 96
+     "framedMoved": 88
     },
     {
      "move": 0.3,
@@ -7029,7 +7052,7 @@
      "meanMove": 0.26969458544044755,
      "floatMoved": 0,
      "snapMoved": 0,
-     "anchoredMoved": 166,
+     "anchoredMoved": 157,
      "framedMoved": 0
     },
     {
@@ -7040,23 +7063,23 @@
      "floatMoved": 0,
      "snapMoved": 0,
      "anchoredMoved": 0,
-     "framedMoved": 203
+     "framedMoved": 196
     }
    ]
   },
   {
    "router": "sections",
    "kind": "painted",
-   "floatPoints": 3424,
-   "snapPoints": 3404,
-   "exactPoints": 3428,
-   "anchoredPoints": 3407,
-   "framedPoints": 3404,
-   "floatPairs": 2291,
-   "snapPairs": 2280,
-   "exactPairs": 2293,
-   "anchoredPairs": 2285,
-   "framedPairs": 2280,
+   "floatPoints": 3419,
+   "snapPoints": 3399,
+   "exactPoints": 3423,
+   "anchoredPoints": 3402,
+   "framedPoints": 3399,
+   "floatPairs": 2287,
+   "snapPairs": 2276,
+   "exactPairs": 2289,
+   "anchoredPairs": 2281,
+   "framedPairs": 2276,
    "lost": {
     "count": 56,
     "widest": 1.2710574864626038e-13,
@@ -7927,16 +7950,16 @@
   {
    "router": "sections",
    "kind": "polyline",
-   "floatPoints": 3431,
-   "snapPoints": 3430,
-   "exactPoints": 3431,
-   "anchoredPoints": 3431,
-   "framedPoints": 3430,
-   "floatPairs": 2232,
-   "snapPairs": 2231,
-   "exactPairs": 2232,
-   "anchoredPairs": 2232,
-   "framedPairs": 2231,
+   "floatPoints": 3429,
+   "snapPoints": 3428,
+   "exactPoints": 3429,
+   "anchoredPoints": 3429,
+   "framedPoints": 3428,
+   "floatPairs": 2230,
+   "snapPairs": 2229,
+   "exactPairs": 2230,
+   "anchoredPairs": 2230,
+   "framedPairs": 2229,
    "lost": {
     "count": 29,
     "widest": 2.2737367544323206e-13,
@@ -8643,16 +8666,16 @@
   {
    "router": "sections-site",
    "kind": "painted",
-   "floatPoints": 3507,
-   "snapPoints": 3511,
-   "exactPoints": 3507,
-   "anchoredPoints": 3506,
-   "framedPoints": 3511,
-   "floatPairs": 2090,
-   "snapPairs": 2088,
-   "exactPairs": 2088,
-   "anchoredPairs": 2088,
-   "framedPairs": 2088,
+   "floatPoints": 3501,
+   "snapPoints": 3505,
+   "exactPoints": 3501,
+   "anchoredPoints": 3500,
+   "framedPoints": 3505,
+   "floatPairs": 2084,
+   "snapPairs": 2082,
+   "exactPairs": 2082,
+   "anchoredPairs": 2082,
+   "framedPairs": 2082,
    "lost": {
     "count": 91,
     "widest": 1.1368683772161603e-13,

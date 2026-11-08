@@ -10,18 +10,19 @@ const STALE = `The record through-check/7 is stale. Write it again with: ${REGEN
 const SITE_ROUTES = { wall: 41, corner: 1, "plug-seam": 53 };
 const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
 /**
- * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
+ * The painted crossings of the lanes of each router, at the time of ROUTE-TIE.
+ * The six counts are the crossing points and pairs of the board, the pairs added and lost, and the two counts of the bundles.
  * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33260, 31244, 0, 0, 0, 0],
-  "trunks": [34052, 31785, 0, 0, 0, 1],
-  "shared": [35908, 32548, 273, 40, 1, 531],
-  "sections": [54074, 40505, 815, 489, 144, 2067],
-  "sections-site": [84011, 47306, 121, 68, 441, 2365],
-  "sections-site-no-ladder": [82002, 46559, 127, 119, 435, 2445],
-  "shared-all": [43627, 36243, 1426, 453, 0, 12061],
+  "corners": [33277, 31281, 0, 0, 0, 0],
+  "trunks": [34069, 31822, 0, 0, 0, 1],
+  "shared": [35896, 32568, 271, 40, 1, 524],
+  "sections": [54068, 40525, 810, 504, 144, 2072],
+  "sections-site": [83887, 47207, 121, 68, 442, 2364],
+  "sections-site-no-ladder": [81883, 46460, 127, 119, 436, 2444],
+  "shared-all": [43980, 36284, 1467, 461, 0, 12066],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 

@@ -9,12 +9,12 @@ import { dirname } from "node:path";
 import { median } from "@mark1russell7/rigor-statistics";
 import { measureQuality, routePairCrossings } from "../src/bench/quality.ts";
 import { SCREEN_SETS } from "../src/bench/screen/set.ts";
-import { boardRows, NAMES, pairsRecord, routerOf } from "./route-pairs-rows.ts";
+import { boardRows, NAMES, PAIR_FAMILIES, pairsRecord, routerOf } from "./route-pairs-rows.ts";
 
 const OUT = process.argv[2] ?? "out/route-pairs.json";
 const ROUNDS = 9;
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, `${JSON.stringify(pairsRecord(boardRows(undefined, undefined, (line) => console.log(line))), null, 1)}\n`);
+writeFileSync(OUT, `${JSON.stringify(pairsRecord(boardRows(PAIR_FAMILIES, undefined, (line) => console.log(line))), null, 1)}\n`);
 
 if (process.argv[3] === "--screen") {
   const routers = NAMES.map((name) => {

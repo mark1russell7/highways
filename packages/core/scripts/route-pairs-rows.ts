@@ -28,6 +28,14 @@ export const SEEDS = 3;
 const SITE = sectionsRouter({ name: "sections-site", margin: 20, stretch: 3, cap: 6 });
 /** The routers of the record. `corners` is the base of each ratio. */
 export const NAMES = ["corners", "shared", "shared-all", "sections", "sections-site"] as const;
+/**
+ * The families of the record `route-pairs/2`: the 25 families when the record started. A new family of `HIGHWAYS_FAMILIES` does not change the record.
+ * A record of more families needs a new schema and new claims of its test.
+ */
+export const PAIR_FAMILIES: readonly string[] = [
+  "tiny-uniform", "small-clustered", "dense-groups", "hub-chain", "many-groups", "packed-grid", "frame-rows", "pipeline", "fan-out", "two-hubs", "uneven-sizes", "thin-bars", "sparse-long",
+  "local-mesh", "bipartite", "bottleneck", "parallel-edges", "maze", "channel", "comb", "spiral", "switchbox", "escape", "rings", "walled-level",
+];
 /** This function gives the router of a name of `NAMES`. */
 export function routerOf(name: string): Router {
   return name === SITE.name ? SITE : ROUTERS.find((r) => r.name === name)!;

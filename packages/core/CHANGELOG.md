@@ -1,5 +1,29 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.17.0
+
+This version is a MINOR before 1.0, because default routes change. The public API does not change.
+
+### Read this first
+
+- The claim is only this: a tie of two path costs does not decide the route. A route can still move under a shift of the board.
+- The routes of the 6 routers move under 5 shifts of 1e-12. On `corners`, 15 to 64 of 6,307 routes move. On `sections`, 322 to 589 move.
+- The item GRAPH-SHIFT reads the cause of these moves. No text of this version says that routes do not move under a shift.
+
+### Routes that change
+
+- The search of the corner graph has a tie rule (ROUTE-TIE). Two path costs within 1e-9 tie. The route then does not depend on the search floor.
+- Among the paths that tie, the walk takes the straightest corner. A near-tie of the straightness goes to the lowest index.
+- On 84 boards, 6,307 routes for each router, the routes that move against 0.16.0 are 100 on `corners` (1.59%) and 524 on `shared-all` (8.31%).
+- The search of the corner graph is the same in 0.15.0 and 0.16.0.
+- The same inputs at the floors 1, 0.5 and 0.25 give the same bytes on each of the 6 routers. Before the rule, 16 to 117 routes moved.
+- `shared` with no key gives the routes of `corners`.
+
+### Work and time
+
+- The count `WORK.corner` rises by a ratio of 1.216 on `corners`, 1.274 on `sections` and 1.197 on `sections-site`. This is a count, not a time.
+- The record `route-tie/1` in `scripts/data/route-tie/` holds each row, the tolerances from 1e-12 to 1e-5 and the floor of each route measure.
+
 ## 0.16.0
 
 This version is a MINOR before 1.0: the routes of two routers change in their last bits.

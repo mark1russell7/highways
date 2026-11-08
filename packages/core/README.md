@@ -192,6 +192,7 @@ Each built-in router sets the field. The controls `straight` and `plugs` go thro
 - The option `outSteps: false` keeps the whole margin, so a closed gap gives the straight line.
 - A router gives a straight line when it finds no way at any step. The field tells you that the line goes through a box.
 - The corner graph joins the parts that can see each other, so a way that exists stays in the graph. A limit of work bounds this join.
+- Two path costs of the search within 1e-9 tie. Among the paths that tie, the walk takes the straightest corner. So the search floor does not change a route.
 - When the limit stops the join, the result has `joinStopped: true`. Then a route can miss a way that exists.
 - The boxes at the ends of the edge do not count. The test is the rule `no-pass-through` of `checkProperties`.
 - A clean route does not have the field, so its bytes do not change.

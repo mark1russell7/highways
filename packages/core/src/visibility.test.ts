@@ -5,6 +5,9 @@ import type { Node } from "./model.ts";
 import { CornerGraph, Obstacles, SoftGraph, type CornerGraphOptions, type Terminal } from "./visibility.ts";
 import { WORK } from "./work.ts";
 
+/** Two path costs within this distance tie, as in `visibility.ts`. The test of the record `route-tie` reads the value in the source. */
+const TIE = 1e-9;
+
 /** This function makes a board of `count` random boxes in a square of side `side`. A second group far away makes the corner buckets sparse. */
 function board(seed: number, count: number, side: number, far = 0): Node[] {
   const random = rng(seed);
@@ -93,12 +96,11 @@ function referenceSearch(
     for (const j of starts[i]!) relax(j, a.cost + dist(a.point, points[j]!), -1 - i);
   });
   let best = Infinity;
-  let bestEnd = -1;
   let settled = 0;
   while (heap.length > 0) {
     let top = heap[0]!;
     for (const e of heap) if (better(e, top)) top = e;
-    if (top[0] >= best) break;
+    if (top[0] > best + TIE) break;
     const i = pop()[1];
     if (closed.has(i)) continue;
     closed.add(i);
@@ -106,25 +108,59 @@ function referenceSearch(
     settled += 1 + adj.length;
     const gi = G.get(i)!;
     const tail = goal.get(i);
-    if (tail !== undefined && gi + tail < best) {
-      best = gi + tail;
-      bestEnd = i;
-    }
+    if (tail !== undefined && gi + tail < best) best = gi + tail;
     for (const j of adj) {
       if (closed.has(j)) continue;
       const d = dist(points[i]!, points[j]!);
       relax(j, gi + (cost ? cost(i, j, d) : d), i);
     }
   }
-  if (bestEnd < 0) return undefined;
-  const k = goalOf.get(bestEnd)!;
+  if (best === Infinity) return undefined;
+  // The walk back: the goal corner of the smallest index within the limit, then at each corner the straightest closed corner within the limit.
+  const limit = best + TIE;
+  let end = -1;
+  for (const [j, tail] of goal) if (closed.has(j) && G.get(j)! + tail <= limit && (end < 0 || j < end)) end = j;
+  const k = goalOf.get(end)!;
   const out: Point[] = [to[k]!.point];
-  for (let i = bestEnd; ; i = parentOf.get(i)!) {
-    out.push(points[i]!);
-    if (parentOf.get(i)! < 0) {
-      const f = -1 - parentOf.get(i)!;
-      out.push(from[f]!.point);
-      return { points: out.reverse(), from: f, to: k, cost: best, settled };
+  let at = end;
+  let rest = goal.get(end)!;
+  for (;;) {
+    const here = points[at]!;
+    out.push(here);
+    const first = from.findIndex((a, f) => a.cost + dist(a.point, here) + rest <= limit && starts[f]!.includes(at));
+    if (first >= 0) {
+      out.push(from[first]!.point);
+      return { points: out.reverse(), from: first, to: k, cost: best, settled };
+    }
+    const adj = graph.neighbours(at);
+    settled += 1 + adj.length;
+    const after = out[out.length - 2]!;
+    const near = TIE * (Math.abs(after.x - here.x) + Math.abs(after.y - here.y) + 1);
+    // The scan goes over the links in their order, as in the search: a clear best wins, and a near tie goes to the smaller index.
+    let pick: { i: number; step: number } | undefined;
+    let score = -Infinity;
+    for (const i of adj) {
+      if (!closed.has(i) || G.get(i)! >= G.get(at)!) continue;
+      const d = dist(points[i]!, here);
+      const step = cost ? cost(i, at, d) : d;
+      if (G.get(i)! + step + rest > limit) continue;
+      const straight = d > 0 ? ((here.x - points[i]!.x) * (after.x - here.x) + (here.y - points[i]!.y) * (after.y - here.y)) / d : 0;
+      if (pick === undefined || straight > score + near || (straight >= score - near && i < pick.i)) {
+        if (pick === undefined || straight > score + near) score = straight;
+        pick = { i, step };
+      }
+    }
+    if (pick === undefined) {
+      const parent = parentOf.get(at)!;
+      if (parent < 0) {
+        out.push(from[-1 - parent]!.point);
+        return { points: out.reverse(), from: -1 - parent, to: k, cost: best, settled };
+      }
+      rest += G.get(at)! - G.get(parent)!;
+      at = parent;
+    } else {
+      rest += pick.step;
+      at = pick.i;
     }
   }
 }
