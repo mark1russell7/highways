@@ -6,7 +6,7 @@ import type { SiteMeasure } from "./kpi.ts";
 /** The record of the count of the grammar, relative to the root of the repository. The workflow `Records` writes it. */
 export const SPACE_SIZE_FILE = "docs/research/space-size/record.json";
 
-/** The count of operators that a step needs to count in the measure `steps-with-20-operators`. */
+/** The least count of operators of a step that the measure `steps-with-20-operators` counts. */
 export const STEP_OPERATOR_BAR = 20;
 
 /** This function counts the operators of each step: the built-in strategies of the registry, by their step. */
