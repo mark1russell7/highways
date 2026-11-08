@@ -3,6 +3,7 @@
 // `activation.ts` holds the functions without the types of `highways`. This file holds the parts of `highways`.
 import type { CurveSegment } from "../../curves/model.ts";
 import type { HighwayPlan } from "../../highways/model.ts";
+import { resultForm, sortByEdge } from "../../fingerprint/form.ts";
 import type { Graph, Result } from "../../model.ts";
 import { highwayStrategies } from "../../strategies/builtins.ts";
 import type { Strategy } from "../../strategies/model.ts";
@@ -10,10 +11,8 @@ import { exercised, outputGroups, outputHash, type OutputGroup } from "./activat
 import type { LayoutRecord } from "./forms.ts";
 import { RECORD_EPS } from "./hash.ts";
 
-const byEdge = <T extends { readonly edge: string }>(list: readonly T[]): T[] => [...list].sort((a, b) => (a.edge < b.edge ? -1 : a.edge > b.edge ? 1 : 0));
-
 /**
- * This function gives the output hash of a result of a router, in the highways form.
+ * This function gives the output hash of a result of a router, in the highways form of `resultForm` (`src/fingerprint/form.ts`).
  * The form holds the routes in the order of the edge ids, and the levels, the bundles and the runs as the router gives them.
  * Each number goes to the grid `RECORD_EPS`, as `round3` does.
  */
@@ -21,14 +20,9 @@ export function resultHash(result: Result): string {
   return outputHash(resultForm(result), { grid: RECORD_EPS });
 }
 
-/** This function gives the highways form of a result of a router: the value that `resultHash` hashes. */
-export function resultForm(result: Result): object {
-  return { routes: byEdge(result.routes), levels: result.levels, bundles: result.bundles, runs: result.runs };
-}
-
 /** This function gives the output hash of the curves of the step `curve`, in the order of the edge ids. */
 export function curvesHash(edges: readonly string[], curves: readonly (readonly CurveSegment[])[]): string {
-  return outputHash(byEdge(edges.map((edge, i) => ({ edge, segments: curves[i] ?? [] }))), { grid: RECORD_EPS });
+  return outputHash(sortByEdge(edges.map((edge, i) => ({ edge, segments: curves[i] ?? [] }))), { grid: RECORD_EPS });
 }
 
 /**

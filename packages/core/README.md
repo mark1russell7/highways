@@ -1041,6 +1041,24 @@ A transcendental Math function, for example `Math.atan2` or `Math.hypot`, can gi
 - Version 0.8.0 changes the default lane order of some shared runs. No route point moves. [The lane order](../../docs/research/XPLAT.md#the-lane-order-lane-order) gives the changes.
 - The note [`XPLAT.md`](../../docs/research/XPLAT.md) gives the result of the item XPLAT-HASH.
 
+## The fingerprint of each router
+
+A fingerprint is a hash of the routes of one keyed router on fixed probe boards. A consumer routes again only the routers with a changed fingerprint.
+
+```ts
+import { routerEntries } from "@mark1russell7/highways";
+
+for (const entry of routerEntries()) console.log(entry.key, entry.fingerprint);
+```
+
+- `routerEntries()` gives the 23 router strategies and the 67 highway strategies of `KEYED_STRATEGIES`. A highway strategy routes with `follow`.
+- `fingerprintProbes()` gives 28 boards with the seed 1. Each corpus family gives one board at its defaults. Each size band of the portfolio has a board.
+- The hash of a probe is `probeHash` of `layout-contract` over `resultForm`. It reads the exact numbers, and it does not read the field `through`.
+- A probe that throws, or that has more nodes than `maxNodes` of the router, gets the hash `REFUSED_PROBE`.
+- The fingerprint is `fingerprintOf` over the hashes of the probes: 16 lowercase hex digits.
+- The table `ENTRY_FINGERPRINTS` ships with each release. The CI job `fingerprints` and each cell of `Xplat` compare the table with a fresh read.
+- A change of the routes of a router changes the table. Start `pnpm --filter @mark1russell7/highways fingerprints --write`, and commit `src/fingerprint/table.ts`.
+
 ## License
 
 MIT

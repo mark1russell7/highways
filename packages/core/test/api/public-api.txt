@@ -48,6 +48,7 @@ BACKTRACK_MIN: build/index.d.ts#BACKTRACK_MIN
 BACKTRACK_SHARE: build/index.d.ts#BACKTRACK_SHARE
 BALANCE_DEFAULTS: build/index.d.ts#BALANCE_DEFAULTS
 BALANCE_ENDS: build/index.d.ts#BALANCE_ENDS
+BAND_PROBES: build/index.d.ts#BAND_PROBES
 BASELINE_STRATEGIES: build/index.d.ts#BASELINE_STRATEGIES
 BIPARTITE: build/index.d.ts#BIPARTITE
 BIPARTITE_LAYOUTS: build/index.d.ts#BIPARTITE_LAYOUTS
@@ -63,6 +64,7 @@ BUILT_IN_STRATEGIES: build/index.d.ts#BUILT_IN_STRATEGIES
 BUNDLE_COUNTER: build/index.d.ts#BUNDLE_COUNTER
 type BalanceEnd: build/index.d.ts#BalanceEnd
 type BalanceOptions: build/index.d.ts#BalanceOptions
+BandProbe: build/index.d.ts#BandProbe
 BenchOptions: build/index.d.ts#BenchOptions
 BenchRow: build/index.d.ts#BenchRow
 BenchRun: build/index.d.ts#BenchRun
@@ -186,6 +188,7 @@ type DividedOptions: build/index.d.ts#DividedOptions
 DrawnSegment: build/index.d.ts#DrawnSegment
 EDGE_DISTANCES: build/index.d.ts#EDGE_DISTANCES
 EDGE_PATH_DEFAULTS: build/index.d.ts#EDGE_PATH_DEFAULTS
+ENTRY_FINGERPRINTS: build/index.d.ts#ENTRY_FINGERPRINTS
 EPS_STEPS: build/index.d.ts#EPS_STEPS
 ESCAPE: build/index.d.ts#ESCAPE
 ESCAPE_DEFAULTS: build/index.d.ts#ESCAPE_DEFAULTS
@@ -205,6 +208,7 @@ type EdgeLengths: build/index.d.ts#EdgeLengths
 type EdgePathOptions: build/index.d.ts#EdgePathOptions
 type EdgePlugs: build/index.d.ts#EdgePlugs
 End: build/index.d.ts#End
+EntryRead: build/index.d.ts#EntryRead
 EnumOption: build/index.d.ts#EnumOption
 EscapeMethod: build/index.d.ts#EscapeMethod
 EscapeOptions: build/index.d.ts#EscapeOptions
@@ -214,6 +218,8 @@ ExactOptimum: build/index.d.ts#ExactOptimum
 type ExerciseEvidence: @mark1russell7/layout-contract#ExerciseEvidence (external)
 FAN_OUT: build/index.d.ts#FAN_OUT
 FDEB_DEFAULTS: build/index.d.ts#FDEB_DEFAULTS
+FINGERPRINT_HASH: build/index.d.ts#FINGERPRINT_HASH
+FINGERPRINT_SOURCE: build/index.d.ts#FINGERPRINT_SOURCE
 FIREFLY_DEFAULTS: build/index.d.ts#FIREFLY_DEFAULTS
 FIXTURES: build/index.d.ts#FIXTURES
 FIXTURE_LAYOUTS: build/index.d.ts#FIXTURE_LAYOUTS
@@ -226,6 +232,7 @@ FRONT_OBJECTIVES: build/index.d.ts#FRONT_OBJECTIVES
 type FamilyRegistry: @mark1russell7/layout-contract#FamilyRegistry (external)
 type FdebOptions: build/index.d.ts#FdebOptions
 type FieldEnd: build/index.d.ts#FieldEnd
+FingerprintProbe: build/index.d.ts#FingerprintProbe
 FireflyOptions: build/index.d.ts#FireflyOptions
 FixPortsOptions: build/index.d.ts#FixPortsOptions
 FixtureKind: build/index.d.ts#FixtureKind
@@ -497,6 +504,7 @@ POWER_DEFAULTS: build/index.d.ts#POWER_DEFAULTS
 PREFERENCE_DEFAULTS: build/index.d.ts#PREFERENCE_DEFAULTS
 PREFERENCE_FEATURES: build/index.d.ts#PREFERENCE_FEATURES
 PREFERENCE_PANEL: build/index.d.ts#PREFERENCE_PANEL
+PROBE_SEED: build/index.d.ts#PROBE_SEED
 PROPOSED_RULES: build/index.d.ts#PROPOSED_RULES
 P_HUB_DEFAULTS: build/index.d.ts#P_HUB_DEFAULTS
 PackedGridOptions: build/index.d.ts#PackedGridOptions
@@ -537,6 +545,7 @@ PreferenceFit: build/index.d.ts#PreferenceFit
 PreferenceModel: build/index.d.ts#PreferenceModel
 PreferenceOptions: build/index.d.ts#PreferenceOptions
 PreferencePair: build/index.d.ts#PreferencePair
+ProbeRoute: build/index.d.ts#ProbeRoute
 PullApartOptions: build/index.d.ts#PullApartOptions
 QUICKBUNDLES_DEFAULTS: build/index.d.ts#QUICKBUNDLES_DEFAULTS
 Quality: build/index.d.ts#Quality
@@ -596,6 +605,7 @@ RouteStability: build/index.d.ts#RouteStability
 RouteStabilityOptions: build/index.d.ts#RouteStabilityOptions
 RoutedStep: build/index.d.ts#RoutedStep
 Router: build/index.d.ts#Router
+RouterEntry: build/index.d.ts#RouterEntry
 RouterPreset: build/index.d.ts#RouterPreset
 RowFit: build/index.d.ts#RowFit
 RuleCount: build/index.d.ts#RuleCount
@@ -1004,6 +1014,7 @@ edgePaths: build/index.d.ts#edgePaths
 edgePlugs: build/index.d.ts#edgePlugs
 edgeResistance: build/index.d.ts#edgeResistance
 edgesWithNoWay: build/index.d.ts#edgesWithNoWay
+emptyBands: build/index.d.ts#emptyBands
 enumDimension: build/index.d.ts#enumDimension
 escapeEnds: build/index.d.ts#escapeEnds
 exactBoard: build/index.d.ts#exactBoard
@@ -1025,6 +1036,8 @@ fdebPlan: build/index.d.ts#fdebPlan
 fft: build/index.d.ts#fft
 findStrategy: build/index.d.ts#findStrategy
 finderOf: build/index.d.ts#finderOf
+fingerprintFindings: build/index.d.ts#fingerprintFindings
+fingerprintProbes: build/index.d.ts#fingerprintProbes
 fireflies: build/index.d.ts#fireflies
 firstLines: build/index.d.ts#firstLines
 fitPreferences: build/index.d.ts#fitPreferences
@@ -1332,6 +1345,7 @@ randomInt: @mark1russell7/layout-contract#randomInt (external)
 rankSettings: build/index.d.ts#rankSettings
 rankShares: build/index.d.ts#rankShares
 rayToBox: build/index.d.ts#rayToBox
+readEntry: build/index.d.ts#readEntry
 recordLines: build/index.d.ts#recordLines
 recordMoves: build/index.d.ts#recordMoves
 rectScattered: build/index.d.ts#rectScattered
@@ -1372,10 +1386,12 @@ routeInStableOrder: build/index.d.ts#routeInStableOrder
 routeMeasures: build/index.d.ts#routeMeasures
 routePairCrossings: build/index.d.ts#routePairCrossings
 routePortfolio: build/index.d.ts#routePortfolio
+routeProbe: build/index.d.ts#routeProbe
 routeSeparation: build/index.d.ts#routeSeparation
 routeSpace: build/index.d.ts#routeSpace
 routeStability: build/index.d.ts#routeStability
 routeSymmetry: build/index.d.ts#routeSymmetry
+routerEntries: build/index.d.ts#routerEntries
 routerStrategies: build/index.d.ts#routerStrategies
 routersOf: build/index.d.ts#routersOf
 rowFit: build/index.d.ts#rowFit
@@ -1750,6 +1766,9 @@ export declare const BALANCE_DEFAULTS: Readonly<BalanceOptions>;
 ### build/index.d.ts#BALANCE_ENDS
 export declare const BALANCE_ENDS: readonly BalanceEnd[];
 
+### build/index.d.ts#BAND_PROBES
+export declare const BAND_PROBES: readonly BandProbe[];
+
 ### build/index.d.ts#BASELINE_STRATEGIES
 export declare const BASELINE_STRATEGIES: readonly AnyStrategy[];
 
@@ -1798,6 +1817,12 @@ interface BalanceOptions {
   readonly iterations: number;
   readonly end: BalanceEnd;
   readonly from: HighwayBase;
+}
+
+### build/index.d.ts#BandProbe
+export interface BandProbe {
+  readonly family: string;
+  readonly dims: DimensionValues$1;
 }
 
 ### build/index.d.ts#BenchOptions
@@ -2517,6 +2542,9 @@ export declare const EDGE_DISTANCES: readonly EdgeDistance[];
 ### build/index.d.ts#EDGE_PATH_DEFAULTS
 export declare const EDGE_PATH_DEFAULTS: Readonly<Required<Omit<EdgePathOptions, "margin" | "k">>>;
 
+### build/index.d.ts#ENTRY_FINGERPRINTS
+export declare const ENTRY_FINGERPRINTS: Readonly<Record<string, string>>;
+
 ### build/index.d.ts#EPS_STEPS
 export declare const EPS_STEPS: number;
 
@@ -2600,6 +2628,14 @@ export interface End {
   readonly port?: string;
 }
 
+### build/index.d.ts#EntryRead
+export interface EntryRead {
+  readonly key: string;
+  readonly hashes: Readonly<Record<string, string>>;
+  readonly refused: Readonly<Record<string, string>>;
+  readonly fingerprint: string;
+}
+
 ### build/index.d.ts#EnumOption
 export interface EnumOption<V extends string = string> extends OptionBase {
   readonly type: "enum";
@@ -2660,6 +2696,12 @@ export declare const FAN_OUT: HighwaysFamily;
 ### build/index.d.ts#FDEB_DEFAULTS
 export declare const FDEB_DEFAULTS: Readonly<Required<Omit<FdebOptions, "margin" | "k">>>;
 
+### build/index.d.ts#FINGERPRINT_HASH
+export declare const FINGERPRINT_HASH: HashOptions$1;
+
+### build/index.d.ts#FINGERPRINT_SOURCE
+export declare const FINGERPRINT_SOURCE = "28 corpus families at their defaults, seed 1: 28 probes";
+
 ### build/index.d.ts#FIREFLY_DEFAULTS
 export declare const FIREFLY_DEFAULTS: Readonly<FireflyOptions>;
 
@@ -2701,6 +2743,15 @@ interface FdebOptions extends Pick<WayOptions, "margin" | "k"> {
 
 ### build/index.d.ts#FieldEnd
 type FieldEnd = "target" | "source";
+
+### build/index.d.ts#FingerprintProbe
+export interface FingerprintProbe {
+  readonly id: string;
+  readonly family: string;
+  readonly nodes: number;
+  readonly band: string;
+  readonly graph: Graph;
+}
 
 ### build/index.d.ts#FireflyOptions
 export interface FireflyOptions {
@@ -4246,6 +4297,9 @@ export declare const PREFERENCE_FEATURES: readonly string[];
 ### build/index.d.ts#PREFERENCE_PANEL
 export declare const PREFERENCE_PANEL: readonly number[];
 
+### build/index.d.ts#PROBE_SEED
+export declare const PROBE_SEED = 1;
+
 ### build/index.d.ts#PROPOSED_RULES
 export declare const PROPOSED_RULES: readonly string[];
 
@@ -4462,6 +4516,9 @@ export interface PreferencePair {
   readonly b: readonly number[];
   readonly first: 0 | 1;
 }
+
+### build/index.d.ts#ProbeRoute
+export type ProbeRoute = (router: Strategy<"router", object>, graph: Graph) => Result;
 
 ### build/index.d.ts#PullApartOptions
 export interface PullApartOptions {
@@ -4825,6 +4882,15 @@ export interface Router {
   readonly name: string;
   readonly maxNodes?: number;
   route(graph: Graph): Result;
+}
+
+### build/index.d.ts#RouterEntry
+export interface RouterEntry {
+  readonly key: string;
+  readonly step: "router" | "highway";
+  readonly name: string;
+  readonly router: Strategy<"router", object>;
+  readonly fingerprint?: string;
 }
 
 ### build/index.d.ts#RouterPreset
@@ -6741,6 +6807,9 @@ export declare function edgeResistance(graph: Graph, projections: number): Map<s
 ### build/index.d.ts#edgesWithNoWay
 export declare function edgesWithNoWay(input: Graph): ReadonlySet<string>;
 
+### build/index.d.ts#emptyBands
+export declare function emptyBands(probes: readonly FingerprintProbe[]): string[];
+
 ### build/index.d.ts#enumDimension
 export declare function enumDimension(name: string, values: readonly string[], value: string, meaning: string): CorpusDimension$1;
 
@@ -6800,6 +6869,12 @@ export declare function findStrategy<S extends Step>(registry: Registry, step: S
 
 ### build/index.d.ts#finderOf
 export declare function finderOf(name: string): string | undefined;
+
+### build/index.d.ts#fingerprintFindings
+export declare function fingerprintFindings(table: Readonly<Record<string, string>>, reads: readonly EntryRead[], all?: boolean): string[];
+
+### build/index.d.ts#fingerprintProbes
+export declare function fingerprintProbes(): FingerprintProbe[];
 
 ### build/index.d.ts#fireflies
 export declare function fireflies(graph: Graph, router: Strategy<"router">, options?: Partial<FireflyOptions>): SwarmRun;
@@ -7843,6 +7918,9 @@ export declare function rankShares(values: readonly number[], lowerIsBetter: boo
 ### build/index.d.ts#rayToBox
 export declare function rayToBox(p: Point, d: Point, box: Box): number;
 
+### build/index.d.ts#readEntry
+export declare function readEntry(entry: Pick<RouterEntry, "key" | "router">, probes: readonly FingerprintProbe[], route?: ProbeRoute): EntryRead;
+
 ### build/index.d.ts#recordLines
 export declare function recordLines(records: readonly LayoutRecord[]): string;
 
@@ -7981,6 +8059,9 @@ export declare function routePairCrossings(routes: readonly {
 ### build/index.d.ts#routePortfolio
 export declare function routePortfolio(graph: Graph, options?: PortfolioRouterOptions): PortfolioRoute;
 
+### build/index.d.ts#routeProbe
+export declare const routeProbe: ProbeRoute;
+
 ### build/index.d.ts#routeSeparation
 export declare function routeSeparation(routes: readonly Route[], near?: number, maxAngle?: number): number;
 
@@ -7992,6 +8073,9 @@ export declare function routeStability(graph: Graph, before: Result, after: Resu
 
 ### build/index.d.ts#routeSymmetry
 export declare function routeSymmetry(graph: Graph, routes: readonly Route[]): number | undefined;
+
+### build/index.d.ts#routerEntries
+export declare function routerEntries(registry?: Registry, table?: Readonly<Record<string, string>>): RouterEntry[];
 
 ### build/index.d.ts#routerStrategies
 export declare const routerStrategies: {
