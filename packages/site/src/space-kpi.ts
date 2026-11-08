@@ -6,6 +6,9 @@ import type { SiteMeasure } from "./kpi.ts";
 /** The record of the count of the grammar, relative to the root of the repository. The script `space-size.ts` of the core writes it. */
 export const SPACE_SIZE_FILE = "docs/research/space-size/record.json";
 
+/** The form of a time in UTC that `kpi.json` takes, with or without seconds. */
+const UTC_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z$/;
+
 /** The least count of operators of a step that the measure `steps-with-20-operators` counts. */
 export const STEP_OPERATOR_BAR = 20;
 
@@ -52,12 +55,12 @@ export interface GrammarCount {
 
 /**
  * This function gives the count and the date of the record of the count of the grammar, in the form `space-size/1`.
- * It gives `undefined` for a value that is not such a record. Then the file has no measure of the grammar.
+ * It gives `undefined` for a value that is not such a record, or for a date that is not a time in UTC. Then the file has no measure of the grammar.
  */
 export function spaceSizeOf(record: unknown): GrammarCount | undefined {
   if (typeof record !== "object" || record === null) return undefined;
   const { schema, base, levels, date } = record as { readonly schema?: unknown; readonly base?: unknown; readonly levels?: unknown; readonly date?: unknown };
-  if (schema !== "space-size/1" || typeof base !== "string" || !/^\d+$/.test(base) || typeof levels !== "number" || typeof date !== "string") return undefined;
+  if (schema !== "space-size/1" || typeof base !== "string" || !/^\d+$/.test(base) || typeof levels !== "number" || typeof date !== "string" || !UTC_TIME.test(date)) return undefined;
   return { points: Number(base), levels, date };
 }
 

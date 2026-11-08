@@ -35,6 +35,7 @@ export interface SpaceSizeRecord {
   readonly meta: string | null;
   readonly seconds: number;
   readonly cpu: string;
+  /** The time in UTC of the count, in the form of `Date.prototype.toISOString`. */
   readonly date: string;
   readonly run: string | null;
   readonly commit: string | null;

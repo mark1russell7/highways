@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
+import { kpiProblems } from "@mark1russell7/site-pages";
 import { BUILT_IN_STRATEGIES, HIGHWAYS_FAMILIES, SCREEN_SETS } from "@mark1russell7/highways";
 import { spaceFacts } from "./kpi-files.ts";
 import { siteKpiInput } from "./kpi.ts";
 import { fullCorpusSets, operatorsByStep, screenedStrategies, SPACE_NOT_COUNTED, spaceMeasures, spaceSizeOf, type SpaceFacts } from "./space-kpi.ts";
 
-const FACTS: SpaceFacts = { operators: { router: 3, highway: 21, plugs: 1 }, grammar: { points: 1000, levels: 3, date: "2026-11-07" }, screened: 40, measuredFull: 0, inputFamilies: 28, fittedShare: 2.5 };
+const FACTS: SpaceFacts = { operators: { router: 3, highway: 21, plugs: 1 }, grammar: { points: 1000, levels: 3, date: "2026-11-07T10:00:00Z" }, screened: 40, measuredFull: 0, inputFamilies: 28, fittedShare: 2.5 };
 const value = (id: string, facts = FACTS): number | undefined => spaceMeasures(facts).find((m) => m.id === id)?.value;
 
 describe("operatorsByStep", () => {
@@ -36,7 +37,8 @@ describe("screenedStrategies", () => {
 
 describe("spaceSizeOf", () => {
   it("reads a record space-size/1, and refuses another value", () => {
-    expect(spaceSizeOf({ schema: "space-size/1", base: "31717809875", levels: 3, date: "2026-11-08" })).toEqual({ points: 31_717_809_875, levels: 3, date: "2026-11-08" });
+    expect(spaceSizeOf({ schema: "space-size/1", base: "31717809875", levels: 3, date: "2026-11-08T15:23:33Z" })).toEqual({ points: 31_717_809_875, levels: 3, date: "2026-11-08T15:23:33Z" });
+    expect(spaceSizeOf({ schema: "space-size/1", base: "1", levels: 3, date: "2026-11-08" })).toBeUndefined();
     expect(spaceSizeOf({ schema: "space-size/2", base: "1", levels: 3, date: "2026-11-08" })).toBeUndefined();
     expect(spaceSizeOf({ schema: "space-size/1", base: "-1", levels: 3, date: "2026-11-08" })).toBeUndefined();
     expect(spaceSizeOf(null)).toBeUndefined();
@@ -71,7 +73,7 @@ describe("spaceMeasures", () => {
   });
 
   it("gives the count of the grammar the date of its record, and no count without a record", () => {
-    expect(spaceMeasures(FACTS, "2026-11-08").find((m) => m.id === "grammar-strategies")?.at).toBe("2026-11-07");
+    expect(spaceMeasures(FACTS, "2026-11-08").find((m) => m.id === "grammar-strategies")?.at).toBe("2026-11-07T10:00:00Z");
     const noRecord: SpaceFacts = { operators: FACTS.operators, screened: 1, measuredFull: 0, inputFamilies: 1, fittedShare: 0 };
     expect(spaceMeasures(noRecord).map((m) => m.id)).not.toContain("grammar-strategies");
   });
@@ -137,7 +139,13 @@ describe("the layout space facts of the repository (SPACE-KPI)", () => {
   // The core test `space-size.test.ts` fails when the record does not count the current space.
   it("reads the count of the grammar from its record", () => {
     expect(facts.grammar?.points).toBeGreaterThan(0);
-    expect(facts.grammar?.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(facts.grammar?.date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z$/);
+  });
+
+  // The build of the pages refuses a measure that this check refuses, so the test gives the same check.
+  it("gives measures that the check of kpi.json takes", () => {
+    const file = { format: "kpi/1", project: "highways", at: "2026-11-08T15:00:00Z", commit: "0".repeat(40), measures: spaceMeasures(facts, "2026-11-08T15:00:00Z") };
+    expect(kpiProblems(file)).toEqual([]);
   });
 
   it("reads the fitted share as a percent", () => {

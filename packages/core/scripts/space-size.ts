@@ -21,7 +21,7 @@ const record: SpaceSizeRecord = {
   meta: size.meta === null ? null : size.meta.toString(),
   seconds: Math.round((performance.now() - started) / 1000),
   cpu: cpus()[0]?.model ?? "unknown",
-  date: new Date().toISOString().slice(0, 10),
+  date: new Date().toISOString(),
   run: process.env["GITHUB_RUN_ID"] ?? null,
   commit: process.env["GITHUB_SHA"] ?? null,
 };
