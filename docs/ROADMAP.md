@@ -219,6 +219,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | PAINT-TIE | The painted count and the pair count read one grid, `EPS_STEPS`, so a shift of 1e-12 of a room moves no count. An exact predicate decides the bits that it gets, so it does not end the tie. The record `paint-tie/1` reads the arms, and `through-check/6` holds the counts. | 2026-11-05 | [#344](https://github.com/mark1russell7/highways/pull/344) |
 | SPACE-KPI | `kpi.json` gets the measures of the layout space: the operators of each step, the strategies of the grammar, the screened strategies, the input families and the fitted share. A committed record counts the grammar: 1,016,274,652,058 configs. A test fails when the space or the count changes. | 2026-11-08 | [#404](https://github.com/mark1russell7/highways/pull/404) |
 | D23-DISTINCT | The distinctness gate: a variant counts only when its routes differ from each operator of its stage on a board. `scripts/distinct.ts` imports nothing, and the package `strategy-space` takes it whole. | 2026-11-08 | [#406](https://github.com/mark1russell7/highways/pull/406) |
+| D23-POINTS | The points of the grammar for a screen: `grammar-points.ts` draws a seeded sample of `routeSpace` with a unique id for each point, and gives each job its shard. `readShard` refuses a stale file and a wrong id. | 2026-11-08 | [#408](https://github.com/mark1russell7/highways/pull/408) |
 
 ## Calibration
 
@@ -258,7 +259,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| D23-POINTS | The points of the grammar for a screen: `grammar-points.ts` draws a seeded sample of `routeSpace` with a unique id for each point, and gives each job its shard. `readShard` refuses a stale file and a wrong id. The first grammar screen takes 1,000 points in 8 jobs. Due 2026-11-10. | `active` | | P1 |
+| D23-SCREEN1 | The first grammar screen: 1,000 points of `routeSpace` on `screen-v1`, in 7 shard jobs and a join. `grammar-join.ts` refuses a missing shard or record, and keeps the cost, the medians and the output hashes of each point. The measured cost refines the targets, only upward. Due 2026-11-11. | `active` | | P1 |
 | HOME-COPIES-2 | The duplication atlas labels 24 functions as copies of a home function. For each one, a test shows the same behavior first. Then the function uses the home, or a PR adds it to the home. | `later` | D23 steps 1 to 4 | P2 |
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
