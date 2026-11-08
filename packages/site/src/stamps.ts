@@ -1,4 +1,4 @@
-// The data stamps of the Results page (VERDICT-STAMPS). The freshness gate of the Pages workflow reads them.
+// The data stamps of the Results page (VERDICT-STAMPS) and of the home page (HOME-STAMPS). The freshness gate of the Pages workflow reads them.
 // Only the build and the tests use this module. It reads no file.
 
 /** The npm name of the engine of each verdict run. */
@@ -12,6 +12,25 @@ export const READ_WORKFLOW = ".github/workflows/read-on-release.yml";
 
 /** The age limit of the verdicts, in days. The read starts each week, so a missed week does not fail the gate. */
 export const VERDICT_AGE_DAYS = 14;
+
+/** The home page, which shows the table of the benchmark snapshot. */
+export const HOME_PAGE = "index.html";
+
+/** The workflow that measures the benchmark snapshot. Its schedule starts each day, and a run that passes lands its record. */
+export const BENCH_WORKFLOW = ".github/workflows/bench.yml";
+
+/** The age limit of the benchmark snapshot, in days. A day or two with no record does not fail the gate. A week with no record fails it. */
+export const BENCH_AGE_DAYS = 7;
+
+/** The fields of `bench-meta.json` that the stamp reads. */
+export interface BenchHeader {
+  readonly run?: string | number;
+  readonly sha?: string;
+  readonly date?: string;
+  /** The time of the run in UTC. The stamp uses it before the date. */
+  readonly time?: string;
+  readonly core?: string;
+}
 
 /** The fields of a verdict snapshot that the stamps read. */
 export interface VerdictHeader {
@@ -56,6 +75,37 @@ export function lastRead(header: VerdictHeader, repo: string): StampRun | undefi
     engines: { [ENGINE]: read.core },
     ...(read.commit === undefined ? {} : { commit: read.commit }),
   };
+}
+
+/**
+ * This function gives the run of the benchmark snapshot. It gives `undefined` when the snapshot has no run, no date or no core.
+ */
+export function benchRun(meta: BenchHeader, repo: string): StampRun | undefined {
+  const date = meta.time ?? meta.date;
+  if (meta.run === undefined || date === undefined || meta.core === undefined) return undefined;
+  const id = String(meta.run);
+  return {
+    id,
+    url: `https://github.com/${repo}/actions/runs/${id}`,
+    date: /T/.test(date) ? date : `${date}T00:00:00Z`,
+    engines: { [ENGINE]: meta.core },
+    ...(meta.sha === undefined ? {} : { commit: meta.sha }),
+  };
+}
+
+/**
+ * This function gives the stamps of the site: the Results page from the verdicts, and the home page from the benchmark snapshot.
+ * A snapshot with no run stops the build, because a page with an unknown run cannot pass the gate.
+ */
+export function siteDataStamps(headers: readonly VerdictHeader[], bench: BenchHeader, repo: string): VerdictStamps {
+  const run = benchRun(bench, repo);
+  if (run === undefined) throw new Error("bench-meta.json has no run, date or core, so the home page has no stamp.");
+  const home = {
+    page: HOME_PAGE,
+    runs: [run],
+    limit: { days: BENCH_AGE_DAYS, reason: "The workflow Bench starts each day, and each run that passes lands a new snapshot.", workflow: BENCH_WORKFLOW },
+  };
+  return { schema: "data-stamp/1", pages: [...verdictStamps(headers, repo).pages, home] };
 }
 
 /**
