@@ -2,6 +2,7 @@
 // So no reader copies a number from a page, and no number has a person as its source.
 import { parseResponseRecord } from "@mark1russell7/rigor-statistics";
 import type { BenchMeta } from "./bench-label.ts";
+import { spaceMeasures, type SpaceFacts } from "./space-kpi.ts";
 
 /** The name of the project in the file. */
 export const KPI_PROJECT = "highways";
@@ -25,6 +26,8 @@ export interface KpiFacts {
   readonly cardStrategies?: readonly string[];
   /** The date of the commit of the build. A page is live from the date of its commit. */
   readonly commitDate?: string;
+  /** The facts of the layout space measures (SPACE-KPI). Without them, the file has no layout space measure. */
+  readonly space?: SpaceFacts;
 }
 
 /** The folder of the sweep records, relative to the root of the repository. */
@@ -237,6 +240,8 @@ export function siteKpiInput(meta: BenchMeta, core: string, hasPage: (file: stri
         notCounted: CARDS_SHARE_NOT_COUNTED,
         ...dated(latestAt((facts.sweeps ?? []).filter((f) => curveCards(f.record).length > 0).map((f) => f.date))),
       },
+      // The layout space measures count the registry and the committed records of the build, so they have the time of its commit.
+      ...(facts.space === undefined ? [] : spaceMeasures(facts.space, latestAt([facts.commitDate]))),
     ],
   };
 }

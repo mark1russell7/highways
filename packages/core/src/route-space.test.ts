@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { canonicalConfig, checkConfig, checkSpace, configId, spaceSize } from "@mark1russell7/layout-contract";
+import { canonicalConfig, checkConfig, checkSpace, configId } from "@mark1russell7/layout-contract";
 import { describe, expect, it } from "vitest";
 import { CASES } from "./cases.ts";
 import { FIXTURES, makeFixture } from "./fixtures.ts";
@@ -60,10 +60,7 @@ describe("routeSpace (STAGE-DATA)", () => {
     expect(ids.size).toBe(Object.keys(named).length);
   });
 
-  // The count of `spaceSize` takes more than 120 s on this space in CI. Set `ROUTE_SPACE_SIZE=1` to start it.
-  it.skipIf(process.env["ROUTE_SPACE_SIZE"] !== "1")("has 31 717 809 875 base configs with 3 levels", { timeout: 900_000 }, () => {
-    expect(spaceSize(routeSpace, { levels: 3 }).base).toBe(31_717_809_875n);
-  });
+  // The record `docs/research/space-size/record.json` holds the count of `spaceSize`, and `scripts/space-size.test.ts` examines it.
 
   it("gives one id for two spellings of one config", () => {
     const short = { space: "highways", stages: { routing: { option: "corridors" } } };
