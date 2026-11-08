@@ -184,6 +184,7 @@ const gutters = cornersRouter({ name: "corners", inner: "gutter", bendCost: 24 }
 ### A route through a box
 
 A route that goes through a box has the field `through`, with the ids of those boxes, sorted (CORNER-REACH).
+Each built-in router sets the field. The controls `straight` and `plugs` go through boxes by design, and they set it too (UNMARKED-THROUGH).
 
 - A margin is a preference, not a wall. When the whole margin gives no way, a router tries the steps of `OUT_STEPS`: one half, one quarter and one sixteenth of the margin (PLUG-OUT-BLOCKED).
 - The lowest step is above 0. Boxes that touch stay closed, so a route does not run along their seam. A route with no way says so in `through`.
