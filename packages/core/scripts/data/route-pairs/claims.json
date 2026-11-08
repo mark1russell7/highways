@@ -933,7 +933,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -943,7 +943,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -953,7 +953,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -963,7 +963,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -973,7 +973,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -983,7 +983,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -993,7 +993,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "sections",
    "label": "depends on the mix",
    "ink": "more"
@@ -1003,7 +1003,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "sections-tree",
    "label": "no verdict",
    "ink": "more"
@@ -1823,7 +1823,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -1833,7 +1833,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -1843,7 +1843,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -1853,7 +1853,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -1863,7 +1863,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -1873,7 +1873,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -1883,7 +1883,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "sections",
    "label": "no verdict",
    "ink": "more"
@@ -1893,7 +1893,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.9.2",
+   "core": "0.16.0",
    "strategy": "sections-tree",
    "label": "better",
    "ink": "more"
@@ -2713,7 +2713,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -2723,7 +2723,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -2733,7 +2733,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -2743,7 +2743,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -2753,7 +2753,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -2763,7 +2763,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -2773,7 +2773,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "sections",
    "label": "better",
    "ink": "more"
@@ -2783,7 +2783,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.9.4",
+   "core": "0.16.0",
    "strategy": "sections-tree",
    "label": "better",
    "ink": "more"
