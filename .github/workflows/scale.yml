@@ -154,6 +154,13 @@ jobs:
             done
           done
           route 1000 0 fixture || true
+          # A route over the limit is a "no read" of its size, so the check line names each one (NO-READ-LINE).
+          over=$(jq -s '[.[] | select(.over == true)] | length' "$rows")
+          if [ "$over" -gt 0 ]; then
+            cases=$(jq -rs '[.[] | select(.over == true) | "\(.nodes) nodes in round \(.round), arm \(.arm)"] | join(", ")' "$rows")
+            cpu=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs)
+            echo "::warning title=Scale ${ROUTER}::No read of ${over} routes: each one went over the limit of ${CAP} min. The cases: ${cases}. The CPU model: ${cpu}."
+          fi
       - name: Profile one more route
         if: env.PROFILE == 'true' && env.SIZES == ''
         run: |
@@ -170,7 +177,7 @@ jobs:
 
   summary:
     needs: [changes, routers, time]
-    if: ${{ needs.changes.outputs.match == 'true' && (always()) }}
+    if: ${{ needs.changes.outputs.match == 'true' && (!cancelled()) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

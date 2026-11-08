@@ -76,6 +76,14 @@
     "partner": "route.through"
    },
    {
+    "measure": "route.crossings.pairs.low",
+    "partner": "route.through"
+   },
+   {
+    "measure": "route.crossings.pairs.high",
+    "partner": "route.through"
+   },
+   {
     "measure": "route.turn.mean",
     "partner": "route.through"
    },
@@ -121,16 +129,19 @@
   "one-trunk": [
    "route.crossings.estimated",
    "route.crossings.pairs.estimated",
+   "route.crossings.pairs.contact-sampled",
    "route.outside"
   ],
   "perimeter": [
    "route.crossings.estimated",
    "route.crossings.pairs.estimated",
+   "route.crossings.pairs.contact-sampled",
    "route.outside"
   ],
   "straight": [
    "route.crossings.estimated",
    "route.crossings.pairs.estimated",
+   "route.crossings.pairs.contact-sampled",
    "route.backtrack",
    "route.outside"
   ]
@@ -426,21 +437,21 @@
     "one-trunk": 0,
     "perimeter": 0,
     "straight": 77,
-    "corners": 68.5,
-    "shared": 68.5,
-    "shared-all": 18.5,
-    "sections": 35.5,
+    "corners": 69.5,
+    "shared": 69.5,
+    "shared-all": 20,
+    "sections": 36,
     "sections-site": 80
    },
    "sums": {
     "one-trunk": 0,
     "perimeter": 1485,
     "straight": 22483,
-    "corners": 20652,
-    "shared": 16777,
-    "shared-all": 6955,
-    "sections": 13015,
-    "sections-site": 21262
+    "corners": 20654,
+    "shared": 16750,
+    "shared-all": 6991,
+    "sections": 12947,
+    "sections-site": 21290
    },
    "best": [
     "one-trunk",
@@ -465,11 +476,11 @@
     "one-trunk": 0,
     "perimeter": 50.558711190406996,
     "straight": 219.90300125257954,
-    "corners": 195.6600547091862,
-    "shared": 180.86005470918622,
-    "shared-all": 90.15459996188304,
-    "sections": 115.2336080983002,
-    "sections-site": 228.40710810887865
+    "corners": 195.8963004811438,
+    "shared": 180.7494894786968,
+    "shared-all": 90.44336677278658,
+    "sections": 114.67408595418767,
+    "sections-site": 228.65161816368405
    },
    "best": [
     "one-trunk",
@@ -521,19 +532,19 @@
     "straight": 84.5,
     "corners": 103.5,
     "shared": 103.5,
-    "shared-all": 112,
-    "sections": 133,
+    "shared-all": 113.5,
+    "sections": 131,
     "sections-site": 243
    },
    "sums": {
     "one-trunk": 50829,
     "perimeter": 67320,
     "straight": 24837,
-    "corners": 32383,
-    "shared": 34363,
-    "shared-all": 35878,
-    "sections": 44287,
-    "sections-site": 70062
+    "corners": 32433,
+    "shared": 34430,
+    "shared-all": 35860,
+    "sections": 44326,
+    "sections-site": 70192
    },
    "best": [
     "straight"
@@ -542,6 +553,97 @@
   {
    "name": "route.crossings.pairs.estimated",
    "key": "R1.pairsEstimated",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0,
+    "perimeter": 0,
+    "straight": 0,
+    "corners": 0,
+    "shared": 0,
+    "shared-all": 0,
+    "sections": 0,
+    "sections-site": 0
+   },
+   "sums": {
+    "one-trunk": 0,
+    "perimeter": 0,
+    "straight": 0,
+    "corners": 0,
+    "shared": 0,
+    "shared-all": 0,
+    "sections": 0,
+    "sections-site": 0
+   },
+   "best": [
+    "one-trunk",
+    "perimeter",
+    "straight",
+    "corners",
+    "shared",
+    "shared-all",
+    "sections",
+    "sections-site"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.low",
+   "key": "R1.pairsLow",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 120.5,
+    "perimeter": 177.5,
+    "straight": 84.5,
+    "corners": 103.5,
+    "shared": 103.5,
+    "shared-all": 113.5,
+    "sections": 131,
+    "sections-site": 243
+   },
+   "sums": {
+    "one-trunk": 50829,
+    "perimeter": 67320,
+    "straight": 24837,
+    "corners": 32433,
+    "shared": 34430,
+    "shared-all": 35860,
+    "sections": 44326,
+    "sections-site": 70192
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.high",
+   "key": "R1.pairsHigh",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 120.5,
+    "perimeter": 177.5,
+    "straight": 84.5,
+    "corners": 103.5,
+    "shared": 103.5,
+    "shared-all": 113.5,
+    "sections": 131,
+    "sections-site": 243
+   },
+   "sums": {
+    "one-trunk": 50829,
+    "perimeter": 67320,
+    "straight": 24837,
+    "corners": 32433,
+    "shared": 34430,
+    "shared-all": 35860,
+    "sections": 44326,
+    "sections-site": 70192
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.contact-sampled",
+   "key": "R1.pairsContactSampled",
    "better": "lower",
    "medians": {
     "one-trunk": 0,
@@ -584,19 +686,19 @@
     "straight": 0.6224845197064348,
     "corners": 0.5482318820872043,
     "shared": 0.5482318820872043,
-    "shared-all": 0.6237871235140373,
-    "sections": 0.5763850149763399,
-    "sections-site": 0.6605027767430989
+    "shared-all": 0.6365796657655243,
+    "sections": 0.5752834260766655,
+    "sections-site": 0.6604556351058941
    },
    "sums": {
     "one-trunk": 84,
     "perimeter": 84,
     "straight": 50.98251931910049,
-    "corners": 44.071222260903305,
-    "shared": 44.178234718974025,
-    "shared-all": 50.65705203344274,
-    "sections": 45.80026468149347,
-    "sections-site": 56.273675095027784
+    "corners": 44.01127704065064,
+    "shared": 44.12588249238791,
+    "shared-all": 51.36698305969311,
+    "sections": 45.618843143637754,
+    "sections-site": 56.249730299854605
    },
    "best": [
     "one-trunk",
@@ -611,21 +713,21 @@
     "one-trunk": 90,
     "perimeter": 90,
     "straight": 9.128105487784524,
-    "corners": 4.360334912920157,
-    "shared": 4.360334912920157,
-    "shared-all": 12.480069247594493,
+    "corners": 3.8735579511012546,
+    "shared": 3.995638480806762,
+    "shared-all": 12.227718764421526,
     "sections": 5.951310218966529,
-    "sections-site": 4.405896738838709
+    "sections-site": 4.463334019437905
    },
    "sums": {
     "one-trunk": 7560,
     "perimeter": 7560,
     "straight": 1825.8713971387392,
-    "corners": 1280.8024810677434,
-    "shared": 1282.8799677682766,
-    "shared-all": 2043.3990311572134,
-    "sections": 1310.8626719012984,
-    "sections-site": 832.8184889019274
+    "corners": 1271.6503237460388,
+    "shared": 1274.333868391651,
+    "shared-all": 2020.1882207598535,
+    "sections": 1320.9349716654772,
+    "sections-site": 827.2502442608841
    },
    "best": [
     "one-trunk",
@@ -642,7 +744,7 @@
     "straight": 0,
     "corners": 0.731865989210031,
     "shared": 0.7891854731939241,
-    "shared-all": 1.0861147364191934,
+    "shared-all": 1.086491416126846,
     "sections": 1.578420691040153,
     "sections-site": 2.328622345401489
    },
@@ -650,11 +752,11 @@
     "one-trunk": 81.52287245327277,
     "perimeter": 120.87256692830218,
     "straight": 0,
-    "corners": 87.42997225884841,
-    "shared": 89.02063804521067,
-    "shared-all": 115.277723738941,
-    "sections": 145.16553537263175,
-    "sections-site": 186.67704298009255
+    "corners": 87.49017092620446,
+    "shared": 89.08858976125595,
+    "shared-all": 115.63165112665774,
+    "sections": 145.24667430567473,
+    "sections-site": 186.77668238386912
    },
    "best": [
     "straight"
@@ -670,7 +772,7 @@
     "straight": 0,
     "corners": 86.30479539535615,
     "shared": 87.36632657687156,
-    "shared-all": 112.36458556326022,
+    "shared-all": 109.08824764939298,
     "sections": 180,
     "sections-site": 180
    },
@@ -678,11 +780,11 @@
     "one-trunk": 9630,
     "perimeter": 9180,
     "straight": 0,
-    "corners": 6636.119311664904,
+    "corners": 6636.456020859755,
     "shared": 6915.9252878443285,
-    "shared-all": 9860.547342607442,
+    "shared-all": 9854.303220221285,
     "sections": 13789.289832275374,
-    "sections-site": 14632.780004808465
+    "sections-site": 14631.060572806293
    },
    "best": [
     "straight"
@@ -699,18 +801,18 @@
     "corners": 1.023332921874794,
     "shared": 1.0254912240815668,
     "shared-all": 1.064766568881169,
-    "sections": 1.1171713178540703,
+    "sections": 1.1185803470608509,
     "sections-site": 1.3757750730582716
    },
    "sums": {
     "one-trunk": 136.90487271688878,
     "perimeter": 241.27612605715305,
     "straight": 84,
-    "corners": 115.68391834317919,
-    "shared": 115.74154792500036,
-    "shared-all": 119.4239352579797,
-    "sections": 124.67124116688946,
-    "sections-site": 147.22996403228544
+    "corners": 115.68426901529271,
+    "shared": 115.7520271741429,
+    "shared-all": 119.8107969236227,
+    "sections": 124.67636023937938,
+    "sections-site": 147.32624062714828
    },
    "best": [
     "straight"
@@ -724,21 +826,21 @@
     "one-trunk": 3.081260870558432,
     "perimeter": 6.102466116901162,
     "straight": 1,
-    "corners": 1.148938623641606,
+    "corners": 1.1486483868977553,
     "shared": 1.1973189313967005,
-    "shared-all": 1.3390737304968097,
+    "shared-all": 1.3335110112943056,
     "sections": 1.8856906739366888,
-    "sections-site": 2.997387913428713
+    "sections-site": 2.999238088430354
    },
    "sums": {
     "one-trunk": 303.87124283978125,
     "perimeter": 711.8819901787807,
     "straight": 84,
-    "corners": 216.56968614471572,
-    "shared": 217.4711620207973,
-    "shared-all": 230.86792054698222,
-    "sections": 256.17011594215626,
-    "sections-site": 400.564717384026
+    "corners": 216.56851319659728,
+    "shared": 217.46999659646684,
+    "shared-all": 230.80137713876928,
+    "sections": 256.2793232256512,
+    "sections-site": 400.62351004238184
    },
    "best": [
     "straight"
@@ -752,9 +854,9 @@
     "one-trunk": 1.75354103674582,
     "perimeter": 2.9244172927366177,
     "straight": 1,
-    "corners": 1.0551452362881628,
-    "shared": 1.070849559210913,
-    "shared-all": 1.1110895090268613,
+    "corners": 1.0552466277810464,
+    "shared": 1.0709358704078311,
+    "shared-all": 1.1110324195427057,
     "sections": 1.2707625864955343,
     "sections-site": 1.7121140181496186
    },
@@ -762,11 +864,11 @@
     "one-trunk": 159.93625107473605,
     "perimeter": 314.4695253914703,
     "straight": 84,
-    "corners": 129.9903967524068,
-    "shared": 130.20966469624446,
-    "shared-all": 135.21836154692198,
-    "sections": 143.21993563085843,
-    "sections-site": 189.64456630831305
+    "corners": 129.9952128510779,
+    "shared": 130.2151644509766,
+    "shared-all": 135.28652160434078,
+    "sections": 143.24581508026367,
+    "sections-site": 189.7234160117404
    },
    "best": [
     "straight"
@@ -782,7 +884,7 @@
     "straight": 1,
     "corners": 1.2543734454878432,
     "shared": 1.2543734454878432,
-    "shared-all": 1.4210812364314944,
+    "shared-all": 1.3911479988633126,
     "sections": 2.034989430418588,
     "sections-site": 3.57865171670721
    },
@@ -790,11 +892,11 @@
     "one-trunk": 432.15483459347485,
     "perimeter": 1322.6312348793185,
     "straight": 84,
-    "corners": 254.94035145053675,
+    "corners": 254.9394913261683,
     "shared": 255.58122725418502,
-    "shared-all": 273.2536102854824,
-    "sections": 302.6565830396201,
-    "sections-site": 682.6866059585134
+    "shared-all": 273.16541686454764,
+    "sections": 302.7297803682562,
+    "sections-site": 683.0202891929403
    },
    "best": [
     "straight"
@@ -822,7 +924,7 @@
     "shared": 7.029534307500409,
     "shared-all": 7.269224910564952,
     "sections": 7.029534307500409,
-    "sections-site": 10.874935068727419
+    "sections-site": 10.891463994347255
    },
    "best": [
     "straight",
@@ -967,20 +1069,20 @@
     "perimeter": 0.4356748721149041,
     "straight": 0,
     "corners": 0.06615535047119209,
-    "shared": 0.07005777220161113,
-    "shared-all": 0.42439712122464457,
-    "sections": 0.3417866546226462,
-    "sections-site": 0.3758567552150657
+    "shared": 0.0743675953459394,
+    "shared-all": 0.4241894420083346,
+    "sections": 0.3403571104038297,
+    "sections-site": 0.3784047124162341
    },
    "sums": {
     "one-trunk": 60.251979200356146,
     "perimeter": 35.74041099538813,
     "straight": 2.1135504052083096,
-    "corners": 12.983049276219042,
-    "shared": 14.202646397826376,
-    "shared-all": 32.137302229586055,
-    "sections": 27.53950833088315,
-    "sections-site": 27.598888192153108
+    "corners": 12.98652198582809,
+    "shared": 14.225408207717862,
+    "shared-all": 31.93964937104802,
+    "sections": 27.74316764660097,
+    "sections-site": 27.50115971335183
    },
    "best": [
     "one-trunk"
@@ -994,21 +1096,21 @@
     "one-trunk": 0.9696646465416449,
     "perimeter": 0.9782450938065411,
     "straight": 0,
-    "corners": 0.035189952805125144,
-    "shared": 0.04377707259499758,
-    "shared-all": 0.1661664374131968,
-    "sections": 0.1537144822429595,
+    "corners": 0.03472851253318408,
+    "shared": 0.04417703007247286,
+    "shared-all": 0.15993726596089056,
+    "sections": 0.15212827142464846,
     "sections-site": 0.17618658941158719
    },
    "sums": {
     "one-trunk": 77.13245023536076,
     "perimeter": 80.25814861759575,
     "straight": 5.179478538044017,
-    "corners": 11.132974638662258,
-    "shared": 11.362763233866406,
-    "shared-all": 18.8357046561766,
-    "sections": 17.038161152435862,
-    "sections-site": 18.102446942624844
+    "corners": 11.089223906628389,
+    "shared": 11.380444771901695,
+    "shared-all": 18.605080754862307,
+    "sections": 17.214872041180474,
+    "sections-site": 18.18020025069176
    },
    "best": [
     "straight"
@@ -1024,19 +1126,19 @@
     "straight": 1,
     "corners": 4,
     "shared": 4,
-    "shared-all": 7,
-    "sections": 6,
+    "shared-all": 6.5,
+    "sections": 6.5,
     "sections-site": 6
    },
    "sums": {
     "one-trunk": 2525,
     "perimeter": 1942,
     "straight": 135,
-    "corners": 379,
-    "shared": 406,
-    "shared-all": 917,
-    "sections": 603,
-    "sections-site": 747
+    "corners": 384,
+    "shared": 411,
+    "shared-all": 907,
+    "sections": 605,
+    "sections-site": 752
    },
    "best": [
     "straight"
@@ -1050,21 +1152,21 @@
     "one-trunk": 0.9081668355285377,
     "perimeter": 0.6764386627594365,
     "straight": 0,
-    "corners": 0.31779398076326404,
-    "shared": 0.36008325624421833,
+    "corners": 0.31378424657534243,
+    "shared": 0.3356777493606138,
     "shared-all": 0.7108187134502923,
-    "sections": 0.6706615986623227,
-    "sections-site": 0.6262044407205698
+    "sections": 0.6720277188809018,
+    "sections-site": 0.6315892997639654
    },
    "sums": {
     "one-trunk": 72.3602533205629,
     "perimeter": 57.878650686694506,
     "straight": 0,
-    "corners": 27.942214244821148,
-    "shared": 30.444724422456748,
-    "shared-all": 48.32154883622277,
-    "sections": 47.691912822596095,
-    "sections-site": 47.394635988279354
+    "corners": 27.619416420975124,
+    "shared": 30.235397044876688,
+    "shared-all": 48.104443764723776,
+    "sections": 47.83229954409979,
+    "sections-site": 47.25463972836392
    },
    "best": [
     "straight"
@@ -1080,19 +1182,19 @@
     "straight": 0,
     "corners": 0.016707327499675254,
     "shared": 0.016925154320987658,
-    "shared-all": 0.06456597222222221,
-    "sections": 0.05604166666666667,
+    "shared-all": 0.06308641975308642,
+    "sections": 0.055077459215972735,
     "sections-site": 0.05666666666666667
    },
    "sums": {
     "one-trunk": 34.11375428147957,
     "perimeter": 14.54194747416554,
     "straight": 0,
-    "corners": 2.437886146344946,
-    "shared": 2.9182194796782794,
-    "shared-all": 9.805160372052775,
-    "sections": 6.477244317555203,
-    "sections-site": 7.687385984072975
+    "corners": 2.438402218193494,
+    "shared": 2.922494807552994,
+    "shared-all": 9.739530689504095,
+    "sections": 6.50978491581227,
+    "sections-site": 7.69215523857956
    },
    "best": [
     "straight"
@@ -1111,7 +1213,7 @@
     "corners": 649,
     "shared": 503.5,
     "shared-all": 153.5,
-    "sections": 402,
+    "sections": 403,
     "sections-site": 447
    },
    "sums": {
@@ -1121,7 +1223,7 @@
     "corners": 1298,
     "shared": 1007,
     "shared-all": 307,
-    "sections": 804,
+    "sections": 806,
     "sections-site": 894
    },
    "best": [
@@ -1139,7 +1241,7 @@
     "corners": 5.7508333333333335,
     "shared": 5.023333333333333,
     "shared-all": 0.7933333333333333,
-    "sections": 2.8711111111111114,
+    "sections": 2.8761111111111113,
     "sections-site": 2.923888888888889
    },
    "sums": {
@@ -1149,7 +1251,7 @@
     "corners": 11.501666666666667,
     "shared": 10.046666666666667,
     "shared-all": 1.5866666666666667,
-    "sections": 5.742222222222223,
+    "sections": 5.752222222222223,
     "sections-site": 5.847777777777778
    },
    "best": [
@@ -1202,8 +1304,8 @@
     "corners": 996.5,
     "shared": 1039.5,
     "shared-all": 895.5,
-    "sections": 1403.5,
-    "sections-site": 1665
+    "sections": 1405,
+    "sections-site": 1666
    },
    "sums": {
     "one-trunk": 3027,
@@ -1212,8 +1314,8 @@
     "corners": 1993,
     "shared": 2079,
     "shared-all": 1791,
-    "sections": 2807,
-    "sections-site": 3330
+    "sections": 2810,
+    "sections-site": 3332
    },
    "best": [
     "straight"
@@ -1222,6 +1324,97 @@
   {
    "name": "route.crossings.pairs.estimated",
    "key": "R1.pairsEstimated",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 0,
+    "perimeter": 0,
+    "straight": 0,
+    "corners": 0,
+    "shared": 0,
+    "shared-all": 0,
+    "sections": 0,
+    "sections-site": 0
+   },
+   "sums": {
+    "one-trunk": 0,
+    "perimeter": 0,
+    "straight": 0,
+    "corners": 0,
+    "shared": 0,
+    "shared-all": 0,
+    "sections": 0,
+    "sections-site": 0
+   },
+   "best": [
+    "one-trunk",
+    "perimeter",
+    "straight",
+    "corners",
+    "shared",
+    "shared-all",
+    "sections",
+    "sections-site"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.low",
+   "key": "R1.pairsLow",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 1513.5,
+    "perimeter": 2302.5,
+    "straight": 650,
+    "corners": 996.5,
+    "shared": 1039.5,
+    "shared-all": 895.5,
+    "sections": 1405,
+    "sections-site": 1666
+   },
+   "sums": {
+    "one-trunk": 3027,
+    "perimeter": 4605,
+    "straight": 1300,
+    "corners": 1993,
+    "shared": 2079,
+    "shared-all": 1791,
+    "sections": 2810,
+    "sections-site": 3332
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.high",
+   "key": "R1.pairsHigh",
+   "better": "lower",
+   "medians": {
+    "one-trunk": 1513.5,
+    "perimeter": 2302.5,
+    "straight": 650,
+    "corners": 996.5,
+    "shared": 1039.5,
+    "shared-all": 895.5,
+    "sections": 1405,
+    "sections-site": 1666
+   },
+   "sums": {
+    "one-trunk": 3027,
+    "perimeter": 4605,
+    "straight": 1300,
+    "corners": 1993,
+    "shared": 2079,
+    "shared-all": 1791,
+    "sections": 2810,
+    "sections-site": 3332
+   },
+   "best": [
+    "straight"
+   ]
+  },
+  {
+   "name": "route.crossings.pairs.contact-sampled",
+   "key": "R1.pairsContactSampled",
    "better": "lower",
    "medians": {
     "one-trunk": 0,
@@ -1265,7 +1458,7 @@
     "corners": 0.44229908749453106,
     "shared": 0.4573223266404079,
     "shared-all": 0.6999046120545396,
-    "sections": 0.5080157339121097,
+    "sections": 0.5082003131819326,
     "sections-site": 0.7083775384484696
    },
    "sums": {
@@ -1275,7 +1468,7 @@
     "corners": 0.8845981749890621,
     "shared": 0.9146446532808158,
     "shared-all": 1.3998092241090792,
-    "sections": 1.0160314678242195,
+    "sections": 1.0164006263638652,
     "sections-site": 1.4167550768969392
    },
    "best": [
@@ -1322,8 +1515,8 @@
     "straight": 0,
     "corners": 0.8090922665593979,
     "shared": 0.9044259454286488,
-    "shared-all": 1.652166870928093,
-    "sections": 2.101441952868779,
+    "shared-all": 1.6619681315204273,
+    "sections": 2.1002942719351445,
     "sections-site": 2.4699199124974673
    },
    "sums": {
@@ -1332,8 +1525,8 @@
     "straight": 0,
     "corners": 1.6181845331187958,
     "shared": 1.8088518908572977,
-    "shared-all": 3.304333741856186,
-    "sections": 4.202883905737558,
+    "shared-all": 3.3239362630408547,
+    "sections": 4.200588543870289,
     "sections-site": 4.939839824994935
    },
    "best": [
@@ -1378,7 +1571,7 @@
     "straight": 1,
     "corners": 1.0395113359889967,
     "shared": 1.0433577424709664,
-    "shared-all": 1.1234886066791898,
+    "shared-all": 1.122907010817518,
     "sections": 1.1820417518363744,
     "sections-site": 1.9570240254526254
    },
@@ -1388,7 +1581,7 @@
     "straight": 2,
     "corners": 2.0790226719779934,
     "shared": 2.0867154849419327,
-    "shared-all": 2.2469772133583796,
+    "shared-all": 2.245814021635036,
     "sections": 2.3640835036727488,
     "sections-site": 3.914048050905251
    },
@@ -1434,9 +1627,9 @@
     "straight": 1,
     "corners": 1.0901352183798996,
     "shared": 1.1013594809924552,
-    "shared-all": 1.2024256211802609,
-    "sections": 1.2841997742842728,
-    "sections-site": 2.392779625042059
+    "shared-all": 1.2004945491626884,
+    "sections": 1.2841169766632414,
+    "sections-site": 2.392828406193005
    },
    "sums": {
     "one-trunk": 4.454291680692471,
@@ -1444,9 +1637,9 @@
     "straight": 2,
     "corners": 2.180270436759799,
     "shared": 2.2027189619849104,
-    "shared-all": 2.4048512423605217,
-    "sections": 2.5683995485685456,
-    "sections-site": 4.785559250084118
+    "shared-all": 2.4009890983253768,
+    "sections": 2.568233953326483,
+    "sections-site": 4.78565681238601
    },
    "best": [
     "straight"
@@ -1644,9 +1837,9 @@
     "straight": 0,
     "corners": 0.16776167359800587,
     "shared": 0.23107539509333097,
-    "shared-all": 0.5877595671308231,
-    "sections": 0.47713595278867765,
-    "sections-site": 0.44991747732999465
+    "shared-all": 0.5788668728297794,
+    "sections": 0.47675623694513186,
+    "sections-site": 0.44901293430928285
    },
    "sums": {
     "one-trunk": 1.6839862540339094,
@@ -1654,9 +1847,9 @@
     "straight": 0,
     "corners": 0.33552334719601173,
     "shared": 0.46215079018666194,
-    "shared-all": 1.1755191342616462,
-    "sections": 0.9542719055773553,
-    "sections-site": 0.8998349546599893
+    "shared-all": 1.1577337456595589,
+    "sections": 0.9535124738902637,
+    "sections-site": 0.8980258686185657
    },
    "best": [
     "one-trunk"
@@ -1672,9 +1865,9 @@
     "straight": 0,
     "corners": 0.0616544763629852,
     "shared": 0.07740441090974576,
-    "shared-all": 0.22087142386261854,
-    "sections": 0.10994757738114296,
-    "sections-site": 0.08917778069083868
+    "shared-all": 0.20912074189193663,
+    "sections": 0.10995280173836407,
+    "sections-site": 0.09069521897291583
    },
    "sums": {
     "one-trunk": 1.965935621067562,
@@ -1682,9 +1875,9 @@
     "straight": 0,
     "corners": 0.1233089527259704,
     "shared": 0.15480882181949152,
-    "shared-all": 0.4417428477252371,
-    "sections": 0.2198951547622859,
-    "sections-site": 0.17835556138167735
+    "shared-all": 0.41824148378387327,
+    "sections": 0.21990560347672813,
+    "sections-site": 0.18139043794583165
    },
    "best": [
     "straight"

@@ -1,5 +1,5 @@
 import { nodeIndex, type Graph, type Route, type Result } from "./model.ts";
-import type { Obstacles } from "./visibility.ts";
+import { Obstacles } from "./visibility.ts";
 import type { WayFinder } from "./ways.ts";
 
 /**
@@ -33,6 +33,17 @@ export function markThrough(graph: Graph, routes: Route[], obstacles: Obstacles)
     if (through.length > 0) (out ??= [...routes])[i] = { ...route, through };
   });
   return out ?? routes;
+}
+
+/**
+ * This function gives the routes with the field `through`, as `markThrough` does, with a new index of the boxes of the graph (UNMARKED-THROUGH).
+ * A router with no index of its own uses it, for example `straight` and `plugs`. Their routes go through boxes by design, and the record tells it.
+ */
+export function markBoard(graph: Graph, routes: Route[]): Route[] {
+  if (routes.length === 0) return routes;
+  let size = 0;
+  for (const n of graph.nodes) size += Math.max(n.box.w, n.box.h);
+  return markThrough(graph, routes, new Obstacles(graph.nodes, Math.max(180, (2 * size) / Math.max(1, graph.nodes.length))));
 }
 
 /** This function gives the route with the field `through`, when it goes through a box that `ends` does not name. A clean route stays the same object. */

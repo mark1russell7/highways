@@ -27,6 +27,8 @@ export function inflectionSector(angle: number, tol: number = (7 * Math.PI) / 18
  * The curve leaves `p0` along `normal`. In the frame of the chord, its side offset f has f(0) = f(L) = 0 and f'(0) = tan θ.
  * Here θ is the angle from the chord to the normal. A polynomial of degree 2, 3 or 4 gives 0, 1 or 2 inflections,
  * at 1/2, or at 1/3 and 2/3, of the chord.
+ *
+ * The powers are products, not `**` or `Math.pow`. In Node.js, `x ** 3` gives different last bits on Linux and on Windows.
  */
 export function inflectionCurve(p0: Point, normal: Point, target: Point, options: InflectionOptions = {}): Point[] {
   const L = dist(p0, target);
@@ -41,8 +43,8 @@ export function inflectionCurve(p0: Point, normal: Point, target: Point, options
     k === 0
       ? (s: number): number => (-d / L) * s * s + d * s
       : k === 1
-        ? (s: number): number => ((12 * d) / (L * L)) * (s ** 3 / 6 - (L * s * s) / 4) + d * s
-        : (s: number): number => ((-36 * d) / L ** 3) * (s ** 4 / 12 - (L * s ** 3) / 6 + (L * L * s * s) / 9) + d * s;
+        ? (s: number): number => ((12 * d) / (L * L)) * ((s * s * s) / 6 - (L * s * s) / 4) + d * s
+        : (s: number): number => ((-36 * d) / (L * L * L)) * ((s * s * (s * s)) / 12 - (L * (s * s * s)) / 6 + (L * L * s * s) / 9) + d * s;
   const n = Math.max(2, options.samples ?? 24);
   const out: Point[] = [];
   for (let i = 0; i <= n; i++) {

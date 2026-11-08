@@ -1,4 +1,5 @@
 import { mulberry32, seedOf } from "@mark1russell7/rigor-generators";
+import { wilson } from "@mark1russell7/rigor-statistics";
 import { describe, expect, it } from "vitest";
 import { countCrossings, paintedOutsidePairs, routePairCrossings } from "./quality.ts";
 
@@ -61,7 +62,7 @@ describe("paintedOutsidePairs", () => {
 
 describe("routePairCrossings", () => {
   it("counts a proper crossing of two routes", () => {
-    expect(count([[0, 0], [10, 10]], [[0, 10], [10, 0]])).toEqual({ pairs: 1, proper: 1, contact: 0, estimated: false });
+    expect(count([[0, 0], [10, 10]], [[0, 10], [10, 0]])).toEqual({ pairs: 1, proper: 1, contact: 0, estimated: false, low: 1, high: 1, contactSampled: false });
   });
 
   it("counts no crossing of parallel routes, of equal routes or of one route", () => {
@@ -85,7 +86,7 @@ describe("routePairCrossings", () => {
   });
 
   it("counts two routes that cross at a shared vertex", () => {
-    expect(count([[0, 0], [5, 5], [10, 10]], [[0, 10], [5, 5], [10, 0]])).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count([[0, 0], [5, 5], [10, 10]], [[0, 10], [5, 5], [10, 0]])).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1, contactSampled: false });
   });
 
   it("does not count two routes that touch at a shared vertex and come back", () => {
@@ -101,7 +102,7 @@ describe("routePairCrossings", () => {
   it("counts a shared stretch that two routes leave on opposite sides", () => {
     const a = [[0, 10], [5, 0], [15, 0], [20, -10]] as const;
     const b = [[0, -10], [5, 0], [15, 0], [20, 10]] as const;
-    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1, contactSampled: false });
   });
 
   it("does not count a shared stretch that two routes leave on one side", () => {
@@ -116,7 +117,7 @@ describe("routePairCrossings", () => {
   it("counts a stretch of routes in opposite directions one time", () => {
     const a = [[0, 10], [5, 0], [15, 0], [20, -10]] as const;
     const b = [[20, 10], [15, 0], [5, 0], [0, -10]] as const;
-    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false });
+    expect(count(a, b)).toEqual({ pairs: 1, proper: 0, contact: 1, estimated: false, low: 1, high: 1, contactSampled: false });
     expect(count(b, a).pairs).toBe(1);
     // Both ends of this route lie below, and at the right end it passes on the other side of the first route.
     const below = [[22, -10], [15, 0], [5, 0], [-2, -10]] as const;
@@ -166,8 +167,11 @@ describe("routePairCrossings", () => {
     }
   });
 
-  /** This function draws a walk on a coarse grid, so that walks share vertices and stretches. Both ends go out to their own points on a large circle. */
-  function walks(name: string, routes: number): { readonly points: Xy[]; readonly ends: readonly [number, number] }[] {
+  /**
+   * This function draws a walk on a coarse grid, so that walks share vertices and stretches. Both ends go out to their own points on a large circle.
+   * Each walk has `extra` more steps. Long walks give a small sample under a point limit.
+   */
+  function walks(name: string, routes: number, extra = 0): { readonly points: Xy[]; readonly ends: readonly [number, number] }[] {
     const random = mulberry32(seedOf(name));
     const steps = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1]] as const;
     const angles = Array.from({ length: 2 * routes }, (_, i) => (i + 0.37) / (2 * routes));
@@ -187,7 +191,7 @@ describe("routePairCrossings", () => {
       let [x, y] = [Math.floor(random() * 3), Math.floor(random() * 3)];
       const inner: Xy[] = [[x * 10, y * 10]];
       let last = -1;
-      for (let i = 0; i < 2 + Math.floor(random() * 7); i++) {
+      for (let i = 0; i < 2 + extra + Math.floor(random() * 7); i++) {
         let pick = Math.floor(random() * steps.length);
         // A walk does not go straight back, because a spike has no side.
         const back = (a: number, b: number): boolean => steps[a]![0] === -steps[b]![0] && steps[a]![1] === -steps[b]![1];
@@ -227,5 +231,77 @@ describe("routePairCrossings", () => {
       for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) sum += count(list[i]!, list[j]!).pairs;
       expect(count(...list).pairs, `board ${board}`).toBe(sum);
     }
+  });
+
+  it("reads all routes up to the point limit, so the count with the limit equals the full count (BENCH-PAIRS-HEAP)", () => {
+    const routes = walks("route-pairs/limit/full", 30).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    expect(routePairCrossings(routes, { maxPoints: points })).toEqual(routePairCrossings(routes));
+    const full = routePairCrossings(routes);
+    expect([full.low, full.high, full.contactSampled]).toEqual([full.pairs, full.pairs, false]);
+  });
+
+  it("gives a 95% interval of a sampled count that holds the full count for about 95% of the seeds", () => {
+    const routes = walks("route-pairs/limit/cover", 120).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes).pairs;
+    const runs = Array.from({ length: 200 }, (_, seed) => routePairCrossings(routes, { maxPoints: points / 2, seed }));
+    const inside = runs.filter((r) => r.low <= full && full <= r.high).length;
+    expect(runs.every((r) => r.low <= r.pairs && r.pairs <= r.high && r.low < r.high)).toBe(true);
+    // The sample has 60 of the 120 routes. The Wilson interval of the measured coverage holds 0.95.
+    expect(inside).toBe(189);
+    const cover = wilson(inside, runs.length);
+    expect(cover.low).toBeLessThanOrEqual(0.95);
+    expect(cover.high).toBeGreaterThanOrEqual(0.95);
+  });
+
+  // A small sample gives a narrow interval, as the TSDoc of `routePairCrossings` tells. These cells pin the measured coverage.
+  it.each([
+    { cell: "40x8", routes: 40, extra: 20, part: 5, m: 8, inside: 177 },
+    { cell: "40x10", routes: 40, extra: 14, part: 4, m: 10, inside: 174 },
+    { cell: "60x12", routes: 60, extra: 16, part: 5, m: 12, inside: 181 },
+  ])("gives a known narrow interval at a small sample, cell $cell", ({ cell, routes: n, extra, part, m, inside }) => {
+    const routes = walks(`route-pairs/limit/small/${cell}`, n, extra).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const maxPoints = points / part;
+    // The count takes this number of routes in its sample.
+    expect(Math.floor((n * maxPoints) / points)).toBe(m);
+    const full = routePairCrossings(routes).pairs;
+    const runs = Array.from({ length: 200 }, (_, seed) => routePairCrossings(routes, { maxPoints, seed }));
+    const held = runs.filter((r) => r.low <= full && full <= r.high).length;
+    expect(held).toBe(inside);
+    // The Wilson interval of the coverage is below 0.95. So the interval of a sample under 20 routes is too narrow.
+    expect(wilson(held, runs.length).high).toBeLessThan(0.95);
+  });
+
+  it.each([
+    { board: 0, routes: 30, error: 0.0667 },
+    { board: 1, routes: 50, error: 0.0358 },
+    { board: 2, routes: 80, error: 0.0401 },
+    { board: 3, routes: 100, error: 0.0252 },
+  ])("holds the full count in the interval of a sample of half the points, board $board", ({ board, routes: n, error }) => {
+    const routes = walks(`route-pairs/limit/error/${board}`, n).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes).pairs;
+    const sample = routePairCrossings(routes, { maxPoints: points / 2 });
+    expect(sample.estimated).toBe(true);
+    expect(sample.low <= full && full <= sample.high).toBe(true);
+    // The relative error of the sample against the full count, to 4 places.
+    expect(Number((Math.abs(sample.pairs - full) / full).toFixed(4))).toBe(error);
+  });
+
+  it("reads a seeded sample of the routes above the point limit, and the mean of the scaled counts is the full count", () => {
+    const routes = walks("route-pairs/limit/sample", 80).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes);
+    const one = routePairCrossings(routes, { maxPoints: points / 2 });
+    expect(one.estimated).toBe(true);
+    expect(one.pairs).toBe(one.proper + one.contact);
+    expect(routePairCrossings(routes, { maxPoints: points / 2 })).toEqual(one);
+    // The scaled count of a sample has no bias. So the mean over 60 seeds comes near the full count.
+    const seeds = Array.from({ length: 60 }, (_, seed) => routePairCrossings(routes, { maxPoints: points / 2, seed }).pairs);
+    const mean = seeds.reduce((sum, v) => sum + v, 0) / seeds.length;
+    expect(full.pairs).toBeGreaterThan(500);
+    expect(Math.abs(mean - full.pairs) / full.pairs).toBeLessThan(0.03);
   });
 });

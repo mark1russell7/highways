@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { kpiFacts } from "./kpi-files.ts";
+import type { BenchMeta } from "./bench-label.ts";
+import { BUILT_IN_STRATEGIES } from "@mark1russell7/highways";
+import { cardStrategies, kpiFacts, strategiesWithoutNumberOption } from "./kpi-files.ts";
 import { fitResponse, RESPONSE_RECORDS_SCHEMA, type ResponseData } from "@mark1russell7/rigor-statistics";
-import { cardsWithCurves, KPI_PAGES, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
+import { RESULT_FILES } from "./results-files.ts";
+import { cardShare, cardsWithCurves, cardsWithoutCurve, KPI_PAGES, NO_CURVE, percentDown, LAG_NOT_COUNTED, latestAt, minorsBehind, resultsLag, resultsLagAt, resultsUnread, siteKpiInput, type KpiFacts, type SweepFile } from "./kpi.ts";
 
 const FACTS: KpiFacts = { demoComplete: true, coverageCells: 10, verdictReads: [] };
 const value = (input: ReturnType<typeof siteKpiInput>, id: string): number | undefined => input?.measures.find((m) => m.id === id)?.value;
@@ -134,6 +139,38 @@ describe("cardsWithCurves", () => {
     const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps });
     expect(input?.measures.find((x) => x.id === "cards-with-curves")).toMatchObject({ value: 2, at: "2026-11-12T00:00:00Z" });
   });
+
+  it("gives the share of the cards of the list with a curve, and reads no card off the list (CARDS-SHARE)", () => {
+    const sweeps = [file({ alpha: 2, beta: 4, gamma: 1, omega: 2 })];
+    const list = ["router/alpha", "router/beta", "router/gamma"];
+    expect(cardsWithoutCurve(sweeps, list)).toEqual(["router/gamma"]);
+    expect(cardShare(sweeps, list)).toBe(66.6);
+    expect(cardShare(sweeps, list.slice(0, 2))).toBe(100);
+    expect(cardShare([], [])).toBe(0);
+    const input = siteKpiInput({ date: "2026-11-05" }, "0.15.0", () => false, { ...FACTS, sweeps, cardStrategies: list });
+    const m = input?.measures.find((x) => x.id === "cards-curve-share");
+    expect(m).toMatchObject({ value: 66.6, unit: "%" });
+    expect(m?.notCounted).toContain("NO_CURVE");
+  });
+
+  it("does not read 100 while one card of many has no curve", () => {
+    // Math.round gives 100 for 1999 of 2000. The share rounds down.
+    expect(percentDown(1999, 2000)).toBe(99.9);
+    expect(percentDown(2000, 2000)).toBe(100);
+    expect(percentDown(0, 0)).toBe(0);
+  });
+});
+
+describe("the cards of the registry (CARDS-SHARE)", () => {
+  it("gives each built-in strategy a card, or a reason in NO_CURVE", () => {
+    expect(strategiesWithoutNumberOption().sort()).toEqual(Object.keys(NO_CURVE).sort());
+    expect(cardStrategies().length + Object.keys(NO_CURVE).length).toBe(BUILT_IN_STRATEGIES.length);
+  });
+
+  it("holds the count of the cards, so a new strategy shows in this test", () => {
+    // A new built-in strategy with a number option raises this count and lowers the share until its sweep.
+    expect(cardStrategies()).toHaveLength(101);
+  });
 });
 
 describe("the time of each measure", () => {
@@ -177,5 +214,18 @@ describe("kpiFacts", () => {
     expect(facts.verdictReadDates).not.toContain(undefined);
     expect(Array.isArray(facts.sweeps)).toBe(true);
     expect(facts.commitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("the results lag of the repository (STAMP-ON-RELEASE)", () => {
+  const root = fileURLToPath(new URL("../../../", import.meta.url));
+
+  // This test is the gate of the target: a change of the version of the core fails it while a snapshot is 2 or more minors behind.
+  // Then the snapshots need a read on the new core first: the workflow `Read on release`, and the stamps of its job `stamps`.
+  it("has each snapshot at most 1 minor behind the version of the core", () => {
+    const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+    const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
+    const lag = siteKpiInput(meta, core, () => true, kpiFacts(root))?.measures.find((m) => m.id === "results-lag");
+    expect(lag?.value, `results-lag on core ${core}, from the read at ${lag?.at}`).toBeLessThanOrEqual(1);
   });
 });

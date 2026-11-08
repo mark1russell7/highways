@@ -2,10 +2,12 @@ import { inflectionCurve } from "../curves.ts";
 import { center } from "../geom.ts";
 import { nodeIndex, outerGraph, type Graph, type Result, type Route, type Router } from "../model.ts";
 import { placePlug } from "../plugs.ts";
+import { markBoard } from "../through.ts";
 
 /**
  * Plugs and the inflection rule, with no obstacles. Each edge leaves its source plug at the tangent of the side.
  * It goes to the target plug on the curve of the rule. This router measures the rule alone.
+ * A curve that goes through a box has the field `through`, as the routes of the other routers do (UNMARKED-THROUGH).
  */
 export const plugsRouter: Router = {
   name: "plugs",
@@ -21,6 +23,6 @@ export const plugsRouter: Router = {
       const pt = placePlug(t, e.target, center(s.box));
       routes.push({ edge: e.id, points: inflectionCurve(ps.point, ps.normal, pt.point) });
     }
-    return { routes };
+    return { routes: markBoard(graph, routes) };
   },
 };
