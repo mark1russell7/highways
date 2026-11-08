@@ -57,13 +57,41 @@ jobs:
           path: ${{ runner.temp }}/heap.jsonl
           if-no-files-found: warn
 
+  # The fingerprints of the keyed routers (ENTRY-FINGERPRINT, packages/core/scripts/fingerprints.ts). Each router and highway entry routes the
+  # probe boards, and the check compares each fingerprint with the table src/fingerprint/table.ts. The release starts this file, so each release
+  # holds a table that the code gives. The artifact holds the read: the table, the hash of each probe and the time of each entry.
+  fingerprints:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Compare the fingerprints with the table
+        working-directory: packages/core
+        run: node scripts/fingerprints.ts --out "$RUNNER_TEMP/fingerprints"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: fingerprints
+          path: ${{ runner.temp }}/fingerprints/
+          if-no-files-found: warn
+
   # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
   # A job that its own if skips fails it, unless ALLOW_SKIP names the job (template #85). Add each new job of the gate to needs.
   # The cells of Xplat have their own check "Xplat OK" in xplat.yml.
   ci-ok:
     name: CI OK
     if: ${{ !cancelled() }}
-    needs: [ci, heap, presets]
+    needs: [ci, heap, fingerprints, presets]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}

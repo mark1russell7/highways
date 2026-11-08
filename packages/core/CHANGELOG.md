@@ -1,5 +1,24 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.15.3
+
+This version is a PATCH before 1.0: a new optional field and new exports. No route output changes.
+
+### New
+
+- `routerEntries(registry)` gives each keyed router of a registry: each router strategy, and each highway strategy that `follow` routes (ENTRY-FINGERPRINT).
+- Each entry of `KEYED_STRATEGIES` has the optional field `fingerprint`, with 16 lowercase hex digits. A consumer routes again only the entries with a changed fingerprint.
+- The fingerprint is `fingerprintOf` of `layout-contract` over one `probeHash` for each probe. The hash reads `resultForm` with exact numbers, and without the field `through`.
+- `fingerprintProbes()` gives the 28 probes: each corpus family at its defaults, with the seed 1. The probes cover each size band of the portfolio.
+- `readEntry(entry, probes)` reads one entry. A probe that throws, or that has more nodes than `maxNodes`, gets the hash `REFUSED_PROBE`.
+- `fingerprintFindings(table, reads)` names each changed, missing or extra entry, and each entry that refuses each probe.
+- `ENTRY_FINGERPRINTS` is the table of the release, and `FINGERPRINT_SOURCE` names its probes. `node scripts/fingerprints.ts --write` writes the table.
+- `resultForm` has its home in `src/fingerprint/form.ts`. The screen and the fingerprints use the same form.
+
+### Dependencies
+
+- `@mark1russell7/layout-contract` is `^0.5.6`, for `fingerprintOf`, `probeHash` and the option `skip` of the hash.
+
 ## 0.15.2
 
 This version is a PATCH before 1.0: two new exports. No route output changes.
