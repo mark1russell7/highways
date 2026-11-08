@@ -8,6 +8,8 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| CARDS-SHARE | The measure `cards-curve-share` gives the cards with a curve over the built-in strategies with a number option. The sweep records of the 8 steps give each of the 101 cards a curve, so the share reads 100 %. `NO_CURVE` gives the 6 strategies with no number option. | 2026-11-08 | [#391](https://github.com/mark1russell7/highways/pull/391) |
+| ROOM-SWEEP | The sweep takes the step `room`. It starts each room strategy in the strategy `pipeline` of `whole`, and its record also has the 3 measures of the board. The record `room-screen-v1.json` gives the 3 room cards. | 2026-11-08 | [#392](https://github.com/mark1russell7/highways/pull/392) |
 | WON-LINES | Each page line that quotes a measure that a control wins has its partner, or says that no partner is read. A table of the README gives the medians of the controls and the real routers. A test holds the notes of the site. | 2026-11-07 | [#340](https://github.com/mark1russell7/highways/pull/340) |
 | THROUGH-FLOOR | The 292 routes through a box of `corners`, `shared`, `shared-all` and `sections` are edges of `packed-grid` with no way in the corner graph. An exact search of the free space reads them: with a clearance of 1, 246 have no way, because one end is an inner tile. 46 have a way around the outside of the board (NO-WAY-RING). `sections-site` has 4 more routes through a box, and each has a clean way (SITE-HUB-THROUGH). | 2026-11-07 | [`through-floor/`](../packages/core/scripts/data/through-floor/) |
 | SCREEN-ON-RELEASE | The workflow `Read on release` starts one `Screen` run of the 15 verdict snapshots after each release that changes the version of the core, and each week. | 2026-11-07 | [#377](https://github.com/mark1russell7/highways/pull/377) |
@@ -238,8 +240,6 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
-| CARDS-SHARE | The measure `cards-curve-share` gives the cards with a curve over the built-in strategies with a number option, 0 of 101 on 2026-11-07. The target is 100 %. `NO_CURVE` gives the 6 strategies with no number option. Due 2026-11-25. | `active` | | P1 |
-| ROOM-SWEEP | The screen has no step `room`, so the 3 room strategies had no card with a curve. The sweep starts each room strategy in the strategy `pipeline` of `whole`, and its record also has the 3 measures of the board. | `active` | | P1 |
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
 | NO-WAY-RING | On `packed-grid`, 46 routes have a way around the outside of the board, and the corner graph does not find it. Each such route finds its way, and the 246 with no way keep `route.through`. Due 2026-11-14. | `later` | | P2 |
