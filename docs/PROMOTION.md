@@ -105,7 +105,7 @@ The A/A arm of the same jobs gives the resolution of the time test, not a fixed 
 - The A/A quantile uses the ratios of the `~aa` arm in `inputs[].ratio`, with the linear quantile of `paired-time/1`.
 - A decision that is not valid gives the verdict `cannot decide (noise)`. The record names the check and the A/A value. A candidate without a decision does not promote.
 - An input under `timeFloorMs` in the two arms is too small to be a cost to the user.
-- An empty tail set in the 5 jobs gives the line `tail: not measured, no input above timeFloorMs` in the record. It does not stop a promotion.
+- An empty tail set in the 5 jobs gives the line `tail: not measured, no input above timeFloorMs` in the record. It does not stop a promotion. The summary says "pass on the median" and "no read" of the tail, and the job writes a warning to the check line (NO-READ-LINE).
 - An empty tail set in only some jobs makes the tail decision not valid.
 - The record keeps the 5 medians and tails, the worst A/A values with their spreads, and the CI run. It keeps the CPU model of each job.
 

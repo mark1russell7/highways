@@ -7,6 +7,7 @@ import { COMMIT_ARM, PARENT_ARM, spreadOf } from "./gates/pair-confirm.ts";
 import { homeVerdict } from "./gates/home-verdict.ts";
 import {
   BASE_FILE,
+  checkLine,
   BASE_SCHEMA,
   FIXED_ARM,
   FIXED_LIMIT,
@@ -355,5 +356,29 @@ describe("the record of the gate", () => {
     expect(gateExit(record(report(1, 1, NOISY), null, 2))).toBe(1);
     // A slower head fails at once, with no retry.
     expect(gateExit(record(report(1.19, 1.12)))).toBe(1);
+  });
+});
+
+describe("checkLine", () => {
+  it("writes a no read with the case, the rounds and the CPU model, and no line for a pass (NO-READ-LINE)", () => {
+    expect(gateExit(record(report(0.9, 0.9)))).toBe(0);
+    expect(checkLine(record(report(0.9, 0.9)))).toBeUndefined();
+    const first = checkLine(record(report(1, 1, NOISY)))!;
+    expect(first.level).toBe("warning");
+    expect(first.line).toMatch(/^::warning title=Sections gate::run 1 of 2: No read of 1 case: The home cannot decide/);
+    expect(first.line).toContain(`${GATE_ROUTER} on large-clustered, 10 rounds of each arm`);
+    expect(first.line).toContain("The CPU model: Made-up CPU, 4 cores.");
+    expect(first.line).toContain("The job retry times the gate on a fresh runner.");
+    const second = checkLine(record(report(1, 1, NOISY), null, 2))!;
+    expect(second.level).toBe("error");
+    expect(second.line).toContain("run 2 of 2: No read of 1 case");
+    const none = checkLine(record(null, "HEAD: the core does not load"))!;
+    expect(none.level).toBe("error");
+    expect(none.line).toContain("No read of 1 case: The job timed no arm");
+    expect(none.line).toContain("HEAD: the core does not load");
+    const slow = checkLine(record(report(1.19, 1.12)))!;
+    expect(slow.level).toBe("error");
+    expect(slow.line).toContain("run 1 of 2: The gate fails.");
+    expect(slow.line).not.toContain("No read");
   });
 });

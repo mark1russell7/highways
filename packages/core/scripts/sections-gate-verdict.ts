@@ -12,6 +12,7 @@
 import type { PairedTime, PoolOptions, TimeOutcome, TimeVerdict, VerdictOptions } from "@mark1russell7/rigor-bench";
 import { aaId, type PairedReport, type RecordEnv } from "./gates/paired.ts";
 import { COMMIT_ARM, PARENT_ARM, aaRatios, armRows, spreadOf, type ArmRow } from "./gates/pair-confirm.ts";
+import { annotation, noReadText, type AnnotationLevel } from "./gates/annotate.ts";
 import { InputError } from "./gates/inputs.ts";
 import { type Side } from "./sections-confirm-verdict.ts";
 
@@ -389,6 +390,26 @@ export function outcomeText(record: GateRecord): string {
   if (g.outcome === "fail") return `The gate fails. ${g.reason}`;
   if (record.attempt === 1) return `This run cannot decide. ${g.reason} The job \`retry\` runs the gate once more on a fresh runner.`;
   return `The gate fails. ${g.reason} The first run could not decide too, and such a run does not pass.`;
+}
+
+/**
+ * This function gives the annotation of a run that does not pass, for the check line of the pull request (NO-READ-LINE).
+ * A run that cannot decide, or that timed no arm, is a "no read". The line names the case, the rounds and the CPU model of the runner.
+ * The four arms of a run time on one runner, so the CPU model of the pair is one model. A pass gives no line.
+ */
+export function checkLine(record: GateRecord): { readonly level: AnnotationLevel; readonly line: string } | undefined {
+  const g = recordVerdict(record);
+  if (g.outcome === "pass") return undefined;
+  const run = `run ${record.attempt} of 2`;
+  const read = { cases: [`${record.router} on ${record.fixture}, ${record.rounds} rounds of each arm`], cpus: [`${record.env.cpu}, ${record.env.cores} cores`] };
+  if (g.outcome === "cannot decide" && record.attempt === 1)
+    return { level: "warning", line: annotation("warning", "Sections gate", `${run}: ${noReadText({ ...read, why: g.reason })} The job retry times the gate on a fresh runner.`) };
+  if (g.outcome === "cannot decide") return { level: "error", line: annotation("error", "Sections gate", `${run}: ${noReadText({ ...read, why: g.reason })} The first run could not decide too, so the gate fails.`) };
+  if (g.words === "not measured") {
+    const why = record.skipped === null ? g.reason : `${g.reason} ${record.skipped}`;
+    return { level: "error", line: annotation("error", "Sections gate", `${run}: ${noReadText({ ...read, why })} The gate fails (FAIL-CLOSED).`) };
+  }
+  return { level: "error", line: annotation("error", "Sections gate", `${run}: The gate fails. ${g.reason} The CPU model: ${read.cpus[0]}.`) };
 }
 
 /** This function writes a time in ms, or in s above 10 s. */

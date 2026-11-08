@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { SEARCH_DEFAULTS, searchRun, type Graph } from "../src/index.ts";
 import { WORK_WEIGHTS, workCounts, workUnits, type WorkCounts } from "../src/work.ts";
+import { annotation, warnNoRead } from "./gates/annotate.ts";
 import { envOf, type RecordEnv } from "./gates/paired.ts";
 
 const opt = (name: string): string | undefined => {
@@ -210,3 +211,11 @@ const lines = [
   ...points.map((p) => `| ${p.nodes} | ${p.edges} | ${p.evaluations} | ${p.counts.lane} | ${p.counts.corner} | ${p.counts.sight} | ${p.counts.score} | ${p.counts.route} | ${p.ms} | ${Math.round(p.extra)} |`),
 ];
 console.log(lines.join("\n"));
+// Gate (a) reports only, so its job stays green. Thus a fail or a fit with no point writes a warning to the check line (NO-READ-LINE).
+const computer = `${envOf("fresh").cpu}, ${envOf("fresh").cores} cores`;
+if (points.length === 0) warnNoRead("Search work", { cases: ["gate (a)"], why: "the fit has no point", cpus: [computer] });
+else if (!now.pass) {
+  const off = now.windows.filter((w) => Math.abs(w.off) > 0.2).map((w) => `${w.nodes} boxes ${(100 * w.off).toFixed(1)}%`);
+  const text = `Gate (a) fails: R² ${now.r2.toFixed(4)} over ${points.length} points, with the limit 0.95${off.length === 0 ? "" : `, and the windows off the slope by more than 20%: ${off.join(", ")}`}. The CPU model: ${computer}.`;
+  console.error(annotation("warning", "Search work", text));
+}

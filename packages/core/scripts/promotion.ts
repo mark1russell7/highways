@@ -14,7 +14,8 @@ import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1r
 import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { compareSpec, MEASURES, sameKind, withoutMixedKinds, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
-import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
+import { droppedCases, mixedKindsWhy, warnNoRead } from "./gates/annotate.ts";
+import { parseReports, pairedTimeTest, timeNoRead, timeText, type TimeTest } from "./gates/time-gate.ts";
 
 /** The fields of a screen record that the test reads. */
 interface Rec {
@@ -254,10 +255,13 @@ function verdicts(records: readonly Rec[]): VerdictRow[] {
   const ps = pairs(records);
   const seen = MEASURES.filter((m) => recs.some((r) => r.measures[m.name] !== undefined));
   const paired = (m: MeasureInfo): boolean => ps.some((p) => p.c.measures[m.name] !== undefined && p.b.measures[m.name] !== undefined && sameKind(m, p.c.measures, p.b.measures));
-  const rows = seen.filter((m) => paired(m)).map((m) => ({
-    m,
-    result: verdict(withoutMixedKinds(recs, m), { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }),
-  }));
+  const rows = seen.filter((m) => paired(m)).map((m) => {
+    const kept = withoutMixedKinds(recs, m);
+    // A value that the filter removes is a "no read" of its input and seed, so the check line names it (NO-READ-LINE).
+    const dropped = droppedCases(recs, kept, m.name);
+    if (dropped.length > 0) warnNoRead(`Promotion ${candidate}`, { cases: dropped, why: mixedKindsWhy(m.name) });
+    return { m, result: verdict(kept, { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }) };
+  });
   const adjusted = holm(rows.map((r) => r.result.permutation.p));
   const measured = new Map(
     rows.map((r, i): [string, VerdictRow] => {
@@ -338,6 +342,11 @@ for (const s of sets) {
   const ex = ps.filter((p) => p.exercised);
   const literal = winTest(ps, "literal");
   const exercised = winTest(ex, "exercised");
+  // A time test that cannot read a check writes a warning to the check line, with the jobs, the inputs and the CPU models (NO-READ-LINE).
+  for (const [reading, t] of [["literal", literal], ["exercised", exercised]] as const) {
+    const none = timeNoRead(t.time);
+    if (none !== undefined) warnNoRead(`Promotion ${candidate} on ${s.name}, ${reading} reading`, none);
+  }
   const vs = verdicts(s.records);
   out.push(`## ${s.name}`, "", `${ps.length} paired inputs in ${new Set(ps.map((p) => p.family)).size} families. The candidate changes the output on ${ex.length} inputs.`, "");
   out.push(winText(s.name, literal, ps.length), "", winText(s.name, exercised, ps.length), "", `### The verdict over families`, "", verdictText(vs), "");

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aaId, pairedReport, type Mode, type PairedReport, type RawTimes } from "./paired.ts";
-import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, roundsTable, timeText, type TimeLimits } from "./time-gate.ts";
+import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, roundsTable, timeNoRead, timeText, type TimeLimits } from "./time-gate.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
 const LIMITS: TimeLimits = { timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2, timeFloorMs: 5 };
@@ -179,6 +179,17 @@ describe("pairedTimeTest", () => {
     expect(all.jobs).toBe(5);
     expect(all.checks.map((c) => c.verdict)).toEqual(["pass", "pass"]);
     expect(all.pass).toBe(true);
+  });
+
+  it("gives the facts of each no read for the check line, and none for a test that reads each check (NO-READ-LINE)", () => {
+    const tail = pairedTimeTest(five(() => job((arm) => (arm === "cand" ? 1.2 : 1))), "base", "cand", undefined, LIMITS);
+    expect(timeText(tail, 0.95)).toContain(": pass on the median. The tail check has no read");
+    expect(timeNoRead(tail)).toEqual({ cases: [`the tail over ${tail.inputs} inputs`], why: TAIL_NOT_MEASURED, cpus: tail.cpus });
+    const one = timeNoRead(pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS));
+    expect(one?.why).toBe("1 job of 5, so the checks cannot decide");
+    expect(one?.cases).toHaveLength(2);
+    expect(timeNoRead(pairedTimeTest([], "base", "cand", undefined, LIMITS))?.cases).toEqual(["the time test"]);
+    expect(timeNoRead(pairedTimeTest(five(() => report(0.5)), "base", "cand", undefined, LIMITS))).toBeUndefined();
   });
 
   it("reads only the inputs of the keys", () => {

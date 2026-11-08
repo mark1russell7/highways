@@ -72,6 +72,7 @@ import {
   GATE_ROUTER,
   GATE_SCHEMA,
   POOL_FILE,
+  checkLine,
   gateExit,
   gateOptions,
   gateText,
@@ -315,6 +316,9 @@ if (args.includes("--child")) {
   const text = gateText(record).join("\n") + "\n";
   writeFileSync(join(out, "sections-gate.md"), text);
   console.log(text);
+  // A run that does not pass writes its line to the check of the pull request (NO-READ-LINE). The job sends the standard output to /dev/null, so the line goes to the standard error.
+  const line = checkLine(record);
+  if (line !== undefined) console.error(line.line);
   process.exitCode = gateExit(record);
 } else if (args.includes("--confirm")) {
   const pair = Number(need("--pair"));

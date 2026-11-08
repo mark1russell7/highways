@@ -20,6 +20,7 @@ import { measureByName, withoutMixedKinds } from "../src/bench/screen/measures.t
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, type Step } from "../src/strategies/model.ts";
+import { droppedCases, mixedKindsWhy, warnNoRead } from "./gates/annotate.ts";
 import { requireGrid } from "./gates/inputs.ts";
 
 /** The significance level of each verdict. */
@@ -162,6 +163,9 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string, strategi
       const tie = info.minEffect ?? 0;
       // A verdict does not pair an estimate from a sample with a full count (BENCH-PAIRS-HEAP).
       const kept = withoutMixedKinds(pair, info);
+      // A drop of a value is a "no read" of its input and seed, so the check line names it (NO-READ-LINE).
+      const dropped = droppedCases(pair, kept, guard.name);
+      if (dropped.length > 0) warnNoRead(`Screen verdict ${strategy}`, { cases: dropped, why: mixedKindsWhy(guard.name) });
       const v = verdict(kept, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
       const values = (s: string): number[] => kept.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
       const old = compareMeasure(mean(values(strategy)), mean(values(base)), { direction: info.better, minEffect: tie });

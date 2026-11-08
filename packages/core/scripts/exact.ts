@@ -14,6 +14,7 @@ import { EXACT_CLASSES, exactBoard, exactGenerator, type ExactClass } from "../s
 import { graphInput, inputGraph, type LayoutInput } from "../src/bench/screen/forms.ts";
 import { SCREEN_SETS, screenInputs } from "../src/bench/screen/set.ts";
 import { optimaFile, type ExactOptimum } from "../src/bench/screen/gap.ts";
+import { noReadText, warnNoRead } from "./gates/annotate.ts";
 import { requireInputs } from "./gates/inputs.ts";
 
 const args = process.argv.slice(2);
@@ -69,11 +70,16 @@ if (mergeDir !== undefined) {
     return s.length === 0 ? Number.NaN : s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
   };
   const f = (v: number | null | undefined, d = 3): string => (v === null || v === undefined || Number.isNaN(v) ? "-" : v.toFixed(d));
+  // A solve that stops with an error is a "no read" of its input, so the check line names it (NO-READ-LINE).
+  const errors = file.optima.filter((o) => o.status.startsWith("error"));
+  const errorsRead = { cases: errors.map((o) => `${o.input} (${o.rule}, cap ${o.cap})`), why: `the solve stopped with an error, for example ${errors[0]?.status ?? ""}` };
+  if (errors.length > 0) warnNoRead(`Exact solves of ${setId}`, errorsRead);
   const text = [
     `## The exact solves of \`${setId}\``,
     "",
     `${file.optima.length} solves, ${file.optima.filter((o) => o.proven).length} proven, ${seconds} s each at most.`,
     "",
+    ...(errors.length === 0 ? [] : [`${noReadText(errorsRead)} The table counts these solves as not proven.`, ""]),
     "| nodes | class | rule | cap | solves | proven | median s | max s | largest MIP gap | median binaries | median B1 |",
     "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...[...groups.entries()]

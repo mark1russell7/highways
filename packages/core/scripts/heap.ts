@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import { getHeapStatistics } from "node:v8";
 import { gunzipSync } from "node:zlib";
 import { asRouter, getStrategy, highwayRouterStrategy, routePortfolio, routerStrategies, STRATEGIES, type Graph, type Result, type Strategy } from "../src/index.ts";
+import { annotation, noReadText } from "./gates/annotate.ts";
 import { envOf, type RecordEnv } from "./gates/paired.ts";
 import { routeHash } from "./xplat.ts";
 
@@ -85,6 +86,10 @@ function rssBudget(budgets: Pick<Budgets, "margin" | "slackMb">, rssMb: number):
 /** This function runs each router of the budget file in its own process. It gives the rows of the summary and the count of the breaks. */
 function gate(budgets: Budgets, fixture: string, out: string): number {
   const lines = [`### Heap gate (HEAP-GATE)`, "", `The measures come from run ${budgets.run}. The margin is ${budgets.margin}.`, "", "The budgets do not come from 5 runs yet (GATE-LIMITS).", "","| Router | Cap (MB) | Peak RSS (MB) | Budget RSS (MB) | Heap (MB) | ms | Route hash | Result |", "|---|---:|---:|---:|---:|---:|---|---|"];
+  // The record names the computer, so a peak compares only with a peak of the same CPU model (MEASURE-ISOLATE).
+  const env = envOf("fresh");
+  const cpu = `${env.cpu}, ${env.cores} cores`;
+  lines.splice(4, 0, `The computer: ${cpu}.`, "");
   let breaks = 0;
   for (const [name, measure] of Object.entries(budgets.routers)) {
     const cap = measure === null ? budgets.measureCapMb : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));
@@ -104,7 +109,15 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
     if (measure === null) result = `fail: no read, the budget file has no measure${error === "" ? "" : `, and the run ${error}`}`;
     else if (error !== "" || row === undefined) result = `fail: ${error || "no row"}`;
     else if (row.rssMb > budgetRss!) result = `fail: the peak RSS is above the budget`;
-    if (result.startsWith("fail")) breaks++;
+    if (result.startsWith("fail")) {
+      breaks++;
+      // Each break writes its line to the check, so a red check names the router and the reason (NO-READ-LINE).
+      const why = result.replace(/^fail: /, "");
+      const text = measure === null || row === undefined
+        ? noReadText({ cases: [name], why: `${why}, at the cap ${cap} MB`, cpus: [cpu] })
+        : `${name}: the peak RSS ${row.rssMb} MB is above the budget ${budgetRss} MB, at the cap ${cap} MB. The CPU model: ${cpu}.`;
+      console.error(annotation("error", "Heap gate", text));
+    }
     lines.push(`| \`${name}\` | ${cap} | ${row?.rssMb ?? ""} | ${budgetRss ?? ""} | ${row?.heapMb ?? ""} | ${row?.ms ?? ""} | \`${row?.hash.slice(0, 16) ?? ""}\` | ${result} |`);
     console.log(`heap: ${name}: cap ${cap} MB, ${row === undefined ? "no row" : `peak RSS ${row.rssMb} MB, heap ${row.heapMb} MB, ${row.ms} ms`}, ${result}.`);
   }

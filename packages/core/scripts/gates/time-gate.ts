@@ -3,6 +3,7 @@
 // - The verdict of an arm in a table: a median ratio inside the noise floor (p10 to p90 of the A/A ratios) is not a gain and not a loss.
 // - The verdict of an arm on one input in `roundsTable`: the band is 1 ± the A/A spread of the rounds of the input (the confirm rule), so one input has a band too.
 // - The promotion time test reads the reports of several jobs. A check that the A/A arm cannot resolve gives "cannot decide (noise)", and it does not pass.
+import type { NoRead } from "./annotate.ts";
 import { armRows } from "./pair-confirm.ts";
 import { aaId, pairedReport, quantileOf, type Arm, type Input, type Mode, type PairedEnv, type PairedRatio, type PairedReport, type RawTimes } from "./paired.ts";
 
@@ -216,7 +217,22 @@ export function timeText(t: TimeTest, q: number): string {
   if (t.status === "noise") return `${head}: cannot decide (noise). ${undecided.map((c) => `The ${c.check} check cannot decide: ${c.why}.`).join(" ")} This is not a pass.`;
   const failed = t.checks.filter((c) => c.verdict === "fail");
   if (t.status === "fail") return `${head}: fail. ${failed.map((c) => `The ${c.check} ${fmt(c.worst)} is above ${c.limit}.`).join(" ")}`;
-  return `${head}: ${t.faster ? "pass, and faster than the baseline" : "pass"}.${t.note === undefined ? "" : ` The record has the line \`${t.note}\`.`}`;
+  if (t.note !== undefined) return `${head}: pass on the median${t.faster ? ", and faster than the baseline" : ""}. The tail check has no read (\`${t.note}\`), so this is not a pass of the tail.`;
+  return `${head}: ${t.faster ? "pass, and faster than the baseline" : "pass"}.`;
+}
+
+/**
+ * This function gives the facts of a time test that cannot read a check, for a warning on the check line (NO-READ-LINE).
+ * A void test, too few jobs, a check that cannot decide and a tail with no input above the floor are each a "no read".
+ * A test that reads each check gives `undefined`.
+ */
+export function timeNoRead(t: TimeTest): NoRead | undefined {
+  if (t.status === "void") return { cases: ["the time test"], why: t.reason ?? "no paired time report", cpus: t.cpus };
+  const over = `over ${t.inputs} inputs`;
+  if (t.jobs < t.policy) return { cases: [`the median ${over}`, `the tail ${over}`], why: `${jobsOf(t.jobs, t.policy)}, so the checks cannot decide`, cpus: t.cpus };
+  const undecided = t.checks.filter((c) => c.verdict === "noise" || c.verdict === "not measured");
+  if (undecided.length === 0) return undefined;
+  return { cases: undecided.map((c) => `the ${c.check} ${over}`), why: undecided.map((c) => c.why ?? c.verdict).join(", and "), cpus: t.cpus };
 }
 
 /** The verdict of the median ratio of one arm against the noise floor. */

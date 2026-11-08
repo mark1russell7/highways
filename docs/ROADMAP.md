@@ -8,6 +8,7 @@ Status: `done`, `active`, `blocked`, `later`.
 
 | Id | Item | Shipped | Link |
 |---|---|---|---|
+| NO-READ-LINE | A gate that cannot read a case writes "No read" to the check line of the pull request, with the count, the cases and the CPU model. The sections gate, the heap gate, the time test and the verdicts of a promotion, the screen verdicts, the exact solves, the work fit and the scale routes each do it. | 2026-11-08 | |
 | WON-LINES | Each page line that quotes a measure that a control wins has its partner, or says that no partner is read. A table of the README gives the medians of the controls and the real routers. A test holds the notes of the site. | 2026-11-07 | [#340](https://github.com/mark1russell7/highways/pull/340) |
 | THROUGH-FLOOR | The 292 routes through a box of `corners`, `shared`, `shared-all` and `sections` are edges of `packed-grid` with no way in the corner graph. An exact search of the free space reads them: with a clearance of 1, 246 have no way, because one end is an inner tile. 46 have a way around the outside of the board (NO-WAY-RING). `sections-site` has 4 more routes through a box, and each has a clean way (SITE-HUB-THROUGH). | 2026-11-07 | [`through-floor/`](../packages/core/scripts/data/through-floor/) |
 | SCREEN-ON-RELEASE | The workflow `Read on release` starts one `Screen` run of the 15 verdict snapshots after each release that changes the version of the core, and each week. | 2026-11-07 | [#377](https://github.com/mark1russell7/highways/pull/377) |
