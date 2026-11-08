@@ -237,6 +237,7 @@ The rule for the next predictions:
 
 | Id | Item | Status | Waits for | Priority |
 |---|---|---|---|---|
+| STAMP-ON-RELEASE | The job `stamps` of a full read of `Screen` stamps each snapshot with the same rows. It fails with each snapshot that differs or has no read. A CI test fails when `results-lag` is more than 1. Due 2026-11-13. | `active` | | P1 |
 | CROSSINGS-LIMIT | The sample above 20,000 segments reads up to 16.03% off a full count. The first arm is an exact count at each size of the family, with its time from CI and an A/A arm. A sample stays only where that time truly costs, with a stated limit, and each estimate then carries a bound from its draws. A change of the limit changes `route.crossings` on those rows, and the rows state the method. Due 2026-11-11. | `next` | CROSSINGS-SAMPLE | P1 |
 | JOINT-WIN | A real win is joint: a real router is not dominated by a control on a stated set of measures, and it beats a control on each. This item proposes the set and reads each router, whole and for each family. Due 2026-11-14. | `active` | | P1 |
 | NO-WAY-RING | On `packed-grid`, 46 routes have a way around the outside of the board, and the corner graph does not find it. Each such route finds its way, and the 246 with no way keep `route.through`. Due 2026-11-14. | `later` | | P2 |
