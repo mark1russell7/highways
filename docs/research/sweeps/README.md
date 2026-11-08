@@ -17,3 +17,15 @@ The file `kpi.json` of the site has the measure `cards-with-curves`. It counts e
 - a record with no dimensions `step` and `strategy`.
 
 A card in two records counts once. The measure has the date of the latest commit of a record with a card.
+
+## The source of each record
+
+The format `response-records/1` refuses a field that it does not have. Thus a record cannot name its run, and this table names it.
+
+| File | The workflow `Sweep` | Commit | Inputs |
+|---|---|---|---|
+| `router-screen-v1-sample.json` | [42424232256](https://github.com/mark1russell7/highways/actions/runs/42424232256) | `1db7ef7` | `corners`, `trunks` and `shared` on `tiny-uniform` and `small-clustered` |
+
+- The first copy of this file came from a local machine. The record of the run has the same route measures on each of the 588 points. Only `ms` and `ms.ratio` differ, because they are times.
+- To add a record, start `Sweep` and download its artifact `sweep` into a new empty folder. Copy `sweep.json` here with its bytes, and add its row to this table.
+- An empty input `families` gives the default families of the workflow, not each family. To sweep each family, give their names.
