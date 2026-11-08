@@ -1,4 +1,4 @@
-// The command line of the sweep (EXPLORER-1): `node scripts/sweep.ts [--step router] [--strategy <name,...>] [--families <a,b>] [--set screen-v1]
+// The command line of the sweep (EXPLORER-1): `node scripts/sweep.ts [--step router|room|...] [--strategy <name,...>] [--families <a,b>] [--set screen-v1]
 // [--values <n>] [--name <text>] [--out sweep.json]`.
 // The sweep changes one number option of a strategy at a time. The other options keep their defaults.
 // The default strategies are `corners`, `trunks` and `shared`. Without `--families`, the sweep takes each family of the set.
@@ -10,6 +10,9 @@
 // Each measure also has a ratio to the value of its strategy at the defaults on the same input, for example `crossings.ratio`.
 // The size of a board sets most of a raw value, so the ratio shows the effect of an option more clearly.
 // The time `ms` comes from one process on one computer. It is not a paired time, so two records do not compare their times.
+// The screen has no step `room`. With `--step room`, each setting starts the strategy `pipeline` of the step `whole` with the room strategy and its options (ROOM-SWEEP).
+// The pipeline routes with its default router `corners`. The points have the step `room` and the name of the room strategy, so a card is `room/<name>`.
+// A room record also has the 3 measures of the board of the step `whole`: the faults of the order, the displacement and the distortion of the boxes.
 // The workflow `Sweep` starts it in CI. Locally, start it only on one or two small families, for example `--families tiny-uniform`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -25,7 +28,7 @@ import {
 } from "@mark1russell7/rigor-statistics";
 import { screen, SCREEN_SETS, SCREEN_STEPS, type LayoutRecord, type ScreenStep } from "../src/bench/screen/index.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
-import { getStrategy, type Strategy } from "../src/strategies/model.ts";
+import { getStrategy, type Step, type Strategy } from "../src/strategies/model.ts";
 import { optionDefaults, sweepValues, type AnyOption, type NumberOption } from "../src/strategies/options.ts";
 import { corpusInputs } from "./corpus-files.ts";
 
@@ -41,12 +44,27 @@ const list = (name: string): string[] | undefined =>
     .filter((x) => x.length > 0);
 const warn = (line: string): void => void process.stderr.write(line + "\n");
 
-/** The measures of the record: the id in the record, the name in a screen record, the label and the unit. Lower is better for each. */
-const MEASURES: readonly { readonly id: string; readonly key: string; readonly label: string; readonly unit: string }[] = [
+/** One measure of the record: the id in the record, the name in a screen record, the label and the unit. Lower is better for each. */
+interface SweepMeasure {
+  readonly id: string;
+  readonly key: string;
+  readonly label: string;
+  readonly unit: string;
+}
+
+/** The measures of the routes. Each record has them. */
+const ROUTE_MEASURES: readonly SweepMeasure[] = [
   { id: "crossings", key: "route.crossings", label: "Crossings", unit: "count" },
   { id: "bends", key: "route.bends", label: "Bends for each route", unit: "count" },
   { id: "length", key: "route.ink", label: "Ink length", unit: "units" },
   { id: "ms", key: "ms", label: "Time in one process", unit: "ms" },
+];
+
+/** The measures of the board that the screen of the step `whole` gives (M2, M3 and M5). A room record also has them. */
+const BOARD_MEASURES: readonly SweepMeasure[] = [
+  { id: "order", key: "route.room.order", label: "Pairs of boxes with a changed order", unit: "count" },
+  { id: "displacement", key: "route.room.displacement", label: "Mean move of a box, over the unit of the board", unit: "no unit" },
+  { id: "distortion", key: "route.room.distortion", label: "Stress of the distances to the 4 nearest boxes", unit: "0 to 1" },
 ];
 
 /** The reasons of a measure with no value. */
@@ -67,6 +85,7 @@ interface SweptOption {
 /** One strategy of the sweep, with its swept options. */
 interface SweptStrategy {
   readonly name: string;
+  readonly strategy: Strategy<Step, object>;
   readonly options: readonly SweptOption[];
 }
 
@@ -76,8 +95,12 @@ interface Setting {
   readonly options: Readonly<Record<string, number>>;
 }
 
-const step = (opt("--step") ?? "router") as ScreenStep;
-if (!SCREEN_STEPS.includes(step)) throw new Error(`The sweep has no step "${step}". The steps are ${SCREEN_STEPS.join(", ")}.`);
+/** The steps of the sweep: the steps of the screen, and the step `room` through the strategy `pipeline`. */
+const SWEEP_STEPS: readonly Step[] = [...SCREEN_STEPS, "room"];
+const step = (opt("--step") ?? "router") as Step;
+if (!SWEEP_STEPS.includes(step)) throw new Error(`The sweep has no step "${step}". The steps are ${SWEEP_STEPS.join(", ")}.`);
+const isRoom = step === "room";
+const MEASURES: readonly SweepMeasure[] = isRoom ? [...ROUTE_MEASURES, ...BOARD_MEASURES] : ROUTE_MEASURES;
 // An empty list, for example the empty input of a workflow, gives the default routers.
 const names = list("--strategy")?.length ? list("--strategy")! : ["corners", "trunks", "shared"];
 const setId = opt("--set") ?? "screen-v1";
@@ -96,7 +119,7 @@ const inRange = (d: NumberOption, v: number): boolean => Number.isFinite(v) && v
  * This function gives the swept options of a strategy. An option needs a finite default in its range, and two values or more.
  * Each option that the sweep cannot use gets a line on stderr.
  */
-function sweptOptions(strategy: Strategy<ScreenStep, object>): SweptOption[] {
+function sweptOptions(strategy: Strategy<Step, object>): SweptOption[] {
   const defaults = optionDefaults(strategy) as Readonly<Record<string, unknown>>;
   const out: SweptOption[] = [];
   for (const [key, declaration] of Object.entries((strategy.schema ?? {}) as Readonly<Record<string, AnyOption>>)) {
@@ -119,13 +142,13 @@ function sweptOptions(strategy: Strategy<ScreenStep, object>): SweptOption[] {
 
 const strategies: SweptStrategy[] = [];
 for (const name of names) {
-  const strategy = getStrategy(STRATEGIES, step, name) as Strategy<ScreenStep, object>;
+  const strategy = getStrategy(STRATEGIES, step, name) as Strategy<Step, object>;
   const options = sweptOptions(strategy);
   if (options.length === 0) {
     warn(`The sweep skips the strategy ${name}: it has no number option to sweep.`);
     continue;
   }
-  strategies.push({ name, options });
+  strategies.push({ name, strategy, options });
 }
 if (strategies.length === 0) throw new Error(`No strategy of ${names.join(", ")} has a number option to sweep.`);
 
@@ -208,16 +231,24 @@ const start = performance.now();
 const inputs = corpusInputs(set.id);
 const points: ResponsePoint[] = [];
 const all = settings();
+/** This function gives the step, the strategy and the options of the screen of one setting. A room setting starts the strategy `pipeline`. */
+function screenCall(setting: Setting): { step: ScreenStep; name: string; options: Readonly<Record<string, object>> } {
+  const name = setting.strategy.name;
+  if (!isRoom) return { step: step as ScreenStep, name, options: { [name]: setting.options } };
+  return { step: "whole", name: "pipeline", options: { pipeline: { room: setting.strategy.strategy, roomOptions: setting.options } } };
+}
+
 for (const [i, setting] of all.entries()) {
   const name = setting.strategy.name;
-  const report = screen(step, [name], {
+  const call = screenCall(setting);
+  const report = screen(call.step, [call.name], {
     set,
     ...(inputs ? { inputs } : {}),
     ...(families ? { families } : {}),
     baseline: false,
-    options: { [name]: setting.options },
+    options: call.options,
   });
-  const records = report.records.filter((r) => r.strategy === name);
+  const records = report.records.filter((r) => r.strategy === call.name);
   if (records.length === 0) throw new Error(`The screen gave no record of ${name}. Look at the names of --families.`);
   points.push(...pointsOf(setting, records));
   warn(`${i + 1}/${all.length} ${name} ${JSON.stringify(setting.options)}: ${records.length} inputs.`);
