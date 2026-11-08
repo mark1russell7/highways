@@ -31,10 +31,10 @@ describe("the strategies and options that the pages show", () => {
 
   it("states the counts", () => {
     expect({ strategies: coverage.strategies, leftByDemo: coverage.leftByDemo.length, leftByPages: coverage.leftByPages.length, controls: coverage.controls, fixed: coverage.fixed }).toEqual({
-      strategies: 123,
+      strategies: 124,
       leftByDemo: 4,
       leftByPages: 4,
-      controls: 756,
+      controls: 759,
       fixed: 43,
     });
   });

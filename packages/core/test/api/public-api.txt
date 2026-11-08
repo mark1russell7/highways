@@ -90,6 +90,7 @@ CAP_SWEEP: build/index.d.ts#CAP_SWEEP
 CASES: build/index.d.ts#CASES
 CHANNEL: build/index.d.ts#CHANNEL
 CHANNEL_REACH: build/index.d.ts#CHANNEL_REACH
+CHARGE_DEFAULTS: build/index.d.ts#CHARGE_DEFAULTS
 CHOICE_DEFAULTS: build/index.d.ts#CHOICE_DEFAULTS
 CHOICE_FEATURES: build/index.d.ts#CHOICE_FEATURES
 CHOICE_FEATURE_SETS: build/index.d.ts#CHOICE_FEATURE_SETS
@@ -120,6 +121,7 @@ CaseBoard: build/index.d.ts#CaseBoard
 CaseSeedOptions: build/index.d.ts#CaseSeedOptions
 CellGroups: build/index.d.ts#CellGroups
 type CellStep: build/index.d.ts#CellStep
+ChargeOptions: build/index.d.ts#ChargeOptions
 ChoiceFeatureSet: build/index.d.ts#ChoiceFeatureSet
 ChoiceOptions: build/index.d.ts#ChoiceOptions
 ChoiceRow: build/index.d.ts#ChoiceRow
@@ -921,6 +923,8 @@ changedDimensions: build/index.d.ts#changedDimensions
 channelOverflows: build/index.d.ts#channelOverflows
 channelWidth: build/index.d.ts#channelWidth
 characteristicPoints: build/index.d.ts#characteristicPoints
+chargeEnds: build/index.d.ts#chargeEnds
+chargePlugs: build/index.d.ts#chargePlugs
 checkFamilies: build/index.d.ts#checkFamilies
 checkLevels: build/index.d.ts#checkLevels
 checkOptions: build/index.d.ts#checkOptions
@@ -1966,6 +1970,9 @@ export declare const CHANNEL: HighwaysFamily;
 ### build/index.d.ts#CHANNEL_REACH
 export declare const CHANNEL_REACH = 64;
 
+### build/index.d.ts#CHARGE_DEFAULTS
+export declare const CHARGE_DEFAULTS: Required<ChargeOptions>;
+
 ### build/index.d.ts#CHOICE_DEFAULTS
 export declare const CHOICE_DEFAULTS: Readonly<ChoiceOptions>;
 
@@ -2082,6 +2089,13 @@ interface CellStep {
   readonly from: number;
   readonly to: number;
   readonly at: number;
+}
+
+### build/index.d.ts#ChargeOptions
+export interface ChargeOptions {
+  readonly spacing?: number;
+  readonly rounds?: number;
+  readonly inset?: number;
 }
 
 ### build/index.d.ts#ChoiceFeatureSet
@@ -6513,6 +6527,12 @@ export declare function channelWidth(obstacles: Obstacles, a: Point, b: Point, r
 ### build/index.d.ts#characteristicPoints
 export declare function characteristicPoints(route: readonly Point[], unit: number, ratio: number): Point[];
 
+### build/index.d.ts#chargeEnds
+export declare function chargeEnds(input: PlugInput, options?: ChargeOptions): PlugPair[];
+
+### build/index.d.ts#chargePlugs
+export declare function chargePlugs(ideal: readonly number[], lo: readonly number[], hi: readonly number[], options?: ChargeOptions, tie?: (i: number) => number): number[];
+
 ### build/index.d.ts#checkFamilies
 export declare function checkFamilies(manifest: LayoutCorpus, inputs: readonly LayoutInput[]): ClaimBreak[];
 
@@ -7782,6 +7802,7 @@ export declare const plugStrategies: {
   readonly leaders: Strategy<"plugs", LeaderOptions>;
   readonly assign: Strategy<"plugs", AssignOptions>;
   readonly escape: Strategy<"plugs", EscapeOptions>;
+  readonly charges: Strategy<"plugs", ChargeOptions>;
 };
 
 ### build/index.d.ts#plugsRouter

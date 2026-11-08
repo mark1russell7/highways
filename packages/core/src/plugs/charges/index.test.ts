@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { Edge, Graph, Node, Port } from "../../model.ts";
+import { plugStrategies } from "../../strategies/builtins.ts";
+import { checkOptions } from "../../strategies/options.ts";
 import { facingEnds } from "../facing/index.ts";
-import { chargeEnds, chargePlugs } from "./index.ts";
+import { CHARGE_DEFAULTS, chargeEnds, chargePlugs } from "./index.ts";
 
 /** A card of 60 by 100 at the origin, and far boxes to its east at the points `far`. The edges go from the card to the boxes in order. */
 function fan(far: readonly { x: number; y: number }[], ports?: readonly Port[]): Graph {
@@ -105,5 +107,10 @@ describe("the plug strategy charges (RULE-054)", () => {
       expect(p.source.point.y).toBeGreaterThanOrEqual(40 - 1e-9);
       expect(p.source.point.y).toBeLessThanOrEqual(50 + 1e-9);
     }
+  });
+
+  it("is the plug strategy charges of the registry, with defaults that its schema accepts", () => {
+    expect(plugStrategies.charges.run({ graph: crowd }, { ...CHARGE_DEFAULTS })).toEqual(chargeEnds({ graph: crowd }));
+    expect(checkOptions(plugStrategies.charges, CHARGE_DEFAULTS)).toEqual([]);
   });
 });
