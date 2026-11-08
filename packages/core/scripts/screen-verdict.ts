@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 import { compareMeasure, familyOf, verdict, type FamilyVerdict, type VerdictLabel, type VerdictResult } from "@mark1russell7/layout-contract";
 import { overlapLimitRows, type OverlapLimitRow } from "../src/bench/measures/overlap.ts";
 import { parseLines, passThroughs, type LayoutRecord } from "../src/bench/screen/forms.ts";
-import { measureByName } from "../src/bench/screen/measures.ts";
+import { measureByName, withoutMixedKinds } from "../src/bench/screen/measures.ts";
 import { familyCell, SCREEN_FAMILY_BY, signTestPower } from "../src/bench/screen/set.ts";
 import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { listStrategies, type Step } from "../src/strategies/model.ts";
@@ -160,8 +160,10 @@ function screenVerdicts(records: readonly LayoutRecord[], base: string, strategi
       const info = measureByName(guard.name);
       if (info === undefined) throw new Error(`The measure ${guard.name} is not in MEASURES.`);
       const tie = info.minEffect ?? 0;
-      const v = verdict(pair, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
-      const values = (s: string): number[] => pair.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
+      // A verdict does not pair an estimate from a sample with a full count (BENCH-PAIRS-HEAP).
+      const kept = withoutMixedKinds(pair, info);
+      const v = verdict(kept, { by: "family", family: familyOfRecord, measure: { id: guard.name, direction: info.better }, a: base, b: strategy, tie, level: LEVEL });
+      const values = (s: string): number[] => kept.filter((r) => r.strategy === s && r.skipped === undefined && r.measures[guard.name] !== undefined).map((r) => r.measures[guard.name]!);
       const old = compareMeasure(mean(values(strategy)), mean(values(base)), { direction: info.better, minEffect: tie });
       out.push({ strategy, guard: guard.id, measure: guard.name, label: v.label, old, stratified: v.stratified.mean, pooled: v.pooled.mean, p: v.permutation.p, families: v.families, breadth: breadthOf(v), through: passThroughs(pair, strategy), baseThrough: passThroughs(pair, base) });
     }
