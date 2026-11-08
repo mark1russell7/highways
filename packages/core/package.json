@@ -63,7 +63,7 @@
     "@mark1russell7/layout-contract": "^0.5.1",
     "@mark1russell7/predicates": "^0.1.0",
     "@mark1russell7/rigor-generators": "^0.1.1",
-    "@mark1russell7/rigor-statistics": "^0.1.5"
+    "@mark1russell7/rigor-statistics": "^0.1.18"
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
