@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { median } from "@mark1russell7/rigor-statistics";
+import type { OutputHashes } from "@mark1russell7/strategy-space";
 import { routeSpace } from "../src/route-space.ts";
 import type { GrammarCost } from "./grammar-screen.ts";
 import { readShard, type GrammarPointsFile } from "./grammar-points-rows.ts";
@@ -11,6 +12,9 @@ import { spaceDigest } from "./space-size-rows.ts";
 
 /** The form of the joined record. */
 export const GRAMMAR_SCREEN_SCHEMA = "grammar-screen/1";
+
+/** The stage of each point of the grammar. */
+export const GRAMMAR_STAGE = "router";
 
 /** The measures of each point in the joined record, by their names in a record. */
 export const GRAMMAR_MEASURES: readonly string[] = ["route.crossings", "route.bends", "route.ink"];
@@ -26,18 +30,15 @@ export interface ShardRecord {
   readonly skipped?: string;
 }
 
-/** One point of the joined record. */
-export interface JoinedPoint {
+/** One point of the joined record. Its fields `id`, `stage` and `outputs` have the form `OutputHashes` of the gate `distinctness` of `strategy-space`. */
+export interface JoinedPoint extends OutputHashes {
   readonly index: number;
-  readonly id: string;
   /** The count of the inputs that the point skipped. */
   readonly skipped: number;
   /** The sum of the breaks of the hard rules over the inputs. */
   readonly hard: number;
   /** The median of each measure of `GRAMMAR_MEASURES` over the inputs, and the median time `ms`. A measure with no value is absent. */
   readonly medians: Readonly<Record<string, number>>;
-  /** The output hash on each input, by the id of the input. The gate `distinct.ts` reads these hashes. */
-  readonly hashes: Readonly<Record<string, string>>;
 }
 
 /** The joined record. */
@@ -95,9 +96,9 @@ export function joinShards(file: GrammarPointsFile, shards: ReadonlyMap<number, 
       }
       const ms = medianOf(ran.map((r) => r.ms).filter((v): v is number => typeof v === "number" && Number.isFinite(v)));
       if (ms !== undefined) medians["ms"] = ms;
-      const hashes = Object.fromEntries(ran.filter((r) => r.outputHash !== undefined).map((r) => [r.input, r.outputHash!]).sort(([a], [b]) => (a! < b! ? -1 : 1)));
+      const outputs = Object.fromEntries(ran.filter((r) => r.outputHash !== undefined).map((r) => [r.input, r.outputHash!]).sort(([a], [b]) => (a! < b! ? -1 : 1)));
       const hard = ran.reduce((sum, r) => sum + Object.values(r.hard ?? {}).reduce((s, x) => s + x, 0), 0);
-      points.push({ index: p.index, id: p.id, skipped: rows.length - ran.length, hard, medians, hashes });
+      points.push({ index: p.index, id: p.id, stage: GRAMMAR_STAGE, outputs, skipped: rows.length - ran.length, hard, medians });
     }
   }
   points.sort((a, b) => a.index - b.index);
