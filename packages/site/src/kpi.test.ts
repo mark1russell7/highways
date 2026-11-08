@@ -186,7 +186,7 @@ describe("the cards of the registry (CARDS-SHARE)", () => {
 
   it("holds the count of the cards, so a new strategy shows in this test", () => {
     // A new built-in strategy with a number option raises this count and lowers the share until its sweep.
-    expect(cardStrategies()).toHaveLength(101);
+    expect(cardStrategies()).toHaveLength(103);
   });
 });
 
