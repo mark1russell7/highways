@@ -26,6 +26,7 @@ The measure `cards-curve-share` of `kpi.json` gives the cards with a curve over 
 - The share rounds down, so a gap of one card does not read 100.
 - A card of a strategy that is not built in does not count.
 - On 2026-11-07, 101 of the 107 built-in strategies have a number option. A test of `kpi.test.ts` holds that count.
+- On 2026-11-08, the records of this folder give a curve to each of the 101 cards, so the share reads 100 %.
 - The list `NO_CURVE` of `packages/site/src/kpi.ts` gives the 6 other strategies, each with its reason. A test holds the list against the registry.
 
 ## The source of each record
@@ -39,6 +40,12 @@ The format `response-records/1` refuses a field that it does not have. Thus a re
 | `highway-screen-v1-part-2.json` | [42430144949](https://github.com/mark1russell7/highways/actions/runs/42430144949) | `06cb538` | The next 22 highway strategies with a number option, from `edge-paths` to `link-communities`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
 | `highway-screen-v1-part-3.json` | [42432019520](https://github.com/mark1russell7/highways/actions/runs/42432019520) | `06cb538` | The last 22 highway strategies with a number option, from `territories` to `corridors+ids`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
 | `room-screen-v1.json` | [42431741520](https://github.com/mark1russell7/highways/actions/runs/42431741520) | `3c8cd4b` | The room strategies `routes`, `lines` and `levels` in the pipeline of the step `whole`, on `tiny-uniform` and `small-clustered`. It gives 3 cards. |
+| `group-screen-v1.json` | [42439519618](https://github.com/mark1russell7/highways/actions/runs/42439519618) | `4fd6941` | The group strategies `quadtree`, `kd` and `cut`, on `tiny-uniform` and `small-clustered`. The strategy `keys` has no number option. It gives 3 cards. |
+| `router-screen-v1.json` | [42439529593](https://github.com/mark1russell7/highways/actions/runs/42439529593) | `4fd6941` | The 7 router strategies with a number option, from `corners` to `sections-tree`, on `tiny-uniform` and `small-clustered`. It gives 7 cards. |
+| `curve-screen-v1.json` | [42440536324](https://github.com/mark1russell7/highways/actions/runs/42440536324) | `4fd6941` | The 6 curve strategies with a number option, from `rounded` to `highway`, on `tiny-uniform` and `small-clustered`. It gives 6 cards. |
+| `plugs-screen-v1.json` | [42441295262](https://github.com/mark1russell7/highways/actions/runs/42441295262) | `143ce64` | The 6 plug strategies with a number option, from `side` to `escape`, on `tiny-uniform` and `small-clustered`. It gives 6 cards. |
+| `levels-screen-v1.json` | [42442125207](https://github.com/mark1russell7/highways/actions/runs/42442125207) | `143ce64` | The level strategies `depths`, `venation` and `detail`, on `tiny-uniform` and `small-clustered`. It gives 3 cards. |
+| `whole-screen-v1.json` | [42442134947](https://github.com/mark1russell7/highways/actions/runs/42442134947) | `143ce64` | The 7 whole strategies with a number option, from `board-portfolio` to `choice`, on `tiny-uniform` and `small-clustered`. The strategy `pipeline` has no number option. It gives 7 cards. |
 
 - The first copy of this file came from a local machine. The record of the run has the same route measures on each of the 588 points. Only `ms` and `ms.ratio` differ, because they are times.
 - To add a record, start `Sweep` and download its artifact `sweep` into a new empty folder. Copy `sweep.json` here with its bytes, and add its row to this table.
