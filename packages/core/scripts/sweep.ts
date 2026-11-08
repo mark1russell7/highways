@@ -31,6 +31,7 @@ import { STRATEGIES } from "../src/strategies/builtins.ts";
 import { getStrategy, type Step, type Strategy } from "../src/strategies/model.ts";
 import { optionDefaults, sweepValues, type AnyOption, type NumberOption } from "../src/strategies/options.ts";
 import { corpusInputs } from "./corpus-files.ts";
+import { BOARD_MEASURES, RATIO_SUFFIX, ROUTE_MEASURES, type SweepMeasure } from "./sweep-measures.ts";
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -43,29 +44,6 @@ const list = (name: string): string[] | undefined =>
     .map((x) => x.trim())
     .filter((x) => x.length > 0);
 const warn = (line: string): void => void process.stderr.write(line + "\n");
-
-/** One measure of the record: the id in the record, the name in a screen record, the label and the unit. Lower is better for each. */
-interface SweepMeasure {
-  readonly id: string;
-  readonly key: string;
-  readonly label: string;
-  readonly unit: string;
-}
-
-/** The measures of the routes. Each record has them. */
-const ROUTE_MEASURES: readonly SweepMeasure[] = [
-  { id: "crossings", key: "route.crossings", label: "Crossings", unit: "count" },
-  { id: "bends", key: "route.bends", label: "Bends for each route", unit: "count" },
-  { id: "length", key: "route.ink", label: "Ink length", unit: "units" },
-  { id: "ms", key: "ms", label: "Time in one process", unit: "ms" },
-];
-
-/** The measures of the board that the screen of the step `whole` gives (M2, M3 and M5). A room record also has them. */
-const BOARD_MEASURES: readonly SweepMeasure[] = [
-  { id: "order", key: "route.room.order", label: "Pairs of boxes with a changed order", unit: "count" },
-  { id: "displacement", key: "route.room.displacement", label: "Mean move of a box, over the unit of the board", unit: "no unit" },
-  { id: "distortion", key: "route.room.distortion", label: "Stress of the distances to the 4 nearest boxes", unit: "0 to 1" },
-];
 
 /** The reasons of a measure with no value. */
 const REASONS: readonly ResponseReason[] = [
@@ -206,8 +184,8 @@ function pointsOf(setting: Setting, records: readonly LayoutRecord[]): ResponseP
     if (changed.length === 0) bases.set(key, { ...measures });
     for (const m of MEASURES) {
       const { value, reason } = ratioOf(measures[m.id] ?? null, bases.get(key)?.[m.id]);
-      measures[`${m.id}.ratio`] = value;
-      if (reason !== undefined) absent[`${m.id}.ratio`] = reason;
+      measures[`${m.id}${RATIO_SUFFIX}`] = value;
+      if (reason !== undefined) absent[`${m.id}${RATIO_SUFFIX}`] = reason;
     }
     return {
       id: `${setting.strategy.name}/${changed.length === 0 ? "defaults" : changed.join(",")}/${record.input}`,
@@ -257,7 +235,7 @@ for (const [i, setting] of all.entries()) {
 // The ratio measures come first, so the first view of the explorer shows the effect of an option with no effect of the board.
 // A measure with no value at each point has no model, so the record does not have it.
 const ALL: readonly ResponseMeasure[] = [
-  ...MEASURES.map((m): ResponseMeasure => ({ id: `${m.id}.ratio`, label: `${m.label}, ratio to the defaults`, unit: "ratio", direction: "lower" })),
+  ...MEASURES.map((m): ResponseMeasure => ({ id: `${m.id}${RATIO_SUFFIX}`, label: `${m.label}, ratio to the defaults`, unit: "ratio", direction: "lower" })),
   ...MEASURES.map((m): ResponseMeasure => ({ id: m.id, label: m.label, unit: m.unit, direction: "lower" })),
 ];
 const measures: ResponseMeasure[] = [];

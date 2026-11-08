@@ -3,13 +3,13 @@ import { HIGHWAYS_FAMILIES } from "../families/index.ts";
 import { listStrategies, STEPS, type AnyStrategy } from "../strategies/model.ts";
 import { KEYED_STRATEGIES } from "../strategies/opt-in.ts";
 import { MEASURES } from "./screen/measures.ts";
-import { fitCounts, spaceCoverage, spaceDimensions, type SpaceFit } from "./space-coverage.ts";
+import { FIT_EFFECT_BAR, FIT_MIN_FOLDS, fitCounts, spaceCoverage, spaceDimensions, type SpaceFit } from "./space-coverage.ts";
 
 const strategies = STEPS.flatMap((step) => listStrategies(KEYED_STRATEGIES, step) as readonly AnyStrategy[]);
 const dims = spaceDimensions(KEYED_STRATEGIES, HIGHWAYS_FAMILIES);
 const keys = MEASURES.map((m) => m.key);
 const [first, second] = [dims[0]!.id, dims[1]!.id];
-const fit = (over: Partial<SpaceFit> = {}): SpaceFit => ({ measure: keys[0]!, dimensions: [first, second], heldOutError: 0.1, sobol: { [first]: 0.4, [second]: 0.2 }, run: "1", ...over });
+const fit = (over: Partial<SpaceFit> = {}): SpaceFit => ({ measure: keys[0]!, dimensions: [first, second], heldOutError: 0.1, foldSkill: [0.2, 0.1, 0.3, 0.2, 0.2], sobol: { [first]: 0.4, [second]: 0.2 }, run: "1", ...over });
 
 describe("the space", () => {
   it("has one dimension for each strategy, each option and each input dimension, and each id once", () => {
@@ -38,6 +38,22 @@ describe("the space", () => {
     expect(fitCounts(fit({ sobol: { [first]: 0.4 } }))).toBe(false);
     expect(fitCounts(fit({ dimensions: [] }))).toBe(false);
     expect(spaceCoverage(keys, dims, [fit({ heldOutError: Number.POSITIVE_INFINITY })]).fitted).toBe(0);
+  });
+
+  it("counts a fit only when its model beats the mean on each fold, by the effect bar on the mean", () => {
+    expect(fitCounts(fit({ foldSkill: [0.2, 0.1, -0.01, 0.2, 0.2] }))).toBe(false);
+    expect(fitCounts(fit({ foldSkill: [0.2, 0.1, 0, 0.2, 0.2] }))).toBe(false);
+    expect(fitCounts(fit({ foldSkill: [0.04, 0.04, 0.04, 0.04, 0.04] }))).toBe(false);
+    expect(fitCounts(fit({ foldSkill: Array<number>(FIT_MIN_FOLDS).fill(FIT_EFFECT_BAR) }))).toBe(true);
+    expect(fitCounts(fit({ foldSkill: Array<number>(FIT_MIN_FOLDS - 1).fill(0.5) }))).toBe(false);
+    expect(fitCounts(fit({ foldSkill: [0.2, Number.NaN, 0.3, 0.2, 0.2] }))).toBe(false);
+  });
+
+  it("gives the count of the examined fits, and the expected count of passes by chance", () => {
+    const c = spaceCoverage(keys, dims, [fit(), fit({ foldSkill: [0.1, 0.1, 0.1, 0.1, 0.1, -0.2] })]);
+    expect(c.tested).toBe(2);
+    expect(c.expectedFalse).toBe(1 / 32 + 1 / 64);
+    expect(c.fitted).toBe(2);
   });
 
   it("refuses a fit that names a measure or a dimension outside the space", () => {
