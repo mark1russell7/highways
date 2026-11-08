@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { aaId, pairedReport, type Mode, type PairedReport, type RawTimes } from "./paired.ts";
-import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, roundsTable, timeNoRead, timeText, type TimeLimits } from "./time-gate.ts";
+import { armVerdict, pairedTable, TAIL_NOT_MEASURED, pairedTimeTest, parseReports, roundsReport, roundsTable, timeText, type TimeLimits } from "./time-gate.ts";
+import { timeLine, timeReads } from "./lines.ts";
 
 const env = { cpu: "Test CPU", cores: 2, os: "test", arch: "x64", node: "v0" };
 const LIMITS: TimeLimits = { timeRatio: 1.5, timeJobs: 5, timeTailQ: 0.95, timeTail: 2, timeFloorMs: 5 };
@@ -181,15 +182,26 @@ describe("pairedTimeTest", () => {
     expect(all.pass).toBe(true);
   });
 
-  it("gives the facts of each no read for the check line, and none for a test that reads each check (NO-READ-LINE)", () => {
+  it("gives a read of each check and a report-only line for each test that does not pass each check (NO-READ-LINE)", () => {
     const tail = pairedTimeTest(five(() => job((arm) => (arm === "cand" ? 1.2 : 1))), "base", "cand", undefined, LIMITS);
     expect(timeText(tail, 0.95)).toContain(": pass on the median. The tail check has no read");
-    expect(timeNoRead(tail)).toEqual({ cases: [`the tail over ${tail.inputs} inputs`], why: TAIL_NOT_MEASURED, cpus: tail.cpus });
-    const one = timeNoRead(pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS));
-    expect(one?.why).toBe("1 job of 5, so the checks cannot decide");
-    expect(one?.cases).toHaveLength(2);
-    expect(timeNoRead(pairedTimeTest([], "base", "cand", undefined, LIMITS))?.cases).toEqual(["the time test"]);
-    expect(timeNoRead(pairedTimeTest(five(() => report(0.5)), "base", "cand", undefined, LIMITS))).toBeUndefined();
+    expect(timeReads(tail)).toEqual([
+      { case: `the median over ${tail.inputs} inputs`, outcome: "pass" },
+      { case: `the tail over ${tail.inputs} inputs`, outcome: "no read" },
+    ]);
+    const line = timeLine(tail, "Promotion x")!;
+    expect(line.level).toBe("warning");
+    expect(line.text).toBe(`Promotion x: no read for 1 of 2 cases: the tail over ${tail.inputs} inputs. Tail: not measured, no input above timeFloorMs. jobs on 1 CPU model: Test CPU (5 jobs). A no read is not a pass.`);
+    const one = timeLine(pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS), "x")!;
+    expect(one.noReads.count).toBe(2);
+    expect(one.reason).toBe("1 job of 5, so the checks cannot decide");
+    const none = timeLine(pairedTimeTest([], "base", "cand", undefined, LIMITS), "x")!;
+    expect(none.total).toBe(0);
+    expect(none.cpu).toBeUndefined();
+    const slow = timeLine(pairedTimeTest(five(() => report(2)), "base", "cand", undefined, LIMITS), "x")!;
+    expect(slow.outcome).toBe("block");
+    expect(slow.reason).toBe("The median 2.00 is above 1.5");
+    expect(timeLine(pairedTimeTest(five(() => report(0.5)), "base", "cand", undefined, LIMITS), "x")).toBeUndefined();
   });
 
   it("reads only the inputs of the keys", () => {

@@ -14,9 +14,9 @@ import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
+import { gateLine, jobModels, writeGateLine, type CaseRead } from "@mark1russell7/rigor-bench";
 import { SEARCH_DEFAULTS, searchRun, type Graph } from "../src/index.ts";
 import { WORK_WEIGHTS, workCounts, workUnits, type WorkCounts } from "../src/work.ts";
-import { annotation, warnNoRead } from "./gates/annotate.ts";
 import { envOf, type RecordEnv } from "./gates/paired.ts";
 
 const opt = (name: string): string | undefined => {
@@ -112,7 +112,7 @@ for (const size of sizes) {
   loop.push({ nodes: last.nodes, edges: last.edges, lane: last.counts.lane / per, corner: last.counts.corner / per, sight: last.counts.sight / per, score: last.counts.score / per, route: last.counts.route / per });
 }
 
-/** This function gives the fit through the origin of the extra time against the units of the weights: the slope, the R² and the slope of each window. */
+/** This function gives the fit through the origin of the extra time against the units of the weights. The fit has the slope, the R² and the slope of each window. */
 function gate(weights: Readonly<WorkCounts>): { slope: number; r2: number; windows: { nodes: number; edges: number; slope: number; off: number }[]; pass: boolean } {
   const xs = points.map((p) => workUnits(p.counts, weights));
   const sxy = points.reduce((s, p, i) => s + xs[i]! * p.extra, 0);
@@ -136,7 +136,7 @@ function gate(weights: Readonly<WorkCounts>): { slope: number; r2: number; windo
 
 /**
  * This function solves the least squares of the relative error of the extra time on the counts, with no negative weight. It tries each subset of the counters.
- * The gate compares the slopes of the windows, so each point has the weight 1 / extra², and a small window counts as much as a large window.
+ * The gate compares the slopes of the windows, so each point has the weight 1 / extra². Thus a small window counts as much as a large window.
  */
 function fitWeights(): WorkCounts {
   let best: { w: number[]; res: number } | undefined;
@@ -212,10 +212,14 @@ const lines = [
 ];
 console.log(lines.join("\n"));
 // Gate (a) reports only, so its job stays green. Thus a fail or a fit with no point writes a warning to the check line (NO-READ-LINE).
-const computer = `${envOf("fresh").cpu}, ${envOf("fresh").cores} cores`;
-if (points.length === 0) warnNoRead("Search work", { cases: ["gate (a)"], why: "the fit has no point", cpus: [computer] });
-else if (!now.pass) {
-  const off = now.windows.filter((w) => Math.abs(w.off) > 0.2).map((w) => `${w.nodes} boxes ${(100 * w.off).toFixed(1)}%`);
-  const text = `Gate (a) fails: R² ${now.r2.toFixed(4)} over ${points.length} points, with the limit 0.95${off.length === 0 ? "" : `, and the windows off the slope by more than 20%: ${off.join(", ")}`}. The CPU model: ${computer}.`;
-  console.error(annotation("warning", "Search work", text));
-}
+// The cases are the R² of the fit and the slope of each window. A fit with no point has no cases, and `gateLine` reads that as a no read.
+const reads: CaseRead[] =
+  points.length === 0
+    ? []
+    : [
+        { case: `the R² over ${points.length} points`, outcome: now.r2 >= 0.95 ? "pass" : "beyond" },
+        ...now.windows.map((w) => ({ case: `the window of ${w.nodes} boxes`, outcome: Math.abs(w.off) <= 0.2 ? "pass" : "beyond" })),
+      ];
+const off = now.windows.filter((w) => Math.abs(w.off) > 0.2).map((w) => `${w.nodes} boxes ${(100 * w.off).toFixed(1)}%`);
+const why = points.length === 0 ? "The fit has no point" : `R² ${now.r2.toFixed(4)} with the limit 0.95${off.length === 0 ? "" : `, and the windows off the slope by more than 20%: ${off.join(", ")}`}`;
+writeGateLine(gateLine(reads, { title: "Search work, gate (a)", enforced: false, reason: why, models: jobModels([env]) }), { log: (l) => console.error(l) });

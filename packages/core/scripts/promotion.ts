@@ -14,8 +14,9 @@ import { compareMeasure, mulberry32, verdict, type VerdictResult } from "@mark1r
 import { median as homeMedian } from "@mark1russell7/rigor-statistics";
 import { compareSpec, MEASURES, sameKind, withoutMixedKinds, type MeasureInfo } from "../src/bench/screen/measures.ts";
 import { parseLines } from "../src/bench/screen/index.ts";
-import { droppedCases, mixedKindsWhy, warnNoRead } from "./gates/annotate.ts";
-import { parseReports, pairedTimeTest, timeNoRead, timeText, type TimeTest } from "./gates/time-gate.ts";
+import { writeGateLine } from "@mark1russell7/rigor-bench";
+import { droppedLine, timeLine } from "./gates/lines.ts";
+import { parseReports, pairedTimeTest, timeText, type TimeTest } from "./gates/time-gate.ts";
 
 /** The fields of a screen record that the test reads. */
 interface Rec {
@@ -258,8 +259,8 @@ function verdicts(records: readonly Rec[]): VerdictRow[] {
   const rows = seen.filter((m) => paired(m)).map((m) => {
     const kept = withoutMixedKinds(recs, m);
     // A value that the filter removes is a "no read" of its input and seed, so the check line names it (NO-READ-LINE).
-    const dropped = droppedCases(recs, kept, m.name);
-    if (dropped.length > 0) warnNoRead(`Promotion ${candidate}`, { cases: dropped, why: mixedKindsWhy(m.name) });
+    // The verdict only reports, so the line is a warning. The job sends the standard output to /dev/null, so the line goes to the standard error.
+    writeGateLine(droppedLine(recs, kept, m.name, `Promotion ${candidate} on ${m.name}`), { log: (l) => console.error(l) });
     return { m, result: verdict(kept, { by: "family", family: (r) => familyOf(r.input), measure: { id: m.name, direction: compareSpec(m).direction }, a: baseline, b: candidate, tie: m.minEffect ?? 0, level: P.level, runs: 2000 }) };
   });
   const adjusted = holm(rows.map((r) => r.result.permutation.p));
@@ -342,11 +343,8 @@ for (const s of sets) {
   const ex = ps.filter((p) => p.exercised);
   const literal = winTest(ps, "literal");
   const exercised = winTest(ex, "exercised");
-  // A time test that cannot read a check writes a warning to the check line, with the jobs, the inputs and the CPU models (NO-READ-LINE).
-  for (const [reading, t] of [["literal", literal], ["exercised", exercised]] as const) {
-    const none = timeNoRead(t.time);
-    if (none !== undefined) warnNoRead(`Promotion ${candidate} on ${s.name}, ${reading} reading`, none);
-  }
+  // A time test that does not pass each check writes a warning to the check line, with the checks, the reason and the jobs on each CPU model (NO-READ-LINE).
+  for (const [reading, t] of [["literal", literal], ["exercised", exercised]] as const) writeGateLine(timeLine(t.time, `Promotion ${candidate} on ${s.name}, ${reading} reading`), { log: (l) => console.error(l) });
   const vs = verdicts(s.records);
   out.push(`## ${s.name}`, "", `${ps.length} paired inputs in ${new Set(ps.map((p) => p.family)).size} families. The candidate changes the output on ${ex.length} inputs.`, "");
   out.push(winText(s.name, literal, ps.length), "", winText(s.name, exercised, ps.length), "", `### The verdict over families`, "", verdictText(vs), "");

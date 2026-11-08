@@ -283,16 +283,6 @@ Two rulesets make all 8 checks of this table necessary on `main`, so one ruleset
 
 A ruleset makes `Scale OK`, `Search objective OK` and `Screen OK` necessary, and they read inputs only. A ruleset also makes `Search work OK` necessary, and only its gate (b) judges a result.
 
-### A no read is not a pass
-
-A gate that cannot read a case writes the line "No read" to the check of the pull request, not only to the log (NO-READ-LINE). The line gives the count of the cases, the reason, the cases and the CPU model of each job. A report-only check writes it as a warning, so a green check shows the gap. A gate that fails on a no read writes it as an error. `scripts/gates/annotate.ts` gives the words of each line.
-
-- `Sections gate`: a first try that cannot decide writes a warning with the A/A spread, the noise cap, the rounds and the CPU model. A pass of the retry does not hide it.
-- The heap gate: each router that breaks writes an error with the router, the reason and the cap. The summary names the CPU model.
-- The time test of `promotion.ts`: too few jobs, a check that cannot decide, or a tail with no input above the floor writes a warning.
-- The verdicts of `screen-verdict.ts` and `promotion.ts`: an input whose records pair an estimate with a full count writes a warning.
-- `exact.ts`: a solve that stops with an error writes a warning, and the summary gives the count.
-
 So each merge waits on these four checks, and they do not judge what they measure.
 
 A green on one of these checks is not a result. Do not count it as a pass on a measure, on a page or in a pull request.
@@ -322,3 +312,17 @@ The workflow `Verdict check` reads each committed snapshot again from the record
 The header of a new verdict snapshot names the run and the commit of the records, and the commit of the script in `script`.
 
 The dates of the open rows are in `docs/ROADMAP.md`, items GATE-FLIP and VERDICT-RUN.
+
+### A no read is not a pass
+
+A gate that cannot read a case writes the line "no read" to the check of the pull request, not only to the log (NO-READ-LINE). `gateLine` of `@mark1russell7/rigor-bench` gives the line. `writeGateLine` writes it as an annotation and as a line of the step summary.
+
+The line gives the count of the cases, the name of each case, the reason and the jobs on each CPU model. A block of a case goes in the same line. A report-only check writes the line as a warning, so a green check shows the gap. A gate that decides its check writes it as an error. `scripts/gates/lines.ts` gives the case reads of the gates of this repository.
+
+- `Sections gate`: a first run that cannot decide writes a warning with the case, the A/A spread, the noise cap, the rounds and the CPU model. A pass of the retry does not hide it.
+- The heap gate: one error names each router that breaks, with the reason, the cap and the CPU model.
+- The time test of `promotion.ts` writes a warning for too few jobs, or a check that cannot decide. A tail with no input above the floor, or a fail, also writes a warning.
+- The verdicts of `screen-verdict.ts` and `promotion.ts`: an input whose records pair an estimate with a full count writes a warning.
+- `exact.ts`: a solve that stops with an error writes a warning, and the summary gives the same line.
+- Gate (a) of `search-work.ts`: a fit with no point, an R² below 0.95 or a window off the slope writes a warning.
+- `Scale`: the step of the workflow writes a warning for each route over the time limit.

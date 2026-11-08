@@ -5,9 +5,9 @@ import { InputError } from "./gates/inputs.ts";
 import { aaId, pairedReport, type RawTimes } from "./gates/paired.ts";
 import { COMMIT_ARM, PARENT_ARM, spreadOf } from "./gates/pair-confirm.ts";
 import { homeVerdict } from "./gates/home-verdict.ts";
+import { checkLine, checkReads } from "./gates/lines.ts";
 import {
   BASE_FILE,
-  checkLine,
   BASE_SCHEMA,
   FIXED_ARM,
   FIXED_LIMIT,
@@ -360,25 +360,28 @@ describe("the record of the gate", () => {
 });
 
 describe("checkLine", () => {
-  it("writes a no read with the case, the rounds and the CPU model, and no line for a pass (NO-READ-LINE)", () => {
+  it("gives a read of each check, and a line with the cases, the reason and the CPU model for a run that does not pass (NO-READ-LINE)", () => {
+    const read = `${GATE_ROUTER} on large-clustered, 10 rounds of each arm`;
     expect(gateExit(record(report(0.9, 0.9)))).toBe(0);
     expect(checkLine(record(report(0.9, 0.9)))).toBeUndefined();
+    expect(checkReads(record(report(0.9, 0.9))).map((c) => c.outcome)).toEqual(["pass", "pass"]);
     const first = checkLine(record(report(1, 1, NOISY)))!;
     expect(first.level).toBe("warning");
-    expect(first.line).toMatch(/^::warning title=Sections gate::run 1 of 2: No read of 1 case: The home cannot decide/);
-    expect(first.line).toContain(`${GATE_ROUTER} on large-clustered, 10 rounds of each arm`);
-    expect(first.line).toContain("The CPU model: Made-up CPU, 4 cores.");
-    expect(first.line).toContain("The job retry times the gate on a fresh runner.");
+    expect(first.title).toBe("Sections gate, run 1 of 2");
+    expect(first.noReads.cases).toEqual([`${read}, against the parent`]);
+    expect(first.text).toContain(`no read for 1 of 2 cases: ${read}, against the parent. The home cannot decide`);
+    expect(first.text).toContain("The job retry times the gate on a fresh runner. jobs on 1 CPU model: Made-up CPU (1 job). A no read is not a pass.");
     const second = checkLine(record(report(1, 1, NOISY), null, 2))!;
     expect(second.level).toBe("error");
-    expect(second.line).toContain("run 2 of 2: No read of 1 case");
+    expect(second.text).toContain("The first run could not decide too, so the gate fails.");
     const none = checkLine(record(null, "HEAD: the core does not load"))!;
     expect(none.level).toBe("error");
-    expect(none.line).toContain("No read of 1 case: The job timed no arm");
-    expect(none.line).toContain("HEAD: the core does not load");
+    expect(none.noReads.count).toBe(2);
+    expect(none.text).toContain("The job timed no arm, so the run fails (FAIL-CLOSED). HEAD: the core does not load The gate fails (FAIL-CLOSED).");
     const slow = checkLine(record(report(1.19, 1.12)))!;
     expect(slow.level).toBe("error");
-    expect(slow.line).toContain("run 1 of 2: The gate fails.");
-    expect(slow.line).not.toContain("No read");
+    expect(slow.outcome).toBe("block");
+    expect(slow.noReads.count).toBe(0);
+    expect(slow.text).toContain("The gate fails.");
   });
 });

@@ -19,8 +19,8 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { getHeapStatistics } from "node:v8";
 import { gunzipSync } from "node:zlib";
+import { gateLine, jobModels, writeGateLine, type CaseRead } from "@mark1russell7/rigor-bench";
 import { asRouter, getStrategy, highwayRouterStrategy, routePortfolio, routerStrategies, STRATEGIES, type Graph, type Result, type Strategy } from "../src/index.ts";
-import { annotation, noReadText } from "./gates/annotate.ts";
 import { envOf, type RecordEnv } from "./gates/paired.ts";
 import { routeHash } from "./xplat.ts";
 
@@ -91,6 +91,9 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
   const cpu = `${env.cpu}, ${env.cores} cores`;
   lines.splice(4, 0, `The computer: ${cpu}.`, "");
   let breaks = 0;
+  // The read of each router, and the reason of each break, for the check line (NO-READ-LINE).
+  const reads: CaseRead[] = [];
+  const whys: string[] = [];
   for (const [name, measure] of Object.entries(budgets.routers)) {
     const cap = measure === null ? budgets.measureCapMb : Math.max(budgets.floorMb, Math.ceil(measure.rssMb * budgets.margin));
     const tmp = join(tmpdir(), `heap-${process.pid}-${name}.jsonl`);
@@ -109,20 +112,23 @@ function gate(budgets: Budgets, fixture: string, out: string): number {
     if (measure === null) result = `fail: no read, the budget file has no measure${error === "" ? "" : `, and the run ${error}`}`;
     else if (error !== "" || row === undefined) result = `fail: ${error || "no row"}`;
     else if (row.rssMb > budgetRss!) result = `fail: the peak RSS is above the budget`;
-    if (result.startsWith("fail")) {
+    // A router with no measure or no row is a "no read". A router with a row that breaks is a block.
+    const fail = result.startsWith("fail");
+    reads.push({ case: name, outcome: !fail ? "pass" : measure === null || row === undefined ? "no read" : "beyond" });
+    if (fail) {
       breaks++;
-      // Each break writes its line to the check, so a red check names the router and the reason (NO-READ-LINE).
-      const why = result.replace(/^fail: /, "");
-      const text = measure === null || row === undefined
-        ? noReadText({ cases: [name], why: `${why}, at the cap ${cap} MB`, cpus: [cpu] })
-        : `${name}: the peak RSS ${row.rssMb} MB is above the budget ${budgetRss} MB, at the cap ${cap} MB. The CPU model: ${cpu}.`;
-      console.error(annotation("error", "Heap gate", text));
+      const above = row !== undefined && budgetRss !== undefined && row.rssMb > budgetRss;
+      whys.push(above ? `${name}: the peak RSS ${row.rssMb} MB is above the budget ${budgetRss} MB, at the cap ${cap} MB` : `${name}: ${result.replace(/^fail: /, "")}, at the cap ${cap} MB`);
     }
     lines.push(`| \`${name}\` | ${cap} | ${row?.rssMb ?? ""} | ${budgetRss ?? ""} | ${row?.heapMb ?? ""} | ${row?.ms ?? ""} | \`${row?.hash.slice(0, 16) ?? ""}\` | ${result} |`);
     console.log(`heap: ${name}: cap ${cap} MB, ${row === undefined ? "no row" : `peak RSS ${row.rssMb} MB, heap ${row.heapMb} MB, ${row.ms} ms`}, ${result}.`);
   }
   const summary = process.env["GITHUB_STEP_SUMMARY"];
-  if (summary !== undefined) appendFileSync(summary, lines.join("\n") + "\n");
+  // An empty name is no file, as in `writeGateLine` of `@mark1russell7/rigor-bench`.
+  if (summary !== undefined && summary !== "") appendFileSync(summary, lines.join("\n") + "\n");
+  // The gate decides the check, so the line is an error. One line names each break, so a red check names the routers and the reasons.
+  // A budget file with no router gives no line, because the gate then has no break.
+  if (reads.length > 0) writeGateLine(gateLine(reads, { title: "Heap gate", enforced: true, reason: whys.join(". "), models: jobModels([env]) }), { log: (l) => console.error(l) });
   return breaks;
 }
 

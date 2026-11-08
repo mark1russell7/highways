@@ -231,8 +231,8 @@ importers:
         specifier: github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/rigor-bench':
-        specifier: ^0.2.14
-        version: 0.2.23(esbuild@0.28.2)
+        specifier: ^0.2.29
+        version: 0.2.29(esbuild@0.28.2)
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -530,8 +530,8 @@ packages:
     resolution: {integrity: sha512-i1hEZIfnFLLexRXvBReCNMEuaGzejHDSHunErk/GvJ+UYQcuI3ECIOKAouZeEUhwohXp+u6XEx3icagVk5l5mQ==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/rigor-bench@0.2.23':
-    resolution: {integrity: sha512-/zuSClxNKIwZ1RFy+9giLK0kIpvNNkrD184EP6onk/4vYRJXKV8pB4+EPpuZOvRuND2lTVY3PUFnm+Amvf9BBw==}
+  '@mark1russell7/rigor-bench@0.2.29':
+    resolution: {integrity: sha512-lWsyf5bLz3u1jJWCgF2xiAShPu9pcLSK7zBmKKvj89rtfFCgsg7B9HLX3TBzOnirmpslWdeOCGD947PzRq/Skg==}
     engines: {node: '>=22'}
     peerDependencies:
       esbuild: ^0.28.2
@@ -549,6 +549,10 @@ packages:
 
   '@mark1russell7/rigor-statistics@0.1.15':
     resolution: {integrity: sha512-dxr3UiAs64JXV3trXCaTRTesHqXEMUoVvDGIyrz0BWsAZERA/lrIQNUATFAuqnAWzdmbHUyi/5nzA4uPXTSTJw==}
+    engines: {node: '>=22'}
+
+  '@mark1russell7/rigor-statistics@0.1.17':
+    resolution: {integrity: sha512-euqZuWFcX8ufU7/+pOPbTPWHqwzKDwuINf1I06FaFyqtD+Tn30TFUHUUmWkgQCVoJ86sZdjV/UnN1nBuWEcRWQ==}
     engines: {node: '>=22'}
 
   '@mark1russell7/site-pages@0.3.5':
@@ -1915,10 +1919,10 @@ snapshots:
 
   '@mark1russell7/predicates@0.1.1': {}
 
-  '@mark1russell7/rigor-bench@0.2.23(esbuild@0.28.2)':
+  '@mark1russell7/rigor-bench@0.2.29(esbuild@0.28.2)':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.6
-      '@mark1russell7/rigor-statistics': 0.1.15
+      '@mark1russell7/rigor-statistics': 0.1.17
     optionalDependencies:
       esbuild: 0.28.2
 
@@ -1927,6 +1931,10 @@ snapshots:
   '@mark1russell7/rigor-generators@0.1.6': {}
 
   '@mark1russell7/rigor-statistics@0.1.15':
+    dependencies:
+      '@mark1russell7/rigor-generators': 0.1.6
+
+  '@mark1russell7/rigor-statistics@0.1.17':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.6
 

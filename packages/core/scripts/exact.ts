@@ -7,6 +7,7 @@
 // Each line has the input, its hash, the rule, the cap, the status, the proof, the objective, the bound, the MIP gap, the time, and B1 and the largest B3 of the plan.
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { gateLine, writeGateLine } from "@mark1russell7/rigor-bench";
 import highsModule from "highs";
 import { solveExact, planMeasures, type HighsLike } from "../src/bench/exact/solve.ts";
 import type { ExactRule } from "../src/bench/exact/index.ts";
@@ -14,7 +15,6 @@ import { EXACT_CLASSES, exactBoard, exactGenerator, type ExactClass } from "../s
 import { graphInput, inputGraph, type LayoutInput } from "../src/bench/screen/forms.ts";
 import { SCREEN_SETS, screenInputs } from "../src/bench/screen/set.ts";
 import { optimaFile, type ExactOptimum } from "../src/bench/screen/gap.ts";
-import { noReadText, warnNoRead } from "./gates/annotate.ts";
 import { requireInputs } from "./gates/inputs.ts";
 
 const args = process.argv.slice(2);
@@ -71,15 +71,17 @@ if (mergeDir !== undefined) {
   };
   const f = (v: number | null | undefined, d = 3): string => (v === null || v === undefined || Number.isNaN(v) ? "-" : v.toFixed(d));
   // A solve that stops with an error is a "no read" of its input, so the check line names it (NO-READ-LINE).
+  // The line only reports, so it is a warning. The summary of the job has the line in the text of this script, so `writeGateLine` writes only the annotation.
   const errors = file.optima.filter((o) => o.status.startsWith("error"));
-  const errorsRead = { cases: errors.map((o) => `${o.input} (${o.rule}, cap ${o.cap})`), why: `the solve stopped with an error, for example ${errors[0]?.status ?? ""}` };
-  if (errors.length > 0) warnNoRead(`Exact solves of ${setId}`, errorsRead);
+  const reads = file.optima.map((o) => ({ case: `${o.input} (${o.rule}, cap ${o.cap})`, outcome: o.status.startsWith("error") ? "no read" : "pass" }));
+  const line = errors.length === 0 ? undefined : gateLine(reads, { title: `Exact solves of ${setId}`, enforced: false, reason: `The solve stopped with an error, for example ${errors[0]!.status}` });
+  writeGateLine(line, { log: (l) => console.error(l), summary: undefined });
   const text = [
     `## The exact solves of \`${setId}\``,
     "",
     `${file.optima.length} solves, ${file.optima.filter((o) => o.proven).length} proven, ${seconds} s each at most.`,
     "",
-    ...(errors.length === 0 ? [] : [`${noReadText(errorsRead)} The table counts these solves as not proven.`, ""]),
+    ...(line === undefined ? [] : [`${line.text} The table counts these solves as not proven.`, ""]),
     "| nodes | class | rule | cap | solves | proven | median s | max s | largest MIP gap | median binaries | median B1 |",
     "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...[...groups.entries()]
