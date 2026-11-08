@@ -1,9 +1,17 @@
 import type { Level } from "./model.ts";
 
-/** This function gives the median width of the shown items of each level, in units of the plane. */
-export function itemSizes(levels: readonly Level[]): number[] {
+/** The side of an item box that `itemSizes` measures: the long side or the short side. */
+export type ItemSide = "long" | "short";
+
+/**
+ * This function gives the median size of the shown items of each level, in units of the plane.
+ * The size of an item is the long side of its box, or the short side with `side` set to `short`.
+ * An even count takes the upper of the two middle values.
+ */
+export function itemSizes(levels: readonly Level[], side: ItemSide = "long"): number[] {
+  const measure = side === "short" ? Math.min : Math.max;
   return levels.map((level) => {
-    const sizes = level.items.map((i) => Math.max(i.box.w, i.box.h)).sort((a, b) => a - b);
+    const sizes = level.items.map((i) => measure(i.box.w, i.box.h)).sort((a, b) => a - b);
     return sizes.length ? sizes[Math.floor(sizes.length / 2)]! : 0;
   });
 }
@@ -33,4 +41,41 @@ export function pickLevel(sizes: readonly number[], scale: number, options: Part
   let pick = 0;
   for (let d = 0; d < n - 1; d++) if (sizes[d]! * scale >= itemAt) pick = d;
   return pick;
+}
+
+/** The options of `pickLevelOf`: the thresholds of `pickLevel`, the side of the items, and the least count of items of a level. */
+export interface LevelPickOptions extends PickOptions {
+  /** The side of an item box that the median takes. The default is `long`. */
+  readonly side: ItemSide;
+  /**
+   * The least count of items of a level that the pick shows. The search from fine to coarse stops at a level with fewer items.
+   * When no level passes, the pick is the coarsest level with this count or more, else the routes.
+   * With no value, the search does not stop, and the fallback is the root level, as in `pickLevel`.
+   */
+  readonly minItems?: number;
+}
+
+/**
+ * This function picks the level that a camera shows at a scale, from the levels themselves.
+ * Without `side` and `minItems`, it gives `pickLevel(itemSizes(levels), scale, options)`.
+ * The value `levels.length` stands for the routes of each edge.
+ *
+ * One threshold for both values and a `minItems` of 2 give a rule with one threshold.
+ * This rule shows the finest level with a median item at the threshold or more, and no level with 1 item.
+ */
+export function pickLevelOf(levels: readonly Level[], scale: number, options: Partial<LevelPickOptions> = {}): number {
+  const sizes = itemSizes(levels, options.side ?? "long");
+  const { minItems } = options;
+  if (minItems === undefined) return pickLevel(sizes, scale, options);
+  const routesAt = options.routesAt ?? PICK.routesAt;
+  const itemAt = options.itemAt ?? PICK.itemAt;
+  const n = levels.length;
+  if (n === 0) return 0;
+  if (sizes[n - 1]! * scale >= routesAt) return n;
+  for (let d = n - 2; d >= 0; d--) {
+    if (levels[d]!.items.length < minItems) break;
+    if (sizes[d]! * scale >= itemAt) return d;
+  }
+  for (let d = 0; d < n - 1; d++) if (levels[d]!.items.length >= minItems) return d;
+  return n;
 }
