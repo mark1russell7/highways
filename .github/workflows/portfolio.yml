@@ -121,7 +121,7 @@ jobs:
 
   merge:
     needs: [plan, time]
-    if: ${{ always() && !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
+    if: ${{ !cancelled() && !inputs.report && !inputs.sets && !inputs.api && !inputs.summary }}
     runs-on: ubuntu-latest
     env:
       # The join expects the file of each shard of the plan (FAIL-CLOSED).

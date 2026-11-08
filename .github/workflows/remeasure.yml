@@ -79,7 +79,7 @@ jobs:
   join:
     needs: measure
     # The join also runs when a job fails, and then it fails: each job of the 5 jobs must give its report (FAIL-CLOSED).
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
