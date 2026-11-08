@@ -1,5 +1,22 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.15.1
+
+This version is a PATCH before 1.0: a new optional parameter, new fields and new exports. No route output changes.
+
+### Measures
+
+- `routePairCrossings(routes, options)` takes the optional `maxPoints` and `seed` (BENCH-PAIRS-HEAP). Above `maxPoints`, the count reads a seeded sample of the routes, and `estimated` is true.
+- A sampled count gives a 95% interval in `low` and `high`. A full count has `low` and `high` equal to `pairs`.
+- `contactSampled` is true when the contact count comes from a sample of the shared vertices. Then the interval is too narrow.
+- The suite passes `PAIR_POINTS`, 1 000 000. Each board up to 10 000 nodes keeps a full count.
+- The suite rows give `R1.pairsLow`, `R1.pairsHigh` and `R1.pairsContactSampled`.
+
+### New
+
+- `RoutePairOptions`, `PAIR_POINTS`, `sameKind` and `withoutMixedKinds`.
+- `MeasureInfo.estimatedBy` names the flag of a count that can come from a sample. A gate does not pair an estimate with a full count.
+
 ## 0.15.0
 
 This version is a MINOR before 1.0, because default routes change and the public types name `layout-contract` 0.4.0.

@@ -11,6 +11,7 @@ import {
   type Box,
   type Point,
 } from "../geom.ts";
+import { bootstrap } from "@mark1russell7/rigor-statistics";
 import { rng } from "../fixtures.ts";
 import { Grid } from "../grid.ts";
 import { nodeIndex, type Graph, type Node, type Result } from "../model.ts";
@@ -243,8 +244,31 @@ export interface RoutePairCrossings {
   readonly proper: number;
   /** The crossings at a shared vertex, and on a shared stretch that two routes leave on opposite sides. */
   readonly contact: number;
-  /** This value is true when `contact` is an estimate from a sample of the pairs of routes. */
+  /** This value is true when the count is an estimate. The estimate comes from a sample of the routes, or `contact` comes from a sample of the pairs. */
   readonly estimated: boolean;
+  /**
+   * The low end of the 95% interval of `pairs`, from a bootstrap over the sampled routes (BENCH-PAIRS-HEAP). It equals `pairs` when the count reads all routes.
+   * The interval does not include the error of a sample of the pairs in `contact`.
+   */
+  readonly low: number;
+  /** The high end of the 95% interval of `pairs`. It equals `pairs` when the count reads all routes. */
+  readonly high: number;
+  /**
+   * This value is true when `contact` comes from a seeded sample of the pairs at shared vertices, above 20 000 000 reads.
+   * Then the interval of `low` and `high` is too narrow, because it does not include the error of that sample.
+   */
+  readonly contactSampled: boolean;
+}
+
+/** The options of `routePairCrossings` (BENCH-PAIRS-HEAP). */
+export interface RoutePairOptions {
+  /**
+   * The count reads all routes up to this number of route points. The memory of the count grows with the points.
+   * Above the limit, the count reads a seeded sample of the routes and scales the count to all pairs. With no limit, the count reads all routes.
+   */
+  readonly maxPoints?: number;
+  /** The seed of the sample of the routes. The default seed is the number of route points. */
+  readonly seed?: number;
 }
 
 /** A vertex that lies at most this number of grid steps from a segment is a vertex of that segment. */
@@ -319,7 +343,7 @@ function splitAtVertices({ xs, ys, paths }: SnappedPaths): SnappedPaths {
 }
 
 /** This function counts the proper crossings of two different routes: each pair of crossing segments, times the routes on each segment. */
-function properPairCrossings({ xs, ys, paths }: SnappedPaths): number {
+function properPairCrossings({ xs, ys, paths }: SnappedPaths, totals?: Float64Array): number {
   const count = xs.length;
   const index = new Map<number, number>();
   const atoms: { readonly u: number; readonly v: number; readonly routes: number[] }[] = [];
@@ -348,7 +372,9 @@ function properPairCrossings({ xs, ys, paths }: SnappedPaths): number {
       const t = atoms[j]!;
       if (s.u === t.u || s.u === t.v || s.v === t.u || s.v === t.v) return;
       const relation = classifySegments(xs[s.u]!, ys[s.u]!, xs[s.v]!, ys[s.v]!, xs[t.u]!, ys[t.u]!, xs[t.v]!, ys[t.v]!).relation;
-      if (relation === "cross") total += s.routes.length * t.routes.length - shared(s.routes, t.routes);
+      if (relation !== "cross") return;
+      total += s.routes.length * t.routes.length - shared(s.routes, t.routes);
+      if (totals) credit(s.routes, t.routes, 1, totals);
     });
   });
   return total;
@@ -372,10 +398,25 @@ function shared(a: readonly number[], b: readonly number[]): number {
 }
 
 /**
+ * This function adds the crossings of the pairs of two sorted lists of routes to each route of a pair, times the weight `w`.
+ * A pair of one route with itself does not count. Thus the totals add up to two times the count of the pairs.
+ */
+function credit(a: readonly number[], b: readonly number[], w: number, totals: Float64Array): void {
+  let [i, j] = [0, 0];
+  while (i < a.length || j < b.length) {
+    const route = Math.min(i < a.length ? a[i]! : Infinity, j < b.length ? b[j]! : Infinity);
+    let [n, m] = [0, 0];
+    while (a[i] === route) (i++, n++);
+    while (b[j] === route) (j++, m++);
+    totals[route]! += w * (n * (b.length - m) + m * (a.length - n));
+  }
+}
+
+/**
  * This function counts the crossings of two different routes at the vertices that they share.
  * Each interior vertex of a route is one pass, with the vertex before it and the vertex after it. A route does not cross at its own end.
  */
-function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total: number; readonly estimated: boolean } {
+function contactPairCrossings({ xs, ys, paths }: SnappedPaths, totals?: Float64Array): { readonly total: number; readonly estimated: boolean } {
   const facing = (v: number, p: number, q: number): boolean => (xs[p]! - xs[v]!) * (xs[q]! - xs[v]!) + (ys[p]! - ys[v]!) * (ys[q]! - ys[v]!) > 0;
   const turn = (v: number, p: number, q: number): number => orient2dSign(xs[v]!, ys[v]!, xs[p]!, ys[p]!, xs[q]!, ys[q]!);
   // The side of the ray from `v` to `r`, for a path through `v`: 1 on the side from `out` to `back` in turn order, -1 on the other side, 0 on the path.
@@ -436,20 +477,25 @@ function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total
   const random = rng(reads);
   // This function adds the stretches of the groups `g` and `h`. The route of `g` is the route that the walk follows.
   const walk = (g: Group, h: Group, way: 1 | -1): number => {
-    const one = (x: number, y: number): number => {
+    const one = (x: number, y: number, w: number): number => {
       const [ra, rb] = [g.routes[x]!, h.routes[y]!];
       // A stretch of two opposite routes shows at both of its ends, so the route with the lower number walks.
       if (ra === rb || (way === -1 && ra > rb)) return 0;
-      return stretch(paths[ra]!, g.at[x]!, paths[rb]!, h.at[y]!, way);
+      const crossed = stretch(paths[ra]!, g.at[x]!, paths[rb]!, h.at[y]!, way);
+      if (crossed && totals) {
+        totals[ra]! += w * crossed;
+        totals[rb]! += w * crossed;
+      }
+      return crossed;
     };
     const size = g.routes.length * h.routes.length;
     let sum = 0;
     if (rate === 1) {
-      for (let x = 0; x < g.routes.length; x++) for (let y = 0; y < h.routes.length; y++) sum += one(x, y);
+      for (let x = 0; x < g.routes.length; x++) for (let y = 0; y < h.routes.length; y++) sum += one(x, y, 1);
       return sum;
     }
     const draws = Math.ceil(size * rate);
-    for (let d = 0; d < draws; d++) sum += one(Math.floor(random() * g.routes.length), Math.floor(random() * h.routes.length));
+    for (let d = 0; d < draws; d++) sum += one(Math.floor(random() * g.routes.length), Math.floor(random() * h.routes.length), size / draws);
     return (sum * size) / draws;
   };
 
@@ -467,7 +513,9 @@ function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total
         else {
           const first = side(g.back, v, g.out, h.back);
           const last = side(g.back, v, g.out, h.out);
-          if (first !== 0 && last !== 0 && first !== last) total += g.routes.length * h.routes.length - shared(g.routes, h.routes);
+          if (first === 0 || last === 0 || first === last) continue;
+          total += g.routes.length * h.routes.length - shared(g.routes, h.routes);
+          if (totals) credit(g.routes, h.routes, 1, totals);
         }
       }
     }
@@ -479,12 +527,58 @@ function contactPairCrossings({ xs, ys, paths }: SnappedPaths): { readonly total
  * This function counts the crossings between pairs of routes on the grid `EPS_STEPS`. `measureQuality` keeps one segment for each pair of ends, so its `crossings` counts two trunks once.
  * This count multiplies a crossing of two trunks by their routes. It also counts two routes that cross at a shared vertex, or that share a stretch and leave it on opposite sides.
  * A crossing of a route with itself does not count.
+ *
+ * The count of a set of routes is the sum of the counts of its pairs. So above `options.maxPoints`, the count of a uniform sample of `m` routes
+ * times `n (n - 1) / (m (m - 1))` is an estimate with no bias, for `n` routes.
+ *
+ * The interval comes from a bootstrap of the drawn routes. Each drawn route has the total of its pairs in the sample.
+ * To first order, a change of the sum of the totals changes the count by the same value. The factor `sqrt(1 - m / n)` corrects for a sample with no route two times.
  */
-export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[]): RoutePairCrossings {
+export function routePairCrossings(routes: readonly { readonly points: readonly Point[] }[], options: RoutePairOptions = {}): RoutePairCrossings {
+  const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+  const limit = options.maxPoints;
+  if (limit !== undefined && points > limit && routes.length > 2) {
+    const n = routes.length;
+    const m = Math.min(n, Math.max(2, Math.floor((n * limit) / points)));
+    const seed = options.seed ?? points;
+    const totals = new Float64Array(m);
+    const part = countRoutePairs(sampleRoutes(routes, m, seed), totals);
+    const scale = (n * (n - 1)) / (m * (m - 1));
+    const [proper, contact] = [Math.round(part.proper * scale), Math.round(part.contact * scale)];
+    const pairs = proper + contact;
+    const all = totals.reduce((s, t) => s + t, 0);
+    const spread = Math.sqrt(1 - m / n) * scale;
+    const interval = bootstrap([...totals], (drawn) => pairs + spread * (drawn.reduce((s, t) => s + t, 0) - all), { runs: PAIR_RUNS, seed });
+    const [low, high] = [Math.max(0, Math.floor(interval.low)), Math.ceil(interval.high)];
+    return { pairs, proper, contact, estimated: m < n || part.estimated, low, high, contactSampled: part.contactSampled };
+  }
+  return countRoutePairs(routes);
+}
+
+/** The bootstrap runs of the interval of a sampled pair count. */
+const PAIR_RUNS = 2_000;
+
+/** This function counts the crossings between pairs of the routes, with no sample of the routes. With `totals`, it adds the crossings of each pair to its two routes. */
+function countRoutePairs(routes: readonly { readonly points: readonly Point[] }[], totals?: Float64Array): RoutePairCrossings {
   const paths = splitAtVertices(snapPaths(routes));
-  const proper = properPairCrossings(paths);
-  const contact = contactPairCrossings(paths);
-  return { pairs: proper + contact.total, proper, contact: contact.total, estimated: contact.estimated };
+  const proper = properPairCrossings(paths, totals);
+  const contact = contactPairCrossings(paths, totals);
+  const pairs = proper + contact.total;
+  return { pairs, proper, contact: contact.total, estimated: contact.estimated, low: pairs, high: pairs, contactSampled: contact.estimated };
+}
+
+/** This function gives a seeded uniform sample of `m` of the routes, with no route two times, in the order of the routes. */
+function sampleRoutes<R>(routes: readonly R[], m: number, seed: number): R[] {
+  const random = rng(seed);
+  const order = routes.map((_, i) => i);
+  for (let i = 0; i < m; i++) {
+    const j = i + Math.floor(random() * (order.length - i));
+    [order[i], order[j]] = [order[j]!, order[i]!];
+  }
+  return order
+    .slice(0, m)
+    .sort((a, b) => a - b)
+    .map((i) => routes[i]!);
 }
 
 /**
