@@ -26,6 +26,8 @@ The format `response-records/1` refuses a field that it does not have. Thus a re
 |---|---|---|---|
 | `router-screen-v1-sample.json` | [42424232256](https://github.com/mark1russell7/highways/actions/runs/42424232256) | `1db7ef7` | `corners`, `trunks` and `shared` on `tiny-uniform` and `small-clustered` |
 | `highway-screen-v1-part-1.json` | [42429126987](https://github.com/mark1russell7/highways/actions/runs/42429126987) | `4c57061` | The first 22 highway strategies with a number option, from `keys` to `growth`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
+| `highway-screen-v1-part-2.json` | [42430144949](https://github.com/mark1russell7/highways/actions/runs/42430144949) | `06cb538` | The next 22 highway strategies with a number option, from `edge-paths` to `link-communities`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
+| `highway-screen-v1-part-3.json` | [42432019520](https://github.com/mark1russell7/highways/actions/runs/42432019520) | `06cb538` | The last 22 highway strategies with a number option, from `territories` to `corridors+ids`, on `tiny-uniform` and `small-clustered`. It gives 22 cards. |
 
 - The first copy of this file came from a local machine. The record of the run has the same route measures on each of the 588 points. Only `ms` and `ms.ratio` differ, because they are times.
 - To add a record, start `Sweep` and download its artifact `sweep` into a new empty folder. Copy `sweep.json` here with its bytes, and add its row to this table.
