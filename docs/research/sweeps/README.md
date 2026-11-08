@@ -7,7 +7,19 @@ A sweep record holds the response curves of the strategy cards. Part 2 of the st
 Each file is one JSON record of the format `response-records/1` of `@mark1russell7/rigor-statistics`. `fitResponse` writes the record, and `parseResponseRecord` reads it. This folder adds two rules:
 
 - The record has the categorical dimensions `step` and `strategy`. Each pair of a step and a strategy is one card.
+- The categorical dimension `family` gives the family of the input of each point. A record from before SPACE-INPUTS does not have it.
+- A dimension with its `when` on `family` is an input dimension, for example `input:tiny-uniform.nodes`. Only a drawn input has its values.
 - Each other dimension is an option of the strategy, for example `gap`.
+
+## The drawn inputs
+
+A screen set has one value of each dimension of a family. Thus a fit cannot tell the effect of the size or the density of an input (SPACE-INPUTS).
+
+- With `--draw <n>`, the sweep draws `n` inputs of each family. The workflow `Sweep` has the input `draw` for it.
+- Each number dimension of a family gets a uniform fraction of its range, on the scale of the dimension. A dimension with a `when` keeps its default.
+- The id of an input dimension is the id of the space, so `space-fits.ts` maps it with no table.
+- A fit holds out whole inputs. With 10 inputs or more, it gets 10 folds.
+- An input dimension gives no curve to a card. Only an option gives a curve.
 
 ## The count
 
