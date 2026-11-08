@@ -179,8 +179,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(@swc/core@1.16.22)(dependency-cruiser@18.7.2)
       '@mark1russell7/conventions':
-        specifier: ^0.35.0
-        version: 0.35.0
+        specifier: ^0.37.2
+        version: 0.37.2
       '@mark1russell7/cue':
         specifier: github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
@@ -501,8 +501,8 @@ packages:
       dependency-cruiser:
         optional: true
 
-  '@mark1russell7/conventions@0.35.0':
-    resolution: {integrity: sha512-zEG/7kK6BDsgJu1IXD4Q70Odg1N1A2mzgu/Hp/Qk8ZYJKhgiuSBt0ATHhc8xDZb4AtIstP/6QTUxCzMtRjOesg==}
+  '@mark1russell7/conventions@0.37.2':
+    resolution: {integrity: sha512-Mip6vwpO3RlAvtlsZkais7Ct4cBYei0OsuX1y4BjPFeV+yxUZ+4LTXKcml2aWJZX5fgNA9VeJ1MWV9Cxm022tA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1896,7 +1896,7 @@ snapshots:
       '@swc/core': 1.16.22
       dependency-cruiser: 18.7.2
 
-  '@mark1russell7/conventions@0.35.0':
+  '@mark1russell7/conventions@0.37.2':
     dependencies:
       yaml: 2.9.1
 
