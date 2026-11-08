@@ -13,7 +13,7 @@ import { splineCurve } from "../spline/index.ts";
 export interface ElasticOptions {
   /** The distance between two samples of the band. The default is 8. */
   readonly step?: number;
-  /** The number of steps of the relaxation. 0 keeps the polyline. The default is 40. */
+  /** The number of steps of the relaxation. 0 gives no band: the curve is the fallback of `elasticCurve`. The default is 40. */
   readonly rounds?: number;
   /** The distance from a box at which the push of the box starts. 0 gives a band with springs only. The default is 12. */
   readonly clearance?: number;
@@ -115,11 +115,20 @@ export function relaxBand(band: readonly Point[], boxes: readonly Box[], rounds:
  * This function draws the curve `elastic`. The samples of the polyline between its two leads relax as an elastic band.
  * Then a centripetal spline goes through the band.
  * With `space`, the boxes near the band push it away. If the spline goes through a box that the polyline avoids, the band moves back toward the polyline.
- * When no weight of the band is clear, the result is the polyline as it is.
+ * When the route has no band, or no weight of the band is clear, the result is the fallback.
+ * With a plug normal, the fallback is the spline of the polyline with the same normals and space. Thus the curve leaves along the normal (C10).
+ * Without a plug normal, the fallback is the polyline as it is.
  */
 export function elasticCurve(points: readonly Point[], options: ElasticOptions = {}): CurveSegment[] {
   const p = distinctPoints(points);
-  const straight = (): CurveSegment[] => p.map((to, i): CurveSegment => (i === 0 ? { kind: "move", to } : { kind: "line", to }));
+  const context = {
+    ...(options.startNormal ? { startNormal: options.startNormal } : {}),
+    ...(options.endNormal ? { endNormal: options.endNormal } : {}),
+  };
+  const straight = (): CurveSegment[] => {
+    if (p.length < 2 || (!options.startNormal && !options.endNormal)) return p.map((to, i): CurveSegment => (i === 0 ? { kind: "move", to } : { kind: "line", to }));
+    return splineCurve(p, { ...context, ...(options.space ? { space: options.space } : {}) });
+  };
   if (p.length < 3) return straight();
   const step = Math.max(1, options.step ?? ELASTIC_DEFAULTS.step);
   const rounds = Math.max(0, Math.floor(options.rounds ?? ELASTIC_DEFAULTS.rounds));
@@ -133,10 +142,6 @@ export function elasticCurve(points: readonly Point[], options: ElasticOptions =
   const hi = { x: Math.max(...band.map((q) => q.x)) + clearance, y: Math.max(...band.map((q) => q.y)) + clearance };
   const boxes = (options.space?.boxes ?? []).filter((b) => b.x <= hi.x && b.x + b.w >= lo.x && b.y <= hi.y && b.y + b.h >= lo.y);
   const relaxed = relaxBand(band, boxes, rounds, clearance);
-  const context = {
-    ...(options.startNormal ? { startNormal: options.startNormal } : {}),
-    ...(options.endNormal ? { endNormal: options.endNormal } : {}),
-  };
   for (const w of BLENDS) {
     if (w === 0) break;
     const mid = band.map((q, i) => ({ x: q.x + (relaxed[i]!.x - q.x) * w, y: q.y + (relaxed[i]!.y - q.y) * w }));

@@ -298,6 +298,7 @@ export const curveStrategies: {
   rounded: defineStrategy({
     step: "curve",
     name: "rounded",
+    curveRules: { g1: true },
     describe: "A quadratic Bezier curve at each corner, as `roundCorners` draws it. The first and the last legs stay.",
     defaults: { radius: 12 },
     schema: RADIUS_SCHEMA,
@@ -306,6 +307,7 @@ export const curveStrategies: {
   spline: defineStrategy({
     step: "curve",
     name: "spline",
+    curveRules: { g1: true, normals: true },
     describe: "A centripetal Catmull-Rom spline through each point. It does not overshoot or make loops in a piece.",
     defaults: { tension: 0 },
     schema: TENSION_SCHEMA,
@@ -314,6 +316,7 @@ export const curveStrategies: {
   arc: defineStrategy({
     step: "curve",
     name: "arc",
+    curveRules: { g1: true },
     describe: "A circular arc at each corner, tangent to the two legs. The first and the last legs stay.",
     defaults: { radius: 12 },
     schema: RADIUS_SCHEMA,
@@ -322,6 +325,7 @@ export const curveStrategies: {
   smooth: defineStrategy({
     step: "curve",
     name: "smooth",
+    curveRules: { g1: true },
     describe: "A cubic spiral, an arc and a second cubic spiral at each corner, as the corner smoothing of Figma. The curvature has no jump.",
     defaults: { radius: 12, smoothing: 0.6 },
     schema: SMOOTH_SCHEMA,
@@ -331,6 +335,7 @@ export const curveStrategies: {
   clothoid: defineStrategy({
     step: "curve",
     name: "clothoid",
+    curveRules: { g1: true },
     describe: "A clothoid, an arc and a second clothoid at each corner, as a transition curve of a road. Cubic pieces draw each clothoid.",
     defaults: { radius: 12, spiral: 0.5, tolerance: 0.25 },
     schema: CLOTHOID_SCHEMA,
@@ -345,6 +350,7 @@ export const curveStrategies: {
   highway: defineStrategy({
     step: "curve",
     name: "highway",
+    curveRules: { g1: true },
     describe: "The lanes of a bundle bend as one, with concentric arcs at the lane spacing. One lane alone gets the curve of `arc`.",
     defaults: { radius: 12, minRadius: 4, jog: "biarc" as JogStyle, jogPieces: 4 },
     schema: HIGHWAY_SCHEMA,
@@ -354,6 +360,7 @@ export const curveStrategies: {
   elastic: defineStrategy({
     step: "curve",
     name: "elastic",
+    curveRules: { g1: true, normals: true },
     describe: "An elastic band (NAT-026): springs pull the route taut, and the near boxes push it away. A spline goes through the band.",
     defaults: { ...ELASTIC_DEFAULTS },
     schema: ELASTIC_SCHEMA,

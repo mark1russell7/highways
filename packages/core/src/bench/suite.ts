@@ -328,9 +328,9 @@ export interface CurveRunOptions {
   readonly fixture: string;
   /** The index of the seed in the family, for the rows. */
   readonly seed: number;
-  /** The curve strategies that are G1 by their design. The rule `curve-g1` examines them. */
+  /** The curve strategies that are G1 by their design. The rule `curve-g1` examines them, and each strategy with `curveRules.g1`. */
   readonly smooth: ReadonlySet<string>;
-  /** The curve strategies that read the normals of the plugs. The rule `curve-ends` examines their end tangents. */
+  /** The curve strategies that read the normals of the plugs. The rule `curve-ends` examines their end tangents, and those of each strategy with `curveRules.normals`. */
   readonly normals: ReadonlySet<string>;
   /** The options of each curve strategy, by its name. A strategy without an entry gets its defaults. */
   readonly curveOptions?: Readonly<Record<string, object>>;
@@ -398,13 +398,13 @@ export function curveRuns(graph: Graph, result: Result, curves: readonly Strateg
       variation.push(curvatureVariation(s, 0.25));
       deviation.push(curveDeviation(s, r.points, u / 4) / u);
       length += polylineLength(s);
-      const normals = options.normals.has(curve.name);
+      const normals = options.normals.has(curve.name) || curve.curveRules?.normals === true;
       const f = curveFaults({
         polyline: r.points,
         segments,
         samples: s,
         space,
-        smooth: options.smooth.has(curve.name),
+        smooth: options.smooth.has(curve.name) || curve.curveRules?.g1 === true,
         ...(normals ? { startNormal: r.startNormal, endNormal: r.endNormal } : {}),
       });
       if (f.clear) rules["curve-clear"]++;

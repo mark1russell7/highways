@@ -159,6 +159,7 @@ CurveFaults: build/index.d.ts#CurveFaults
 CurveInput: build/index.d.ts#CurveInput
 CurveJoint: build/index.d.ts#CurveJoint
 CurveOptions: build/index.d.ts#CurveOptions
+CurveRules: build/index.d.ts#CurveRules
 CurveRun: build/index.d.ts#CurveRun
 CurveRunOptions: build/index.d.ts#CurveRunOptions
 CurveSegment: build/index.d.ts#CurveSegment
@@ -2385,6 +2386,12 @@ export interface CurveOptions {
   readonly startNormal?: Point;
   readonly endNormal?: Point;
   readonly space?: CurveSpace;
+}
+
+### build/index.d.ts#CurveRules
+export interface CurveRules {
+  readonly g1?: boolean;
+  readonly normals?: boolean;
 }
 
 ### build/index.d.ts#CurveRun
@@ -5678,6 +5685,7 @@ export interface Strategy<S extends Step = Step, O extends object = object> {
   readonly defaults: Readonly<O>;
   readonly schema?: OptionSchema<O>;
   readonly maxNodes?: number;
+  readonly curveRules?: CurveRules;
   run(input: StepInput<S>, options?: Partial<O>): StepOutput<S>;
 }
 
@@ -5689,6 +5697,7 @@ export interface StrategyDefinition<S extends Step, O extends object> {
   readonly defaults: O;
   readonly schema?: NoInfer<OptionSchema<O>>;
   readonly maxNodes?: number;
+  readonly curveRules?: CurveRules;
   run(input: StepInput<S>, options: Readonly<O>): StepOutput<S>;
 }
 

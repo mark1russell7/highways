@@ -14,7 +14,8 @@ function variant(name: string, options: Partial<ElasticStrategyOptions>): Strate
       ...(input.space ? { space: input.space } : {}),
       ...o,
     });
-  return defineStrategy({ step: "curve", name, describe: `The settings ${JSON.stringify(o)}.`, defaults: {}, schema: {}, run });
+  // A variant keeps the rules of `elastic`, so the screen examines C1 and C10 on it too.
+  return defineStrategy({ step: "curve", name, describe: `The settings ${JSON.stringify(o)}.`, defaults: {}, schema: {}, curveRules: { g1: true, normals: true }, run });
 }
 
 // NAT-026: springs only, a long relaxation, and dense samples.

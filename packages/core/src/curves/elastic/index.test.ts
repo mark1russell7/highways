@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { polylineLength, type Point } from "../../geom.ts";
 import { sampleCurve } from "../sample.ts";
 import { curveSpace } from "../space.ts";
+import { splineCurve } from "../spline/index.ts";
 import { ELASTIC_DEFAULTS, elasticCurve, relaxBand } from "./index.ts";
 
 /** A route with one corner: 100 east, then 100 south. */
@@ -48,6 +49,18 @@ describe("the curve elastic (NAT-026)", () => {
     expect(elasticCurve(ell.slice(0, 2))).toEqual(line(ell.slice(0, 2)));
     const tiny = [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 4 }];
     expect(elasticCurve(tiny)).toEqual(line(tiny));
+  });
+
+  it("leaves along the plug normals when it has no band, as the spline does (C10)", () => {
+    // Two points, with normals across the leg: the polyline leaves off the normal, and the fallback does not.
+    const leg: Point[] = [{ x: 0, y: 0 }, { x: 100, y: 40 }];
+    const normals = { startNormal: { x: 0, y: 1 }, endNormal: { x: 0, y: 1 } };
+    const curve = elasticCurve(leg, normals);
+    expect(curve).toEqual(splineCurve(leg, normals));
+    const first = curve[1]!;
+    expect(first.kind).toBe("cubic");
+    if (first.kind === "cubic") expect(first.c1.x).toBeCloseTo(0, 9);
+    expect(elasticCurve(ell, { ...normals, rounds: 0 })).toEqual(splineCurve(ell, normals));
   });
 
   it("goes through no box that the polyline avoids", () => {
