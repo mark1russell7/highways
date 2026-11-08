@@ -233,6 +233,9 @@ importers:
       '@mark1russell7/rigor-bench':
         specifier: ^0.2.29
         version: 0.2.29(esbuild@0.28.2)
+      '@mark1russell7/strategy-space':
+        specifier: ^0.0.1
+        version: 0.0.1
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -565,6 +568,10 @@ packages:
     version: 0.1.1
     engines: {node: '>=22'}
     hasBin: true
+
+  '@mark1russell7/strategy-space@0.0.1':
+    resolution: {integrity: sha512-0PX1MsXQh49flCDuko6KfJRbFgQCHXhgXwnhAYH06K06p9kqV1UWxlIWMN918nArmjNV2XY5nDI6AM4EhrK5/w==}
+    engines: {node: '>=22'}
 
   '@mark1russell7/template-cli@0.1.5':
     resolution: {integrity: sha512-OenwEgVEkrt6HjUtIsTgplkJJTBIZLwb0mxiPow533++mbrrJ8BvHK+MsMLFm6X5A8EJZlLgd6IXJspZy3L2og==}
@@ -1943,6 +1950,10 @@ snapshots:
   '@mark1russell7/ste-lint@https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db':
     dependencies:
       typescript: 6.0.3
+
+  '@mark1russell7/strategy-space@0.0.1':
+    dependencies:
+      '@mark1russell7/rigor-generators': 0.1.8
 
   '@mark1russell7/template-cli@0.1.5':
     dependencies:
