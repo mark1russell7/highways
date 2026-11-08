@@ -186,6 +186,7 @@ type DividedOptions: build/index.d.ts#DividedOptions
 DrawnSegment: build/index.d.ts#DrawnSegment
 EDGE_DISTANCES: build/index.d.ts#EDGE_DISTANCES
 EDGE_PATH_DEFAULTS: build/index.d.ts#EDGE_PATH_DEFAULTS
+EPS_STEPS: build/index.d.ts#EPS_STEPS
 ESCAPE: build/index.d.ts#ESCAPE
 ESCAPE_DEFAULTS: build/index.d.ts#ESCAPE_DEFAULTS
 ESCAPE_METHODS: build/index.d.ts#ESCAPE_METHODS
@@ -1439,6 +1440,7 @@ slotPlan: build/index.d.ts#slotPlan
 slotsOf: build/index.d.ts#slotsOf
 smoothCurve: build/index.d.ts#smoothCurve
 snapPlan: build/index.d.ts#snapPlan
+snapToEps: build/index.d.ts#snapToEps
 softDistance: build/index.d.ts#softDistance
 softKeyClusters: build/index.d.ts#softKeyClusters
 softKeyPlan: build/index.d.ts#softKeyPlan
@@ -2514,6 +2516,9 @@ export declare const EDGE_DISTANCES: readonly EdgeDistance[];
 
 ### build/index.d.ts#EDGE_PATH_DEFAULTS
 export declare const EDGE_PATH_DEFAULTS: Readonly<Required<Omit<EdgePathOptions, "margin" | "k">>>;
+
+### build/index.d.ts#EPS_STEPS
+export declare const EPS_STEPS: number;
 
 ### build/index.d.ts#ESCAPE
 export declare const ESCAPE: HighwaysFamily;
@@ -8207,6 +8212,9 @@ export declare function smoothCurve(points: readonly Point[], options?: SmoothOp
 
 ### build/index.d.ts#snapPlan
 export declare function snapPlan(input: HighwayInput, lines: readonly SnapLine[], o: Readonly<SnapOptions>): HighwayPlan;
+
+### build/index.d.ts#snapToEps
+export declare function snapToEps(p: Point): Point;
 
 ### build/index.d.ts#softDistance
 export declare function softDistance(geom: number, keyA: string | undefined, keyB: string | undefined, lambda: number, attributes: number): number;

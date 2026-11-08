@@ -1,5 +1,19 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.15.2
+
+This version is a PATCH before 1.0: two new exports. No route output changes.
+
+### New
+
+- `EPS_STEPS` is the count of grid steps in one unit, from the tolerance `EPS` of `layout-contract` (PAINT-TIE).
+- `snapToEps(point)` puts a point on that grid.
+
+### Measures
+
+- The painted count of the bench reads its points on the grid `EPS_STEPS`, as `routePairCrossings` does. Thus a shift far under the grid does not move a touch.
+- `PAINT_COUNTER` of the bench is 2. A painted count of version 1 does not compare with a count of version 2.
+
 ## 0.15.1
 
 This version is a PATCH before 1.0: a new optional parameter, new fields and new exports. No route output changes.
