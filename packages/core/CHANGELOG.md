@@ -1,5 +1,14 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.16.0
+
+This version is a MINOR before 1.0: the routes of two routers change in their last bits.
+
+### Routes
+
+- `inflectionCurve` takes its powers as products, not with `**` (POW-PORTABLE). In Node.js, `x ** 3` and `x ** 4` give different last bits on Linux and on Windows.
+- The routers `plugs` and `corners` with `smooth` give the same points on each system. The points of their curves move by at most 6e-12. No route changes its count of points.
+
 ## 0.15.2
 
 This version is a PATCH before 1.0: two new exports. No route output changes.
