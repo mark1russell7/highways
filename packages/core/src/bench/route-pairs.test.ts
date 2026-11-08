@@ -1,4 +1,5 @@
 import { mulberry32, seedOf } from "@mark1russell7/rigor-generators";
+import { wilson } from "@mark1russell7/rigor-statistics";
 import { describe, expect, it } from "vitest";
 import { countCrossings, paintedOutsidePairs, routePairCrossings } from "./quality.ts";
 
@@ -166,8 +167,11 @@ describe("routePairCrossings", () => {
     }
   });
 
-  /** This function draws a walk on a coarse grid, so that walks share vertices and stretches. Both ends go out to their own points on a large circle. */
-  function walks(name: string, routes: number): { readonly points: Xy[]; readonly ends: readonly [number, number] }[] {
+  /**
+   * This function draws a walk on a coarse grid, so that walks share vertices and stretches. Both ends go out to their own points on a large circle.
+   * Each walk has `extra` more steps. Long walks give a small sample under a point limit.
+   */
+  function walks(name: string, routes: number, extra = 0): { readonly points: Xy[]; readonly ends: readonly [number, number] }[] {
     const random = mulberry32(seedOf(name));
     const steps = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1]] as const;
     const angles = Array.from({ length: 2 * routes }, (_, i) => (i + 0.37) / (2 * routes));
@@ -187,7 +191,7 @@ describe("routePairCrossings", () => {
       let [x, y] = [Math.floor(random() * 3), Math.floor(random() * 3)];
       const inner: Xy[] = [[x * 10, y * 10]];
       let last = -1;
-      for (let i = 0; i < 2 + Math.floor(random() * 7); i++) {
+      for (let i = 0; i < 2 + extra + Math.floor(random() * 7); i++) {
         let pick = Math.floor(random() * steps.length);
         // A walk does not go straight back, because a spike has no side.
         const back = (a: number, b: number): boolean => steps[a]![0] === -steps[b]![0] && steps[a]![1] === -steps[b]![1];
@@ -242,11 +246,48 @@ describe("routePairCrossings", () => {
     const points = routes.reduce((sum, r) => sum + r.points.length, 0);
     const full = routePairCrossings(routes).pairs;
     const runs = Array.from({ length: 200 }, (_, seed) => routePairCrossings(routes, { maxPoints: points / 2, seed }));
-    const inside = runs.filter((r) => r.low <= full && full <= r.high).length / runs.length;
+    const inside = runs.filter((r) => r.low <= full && full <= r.high).length;
     expect(runs.every((r) => r.low <= r.pairs && r.pairs <= r.high && r.low < r.high)).toBe(true);
-    // A seeded count of 200 trials has a standard error of 0.015 at 0.95. The bounds are 4 errors below and 2.5 above.
-    expect(inside).toBeGreaterThanOrEqual(0.89);
-    expect(inside).toBeLessThanOrEqual(0.99);
+    // The sample has 60 of the 120 routes. The Wilson interval of the measured coverage holds 0.95.
+    expect(inside).toBe(189);
+    const cover = wilson(inside, runs.length);
+    expect(cover.low).toBeLessThanOrEqual(0.95);
+    expect(cover.high).toBeGreaterThanOrEqual(0.95);
+  });
+
+  // A small sample gives a narrow interval, as the TSDoc of `routePairCrossings` tells. These cells pin the measured coverage.
+  it.each([
+    { cell: "40x8", routes: 40, extra: 20, part: 5, m: 8, inside: 177 },
+    { cell: "40x10", routes: 40, extra: 14, part: 4, m: 10, inside: 174 },
+    { cell: "60x12", routes: 60, extra: 16, part: 5, m: 12, inside: 181 },
+  ])("gives a known narrow interval at a small sample, cell $cell", ({ cell, routes: n, extra, part, m, inside }) => {
+    const routes = walks(`route-pairs/limit/small/${cell}`, n, extra).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const maxPoints = points / part;
+    // The count takes this number of routes in its sample.
+    expect(Math.floor((n * maxPoints) / points)).toBe(m);
+    const full = routePairCrossings(routes).pairs;
+    const runs = Array.from({ length: 200 }, (_, seed) => routePairCrossings(routes, { maxPoints, seed }));
+    const held = runs.filter((r) => r.low <= full && full <= r.high).length;
+    expect(held).toBe(inside);
+    // The Wilson interval of the coverage is below 0.95. So the interval of a sample under 20 routes is too narrow.
+    expect(wilson(held, runs.length).high).toBeLessThan(0.95);
+  });
+
+  it.each([
+    { board: 0, routes: 30, error: 0.0667 },
+    { board: 1, routes: 50, error: 0.0358 },
+    { board: 2, routes: 80, error: 0.0401 },
+    { board: 3, routes: 100, error: 0.0252 },
+  ])("holds the full count in the interval of a sample of half the points, board $board", ({ board, routes: n, error }) => {
+    const routes = walks(`route-pairs/limit/error/${board}`, n).map((w) => route(...w.points));
+    const points = routes.reduce((sum, r) => sum + r.points.length, 0);
+    const full = routePairCrossings(routes).pairs;
+    const sample = routePairCrossings(routes, { maxPoints: points / 2 });
+    expect(sample.estimated).toBe(true);
+    expect(sample.low <= full && full <= sample.high).toBe(true);
+    // The relative error of the sample against the full count, to 4 places.
+    expect(Number((Math.abs(sample.pairs - full) / full).toFixed(4))).toBe(error);
   });
 
   it("reads a seeded sample of the routes above the point limit, and the mean of the scaled counts is the full count", () => {
