@@ -13,7 +13,7 @@ import { explorerPage } from "./src/explorer-files.ts";
 import { kpiFacts } from "./src/kpi-files.ts";
 import { siteKpiInput } from "./src/kpi.ts";
 import { buildInfo, dataLineHtml, readResults, RESULT_FILES, snapshotFiles, textSections } from "./src/results-files.ts";
-import { verdictStamps, type VerdictHeader } from "./src/stamps.ts";
+import { siteDataStamps, type VerdictHeader } from "./src/stamps.ts";
 import { BUILT_FILE, readStrategies } from "./src/strategies-files.ts";
 
 // The Pages workflow sets SITE_BASE to "/highways". A local build uses the root.
@@ -22,9 +22,14 @@ const base = env["SITE_BASE"] ? `${env["SITE_BASE"].replace(/\/$/, "")}/` : "/";
 const page = (name: string): string => fileURLToPath(new URL(name, import.meta.url));
 const root = fileURLToPath(new URL("../../", import.meta.url));
 
+/** This function reads `bench-meta.json` of the benchmark snapshot. The Pages build first puts the newest record of the branch `bench-data` there. */
+function benchMeta(): BenchMeta {
+  return JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+}
+
 /** This function gives the input of `kpi.json`. A snapshot with no date stops the build, because the file then has no time of the data. */
 function kpiInput(): NonNullable<ReturnType<typeof siteKpiInput>> {
-  const meta = JSON.parse(readFileSync(join(root, RESULT_FILES.bench, "bench-meta.json"), "utf8")) as BenchMeta;
+  const meta = benchMeta();
   const core = (JSON.parse(readFileSync(join(root, RESULT_FILES.core), "utf8")) as { version: string }).version;
   const input = siteKpiInput(meta, core, (file) => existsSync(page(file)), kpiFacts(root));
   if (input === undefined) throw new Error("bench-meta.json has no date, so kpi.json has no time of the data.");
@@ -121,8 +126,8 @@ function committedResults(): Plugin {
 // The site has seven pages: the live demo, the examples, the compare page, the results, the strategy cards, the atlas and the explorer.
 export default defineConfig({
   base,
-  // The freshness gate of the Pages workflow reads the stamps of the verdicts (VERDICT-STAMPS).
-  plugins: [committedResults(), siteKpi(kpiInput, env), siteStamps(() => verdictStamps(snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader), "mark1russell7/highways"))],
+  // The freshness gate of the Pages workflow reads the stamps of the verdicts (VERDICT-STAMPS) and of the benchmark snapshot (HOME-STAMPS).
+  plugins: [committedResults(), siteKpi(kpiInput, env), siteStamps(() => siteDataStamps(snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader), benchMeta(), "mark1russell7/highways"))],
   worker: { format: "es" },
   build: {
     target: "es2022",
