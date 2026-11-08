@@ -10,6 +10,10 @@ This version is a MINOR before 1.0: the routes of two routers change in their la
 - The routers `plugs` and `corners` with `smooth` give the same points on each system. The points of their curves move by at most 6e-12. No route changes its count of points.
 - The record of the gate `through-check/7` changes in 6 rows of `plugs`. In 5 rows, a depth moves by less than 2e-13. In `packed-grid`, the route `0:e115` had a depth of 0, and it has a depth of 6e-14. Thus its class changes from `wall` to `band`.
 
+### Dependencies
+
+- The range of `@mark1russell7/rigor-statistics` is `^0.1.18`. It was `^0.1.5`. The interval of `routePairCrossings` does not change.
+
 ## 0.15.2
 
 This version is a PATCH before 1.0: two new exports. No route output changes.
