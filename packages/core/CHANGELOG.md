@@ -14,7 +14,8 @@ This version is a MINOR before 1.0, because default routes change. The public AP
 
 - The search of the corner graph has a tie rule (ROUTE-TIE). Two path costs within 1e-9 tie. The route then does not depend on the search floor.
 - Among the paths that tie, the walk takes the straightest corner. A near-tie of the straightness goes to the lowest index.
-- On 84 boards, 6,307 routes for each router, the routes that move against 0.15.0 are 100 on `corners` (1.59%) and 524 on `shared-all` (8.31%).
+- On 84 boards, 6,307 routes for each router, the routes that move against 0.16.0 are 100 on `corners` (1.59%) and 524 on `shared-all` (8.31%).
+- The search of the corner graph is the same in 0.15.0 and 0.16.0.
 - The same inputs at the floors 1, 0.5 and 0.25 give the same bytes on each of the 6 routers. Before the rule, 16 to 117 routes moved.
 - `shared` with no key gives the routes of `corners`.
 

@@ -340,6 +340,9 @@
      "R1.estimated": 0,
      "R1.pairs": 32433,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 32433,
+     "R1.pairsHigh": 32433,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.01127704065064,
      "R2.min": 1271.6503237460388,
      "B1.inkSaved": 12.98652198582809,
@@ -383,6 +386,9 @@
      "R1.estimated": 0,
      "R1.pairs": 34430,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 34430,
+     "R1.pairsHigh": 34430,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.12588249238791,
      "R2.min": 1274.333868391651,
      "B1.inkSaved": 14.225408207717862,
@@ -426,6 +432,9 @@
      "R1.estimated": 0,
      "R1.pairs": 35860,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 35860,
+     "R1.pairsHigh": 35860,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 51.36698305969311,
      "R2.min": 2020.1882207598535,
      "B1.inkSaved": 31.93964937104802,
@@ -469,6 +478,9 @@
      "R1.estimated": 0,
      "R1.pairs": 44326,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 44326,
+     "R1.pairsHigh": 44326,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 45.618843143637754,
      "R2.min": 1320.9349716654772,
      "B1.inkSaved": 27.74316764660097,
@@ -520,6 +532,9 @@
      "R1.estimated": 0,
      "R1.pairs": 33162,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 33162,
+     "R1.pairsHigh": 33162,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 43.902112767238066,
      "R2.min": 1262.7313366706264,
      "B1.inkSaved": 13.305789024461024,
@@ -563,6 +578,9 @@
      "R1.estimated": 0,
      "R1.pairs": 70192,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 70192,
+     "R1.pairsHigh": 70192,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 56.249730299854605,
      "R2.min": 827.2502442608841,
      "B1.inkSaved": 27.50115971335183,
@@ -616,6 +634,9 @@
      "R1.estimated": 0,
      "R1.pairs": 32388,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 32388,
+     "R1.pairsHigh": 32388,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.07340749072494,
      "R2.min": 1272.1464524673977,
      "B1.inkSaved": 12.998614977990565,
@@ -659,6 +680,9 @@
      "R1.estimated": 0,
      "R1.pairs": 34362,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 34362,
+     "R1.pairsHigh": 34362,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.18210711830768,
      "R2.min": 1274.223939167931,
      "B1.inkSaved": 14.215840235399742,
@@ -702,6 +726,9 @@
      "R1.estimated": 0,
      "R1.pairs": 35878,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 35878,
+     "R1.pairsHigh": 35878,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 50.80292186743587,
      "R2.min": 2024.9567638541564,
      "B1.inkSaved": 32.114707865309164,
@@ -745,6 +772,9 @@
      "R1.estimated": 0,
      "R1.pairs": 44354,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 44354,
+     "R1.pairsHigh": 44354,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 45.77962766341162,
      "R2.min": 1328.8295188256343,
      "B1.inkSaved": 27.66260654800283,
@@ -796,6 +826,9 @@
      "R1.estimated": 0,
      "R1.pairs": 33117,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 33117,
+     "R1.pairsHigh": 33117,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 43.96424321731236,
      "R2.min": 1263.2274653919853,
      "B1.inkSaved": 13.317882016623502,
@@ -839,6 +872,9 @@
      "R1.estimated": 0,
      "R1.pairs": 70060,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 70060,
+     "R1.pairsHigh": 70060,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 56.25094831400279,
      "R2.min": 829.666028157524,
      "B1.inkSaved": 27.6092547698973,
@@ -892,6 +928,9 @@
      "R1.estimated": 0,
      "R1.pairs": 32383,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 32383,
+     "R1.pairsHigh": 32383,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.071222260903305,
      "R2.min": 1280.8024810677434,
      "B1.inkSaved": 12.983049276219042,
@@ -935,6 +974,9 @@
      "R1.estimated": 0,
      "R1.pairs": 34363,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 34363,
+     "R1.pairsHigh": 34363,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 44.178234718974025,
      "R2.min": 1282.8799677682766,
      "B1.inkSaved": 14.202646397826376,
@@ -978,6 +1020,9 @@
      "R1.estimated": 0,
      "R1.pairs": 35878,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 35878,
+     "R1.pairsHigh": 35878,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 50.65705203344274,
      "R2.min": 2043.3990311572134,
      "B1.inkSaved": 32.137302229586055,
@@ -1021,6 +1066,9 @@
      "R1.estimated": 0,
      "R1.pairs": 44287,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 44287,
+     "R1.pairsHigh": 44287,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 45.80026468149347,
      "R2.min": 1310.8626719012984,
      "B1.inkSaved": 27.53950833088315,
@@ -1072,6 +1120,9 @@
      "R1.estimated": 0,
      "R1.pairs": 33112,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 33112,
+     "R1.pairsHigh": 33112,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 43.96205798749073,
      "R2.min": 1271.8834939923313,
      "B1.inkSaved": 13.302316314851977,
@@ -1115,6 +1166,9 @@
      "R1.estimated": 0,
      "R1.pairs": 70062,
      "R1.pairsEstimated": 0,
+     "R1.pairsLow": 70062,
+     "R1.pairsHigh": 70062,
+     "R1.pairsContactSampled": 0,
      "R2.angle": 56.273675095027784,
      "R2.min": 832.8184889019274,
      "B1.inkSaved": 27.598888192153108,
@@ -1241,6 +1295,17 @@
   },
   {
    "router": "corners",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "corners",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -1249,6 +1314,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16,
+   "boardsMoved": 5
+  },
+  {
+   "router": "corners",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 16,
+   "boardsMoved": 5
   },
   {
    "router": "corners",
@@ -1494,6 +1581,17 @@
   },
   {
    "router": "shared",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -1502,6 +1600,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 46,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 46,
+   "boardsMoved": 5
   },
   {
    "router": "shared",
@@ -1747,6 +1867,17 @@
   },
   {
    "router": "shared-all",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -1755,6 +1886,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 95,
+   "boardsMoved": 5
+  },
+  {
+   "router": "shared-all",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 95,
+   "boardsMoved": 5
   },
   {
    "router": "shared-all",
@@ -2044,6 +2197,17 @@
   },
   {
    "router": "sections",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -2052,6 +2216,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 94,
+   "boardsMoved": 25
+  },
+  {
+   "router": "sections",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 94,
+   "boardsMoved": 25
   },
   {
    "router": "sections",
@@ -2341,6 +2527,17 @@
   },
   {
    "router": "trunks",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -2349,6 +2546,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 5
+  },
+  {
+   "router": "trunks",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 20,
+   "boardsMoved": 5
   },
   {
    "router": "trunks",
@@ -2638,6 +2857,17 @@
   },
   {
    "router": "sections-site",
+   "measure": "R1.pairsContactSampled",
+   "floor": 0,
+   "interval": [
+    0,
+    0
+   ],
+   "largest": 0,
+   "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
    "measure": "R1.pairsEstimated",
    "floor": 0,
    "interval": [
@@ -2646,6 +2876,28 @@
    ],
    "largest": 0,
    "boardsMoved": 0
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairsHigh",
+   "floor": 0,
+   "interval": [
+    0,
+    1
+   ],
+   "largest": 371,
+   "boardsMoved": 36
+  },
+  {
+   "router": "sections-site",
+   "measure": "R1.pairsLow",
+   "floor": 0,
+   "interval": [
+    0,
+    1
+   ],
+   "largest": 371,
+   "boardsMoved": 36
   },
   {
    "router": "sections-site",
