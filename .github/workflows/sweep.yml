@@ -68,7 +68,9 @@ jobs:
           # The log streams each progress line, so a run that ends at its limit still shows the time of each setting.
           node scripts/sweep.ts "${args[@]}" 2>&1 | tee "$RUNNER_TEMP/sweep.log"
           { echo "## Sweep of $STEP"; echo; echo "The script took $SECONDS s on $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)."; echo; echo '```'; tail -n 20 "$RUNNER_TEMP/sweep.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      # A fit that fails leaves a file with the points, so the job keeps it.
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
         with:
           name: sweep
           path: out/sweep.json
