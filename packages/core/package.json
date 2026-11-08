@@ -15,6 +15,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./strategy-ideas": "./scripts/strategy-ideas.ts",
     "./package.json": "./package.json"
   },
   "files": [
