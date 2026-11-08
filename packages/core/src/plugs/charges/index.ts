@@ -122,7 +122,7 @@ export function chargeEnds(input: PlugInput, options: ChargeOptions = {}): PlugP
     const start = along === "y" ? b.y : b.x;
     const len = along === "y" ? b.h : b.w;
     const m = Math.min(inset, len / 4);
-    const spans = items.map(([, , , port]) => rangeInterval(b, side, port, inset) ?? [start + m, start + len - m]);
+    const spans = items.map(([, , , port]): [number, number] => rangeInterval(b, side, port, inset) ?? [start + m, start + len - m]);
     const ideal = items.map(([i, k]) => ends[i]![k].point[along]);
     const placed = chargePlugs(
       ideal,
