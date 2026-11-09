@@ -15,6 +15,7 @@ import { controlOptions } from "./options.ts";
 import type { RouteDone, RouteReply, RouteRequest } from "./protocol.ts";
 import "./style.css";
 import { MapView, type BundleView } from "./view.ts";
+import { escapeAttribute as esc } from "@mark1russell7/text";
 
 const $ = <T extends HTMLElement>(id: string): T => {
   const el = document.getElementById(id);
@@ -36,10 +37,6 @@ const GENERATED = "generated";
 /** The generated board of the hash, when the hash has the key `family`. */
 const hashGen = (): GenSpec | undefined => (location.hash.includes("family=") ? readGen(new URLSearchParams(location.hash.slice(1))) : undefined);
 const fmt = new Intl.NumberFormat("en-US");
-
-/** This function escapes text for HTML. */
-const esc = (text: string): string =>
-  text.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[ch]!);
 
 interface State {
   fixture: string;
