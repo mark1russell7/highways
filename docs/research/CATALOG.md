@@ -1923,6 +1923,24 @@ For the other strategies, each row is the same as before. The snapshots of the s
 - The table of `choice` is empty, so the screen has no value for the learned choice of WILD-046.
 - B5 is 0 at the median for `shared`, `two-way` and `global-order`, and for `facing` and `escape`. Half of the inputs or more have no lane crossing.
 
+## The snapshots of the step `plugs` on core 0.16.1
+
+Version 0.16.1 added the plug rule `charges`. The snapshots of the step `plugs` had no rows for it. Run 42582811615 is the read on release of 0.16.1. It gave 5 new rows on each set, so the job `stamps` did not stamp these snapshots. A snapshot with new rows needs a new snapshot.
+
+The 3 snapshots of the step `plugs` hold the 35 rows of that run. Each old row keeps its label and its count of families against it.
+
+| Set | `R1` | `R4` | `R5` q0.95 | `R11` | `B1` |
+|---|---|---|---|---|---|
+| `screen-v1` | `worse` | `no verdict` | `better` | `better` | `worse` |
+| `screen-v2` | `worse` | `worse` | `no verdict` | `better` | `worse` |
+| `screen-v3` | `worse` | `worse` | `better` | `better` | `worse` |
+
+- Over all the `better` verdicts of `screen-v1`, 33 of 114 have 1 or more families against them. Over all the `better` and `worse` verdicts, 61 of 226 have.
+- Over all the `better` verdicts of `screen-v2`, 48 of 142 have 1 or more families against them. Over all the `better` and `worse` verdicts, 116 of 299 have.
+- Over all the `better` verdicts of `screen-v3`, 89 of 143 have 1 or more families against them. Over all the `better` and `worse` verdicts, 166 of 295 have.
+- The line of `screen-v1` in [wave 4D](#wave-4d-build-w4d) gives 34 of 112 and 61 of 222. The snapshots of that wave give 33 of 112 and 60 of 222.
+- The open targets of the newest set go from 87 to 89.
+
 ## Gaps
 
 - The screen does not have `G5` and the 12 ids of waves 4 to 7 yet.
