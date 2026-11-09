@@ -72,7 +72,7 @@ describe("the built-in registry", () => {
   });
 
   it("holds each curve type, with the segments of curveOf", () => {
-    expect(listStrategies(STRATEGIES, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway"]);
+    expect(listStrategies(STRATEGIES, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "elastic"]);
     const space = curveSpace(tiny.nodes.map((n) => n.box));
     const byId = nodeIndex(tiny);
     const result = ROUTERS.find((r) => r.name === "corners")!.route(tiny);
@@ -185,16 +185,16 @@ describe("a consumer strategy", () => {
       run: (input) => [{ kind: "move", to: input.points[0]! }, ...input.points.slice(1).map((to) => ({ kind: "line" as const, to }))],
     });
     const more = register(STRATEGIES, zigzag);
-    expect(listStrategies(more, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag"]);
-    expect(listStrategies(STRATEGIES, "curve")).toHaveLength(CURVE_TYPES.length + 1);
-    expect(benchCurveStrategies(ROUTERS[0]!, "tiny-uniform", tiny, listStrategies(more, "curve")).map((r) => r.type)).toEqual([...CURVE_TYPES, "highway", "zigzag"]);
+    expect(listStrategies(more, "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "elastic", "zigzag"]);
+    expect(listStrategies(STRATEGIES, "curve")).toHaveLength(CURVE_TYPES.length + 2);
+    expect(benchCurveStrategies(ROUTERS[0]!, "tiny-uniform", tiny, listStrategies(more, "curve")).map((r) => r.type)).toEqual([...CURVE_TYPES, "highway", "elastic", "zigzag"]);
   });
 
   it("works with a registry of version 0.1.5, which has no list group", () => {
     const old = { router: STRATEGIES.router, curve: STRATEGIES.curve, room: STRATEGIES.room };
     expect(listStrategies(old, "group")).toEqual([]);
     expect(listStrategies(old, "highway")).toEqual([]);
-    expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "zigzag-like"]);
+    expect(listStrategies(register(old, zigzagLike), "curve").map((s) => s.name)).toEqual([...CURVE_TYPES, "highway", "elastic", "zigzag-like"]);
     for (const step of ["plugs", "levels", "whole"] as const) expect(listStrategies(old, step)).toEqual([]);
     expect(STEPS).toEqual(["group", "plugs", "router", "highway", "levels", "curve", "room", "whole"]);
   });

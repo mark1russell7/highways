@@ -90,6 +90,7 @@ CAP_SWEEP: build/index.d.ts#CAP_SWEEP
 CASES: build/index.d.ts#CASES
 CHANNEL: build/index.d.ts#CHANNEL
 CHANNEL_REACH: build/index.d.ts#CHANNEL_REACH
+CHARGE_DEFAULTS: build/index.d.ts#CHARGE_DEFAULTS
 CHOICE_DEFAULTS: build/index.d.ts#CHOICE_DEFAULTS
 CHOICE_FEATURES: build/index.d.ts#CHOICE_FEATURES
 CHOICE_FEATURE_SETS: build/index.d.ts#CHOICE_FEATURE_SETS
@@ -120,6 +121,7 @@ CaseBoard: build/index.d.ts#CaseBoard
 CaseSeedOptions: build/index.d.ts#CaseSeedOptions
 CellGroups: build/index.d.ts#CellGroups
 type CellStep: build/index.d.ts#CellStep
+ChargeOptions: build/index.d.ts#ChargeOptions
 ChoiceFeatureSet: build/index.d.ts#ChoiceFeatureSet
 ChoiceOptions: build/index.d.ts#ChoiceOptions
 ChoiceRow: build/index.d.ts#ChoiceRow
@@ -159,6 +161,7 @@ CurveFaults: build/index.d.ts#CurveFaults
 CurveInput: build/index.d.ts#CurveInput
 CurveJoint: build/index.d.ts#CurveJoint
 CurveOptions: build/index.d.ts#CurveOptions
+CurveRules: build/index.d.ts#CurveRules
 CurveRun: build/index.d.ts#CurveRun
 CurveRunOptions: build/index.d.ts#CurveRunOptions
 CurveSegment: build/index.d.ts#CurveSegment
@@ -186,6 +189,7 @@ type DividedOptions: build/index.d.ts#DividedOptions
 DrawnSegment: build/index.d.ts#DrawnSegment
 EDGE_DISTANCES: build/index.d.ts#EDGE_DISTANCES
 EDGE_PATH_DEFAULTS: build/index.d.ts#EDGE_PATH_DEFAULTS
+ELASTIC_DEFAULTS: build/index.d.ts#ELASTIC_DEFAULTS
 EPS_STEPS: build/index.d.ts#EPS_STEPS
 ESCAPE: build/index.d.ts#ESCAPE
 ESCAPE_DEFAULTS: build/index.d.ts#ESCAPE_DEFAULTS
@@ -204,6 +208,8 @@ type EdgeGroup: build/index.d.ts#EdgeGroup
 type EdgeLengths: build/index.d.ts#EdgeLengths
 type EdgePathOptions: build/index.d.ts#EdgePathOptions
 type EdgePlugs: build/index.d.ts#EdgePlugs
+type ElasticOptions: build/index.d.ts#ElasticOptions
+type ElasticStrategyOptions: build/index.d.ts#ElasticStrategyOptions
 End: build/index.d.ts#End
 EnumOption: build/index.d.ts#EnumOption
 EscapeMethod: build/index.d.ts#EscapeMethod
@@ -919,6 +925,8 @@ changedDimensions: build/index.d.ts#changedDimensions
 channelOverflows: build/index.d.ts#channelOverflows
 channelWidth: build/index.d.ts#channelWidth
 characteristicPoints: build/index.d.ts#characteristicPoints
+chargeEnds: build/index.d.ts#chargeEnds
+chargePlugs: build/index.d.ts#chargePlugs
 checkFamilies: build/index.d.ts#checkFamilies
 checkLevels: build/index.d.ts#checkLevels
 checkOptions: build/index.d.ts#checkOptions
@@ -1006,6 +1014,7 @@ edgePaths: build/index.d.ts#edgePaths
 edgePlugs: build/index.d.ts#edgePlugs
 edgeResistance: build/index.d.ts#edgeResistance
 edgesWithNoWay: build/index.d.ts#edgesWithNoWay
+elasticCurve: build/index.d.ts#elasticCurve
 enumDimension: build/index.d.ts#enumDimension
 escapeEnds: build/index.d.ts#escapeEnds
 exactBoard: build/index.d.ts#exactBoard
@@ -1340,6 +1349,7 @@ recordMoves: build/index.d.ts#recordMoves
 rectScattered: build/index.d.ts#rectScattered
 regionBounds: build/index.d.ts#regionBounds
 register: build/index.d.ts#register
+relaxBand: build/index.d.ts#relaxBand
 relaxRoutes: build/index.d.ts#relaxRoutes
 repairResult: build/index.d.ts#repairResult
 repairStrategy: build/index.d.ts#repairStrategy
@@ -1963,6 +1973,9 @@ export declare const CHANNEL: HighwaysFamily;
 ### build/index.d.ts#CHANNEL_REACH
 export declare const CHANNEL_REACH = 64;
 
+### build/index.d.ts#CHARGE_DEFAULTS
+export declare const CHARGE_DEFAULTS: Required<ChargeOptions>;
+
 ### build/index.d.ts#CHOICE_DEFAULTS
 export declare const CHOICE_DEFAULTS: Readonly<ChoiceOptions>;
 
@@ -2079,6 +2092,13 @@ interface CellStep {
   readonly from: number;
   readonly to: number;
   readonly at: number;
+}
+
+### build/index.d.ts#ChargeOptions
+export interface ChargeOptions {
+  readonly spacing?: number;
+  readonly rounds?: number;
+  readonly inset?: number;
 }
 
 ### build/index.d.ts#ChoiceFeatureSet
@@ -2385,6 +2405,12 @@ export interface CurveOptions {
   readonly space?: CurveSpace;
 }
 
+### build/index.d.ts#CurveRules
+export interface CurveRules {
+  readonly g1?: boolean;
+  readonly normals?: boolean;
+}
+
 ### build/index.d.ts#CurveRun
 export interface CurveRun {
   readonly row: SuiteRow;
@@ -2520,6 +2546,9 @@ export declare const EDGE_DISTANCES: readonly EdgeDistance[];
 ### build/index.d.ts#EDGE_PATH_DEFAULTS
 export declare const EDGE_PATH_DEFAULTS: Readonly<Required<Omit<EdgePathOptions, "margin" | "k">>>;
 
+### build/index.d.ts#ELASTIC_DEFAULTS
+export declare const ELASTIC_DEFAULTS: Readonly<Required<ElasticStrategyOptions>>;
+
 ### build/index.d.ts#EPS_STEPS
 export declare const EPS_STEPS: number;
 
@@ -2596,6 +2625,20 @@ interface EdgePlugs {
   readonly ps: Plug;
   readonly pt: Plug;
 }
+
+### build/index.d.ts#ElasticOptions
+interface ElasticOptions {
+  readonly step?: number;
+  readonly rounds?: number;
+  readonly clearance?: number;
+  readonly lead?: number;
+  readonly startNormal?: Point;
+  readonly endNormal?: Point;
+  readonly space?: CurveSpace;
+}
+
+### build/index.d.ts#ElasticStrategyOptions
+type ElasticStrategyOptions = Pick<ElasticOptions, "step" | "rounds" | "clearance" | "lead">;
 
 ### build/index.d.ts#End
 export interface End {
@@ -5668,6 +5711,7 @@ export interface Strategy<S extends Step = Step, O extends object = object> {
   readonly defaults: Readonly<O>;
   readonly schema?: OptionSchema<O>;
   readonly maxNodes?: number;
+  readonly curveRules?: CurveRules;
   run(input: StepInput<S>, options?: Partial<O>): StepOutput<S>;
 }
 
@@ -5679,6 +5723,7 @@ export interface StrategyDefinition<S extends Step, O extends object> {
   readonly defaults: O;
   readonly schema?: NoInfer<OptionSchema<O>>;
   readonly maxNodes?: number;
+  readonly curveRules?: CurveRules;
   run(input: StepInput<S>, options: Readonly<O>): StepOutput<S>;
 }
 
@@ -6494,6 +6539,12 @@ export declare function channelWidth(obstacles: Obstacles, a: Point, b: Point, r
 ### build/index.d.ts#characteristicPoints
 export declare function characteristicPoints(route: readonly Point[], unit: number, ratio: number): Point[];
 
+### build/index.d.ts#chargeEnds
+export declare function chargeEnds(input: PlugInput, options?: ChargeOptions): PlugPair[];
+
+### build/index.d.ts#chargePlugs
+export declare function chargePlugs(ideal: readonly number[], lo: readonly number[], hi: readonly number[], options?: ChargeOptions, tie?: (i: number) => number): number[];
+
 ### build/index.d.ts#checkFamilies
 export declare function checkFamilies(manifest: LayoutCorpus, inputs: readonly LayoutInput[]): ClaimBreak[];
 
@@ -6653,6 +6704,7 @@ export declare const curveStrategies: {
   readonly smooth: Strategy<"curve", SmoothStrategyOptions>;
   readonly clothoid: Strategy<"curve", ClothoidStrategyOptions>;
   readonly highway: Strategy<"curve", HighwayStrategyOptions>;
+  readonly elastic: Strategy<"curve", ElasticStrategyOptions>;
 };
 
 ### build/index.d.ts#curvesHash
@@ -6752,6 +6804,9 @@ export declare function edgeResistance(graph: Graph, projections: number): Map<s
 
 ### build/index.d.ts#edgesWithNoWay
 export declare function edgesWithNoWay(input: Graph): ReadonlySet<string>;
+
+### build/index.d.ts#elasticCurve
+export declare function elasticCurve(points: readonly Point[], options?: ElasticOptions): CurveSegment[];
 
 ### build/index.d.ts#enumDimension
 export declare function enumDimension(name: string, values: readonly string[], value: string, meaning: string): CorpusDimension$1;
@@ -7762,6 +7817,7 @@ export declare const plugStrategies: {
   readonly leaders: Strategy<"plugs", LeaderOptions>;
   readonly assign: Strategy<"plugs", AssignOptions>;
   readonly escape: Strategy<"plugs", EscapeOptions>;
+  readonly charges: Strategy<"plugs", ChargeOptions>;
 };
 
 ### build/index.d.ts#plugsRouter
@@ -7877,6 +7933,9 @@ export declare function regionBounds(region: Region): {
 
 ### build/index.d.ts#register
 export declare function register(registry: Registry, ...strategies: readonly AnyStrategy[]): Registry;
+
+### build/index.d.ts#relaxBand
+export declare function relaxBand(band: readonly Point[], boxes: readonly Box[], rounds: number, clearance: number): Point[];
 
 ### build/index.d.ts#relaxRoutes
 export declare function relaxRoutes(graph: Graph, start: readonly Route[], o: Readonly<RelaxOptions>, side?: RelaxSide): Route[];

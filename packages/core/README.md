@@ -62,6 +62,7 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
 | `leaders` | The boundary leaders of EDA-041. The plugs of each wall take the order of `po`, `s` or `opo` leaders, with the gap `slotSpacing`. |
 | `assign` | The plugs of each wall go to the ranges of their ports with the gap `plugGap` (PLUG-ASSIGN). The most plugs land in their ranges. The option `rangeShrink` lets a wall take a smaller gap for more plugs in their ranges. |
 | `escape` | The ordered escape of EDA-022. The plugs of each wall take the order of the first legs of their ways, with the gap `slotSpacing`. |
+| `charges` | Charges on a side (RULE-054). The free plugs of each side push apart as equal charges. A spring pulls each plug to the place of `facing`. |
 
 - `side` gives the plugs of `corners` with `plugs: "side"`. `justify` gives the plugs of `corners` with the same `plugGap`.
 - `spread` keeps the room of a wall free of the corner insets (`inset`) and of the fixed plugs on the wall.
@@ -75,6 +76,10 @@ A plug rule is a strategy of the step `plugs`. It places the free plugs of each 
   - With `sort`, the default, the plugs of a wall keep that order with the least moves. With `flow`, they go on even slots `slotSpacing` apart.
   - The option `cornerReserve` keeps a share of each side free at the corners. The option `rounds` routes the ways again from the new plugs.
   - A fixed plug does not move, and a plug of a port with a range stays in its range.
+- `charges` (RULE-054) starts from the plugs of `facing`. Two plugs with one ideal place come to rest `spacing` apart.
+  - Each of the `rounds` steps is a Jacobi step of the energy. The plugs keep their order on the side.
+  - The result has no hard gap: a crowded side gives plugs closer than `spacing`.
+  - A fixed plug does not move, and a plug of a port with a range stays in its range. `chargePlugs` gives the places on one side.
 - The option `plug` of `corners` takes a plug rule. The other routers place the plugs as `facing` does.
 
 A port can have a `range`: an interval of its side, from 0 to 1 as `along` (PORT-RANGE). A free plug of the port goes in this interval.
@@ -211,6 +216,10 @@ A router gives polylines. The curve layer turns a polyline into a curve of a typ
 | `clothoid` | A clothoid, an arc and a second clothoid at each corner, as a transition curve of a road. The `spiral` goes from 0 (the curve `arc`) to 1 (no arc). Cubic pieces draw each clothoid within the `tolerance`. | The first and the last legs stay. |
 
 The curves `smooth` and `clothoid` have no jump of the curvature. The curvature grows from 0 on a leg to `1 / radius` on the arc. A cubic spiral turns by 1 radian or less, so a sharp corner keeps a part of its arc. The free space tests the triangle of each corner of these curves: the start of the corner, the vertex and the end of the corner. The curve stays in this triangle, so the test needs no samples.
+
+The curve strategy `elastic` (NAT-026) is an elastic band on the polyline. It is a strategy of the step `curve`, not a type of `curveOf`. Springs between samples `step` apart pull the route taut. Each box nearer than `clearance` pushes the band away. A centripetal spline goes through the band after `rounds` steps. The band starts and ends at a `lead` along the first and the last legs.
+
+When the spline goes through a box that the polyline avoids, the band moves back toward the polyline. `elasticCurve` and `relaxBand` give the same curve without the registry.
 
 The output is a list of segments: `move`, `line`, `cubic` and `arc`. A renderer maps them to SVG path data, to canvas calls or to the vertices of a mesh.
 
@@ -540,11 +549,11 @@ The steps of the pipeline that vary have strategies. Each step has one interface
 | Step | Input | Output | Built-in strategies |
 |---|---|---|---|
 | `group` | `Graph` | `Section`: the tree of groups of the router `sections` | `quadtree`, `keys`, `kd`, `cut` |
-| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign`, `escape` |
+| `plugs` | `PlugInput`: the graph, and optionally the ways of the router | `PlugPair[]`: the two plugs of each edge | `facing`, `side`, `justify`, `spread`, `leaders`, `assign`, `escape`, `charges` |
 | `router` | `Graph` | `Result` | `straight`, `plugs`, `corners`, `corners-smooth`, `trunks`, `shared`, `shared-all`, `sections`, `sections-tree` |
 | `highway` | `HighwayInput`: the graph, optionally the first routes of a router, and optionally the plan before an edit | `HighwayPlan`: the highways as data | `keys`, `shared-ways`, `corridors`, `meet`, `weiszfeld`, `stubs`, `zipper`, `level-links`, `quickbundles`, `road-classes`, `flow-field`, `wspd`, `od-cells`, `select`, `mingle`, `spiral`, `flow-clusters`, `traclus`, `diffusion`, `nested`, `lanes`, `growth`, `edge-paths`, `soft-keys`, `hough`, `ridges`, `hdbscan`, `hub-arcs`, `divided`, `hierarchy`, `fdeb`, `mesh`, `kdeeb`, `cubu`, `mlseb`, `sbeb`, `areas`, `confluent`, `power`, `crossbars`, `frechet`, `spectral`, `resistance`, `link-communities`, `territories`, `consensus`, `p-hub`, `scale-space`, `gaps`, `streets`, `search`, `interchanges`, `knee`, `bronchial`, `balance`, `manifolds`, `slots`, `two-way`, `global-order`, `approval`, `corridors+breakeven`, `corridors+stretch`, `corridors+ambiguity`, `corridors+hysteresis`, `corridors+ids` |
 | `levels` | `LevelInput`: the graph, the tree of groups and the routes | `Level[]`: the zoom levels of the router `sections` | `depths`, `venation`, `detail` |
-| `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway` |
+| `curve` | `CurveInput`: the points, the normals of the plugs, the free space and the lane on its board | `CurveSegment[]` | `straight`, `rounded`, `spline`, `arc`, `smooth`, `clothoid`, `highway`, `elastic` |
 | `room` | `RoomInput`: the boxes and the links of a board, and the tree of sections for `levels` | `Gap[]` | `routes`, `lines`, `levels` |
 | `whole` | `Graph` | `WholeOutput`: the board and its `Result` | `pipeline`, `board-portfolio`, `curriculum`, `preferences`, `fireflies`, `tracing`, `crops`, `choice` |
 
