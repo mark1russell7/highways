@@ -177,7 +177,7 @@ importers:
         version: 0.4.1
       '@mark1russell7/boundaries':
         specifier: ^0.2.0
-        version: 0.2.0(@swc/core@1.16.22)(dependency-cruiser@18.7.2)
+        version: 0.2.1(@swc/core@1.16.22)(dependency-cruiser@18.7.2)
       '@mark1russell7/conventions':
         specifier: ^0.37.2
         version: 0.37.2
@@ -189,7 +189,7 @@ importers:
         version: https://codeload.github.com/mark1russell7/ste-lint/tar.gz/3428ebde9116812a52540cf8b0b978caa98e02db
       '@mark1russell7/template-cli':
         specifier: ^0.1.0
-        version: 0.1.5
+        version: 0.1.7
       '@swc/core':
         specifier: ^1.16.22
         version: 1.16.22
@@ -234,8 +234,8 @@ importers:
         specifier: ^0.2.29
         version: 0.2.29(esbuild@0.28.2)
       '@mark1russell7/strategy-space':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.0.4
+        version: 0.0.4
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -280,8 +280,8 @@ importers:
         specifier: ^0.1.22
         version: 0.1.23
       '@mark1russell7/site-pages':
-        specifier: ^0.3.5
-        version: 0.3.5
+        specifier: ^0.4.4
+        version: 0.4.4
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -522,8 +522,8 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/boundaries@0.2.0':
-    resolution: {integrity: sha512-r3W3537Ev2IsSlA11hozfHmXq4JmBk0zZYv43y+OBqpIKmc3wzPLORWGUPrriLe+MmOL7gW0idrTz2E4kQZAuw==}
+  '@mark1russell7/boundaries@0.2.1':
+    resolution: {integrity: sha512-ZaNTU/VEDJddvBEHyCtYhrPippjOWoWWWpgVs/zpYOfu4QujMz+JfQfmyCE1IGgb6SJq9Rsb5RlujAgTrP6qOw==}
     engines: {node: '>=22'}
     peerDependencies:
       '@swc/core': ^1.10.0
@@ -588,8 +588,8 @@ packages:
     resolution: {integrity: sha512-UVO6cWyu6PXt33qvj5vEOVzeSfU4jQy6yaowvMi3ETlQid/srKmam3kYokxyDHVc+yNzYr3zXVhgtOUKYcNkdA==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/site-pages@0.3.5':
-    resolution: {integrity: sha512-3/VryGHcANgpTwAdAeyWL08I2qpfyUoXCVBUYtzjRQDpGT4i/wCUgJpAziiJrhY5g8HDOOsKgP/9Nf+kGh0a7Q==}
+  '@mark1russell7/site-pages@0.4.4':
+    resolution: {integrity: sha512-d6R1dLYAN7CA+Bnww3gZju5sO/2B3s+EuE+UupO5Fx6iKCo4w+oAenNX13yeBy/jLdxxD++m/zrcx+MxcbZ1ig==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -599,12 +599,12 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/strategy-space@0.0.1':
-    resolution: {integrity: sha512-0PX1MsXQh49flCDuko6KfJRbFgQCHXhgXwnhAYH06K06p9kqV1UWxlIWMN918nArmjNV2XY5nDI6AM4EhrK5/w==}
+  '@mark1russell7/strategy-space@0.0.4':
+    resolution: {integrity: sha512-ZvxmKtfdATXVXKw1qncW25KbqNV/wS1gwRItaPLNb1xWn5X1MbNfHM/5YRG71J5/sgTTv/iZuCVG/qLSch72bQ==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/template-cli@0.1.5':
-    resolution: {integrity: sha512-OenwEgVEkrt6HjUtIsTgplkJJTBIZLwb0mxiPow533++mbrrJ8BvHK+MsMLFm6X5A8EJZlLgd6IXJspZy3L2og==}
+  '@mark1russell7/template-cli@0.1.7':
+    resolution: {integrity: sha512-Wy4xa6OgNXyMunSyXOArxmrspLSCuyw1pf1P5X45Uiwe1aWHzn0LJptUYVGUSwT3GTp9FGVDhFMeOnKlapD3Xw==}
     engines: {node: '>=22.12'}
     hasBin: true
 
@@ -1977,7 +1977,7 @@ snapshots:
 
   '@mark1russell7/api-report@0.4.1': {}
 
-  '@mark1russell7/boundaries@0.2.0(@swc/core@1.16.22)(dependency-cruiser@18.7.2)':
+  '@mark1russell7/boundaries@0.2.1(@swc/core@1.16.22)(dependency-cruiser@18.7.2)':
     optionalDependencies:
       '@swc/core': 1.16.22
       dependency-cruiser: 18.7.2
@@ -2022,7 +2022,7 @@ snapshots:
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.8
 
-  '@mark1russell7/site-pages@0.3.5':
+  '@mark1russell7/site-pages@0.4.4':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.1.23
 
@@ -2030,11 +2030,12 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  '@mark1russell7/strategy-space@0.0.1':
+  '@mark1russell7/strategy-space@0.0.4':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.8
+      '@mark1russell7/rigor-statistics': 0.1.23
 
-  '@mark1russell7/template-cli@0.1.5':
+  '@mark1russell7/template-cli@0.1.7':
     dependencies:
       '@clack/prompts': 1.8.1
 
