@@ -12,7 +12,7 @@
     "log",
     "pow"
   ],
-  "total": 188,
+  "total": 186,
   "files": {
     "packages/core/src/bench/curves.ts": 16,
     "packages/core/src/bench/measures/bundles.ts": 1,
@@ -36,8 +36,8 @@
     "packages/core/src/curves/space.ts": 1,
     "packages/core/src/curves/spline/index.ts": 1,
     "packages/core/src/fixtures.ts": 2,
-    "packages/core/src/geom.ts": 3,
-    "packages/core/src/grid.ts": 2,
+    "packages/core/src/geom.ts": 2,
+    "packages/core/src/grid.ts": 1,
     "packages/core/src/highways/crossbars/index.ts": 1,
     "packages/core/src/highways/diffusion/index.ts": 2,
     "packages/core/src/highways/divided/index.ts": 2,

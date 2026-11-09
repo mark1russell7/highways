@@ -63,12 +63,14 @@
     "@mark1russell7/layout-contract": "^0.5.1",
     "@mark1russell7/predicates": "^0.1.0",
     "@mark1russell7/rigor-generators": "^0.1.1",
-    "@mark1russell7/rigor-statistics": "^0.1.18"
+    "@mark1russell7/rigor-statistics": "^0.1.22"
   },
   "devDependencies": {
     "@mark1russell7/cue": "github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8",
     "@mark1russell7/rigor-bench": "^0.2.29",
+    "@mark1russell7/strategy-space": "^0.0.4",
     "@types/node": "^26.6.4",
+    "@vitest/coverage-v8": "5.1.0",
     "highs": "^1.15.4",
     "highways-0-5-1": "npm:@mark1russell7/highways@0.5.1",
     "highways-0-8-0": "npm:@mark1russell7/highways@0.8.0",

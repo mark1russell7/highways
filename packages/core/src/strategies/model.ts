@@ -120,6 +120,17 @@ export type StepOutput<S extends Step> = StepTypes[S]["output"];
 export const STEPS: readonly Step[] = ["group", "plugs", "router", "highway", "levels", "curve", "room", "whole"];
 
 /**
+ * The hard rules of the curves that a curve strategy keeps by its design. The curve benchmark examines each declared rule.
+ * A strategy that a screen module makes declares its rules too, so the screen examines it as it examines a built-in curve.
+ */
+export interface CurveRules {
+  /** The curve is G1 at each joint, apart from a corner that the free space keeps sharp. The rule `curve-g1` (C1) examines it. */
+  readonly g1?: boolean;
+  /** The curve leaves along the normal of each plug. The rule `curve-ends` (C10) examines its end tangents. */
+  readonly normals?: boolean;
+}
+
+/**
  * A strategy: one way to do one step, with a name and a description.
  * The same input and the same options must give the same output.
  */
@@ -136,6 +147,8 @@ export interface Strategy<S extends Step = Step, O extends object = object> {
   readonly schema?: OptionSchema<O>;
   /** The benchmark skips an input with more nodes than this. Without it, the strategy takes each input. */
   readonly maxNodes?: number;
+  /** The curve rules that a curve strategy keeps. Without it, the strategy declares no rule. */
+  readonly curveRules?: CurveRules;
   /** This method does the step. Each option that `options` does not give gets its value from `defaults`. */
   run(input: StepInput<S>, options?: Partial<O>): StepOutput<S>;
 }
@@ -153,6 +166,8 @@ export interface StrategyDefinition<S extends Step, O extends object> {
   /** These declarations tell the type, the range, the step and the meaning of each option. `checkSchema` examines them. */
   readonly schema?: NoInfer<OptionSchema<O>>;
   readonly maxNodes?: number;
+  /** These rules are the curve rules that a curve strategy keeps. */
+  readonly curveRules?: CurveRules;
   /** This function does the step. It gets each option, from the caller or from `defaults`. */
   run(input: StepInput<S>, options: Readonly<O>): StepOutput<S>;
 }
@@ -169,7 +184,7 @@ function freezeSchema<O>(schema: OptionSchema<O>): OptionSchema<O> {
  * When the caller gives no option, the definition gets the `defaults` object itself.
  */
 export function defineStrategy<S extends Step, O extends object>(definition: StrategyDefinition<S, O>): Strategy<S, O> {
-  const { step, name, describe, defaults, schema, maxNodes } = definition;
+  const { step, name, describe, defaults, schema, maxNodes, curveRules } = definition;
   if (name.length === 0) throw new Error(`A strategy of the step "${step}" has no name.`);
   const strategy: Strategy<S, O> = {
     step,
@@ -178,6 +193,7 @@ export function defineStrategy<S extends Step, O extends object>(definition: Str
     defaults: Object.freeze({ ...defaults }),
     ...(schema === undefined ? {} : { schema: freezeSchema(schema) }),
     ...(maxNodes === undefined ? {} : { maxNodes }),
+    ...(curveRules === undefined ? {} : { curveRules: Object.freeze({ ...curveRules }) }),
     run(input: StepInput<S>, options?: Partial<O>): StepOutput<S> {
       const all = options === undefined || Object.keys(options).length === 0 ? strategy.defaults : { ...strategy.defaults, ...options };
       return definition.run(input, all as Readonly<O>);

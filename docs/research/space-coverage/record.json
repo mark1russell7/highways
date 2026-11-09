@@ -1,11 +1,13 @@
 {
   "schema": "space-coverage/1",
   "measures": 120,
-  "strategies": 122,
-  "options": 797,
+  "strategies": 124,
+  "options": 804,
   "inputs": 149,
-  "cells": 128160,
-  "fitted": 0,
-  "value": 0,
-  "fits": []
+  "cells": 129240,
+  "fitted": 1077,
+  "tested": 60,
+  "expectedFalse": 0.9375,
+  "value": 0.008333333333333333,
+  "fits": "docs/research/space-coverage/fits.json"
 }

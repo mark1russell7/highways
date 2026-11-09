@@ -1,0 +1,122 @@
+# The grammar screen (D23 step 4). It screens the points of `routeSpace` that `packages/core/scripts/grammar-points.ts` gives.
+# Each shard job writes the same file of points, screens its own shard with `grammar-screen.ts`, and keeps its files as an artifact.
+# The join job joins the shards with `grammar-join.ts`, writes the cost to the summary, and keeps `grammar-screen.json` as an artifact.
+# The default run has 7 shard jobs and the join: 8 jobs, the limit of one screen run.
+name: Grammar screen
+
+on:
+  workflow_dispatch:
+    inputs:
+      n:
+        description: "The count of the points of the grammar."
+        default: "1000"
+      seed:
+        description: "The seed of the draw of the points."
+        default: "1"
+      shards:
+        description: "The shards, as a JSON list of the numbers from 0. The count of the list is the count of the shards."
+        default: "[0,1,2,3,4,5,6]"
+      set:
+        description: "The screen set."
+        default: "screen-v1"
+      minutes:
+        description: "The time limit of each shard job, in minutes."
+        default: "40"
+
+permissions: {}
+
+concurrency:
+  # One run for each workflow and ref (RUNNER-SLOTS). A new dispatch waits for the run before it.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJSON(inputs.minutes || '40') }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      # The account runs at most 40 jobs at one time across all repositories, and heavy work keeps 28 of them at most. So a heavy matrix runs 3 cells at most (RUNNER-SLOTS).
+      max-parallel: 3
+      matrix:
+        shard: ${{ fromJSON(inputs.shards) }}
+    env:
+      N: ${{ inputs.n }}
+      SEED: ${{ inputs.seed }}
+      SHARDS: ${{ inputs.shards }}
+      SET: ${{ inputs.set }}
+      SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Screen the shard
+        working-directory: packages/core
+        run: |
+          set -o pipefail
+          count=$(jq length <<< "$SHARDS")
+          out="$GITHUB_WORKSPACE/out"
+          node scripts/grammar-points.ts "$out/points.json" "$N" "$SEED" "$count"
+          node scripts/grammar-screen.ts --points "$out/points.json" --shard "$SHARD" --set "$SET" --out "$out" 2> "$RUNNER_TEMP/screen.log" | tee -a "$GITHUB_STEP_SUMMARY"
+          tail -n 5 "$RUNNER_TEMP/screen.log"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: grammar-shard-${{ matrix.shard }}
+          path: |
+            out/shard-${{ matrix.shard }}.json
+            out/shard-${{ matrix.shard }}.jsonl
+          if-no-files-found: error
+
+  join:
+    needs: shard
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      N: ${{ inputs.n }}
+      SEED: ${{ inputs.seed }}
+      SHARDS: ${{ inputs.shards }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: grammar-shard-*
+          path: shards
+          merge-multiple: true
+      # The join expects the files of each shard (FAIL-CLOSED), so a failed shard fails the join.
+      - name: Join the shards
+        working-directory: packages/core
+        run: |
+          set -o pipefail
+          count=$(jq length <<< "$SHARDS")
+          node scripts/grammar-points.ts "$GITHUB_WORKSPACE/points.json" "$N" "$SEED" "$count"
+          node scripts/grammar-join.ts --points "$GITHUB_WORKSPACE/points.json" --in "$GITHUB_WORKSPACE/shards" --out "$GITHUB_WORKSPACE/grammar-screen.json" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: grammar-screen
+          path: |
+            grammar-screen.json
+            points.json
+          if-no-files-found: error

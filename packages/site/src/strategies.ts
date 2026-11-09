@@ -2,6 +2,7 @@
 import data from "virtual:strategies";
 import type { VerdictLabel } from "./results-data.ts";
 import { cardId, STATUSES, SWEEPS_LINE, type CardIdea, type CardStatus, type StrategyCard } from "./strategies-data.ts";
+import { escapeAttribute as esc } from "@mark1russell7/text";
 import "./style.css";
 import "./strategies.css";
 
@@ -11,7 +12,6 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 /** This function escapes a text and shows each span between backticks as code. */
 const code = (text: string): string => esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 const REPO = "https://github.com/mark1russell7/highways";
