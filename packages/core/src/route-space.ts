@@ -5,6 +5,7 @@
 import {
   canonicalConfig,
   checkConfig,
+  configId,
   paramValue,
   STRATEGY_SPACE_SCHEMA,
   type ParamValue,
@@ -25,8 +26,10 @@ import { stretchGate } from "./highways/gates/stretch/index.ts";
 import { ARC_SOURCES } from "./highways/hub-arcs/index.ts";
 import { highwayRouterStrategy } from "./highways/router.ts";
 import { CANDIDATE_SOURCES } from "./highways/select/index.ts";
-import type { Graph, Result } from "./model.ts";
+import type { Graph, Result, Router } from "./model.ts";
 import { MEMBER_FORMS, type MemberForm } from "./portfolio/members.ts";
+import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "./routers/index.ts";
+import { seamsStrategy } from "./routers/seams/index.ts";
 import { byCollection } from "./routers/trunks.ts";
 import { groupStrategies, highwayStrategies, levelStrategies, plugStrategies, routerStrategies } from "./strategies/builtins.ts";
 import type { Step, Strategy } from "./strategies/model.ts";
@@ -213,10 +216,13 @@ function readsOf(s: Strategy<Step, object>): Set<string> {
 /** The options of `routeSpace` that the space does not hold, by `<strategy>.<option>`. `ROUTE_SPACE_LEFT_OUT` gives the reason of each. */
 const left: string[] = [];
 
-/** The routers of the stage `routing`: the routers of `routerStrategies` without a preset, then each highway plan without a gate. */
+/** The opt-in routers with their own point: each router of `OPT_IN_STRATEGIES` but `portfolio` and `shared-stretch`, then the unscreened router `seams`. */
+const OPT_IN_ROUTERS = [adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy, seamsStrategy] as const;
+
+/** The routers of the stage `routing`: the routers of `routerStrategies` without a preset, then the opt-in routers, then each highway plan without a gate. */
 const ROUTING: ReadonlyMap<string, RoutingEntry> = (() => {
   const out = new Map<string, RoutingEntry>();
-  const routers = [routerStrategies.straight, routerStrategies.plugs, routerStrategies.corners, routerStrategies.trunks, routerStrategies.shared, routerStrategies.sections];
+  const routers = [routerStrategies.straight, routerStrategies.plugs, routerStrategies.corners, routerStrategies.trunks, routerStrategies.shared, routerStrategies.sections, ...OPT_IN_ROUTERS];
   const plans = Object.values(highwayStrategies).filter((s) => !s.name.includes("+"));
   for (const s of [...routers, ...plans] as (Strategy<"router", object> | Strategy<"highway", object>)[]) {
     const reads = readsOf(s);
@@ -366,8 +372,9 @@ function pointOf(id: string, routing: Readonly<Record<string, ParamValue>> = {},
 }
 
 /**
- * The named points of `routeSpace`: each row of the router table of today, then the opt-in router `shared-stretch`.
+ * The named points of `routeSpace`: each row of the router table of today, then the opt-in routers and the control `shared-ways-all`.
  * The rows are the routers of `routerStrategies`, then each highway strategy of `highwayStrategies`.
+ * `shared-stretch` is `shared` with the lane order `stretch`, and `shared-ways-all` is `shared-ways` with the key `all`.
  */
 const NAMED: Readonly<Record<string, StrategyConfig>> = (() => {
   const out: Record<string, StrategyConfig> = {
@@ -386,6 +393,8 @@ const NAMED: Readonly<Record<string, StrategyConfig>> = (() => {
     out[s.name] = pointOf(plan, {}, gate === undefined ? {} : { gate: choice(gate) });
   }
   out["shared-stretch"] = pointOf("shared", {}, { "lane-order": choice("stretch", { order: "sifting" }) });
+  for (const s of OPT_IN_ROUTERS) out[s.name] = pointOf(s.name);
+  out["shared-ways-all"] = pointOf("shared-ways", {}, { grouping: choice("edge-key", { rule: "all" }) });
   return out;
 })();
 
@@ -393,7 +402,7 @@ const NAMED: Readonly<Record<string, StrategyConfig>> = (() => {
  * The strategy space of `highways`, schema `strategy-space/1`. It has 7 stages: `grouping`, `plugs`, `routing`, `gate`, `lane-order`, `smoothing` and `levels`.
  * Each row of the router table is a named point, and `routeConfig` of the point gives the routes of that router.
  *
- * - `routing` holds the 6 routers without a preset and the 61 highway plans without a gate. Each option of a router is a param, or a param of another stage.
+ * - `routing` holds the 6 routers without a preset, 10 opt-in routers and the 61 highway plans without a gate. Each option of a router is a param, or a param of another stage.
  * - `grouping` holds the key of the edges of `trunks`, `shared`, `keys`, `shared-ways` and `soft-keys`. It also holds the tree of sections of `sections`.
  * - `plugs` holds the plugs of `corners`: the places `facing` and `side`, and each plug strategy as `rule-<name>`.
  * - `gate` holds a gate after a highway plan. A gate goes with each plan whose options do not have the keys of the gate.
@@ -490,10 +499,36 @@ function routerOf(config: StrategyConfig): { readonly router: Strategy<"router",
  * - The routes of each named point are equal to the routes of the router of that name.
  */
 export function routeConfig(graph: Graph, config: StrategyConfig): Result {
+  return routerOfConfig(config).route(graph);
+}
+
+/** The name of each named point of `routeSpace`, by its `configId`. The function `nameOfConfig` makes it at its first call. */
+let namedById: Map<string, string> | undefined;
+
+/** This function gives the key of the named point with the config, or the `configId` of the config. */
+function nameOfConfig(config: StrategyConfig): string {
+  namedById ??= new Map(Object.entries(NAMED).map(([name, point]) => [configId(routeSpace, point), name]));
+  const id = configId(routeSpace, config);
+  return namedById.get(id) ?? id;
+}
+
+/**
+ * This function gives the `Router` of a config of `routeSpace`. The function `route` of the router gives the routes of `routeConfig`.
+ *
+ * - The function checks the config with `checkConfig`. A config with a break causes a `RangeError` with the details of each break.
+ * - The name is the key of the named point with the same canonical config. Without a named point, the name is the `configId`.
+ * - The router keeps the `maxNodes` of the strategy of the stage `routing`. A plan keeps the `maxNodes` of its `follow` router.
+ */
+export function routerOfConfig(config: StrategyConfig): Router {
   const breaks = checkConfig(routeSpace, config);
   if (breaks.length > 0) throw new RangeError(`The config is not a config of the space highways: ${breaks.map((b) => b.detail).join("; ")}.`);
-  const { router, options } = routerOf(canonicalConfig(routeSpace, config));
-  return router.run(graph, options);
+  const canonical = canonicalConfig(routeSpace, config);
+  const { router, options } = routerOf(canonical);
+  return {
+    name: nameOfConfig(canonical),
+    ...(router.maxNodes === undefined ? {} : { maxNodes: router.maxNodes }),
+    route: (graph: Graph): Result => router.run(graph, options),
+  };
 }
 
 /** The point of a member in `routeSpace`: its config, or the reason that it has no config. */
@@ -505,7 +540,6 @@ export type MemberPoint = { readonly ok: true; readonly config: StrategyConfig }
  */
 export const MEMBER_MISFITS: Readonly<Record<string, string>> = Object.freeze({
   portfolio: "It is a selector, not a router. One route for each board comes from a choice among the members, and the stage `routing` holds one router.",
-  "w3a:diffusion-l3": "Its option `lambda` is 3, and the schema of `diffusion` stops at 2. The space takes its ranges from the schemas, so the value is not in the space.",
 });
 
 /** This function gives the params of the options of a strategy, the reverse of `decode`, or a reason for an option with no param. */
@@ -538,7 +572,7 @@ function routerPoint(id: string, options: Options): MemberPoint {
 function formPoint(form: MemberForm): MemberPoint {
   switch (form[0]) {
     case "highway":
-      return { ok: true, config: form[1] === "shared-ways-all" ? pointOf("shared-ways", {}, { grouping: choice("edge-key", { rule: "all" }) }) : NAMED[form[1]]! };
+      return { ok: true, config: NAMED[form[1]]! };
     case "gate":
       return ROUTING.has(form[1])
         ? { ok: true, config: pointOf(form[1], {}, { gate: choice(form[2], form[3] === undefined ? {} : { budget: form[3] }) }) }
@@ -553,13 +587,17 @@ function formPoint(form: MemberForm): MemberPoint {
 /**
  * This function gives the canonical point in `routeSpace` of a member of `MEMBER_FORMS`. `routeConfig` of the point gives the routes of the member.
  *
- * - A name without a form gets a reason in place of a config. An option with no param and a break of `checkConfig` also give a reason.
+ * - A name without a form gets the named point of that name, for example `springs` or `shared-ways-all`. Another name gets a reason in place of a config.
+ * - An option with no param and a break of `checkConfig` also give a reason.
  * - The reason is the row of `MEMBER_MISFITS` when the name has a row. The function examines the form first, so a test finds a row that is out of date.
  */
 export function configOfMember(name: string): MemberPoint {
   const row = MEMBER_MISFITS[name];
   const form = MEMBER_FORMS[name];
-  if (form === undefined) return { ok: false, reason: row ?? `The name ${name} is not a member of MEMBER_FORMS.` };
+  if (form === undefined) {
+    const point = row === undefined ? NAMED[name] : undefined;
+    return point === undefined ? { ok: false, reason: row ?? `The name ${name} is not a member of MEMBER_FORMS or a named point.` } : { ok: true, config: canonicalConfig(routeSpace, point) };
+  }
   const raw = formPoint(form);
   if (!raw.ok) return { ok: false, reason: row ?? raw.reason };
   const breaks = checkConfig(routeSpace, raw.config);

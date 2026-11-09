@@ -1,5 +1,18 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.18.0
+
+This version is a MINOR before 1.0: the space `routeSpace` holds more options, and the range of one option is wider. The routes of each router stay the same.
+
+### Strategy space
+
+- The stage `routing` of `routeSpace` holds 10 opt-in routers: `adam`, `annealing`, `attraction`, `canals`, `nudge`, `repel`, `reroute`, `springs`, `tight` and `seams`. Each one is a named point.
+- The control `shared-ways-all` is a named point too.
+- `configOfMember(name)` gives the named point for a name without a form in `MEMBER_FORMS`. The reason for a name with no point changes its text.
+- The option `lambda` of `diffusion` goes up to 4, from 2. So the member `w3a:diffusion-l3` has a point, and `MEMBER_MISFITS` loses its row.
+- The record `space-size/1` counts 77 options of the stage `routing`, from 67, and 1016275077761 base configs.
+- The new export `routerOfConfig(config)` gives the `Router` of a config of `routeSpace`, with the `maxNodes` of its strategy. Its name is the key of the named point with the same config, or the `configId`. `routeConfig` uses it.
+
 ## 0.16.1
 
 This version is a PATCH before 1.0: it adds two strategies, a new optional field and new exports. The default routes do not change.

@@ -45,6 +45,16 @@ describe("configOfMember (MEMBER-POINTS)", () => {
   it("gives a reason for `portfolio` and for an unknown name", () => {
     expect(MEMBER_FORMS["portfolio"]).toBeUndefined();
     expect(configOfMember("portfolio")).toEqual({ ok: false, reason: MEMBER_MISFITS["portfolio"] });
-    expect(configOfMember("no-such-member")).toEqual({ ok: false, reason: "The name no-such-member is not a member of MEMBER_FORMS." });
+    expect(configOfMember("no-such-member")).toEqual({ ok: false, reason: "The name no-such-member is not a member of MEMBER_FORMS or a named point." });
+  });
+
+  it("gives the named point for a router name without a form, for example the opt-in routers", () => {
+    const routers = ["adam", "annealing", "attraction", "canals", "nudge", "repel", "reroute", "springs", "tight", "seams", "shared-ways-all"];
+    for (const name of routers) {
+      expect(MEMBER_FORMS[name], name).toBeUndefined();
+      expect(configOfMember(name), name).toEqual({ ok: true, config: canonicalConfig(routeSpace, routeSpace.named![name]!) });
+    }
+    expect(configOfMember("shared-ways-all")).toEqual(configOfMember("hw:shared-ways-all"));
+    expect(configOfMember("w3a:diffusion-l3").ok).toBe(true);
   });
 });

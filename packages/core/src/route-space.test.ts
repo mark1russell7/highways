@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { canonicalConfig, checkConfig, checkSpace, configId } from "@mark1russell7/layout-contract";
 import { describe, expect, it } from "vitest";
+import { sharedWaysAll } from "./bench/screen/gap.ts";
 import { CASES } from "./cases.ts";
 import { FIXTURES, makeFixture } from "./fixtures.ts";
 import { gateStrategy } from "./highways/gates/model.ts";
@@ -9,7 +10,8 @@ import { highwayRouterStrategy } from "./highways/router.ts";
 import { sharedStretchStrategy } from "./lane-orders/stretch/router.ts";
 import type { Graph, Result } from "./model.ts";
 import { ROUTE_SPACE_LEFT_OUT, ROUTE_SPACE_MISFITS, routeConfig, routeSpace } from "./route-space.ts";
-import { ROUTERS } from "./routers/index.ts";
+import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, ROUTERS, springsStrategy, tightStrategy } from "./routers/index.ts";
+import { seamsStrategy } from "./routers/seams/index.ts";
 import { laneRoutes, runKey, segmentsOf } from "./segments.ts";
 import { highwayStrategies } from "./strategies/builtins.ts";
 import { asRouter, type Strategy } from "./strategies/model.ts";
@@ -18,11 +20,15 @@ import { asRouter, type Strategy } from "./strategies/model.ts";
 
 const named = routeSpace.named!;
 
-/** The router table of today: the routers of `ROUTERS`, then each highway strategy through `follow`, then the opt-in router `shared-stretch`. */
+/** The router table of today: the routers of `ROUTERS`, then each highway strategy through `follow`, then the opt-in routers and the control `shared-ways-all`. */
 const TABLE: ReadonlyMap<string, (graph: Graph) => Result> = new Map([
   ...ROUTERS.map((r) => [r.name, (g: Graph) => r.route(g)] as const),
   ...Object.values(highwayStrategies).map((s) => [s.name, (g: Graph) => asRouter(highwayRouterStrategy(s as Strategy<"highway", object>)).route(g)] as const),
   [sharedStretchStrategy.name, (g: Graph) => asRouter(sharedStretchStrategy).route(g)] as const,
+  ...[adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy, seamsStrategy].map(
+    (s) => [s.name, (g: Graph) => asRouter(s as Strategy<"router", object>).route(g)] as const,
+  ),
+  [sharedWaysAll.name, (g: Graph) => asRouter(highwayRouterStrategy(sharedWaysAll)).route(g)] as const,
 ]);
 
 const graphs: readonly (readonly [string, () => Graph])[] = [

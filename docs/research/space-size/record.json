@@ -1,7 +1,7 @@
 {
  "schema": "space-size/1",
  "space": "highways",
- "digest": "2011651db0302c6e5af8fd647ce0763e4e5924bca8d794a555727a4901a45657",
+ "digest": "cc4e4b37c948f237932233b0332d64ca57cb9d1751912c68185c4ad82e28885f",
  "levels": 3,
  "stages": [
   {
@@ -19,8 +19,8 @@
   {
    "name": "routing",
    "optional": false,
-   "options": 67,
-   "params": 474
+   "options": 77,
+   "params": 520
   },
   {
    "name": "gate",
@@ -47,12 +47,12 @@
    "params": 14
   }
  ],
- "constraints": 360,
- "base": "1016275071962",
+ "constraints": 420,
+ "base": "1016275077761",
  "meta": "0",
  "seconds": 0,
  "cpu": "AMD Ryzen AI 7 PRO 350 w/ Radeon 860M          ",
- "date": "2026-11-08T21:02:57.021Z",
+ "date": "2026-11-09T04:48:15.471Z",
  "run": null,
  "commit": null
 }
