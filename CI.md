@@ -305,6 +305,15 @@ The flip on the whole workflow has 3 dispatches, each with `all` false:
 - [A route that differs](https://github.com/mark1russell7/highways/actions/runs/42055671579): `summary` and `Xplat partial` are red.
 - [A failed download](https://github.com/mark1russell7/highways/actions/runs/42055704453): the run is red with its own text.
 
+Each job of a workflow waits in the queue of the account again. So a run of `Xplat` has 4 stages when no chunk of Math calls differs:
+
+1. `inputs` finds the changed paths and collects the inputs.
+2. `trace` routes the inputs on each cell.
+3. `summary` finds the chunks that differ, then gives the verdict and the flip.
+4. The check `Xplat OK` reads each job.
+
+When a chunk differs, `near` logs its calls and `near-summary` gives the first call that differs. These two jobs add detail only, and the verdict does not read them. The dispatch input `near` starts them also with no chunk that differs.
+
 The job `screen` of `Screen` starts `screen-verdict.ts` on a screen of a whole step. Its artifact has `verdict.json`, `verdict-all.json` and `verdict.md`. This step gives the verdicts. It does not fail on a label.
 
 The workflow `Verdict check` reads each committed snapshot again from the records of its run, each week. It is not a gate on those snapshots. The flip `verdict` of `Gate flip` shows that its check goes red on a moved label, a missing row and a missing record.

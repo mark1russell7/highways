@@ -1,7 +1,9 @@
 # The same routes on each platform (XPLAT-HASH). Each cell of the matrix (a system and a node version) routes the inputs of the joint bench
-# of layout-contract with `scripts/xplat.ts`: the route hash, the exact routes and the hashes of the Math calls. The job locate finds the first chunk
-# of 1000 calls that differs between two cells. The job near routes those inputs again and writes each call of those chunks in full.
-# The last job compares the cells with `scripts/xplat-summary.ts` and writes the summary. The note `docs/research/XPLAT.md` gives the result.
+# of layout-contract with `scripts/xplat.ts`: the route hash, the exact routes and the hashes of the Math calls. The job summary finds the first chunk
+# of 1000 calls that differs between two cells, then compares the cells with `scripts/xplat-summary.ts` and writes the summary.
+# Only when a chunk differs, the job near routes those inputs again and writes each call of those chunks in full. The job near-summary reads those logs.
+# Each stage waits in the queue of the account again. So a run with no chunk that differs has 4 stages: inputs, trace, summary and the check.
+# The note `docs/research/XPLAT.md` gives the result.
 # The claim of the check is byte-equal routes on each cell. A route that differs, a repeat that differs or a cell with another count of rows ends the job red, and `CI.md` tells what a red means.
 # The check also runs each week on its own minute, because a runner image can move with no change here. The node versions do not float.
 name: Xplat
@@ -18,8 +20,11 @@ on:
       fault:
         description: "The fault of the flip of the verdict: none, route or short. The job summary puts it on one real cell before the verdict, and the gate must go red."
         default: "none"
+      near:
+        description: "With true, the jobs near and near-summary also start when no chunk differs. The verdict does not change."
+        default: "false"
   # Each pull request starts this workflow, so the check "Xplat OK" of the ruleset is always there (CI-OK).
-  # The job changes skips the cells when the pull request does not change the core or the trace.
+  # The job inputs skips the cells when the pull request does not change the core or the trace.
   # Xplat is not a job of ci.yml: release.yml gives ci.yml only "contents: read", and the job inputs needs "actions: read".
   pull_request:
   schedule:
@@ -30,7 +35,7 @@ permissions:
 
 concurrency:
   # Each set of inputs has its own group, so the dispatches of a flip do not cancel each other.
-  group: xplat-${{ github.ref }}-${{ inputs.all }}-${{ inputs.run }}-${{ inputs.fault }}
+  group: xplat-${{ github.ref }}-${{ inputs.all }}-${{ inputs.run }}-${{ inputs.fault }}-${{ inputs.near }}
   cancel-in-progress: true
 
 defaults:
@@ -42,17 +47,17 @@ env:
   CELLS: linux-node24,linux-node26,win32-node24,win32-node26
 
 jobs:
-  # The paths that start the cells. A dispatch always starts them.
-  changes:
+  # The paths that start the cells, then the inputs of the cells. A dispatch always starts the cells.
+  inputs:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
+      actions: read
     outputs:
       xplat: ${{ steps.diff.outputs.xplat }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: github.event_name == 'pull_request'
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -66,22 +71,12 @@ jobs:
           files="$(git diff --name-only "$BASE...$HEAD")"
           if grep -qE '^(packages/core/src/|packages/core/scripts/data/xplat/|packages/core/scripts/xplat(-summary)?\.ts$|packages/core/scripts/gates/(flip|inputs|paired|pair-confirm)\.ts$|packages/core/scripts/sections-(gate|confirm)-verdict\.ts$|\.github/workflows/xplat\.yml$)' <<< "$files"; then echo "xplat=true" >> "$GITHUB_OUTPUT"; else echo "xplat=false" >> "$GITHUB_OUTPUT"; fi
 
-  inputs:
-    needs: changes
-    if: needs.changes.outputs.xplat == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: read
-    env:
-      ALL: ${{ inputs.all || 'true' }}
-      RUN: ${{ inputs.run || '40688908137' }}
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
       - name: Collect the inputs
+        if: steps.diff.outputs.xplat == 'true'
+        env:
+          ALL: ${{ inputs.all || 'true' }}
+          RUN: ${{ inputs.run || '40688908137' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p inputs
           cp packages/core/scripts/data/xplat/*.json.gz inputs/
@@ -96,12 +91,14 @@ jobs:
           fi
           echo "The inputs: $(find inputs -name '*.json*' | sed 's#.*/##; s#\.json.*##' | sort -u | wc -l) graphs." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: steps.diff.outputs.xplat == 'true'
         with:
           name: xplat-inputs
           path: inputs/
 
   trace:
     needs: inputs
+    if: needs.inputs.outputs.xplat == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -143,10 +140,12 @@ jobs:
           path: trace/
           if-no-files-found: warn
 
-  locate:
-    needs: [changes, trace]
-    if: ${{ !cancelled() && needs.changes.outputs.xplat == 'true' }}
+  summary:
+    needs: [inputs, trace]
+    if: ${{ !cancelled() && needs.inputs.outputs.xplat == 'true' }}
     runs-on: ubuntu-latest
+    outputs:
+      differs: ${{ steps.find.outputs.differs }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -158,15 +157,52 @@ jobs:
         with:
           pattern: xplat-trace-*
           path: cells
+      # The chunks come from the cells before the fault of a flip. A failure of this step gives no chunk, and the verdict then tells the cause.
       - name: Find the first chunk of calls that differs
-        run: node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --targets targets.json
+        id: find
+        env:
+          NEAR: ${{ inputs.near || 'false' }}
+        run: |
+          echo '{}' > targets.json
+          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --targets targets.json || echo "::warning::The job could not find the chunks that differ."
+          if [ "$NEAR" = "true" ] || [ "$(jq 'length' targets.json)" != "0" ]; then echo "differs=true" >> "$GITHUB_OUTPUT"; else echo "differs=false" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: xplat-targets
           path: targets.json
+      - name: Put the fault of the dispatch on one cell
+        if: ${{ inputs.fault != '' && inputs.fault != 'none' }}
+        env:
+          FAULT: ${{ inputs.fault }}
+        run: node packages/core/scripts/gates/flip.ts --inject "$FAULT" --cells cells
+      # The exit code of the script is the exit code of this step, through no pipe. The summary comes from the file, so a red run keeps it.
+      - name: The verdict
+        env:
+          # The rows of a run: 24 inputs with 3 routers, and 3 of them with `sections` too, or 10 rows on the 3 inputs of the repository. Only a dispatch can give `all` false.
+          ROWS: ${{ (inputs.all || 'true') == 'true' && '75' || '10' }}
+        run: |
+          status=0
+          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --rows "$ROWS" --out xplat.md --json xplat.json || status=$?
+          if [ -f xplat.md ]; then cat xplat.md >> "$GITHUB_STEP_SUMMARY"; fi
+          exit "$status"
+      # The flip reads only the reference cell, so it holds on a run with a fault. It runs in each run of this check: no package is installed in this job, and the flip needs none.
+      - name: The flip of the verdict
+        if: always()
+        run: node packages/core/scripts/gates/flip.ts --check xplat --cells cells --out flip
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: xplat-summary
+          if-no-files-found: warn
+          path: |
+            xplat.md
+            xplat.json
+            flip/
 
+  # Only when a chunk differs, or with the input near of a dispatch. The job starts also after a red verdict, so a red run gets the calls.
   near:
-    needs: locate
+    needs: summary
+    if: ${{ !cancelled() && needs.summary.outputs.differs == 'true' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -209,9 +245,10 @@ jobs:
           path: near/
           if-no-files-found: warn
 
-  summary:
-    needs: [changes, near]
-    if: ${{ !cancelled() && needs.changes.outputs.xplat == 'true' }}
+  # The first call that differs, from the logs of near. The verdict of the job summary does not read these logs, so this job adds detail only.
+  near-summary:
+    needs: [summary, near]
+    if: ${{ !cancelled() && needs.summary.outputs.differs == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -228,43 +265,30 @@ jobs:
         with:
           pattern: xplat-near-*
           path: near
-      - name: Put the fault of the dispatch on one cell
-        if: ${{ inputs.fault != '' && inputs.fault != 'none' }}
+      # The exit code of the verdict is the exit code of the job summary, so this step keeps the file and not the code.
+      - name: The first call that differs
         env:
-          FAULT: ${{ inputs.fault }}
-        run: node packages/core/scripts/gates/flip.ts --inject "$FAULT" --cells cells
-      # The exit code of the script is the exit code of this step, through no pipe. The summary comes from the file, so a red run keeps it.
-      - name: The verdict
-        env:
-          # The rows of a run: 24 inputs with 3 routers, and 3 of them with `sections` too, or 10 rows on the 3 inputs of the repository. Only a dispatch can give `all` false.
           ROWS: ${{ (inputs.all || 'true') == 'true' && '75' || '10' }}
         run: |
           mkdir -p near
-          status=0
-          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --rows "$ROWS" --near near --out xplat.md --json xplat.json || status=$?
-          if [ -f xplat.md ]; then cat xplat.md >> "$GITHUB_STEP_SUMMARY"; fi
-          exit "$status"
-      # The flip reads only the reference cell, so it holds on a run with a fault. It runs in each run of this check: no package is installed in this job, and the flip needs none.
-      - name: The flip of the verdict
-        if: always()
-        run: node packages/core/scripts/gates/flip.ts --check xplat --cells cells --out flip
+          node packages/core/scripts/xplat-summary.ts --cells cells --expect "$CELLS" --rows "$ROWS" --near near --out xplat-near.md --json xplat-near.json || true
+          if [ -f xplat-near.md ]; then cat xplat-near.md >> "$GITHUB_STEP_SUMMARY"; fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: xplat-summary
+          name: xplat-near-summary
           if-no-files-found: warn
           path: |
-            xplat.md
-            xplat.json
-            flip/
+            xplat-near.md
+            xplat-near.json
 
   # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
-  # A skipped job fails it (template #85), except the jobs of the cells on a pull request without changes to the core.
+  # A skipped job fails it (template #85), except the jobs of the cells on a pull request without changes to the core, and near and near-summary when no chunk differs.
   # Only a run that reads the whole check writes that name. A dispatch with another `all`, `run` or `fault` writes `Xplat partial`, so it cannot satisfy the ruleset on any commit.
   xplat-ok:
     name: ${{ ((inputs.all || 'true') == 'true' && (inputs.run || '40688908137') == '40688908137' && (inputs.fault || 'none') == 'none') && 'Xplat OK' || 'Xplat partial' }}
     if: ${{ !cancelled() }}
-    needs: [changes, inputs, trace, locate, near, summary]
+    needs: [inputs, trace, summary, near, near-summary]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
@@ -273,7 +297,7 @@ jobs:
         env:
           NEEDS: ${{ toJSON(needs) }}
           # The jobs that their own if may skip, separated by spaces. Each other job must pass.
-          ALLOW_SKIP: ${{ needs.changes.outputs.xplat != 'true' && 'inputs trace locate near summary' || '' }}
+          ALLOW_SKIP: ${{ needs.inputs.outputs.xplat != 'true' && 'trace summary near near-summary' || needs.summary.outputs.differs != 'true' && 'near near-summary' || '' }}
         run: |
           echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) \(.value.result)"' > results
           cat results
