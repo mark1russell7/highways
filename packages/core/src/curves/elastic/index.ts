@@ -85,10 +85,13 @@ function push(q: Point, boxes: readonly Box[], clearance: number): Point {
   for (const b of boxes) {
     const nx = Math.max(b.x, Math.min(b.x + b.w, q.x));
     const ny = Math.max(b.y, Math.min(b.y + b.h, q.y));
-    const d = Math.hypot(q.x - nx, q.y - ny);
-    if (d === 0 || d >= clearance) continue;
-    fx += ((q.x - nx) / d) * (clearance - d);
-    fy += ((q.y - ny) / d) * (clearance - d);
+    const dx = q.x - nx;
+    const dy = q.y - ny;
+    const d2 = dx * dx + dy * dy;
+    if (d2 === 0 || d2 >= clearance * clearance) continue;
+    const d = Math.sqrt(d2);
+    fx += (dx / d) * (clearance - d);
+    fy += (dy / d) * (clearance - d);
   }
   return { x: fx, y: fy };
 }
