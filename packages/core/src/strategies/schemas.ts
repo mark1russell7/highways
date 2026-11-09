@@ -23,6 +23,8 @@ import type { TwoWayOptions } from "../highways/two-way/index.ts";
 import type { GlobalOrderOptions } from "../highways/global-order/index.ts";
 import type { ApprovalOptions } from "../highways/approval/index.ts";
 import type { EscapeOptions } from "../plugs/escape/index.ts";
+import type { ElasticStrategyOptions } from "../curves/elastic/index.ts";
+import type { ChargeOptions } from "../plugs/charges/index.ts";
 import type { CropOptions } from "../whole/crops/index.ts";
 import type { ChoiceOptions } from "../whole/choice/index.ts";
 import type { KdOptions } from "../groups/kd/index.ts";
@@ -382,6 +384,14 @@ export const CLOTHOID_SCHEMA: OptionSchema<ClothoidStrategyOptions> = {
 /** The declarations of the option of the curve `spline`. */
 export const TENSION_SCHEMA: OptionSchema<TensionOptions> = {
   tension: { type: "number", min: 0, max: 1, step: 0.05, describe: "The tension of the spline, from 0 (the spline) to 1 (the polyline)." },
+};
+
+/** The declarations of the options of the curve `elastic` (NAT-026). */
+export const ELASTIC_SCHEMA: OptionSchema<ElasticStrategyOptions> = {
+  step: { type: "number", min: 2, max: 32, step: 1, marks: [4, 8, 16], default: 8, describe: "The distance between two samples of the band." },
+  rounds: { type: "integer", min: 0, max: 200, step: 10, marks: [0, 20, 40, 100], default: 40, describe: "The steps of the relaxation. The value 0 gives the polyline." },
+  clearance: { type: "number", min: 0, max: 32, step: 1, marks: [0, 6, 12, 24], default: 12, describe: "The distance from a box at which the push of the box starts." },
+  lead: { type: "number", min: 0, max: 32, step: 1, marks: [0, 6, 12, 24], default: 12, describe: "The length of the band at each end that stays on the polyline." },
 };
 
 /** The declarations of the options of the room strategies: the options of `roomDemand`, without the method. */
@@ -1164,6 +1174,13 @@ export const ESCAPE_SCHEMA: OptionSchema<EscapeOptions> = {
   slotSpacing: { type: "number", min: 2, max: 8, step: 1, marks: [2, 4, 8], default: 4, describe: "The least gap between two plugs of one wall, and the gap of the slots." },
   cornerReserve: { type: "number", min: 0, max: 0.25, step: 0.05, marks: [0, 0.1, 0.25], default: 0.1, describe: "The share of the side that stays free at each corner." },
   rounds: { type: "integer", min: 0, max: 3, step: 1, default: 1, describe: "The passes that route the ways again from the new plugs and sort each wall again." },
+};
+
+/** The declarations of the options of the plug strategy `charges` (RULE-054). */
+export const CHARGE_SCHEMA: OptionSchema<ChargeOptions> = {
+  spacing: { type: "number", min: 0, max: 16, step: 1, marks: [4, 8, 12, 16], default: 8, describe: "The distance at which two plugs with one ideal place come to rest. The charge follows from it." },
+  rounds: { type: "integer", min: 0, max: 200, step: 10, marks: [0, 10, 60, 120], default: 60, describe: "The steps of the descent. The value 0 keeps the plugs of facing." },
+  inset: { type: "number", min: 0, max: 12, step: 1, default: 6, describe: "A plug stays this far from the corners of its side." },
 };
 
 /** The declarations of the options of the plug strategy `leaders` (EDA-041). */

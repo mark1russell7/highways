@@ -10,8 +10,31 @@ This version is a MINOR before 1.0: the space `routeSpace` holds more options, a
 - The control `shared-ways-all` is a named point too.
 - `configOfMember(name)` gives the named point for a name without a form in `MEMBER_FORMS`. The reason for a name with no point changes its text.
 - The option `lambda` of `diffusion` goes up to 4, from 2. So the member `w3a:diffusion-l3` has a point, and `MEMBER_MISFITS` loses its row.
-- The record `space-size/1` counts 77 options of the stage `routing`, from 67.
+- The record `space-size/1` counts 77 options of the stage `routing`, from 67, and 1016275077761 base configs.
 - The new export `routerOfConfig(config)` gives the `Router` of a config of `routeSpace`, with the `maxNodes` of its strategy. Its name is the key of the named point with the same config, or the `configId`. `routeConfig` uses it.
+
+## 0.16.1
+
+This version is a PATCH before 1.0: it adds two strategies, a new optional field and new exports. The default routes do not change.
+
+### Strategies
+
+- The curve strategy `elastic` (NAT-026) is an elastic band on the polyline of a route. Springs pull the band taut, and the boxes near it push it away. A spline goes through the band.
+- When a route has no band, `elastic` gives the spline of the polyline with the plug normals. Thus the curve leaves along the normal of each plug.
+- The plug strategy `charges` (RULE-054) pushes the free plugs of a side apart as equal charges. A spring pulls each plug to the place of `facing`.
+- `routeSpace` has 10 plug options. The record `space-size/1` counts 1016275071962 base configs.
+
+### The rules of a curve
+
+- A curve strategy can declare `curveRules`: `g1` for a curve with no kink, and `normals` for a curve that leaves along the plug normals.
+- The bench checks the rules C1 and C10 of each strategy that declares them. Before, the bench checked a fixed list of names. Thus a variant of a screen got no check.
+- The built-in curves declare the rules that the fixed list gave them. The results of the bench do not change.
+
+### Exports
+
+- `elasticCurve`, `relaxBand`, `ELASTIC_DEFAULTS`, `ElasticOptions` and `ElasticStrategyOptions`.
+- `chargeEnds`, `chargePlugs`, `CHARGE_DEFAULTS` and `ChargeOptions`.
+- `CurveRules`, and the optional field `curveRules` of `Strategy` and `StrategyDefinition`.
 
 ## 0.16.0
 

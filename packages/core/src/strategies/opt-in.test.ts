@@ -43,9 +43,9 @@ describe("the keys of the strategies (CATALOG-LOOKUP)", () => {
 
   it("holds the built-in strategies and the 13 opt-in strategies, with no remainder", () => {
     const builtIn = STEPS.flatMap((step) => listStrategies(STRATEGIES, step) as readonly AnyStrategy[]);
-    expect(builtIn).toHaveLength(107);
+    expect(builtIn).toHaveLength(109);
     const listed = [...builtIn, ...OPT_IN_STRATEGIES, ...BASELINE_STRATEGIES, ...UNSCREENED_STRATEGIES];
-    expect(listed).toHaveLength(122);
+    expect(listed).toHaveLength(124);
     expect(new Set(every)).toEqual(new Set(listed));
     expect(BASELINE_STRATEGIES.map(keyOfStrategy)).toEqual(["highway/shared-ways-all", "router/one-trunk", "router/perimeter"]);
     expect(UNSCREENED_STRATEGIES.map(keyOfStrategy)).toEqual(["router/seams"]);

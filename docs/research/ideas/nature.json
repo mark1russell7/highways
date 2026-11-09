@@ -2438,7 +2438,7 @@
     "placementDependent": true,
     "screen": "The curve step on corners routes, case-many-groups and small-clustered. Keep if C3 median drops by 20% against smooth, with the counts curve-clear and curve-ends at 0.",
     "prototype": "S",
-    "stage": "cataloged",
+    "stage": "screened",
     "related": [
       "NAT-021",
       "NAT-038",
@@ -2447,7 +2447,111 @@
     "same": [
       "RULE-001"
     ],
-    "wave": 6
+    "wave": 6,
+    "result": {
+      "date": "2026-11-08",
+      "run": "https://github.com/mark1russell7/highways/actions/runs/42525962115",
+      "records": [
+        "screen-v1/*/smooth@ca10edc",
+        "screen-v1/*/spline@ca10edc",
+        "screen-v1/*/elastic@ca10edc",
+        "screen-v1/*/elastic-springs@ca10edc",
+        "screen-v1/*/elastic-step4@ca10edc",
+        "screen-v1/*/elastic-r100@ca10edc"
+      ],
+      "measures": {
+        "C3 curve.c3.median": {
+          "base": {
+            "smooth": 29.8941
+          },
+          "new": {
+            "elastic": 27.417,
+            "elastic-springs": 29.724,
+            "elastic-step4": 25.0774,
+            "elastic-r100": 27.2102
+          },
+          "byFamily": {
+            "many-groups": {
+              "smooth": 35.6229,
+              "spline": 39.4594,
+              "elastic": 45.6779,
+              "elastic-springs": 51.5472,
+              "elastic-step4": 47.2889,
+              "elastic-r100": 45.6779
+            },
+            "small-clustered": {
+              "smooth": 43.4432,
+              "spline": 34.6421,
+              "elastic": 44.169,
+              "elastic-springs": 41.6213,
+              "elastic-step4": 40.6902,
+              "elastic-r100": 42.6718
+            }
+          }
+        },
+        "C6 curve.c6.length": {
+          "base": {
+            "smooth": 0.9976
+          },
+          "new": {
+            "elastic": 1.0105,
+            "elastic-springs": 0.9922,
+            "elastic-step4": 1.0154,
+            "elastic-r100": 1.0103
+          },
+          "byFamily": {
+            "many-groups": {
+              "smooth": 0.9914,
+              "spline": 1.0068,
+              "elastic": 1.0,
+              "elastic-springs": 0.9821,
+              "elastic-step4": 1.0117,
+              "elastic-r100": 0.9973
+            },
+            "small-clustered": {
+              "smooth": 0.9966,
+              "spline": 1.0039,
+              "elastic": 1.011,
+              "elastic-springs": 0.9908,
+              "elastic-step4": 1.0193,
+              "elastic-r100": 1.0104
+            }
+          }
+        },
+        "C10 curve.rule.ends": {
+          "base": {
+            "smooth": 0.0
+          },
+          "new": {
+            "elastic": 0.0,
+            "elastic-springs": 0.0,
+            "elastic-step4": 0.0,
+            "elastic-r100": 0.0
+          },
+          "byFamily": {
+            "many-groups": {
+              "smooth": 0,
+              "spline": 0,
+              "elastic": 0,
+              "elastic-springs": 0,
+              "elastic-step4": 0,
+              "elastic-r100": 0
+            },
+            "small-clustered": {
+              "smooth": 0,
+              "spline": 0,
+              "elastic": 0,
+              "elastic-springs": 0,
+              "elastic-step4": 0,
+              "elastic-r100": 0
+            }
+          }
+        }
+      },
+      "verdict": "dropped",
+      "summary": "No setting of elastic lowers the C3 median by 20% against smooth on many-groups and small-clustered. The rule of the idea fails.",
+      "note": "Medians over the 14 inputs of screen-v1, after the fix of the fallback (c6cbdde). C10 and G1 give 0 breaks for each setting. On many-groups each setting has a higher C3 than smooth (45.7 to 51.5 against 35.6). On small-clustered the best is elastic-step4, 6% below smooth. elastic-springs (clearance 0) is on the Pareto front of 11 inputs, with the shortest curves (C6 0.992) and 12 ms against 121 ms for the default. The first run (42517217375) does not count: its default broke C10 on packed-grid."
+    }
   },
   {
     "id": "NAT-027",
