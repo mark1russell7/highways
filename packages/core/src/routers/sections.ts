@@ -86,6 +86,7 @@ const dedupe = (p: readonly Point[]): Point[] => p.filter((q, i) => i === 0 || d
  * The edges in one section of the lowest level go straight around the nodes.
  *
  * An edge skips a hub that takes it away from its target. A way that still goes out and back gives way to the direct way.
+ * A way through the hubs that goes through a box also gives way to the direct way, when the direct way goes through no box.
  *
  * The result gives one zoom level for each depth of the tree.
  * A link of a level goes from the boundary of one item to the boundary of the other, around the other items.
@@ -149,6 +150,8 @@ export function sectionsRouter(options: SectionsOptions): Router {
 
       // The ways between two places, found one time. A place is a hub or a free point.
       const pieces = new Map<string, Point[]>();
+      // The pieces with no way whose straight line goes through a box.
+      const blind = new Set<string>();
       const users = new Map<string, string[]>();
       const piece = (ka: string, a: Point, kb: string, b: Point, used: string[]): Point[] => {
         const forward = ka <= kb;
@@ -159,6 +162,7 @@ export function sectionsRouter(options: SectionsOptions): Router {
           const way = ways.way(from, to);
           p = dedupe(way ?? [from, to]);
           pieces.set(key, p);
+          if (!way && !ways.obstacles.clear(from, to, 0)) blind.add(key);
         }
         if (!used.includes(key)) used.push(key);
         return forward ? p : [...p].reverse();
@@ -206,6 +210,17 @@ export function sectionsRouter(options: SectionsOptions): Router {
         if (polylineLength(out) > stretch * dist(ps.point, pt.point) + stretchPad * ways.margin || goesOutAndBack(out)) {
           routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
           continue;
+        }
+        // A way through the hubs that goes through a box gives way to a direct way that goes through none (SITE-HUB-THROUGH).
+        // The way goes through a box when a piece has no way, or when a step from a plug goes into a box.
+        // With `outSteps: false`, the routes keep their bytes from before PLUG-OUT-BLOCKED, so this test does not run.
+        const ends = new Set<Node>([s, t]);
+        if (ways.outSteps && (used.some((key) => blind.has(key)) || !ways.obstacles.clear(ps.point, start, 0, ends) || !ways.obstacles.clear(end, pt.point, 0, ends))) {
+          const direct = ways.between(ps, pt, ends);
+          if (ways.obstacles.clearPath(direct, 0, ends)) {
+            routes.push({ edge: e.id, points: direct });
+            continue;
+          }
         }
         for (const key of used) {
           const list = users.get(key);

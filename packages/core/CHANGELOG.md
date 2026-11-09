@@ -30,6 +30,17 @@ This version is a MINOR before 1.0: the exported data `MEASURES` changes, and th
 - The fields `min` and `max` of `MeasureInfo`.
 - `RANGES` and `RangeRule`: the range of each measure, by its unit or its key, with the reason.
 
+## 0.17.0
+
+This version is a MINOR before 1.0, because default routes of `sectionsRouter` change. The public API does not change.
+
+### Routes that change
+
+- A way through the hubs that goes through a box gives way to the direct way, when the direct way goes through no box (SITE-HUB-THROUGH).
+- The way goes through a box when a piece between two hubs has no way. A step from a plug into a box does too.
+- The options `margin: 20, stretch: 3, cap: 6` move 4 of 6,307 routes of 84 boards. Their `route.through` goes from 296 to 292.
+- With the default options, no route of these boards moves. The option `outSteps: false` keeps the routes of 0.16.0.
+
 ## 0.16.1
 
 This version is a PATCH before 1.0: it adds two strategies, a new optional field and new exports. The default routes do not change.
