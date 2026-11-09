@@ -1,6 +1,6 @@
 # Changelog of `@mark1russell7/highways`
 
-## 0.16.2
+## 0.17.1
 
 This version is a PATCH: it adds an export and an optional parameter. No output changes.
 
@@ -10,6 +10,17 @@ This version is a PATCH: it adds an export and an optional parameter. No output 
 - The new function `pickLevelOf(levels, scale, options)` picks a level from the levels themselves. Its options are the thresholds of `pickLevel`, `side` and `minItems`.
 - With `minItems`, the search from fine to coarse stops at a level with fewer items. When no level passes, the pick is the coarsest level with enough items.
 - Without `side` and `minItems`, `pickLevelOf` gives the result of `pickLevel`. A test compares a rule with one threshold on 400 random sets of levels.
+
+## 0.17.0
+
+This version is a MINOR before 1.0, because default routes of `sectionsRouter` change. The public API does not change.
+
+### Routes that change
+
+- A way through the hubs that goes through a box gives way to the direct way, when the direct way goes through no box (SITE-HUB-THROUGH).
+- The way goes through a box when a piece between two hubs has no way. A step from a plug into a box does too.
+- The options `margin: 20, stretch: 3, cap: 6` move 4 of 6,307 routes of 84 boards. Their `route.through` goes from 296 to 292.
+- With the default options, no route of these boards moves. The option `outSteps: false` keeps the routes of 0.16.0.
 
 ## 0.16.1
 

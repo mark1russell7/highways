@@ -114,7 +114,10 @@ jobs:
           if-no-files-found: warn
 
   plan:
-    if: ${{ inputs.pairs != '' }}
+    # The input `pairs` runs measure and join, or plan and confirm, never the two. The chain join, then plan, puts this in the job graph.
+    # So the peak of the graph is 3 jobs. With a skipped join, `!cancelled()` lets plan run.
+    needs: join
+    if: ${{ !cancelled() && inputs.pairs != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
