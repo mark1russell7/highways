@@ -599,7 +599,7 @@ export const DIFFUSION_SCHEMA: OptionSchema<DiffusionOptions> = {
   k: WAY_SCHEMA.k,
   a: { type: "number", min: 0, max: 0.5, step: 0.05, default: 0.25, describe: "The share of the density that each step takes from the links next to a link." },
   steps: { type: "integer", min: 0, max: 10, step: 1, default: 3, describe: "The number of steps of the diffusion." },
-  lambda: { type: "number", min: 0, max: 2, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the density in the cost of a link." },
+  lambda: { type: "number", min: 0, max: 4, step: 0.25, marks: [0.5, 1, 2], default: 1, describe: "The weight of the density in the cost of a link." },
   gamma: { type: "number", min: 0.5, max: 2, step: 0.25, default: 1, describe: "The power of the discount of a dense link." },
   minSize: { type: "integer", min: 2, max: 16, step: 1, default: 2, describe: "A highway has this number of edges or more." },
 };

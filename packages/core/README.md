@@ -914,7 +914,7 @@ The step `plugs` gives the plugs of the router `corners`. The step `group` gives
 |---|---|---|
 | `grouping` | `edge-key`, `quadtree`, `kd`, `cut`, `data-keys` | `edge-key`: `trunks`, `shared`, `keys`, `shared-ways`, `soft-keys`. The other options: `sections`. |
 | `plugs` | `facing`, `side`, and `rule-<name>` for each plug strategy | `corners` |
-| `routing` | 6 routers and 61 highway plans | Each config |
+| `routing` | 6 routers, 10 opt-in routers and 61 highway plans | Each config |
 | `gate` | `breakeven`, `stretch`, `ambiguity`, `hysteresis`, `ids` | Each highway plan without the keys of the gate |
 | `lane-order` | `bundle`, `run`, `stretch` | `trunks`, `shared`, `sections`, `keys`, `shared-ways`. Only `shared` and `shared-ways` take `stretch`. |
 | `smoothing` | `smooth` | Each router with the option `smooth` |
@@ -929,6 +929,7 @@ The step `plugs` gives the plugs of the router `corners`. The step `group` gives
 - `ROUTE_SPACE_LEFT_OUT` gives each option that the space does not hold, with its reason. The router gets the default of that option.
 - `ROUTE_SPACE_MISFITS` gives each router of the table that is not a named point. The list is empty.
 - `configOfMember(name)` gives the point of a member of `MEMBER_FORMS`, or a reason. `routeConfig` of the point gives the routes of the member.
+- A name without a form gets its named point. Thus each opt-in router but `portfolio`, and the control `shared-ways-all`, has a point.
 - `MEMBER_MISFITS` gives each name with no point, with its reason.
 - The portfolio router is not in the space. It is a selector over the routers.
 
