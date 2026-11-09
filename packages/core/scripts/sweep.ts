@@ -21,7 +21,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import {
-  fitResponse,
   RESPONSE_RECORDS_SCHEMA,
   type ResponseData,
   type ResponseDimension,
@@ -36,6 +35,7 @@ import { getStrategy, type Step, type Strategy } from "../src/strategies/model.t
 import { optionDefaults, sweepValues, type AnyOption, type NumberOption } from "../src/strategies/options.ts";
 import { highwaysRegistry } from "../src/families/index.ts";
 import { setInputs } from "./corpus-files.ts";
+import { fitSweep } from "./sweep-fit.ts";
 import { drawInputs, FAMILY_DIMENSION, inputDimensions } from "./sweep-inputs.ts";
 import { BOARD_MEASURES, RATIO_SUFFIX, ROUTE_MEASURES, type SweepMeasure } from "./sweep-measures.ts";
 
@@ -305,9 +305,12 @@ const data: ResponseData = {
   reasons: REASONS,
   points: keptPoints,
 };
-// The times have a long tail, so their model uses a log scale. A time below 0.01 ms gets 0.01 ms.
-const record = fitResponse(data, { interactions: "seen", ...(kept.has("ms") ? { log: ["ms"], logFloor: 0.01 } : {}) });
 mkdirSync(dirname(out), { recursive: true });
+// The file gets the points before the fit, so a fit that fails keeps the points of the sweep.
+writeFileSync(out, recordText({ ...data, models: [], folds: [] }));
+// The times have a long tail, so their model uses a log scale. A time below 0.01 ms gets 0.01 ms.
+const { record, interactions } = fitSweep(data, kept.has("ms") ? { log: ["ms"], logFloor: 0.01 } : {});
+if (interactions === false) warn("The expansion with the interactions seen has too many terms, so the models of this record have no interactions.");
 // The record has one point on each line, so a change of a record gives a short diff.
 writeFileSync(out, recordText(record));
 const seconds = ((performance.now() - start) / 1000).toFixed(1);
