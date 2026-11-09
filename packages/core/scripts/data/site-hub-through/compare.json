@@ -1,0 +1,28 @@
+{
+  "sections": {
+    "routes": 6307,
+    "moved": 0,
+    "throughBefore": 292,
+    "throughAfter": 292,
+    "moves": []
+  },
+  "sections-tree": {
+    "routes": 6307,
+    "moved": 0,
+    "throughBefore": 292,
+    "throughAfter": 292,
+    "moves": []
+  },
+  "sections-site": {
+    "routes": 6307,
+    "moved": 4,
+    "throughBefore": 296,
+    "throughAfter": 292,
+    "moves": [
+      "thin-bars/1 e12: through true -> false",
+      "thin-bars/2 e16: through true -> false",
+      "comb/0 e11: through true -> false",
+      "comb/2 e1: through true -> false"
+    ]
+  }
+}
