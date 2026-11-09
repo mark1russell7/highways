@@ -185,8 +185,9 @@ export function compareStep(step: CompareStep, graph: Graph, options: CompareOpt
     const lanes = options.lanes && laneBoard(result, options.lanes);
     const runs = curveRuns(graph, result, listStrategies(registry, "curve"), {
       ...at,
-      smooth: new Set(["rounded", "arc", "spline", "smooth", "clothoid", "highway"]),
-      normals: new Set(["spline"]),
+      // Each built-in curve declares its rules in `curveRules`, and so does a curve of a screen module.
+      smooth: new Set<string>(),
+      normals: new Set<string>(),
       curveOptions: own,
       ...(lanes ? { lanes } : {}),
     });

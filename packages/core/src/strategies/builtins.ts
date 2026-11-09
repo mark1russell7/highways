@@ -1,5 +1,6 @@
 import { arcCurve, type ArcOptions } from "../curves/arc/index.ts";
 import { clothoidCurve, type ClothoidOptions } from "../curves/clothoid/index.ts";
+import { ELASTIC_DEFAULTS, elasticCurve, type ElasticStrategyOptions } from "../curves/elastic/index.ts";
 import { highwayCurve, highwayCurves, type JogStyle, type LaneCurve } from "../curves/highway/index.ts";
 import type { CurveSegment } from "../curves/model.ts";
 import { roundedCurve, type RoundedOptions } from "../curves/rounded/index.ts";
@@ -105,12 +106,13 @@ import { TWO_WAY_DEFAULTS, twoWayPlan, type TwoWayOptions } from "../highways/tw
 import { GLOBAL_ORDER_DEFAULTS, globalOrderPlan, type GlobalOrderOptions } from "../highways/global-order/index.ts";
 import { APPROVAL_DEFAULTS, approvalPlan, type ApprovalOptions } from "../highways/approval/index.ts";
 import { ESCAPE_DEFAULTS, escapeEnds, type EscapeOptions } from "../plugs/escape/index.ts";
+import { CHARGE_DEFAULTS, chargeEnds, type ChargeOptions } from "../plugs/charges/index.ts";
 import { CROP_DEFAULTS, crops, type CropOptions } from "../whole/crops/index.ts";
 import { CHOICE_DEFAULTS, choice, type ChoiceOptions } from "../whole/choice/index.ts";
 import { createRegistry, defineStrategy, type AnyStrategy, type CurveInput, type LaneBoard, type Registry, type Strategy } from "./model.ts";
 import type { OptionSchema } from "./options.ts";
 import { AREA_SCHEMA, CONFLUENT_SCHEMA, CROSSBAR_SCHEMA, FRECHET_SCHEMA, MLSEB_SCHEMA, POWER_SCHEMA, SBEB_SCHEMA } from "./schemas.ts";
-import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA } from "./schemas.ts";
+import { ASSIGN_SCHEMA, DEPTHS_SCHEMA, JUSTIFY_SCHEMA, PIPELINE_SCHEMA, SIDE_PLUG_SCHEMA, SPREAD_SCHEMA, CLOTHOID_SCHEMA, CORNERS_SCHEMA, CORRIDOR_SCHEMA, CONSENSUS_SCHEMA, CUBU_SCHEMA, CUT_SCHEMA, DIFFUSION_SCHEMA, DIVIDED_SCHEMA, EDGE_PATH_SCHEMA, FDEB_SCHEMA, FLOW_CLUSTER_SCHEMA, FLOW_FIELD_SCHEMA, GROWTH_SCHEMA, HDBSCAN_SCHEMA, HIERARCHY_SCHEMA, HIGHWAY_SCHEMA, HOUGH_SCHEMA, HUB_ARC_SCHEMA, KD_SCHEMA, KDEEB_SCHEMA, KEY_SCHEMA, LANES_SCHEMA, LEVEL_HIGHWAY_SCHEMA, LEVEL_ROOM_SCHEMA, LINK_COMMUNITY_SCHEMA, MEET_SCHEMA, MESH_SCHEMA, MINGLE_SCHEMA, NESTED_SCHEMA, OD_CELL_SCHEMA, P_HUB_SCHEMA, QUICKBUNDLES_SCHEMA, RADIUS_SCHEMA, RESISTANCE_SCHEMA, RIDGE_SCHEMA, ROAD_CLASS_SCHEMA, ROOM_SCHEMA, SCALE_SPACE_SCHEMA, SECTION_SCHEMA, SELECT_SCHEMA, SECTIONS_SCHEMA, SHARED_ALL_SCHEMA, SHARED_SCHEMA, SMOOTH_SCHEMA, SOFT_KEY_SCHEMA, SPECTRAL_SCHEMA, SPIRAL_SCHEMA, STUB_SCHEMA, TENSION_SCHEMA, TERRITORY_SCHEMA, TRACLUS_SCHEMA, TRUNKS_SCHEMA, WEISZFELD_SCHEMA, WSPD_SCHEMA, ZIPPER_SCHEMA, STEINER_SCHEMA, GAP_SCHEMA, STREET_SCHEMA, SEARCH_SCHEMA, INTERCHANGE_SCHEMA, KNEE_SCHEMA, BRONCHIAL_SCHEMA, BOARD_PORTFOLIO_SCHEMA, VENATION_SCHEMA, BALANCE_SCHEMA, MANIFOLD_SCHEMA, LEADER_SCHEMA, DETAIL_SCHEMA, CURRICULUM_SCHEMA, SLOT_SCHEMA, PREFERENCE_SCHEMA, FIREFLY_SCHEMA, TRACING_SCHEMA, TWO_WAY_SCHEMA, GLOBAL_ORDER_SCHEMA, APPROVAL_SCHEMA, ESCAPE_SCHEMA, CHARGE_SCHEMA, CROP_SCHEMA, CHOICE_SCHEMA, ELASTIC_SCHEMA } from "./schemas.ts";
 
 /** The options of a router strategy: the options of its router, without the name and the limit of the benchmark. */
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
@@ -291,11 +293,13 @@ export const curveStrategies: {
   readonly smooth: Strategy<"curve", SmoothStrategyOptions>;
   readonly clothoid: Strategy<"curve", ClothoidStrategyOptions>;
   readonly highway: Strategy<"curve", HighwayStrategyOptions>;
+  readonly elastic: Strategy<"curve", ElasticStrategyOptions>;
 } = Object.freeze({
   straight: defineStrategy({ step: "curve", name: "straight", describe: "The polyline as it is.", defaults: {}, schema: {}, run: (input: CurveInput) => straightCurve(input.points) }),
   rounded: defineStrategy({
     step: "curve",
     name: "rounded",
+    curveRules: { g1: true },
     describe: "A quadratic Bezier curve at each corner, as `roundCorners` draws it. The first and the last legs stay.",
     defaults: { radius: 12 },
     schema: RADIUS_SCHEMA,
@@ -304,6 +308,7 @@ export const curveStrategies: {
   spline: defineStrategy({
     step: "curve",
     name: "spline",
+    curveRules: { g1: true, normals: true },
     describe: "A centripetal Catmull-Rom spline through each point. It does not overshoot or make loops in a piece.",
     defaults: { tension: 0 },
     schema: TENSION_SCHEMA,
@@ -312,6 +317,7 @@ export const curveStrategies: {
   arc: defineStrategy({
     step: "curve",
     name: "arc",
+    curveRules: { g1: true },
     describe: "A circular arc at each corner, tangent to the two legs. The first and the last legs stay.",
     defaults: { radius: 12 },
     schema: RADIUS_SCHEMA,
@@ -320,6 +326,7 @@ export const curveStrategies: {
   smooth: defineStrategy({
     step: "curve",
     name: "smooth",
+    curveRules: { g1: true },
     describe: "A cubic spiral, an arc and a second cubic spiral at each corner, as the corner smoothing of Figma. The curvature has no jump.",
     defaults: { radius: 12, smoothing: 0.6 },
     schema: SMOOTH_SCHEMA,
@@ -329,6 +336,7 @@ export const curveStrategies: {
   clothoid: defineStrategy({
     step: "curve",
     name: "clothoid",
+    curveRules: { g1: true },
     describe: "A clothoid, an arc and a second clothoid at each corner, as a transition curve of a road. Cubic pieces draw each clothoid.",
     defaults: { radius: 12, spiral: 0.5, tolerance: 0.25 },
     schema: CLOTHOID_SCHEMA,
@@ -343,11 +351,21 @@ export const curveStrategies: {
   highway: defineStrategy({
     step: "curve",
     name: "highway",
+    curveRules: { g1: true },
     describe: "The lanes of a bundle bend as one, with concentric arcs at the lane spacing. One lane alone gets the curve of `arc`.",
     defaults: { radius: 12, minRadius: 4, jog: "biarc" as JogStyle, jogPieces: 4 },
     schema: HIGHWAY_SCHEMA,
     run: (input: CurveInput, o: Readonly<HighwayStrategyOptions>) =>
       input.lane ? highwayLane({ ...input, lane: input.lane }, o) : highwayCurve(input.points, { radius: o.radius, ...(input.space ? { space: input.space } : {}) }),
+  }),
+  elastic: defineStrategy({
+    step: "curve",
+    name: "elastic",
+    curveRules: { g1: true, normals: true },
+    describe: "An elastic band (NAT-026): springs pull the route taut, and the near boxes push it away. A spline goes through the band.",
+    defaults: { ...ELASTIC_DEFAULTS },
+    schema: ELASTIC_SCHEMA,
+    run: (input: CurveInput, o: Readonly<ElasticStrategyOptions>) => elasticCurve(input.points, { ...contextOf(input), ...o }),
   }),
 });
 
@@ -1065,6 +1083,7 @@ export const plugStrategies: {
   readonly leaders: Strategy<"plugs", LeaderOptions>;
   readonly assign: Strategy<"plugs", AssignOptions>;
   readonly escape: Strategy<"plugs", EscapeOptions>;
+  readonly charges: Strategy<"plugs", ChargeOptions>;
 } = Object.freeze({
   facing: defineStrategy({
     step: "plugs",
@@ -1121,6 +1140,14 @@ export const plugStrategies: {
     defaults: { ...ESCAPE_DEFAULTS },
     schema: ESCAPE_SCHEMA,
     run: (input, o) => escapeEnds(input, o),
+  }),
+  charges: defineStrategy<"plugs", ChargeOptions>({
+    step: "plugs",
+    name: "charges",
+    describe: "Charges on a side (RULE-054). The free plugs of a side push apart as equal charges, and a spring pulls each plug to the place that faces its far end.",
+    defaults: { ...CHARGE_DEFAULTS },
+    schema: CHARGE_SCHEMA,
+    run: (input, o) => chargeEnds(input, o),
   }),
 });
 

@@ -1,7 +1,7 @@
 {
  "schema": "space-size/1",
  "space": "highways",
- "digest": "6452a62aca2dd0bb932c8ea88b3c53d47370028f92f385f1a5f5a7342df497f5",
+ "digest": "2011651db0302c6e5af8fd647ce0763e4e5924bca8d794a555727a4901a45657",
  "levels": 3,
  "stages": [
   {
@@ -13,8 +13,8 @@
   {
    "name": "plugs",
    "optional": true,
-   "options": 9,
-   "params": 20
+   "options": 10,
+   "params": 23
   },
   {
    "name": "routing",
@@ -48,11 +48,11 @@
   }
  ],
  "constraints": 360,
- "base": "1016274652058",
+ "base": "1016275071962",
  "meta": "0",
  "seconds": 0,
- "cpu": "AMD EPYC 9V74 80-Core Processor",
- "date": "2026-11-08T15:23:33Z",
- "run": "42494175371",
- "commit": "99e0dc5de34313b83876c30a4e7d4cd1225b1ab0"
+ "cpu": "AMD Ryzen AI 7 PRO 350 w/ Radeon 860M          ",
+ "date": "2026-11-08T21:02:57.021Z",
+ "run": null,
+ "commit": null
 }
