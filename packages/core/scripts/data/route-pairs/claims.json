@@ -1,7 +1,7 @@
 {
  "schema": "route-pairs-claims/1",
  "regenerate": "node packages/core/scripts/route-pairs-claims.ts packages/core/scripts/data/route-pairs/claims.json",
- "total": 282,
+ "total": 285,
  "counts": {
   "better / ink more": 111,
   "better / ink not more": 2,
@@ -9,7 +9,7 @@
   "no verdict / ink more": 51,
   "no verdict / ink not more": 16,
   "worse / ink more": 29,
-  "worse / ink not more": 70
+  "worse / ink not more": 73
  },
  "bySet": {
   "screen-v1": {
@@ -18,7 +18,7 @@
    "no verdict / ink more": 28,
    "no verdict / ink not more": 7,
    "worse / ink more": 3,
-   "worse / ink not more": 25
+   "worse / ink not more": 26
   },
   "screen-v2": {
    "better / ink more": 38,
@@ -26,7 +26,7 @@
    "no verdict / ink more": 7,
    "no verdict / ink not more": 4,
    "worse / ink more": 16,
-   "worse / ink not more": 28
+   "worse / ink not more": 29
   },
   "screen-v3": {
    "better / ink more": 45,
@@ -34,7 +34,7 @@
    "no verdict / ink more": 16,
    "no verdict / ink not more": 5,
    "worse / ink more": 10,
-   "worse / ink not more": 17
+   "worse / ink not more": 18
   }
  },
  "rows": [
@@ -873,7 +873,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -883,7 +883,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -893,7 +893,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -903,7 +903,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -913,7 +913,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -923,8 +923,18 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "escape",
+   "label": "worse",
+   "ink": "not more"
+  },
+  {
+   "file": "screen-v1-plugs.json",
+   "set": "screen-v1",
+   "step": "plugs",
+   "base": "facing",
+   "core": "0.16.1",
+   "strategy": "charges",
    "label": "worse",
    "ink": "not more"
   },
@@ -1763,7 +1773,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -1773,7 +1783,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -1783,7 +1793,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -1793,7 +1803,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -1803,7 +1813,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -1813,8 +1823,18 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "escape",
+   "label": "worse",
+   "ink": "not more"
+  },
+  {
+   "file": "screen-v2-plugs.json",
+   "set": "screen-v2",
+   "step": "plugs",
+   "base": "facing",
+   "core": "0.16.1",
+   "strategy": "charges",
    "label": "worse",
    "ink": "not more"
   },
@@ -2653,7 +2673,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -2663,7 +2683,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -2673,7 +2693,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -2683,7 +2703,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -2693,7 +2713,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -2703,8 +2723,18 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.10.0",
+   "core": "0.16.1",
    "strategy": "escape",
+   "label": "worse",
+   "ink": "not more"
+  },
+  {
+   "file": "screen-v3-plugs.json",
+   "set": "screen-v3",
+   "step": "plugs",
+   "base": "facing",
+   "core": "0.16.1",
+   "strategy": "charges",
    "label": "worse",
    "ink": "not more"
   },
