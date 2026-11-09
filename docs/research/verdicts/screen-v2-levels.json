@@ -7,7 +7,7 @@
   "commit": "2a5caedfa78c7761bd88e43f5ee1e3dd8bdea1b2",
   "date": "2026-10-29",
   "core": "0.9.4",
-  "verified": {"core":"0.16.1","run":42582811615,"commit":"ff2d23d68699c813f2f7375dd08a637bac5b17bd","date":"2026-11-09"},
+  "verified": {"core":"0.17.1","run":42660377369,"commit":"593c7aab68fd218ff413f5b3a5ded01f3f38e4f2","date":"2026-11-09"},
   "rows": [
     {"strategy":"venation","guard":"R1","measure":"route.crossings","label":"no verdict","old":"tie","stratified":0,"pooled":0,"p":1,"families":[{"family":"dense-groups","n":10,"mean":0,"sign":0},{"family":"hub-chain","n":10,"mean":0,"sign":0},{"family":"many-groups","n":10,"mean":0,"sign":0},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"small-clustered","n":10,"mean":0,"sign":0},{"family":"tiny-uniform","n":10,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},
     {"strategy":"venation","guard":"R4","measure":"route.turn.mean","label":"no verdict","old":"tie","stratified":0,"pooled":0,"p":1,"families":[{"family":"dense-groups","n":10,"mean":0,"sign":0},{"family":"hub-chain","n":10,"mean":0,"sign":0},{"family":"many-groups","n":10,"mean":0,"sign":0},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"small-clustered","n":10,"mean":0,"sign":0},{"family":"tiny-uniform","n":10,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":6}},

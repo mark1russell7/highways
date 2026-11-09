@@ -7,6 +7,7 @@
   "commit": "ff2d23d68699c813f2f7375dd08a637bac5b17bd",
   "date": "2026-11-09",
   "core": "0.16.1",
+  "verified": {"core":"0.17.1","run":42660377369,"commit":"593c7aab68fd218ff413f5b3a5ded01f3f38e4f2","date":"2026-11-09"},
   "script": "ff2d23d68699c813f2f7375dd08a637bac5b17bd",
   "rows": [
     {"strategy":"side","guard":"R1","measure":"route.crossings","label":"better","old":"better","stratified":27.87333333333333,"pooled":27.873333333333335,"p":0.00004999750012499375,"families":[{"family":"bipartite","n":10,"mean":3,"sign":1},{"family":"dense-groups","n":10,"mean":94.3,"sign":1},{"family":"fan-out","n":10,"mean":19.5,"sign":1},{"family":"frame-rows","n":10,"mean":0,"sign":0},{"family":"hub-chain","n":10,"mean":14.1,"sign":1},{"family":"local-mesh","n":10,"mean":0,"sign":0},{"family":"many-groups","n":10,"mean":8.5,"sign":1},{"family":"packed-grid","n":10,"mean":0,"sign":0},{"family":"pipeline","n":10,"mean":0.1,"sign":1},{"family":"small-clustered","n":10,"mean":47.7,"sign":1},{"family":"sparse-long","n":10,"mean":0.1,"sign":1},{"family":"thin-bars","n":10,"mean":1.7,"sign":1},{"family":"tiny-uniform","n":10,"mean":0.5,"sign":1},{"family":"two-hubs","n":10,"mean":120.6,"sign":1},{"family":"uneven-sizes","n":10,"mean":108,"sign":1}],"breadth":{"against":0,"of":15,"ties":3},"through":924,"baseThrough":924},
