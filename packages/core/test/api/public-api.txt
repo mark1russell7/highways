@@ -1376,6 +1376,7 @@ routeSeparation: build/index.d.ts#routeSeparation
 routeSpace: build/index.d.ts#routeSpace
 routeStability: build/index.d.ts#routeStability
 routeSymmetry: build/index.d.ts#routeSymmetry
+routerOfConfig: build/index.d.ts#routerOfConfig
 routerStrategies: build/index.d.ts#routerStrategies
 routersOf: build/index.d.ts#routersOf
 rowFit: build/index.d.ts#rowFit
@@ -7992,6 +7993,9 @@ export declare function routeStability(graph: Graph, before: Result, after: Resu
 
 ### build/index.d.ts#routeSymmetry
 export declare function routeSymmetry(graph: Graph, routes: readonly Route[]): number | undefined;
+
+### build/index.d.ts#routerOfConfig
+export declare function routerOfConfig(config: StrategyConfig): Router;
 
 ### build/index.d.ts#routerStrategies
 export declare const routerStrategies: {

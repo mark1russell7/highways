@@ -5,6 +5,7 @@
 import {
   canonicalConfig,
   checkConfig,
+  configId,
   paramValue,
   STRATEGY_SPACE_SCHEMA,
   type ParamValue,
@@ -25,7 +26,7 @@ import { stretchGate } from "./highways/gates/stretch/index.ts";
 import { ARC_SOURCES } from "./highways/hub-arcs/index.ts";
 import { highwayRouterStrategy } from "./highways/router.ts";
 import { CANDIDATE_SOURCES } from "./highways/select/index.ts";
-import type { Graph, Result } from "./model.ts";
+import type { Graph, Result, Router } from "./model.ts";
 import { MEMBER_FORMS, type MemberForm } from "./portfolio/members.ts";
 import { adamStrategy, annealingStrategy, attractionStrategy, canalStrategy, nudgeStrategy, repelStrategy, rerouteStrategy, springsStrategy, tightStrategy } from "./routers/index.ts";
 import { seamsStrategy } from "./routers/seams/index.ts";
@@ -498,10 +499,36 @@ function routerOf(config: StrategyConfig): { readonly router: Strategy<"router",
  * - The routes of each named point are equal to the routes of the router of that name.
  */
 export function routeConfig(graph: Graph, config: StrategyConfig): Result {
+  return routerOfConfig(config).route(graph);
+}
+
+/** The name of each named point of `routeSpace`, by its `configId`. The function `nameOfConfig` makes it at its first call. */
+let namedById: Map<string, string> | undefined;
+
+/** This function gives the key of the named point with the config, or the `configId` of the config. */
+function nameOfConfig(config: StrategyConfig): string {
+  namedById ??= new Map(Object.entries(NAMED).map(([name, point]) => [configId(routeSpace, point), name]));
+  const id = configId(routeSpace, config);
+  return namedById.get(id) ?? id;
+}
+
+/**
+ * This function gives the `Router` of a config of `routeSpace`. The function `route` of the router gives the routes of `routeConfig`.
+ *
+ * - The function checks the config with `checkConfig`. A config with a break causes a `RangeError` with the details of each break.
+ * - The name is the key of the named point with the same canonical config. Without a named point, the name is the `configId`.
+ * - The router keeps the `maxNodes` of the strategy of the stage `routing`. A plan keeps the `maxNodes` of its `follow` router.
+ */
+export function routerOfConfig(config: StrategyConfig): Router {
   const breaks = checkConfig(routeSpace, config);
   if (breaks.length > 0) throw new RangeError(`The config is not a config of the space highways: ${breaks.map((b) => b.detail).join("; ")}.`);
-  const { router, options } = routerOf(canonicalConfig(routeSpace, config));
-  return router.run(graph, options);
+  const canonical = canonicalConfig(routeSpace, config);
+  const { router, options } = routerOf(canonical);
+  return {
+    name: nameOfConfig(canonical),
+    ...(router.maxNodes === undefined ? {} : { maxNodes: router.maxNodes }),
+    route: (graph: Graph): Result => router.run(graph, options),
+  };
 }
 
 /** The point of a member in `routeSpace`: its config, or the reason that it has no config. */

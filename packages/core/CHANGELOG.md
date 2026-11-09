@@ -11,6 +11,7 @@ This version is a MINOR before 1.0: the space `routeSpace` holds more options, a
 - `configOfMember(name)` gives the named point for a name without a form in `MEMBER_FORMS`. The reason for a name with no point changes its text.
 - The option `lambda` of `diffusion` goes up to 4, from 2. So the member `w3a:diffusion-l3` has a point, and `MEMBER_MISFITS` loses its row.
 - The record `space-size/1` counts 77 options of the stage `routing`, from 67.
+- The new export `routerOfConfig(config)` gives the `Router` of a config of `routeSpace`, with the `maxNodes` of its strategy. Its name is the key of the named point with the same config, or the `configId`. `routeConfig` uses it.
 
 ## 0.16.0
 
