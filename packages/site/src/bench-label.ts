@@ -1,5 +1,7 @@
 // The label of the benchmark snapshot: its run, its commit and its date, and a warning when the snapshot is old.
 
+import { escapeAttribute as esc } from "@mark1russell7/text";
+
 /** The fields of `bench-meta.json` that the label uses. Each field can be absent. */
 export interface BenchMeta {
   readonly run?: number;
@@ -27,10 +29,6 @@ export interface BenchLabel {
 export const STALE_DAYS = 1;
 
 const REPO = "https://github.com/mark1russell7/highways";
-
-/** This function escapes text for HTML. */
-const esc = (text: string): string =>
-  text.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[ch]!);
 
 /** This function gives the day number of a date of the form `YYYY-MM-DD`, or `undefined` when the text is not such a date. */
 function dayOf(date: string | undefined): number | undefined {

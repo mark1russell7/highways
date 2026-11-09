@@ -25,6 +25,7 @@ import { cleanGen, START_GEN, type GenSpec } from "./generated.ts";
 import { COMPARE_STRATEGIES, OPT_IN_NOTES, OPT_IN_TAG, type OptInNote } from "./opt-in.ts";
 import { optionSet } from "./option-control.ts";
 import type { CompareReply, CompareRequest } from "./protocol.ts";
+import { escapeAttribute as esc } from "@mark1russell7/text";
 import "./style.css";
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -33,7 +34,6 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 /** This function escapes a text and shows each span between backticks as code. */
 const codeText = (text: string): string => esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 const fmt = new Intl.NumberFormat("en-US");
