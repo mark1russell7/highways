@@ -2,6 +2,7 @@
 import data from "virtual:results";
 import { ageText, LABELS, readCore, recordAge, type VerdictCell, type VerdictLabel, type VerdictTable } from "./results-data.ts";
 import { cardId } from "./strategies-data.ts";
+import { escapeAttribute as esc } from "@mark1russell7/text";
 import "./style.css";
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -10,7 +11,6 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const REPO = "https://github.com/mark1russell7/highways";
 /** The date of the viewer. A page built some time ago still shows the true age of its records. */
 const TODAY = new Date().toISOString().slice(0, 10);

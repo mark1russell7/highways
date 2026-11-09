@@ -4,6 +4,7 @@ import { mountExplorer } from "@mark1russell7/site-pages/explorer";
 import "@mark1russell7/site-pages/explorer.css";
 import data from "virtual:explorer";
 import { firstOption, SWEEP_DIR } from "./explorer-data.ts";
+import { escapeAttribute as esc } from "@mark1russell7/text";
 import "./style.css";
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -12,7 +13,6 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const esc = (text: string): string => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const REPO = "https://github.com/mark1russell7/highways";
 const count = (n: number): string => n.toLocaleString("en-US");
 const fileLink = (file: string): string => `<a href="${REPO}/blob/main/${SWEEP_DIR}/${encodeURIComponent(file)}"><code>${esc(file)}</code></a>`;
