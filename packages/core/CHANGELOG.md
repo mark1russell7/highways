@@ -1,5 +1,35 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.0
+
+This version is a MINOR before 1.0: the exported data `MEASURES` changes, and the stability lengths change their unit. The routes do not change.
+
+### The range of each measure
+
+- Each row of `MEASURES` has the new fields `min` and `max`. They give the range of the values of the measure. `max` is `Infinity` when the measure has no upper limit.
+- A test runs a screen of each step on a small board, and it checks that each value of the records is in the range of its measure.
+- The unit texts give no range. A share and a flag of 0 or 1 have the unit `share`. A signed value has `no unit`. The share of the gap that a strategy closes has `ratio`, with no limit on each side.
+- The results page of the site shows the range of each measure.
+
+### Three values that left their range
+
+- `route.backtrack` (R7) divides by the larger of the edges and the routes. Before, a result with more routes than edges gave a value above 1.
+- `treeCost` (G8) counts at most the `n` nodes of the graph for an item. Before, an item with a node two times gave a value above 1.
+- The high end of the interval of a sampled pair count is never below its low end. The low end was already 0 or more.
+- These three values do not change for a valid result.
+
+### The unit of the stability lengths
+
+- The lengths of Z10 and Z12 (`routeStability`, `highwayEdits` and the stability rows of the suite and the screen) are over the width `W` of the board. Before, they were over the unit of the board.
+- `W` is the width of the bounding box of the boxes of the nodes. A board has no margins. The new function `boardWidth` gives `W`.
+- Thus a stability value compares across boards of different sizes. The share of the routes that move does not change.
+
+### Exports
+
+- `boardWidth`.
+- The fields `min` and `max` of `MeasureInfo`.
+- `RANGES` and `RangeRule`: the range of each measure, by its unit or its key, with the reason.
+
 ## 0.16.1
 
 This version is a PATCH before 1.0: it adds two strategies, a new optional field and new exports. The default routes do not change.

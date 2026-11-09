@@ -92,6 +92,23 @@ export function boardUnit(graph: Graph): number {
   return u > 0 ? u : 1;
 }
 
+/**
+ * This function gives the width `W` of a board: the width of the bounding box of the boxes of the nodes.
+ * `W` is the unit of the stability lengths (Z10 and Z12), as the joint measures of `@mark1russell7/layout-contract` use it for a board without a fixed container.
+ * A board has no margins, so `W` has none. The width of a board without nodes, or with a bounding box of width 0, is 1.
+ */
+export function boardWidth(graph: Graph): number {
+  if (graph.nodes.length === 0) return 1;
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const n of graph.nodes) {
+    lo = Math.min(lo, n.box.x);
+    hi = Math.max(hi, n.box.x + n.box.w);
+  }
+  const w = hi - lo;
+  return w > 0 ? w : 1;
+}
+
 /** The crossings of a set of drawn segments and their angles (R1 and R2 of MEAS0). */
 export interface CrossingAngles {
   /** The number of crossings (R1). It is the same value as `crossings` of `measureQuality`. */

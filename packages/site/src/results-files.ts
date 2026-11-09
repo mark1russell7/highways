@@ -6,7 +6,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { KEYED_FAMILIES, MEASURES } from "@mark1russell7/highways";
 import { marked } from "marked";
-import { isSnapshotFile, resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
+import { isSnapshotFile, rangeText, resultsData, type IdeaRecord, type MeasureRow, type ResultsData } from "./results-data.ts";
 
 /** The folders of the committed files, relative to the root of the repository. */
 export const RESULT_FILES = {
@@ -59,7 +59,7 @@ export function textSections(markdown: string): Record<string, string> {
 
 /** This function gives the measures of the records from `MEASURES` of the core, with the definition of each measure that has one. */
 export function measureRows(): MeasureRow[] {
-  return MEASURES.map((m) => ({ id: m.id, name: m.name, unit: m.unit, better: m.better, definition: m.definition ?? "" }));
+  return MEASURES.map((m) => ({ id: m.id, name: m.name, unit: m.unit, better: m.better, range: rangeText(m.min, m.max), definition: m.definition ?? "" }));
 }
 
 /** This function makes the data of the results page from the files of the repository at `root`. */

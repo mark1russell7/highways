@@ -474,8 +474,18 @@ export interface MeasureRow {
   readonly name: string;
   readonly unit: string;
   readonly better: "lower" | "higher";
+  /** The range of the values of the measure as text, for example `0 to 1` or `1 or more`. `rangeText` writes it from `min` and `max` of the core. */
+  readonly range: string;
   /** The definition of the measure. The value is empty when the core has no definition for it. */
   readonly definition: string;
+}
+
+/** This function writes the range from `min` to `max` as text. An infinite end gives `or more`, `or less` or `any value`. */
+export function rangeText(min: number, max: number): string {
+  if (min === -Infinity && max === Infinity) return "any value";
+  if (max === Infinity) return `${min} or more`;
+  if (min === -Infinity) return `${max} or less`;
+  return `${min} to ${max}`;
 }
 
 /** The base that makes ways only from a key. */

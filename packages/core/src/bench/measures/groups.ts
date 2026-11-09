@@ -74,7 +74,7 @@ export function balance(level: Level): number {
 /**
  * This function gives the tree cost of the levels (G8 of MEAS0, Dasgupta, 2016): `D = Σ_(u,v) leaves(lca(u, v)) / (m n)`.
  * The levels make the tree. `leaves(lca(u, v))` is the number of nodes of the deepest item that holds both ends.
- * Without such an item, the value is `n`. The scale is 0 to 1, and lower is better. The cost is linear times the depth.
+ * Without such an item, the value is `n`. The value of an item is at most `n`. The scale is 0 to 1, and lower is better. The cost is linear times the depth.
  */
 export function treeCost(graph: Graph, levels: readonly Level[]): number {
   const n = graph.nodes.length;
@@ -85,7 +85,8 @@ export function treeCost(graph: Graph, levels: readonly Level[]): number {
     const size = new Map<string, number>();
     const of = new Map<string, string>();
     for (const item of l.items) {
-      size.set(item.id, item.nodes.length);
+      // An item holds at most the `n` nodes of the graph. An item with a node two times or with an unknown node does not count more.
+      size.set(item.id, Math.min(n, item.nodes.length));
       for (const v of item.nodes) of.set(v, item.id);
     }
     return { size, of };

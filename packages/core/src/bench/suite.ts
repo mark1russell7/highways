@@ -302,7 +302,7 @@ export function routeMeasures(graph: Graph, result: Result, row: BenchRow): Reco
     "R5.q95": detour.q95,
     "R5.mean": detour.mean,
     "R6.worstDetour": row.faults.worstDetour,
-    "R7.backtrack": row.faults.backtrack / m,
+    "R7.backtrack": row.faults.backtrack / Math.max(m, row.faults.links),
     "R9.through": row.faults.through,
     "R13.outside": row.faults.outside,
     "R11.min": plugs.min,

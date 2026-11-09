@@ -354,116 +354,135 @@ Each prediction is written before its run. The predictions are a JSON Lines file
 
 The names are lowercase, with a dot after the stage. `MEASURES` exports this table. The key is the key in the values of `runSuite` and `compareStep`.
 
+The column "Range" gives `min` and `max` of the row. `RANGES` gives them by the unit, or by the key for a row with its own range.
+
 The column "Placement" tells if the positions of the boxes alone move the value, with the same router.
 
 - "yes": the value compares only between runs on the same input. The crossings, the clearance and the groups of the far view are examples.
 - "no": the measure scores the routes or the curves for a fixed placement. A joint harness can compare the value between placements.
 
-| Name | MEAS0 | Key | Unit | Better | Placement |
-|---|---|---|---|---|---|
-| `route.crossings` | R1 | `R1.crossings` | count | lower | yes |
-| `route.crossings.per-edge` | R1 | `R1.perEdge` | count for each edge | lower | yes |
-| `route.crossing-angle.mean` | R2 | `R2.angle` | 0 to 1 | higher | yes |
-| `route.crossing-angle.min` | R2 | `R2.min` | degrees | higher | yes |
-| `route.bends` | R3 | `R3.bends` | count for each route | lower | no |
-| `route.turn.mean` | R4 | `R4.turn` | half turns for each route | lower | no |
-| `route.turn.max` | R4 | `R4.max` | degrees | lower | no |
-| `route.detour.median` | R5 | `R5.median` | ratio | lower | no |
-| `route.detour.q95` | R5 | `R5.q95` | ratio | lower | no |
-| `route.detour.mean` | R5 | `R5.mean` | ratio | lower | no |
-| `route.detour.max` | R6 | `R6.worstDetour` | ratio | lower | no |
-| `route.backtrack` | R7 | `R7.backtrack` | 0 to 1 | lower | no |
-| `route.clearance.mean` | R8 | `R8.clearance` | units | higher | yes |
-| `route.clearance.tight` | R8 | `R8.tight` | 0 to 1 | lower | yes |
-| `route.through` | R9 | `R9.through` | count | lower | yes |
-| `route.no-graph` | R17 | `R17.noGraph` | count | lower | yes |
-| `route.plug-angle` | R10 | `R10.plugAngle` | degrees | lower | no |
-| `route.plug-spacing.min` | R11 | `R11.min` | 0 to 1 | higher | yes |
-| `route.plug-spacing.q05` | R11 | `R11.q05` | 0 to 1 | higher | yes |
-| `route.outside` | R13 | `R13.outside` | count | lower | no |
-| `route.inflections` | R15 | `R15.inflections` | count for each route | lower | no |
-| `route.lane.separation` | R12 | `R12.share` | 0 to 1 | lower | yes |
-| `route.orthogonality` | R14 | `R14.share` | 0 to 1 | higher | no |
-| `route.ink` | R1 | `ink` | units | lower | yes |
-| `route.bundle.ink-saved` | B1 | `B1.inkSaved` | 0 to 1 | higher | no |
-| `route.bundle.ambiguity` | B4 | `B4.ambiguity` | 0 to 1 | lower | no |
-| `route.bundle.share` | B2 | `B2.share` | 0 to 1 | higher | no |
-| `route.bundle.stretch.median` | B3 | `B3.median` | ratio | lower | no |
-| `route.bundle.stretch.q95` | B3 | `B3.q95` | ratio | lower | no |
-| `route.bundle.merge-angle.max` | B6 | `B6.max` | degrees | lower | no |
-| `route.bundle.lane-crossings` | B5 | `B5.crossings` | count | lower | no |
-| `route.bundle.occupied-area` | B7 | `B7.ratio` | ratio | lower | no |
-| `route.bundle.runs` | B8 | `B8.runs` | count | lower | no |
-| `route.bundle.run-edges.median` | B8 | `B8.median` | count | higher | no |
-| `route.bundle.run-edges.max` | B8 | `B8.max` | count | higher | no |
-| `route.bundle.stretch.max` | B3 | `B3.max` | ratio | lower | no |
-| `route.bundle.stretch.model.max` | B3 | `gap.stretch` | ratio | lower | no |
-| `route.bundle.gap-closed` | B10 | `gap` | share of the gap | higher | no |
-| `route.bundle.gap-closed.cap` | B10 | `gap.cap` | ratio | lower | no |
-| `route.bundle.gap-closed.mixed` | B10 | `gap.mixed` | 0 or 1 | lower | no |
-| `route.bundle.gap-closed.collection` | B10 | `gap.collection` | share of the gap | higher | no |
-| `route.bundle.gap-closed.cap.collection` | B10 | `gap.cap.collection` | ratio | lower | no |
-| `route.bundle.gap-closed.all` | B10 | `gap.all` | share of the gap | higher | no |
-| `route.bundle.gap-closed.cap.all` | B10 | `gap.cap.all` | ratio | lower | no |
-| `route.bundle.lane-fidelity.median` | B9 | `B9.median` | ratio | lower | no |
-| `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | lower | no |
-| `route.lane.area` | M1 | `M1.area` | ratio | lower | no |
-| `route.lane.through` | M4 | `M4.laneThrough` | count | lower | yes |
-| `route.room.order` | M2 | `M2.order` | count | lower | no |
-| `route.room.displacement` | M3 | `M3.displacement` | no unit | lower | no |
-| `route.room.distortion` | M5 | `M5.stress` | 0 to 1 | lower | no |
-| `route.symmetry` | H3 | `H3.share` | 0 to 1 | higher | yes |
-| `route.order.crossings` | W3 | `W3.crossings` | IQR over the median | lower | yes |
-| `route.order.detour` | W3 | `W3.detour` | IQR over the median | lower | yes |
-| `route.order.ink-saved` | W3 | `W3.inkSaved` | IQR over the median | lower | yes |
-| `route.order.ink` | W3 | `W3.ink` | IQR over the median | lower | yes |
-| `route.order.changed` | W3 | `W3.changed` | 0 to 1 | lower | yes |
-| `route.order.poa` | W3 | `W3.poa` | ratio | lower | yes |
-| `route.stability.mean` | Z10 | `Z10.mean` | units of the board | lower | no |
-| `route.stability.max` | Z10 | `Z10.max` | units of the board | lower | no |
-| `route.stability.moved` | Z10 | `Z10.moved` | 0 to 1 | lower | no |
-| `route.stability.base.mean` | Z10 | `Z10.base.mean` | units of the board | lower | no |
-| `route.stability.base.max` | Z10 | `Z10.base.max` | units of the board | lower | no |
-| `route.stability.base.moved` | Z10 | `Z10.base.moved` | 0 to 1 | lower | no |
-| `route.stability.edits.mean` | Z10 | `Z10.edits.mean` | units of the board | lower | no |
-| `route.stability.edits.moved` | Z10 | `Z10.edits.moved` | 0 to 1 | lower | no |
-| `route.stability.highway-churn` | Z10 | `Z10.churn` | 0 to 1 | lower | no |
-| `route.stability.highway-ids` | Z10 | `Z10.ids` | 0 to 1 | higher | no |
-| `route.level.nesting` | Z6 | `level-nesting` | count | lower | no |
-| `route.level.link-ends` | Z2 | `Z2.linkEnds` | count | lower | no |
-| `route.level.link-agreement` | Z9 | `Z9.mean` | no unit | lower | yes |
-| `route.level.through` | Z3 | `Z3.through` | count | lower | yes |
-| `route.level.link-length` | Z3 | `Z3.length` | units | lower | yes |
-| `route.level.far-items` | Z4 | `Z4.farItems` | count | lower | yes |
-| `route.level.position` | Z7 | `Z7.position` | no unit | lower | yes |
-| `route.level.order` | Z8 | `Z8.order` | -1 to 1 | higher | yes |
-| `route.level.counts-sum` | Z1 | `Z1.countsSum` | count | lower | no |
-| `route.level.ratio.max` | Z5 | `Z5.max` | ratio | lower | yes |
-| `route.level.ratio.spread` | Z5 | `Z5.spread` | no unit | lower | yes |
-| `route.group.modularity` | G1 | `G1.modularity` | -0.5 to 1 | higher | yes |
-| `route.group.cut` | G2 | `G2.cut` | 0 to 1 | lower | yes |
-| `route.group.balance` | G6 | `G6.balance` | 0 to 1 | higher | yes |
-| `route.group.tree-cost` | G8 | `G8.treeCost` | 0 to 1 | lower | yes |
-| `route.group.stability` | G9 | `G9.ari` | -1 to 1 | higher | yes |
-| `route.group.fill` | G4 | `G4.fill` | 0 to 1 | higher | yes |
-| `route.group.overlaps` | G5 | `G5.overlaps` | count | lower | yes |
-| `route.group.silhouette` | G7 | `G7.silhouette` | -1 to 1 | higher | yes |
-| `route.curve.c1.max` | C1 | `C1.max` | degrees | lower | no |
-| `route.curve.c1.share` | C1 | `C1.share` | 0 to 1 | lower | no |
-| `route.curve.c2.median` | C2 | `C2.median` | no unit | lower | no |
-| `route.curve.c2.max` | C2 | `C2.max` | no unit | lower | no |
-| `route.curve.c3.median` | C3 | `C3.median` | no unit | lower | no |
-| `route.curve.c3.q95` | C3 | `C3.q95` | no unit | lower | no |
-| `route.curve.c4.median` | C4 | `C4.median` | no unit | lower | no |
-| `route.curve.c4.q95` | C4 | `C4.q95` | no unit | lower | no |
-| `route.curve.c8.median` | C8 | `C8.median` | no unit | lower | no |
-| `route.curve.c8.max` | C8 | `C8.max` | no unit | lower | no |
-| `route.curve.c5.peak` | C5 | `C5.peak` | curvature times the unit of the board | lower | no |
-| `route.curve.c6.length` | C6 | `C6.length` | ratio | lower | no |
-| `route.curve.rule.clear` | C7 | `curve-clear` | count | lower | no |
-| `route.curve.rule.ends` | C10 | `curve-ends` | count | lower | no |
-| `route.curve.rule.g1` | C1 | `curve-g1` | count | lower | no |
-| `route.curve.rule.simple` | C9 | `curve-simple` | count | lower | no |
+| Name | MEAS0 | Key | Unit | Range | Better | Placement |
+|---|---|---|---|---|---|---|
+| `route.crossings` | R1 | `R1.crossings` | count | 0 or more | lower | yes |
+| `route.crossings.per-edge` | R1 | `R1.perEdge` | count for each edge | 0 or more | lower | yes |
+| `route.crossings.estimated` | R1 | `R1.estimated` | share | 0 to 1 | lower | yes |
+| `route.crossings.pairs` | R1 | `R1.pairs` | count | 0 or more | lower | yes |
+| `route.crossings.pairs.estimated` | R1 | `R1.pairsEstimated` | share | 0 to 1 | lower | yes |
+| `route.crossings.pairs.low` | R1 | `R1.pairsLow` | count | 0 or more | lower | yes |
+| `route.crossings.pairs.high` | R1 | `R1.pairsHigh` | count | 0 or more | lower | yes |
+| `route.crossings.pairs.contact-sampled` | R1 | `R1.pairsContactSampled` | share | 0 to 1 | lower | yes |
+| `route.crossing-angle.mean` | R2 | `R2.angle` | share | 0 to 1 | higher | yes |
+| `route.crossing-angle.min` | R2 | `R2.min` | degrees | 0 to 90 | higher | yes |
+| `route.bends` | R3 | `R3.bends` | count for each route | 0 or more | lower | no |
+| `route.turn.mean` | R4 | `R4.turn` | half turns for each route | 0 or more | lower | no |
+| `route.turn.max` | R4 | `R4.max` | degrees | 0 to 180 | lower | no |
+| `route.detour.median` | R5 | `R5.median` | ratio | 1 or more | lower | no |
+| `route.detour.q95` | R5 | `R5.q95` | ratio | 1 or more | lower | no |
+| `route.detour.mean` | R5 | `R5.mean` | ratio | 1 or more | lower | no |
+| `route.detour.max` | R6 | `R6.worstDetour` | ratio | 0 or more | lower | no |
+| `route.backtrack` | R7 | `R7.backtrack` | share | 0 to 1 | lower | no |
+| `route.clearance.mean` | R8 | `R8.clearance` | units | 0 to 40 | higher | yes |
+| `route.clearance.tight` | R8 | `R8.tight` | share | 0 to 1 | lower | yes |
+| `route.through` | R9 | `R9.through` | count | 0 or more | lower | yes |
+| `route.plug-angle` | R10 | `R10.plugAngle` | degrees | 0 to 180 | lower | no |
+| `route.plug-spacing.min` | R11 | `R11.min` | share | 0 to 1 | higher | yes |
+| `route.plug-spacing.q05` | R11 | `R11.q05` | share | 0 to 1 | higher | yes |
+| `route.outside` | R13 | `R13.outside` | count | 0 or more | lower | no |
+| `route.inflections` | R15 | `R15.inflections` | count for each route | 0 or more | lower | no |
+| `route.lane.separation` | R12 | `R12.share` | share | 0 to 1 | lower | yes |
+| `route.orthogonality` | R14 | `R14.share` | share | 0 to 1 | higher | no |
+| `route.balance.cv` | R16 | `R16.cv` | no unit | 0 or more | lower | yes |
+| `route.balance.low` | R16 | `R16.low` | share | 0 to 1 | lower | yes |
+| `route.no-graph` | R17 | `R17.noGraph` | count | 0 or more | lower | yes |
+| `route.row.fit` | R18 | `R18.fit` | share | 0 to 1 | higher | yes |
+| `route.row.gap` | R18 | `R18.gap` | no unit | 0 or more | higher | yes |
+| `route.ink` | R1 | `ink` | units | 0 or more | lower | yes |
+| `route.bundle.ink-saved` | B1 | `B1.inkSaved` | share | 0 to 1 | higher | no |
+| `route.overlap.share` | B11 | `B11.share` | share | 0 to 1 | lower | no |
+| `route.overlap.peak` | B11 | `B11.peak` | count | 0 or more | lower | no |
+| `route.bundle.ambiguity` | B4 | `B4.ambiguity` | share | 0 to 1 | lower | no |
+| `route.bundle.reach` | B4 | `B4.reach` | share | 0 to 1 | lower | no |
+| `route.bundle.share` | B2 | `B2.share` | share | 0 to 1 | higher | no |
+| `route.bundle.stretch.median` | B3 | `B3.median` | ratio | 0 or more | lower | no |
+| `route.bundle.stretch.q95` | B3 | `B3.q95` | ratio | 0 or more | lower | no |
+| `route.bundle.merge-angle.max` | B6 | `B6.max` | degrees | 0 to 180 | lower | no |
+| `route.bundle.stretch.max` | B3 | `B3.max` | ratio | 1 or more | lower | no |
+| `route.bundle.stretch.model.max` | B3 | `gap.stretch` | ratio | 1 or more | lower | no |
+| `route.bundle.gap-closed.mixed` | B10 | `gap.mixed` | share | 0 to 1 | lower | no |
+| `route.bundle.gap-closed` | B10 | `gap` | ratio | any value | higher | no |
+| `route.bundle.gap-closed.cap` | B10 | `gap.cap` | ratio | 1.1 to 1.5 | lower | no |
+| `route.bundle.gap-closed.collection` | B10 | `gap.collection` | ratio | any value | higher | no |
+| `route.bundle.gap-closed.cap.collection` | B10 | `gap.cap.collection` | ratio | 1.1 to 1.5 | lower | no |
+| `route.bundle.gap-closed.all` | B10 | `gap.all` | ratio | any value | higher | no |
+| `route.bundle.gap-closed.cap.all` | B10 | `gap.cap.all` | ratio | 1.1 to 1.5 | lower | no |
+| `route.bundle.lane-crossings` | B5 | `B5.crossings` | count | 0 or more | lower | no |
+| `route.bundle.occupied-area` | B7 | `B7.ratio` | ratio | 0 or more | lower | no |
+| `route.bundle.runs` | B8 | `B8.runs` | count | 0 or more | lower | no |
+| `route.bundle.run-edges.median` | B8 | `B8.median` | count | 0 or more | higher | no |
+| `route.bundle.run-edges.max` | B8 | `B8.max` | count | 0 or more | higher | no |
+| `route.bundle.lane-fidelity.median` | B9 | `B9.median` | ratio | 0 or more | lower | no |
+| `route.bundle.lane-fidelity.max` | B9 | `B9.max` | ratio | 0 or more | lower | no |
+| `route.lane.area` | M1 | `M1.area` | ratio | 1 or more | lower | no |
+| `route.lane.through` | M4 | `M4.laneThrough` | count | 0 or more | lower | yes |
+| `route.room.order` | M2 | `M2.order` | count | 0 or more | lower | no |
+| `route.room.displacement` | M3 | `M3.displacement` | no unit | 0 or more | lower | no |
+| `route.room.distortion` | M5 | `M5.stress` | share | 0 to 1 | lower | no |
+| `route.symmetry` | H3 | `H3.share` | share | 0 to 1 | higher | yes |
+| `route.order.crossings` | W3 | `W3.crossings` | IQR over the median | 0 or more | lower | yes |
+| `route.order.detour` | W3 | `W3.detour` | IQR over the median | 0 or more | lower | yes |
+| `route.order.ink-saved` | W3 | `W3.inkSaved` | IQR over the median | 0 or more | lower | yes |
+| `route.order.ink` | W3 | `W3.ink` | IQR over the median | 0 or more | lower | yes |
+| `route.order.changed` | W3 | `W3.changed` | share | 0 to 1 | lower | yes |
+| `route.order.poa` | W3 | `W3.poa` | ratio | 0 or more | lower | yes |
+| `route.stability.mean` | Z10 | `Z10.mean` | W | 0 or more | lower | no |
+| `route.stability.max` | Z10 | `Z10.max` | W | 0 or more | lower | no |
+| `route.stability.moved` | Z10 | `Z10.moved` | share | 0 to 1 | lower | no |
+| `route.stability.base.mean` | Z10 | `Z10.base.mean` | W | 0 or more | lower | no |
+| `route.stability.base.max` | Z10 | `Z10.base.max` | W | 0 or more | lower | no |
+| `route.stability.base.moved` | Z10 | `Z10.base.moved` | share | 0 to 1 | lower | no |
+| `route.stability.edits.mean` | Z10 | `Z10.edits.mean` | W | 0 or more | lower | no |
+| `route.stability.edits.moved` | Z10 | `Z10.edits.moved` | share | 0 to 1 | lower | no |
+| `route.stability.highway-churn` | Z10 | `Z10.churn` | share | 0 to 1 | lower | no |
+| `route.stability.highway-ids` | Z10 | `Z10.ids` | share | 0 to 1 | higher | no |
+| `route.stability.move.gain` | Z11 | `Z11.gain` | no unit | 0 or more | lower | no |
+| `route.stability.move.spill` | Z11 | `Z11.spill` | share | 0 to 1 | lower | no |
+| `route.stability.seed.mean` | Z12 | `Z12.mean` | W | 0 or more | lower | no |
+| `route.stability.seed.moved` | Z12 | `Z12.moved` | share | 0 to 1 | lower | no |
+| `route.level.nesting` | Z6 | `level-nesting` | count | 0 or more | lower | no |
+| `route.level.link-ends` | Z2 | `Z2.linkEnds` | count | 0 or more | lower | no |
+| `route.level.link-agreement` | Z9 | `Z9.mean` | no unit | 0 or more | lower | yes |
+| `route.level.through` | Z3 | `Z3.through` | count | 0 or more | lower | yes |
+| `route.level.link-length` | Z3 | `Z3.length` | units | 0 or more | lower | yes |
+| `route.level.far-items` | Z4 | `Z4.farItems` | count | 0 or more | lower | yes |
+| `route.level.position` | Z7 | `Z7.position` | no unit | 0 or more | lower | yes |
+| `route.level.order` | Z8 | `Z8.order` | no unit | -1 to 1 | higher | yes |
+| `route.level.counts-sum` | Z1 | `Z1.countsSum` | count | 0 or more | lower | no |
+| `route.level.ratio.max` | Z5 | `Z5.max` | ratio | 0 or more | lower | yes |
+| `route.level.ratio.spread` | Z5 | `Z5.spread` | no unit | 0 or more | lower | yes |
+| `route.group.modularity` | G1 | `G1.modularity` | no unit | -0.5 to 1 | higher | yes |
+| `route.group.cut` | G2 | `G2.cut` | share | 0 to 1 | lower | yes |
+| `route.group.balance` | G6 | `G6.balance` | share | 0 to 1 | higher | yes |
+| `route.group.tree-cost` | G8 | `G8.treeCost` | share | 0 to 1 | lower | yes |
+| `route.group.stability` | G9 | `G9.ari` | no unit | -1 to 1 | higher | yes |
+| `route.group.fill` | G4 | `G4.fill` | share | 0 to 1 | higher | yes |
+| `route.group.overlaps` | G5 | `G5.overlaps` | count | 0 or more | lower | yes |
+| `route.group.silhouette` | G7 | `G7.silhouette` | no unit | -1 to 1 | higher | yes |
+| `route.curve.c1.max` | C1 | `C1.max` | degrees | 0 to 180 | lower | no |
+| `route.curve.c1.share` | C1 | `C1.share` | share | 0 to 1 | lower | no |
+| `route.curve.c2.median` | C2 | `C2.median` | no unit | 0 or more | lower | no |
+| `route.curve.c2.max` | C2 | `C2.max` | no unit | 0 or more | lower | no |
+| `route.curve.c3.median` | C3 | `C3.median` | no unit | 0 or more | lower | no |
+| `route.curve.c3.q95` | C3 | `C3.q95` | no unit | 0 or more | lower | no |
+| `route.curve.c4.median` | C4 | `C4.median` | no unit | 0 or more | lower | no |
+| `route.curve.c4.q95` | C4 | `C4.q95` | no unit | 0 or more | lower | no |
+| `route.curve.c8.median` | C8 | `C8.median` | no unit | 0 or more | lower | no |
+| `route.curve.c8.max` | C8 | `C8.max` | no unit | 0 or more | lower | no |
+| `route.curve.c5.peak` | C5 | `C5.peak` | curvature times the unit of the board | 0 or more | lower | no |
+| `route.curve.c6.length` | C6 | `C6.length` | ratio | 0 or more | lower | no |
+| `route.curve.rule.clear` | C7 | `curve-clear` | count | 0 or more | lower | no |
+| `route.curve.rule.ends` | C10 | `curve-ends` | count | 0 or more | lower | no |
+| `route.curve.rule.g1` | C1 | `curve-g1` | count | 0 or more | lower | no |
+| `route.curve.rule.simple` | C9 | `curve-simple` | count | 0 or more | lower | no |
 
 `route.stability.*` compares the routes after the small change of `changeGraph`. `route.stability.base.*` compares the routes of a variant with the routes of its base input.
 

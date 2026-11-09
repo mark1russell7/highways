@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts, stampSnapshots } from "./results-data.ts";
+import { absoluteLinks, ageText, compareReads, coverageView, keptRows, keylessTies, linkHtml, parseSnapshot, QUEUE_TOP, rangeText, readCore, queueView, recordAge, shippedRows, SHIPPED_COUNT, splitVerdicts, stageCounts, stampSnapshots } from "./results-data.ts";
 import type { VerdictTable } from "./results-data.ts";
 import { buildInfo, dataLineHtml, ideaRecords, readResults, snapshotFiles } from "./results-files.ts";
 
@@ -249,6 +249,13 @@ describe("the committed files of the results page", () => {
       const rows = data.measures.filter((m) => m.id === id && m.definition !== "");
       expect(rows.length, id).toBeGreaterThan(0);
     }
+  });
+
+  it("writes the range of each measure as text (MEASURE-RANGES)", () => {
+    expect([rangeText(0, 1), rangeText(1, Infinity), rangeText(-Infinity, 0), rangeText(-Infinity, Infinity), rangeText(-0.5, 1)]).toEqual(["0 to 1", "1 or more", "0 or less", "any value", "-0.5 to 1"]);
+    const rows = readResults(root).measures;
+    expect(rows.every((m) => m.range !== "")).toBe(true);
+    expect(rows.find((m) => m.name === "route.crossings")?.range).toBe("0 or more");
   });
 
   it("shows the top of the idea queue and the count of each status", () => {

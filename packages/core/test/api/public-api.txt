@@ -547,6 +547,7 @@ PullApartOptions: build/index.d.ts#PullApartOptions
 QUICKBUNDLES_DEFAULTS: build/index.d.ts#QUICKBUNDLES_DEFAULTS
 Quality: build/index.d.ts#Quality
 type QuickBundlesOptions: build/index.d.ts#QuickBundlesOptions
+RANGES: build/index.d.ts#RANGES
 RECORD_EPS: @mark1russell7/layout-contract#RECORD_EPS (external)
 REPEL_DEFAULTS: build/index.d.ts#REPEL_DEFAULTS
 REPEL_SCHEMA: build/index.d.ts#REPEL_SCHEMA
@@ -562,6 +563,7 @@ ROUTERS: build/index.d.ts#ROUTERS
 ROUTE_SPACE_LEFT_OUT: build/index.d.ts#ROUTE_SPACE_LEFT_OUT
 ROUTE_SPACE_MISFITS: build/index.d.ts#ROUTE_SPACE_MISFITS
 RadiusOptions: build/index.d.ts#RadiusOptions
+RangeRule: build/index.d.ts#RangeRule
 RecordTrace: build/index.d.ts#RecordTrace
 RectScatteredParams: build/index.d.ts#RectScatteredParams
 type Region: @mark1russell7/layout-contract#Region (external)
@@ -888,6 +890,7 @@ boardFeatures: build/index.d.ts#boardFeatures
 boardGaps: build/index.d.ts#boardGaps
 boardPortfolio: build/index.d.ts#boardPortfolio
 boardUnit: build/index.d.ts#boardUnit
+boardWidth: build/index.d.ts#boardWidth
 boardWins: build/index.d.ts#boardWins
 bootstrapMedian: build/index.d.ts#bootstrapMedian
 boundsFamilyName: build/index.d.ts#boundsFamilyName
@@ -3948,6 +3951,8 @@ export interface MeasureInfo {
   readonly unit: string;
   readonly better: "lower" | "higher";
   readonly placementDependent: boolean;
+  readonly min: number;
+  readonly max: number;
   readonly minEffect?: MinEffect;
   readonly definition?: string;
   readonly estimatedBy?: string;
@@ -4539,6 +4544,9 @@ interface QuickBundlesOptions {
   readonly spine: GroupSpine;
 }
 
+### build/index.d.ts#RANGES
+export declare const RANGES: readonly RangeRule[];
+
 ### build/index.d.ts#REPEL_DEFAULTS
 export declare const REPEL_DEFAULTS: Readonly<RepelOptions>;
 
@@ -4581,6 +4589,15 @@ export declare const ROUTE_SPACE_MISFITS: Readonly<Record<string, string>>;
 ### build/index.d.ts#RadiusOptions
 export interface RadiusOptions {
   readonly radius: number;
+}
+
+### build/index.d.ts#RangeRule
+export interface RangeRule {
+  readonly units?: readonly string[];
+  readonly keys?: readonly string[];
+  readonly min: number;
+  readonly max: number;
+  readonly reason: string;
 }
 
 ### build/index.d.ts#RecordTrace
@@ -6411,6 +6428,9 @@ export declare function boardPortfolio(graph: Graph, list: readonly PortfolioSet
 
 ### build/index.d.ts#boardUnit
 export declare function boardUnit(graph: Graph): number;
+
+### build/index.d.ts#boardWidth
+export declare function boardWidth(graph: Graph): number;
 
 ### build/index.d.ts#boardWins
 export declare function boardWins(compares: readonly MeasureCompare[]): boolean;

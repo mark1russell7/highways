@@ -21,7 +21,7 @@ export const ROUTE_MEASURES: readonly SweepMeasure[] = Object.freeze([
 export const BOARD_MEASURES: readonly SweepMeasure[] = Object.freeze([
   { id: "order", key: "route.room.order", label: "Pairs of boxes with a changed order", unit: "count" },
   { id: "displacement", key: "route.room.displacement", label: "Mean move of a box, over the unit of the board", unit: "no unit" },
-  { id: "distortion", key: "route.room.distortion", label: "Stress of the distances to the 4 nearest boxes", unit: "0 to 1" },
+  { id: "distortion", key: "route.room.distortion", label: "Stress of the distances to the 4 nearest boxes", unit: "share" },
 ]);
 
 /** The suffix of the id of a ratio measure. A ratio divides a value by the value of its strategy at the defaults on the same input. */

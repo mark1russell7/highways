@@ -87,7 +87,7 @@ describe("the minimum effects of MEASURES (WIN-RES)", () => {
   it("gives RECORD_EPS to the shares, the stretch values and the counts, and 1% to the lengths and the angles", () => {
     for (const m of MEASURES) {
       if (m.unit.startsWith("count")) expect(m.minEffect).toBe(0);
-      else if (m.unit === "units" || m.unit === "units of the board" || m.unit === "degrees") expect(m.minEffect).toEqual({ rel: 0.01 });
+      else if (m.unit === "units" || m.unit === "W" || m.unit === "degrees") expect(m.minEffect).toEqual({ rel: 0.01 });
       else expect(m.minEffect).toBeUndefined();
     }
   });

@@ -78,6 +78,13 @@ describe("the measures of the groups (G1, G2, G8, G9)", () => {
     expect(treeCost(triangles, triangleLevels)).toBeCloseTo((6 * 3 + 6) / (7 * 6));
   });
 
+  it("G8: counts at most the n nodes of the graph for an item, so the value stays from 0 to 1 (MEASURE-RANGES)", () => {
+    const ids = triangles.nodes.map((n) => n.id);
+    // One item holds each node three times, and an unknown node.
+    const bad = [level(1, item("all", B(0, 0, 110, 10), ...ids, ...ids, ...ids, "unknown"))];
+    expect(treeCost(triangles, bad)).toBe(1);
+  });
+
   it("G9: gives 1 for the same leaves and less for other leaves", () => {
     const section = (id: string, nodes: number[], children: Section[] = []): Section => ({ id, depth: id.length - 1, cell: B(0, 0), nodes, children });
     const before = section("s", [0, 1, 2, 3, 4, 5], [section("s0", [0, 1, 2]), section("s1", [3, 4, 5])]);
