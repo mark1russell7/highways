@@ -221,6 +221,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | SPACE-KPI | `kpi.json` gets the measures of the layout space: the operators of each step, the strategies of the grammar, the screened strategies, the input families and the fitted share. A committed record counts the grammar: 1,016,274,652,058 configs. A test fails when the space or the count changes. | 2026-11-08 | [#404](https://github.com/mark1russell7/highways/pull/404) |
 | D23-DISTINCT | The distinctness gate: a variant counts only when its routes differ from each operator of its stage on a board. `scripts/distinct.ts` imports nothing, and the package `strategy-space` takes it whole. | 2026-11-08 | [#406](https://github.com/mark1russell7/highways/pull/406) |
 | D23-POINTS | The points of the grammar for a screen: `grammar-points.ts` draws a seeded sample of `routeSpace` with a unique id for each point, and gives each job its shard. `readShard` refuses a stale file and a wrong id. | 2026-11-08 | [#408](https://github.com/mark1russell7/highways/pull/408) |
+| MEASURE-RANGES | Each row of `MEASURES` has `min` and `max`, from the rules of `RANGES` by unit or by key. The unit texts name no range. The lengths of Z10 and Z12 are over the width `W` of the board (`boardWidth`). A screen of each step holds each value in its range. R7, G8 and the high end of the sampled pair interval no longer leave their range. | 2026-11-09 | [#427](https://github.com/mark1russell7/highways/pull/427) |
 
 ## Calibration
 
