@@ -482,6 +482,12 @@ The router `sections` makes its hubs and its zoom levels from a tree of groups. 
 
 `SECTIONS_DEFAULTS`, `SECTION_DEFAULTS`, `LEVEL_LINK_DEFAULTS` and `PICK` give the default numbers. `itemSizes(levels)` gives the sizes that `pickLevel(sizes, scale, options)` reads.
 
+`itemSizes(levels, "short")` measures the short side of each item. `pickLevelOf(levels, scale, options)` picks from the levels themselves, with `side` and `minItems`.
+
+- Without `side` and `minItems`, `pickLevelOf` gives the result of `pickLevel`.
+- With `minItems`, the search from fine to coarse stops at a level with fewer items. When no level passes, the pick is the coarsest level with enough items.
+- One value for `routesAt` and `itemAt`, `side: "short"` and `minItems: 2` give a rule with one threshold.
+
 The built-in grouping rules are in `groupStrategies`. The rule `quadtree` splits the plane, as `buildSections` does. The rule `keys` makes one group for each key of the nodes. Its default key is the string `data.group` of a node, and a node without a key is a group alone. With the option `split`, a large group splits into a quadtree.
 
 The rule `kd` splits the plane with lines across one axis, as a k-d tree does. The option `line` sets the place of each line. The value `median` puts half of the nodes on each side. The value `middle` cuts the cell in half. The value `slide` cuts the cell in half and moves a line with an empty side to the nearest node. With the fan-out 4, each half splits again on the same level.

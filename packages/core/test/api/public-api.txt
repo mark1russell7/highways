@@ -327,6 +327,7 @@ type InnerMode: build/index.d.ts#InnerMode
 type Interchange: build/index.d.ts#Interchange
 type InterchangeBase: build/index.d.ts#InterchangeBase
 type InterchangeOptions: build/index.d.ts#InterchangeOptions
+ItemSide: build/index.d.ts#ItemSide
 JOIN_WORK: build/index.d.ts#JOIN_WORK
 JogMeasures: build/index.d.ts#JogMeasures
 type JogStyle: build/index.d.ts#JogStyle
@@ -400,6 +401,7 @@ type LevelHighwayOptions: build/index.d.ts#LevelHighwayOptions
 LevelInput: build/index.d.ts#LevelInput
 LevelItem: build/index.d.ts#LevelItem
 LevelLink: build/index.d.ts#LevelLink
+LevelPickOptions: build/index.d.ts#LevelPickOptions
 LevelRatio: build/index.d.ts#LevelRatio
 LevelRoom: build/index.d.ts#LevelRoom
 LevelRoomOptions: build/index.d.ts#LevelRoomOptions
@@ -1303,6 +1305,7 @@ peakCurvature: build/index.d.ts#peakCurvature
 perimeterRouter: build/index.d.ts#perimeterRouter
 perimeterStrategy: build/index.d.ts#perimeterStrategy
 pickLevel: build/index.d.ts#pickLevel
+pickLevelOf: build/index.d.ts#pickLevelOf
 pickLinks: build/index.d.ts#pickLinks
 pickMoves: @mark1russell7/layout-contract#pickMoves (external)
 placePlug: build/index.d.ts#placePlug
@@ -3318,6 +3321,9 @@ interface InterchangeOptions {
   readonly detour: number;
 }
 
+### build/index.d.ts#ItemSide
+export type ItemSide = "long" | "short";
+
 ### build/index.d.ts#JOIN_WORK
 export declare const JOIN_WORK: number;
 
@@ -3770,6 +3776,12 @@ export interface LevelLink {
   readonly target: string;
   readonly count: number;
   readonly points: readonly Point[];
+}
+
+### build/index.d.ts#LevelPickOptions
+export interface LevelPickOptions extends PickOptions {
+  readonly side: ItemSide;
+  readonly minItems?: number;
 }
 
 ### build/index.d.ts#LevelRatio
@@ -7289,7 +7301,7 @@ export declare const isRoutedStep: (step: Step) => step is RoutedStep;
 export declare function itemOverlaps(levels: readonly Level[]): number;
 
 ### build/index.d.ts#itemSizes
-export declare function itemSizes(levels: readonly Level[]): number[];
+export declare function itemSizes(levels: readonly Level[], side?: ItemSide): number[];
 
 ### build/index.d.ts#jaccard
 export declare function jaccard(a: ReadonlySet<string>, b: ReadonlySet<string>): number;
@@ -7794,6 +7806,9 @@ export declare const perimeterStrategy: Strategy<"router", object>;
 
 ### build/index.d.ts#pickLevel
 export declare function pickLevel(sizes: readonly number[], scale: number, options?: Partial<PickOptions>): number;
+
+### build/index.d.ts#pickLevelOf
+export declare function pickLevelOf(levels: readonly Level[], scale: number, options?: Partial<LevelPickOptions>): number;
 
 ### build/index.d.ts#pickLinks
 export declare function pickLinks(approvals: readonly ReadonlySet<number>[], o: Readonly<Pick<ApprovalOptions, "budget" | "minSize" | "pick">>): Set<number>;

@@ -30,6 +30,17 @@ This version is a MINOR before 1.0: the exported data `MEASURES` changes, and th
 - The fields `min` and `max` of `MeasureInfo`.
 - `RANGES` and `RangeRule`: the range of each measure, by its unit or its key, with the reason.
 
+## 0.17.1
+
+This version is a PATCH: it adds an export and an optional parameter. No output changes.
+
+### The pick of a level
+
+- `itemSizes(levels, side)` takes an optional side, `long` (the default) or `short`. The type `ItemSide` names the two values.
+- The new function `pickLevelOf(levels, scale, options)` picks a level from the levels themselves. Its options are the thresholds of `pickLevel`, `side` and `minItems`.
+- With `minItems`, the search from fine to coarse stops at a level with fewer items. When no level passes, the pick is the coarsest level with enough items.
+- Without `side` and `minItems`, `pickLevelOf` gives the result of `pickLevel`. A test compares a rule with one threshold on 400 random sets of levels.
+
 ## 0.17.0
 
 This version is a MINOR before 1.0, because default routes of `sectionsRouter` change. The public API does not change.
