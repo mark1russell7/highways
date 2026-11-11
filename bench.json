@@ -4,7 +4,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.13422000000002754,
+    "ms": 0.1853580000000079,
     "deterministic": true,
     "violations": 6,
     "sample": [
@@ -57,12 +57,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.13422000000002754,
-      "baseMs": 3.2380640000000085,
-      "ratio": 0.0414506939949387
+      "ms": 0.1853580000000079,
+      "baseMs": 3.840262999999993,
+      "ratio": 0.048267006712823635
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -76,7 +76,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.29935599999998885,
+    "ms": 0.45586500000001706,
     "deterministic": true,
     "violations": 6,
     "sample": [
@@ -129,12 +129,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.29935599999998885,
-      "baseMs": 1.8133310000000051,
-      "ratio": 0.16508624183890752
+      "ms": 0.45586500000001706,
+      "baseMs": 2.8345469999999864,
+      "ratio": 0.1608246397043405
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -148,7 +148,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.7923299999999927,
+    "ms": 1.6465180000000146,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -175,12 +175,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.7923299999999927,
-      "baseMs": 1.1973140000000058,
-      "ratio": 0.6617562310304472
+      "ms": 1.6465180000000146,
+      "baseMs": 1.8523439999999596,
+      "ratio": 0.8888834903236389
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -194,7 +194,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.249621999999988,
+    "ms": 1.55642899999998,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -221,12 +221,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.249621999999988,
-      "baseMs": 1.8886029999999892,
-      "ratio": 0.6616647331387249
+      "ms": 1.55642899999998,
+      "baseMs": 2.3411709999999175,
+      "ratio": 0.6648079102295539
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -240,7 +240,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.9023440000000278,
+    "ms": 1.111774999999966,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -267,12 +267,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.9023440000000278,
-      "baseMs": 0.9610519999999951,
-      "ratio": 0.9389127747510357
+      "ms": 1.111774999999966,
+      "baseMs": 1.3899880000000167,
+      "ratio": 0.7998450346333584
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -286,7 +286,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.8876619999999775,
+    "ms": 1.111564000000044,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -313,12 +313,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.8876619999999775,
-      "baseMs": 0.9722590000000082,
-      "ratio": 0.9129892343500755
+      "ms": 1.111564000000044,
+      "baseMs": 1.3544399999999541,
+      "ratio": 0.8206816101119885
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -332,7 +332,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 0.92526799999996,
+    "ms": 1.197565999999938,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -359,12 +359,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.92526799999996,
-      "baseMs": 0.9399509999999509,
-      "ratio": 0.9843789729464709
+      "ms": 1.197565999999938,
+      "baseMs": 1.2409379999999146,
+      "ratio": 0.9650490193708472
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -378,7 +378,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 2.131905999999958,
+    "ms": 2.8466790000001083,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -432,12 +432,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 2.131905999999958,
-      "baseMs": 1.645179999999982,
-      "ratio": 1.2958496942583677
+      "ms": 2.8466790000001083,
+      "baseMs": 2.0979750000000195,
+      "ratio": 1.3568698387731417
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -451,7 +451,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.6568980000000124,
+    "ms": 2.2304439999999204,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -505,12 +505,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 1.6568980000000124,
-      "baseMs": 1.2895510000000172,
-      "ratio": 1.2848642667098784
+      "ms": 2.2304439999999204,
+      "baseMs": 1.7234919999999647,
+      "ratio": 1.2941423574927915
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -524,7 +524,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 20.634225000000015,
+    "ms": 17.647850000000005,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -551,12 +551,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 20.634225000000015,
-      "baseMs": 2.680253999999991,
-      "ratio": 7.698608042372135
+      "ms": 17.647850000000005,
+      "baseMs": 2.827173000000016,
+      "ratio": 6.242225007100699
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -570,7 +570,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 2.1617330000000265,
+    "ms": 1.7131029999999896,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -597,12 +597,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 2.1617330000000265,
-      "baseMs": 1.4526559999999336,
-      "ratio": 1.4881245112401873
+      "ms": 1.7131029999999896,
+      "baseMs": 1.4001569999999788,
+      "ratio": 1.2235077923404416
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -616,7 +616,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 4.3359400000000505,
+    "ms": 3.2318270000000098,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -643,12 +643,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 4.3359400000000505,
-      "baseMs": 2.5546540000000277,
-      "ratio": 1.69727094158348
+      "ms": 3.2318270000000098,
+      "baseMs": 1.7301879999999983,
+      "ratio": 1.8679051062659162
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -662,7 +662,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.679858999999965,
+    "ms": 1.2675689999999804,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -689,12 +689,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.679858999999965,
-      "baseMs": 1.2806469999999308,
-      "ratio": 1.3117268068406482
+      "ms": 1.2675689999999804,
+      "baseMs": 0.949374999999975,
+      "ratio": 1.335161553653734
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -708,7 +708,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 2.8452140000000554,
+    "ms": 1.5725740000000314,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -735,12 +735,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 2.8452140000000554,
-      "baseMs": 2.5316460000000234,
-      "ratio": 1.123859338943924
+      "ms": 1.5725740000000314,
+      "baseMs": 2.0499450000000365,
+      "ratio": 0.7671298498252409
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -754,7 +754,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 35.86266699999999,
+    "ms": 36.44689600000004,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -781,12 +781,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 35.86266699999999,
-      "baseMs": 2.057641999999987,
-      "ratio": 17.429011946684707
+      "ms": 36.44689600000004,
+      "baseMs": 1.3265969999999925,
+      "ratio": 27.473977402331112
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -800,7 +800,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 17.544559999999933,
+    "ms": 13.360690999999974,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -827,12 +827,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 17.544559999999933,
-      "baseMs": 1.3433480000001055,
-      "ratio": 13.060323907132444
+      "ms": 13.360690999999974,
+      "baseMs": 1.0975449999999682,
+      "ratio": 12.17325121065684
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -846,7 +846,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.8631550000000061,
+    "ms": 1.4565809999999146,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -873,12 +873,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.8631550000000061,
-      "baseMs": 1.2048650000000407,
-      "ratio": 1.5463599656392568
+      "ms": 1.4565809999999146,
+      "baseMs": 1.060169999999971,
+      "ratio": 1.3739126743823675
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -892,7 +892,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.1599740000000338,
+    "ms": 0.9091049999999541,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -919,12 +919,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.1599740000000338,
-      "baseMs": 1.2185079999999289,
-      "ratio": 0.9519625640538277
+      "ms": 0.9091049999999541,
+      "baseMs": 0.9159349999999904,
+      "ratio": 0.9925431389781629
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -938,7 +938,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 4.790885000000003,
+    "ms": 3.3135979999999563,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -965,12 +965,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 4.790885000000003,
-      "baseMs": 1.8271449999999732,
-      "ratio": 2.62206064652782
+      "ms": 3.3135979999999563,
+      "baseMs": 0.9508170000000291,
+      "ratio": 3.485000794053803
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -984,7 +984,7 @@
     "fixture": "tiny-uniform",
     "nodes": 10,
     "edges": 15,
-    "ms": 1.3401859999999033,
+    "ms": 1.1763740000000098,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1011,12 +1011,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.3401859999999033,
-      "baseMs": 1.179204000000027,
-      "ratio": 1.1365175152050642
+      "ms": 1.1763740000000098,
+      "baseMs": 0.9244879999999966,
+      "ratio": 1.272459999480809
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1030,7 +1030,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 0.42045600000005834,
+    "ms": 0.750676999999996,
     "deterministic": true,
     "violations": 104,
     "sample": [
@@ -1083,12 +1083,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 0.42045600000005834,
-      "baseMs": 23.69483600000001,
-      "ratio": 0.01774462587544637
+      "ms": 0.750676999999996,
+      "baseMs": 28.050513000000024,
+      "ratio": 0.026761613949805318
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1102,7 +1102,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 1.751037999999994,
+    "ms": 1.6957210000000487,
     "deterministic": true,
     "violations": 100,
     "sample": [
@@ -1155,12 +1155,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.751037999999994,
-      "baseMs": 18.479838000000086,
-      "ratio": 0.09475396916358174
+      "ms": 1.6957210000000487,
+      "baseMs": 21.42038699999989,
+      "ratio": 0.07916388251995901
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1174,7 +1174,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 10.581811000000016,
+    "ms": 16.017021999999997,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1201,12 +1201,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 10.581811000000016,
-      "baseMs": 17.285286000000042,
-      "ratio": 0.6121860523453294
+      "ms": 16.017021999999997,
+      "baseMs": 21.446586000000025,
+      "ratio": 0.7468331789497862
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1220,7 +1220,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 11.04480099999978,
+    "ms": 14.022592000000031,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1247,12 +1247,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 11.04480099999978,
-      "baseMs": 16.50909999999999,
-      "ratio": 0.6690129080325267
+      "ms": 14.022592000000031,
+      "baseMs": 21.273542000000134,
+      "ratio": 0.6591564300857818
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1266,7 +1266,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 11.17211999999995,
+    "ms": 14.327983999999788,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1293,12 +1293,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 11.17211999999995,
-      "baseMs": 16.578993999999966,
-      "ratio": 0.673872009363172
+      "ms": 14.327983999999788,
+      "baseMs": 20.971526000000267,
+      "ratio": 0.6832113218656385
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1312,7 +1312,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 16.364072999999962,
+    "ms": 21.516347000000223,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1339,12 +1339,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 16.364072999999962,
-      "baseMs": 16.223024000000123,
-      "ratio": 1.0086943716535115
+      "ms": 21.516347000000223,
+      "baseMs": 20.48575400000027,
+      "ratio": 1.0503077895009352
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1358,7 +1358,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 16.514267000000018,
+    "ms": 20.032654999999977,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1385,12 +1385,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 16.514267000000018,
-      "baseMs": 15.552564999999959,
-      "ratio": 1.0618355878917762
+      "ms": 20.032654999999977,
+      "baseMs": 19.19674699999996,
+      "ratio": 1.0435442525757108
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1404,7 +1404,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 24.830093000000033,
+    "ms": 31.56576700000005,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1484,12 +1484,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 24.830093000000033,
-      "baseMs": 15.598543999999947,
-      "ratio": 1.591821198183633
+      "ms": 31.56576700000005,
+      "baseMs": 19.931865000000016,
+      "ratio": 1.5836835639815956
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1503,7 +1503,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 23.48068299999977,
+    "ms": 29.779465999999957,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1583,12 +1583,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 23.48068299999977,
-      "baseMs": 17.09040499999992,
-      "ratio": 1.3739102730450146
+      "ms": 29.779465999999957,
+      "baseMs": 18.930226000000403,
+      "ratio": 1.5731172992863014
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1602,7 +1602,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 134.83084899999994,
+    "ms": 105.94218299999989,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1629,12 +1629,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 134.83084899999994,
-      "baseMs": 23.564920999999913,
-      "ratio": 5.7216762576883005
+      "ms": 105.94218299999989,
+      "baseMs": 19.169488,
+      "ratio": 5.526604727262401
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1648,7 +1648,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 83.38902700000017,
+    "ms": 71.70521000000008,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1675,12 +1675,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 83.38902700000017,
-      "baseMs": 27.27304499999991,
-      "ratio": 3.057562036068963
+      "ms": 71.70521000000008,
+      "baseMs": 17.282204999999976,
+      "ratio": 4.149077620592984
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1694,7 +1694,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 51.76376500000015,
+    "ms": 39.449571000000105,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1721,12 +1721,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 51.76376500000015,
-      "baseMs": 22.117936999999984,
-      "ratio": 2.3403523122432346
+      "ms": 39.449571000000105,
+      "baseMs": 16.72522600000002,
+      "ratio": 2.3586868721534797
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1740,7 +1740,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 36.32485100000031,
+    "ms": 27.278090999999677,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1767,12 +1767,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 36.32485100000031,
-      "baseMs": 21.061113999999634,
-      "ratio": 1.7247355006957819
+      "ms": 27.278090999999677,
+      "baseMs": 16.218601000000035,
+      "ratio": 1.6819016017472541
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1786,7 +1786,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 26.745769999999993,
+    "ms": 19.59735499999988,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1813,12 +1813,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 26.745769999999993,
-      "baseMs": 21.78344100000004,
-      "ratio": 1.2278028067282825
+      "ms": 19.59735499999988,
+      "baseMs": 17.031360999999833,
+      "ratio": 1.15066288595492
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1832,7 +1832,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 22.435477999999875,
+    "ms": 18.580299000000196,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1859,12 +1859,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 22.435477999999875,
-      "baseMs": 20.861297999999806,
-      "ratio": 1.0754593506118404
+      "ms": 18.580299000000196,
+      "baseMs": 17.365138000000115,
+      "ratio": 1.0699770425089667
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1878,7 +1878,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 772.7899950000001,
+    "ms": 551.9651230000009,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1905,12 +1905,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 772.7899950000001,
-      "baseMs": 28.27953500000058,
-      "ratio": 27.326828216941482
+      "ms": 551.9651230000009,
+      "baseMs": 20.00996699999996,
+      "ratio": 27.584509409735755
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1924,7 +1924,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 40.827971000000616,
+    "ms": 28.9858720000002,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1951,12 +1951,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 40.827971000000616,
-      "baseMs": 23.636046999999962,
-      "ratio": 1.7273603746007393
+      "ms": 28.9858720000002,
+      "baseMs": 18.765182000000095,
+      "ratio": 1.544662449849943
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -1970,7 +1970,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 22.65508299999965,
+    "ms": 17.58552099999997,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -1997,12 +1997,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 22.65508299999965,
-      "baseMs": 21.68949999999859,
-      "ratio": 1.0445184536296883
+      "ms": 17.58552099999997,
+      "baseMs": 16.487042000000656,
+      "ratio": 1.0666268091025226
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2016,7 +2016,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 99.96142300000065,
+    "ms": 77.98775600000045,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2043,12 +2043,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 99.96142300000065,
-      "baseMs": 20.68222500000047,
-      "ratio": 4.833204502900359
+      "ms": 77.98775600000045,
+      "baseMs": 16.4107869999998,
+      "ratio": 4.752225228442816
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2062,7 +2062,7 @@
     "fixture": "small-clustered",
     "nodes": 100,
     "edges": 200,
-    "ms": 25.390450999999302,
+    "ms": 20.003351000000293,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2089,12 +2089,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 25.390450999999302,
-      "baseMs": 20.500609000000622,
-      "ratio": 1.2385217922061988
+      "ms": 20.003351000000293,
+      "baseMs": 16.6789119999994,
+      "ratio": 1.199319895686302
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2108,7 +2108,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 1.2995960000007472,
+    "ms": 1.5343979999997828,
     "deterministic": true,
     "violations": 389,
     "sample": [
@@ -2161,12 +2161,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 1.2995960000007472,
-      "baseMs": 77.34875800000009,
-      "ratio": 0.01680176946087157
+      "ms": 1.5343979999997828,
+      "baseMs": 90.66284899999937,
+      "ratio": 0.016924219974598344
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2180,7 +2180,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 4.332572999999684,
+    "ms": 5.507340000000113,
     "deterministic": true,
     "violations": 400,
     "sample": [
@@ -2233,12 +2233,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 4.332572999999684,
-      "baseMs": 73.26507499999934,
-      "ratio": 0.05913558404191523
+      "ms": 5.507340000000113,
+      "baseMs": 91.02372500000001,
+      "ratio": 0.060504445406954196
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2252,7 +2252,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 30.8420900000001,
+    "ms": 39.048429999998916,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2279,12 +2279,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 30.8420900000001,
-      "baseMs": 71.11538399999972,
-      "ratio": 0.4336908312271817
+      "ms": 39.048429999998916,
+      "baseMs": 104.30245099999956,
+      "ratio": 0.3743769166076364
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2298,7 +2298,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 40.56218500000068,
+    "ms": 50.01393700000153,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2325,12 +2325,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 40.56218500000068,
-      "baseMs": 76.55661800000053,
-      "ratio": 0.5298325090588564
+      "ms": 50.01393700000153,
+      "baseMs": 102.72121599999991,
+      "ratio": 0.4868900403204103
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2344,7 +2344,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 36.255339999999705,
+    "ms": 45.643560000000434,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2371,12 +2371,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 36.255339999999705,
-      "baseMs": 76.90861100000075,
-      "ratio": 0.47140807158771014
+      "ms": 45.643560000000434,
+      "baseMs": 91.29119500000161,
+      "ratio": 0.4999776813086917
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2390,7 +2390,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 74.04679899999974,
+    "ms": 89.50563699999839,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2417,12 +2417,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 74.04679899999974,
-      "baseMs": 76.49902099999963,
-      "ratio": 0.967944400229646
+      "ms": 89.50563699999839,
+      "baseMs": 89.74575799999911,
+      "ratio": 0.9973244306432765
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2436,7 +2436,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 68.31177699999898,
+    "ms": 83.27997099999993,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2463,12 +2463,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 68.31177699999898,
-      "baseMs": 74.29858400000012,
-      "ratio": 0.9194223270795965
+      "ms": 83.27997099999993,
+      "baseMs": 85.97238599999946,
+      "ratio": 0.9686827931005714
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2482,7 +2482,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 97.93627200000083,
+    "ms": 115.27028900000005,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2575,12 +2575,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 97.93627200000083,
-      "baseMs": 74.09528099999989,
-      "ratio": 1.3217612603426252
+      "ms": 115.27028900000005,
+      "baseMs": 85.10787899999923,
+      "ratio": 1.3544020877315142
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2594,7 +2594,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 100.41100700000061,
+    "ms": 117.12466700000004,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2687,12 +2687,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 100.41100700000061,
-      "baseMs": 73.84029200000077,
-      "ratio": 1.3598403294504788
+      "ms": 117.12466700000004,
+      "baseMs": 85.91333000000122,
+      "ratio": 1.3632886421699446
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2706,7 +2706,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 855.0336150000003,
+    "ms": 724.4762900000005,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2733,12 +2733,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 855.0336150000003,
-      "baseMs": 96.7572540000001,
-      "ratio": 8.836894182631509
+      "ms": 724.4762900000005,
+      "baseMs": 79.86184499999945,
+      "ratio": 9.071619745324009
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2752,7 +2752,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 2339.491990999999,
+    "ms": 1240.5500580000025,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2779,12 +2779,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 2339.491990999999,
-      "baseMs": 93.73842899999727,
-      "ratio": 24.95766161176082
+      "ms": 1240.5500580000025,
+      "baseMs": 75.41721000000143,
+      "ratio": 16.44916403033179
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2798,7 +2798,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 343.231835999999,
+    "ms": 258.7995770000016,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2825,12 +2825,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 343.231835999999,
-      "baseMs": 98.91517799999929,
-      "ratio": 3.469961263174409
+      "ms": 258.7995770000016,
+      "baseMs": 75.53196100000059,
+      "ratio": 3.4263585053749575
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2844,7 +2844,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 211.67409300000145,
+    "ms": 163.70495200000005,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2871,12 +2871,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 211.67409300000145,
-      "baseMs": 94.89396299999862,
-      "ratio": 2.2306381386980805
+      "ms": 163.70495200000005,
+      "baseMs": 73.9190099999978,
+      "ratio": 2.214652928928633
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2890,7 +2890,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 115.61500900000101,
+    "ms": 96.739923000001,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2917,12 +2917,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 115.61500900000101,
-      "baseMs": 94.76280100000076,
-      "ratio": 1.2200463449787653
+      "ms": 96.739923000001,
+      "baseMs": 79.95601899999747,
+      "ratio": 1.209914202957054
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2936,7 +2936,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 98.44510599999921,
+    "ms": 78.32058799999868,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -2963,12 +2963,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 98.44510599999921,
-      "baseMs": 95.33798100000058,
-      "ratio": 1.0325906314294468
+      "ms": 78.32058799999868,
+      "baseMs": 73.92351600000256,
+      "ratio": 1.0594813699066474
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -2982,7 +2982,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 5930.254881999994,
+    "ms": 4277.033900999999,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3009,12 +3009,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 5930.254881999994,
-      "baseMs": 107.41796199999953,
-      "ratio": 55.20729281756453
+      "ms": 4277.033900999999,
+      "baseMs": 84.31921999999759,
+      "ratio": 50.7243058107051
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3028,7 +3028,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 182.45337599999766,
+    "ms": 148.23040999999648,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3055,12 +3055,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 182.45337599999766,
-      "baseMs": 96.49025599999732,
-      "ratio": 1.8908994914471233
+      "ms": 148.23040999999648,
+      "baseMs": 76.72676700000011,
+      "ratio": 1.9319256603109092
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3074,7 +3074,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 104.78001999999833,
+    "ms": 82.59036900000501,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3101,12 +3101,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 104.78001999999833,
-      "baseMs": 93.82258300000103,
-      "ratio": 1.1167889078474549
+      "ms": 82.59036900000501,
+      "baseMs": 74.69514100000379,
+      "ratio": 1.1056993519832947
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3120,7 +3120,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 705.6093859999964,
+    "ms": 478.6428789999991,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3147,12 +3147,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 705.6093859999964,
-      "baseMs": 113.14213299999392,
-      "ratio": 6.236486508523172
+      "ms": 478.6428789999991,
+      "baseMs": 86.34247000000323,
+      "ratio": 5.5435393381725255
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3166,7 +3166,7 @@
     "fixture": "grid-400",
     "nodes": 400,
     "edges": 800,
-    "ms": 122.40811299999768,
+    "ms": 97.92995499999961,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3193,12 +3193,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 122.40811299999768,
-      "baseMs": 94.65114400000311,
-      "ratio": 1.2932555046560625
+      "ms": 97.92995499999961,
+      "baseMs": 77.15092799999547,
+      "ratio": 1.2693295795483543
     },
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3212,7 +3212,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 5.058896999998979,
+    "ms": 6.754654000003939,
     "deterministic": true,
     "violations": 1198,
     "sample": [
@@ -3265,12 +3265,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 5.058896999998979,
-      "baseMs": 368.5466090000009,
-      "ratio": 0.013726613883995787
+      "ms": 6.754654000003939,
+      "baseMs": 446.8293219999978,
+      "ratio": 0.015116854842404394
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3284,7 +3284,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 17.192921999994724,
+    "ms": 23.717249000001175,
     "deterministic": true,
     "violations": 1216,
     "sample": [
@@ -3337,12 +3337,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 17.192921999994724,
-      "baseMs": 362.842475999998,
-      "ratio": 0.04738398378693353
+      "ms": 23.717249000001175,
+      "baseMs": 444.9344179999971,
+      "ratio": 0.05330504460997065
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3356,7 +3356,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 177.64853900000162,
+    "ms": 220.9916910000029,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3383,12 +3383,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 177.64853900000162,
-      "baseMs": 366.64482000000135,
-      "ratio": 0.4845248843281107
+      "ms": 220.9916910000029,
+      "baseMs": 447.8690510000015,
+      "ratio": 0.49342925238208113
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3402,7 +3402,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 212.0157410000029,
+    "ms": 251.57993400000123,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3429,12 +3429,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 212.0157410000029,
-      "baseMs": 365.36707300000126,
-      "ratio": 0.5802814666881658
+      "ms": 251.57993400000123,
+      "baseMs": 431.20989700000064,
+      "ratio": 0.5834280144084931
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3448,7 +3448,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 196.0322410000008,
+    "ms": 227.62955800000054,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3475,12 +3475,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 196.0322410000008,
-      "baseMs": 369.4193939999968,
-      "ratio": 0.5306495657345008
+      "ms": 227.62955800000054,
+      "baseMs": 436.33216900000116,
+      "ratio": 0.5216886908010671
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3494,7 +3494,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 363.63176499999827,
+    "ms": 428.4112519999908,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3521,12 +3521,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 363.63176499999827,
-      "baseMs": 361.2573709999997,
-      "ratio": 1.0065725828470322
+      "ms": 428.4112519999908,
+      "baseMs": 425.34521400000085,
+      "ratio": 1.0072083519434873
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3540,7 +3540,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 343.7896139999939,
+    "ms": 415.4846140000009,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3567,12 +3567,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 343.7896139999939,
-      "baseMs": 362.83300299999974,
-      "ratio": 0.9475147275949265
+      "ms": 415.4846140000009,
+      "baseMs": 430.37853300001007,
+      "ratio": 0.9653934435433171
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3586,7 +3586,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 385.74710599999526,
+    "ms": 455.8120459999918,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3679,12 +3679,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 385.74710599999526,
-      "baseMs": 360.3532789999954,
-      "ratio": 1.070469254700469
+      "ms": 455.8120459999918,
+      "baseMs": 430.364465000006,
+      "ratio": 1.059130302498338
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3698,7 +3698,7 @@
     "fixture": "mid-uniform",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 382.2463310000021,
+    "ms": 455.8864659999963,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3791,12 +3791,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 382.2463310000021,
-      "baseMs": 366.50412700000743,
-      "ratio": 1.0429523239720417
+      "ms": 455.8864659999963,
+      "baseMs": 425.3627419999975,
+      "ratio": 1.0717592797537472
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3810,7 +3810,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 9.960435999993933,
+    "ms": 11.782103000005009,
     "deterministic": true,
     "violations": 1961,
     "sample": [
@@ -3863,12 +3863,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 9.960435999993933,
-      "baseMs": 602.8664609999978,
-      "ratio": 0.016521794865602867
+      "ms": 11.782103000005009,
+      "baseMs": 698.512864999997,
+      "ratio": 0.016867410165745566
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3882,7 +3882,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 33.25457000001916,
+    "ms": 38.498308000009274,
     "deterministic": true,
     "violations": 2051,
     "sample": [
@@ -3935,12 +3935,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 33.25457000001916,
-      "baseMs": 608.7336869999999,
-      "ratio": 0.054629094315293183
+      "ms": 38.498308000009274,
+      "baseMs": 676.6217630000028,
+      "ratio": 0.05689782697694445
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -3954,7 +3954,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 302.4762219999975,
+    "ms": 338.78106100001605,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -3981,12 +3981,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 302.4762219999975,
-      "baseMs": 608.2780410000123,
-      "ratio": 0.4972663841402609
+      "ms": 338.78106100001605,
+      "baseMs": 680.689165000018,
+      "ratio": 0.4977030316032827
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4000,7 +4000,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 377.4480999999796,
+    "ms": 404.2251600000018,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4027,12 +4027,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 377.4480999999796,
-      "baseMs": 606.2273549999809,
-      "ratio": 0.6226180605129432
+      "ms": 404.2251600000018,
+      "baseMs": 674.0006510000094,
+      "ratio": 0.5997400141976957
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4046,7 +4046,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 318.54091799998423,
+    "ms": 367.9330609999888,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4073,12 +4073,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 318.54091799998423,
-      "baseMs": 589.7880950000254,
-      "ratio": 0.5400938416703215
+      "ms": 367.9330609999888,
+      "baseMs": 691.0681090000144,
+      "ratio": 0.5324121547619862
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4092,7 +4092,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 586.807845000003,
+    "ms": 678.5524509999959,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4119,12 +4119,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 586.807845000003,
-      "baseMs": 571.833221000008,
-      "ratio": 1.026187047988936
+      "ms": 678.5524509999959,
+      "baseMs": 676.5686569999962,
+      "ratio": 1.0029321399675772
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4138,7 +4138,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 559.9501279999968,
+    "ms": 656.2091099999961,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4165,12 +4165,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 559.9501279999968,
-      "baseMs": 576.7979399999895,
-      "ratio": 0.970790790272252
+      "ms": 656.2091099999961,
+      "baseMs": 665.3234090000042,
+      "ratio": 0.9863009494680083
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4184,7 +4184,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 770.290611000004,
+    "ms": 919.8363800000225,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4290,12 +4290,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 770.290611000004,
-      "baseMs": 579.6668139999965,
-      "ratio": 1.3288506300448806
+      "ms": 919.8363800000225,
+      "baseMs": 672.8705149999878,
+      "ratio": 1.3670332693951364
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4309,7 +4309,7 @@
     "fixture": "mid-clustered",
     "nodes": 1000,
     "edges": 3000,
-    "ms": 772.9237250000006,
+    "ms": 919.5801689999935,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4415,12 +4415,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 772.9237250000006,
-      "baseMs": 571.6608699999924,
-      "ratio": 1.352066873144581
+      "ms": 919.5801689999935,
+      "baseMs": 676.4150910000026,
+      "ratio": 1.3594909120677645
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4434,7 +4434,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 4.986787000030745,
+    "ms": 6.365217000013217,
     "deterministic": true,
     "violations": 1172,
     "sample": [
@@ -4487,12 +4487,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 4.986787000030745,
-      "baseMs": 350.5951930000447,
-      "ratio": 0.014223774597018247
+      "ms": 6.365217000013217,
+      "baseMs": 427.0665179999778,
+      "ratio": 0.014904509559359904
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4506,7 +4506,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 19.400628000032157,
+    "ms": 22.45476100000087,
     "deterministic": true,
     "violations": 1202,
     "sample": [
@@ -4559,12 +4559,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 19.400628000032157,
-      "baseMs": 356.25496300001396,
-      "ratio": 0.05445714450308274
+      "ms": 22.45476100000087,
+      "baseMs": 424.3348560000304,
+      "ratio": 0.05291755009633067
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4578,7 +4578,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 182.21584899997106,
+    "ms": 214.9004539999878,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4605,12 +4605,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 182.21584899997106,
-      "baseMs": 384.3651950000203,
-      "ratio": 0.47406958634733154
+      "ms": 214.9004539999878,
+      "baseMs": 438.42943000001833,
+      "ratio": 0.4901597367676226
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4624,7 +4624,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 207.82910500001162,
+    "ms": 252.20966400002362,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4651,12 +4651,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 207.82910500001162,
-      "baseMs": 355.55156999995233,
-      "ratio": 0.5845259099827332
+      "ms": 252.20966400002362,
+      "baseMs": 418.71443200000795,
+      "ratio": 0.6023428970320728
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4670,7 +4670,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 196.31269400002202,
+    "ms": 230.43799299997045,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4697,12 +4697,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 196.31269400002202,
-      "baseMs": 346.710923000006,
-      "ratio": 0.5662143329704632
+      "ms": 230.43799299997045,
+      "baseMs": 422.72956700000213,
+      "ratio": 0.5451191754466734
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4716,7 +4716,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 365.61291299998993,
+    "ms": 422.9029820000287,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4743,12 +4743,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 365.61291299998993,
-      "baseMs": 355.3165709999739,
-      "ratio": 1.0289779392248406
+      "ms": 422.9029820000287,
+      "baseMs": 418.11960099998396,
+      "ratio": 1.0114402218614118
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4762,7 +4762,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 332.7922849999741,
+    "ms": 401.6076469999971,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4789,12 +4789,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 332.7922849999741,
-      "baseMs": 357.84614100004546,
-      "ratio": 0.9299870722929825
+      "ms": 401.6076469999971,
+      "baseMs": 418.29437900002813,
+      "ratio": 0.9601076829195692
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4808,7 +4808,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 377.83851999999024,
+    "ms": 452.1911329999566,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -4901,12 +4901,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 377.83851999999024,
-      "baseMs": 354.7090409999946,
-      "ratio": 1.0652069057354419
+      "ms": 452.1911329999566,
+      "baseMs": 413.27894200000446,
+      "ratio": 1.0941547875912625
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -4920,7 +4920,7 @@
     "fixture": "mid-hubs",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 368.5811209999956,
+    "ms": 443.7127680000267,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5013,12 +5013,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 368.5811209999956,
-      "baseMs": 343.26612599997316,
-      "ratio": 1.073747431169554
+      "ms": 443.7127680000267,
+      "baseMs": 424.53170500003034,
+      "ratio": 1.0451816973245731
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5032,7 +5032,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 7.529558000038378,
+    "ms": 9.255699999979697,
     "deterministic": true,
     "violations": 1675,
     "sample": [
@@ -5085,12 +5085,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 7.529558000038378,
-      "baseMs": 521.6956820000196,
-      "ratio": 0.014432854746223672
+      "ms": 9.255699999979697,
+      "baseMs": 617.4282410000451,
+      "ratio": 0.014990729910553316
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5104,7 +5104,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 22.60083199996734,
+    "ms": 27.21294899994973,
     "deterministic": true,
     "violations": 1675,
     "sample": [
@@ -5157,12 +5157,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 22.60083199996734,
-      "baseMs": 541.4759019999765,
-      "ratio": 0.04173931271269819
+      "ms": 27.21294899994973,
+      "baseMs": 603.1178920000093,
+      "ratio": 0.04512044719765885
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5176,7 +5176,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 272.83817299996736,
+    "ms": 319.7718510000268,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5203,12 +5203,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 272.83817299996736,
-      "baseMs": 534.9670829999959,
-      "ratio": 0.5100092728508484
+      "ms": 319.7718510000268,
+      "baseMs": 601.8076299999375,
+      "ratio": 0.5313522711569144
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5222,7 +5222,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 356.7021899999818,
+    "ms": 383.8841679999605,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5249,12 +5249,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 356.7021899999818,
-      "baseMs": 547.9830610000063,
-      "ratio": 0.650936525937574
+      "ms": 383.8841679999605,
+      "baseMs": 598.1729259999702,
+      "ratio": 0.6417611886365777
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5268,7 +5268,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 235.72837999998592,
+    "ms": 275.3693660000572,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5295,12 +5295,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 235.72837999998592,
-      "baseMs": 523.2354029999697,
-      "ratio": 0.45052069995347693
+      "ms": 275.3693660000572,
+      "baseMs": 598.248367000022,
+      "ratio": 0.4602927165199384
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5314,7 +5314,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 525.5158189999638,
+    "ms": 588.44061099994,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5341,12 +5341,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 525.5158189999638,
-      "baseMs": 522.5652149999514,
-      "ratio": 1.0056463842508396
+      "ms": 588.44061099994,
+      "baseMs": 604.4587240000255,
+      "ratio": 0.9735000714455981
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5360,7 +5360,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 602.0652019999688,
+    "ms": 678.6067559999647,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5387,12 +5387,12 @@
     "levelFaults": [],
     "paired": {
       "base": "shared",
-      "ms": 602.0652019999688,
-      "baseMs": 514.938274999964,
-      "ratio": 1.1691987782419375
+      "ms": 678.6067559999647,
+      "baseMs": 587.3706119999988,
+      "ratio": 1.1553297732913577
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5406,7 +5406,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 729.2973289999645,
+    "ms": 905.7972490000539,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5512,12 +5512,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 729.2973289999645,
-      "baseMs": 500.8128919999581,
-      "ratio": 1.4562271472037616
+      "ms": 905.7972490000539,
+      "baseMs": 617.2170380000025,
+      "ratio": 1.4675506235782982
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5531,7 +5531,7 @@
     "fixture": "mid-fanout",
     "nodes": 1000,
     "edges": 2000,
-    "ms": 687.7775039999979,
+    "ms": 868.8440280000214,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5637,12 +5637,12 @@
     ],
     "paired": {
       "base": "shared",
-      "ms": 687.7775039999979,
-      "baseMs": 506.7551680000033,
-      "ratio": 1.357218529639136
+      "ms": 868.8440280000214,
+      "baseMs": 630.4431709999917,
+      "ratio": 1.3781480519836304
     },
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5656,7 +5656,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 232.66722200000004,
+    "ms": 291.73551499999996,
     "deterministic": true,
     "violations": 19443,
     "sample": [
@@ -5708,7 +5708,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5722,7 +5722,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 542.1277259999988,
+    "ms": 636.4725929999986,
     "deterministic": true,
     "violations": 19733,
     "sample": [
@@ -5774,7 +5774,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5788,7 +5788,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 12878.613974,
+    "ms": 15962.937411000006,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5814,7 +5814,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5828,7 +5828,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 14798.100737999994,
+    "ms": 17388.748720999996,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5854,7 +5854,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5868,7 +5868,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 13385.998989999993,
+    "ms": 16393.816281999985,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5894,7 +5894,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5908,7 +5908,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 25834.255562000006,
+    "ms": 31901.885523999998,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5934,7 +5934,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5948,7 +5948,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 31782.933372,
+    "ms": 25093.168285000007,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -5974,7 +5974,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -5988,7 +5988,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 28061.21644199999,
+    "ms": 32826.17648099999,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6119,7 +6119,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6133,7 +6133,7 @@
     "fixture": "large-clustered",
     "nodes": 10000,
     "edges": 30000,
-    "ms": 32211.93538400001,
+    "ms": 39190.69339900004,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6264,7 +6264,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6278,7 +6278,7 @@
     "fixture": "huge-clustered",
     "nodes": 100000,
     "edges": 200000,
-    "ms": 11550.558968,
+    "ms": 9917.043457,
     "deterministic": true,
     "violations": 136389,
     "sample": [
@@ -6330,7 +6330,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6344,7 +6344,7 @@
     "fixture": "huge-clustered",
     "nodes": 100000,
     "edges": 200000,
-    "ms": 9170.013752999948,
+    "ms": 13552.052403999958,
     "deterministic": true,
     "violations": 137804,
     "sample": [
@@ -6396,7 +6396,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6410,7 +6410,7 @@
     "fixture": "huge-clustered",
     "nodes": 100000,
     "edges": 200000,
-    "ms": 1478674.31709,
+    "ms": 1635875.134049,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6554,7 +6554,7 @@
       }
     ],
     "env": {
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6568,7 +6568,7 @@
     "fixture": "huge-clustered",
     "nodes": 100000,
     "edges": 200000,
-    "ms": 1528638.248803,
+    "ms": 1661742.2346140002,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6712,7 +6712,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6726,7 +6726,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 1.1744180000387132,
+    "ms": 0.6800750000402331,
     "deterministic": true,
     "violations": 167,
     "sample": [
@@ -6778,7 +6778,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6792,7 +6792,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 5.481160999974236,
+    "ms": 3.1537040000548586,
     "deterministic": true,
     "violations": 171,
     "sample": [
@@ -6844,7 +6844,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6858,7 +6858,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 24.94689699995797,
+    "ms": 21.188991999952123,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6884,7 +6884,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6898,7 +6898,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 21.77682599995751,
+    "ms": 25.510545999975875,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6924,7 +6924,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6938,7 +6938,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 20.22173699992709,
+    "ms": 23.69279799994547,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -6964,7 +6964,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -6978,7 +6978,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 30.61024399998132,
+    "ms": 38.001499000005424,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7004,7 +7004,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7018,7 +7018,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 29.8369010000024,
+    "ms": 35.31444499990903,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7044,7 +7044,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7058,7 +7058,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 41.84696599992458,
+    "ms": 50.26244000007864,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7137,7 +7137,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7151,7 +7151,7 @@
     "fixture": "case-dense-groups",
     "nodes": 150,
     "edges": 300,
-    "ms": 42.37923900003079,
+    "ms": 53.00785900000483,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7230,7 +7230,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7244,7 +7244,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 0.1497230000095442,
+    "ms": 0.18105000001378357,
     "deterministic": true,
     "violations": 26,
     "sample": [
@@ -7296,7 +7296,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7310,7 +7310,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 0.6243310000281781,
+    "ms": 0.7940289999824017,
     "deterministic": true,
     "violations": 26,
     "sample": [
@@ -7362,7 +7362,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7376,7 +7376,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 3.659786000032909,
+    "ms": 4.7914050000254065,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7402,7 +7402,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7416,7 +7416,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 4.557965000043623,
+    "ms": 5.688196000060998,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7442,7 +7442,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7456,7 +7456,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 4.01999300008174,
+    "ms": 4.638988999999128,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7482,7 +7482,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7496,7 +7496,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 8.572649999987334,
+    "ms": 10.589026000001468,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7522,7 +7522,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7536,7 +7536,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 8.62748200003989,
+    "ms": 11.14278400002513,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7562,7 +7562,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7576,7 +7576,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 5.766887999954633,
+    "ms": 6.828875999897718,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7642,7 +7642,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7656,7 +7656,7 @@
     "fixture": "case-hub-chain",
     "nodes": 96,
     "edges": 119,
-    "ms": 5.651645999983884,
+    "ms": 6.8384539999533445,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7722,7 +7722,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7736,7 +7736,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 0.28361299994867295,
+    "ms": 0.3848320000106469,
     "deterministic": true,
     "violations": 84,
     "sample": [
@@ -7788,7 +7788,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7802,7 +7802,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 1.2994969999417663,
+    "ms": 1.6139259999617934,
     "deterministic": true,
     "violations": 87,
     "sample": [
@@ -7854,7 +7854,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7868,7 +7868,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 7.171000999980606,
+    "ms": 8.798477999982424,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7894,7 +7894,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7908,7 +7908,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 9.375297000049613,
+    "ms": 11.477242000051774,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7934,7 +7934,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7948,7 +7948,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 7.0498800000641495,
+    "ms": 8.814498999970965,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -7974,7 +7974,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -7988,7 +7988,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 12.892911000060849,
+    "ms": 15.07777299999725,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -8014,7 +8014,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -8028,7 +8028,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 12.681646000011824,
+    "ms": 15.820285999914631,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -8054,7 +8054,7 @@
     },
     "levelFaults": [],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -8068,7 +8068,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 11.032116000074893,
+    "ms": 12.421151999966241,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -8134,7 +8134,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
@@ -8148,7 +8148,7 @@
     "fixture": "case-many-groups",
     "nodes": 128,
     "edges": 187,
-    "ms": 9.880691000027582,
+    "ms": 12.241625000024214,
     "deterministic": true,
     "violations": 0,
     "sample": [],
@@ -8214,7 +8214,7 @@
       }
     ],
     "env": {
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
       "cores": 4,
       "os": "linux",
       "arch": "x64",
