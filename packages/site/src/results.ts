@@ -242,8 +242,8 @@ function queue(): void {
 // The measures of the records: each measure with a definition in a table, and the others in a list that opens.
 function measures(): void {
   const row = (m: (typeof data.measures)[number]): string =>
-    `<tr><th scope="row">${esc(m.id)}</th><td><code>${esc(m.name)}</code></td><td>${esc(m.unit)}</td><td>${m.better === "lower" ? "lower" : "higher"}</td><td>${esc(m.definition)}</td></tr>`;
-  const head = `<thead><tr><th scope="col">Id</th><th scope="col">Name in a record</th><th scope="col">Unit</th><th scope="col">Better</th><th scope="col">Definition</th></tr></thead>`;
+    `<tr><th scope="row">${esc(m.id)}</th><td><code>${esc(m.name)}</code></td><td>${esc(m.unit)}</td><td>${esc(m.range)}</td><td>${m.better === "lower" ? "lower" : "higher"}</td><td>${esc(m.definition)}</td></tr>`;
+  const head = `<thead><tr><th scope="col">Id</th><th scope="col">Name in a record</th><th scope="col">Unit</th><th scope="col">Range</th><th scope="col">Better</th><th scope="col">Definition</th></tr></thead>`;
   const defined = data.measures.filter((m) => m.definition !== "");
   const rest = data.measures.filter((m) => m.definition === "");
   $("measure-list").innerHTML =

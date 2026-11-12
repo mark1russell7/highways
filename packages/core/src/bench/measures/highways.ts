@@ -51,7 +51,7 @@ export function highwayIdKeep(before: HighwayPlan, after: HighwayPlan, edges: Re
 
 /** The stability of a highway strategy over a seeded sequence of edits. Each value is the mean over the edits. */
 export interface HighwayEdits {
-  /** The mean Fréchet distance of the routes over one edit, in units of the board (Z10). */
+  /** The mean Fréchet distance of the routes over one edit, over the width `W` of the board (`boardWidth`, Z10). */
   readonly mean: number;
   /** The share of the routes that move over one edit (Z10). */
   readonly moved: number;

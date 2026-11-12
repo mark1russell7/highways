@@ -2,7 +2,7 @@ import { frechet, inflate, type Box } from "../../geom.ts";
 import { rng } from "../../fixtures.ts";
 import type { Edge, Graph, Node, Result } from "../../model.ts";
 import { measureStability } from "../quality.ts";
-import { boardUnit } from "./routes.ts";
+import { boardUnit, boardWidth } from "./routes.ts";
 
 /** A small change of a graph, for the stability measures Z10 and G9 of MEAS0. */
 export interface GraphChange {
@@ -71,9 +71,9 @@ export function changeGraph(graph: Graph, seed: number, options: { readonly edge
 
 /** The route stability of a router (Z10 of MEAS0). */
 export interface RouteStability {
-  /** The mean Fréchet distance between the two routes of an edge, divided by the unit of the board. */
+  /** The mean Fréchet distance between the two routes of an edge, divided by the width `W` of the board (`boardWidth`). */
   readonly mean: number;
-  /** The largest Fréchet distance, divided by the unit of the board. */
+  /** The largest Fréchet distance, divided by the width `W` of the board. */
   readonly max: number;
   /** The share of the routes that moved more than 1 unit of length. */
   readonly moved: number;
@@ -88,7 +88,7 @@ export interface RouteStabilityOptions {
 
 /**
  * This function measures the route stability of a router (Z10 of MEAS0) with `measureStability`.
- * It compares the routes of the edges that both results have. Each distance is divided by the unit of the board.
+ * It compares the routes of the edges that both results have. Each distance is divided by the width `W` of `graph` (`boardWidth`).
  * The cost is quadratic for each route, so a seeded sample serves above `sample` routes.
  */
 export function routeStability(graph: Graph, before: Result, after: Result, options: RouteStabilityOptions = {}): RouteStability {
@@ -100,8 +100,8 @@ export function routeStability(graph: Graph, before: Result, after: Result, opti
     routes = Array.from({ length: max }, () => routes[Math.floor(R() * routes.length)]!);
   }
   const s = measureStability(before, { routes });
-  const u = boardUnit(graph);
-  return { mean: s.mean / u, max: s.max / u, moved: s.moved };
+  const w = boardWidth(graph);
+  return { mean: s.mean / w, max: s.max / w, moved: s.moved };
 }
 
 /** The move response of a router (Z11 of MEAS0): the routes after a change that only moves one node by one unit of the board. */

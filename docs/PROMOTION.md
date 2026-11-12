@@ -287,13 +287,15 @@ Each row gives two named parameters: `<measure>.floor` and `<measure>.tol`. Thes
 
 | Units | `minEffect` | Reason |
 |---|---|---|
-| `0 to 1`, `-1 to 1`, `-0.5 to 1`, `share of the gap`, `0 or 1` | none, so `RECORD_EPS` | A share or a flag of 0 or 1 has the precision of a written file. |
+| `share` | none, so `RECORD_EPS` | A share or a flag of 0 or 1 has the precision of a written file. |
 | `ratio`, `IQR over the median`, `no unit`, `half turns for each route`, `curvature times the unit of the board` | none, so `RECORD_EPS` | A stretch or another value without a unit has the precision of a written file. |
 | `count`, `count for each edge`, `count for each route` | 0, so `RECORD_EPS` | A count changes in steps. A change of 1 counts. |
-| `units`, `units of the board` | `{ rel: 0.01 }` | A length in pixels moves with each small move of a point. A change of 1% or less is not visible. |
+| `units`, `W` | `{ rel: 0.01 }` | A length in pixels, or a length over the width `W` of the board, moves with each small move of a point. A change of 1% or less is not visible. |
 | `degrees` | `{ rel: 0.01 }` | An angle is a continuous value of the geometry, as a length. |
 
 The time test uses its own ratios (`timeRatio` and `timeTail`), so the times have no row.
+
+Since 0.19.0, a unit names no range. `RANGES` of the same file gives the `min` and the `max` of each measure (MEASURE-RANGES). A signed value has the unit `no unit`. The share of the gap that a strategy closes has the unit `ratio`.
 
 `highways` imports `compareMeasure` and `minEffectOf` from the contract `@mark1russell7/layout-contract` (0.2.7 or later). The contract has no dependencies, so the import adds only the contract to the core. A test checks that the functions agree with this note.
 

@@ -550,7 +550,9 @@ export function routePairCrossings(routes: readonly { readonly points: readonly 
     const all = totals.reduce((s, t) => s + t, 0);
     const spread = Math.sqrt(1 - m / n) * scale;
     const interval = bootstrap([...totals], (drawn) => pairs + spread * (drawn.reduce((s, t) => s + t, 0) - all), { runs: PAIR_RUNS, seed });
-    const [low, high] = [Math.max(0, Math.floor(interval.low)), Math.ceil(interval.high)];
+    const low = Math.max(0, Math.floor(interval.low));
+    // A count of 0 or more has a high end of 0 or more: the high end is never below the low end.
+    const high = Math.max(low, Math.ceil(interval.high));
     return { pairs, proper, contact, estimated: m < n || part.estimated, low, high, contactSampled: part.contactSampled };
   }
   return countRoutePairs(routes);

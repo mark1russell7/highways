@@ -222,6 +222,7 @@ Status: `done`, `active`, `blocked`, `later`.
 | D23-DISTINCT | The distinctness gate: a variant counts only when its routes differ from each operator of its stage on a board. `scripts/distinct.ts` imports nothing, and the package `strategy-space` takes it whole. | 2026-11-08 | [#406](https://github.com/mark1russell7/highways/pull/406) |
 | D23-POINTS | The points of the grammar for a screen: `grammar-points.ts` draws a seeded sample of `routeSpace` with a unique id for each point, and gives each job its shard. `readShard` refuses a stale file and a wrong id. | 2026-11-08 | [#408](https://github.com/mark1russell7/highways/pull/408) |
 | SITE-HUB-THROUGH | A hub way of `sections` that goes through a box gives way to the direct way, when the direct way goes through none. With the options of the site, `route.through` goes from 296 to 292, and only those 4 routes move. The routers `sections` and `sections-tree` move no route. | 2026-11-09 | [#384](https://github.com/mark1russell7/highways/pull/384) |
+| MEASURE-RANGES | Each row of `MEASURES` has `min` and `max`, from the rules of `RANGES` by unit or by key. The unit texts name no range. The lengths of Z10 and Z12 are over the width `W` of the board (`boardWidth`). A screen of each step holds each value in its range. R7, G8 and the high end of the sampled pair interval no longer leave their range. | 2026-11-09 | [#427](https://github.com/mark1russell7/highways/pull/427) |
 
 ## Calibration
 
