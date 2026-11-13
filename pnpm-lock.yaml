@@ -231,7 +231,7 @@ importers:
         specifier: github:mark1russell7/cue#9005ddbd0aac6d10992f638506b14e16b1eb2de8
         version: https://codeload.github.com/mark1russell7/cue/tar.gz/9005ddbd0aac6d10992f638506b14e16b1eb2de8
       '@mark1russell7/rigor-bench':
-        specifier: ^0.2.29
+        specifier: ^0.2.36
         version: 0.2.36(esbuild@0.28.2)
       '@mark1russell7/strategy-space':
         specifier: ^0.0.5

@@ -1560,7 +1560,7 @@
       "fullLength": 191296.346,
       "fullBends": 3178,
       "laneCrossings": 4658,
-      "fullCrossings": 4527,
+      "fullCrossings": 4528,
       "bySeed": [
         {
           "seed": 0,
@@ -1615,7 +1615,7 @@
         {
           "seed": 2,
           "laneCrossings": 1818,
-          "fullCrossings": 1746,
+          "fullCrossings": 1747,
           "polyline": {
             "points": 1843,
             "beforePoints": 1769,
@@ -1735,7 +1735,7 @@
           "bundleBody": 5,
           "bundleEnds": 40,
           "fullBundleBody": 0,
-          "fullBundleEnds": 30
+          "fullBundleEnds": 31
         },
         {
           "seed": 1,
@@ -1888,8 +1888,8 @@
       "laneBends": 4354,
       "fullLength": 303240.004,
       "fullBends": 4353,
-      "laneCrossings": 10953,
-      "fullCrossings": 10720,
+      "laneCrossings": 10955,
+      "fullCrossings": 10721,
       "bySeed": [
         {
           "seed": 0,
@@ -1943,8 +1943,8 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 4261,
-          "fullCrossings": 4027,
+          "laneCrossings": 4263,
+          "fullCrossings": 4028,
           "polyline": {
             "points": 5241,
             "beforePoints": 5157,
@@ -2077,8 +2077,8 @@
       "laneBends": 4290,
       "fullLength": 301841.854,
       "fullBends": 4289,
-      "laneCrossings": 10886,
-      "fullCrossings": 10651,
+      "laneCrossings": 10888,
+      "fullCrossings": 10652,
       "bySeed": [
         {
           "seed": 0,
@@ -2132,8 +2132,8 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 4226,
-          "fullCrossings": 3992,
+          "laneCrossings": 4228,
+          "fullCrossings": 3993,
           "polyline": {
             "points": 5215,
             "beforePoints": 5131,
@@ -2304,7 +2304,7 @@
             "lost": 22
           },
           "bundleBody": 0,
-          "bundleEnds": 252,
+          "bundleEnds": 253,
           "fullBundleBody": 0,
           "fullBundleEnds": 187
         },
@@ -2770,10 +2770,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 2769,
-            "beforePoints": 2769,
-            "pairs": 2638,
-            "beforePairs": 2638,
+            "points": 2771,
+            "beforePoints": 2771,
+            "pairs": 2640,
+            "beforePairs": 2640,
             "added": 0,
             "lost": 0
           },
@@ -2855,7 +2855,7 @@
       "fullLength": 331480.059,
       "fullBends": 5657,
       "laneCrossings": 10615,
-      "fullCrossings": 10195,
+      "fullCrossings": 10197,
       "bySeed": [
         {
           "seed": 0,
@@ -2905,12 +2905,12 @@
           "bundleBody": 0,
           "bundleEnds": 156,
           "fullBundleBody": 1,
-          "fullBundleEnds": 106
+          "fullBundleEnds": 107
         },
         {
           "seed": 2,
           "laneCrossings": 3909,
-          "fullCrossings": 3758,
+          "fullCrossings": 3760,
           "polyline": {
             "points": 3889,
             "beforePoints": 3724,
@@ -3022,7 +3022,7 @@
       "fullLength": 394436.236,
       "fullBends": 5498,
       "laneCrossings": 13453,
-      "fullCrossings": 13019,
+      "fullCrossings": 13020,
       "bySeed": [
         {
           "seed": 0,
@@ -3047,12 +3047,12 @@
           "bundleBody": 5,
           "bundleEnds": 97,
           "fullBundleBody": 7,
-          "fullBundleEnds": 71
+          "fullBundleEnds": 73
         },
         {
           "seed": 1,
           "laneCrossings": 4672,
-          "fullCrossings": 4522,
+          "fullCrossings": 4523,
           "polyline": {
             "points": 5015,
             "beforePoints": 4866,
@@ -3069,10 +3069,10 @@
             "added": 92,
             "lost": 38
           },
-          "bundleBody": 21,
-          "bundleEnds": 112,
+          "bundleBody": 22,
+          "bundleEnds": 114,
           "fullBundleBody": 14,
-          "fullBundleEnds": 75
+          "fullBundleEnds": 77
         },
         {
           "seed": 2,
@@ -3216,13 +3216,13 @@
       "laneBends": 7064,
       "fullLength": 504999.61,
       "fullBends": 7064,
-      "laneCrossings": 19573,
-      "fullCrossings": 19360,
+      "laneCrossings": 19576,
+      "fullCrossings": 19363,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 6620,
-          "fullCrossings": 6555,
+          "laneCrossings": 6621,
+          "fullCrossings": 6556,
           "polyline": {
             "points": 7666,
             "beforePoints": 7625,
@@ -3246,8 +3246,8 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 7021,
-          "fullCrossings": 6933,
+          "laneCrossings": 7023,
+          "fullCrossings": 6935,
           "polyline": {
             "points": 8152,
             "beforePoints": 8087,
@@ -3422,13 +3422,13 @@
       "laneBends": 6886,
       "fullLength": 501437.032,
       "fullBends": 6886,
-      "laneCrossings": 19139,
-      "fullCrossings": 18901,
+      "laneCrossings": 19142,
+      "fullCrossings": 18904,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 6572,
-          "fullCrossings": 6507,
+          "laneCrossings": 6573,
+          "fullCrossings": 6508,
           "polyline": {
             "points": 7613,
             "beforePoints": 7572,
@@ -3452,8 +3452,8 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 6868,
-          "fullCrossings": 6757,
+          "laneCrossings": 6870,
+          "fullCrossings": 6759,
           "polyline": {
             "points": 7888,
             "beforePoints": 7809,
@@ -3609,8 +3609,8 @@
       "laneBends": 8302,
       "fullLength": 357442.779,
       "fullBends": 8303,
-      "laneCrossings": 17750,
-      "fullCrossings": 16907,
+      "laneCrossings": 17752,
+      "fullCrossings": 16909,
       "bySeed": [
         {
           "seed": 0,
@@ -3660,12 +3660,12 @@
           "bundleBody": 0,
           "bundleEnds": 734,
           "fullBundleBody": 0,
-          "fullBundleEnds": 571
+          "fullBundleEnds": 572
         },
         {
           "seed": 2,
-          "laneCrossings": 6355,
-          "fullCrossings": 6109,
+          "laneCrossings": 6357,
+          "fullCrossings": 6111,
           "polyline": {
             "points": 6234,
             "beforePoints": 5965,
@@ -5543,7 +5543,7 @@
           "fullCrossings": 2194,
           "polyline": {
             "points": 2483,
-            "beforePoints": 2365,
+            "beforePoints": 2366,
             "pairs": 1648,
             "beforePairs": 1598,
             "added": 63,
@@ -6016,7 +6016,7 @@
       "fullLength": 202845.362,
       "fullBends": 6620,
       "laneCrossings": 8684,
-      "fullCrossings": 8370,
+      "fullCrossings": 8374,
       "bySeed": [
         {
           "seed": 0,
@@ -6046,7 +6046,7 @@
         {
           "seed": 1,
           "laneCrossings": 3616,
-          "fullCrossings": 3480,
+          "fullCrossings": 3484,
           "polyline": {
             "points": 3518,
             "beforePoints": 3352,
@@ -6064,7 +6064,7 @@
             "lost": 22
           },
           "bundleBody": 0,
-          "bundleEnds": 619,
+          "bundleEnds": 620,
           "fullBundleBody": 0,
           "fullBundleEnds": 380
         },
@@ -12221,13 +12221,13 @@
       "laneBends": 3519,
       "fullLength": 125427.315,
       "fullBends": 3517,
-      "laneCrossings": 3897,
-      "fullCrossings": 3876,
+      "laneCrossings": 3898,
+      "fullCrossings": 3877,
       "bySeed": [
         {
           "seed": 0,
           "laneCrossings": 1098,
-          "fullCrossings": 1086,
+          "fullCrossings": 1087,
           "polyline": {
             "points": 1011,
             "beforePoints": 1024,
@@ -12251,7 +12251,7 @@
         },
         {
           "seed": 1,
-          "laneCrossings": 1433,
+          "laneCrossings": 1434,
           "fullCrossings": 1438,
           "polyline": {
             "points": 1332,
@@ -12958,7 +12958,7 @@
       "fullLength": 250883.09,
       "fullBends": 3285,
       "laneCrossings": 8427,
-      "fullCrossings": 8275,
+      "fullCrossings": 8278,
       "bySeed": [
         {
           "seed": 0,
@@ -13013,7 +13013,7 @@
         {
           "seed": 2,
           "laneCrossings": 2412,
-          "fullCrossings": 2409,
+          "fullCrossings": 2412,
           "polyline": {
             "points": 2697,
             "beforePoints": 2713,
@@ -13125,8 +13125,8 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
-      "laneCrossings": 14862,
-      "fullCrossings": 14369,
+      "laneCrossings": 14867,
+      "fullCrossings": 14373,
       "bySeed": [
         {
           "seed": 0,
@@ -13176,12 +13176,12 @@
           "bundleBody": 61,
           "bundleEnds": 143,
           "fullBundleBody": 51,
-          "fullBundleEnds": 150
+          "fullBundleEnds": 152
         },
         {
           "seed": 2,
-          "laneCrossings": 4524,
-          "fullCrossings": 4436,
+          "laneCrossings": 4529,
+          "fullCrossings": 4440,
           "polyline": {
             "points": 5176,
             "beforePoints": 5087,
@@ -13275,8 +13275,8 @@
       "laneBends": 4341,
       "fullLength": 332095.268,
       "fullBends": 4340,
-      "laneCrossings": 14862,
-      "fullCrossings": 14369,
+      "laneCrossings": 14867,
+      "fullCrossings": 14373,
       "bySeed": [
         {
           "seed": 0,
@@ -13326,12 +13326,12 @@
           "bundleBody": 61,
           "bundleEnds": 143,
           "fullBundleBody": 51,
-          "fullBundleEnds": 150
+          "fullBundleEnds": 152
         },
         {
           "seed": 2,
-          "laneCrossings": 4524,
-          "fullCrossings": 4436,
+          "laneCrossings": 4529,
+          "fullCrossings": 4440,
           "polyline": {
             "points": 5176,
             "beforePoints": 5087,
@@ -13425,13 +13425,13 @@
       "laneBends": 6181,
       "fullLength": 241565.878,
       "fullBends": 6174,
-      "laneCrossings": 16368,
-      "fullCrossings": 15611,
+      "laneCrossings": 16370,
+      "fullCrossings": 15616,
       "bySeed": [
         {
           "seed": 0,
-          "laneCrossings": 6113,
-          "fullCrossings": 5769,
+          "laneCrossings": 6114,
+          "fullCrossings": 5773,
           "polyline": {
             "points": 6039,
             "beforePoints": 5630,
@@ -13474,14 +13474,14 @@
             "lost": 20
           },
           "bundleBody": 0,
-          "bundleEnds": 1067,
+          "bundleEnds": 1068,
           "fullBundleBody": 0,
           "fullBundleEnds": 905
         },
         {
           "seed": 2,
-          "laneCrossings": 4621,
-          "fullCrossings": 4480,
+          "laneCrossings": 4622,
+          "fullCrossings": 4481,
           "polyline": {
             "points": 4566,
             "beforePoints": 4421,
@@ -18447,8 +18447,8 @@
             "lost": 0
           },
           "painted": {
-            "points": 853,
-            "beforePoints": 853,
+            "points": 855,
+            "beforePoints": 855,
             "pairs": 640,
             "beforePairs": 640,
             "added": 0,
@@ -18597,8 +18597,8 @@
             "lost": 0
           },
           "painted": {
-            "points": 853,
-            "beforePoints": 853,
+            "points": 855,
+            "beforePoints": 855,
             "pairs": 640,
             "beforePairs": 640,
             "added": 0,
@@ -18747,8 +18747,8 @@
             "lost": 0
           },
           "painted": {
-            "points": 853,
-            "beforePoints": 853,
+            "points": 855,
+            "beforePoints": 855,
             "pairs": 640,
             "beforePairs": 640,
             "added": 0,
@@ -20085,7 +20085,7 @@
           "bundleBody": 6,
           "bundleEnds": 164,
           "fullBundleBody": 6,
-          "fullBundleEnds": 104
+          "fullBundleEnds": 105
         },
         {
           "seed": 2,
@@ -20275,9 +20275,9 @@
             "lost": 1
           },
           "bundleBody": 18,
-          "bundleEnds": 232,
+          "bundleEnds": 233,
           "fullBundleBody": 19,
-          "fullBundleEnds": 232
+          "fullBundleEnds": 233
         }
       ],
       "classes": {},
@@ -20425,9 +20425,9 @@
             "lost": 1
           },
           "bundleBody": 18,
-          "bundleEnds": 232,
+          "bundleEnds": 233,
           "fullBundleBody": 19,
-          "fullBundleEnds": 232
+          "fullBundleEnds": 233
         }
       ],
       "classes": {},
@@ -20501,8 +20501,8 @@
       "laneBends": 2762,
       "fullLength": 134243.605,
       "fullBends": 2762,
-      "laneCrossings": 9699,
-      "fullCrossings": 9334,
+      "laneCrossings": 9700,
+      "fullCrossings": 9335,
       "bySeed": [
         {
           "seed": 0,
@@ -20556,8 +20556,8 @@
         },
         {
           "seed": 2,
-          "laneCrossings": 3661,
-          "fullCrossings": 3609,
+          "laneCrossings": 3662,
+          "fullCrossings": 3610,
           "polyline": {
             "points": 3654,
             "beforePoints": 3589,
@@ -20855,10 +20855,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 54,
-            "beforePoints": 54,
-            "pairs": 40,
-            "beforePairs": 40,
+            "points": 55,
+            "beforePoints": 55,
+            "pairs": 41,
+            "beforePairs": 41,
             "added": 0,
             "lost": 0
           },
@@ -21005,10 +21005,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 54,
-            "beforePoints": 54,
-            "pairs": 40,
-            "beforePairs": 40,
+            "points": 55,
+            "beforePoints": 55,
+            "pairs": 41,
+            "beforePairs": 41,
             "added": 0,
             "lost": 0
           },
@@ -21305,10 +21305,10 @@
             "lost": 0
           },
           "painted": {
-            "points": 62,
-            "beforePoints": 62,
-            "pairs": 43,
-            "beforePairs": 43,
+            "points": 63,
+            "beforePoints": 63,
+            "pairs": 44,
+            "beforePairs": 44,
             "added": 0,
             "lost": 0
           },
@@ -21740,7 +21740,7 @@
           "bundleBody": 0,
           "bundleEnds": 22,
           "fullBundleBody": 0,
-          "fullBundleEnds": 11
+          "fullBundleEnds": 12
         },
         {
           "seed": 2,
@@ -27012,9 +27012,9 @@
             "added": 0,
             "lost": 6
           },
-          "bundleBody": 7,
+          "bundleBody": 9,
           "bundleEnds": 35,
-          "fullBundleBody": 11,
+          "fullBundleBody": 12,
           "fullBundleEnds": 23
         },
         {
@@ -28583,12 +28583,12 @@
       "fullLength": 43033.464,
       "fullBends": 493,
       "laneCrossings": 298,
-      "fullCrossings": 304,
+      "fullCrossings": 306,
       "bySeed": [
         {
           "seed": 0,
           "laneCrossings": 65,
-          "fullCrossings": 67,
+          "fullCrossings": 69,
           "polyline": {
             "points": 51,
             "beforePoints": 54,
