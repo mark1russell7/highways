@@ -191,7 +191,7 @@ describe("pairedTimeTest", () => {
     ]);
     const line = timeLine(tail, "Promotion x")!;
     expect(line.level).toBe("warning");
-    expect(line.text).toBe(`Promotion x: no read for 1 of 2 cases: the tail over ${tail.inputs} inputs. Tail: not measured, no input above timeFloorMs. jobs on 1 CPU model: Test CPU (5 jobs). A no read is not a pass.`);
+    expect(line.text).toBe(`Promotion x: no read for 1 of 2 cases: the tail over ${tail.inputs} inputs. Tail: not measured, no input above timeFloorMs. Jobs on 1 CPU model: Test CPU (5 jobs). A no read is not a pass.`);
     const one = timeLine(pairedTimeTest([report(0.5)], "base", "cand", undefined, LIMITS), "x")!;
     expect(one.noReads.count).toBe(2);
     expect(one.reason).toBe("1 job of 5, so the checks cannot decide");

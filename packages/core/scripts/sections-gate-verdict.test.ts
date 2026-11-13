@@ -370,7 +370,7 @@ describe("checkLine", () => {
     expect(first.title).toBe("Sections gate, run 1 of 2");
     expect(first.noReads.cases).toEqual([`${read}, against the parent`]);
     expect(first.text).toContain(`no read for 1 of 2 cases: ${read}, against the parent. The home cannot decide`);
-    expect(first.text).toContain("The job retry times the gate on a fresh runner. jobs on 1 CPU model: Made-up CPU (1 job). A no read is not a pass.");
+    expect(first.text).toContain("The job retry times the gate on a fresh runner. Jobs on 1 CPU model: Made-up CPU (1 job). A no read is not a pass.");
     const second = checkLine(record(report(1, 1, NOISY), null, 2))!;
     expect(second.level).toBe("error");
     expect(second.text).toContain("The first run could not decide too, so the gate fails.");

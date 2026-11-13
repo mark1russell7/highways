@@ -1,5 +1,13 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.18.0
+
+The release train changes the range of `@mark1russell7/layout-contract` to a version outside the old range. The public types name @mark1russell7/layout-contract, so its new version outside the old range can change them.
+
+### Breaking
+
+- The range `^0.5.1` of `@mark1russell7/layout-contract` in `dependencies` does not hold `0.10.0`, so it changes.
+
 ## 0.17.1
 
 This version is a PATCH: it adds an export and an optional parameter. No output changes.

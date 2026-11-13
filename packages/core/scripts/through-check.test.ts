@@ -13,15 +13,17 @@ const SITE_LANES = { wall: 40, band: 2, corner: 1, "plug-seam": 53 };
  * The painted crossings of the lanes of each router, at the time of LANE-ROOM: crossing points and pairs of the whole board, pairs added, pairs lost, and the two counts of the bundles.
  * The counts include the families of FAMILIES-WEEKLY.
  * A change of a count fails until this list changes too. The item LANE-WIDTH-CHAIN takes these counts down, or states why it cannot.
+ * Since `@mark1russell7/layout-contract` 0.9.5, `segmentsCross` reads the exact signs of `orient2dSign`. Lanes that are almost collinear then
+ * cross, and the points and the pairs went up by 0 to 5 for each router.
  */
 const PAINTED: Record<string, readonly number[]> = {
-  "corners": [33260, 31244, 0, 0, 0, 0],
-  "trunks": [34052, 31785, 0, 0, 0, 1],
-  "shared": [35908, 32548, 273, 40, 1, 531],
-  "sections": [54074, 40505, 815, 489, 144, 2067],
-  "sections-site": [83959, 47298, 121, 68, 441, 2365],
-  "sections-site-no-ladder": [82002, 46559, 127, 119, 435, 2445],
-  "shared-all": [43627, 36243, 1426, 453, 0, 12061],
+  "corners": [33263, 31245, 0, 0, 0, 0],
+  "trunks": [34057, 31788, 0, 0, 0, 1],
+  "shared": [35910, 32548, 273, 40, 1, 531],
+  "sections": [54075, 40506, 815, 489, 147, 2069],
+  "sections-site": [83959, 47298, 121, 68, 441, 2366],
+  "sections-site-no-ladder": [82002, 46559, 127, 119, 435, 2446],
+  "shared-all": [43627, 36243, 1426, 453, 0, 12064],
 };
 const keyOf = (r: Row): string => `${r.router} | ${r.family} | ${r.view}`;
 
