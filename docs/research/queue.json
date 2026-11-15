@@ -1,7 +1,7 @@
 {
   "formula": "queue/2",
-  "date": "2026-11-09",
-  "commit": "1519dadb2ff419ae2f126a71499e8391fa5966b5",
+  "date": "2026-11-15",
+  "commit": "5e2460439da4463a1dce003c724f57699d545f7a",
   "inputs": [
     "docs/research/ideas/highway.json",
     "docs/research/ideas/wild.json",
@@ -45,7 +45,7 @@
     {
       "set": "screen-v3",
       "step": "highway",
-      "run": 41508652642
+      "run": 43399951543
     },
     {
       "set": "screen-v3",
@@ -55,12 +55,12 @@
     {
       "set": "screen-v3",
       "step": "plugs",
-      "run": 42582811615
+      "run": 43399951543
     },
     {
       "set": "screen-v3",
       "step": "router",
-      "run": 42495997353
+      "run": 43399951543
     },
     {
       "set": "screen-v3",
