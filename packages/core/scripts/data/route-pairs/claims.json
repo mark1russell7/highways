@@ -193,7 +193,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "keys",
    "label": "worse",
    "ink": "not more"
@@ -203,7 +203,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "shared-ways",
    "label": "better",
    "ink": "more"
@@ -213,7 +213,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors",
    "label": "no verdict",
    "ink": "more"
@@ -223,7 +223,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "meet",
    "label": "worse",
    "ink": "not more"
@@ -233,7 +233,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "weiszfeld",
    "label": "no verdict",
    "ink": "more"
@@ -243,7 +243,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "stubs",
    "label": "no verdict",
    "ink": "more"
@@ -253,7 +253,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "zipper",
    "label": "better",
    "ink": "more"
@@ -263,7 +263,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "level-links",
    "label": "better",
    "ink": "more"
@@ -273,7 +273,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "quickbundles",
    "label": "no verdict",
    "ink": "not more"
@@ -283,7 +283,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "road-classes",
    "label": "better",
    "ink": "more"
@@ -293,7 +293,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-field",
    "label": "worse",
    "ink": "not more"
@@ -303,7 +303,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "wspd",
    "label": "no verdict",
    "ink": "more"
@@ -313,7 +313,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "od-cells",
    "label": "worse",
    "ink": "not more"
@@ -323,7 +323,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "select",
    "label": "no verdict",
    "ink": "more"
@@ -333,7 +333,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mingle",
    "label": "no verdict",
    "ink": "more"
@@ -343,7 +343,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spiral",
    "label": "worse",
    "ink": "more"
@@ -353,7 +353,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-clusters",
    "label": "no verdict",
    "ink": "more"
@@ -363,7 +363,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "traclus",
    "label": "worse",
    "ink": "not more"
@@ -373,7 +373,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "diffusion",
    "label": "better",
    "ink": "more"
@@ -383,7 +383,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "nested",
    "label": "no verdict",
    "ink": "not more"
@@ -393,7 +393,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "lanes",
    "label": "better",
    "ink": "more"
@@ -403,7 +403,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "growth",
    "label": "better",
    "ink": "more"
@@ -413,7 +413,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "edge-paths",
    "label": "better",
    "ink": "more"
@@ -423,7 +423,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "soft-keys",
    "label": "no verdict",
    "ink": "more"
@@ -433,7 +433,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hough",
    "label": "worse",
    "ink": "not more"
@@ -443,7 +443,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "ridges",
    "label": "no verdict",
    "ink": "more"
@@ -453,7 +453,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hdbscan",
    "label": "no verdict",
    "ink": "more"
@@ -463,7 +463,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hub-arcs",
    "label": "better",
    "ink": "more"
@@ -473,7 +473,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "divided",
    "label": "worse",
    "ink": "more"
@@ -483,7 +483,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hierarchy",
    "label": "no verdict",
    "ink": "more"
@@ -493,7 +493,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "fdeb",
    "label": "worse",
    "ink": "not more"
@@ -503,7 +503,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mesh",
    "label": "depends on the mix",
    "ink": "more"
@@ -513,7 +513,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "kdeeb",
    "label": "better",
    "ink": "more"
@@ -523,7 +523,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "cubu",
    "label": "better",
    "ink": "more"
@@ -533,7 +533,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mlseb",
    "label": "better",
    "ink": "more"
@@ -543,7 +543,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "sbeb",
    "label": "no verdict",
    "ink": "more"
@@ -553,7 +553,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "areas",
    "label": "worse",
    "ink": "more"
@@ -563,7 +563,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "confluent",
    "label": "worse",
    "ink": "not more"
@@ -573,7 +573,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "power",
    "label": "worse",
    "ink": "not more"
@@ -583,7 +583,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "crossbars",
    "label": "no verdict",
    "ink": "more"
@@ -593,7 +593,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "frechet",
    "label": "better",
    "ink": "more"
@@ -603,7 +603,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spectral",
    "label": "no verdict",
    "ink": "more"
@@ -613,7 +613,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "resistance",
    "label": "no verdict",
    "ink": "more"
@@ -623,7 +623,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "link-communities",
    "label": "worse",
    "ink": "not more"
@@ -633,7 +633,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "territories",
    "label": "better",
    "ink": "more"
@@ -643,7 +643,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "consensus",
    "label": "no verdict",
    "ink": "more"
@@ -653,7 +653,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "p-hub",
    "label": "no verdict",
    "ink": "more"
@@ -663,7 +663,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "scale-space",
    "label": "worse",
    "ink": "not more"
@@ -673,7 +673,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "steiner",
    "label": "no verdict",
    "ink": "more"
@@ -683,7 +683,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "gaps",
    "label": "no verdict",
    "ink": "more"
@@ -693,7 +693,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "streets",
    "label": "no verdict",
    "ink": "more"
@@ -703,7 +703,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "search",
    "label": "no verdict",
    "ink": "more"
@@ -713,7 +713,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "interchanges",
    "label": "better",
    "ink": "more"
@@ -723,7 +723,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "knee",
    "label": "worse",
    "ink": "not more"
@@ -733,7 +733,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "bronchial",
    "label": "worse",
    "ink": "not more"
@@ -743,7 +743,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "balance",
    "label": "no verdict",
    "ink": "more"
@@ -753,7 +753,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "manifolds",
    "label": "depends on the mix",
    "ink": "more"
@@ -763,7 +763,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "slots",
    "label": "better",
    "ink": "more"
@@ -773,7 +773,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "two-way",
    "label": "better",
    "ink": "more"
@@ -783,7 +783,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "global-order",
    "label": "better",
    "ink": "more"
@@ -793,7 +793,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "approval",
    "label": "better",
    "ink": "more"
@@ -803,7 +803,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+breakeven",
    "label": "no verdict",
    "ink": "more"
@@ -813,7 +813,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+stretch",
    "label": "no verdict",
    "ink": "more"
@@ -823,7 +823,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ambiguity",
    "label": "worse",
    "ink": "not more"
@@ -833,7 +833,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+hysteresis",
    "label": "no verdict",
    "ink": "more"
@@ -843,7 +843,7 @@
    "set": "screen-v1",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ids",
    "label": "no verdict",
    "ink": "more"
@@ -873,7 +873,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -883,7 +883,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -893,7 +893,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -903,7 +903,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -913,7 +913,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -923,7 +923,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "escape",
    "label": "worse",
    "ink": "not more"
@@ -933,7 +933,7 @@
    "set": "screen-v1",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "charges",
    "label": "worse",
    "ink": "not more"
@@ -943,7 +943,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -953,7 +953,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -963,7 +963,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -973,7 +973,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -983,7 +983,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -993,7 +993,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -1003,7 +1003,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections",
    "label": "depends on the mix",
    "ink": "more"
@@ -1013,7 +1013,7 @@
    "set": "screen-v1",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections-tree",
    "label": "no verdict",
    "ink": "more"
@@ -1093,7 +1093,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "keys",
    "label": "worse",
    "ink": "not more"
@@ -1103,7 +1103,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "shared-ways",
    "label": "better",
    "ink": "more"
@@ -1113,7 +1113,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors",
    "label": "worse",
    "ink": "more"
@@ -1123,7 +1123,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "meet",
    "label": "worse",
    "ink": "not more"
@@ -1133,7 +1133,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "weiszfeld",
    "label": "worse",
    "ink": "more"
@@ -1143,7 +1143,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "stubs",
    "label": "better",
    "ink": "more"
@@ -1153,7 +1153,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "zipper",
    "label": "better",
    "ink": "more"
@@ -1163,7 +1163,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "level-links",
    "label": "better",
    "ink": "more"
@@ -1173,7 +1173,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "quickbundles",
    "label": "worse",
    "ink": "not more"
@@ -1183,7 +1183,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "road-classes",
    "label": "better",
    "ink": "more"
@@ -1193,7 +1193,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-field",
    "label": "worse",
    "ink": "not more"
@@ -1203,7 +1203,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "wspd",
    "label": "worse",
    "ink": "more"
@@ -1213,7 +1213,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "od-cells",
    "label": "worse",
    "ink": "not more"
@@ -1223,7 +1223,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "select",
    "label": "no verdict",
    "ink": "more"
@@ -1233,7 +1233,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mingle",
    "label": "better",
    "ink": "more"
@@ -1243,7 +1243,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spiral",
    "label": "worse",
    "ink": "more"
@@ -1253,7 +1253,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-clusters",
    "label": "no verdict",
    "ink": "more"
@@ -1263,7 +1263,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "traclus",
    "label": "worse",
    "ink": "not more"
@@ -1273,7 +1273,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "diffusion",
    "label": "better",
    "ink": "more"
@@ -1283,7 +1283,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "nested",
    "label": "worse",
    "ink": "not more"
@@ -1293,7 +1293,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "lanes",
    "label": "better",
    "ink": "more"
@@ -1303,7 +1303,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "growth",
    "label": "better",
    "ink": "more"
@@ -1313,7 +1313,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "edge-paths",
    "label": "better",
    "ink": "more"
@@ -1323,7 +1323,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "soft-keys",
    "label": "no verdict",
    "ink": "more"
@@ -1333,7 +1333,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hough",
    "label": "worse",
    "ink": "not more"
@@ -1343,7 +1343,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "ridges",
    "label": "worse",
    "ink": "more"
@@ -1353,7 +1353,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hdbscan",
    "label": "better",
    "ink": "more"
@@ -1363,7 +1363,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hub-arcs",
    "label": "better",
    "ink": "more"
@@ -1373,7 +1373,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "divided",
    "label": "worse",
    "ink": "more"
@@ -1383,7 +1383,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hierarchy",
    "label": "worse",
    "ink": "more"
@@ -1393,7 +1393,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "fdeb",
    "label": "worse",
    "ink": "more"
@@ -1403,7 +1403,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mesh",
    "label": "no verdict",
    "ink": "more"
@@ -1413,7 +1413,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "kdeeb",
    "label": "better",
    "ink": "more"
@@ -1423,7 +1423,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "cubu",
    "label": "better",
    "ink": "more"
@@ -1433,7 +1433,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mlseb",
    "label": "better",
    "ink": "more"
@@ -1443,7 +1443,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "sbeb",
    "label": "no verdict",
    "ink": "more"
@@ -1453,7 +1453,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "areas",
    "label": "worse",
    "ink": "more"
@@ -1463,7 +1463,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "confluent",
    "label": "worse",
    "ink": "not more"
@@ -1473,7 +1473,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "power",
    "label": "worse",
    "ink": "not more"
@@ -1483,7 +1483,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "crossbars",
    "label": "no verdict",
    "ink": "more"
@@ -1493,7 +1493,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "frechet",
    "label": "better",
    "ink": "more"
@@ -1503,7 +1503,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spectral",
    "label": "better",
    "ink": "more"
@@ -1513,7 +1513,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "resistance",
    "label": "better",
    "ink": "more"
@@ -1523,7 +1523,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "link-communities",
    "label": "worse",
    "ink": "not more"
@@ -1533,7 +1533,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "territories",
    "label": "better",
    "ink": "more"
@@ -1543,7 +1543,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "consensus",
    "label": "worse",
    "ink": "not more"
@@ -1553,7 +1553,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "p-hub",
    "label": "worse",
    "ink": "more"
@@ -1563,7 +1563,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "scale-space",
    "label": "worse",
    "ink": "not more"
@@ -1573,7 +1573,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "steiner",
    "label": "worse",
    "ink": "more"
@@ -1583,7 +1583,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "gaps",
    "label": "better",
    "ink": "more"
@@ -1593,7 +1593,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "streets",
    "label": "better",
    "ink": "more"
@@ -1603,7 +1603,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "search",
    "label": "worse",
    "ink": "more"
@@ -1613,7 +1613,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "interchanges",
    "label": "better",
    "ink": "more"
@@ -1623,7 +1623,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "knee",
    "label": "worse",
    "ink": "not more"
@@ -1633,7 +1633,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "bronchial",
    "label": "worse",
    "ink": "not more"
@@ -1643,7 +1643,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "balance",
    "label": "no verdict",
    "ink": "not more"
@@ -1653,7 +1653,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "manifolds",
    "label": "better",
    "ink": "more"
@@ -1663,7 +1663,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "slots",
    "label": "better",
    "ink": "more"
@@ -1673,7 +1673,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "two-way",
    "label": "better",
    "ink": "more"
@@ -1683,7 +1683,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "global-order",
    "label": "better",
    "ink": "more"
@@ -1693,7 +1693,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "approval",
    "label": "better",
    "ink": "more"
@@ -1703,7 +1703,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+breakeven",
    "label": "worse",
    "ink": "more"
@@ -1713,7 +1713,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+stretch",
    "label": "worse",
    "ink": "more"
@@ -1723,7 +1723,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ambiguity",
    "label": "worse",
    "ink": "not more"
@@ -1733,7 +1733,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+hysteresis",
    "label": "worse",
    "ink": "more"
@@ -1743,7 +1743,7 @@
    "set": "screen-v2",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ids",
    "label": "worse",
    "ink": "more"
@@ -1773,7 +1773,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -1783,7 +1783,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -1793,7 +1793,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -1803,7 +1803,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -1813,7 +1813,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -1823,7 +1823,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "escape",
    "label": "worse",
    "ink": "not more"
@@ -1833,7 +1833,7 @@
    "set": "screen-v2",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "charges",
    "label": "worse",
    "ink": "not more"
@@ -1843,7 +1843,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -1853,7 +1853,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -1863,7 +1863,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -1873,7 +1873,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -1883,7 +1883,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -1893,7 +1893,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -1903,7 +1903,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections",
    "label": "no verdict",
    "ink": "more"
@@ -1913,7 +1913,7 @@
    "set": "screen-v2",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections-tree",
    "label": "better",
    "ink": "more"
@@ -1993,7 +1993,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "keys",
    "label": "worse",
    "ink": "not more"
@@ -2003,7 +2003,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "shared-ways",
    "label": "better",
    "ink": "more"
@@ -2013,7 +2013,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors",
    "label": "no verdict",
    "ink": "more"
@@ -2023,7 +2023,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "meet",
    "label": "worse",
    "ink": "not more"
@@ -2033,7 +2033,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "weiszfeld",
    "label": "worse",
    "ink": "more"
@@ -2043,7 +2043,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "stubs",
    "label": "better",
    "ink": "more"
@@ -2053,7 +2053,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "zipper",
    "label": "better",
    "ink": "more"
@@ -2063,7 +2063,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "level-links",
    "label": "better",
    "ink": "more"
@@ -2073,7 +2073,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "quickbundles",
    "label": "no verdict",
    "ink": "more"
@@ -2083,7 +2083,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "road-classes",
    "label": "better",
    "ink": "more"
@@ -2093,7 +2093,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-field",
    "label": "worse",
    "ink": "not more"
@@ -2103,7 +2103,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "wspd",
    "label": "no verdict",
    "ink": "more"
@@ -2113,7 +2113,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "od-cells",
    "label": "worse",
    "ink": "more"
@@ -2123,7 +2123,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "select",
    "label": "better",
    "ink": "more"
@@ -2133,7 +2133,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mingle",
    "label": "better",
    "ink": "more"
@@ -2143,7 +2143,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spiral",
    "label": "no verdict",
    "ink": "more"
@@ -2153,7 +2153,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "flow-clusters",
    "label": "better",
    "ink": "more"
@@ -2163,7 +2163,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "traclus",
    "label": "worse",
    "ink": "more"
@@ -2173,7 +2173,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "diffusion",
    "label": "better",
    "ink": "more"
@@ -2183,7 +2183,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "nested",
    "label": "no verdict",
    "ink": "more"
@@ -2193,7 +2193,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "lanes",
    "label": "better",
    "ink": "more"
@@ -2203,7 +2203,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "growth",
    "label": "better",
    "ink": "more"
@@ -2213,7 +2213,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "edge-paths",
    "label": "better",
    "ink": "more"
@@ -2223,7 +2223,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "soft-keys",
    "label": "better",
    "ink": "more"
@@ -2233,7 +2233,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hough",
    "label": "worse",
    "ink": "more"
@@ -2243,7 +2243,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "ridges",
    "label": "no verdict",
    "ink": "more"
@@ -2253,7 +2253,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hdbscan",
    "label": "better",
    "ink": "more"
@@ -2263,7 +2263,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hub-arcs",
    "label": "better",
    "ink": "more"
@@ -2273,7 +2273,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "divided",
    "label": "worse",
    "ink": "more"
@@ -2283,7 +2283,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "hierarchy",
    "label": "worse",
    "ink": "more"
@@ -2293,7 +2293,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "fdeb",
    "label": "no verdict",
    "ink": "more"
@@ -2303,7 +2303,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mesh",
    "label": "better",
    "ink": "more"
@@ -2313,7 +2313,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "kdeeb",
    "label": "better",
    "ink": "more"
@@ -2323,7 +2323,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "cubu",
    "label": "better",
    "ink": "more"
@@ -2333,7 +2333,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "mlseb",
    "label": "better",
    "ink": "more"
@@ -2343,7 +2343,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "sbeb",
    "label": "better",
    "ink": "more"
@@ -2353,7 +2353,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "areas",
    "label": "no verdict",
    "ink": "more"
@@ -2363,7 +2363,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "confluent",
    "label": "worse",
    "ink": "more"
@@ -2373,7 +2373,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "power",
    "label": "worse",
    "ink": "not more"
@@ -2383,7 +2383,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "crossbars",
    "label": "no verdict",
    "ink": "more"
@@ -2393,7 +2393,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "frechet",
    "label": "better",
    "ink": "more"
@@ -2403,7 +2403,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "spectral",
    "label": "better",
    "ink": "more"
@@ -2413,7 +2413,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "resistance",
    "label": "better",
    "ink": "more"
@@ -2423,7 +2423,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "link-communities",
    "label": "worse",
    "ink": "not more"
@@ -2433,7 +2433,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "territories",
    "label": "better",
    "ink": "more"
@@ -2443,7 +2443,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "consensus",
    "label": "no verdict",
    "ink": "more"
@@ -2453,7 +2453,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "p-hub",
    "label": "better",
    "ink": "more"
@@ -2463,7 +2463,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "scale-space",
    "label": "worse",
    "ink": "not more"
@@ -2473,7 +2473,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "steiner",
    "label": "no verdict",
    "ink": "more"
@@ -2483,7 +2483,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "gaps",
    "label": "better",
    "ink": "more"
@@ -2493,7 +2493,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "streets",
    "label": "better",
    "ink": "more"
@@ -2503,7 +2503,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "search",
    "label": "no verdict",
    "ink": "more"
@@ -2513,7 +2513,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "interchanges",
    "label": "better",
    "ink": "more"
@@ -2523,7 +2523,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "knee",
    "label": "no verdict",
    "ink": "more"
@@ -2533,7 +2533,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "bronchial",
    "label": "worse",
    "ink": "more"
@@ -2543,7 +2543,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "balance",
    "label": "no verdict",
    "ink": "not more"
@@ -2553,7 +2553,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "manifolds",
    "label": "better",
    "ink": "more"
@@ -2563,7 +2563,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "slots",
    "label": "better",
    "ink": "more"
@@ -2573,7 +2573,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "two-way",
    "label": "better",
    "ink": "more"
@@ -2583,7 +2583,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "global-order",
    "label": "better",
    "ink": "more"
@@ -2593,7 +2593,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "approval",
    "label": "better",
    "ink": "more"
@@ -2603,7 +2603,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+breakeven",
    "label": "no verdict",
    "ink": "more"
@@ -2613,7 +2613,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+stretch",
    "label": "no verdict",
    "ink": "more"
@@ -2623,7 +2623,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ambiguity",
    "label": "worse",
    "ink": "more"
@@ -2633,7 +2633,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+hysteresis",
    "label": "worse",
    "ink": "more"
@@ -2643,7 +2643,7 @@
    "set": "screen-v3",
    "step": "highway",
    "base": "shared",
-   "core": "0.10.0",
+   "core": "0.18.0",
    "strategy": "corridors+ids",
    "label": "no verdict",
    "ink": "more"
@@ -2673,7 +2673,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "side",
    "label": "better",
    "ink": "more"
@@ -2683,7 +2683,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "justify",
    "label": "worse",
    "ink": "not more"
@@ -2693,7 +2693,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "spread",
    "label": "worse",
    "ink": "not more"
@@ -2703,7 +2703,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "leaders",
    "label": "worse",
    "ink": "not more"
@@ -2713,7 +2713,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "assign",
    "label": "worse",
    "ink": "not more"
@@ -2723,7 +2723,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "escape",
    "label": "worse",
    "ink": "not more"
@@ -2733,7 +2733,7 @@
    "set": "screen-v3",
    "step": "plugs",
    "base": "facing",
-   "core": "0.16.1",
+   "core": "0.18.0",
    "strategy": "charges",
    "label": "worse",
    "ink": "not more"
@@ -2743,7 +2743,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "straight",
    "label": "worse",
    "ink": "not more"
@@ -2753,7 +2753,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "plugs",
    "label": "worse",
    "ink": "not more"
@@ -2763,7 +2763,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners",
    "label": "worse",
    "ink": "not more"
@@ -2773,7 +2773,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "corners-smooth",
    "label": "worse",
    "ink": "not more"
@@ -2783,7 +2783,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "trunks",
    "label": "worse",
    "ink": "not more"
@@ -2793,7 +2793,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "shared-all",
    "label": "better",
    "ink": "more"
@@ -2803,7 +2803,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections",
    "label": "better",
    "ink": "more"
@@ -2813,7 +2813,7 @@
    "set": "screen-v3",
    "step": "router",
    "base": "shared",
-   "core": "0.16.0",
+   "core": "0.18.0",
    "strategy": "sections-tree",
    "label": "better",
    "ink": "more"
