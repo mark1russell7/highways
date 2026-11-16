@@ -25,7 +25,7 @@ defaults:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@eb7f3517aa8614e338a46acd37ab0c49395be5f9 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@1702dade663a51743de475fcaae8ce77fd77f456 # main
     # The gate test of the atlas (atlas-history.test.ts) reads the commit that added the newest weekly record, so the checkout gets the whole history.
     with:
       fetch-depth: 0
