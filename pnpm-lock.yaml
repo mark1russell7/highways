@@ -235,7 +235,7 @@ importers:
         version: 0.2.37(esbuild@0.28.2)
       '@mark1russell7/strategy-space':
         specifier: ^0.1.0
-        version: 0.1.0
+        version: 0.1.1
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.6
@@ -616,6 +616,10 @@ packages:
     resolution: {integrity: sha512-C94Q4C31aZ8UXx1R0JSBV7DiQFl5tVpbFxHxHzHaSqr3dTgmCkEvLrvlUV8/0/GZqPhQYG9cbX6GOlqfRj/h4g==}
     engines: {node: '>=22'}
 
+  '@mark1russell7/rigor-generators@0.2.0':
+    resolution: {integrity: sha512-eTyJhK4Nowx1KQ3QrsQqLiAlhFoL+8m1OT6He+X0Lf0G/0f9OyQC8ponQLViQKRkP/ef10B6oACFjtjnKErobg==}
+    engines: {node: '>=22'}
+
   '@mark1russell7/rigor-statistics@0.1.29':
     resolution: {integrity: sha512-Wh91NJIwxIRN3+a5V2bqUkMhdPcjHI+gVZBCnohf12ZegdSTNqGlpqS2WXYmrRVjasF9EBgm1lC8GQNYpBSg7Q==}
     engines: {node: '>=22'}
@@ -639,8 +643,8 @@ packages:
     resolution: {integrity: sha512-E3zTfOPDRFE/KdvETa4PqXMu5Vm9eG7Ipy+oMAptB1kDMAQX9y2By+sH17sIezHoqODFWldi2+GwPNMaW301Vg==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/strategy-space@0.1.0':
-    resolution: {integrity: sha512-Czq6zXWlCqPckHFi+7i340NxhUqA85kTLpl+TZzwvM/cIwL2WWDkC09y4lxrVI2JzP+KNVh2ZcgoLjphgYBtug==}
+  '@mark1russell7/strategy-space@0.1.1':
+    resolution: {integrity: sha512-6AP7wcNFOepPp+/w0Z/b8+a5CKjCP9nmUeGflgWtNvGlzBogVhPQMLM417gqzARTCMH4gc6WtNaIYEhkjkefYA==}
     engines: {node: '>=22'}
 
   '@mark1russell7/template-cli@0.1.9':
@@ -2178,6 +2182,8 @@ snapshots:
 
   '@mark1russell7/rigor-generators@0.1.16': {}
 
+  '@mark1russell7/rigor-generators@0.2.0': {}
+
   '@mark1russell7/rigor-statistics@0.1.29':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.16
@@ -2199,9 +2205,9 @@ snapshots:
       '@mark1russell7/rigor-generators': 0.1.16
       '@mark1russell7/rigor-statistics': 0.1.29
 
-  '@mark1russell7/strategy-space@0.1.0':
+  '@mark1russell7/strategy-space@0.1.1':
     dependencies:
-      '@mark1russell7/rigor-generators': 0.1.16
+      '@mark1russell7/rigor-generators': 0.2.0
       '@mark1russell7/rigor-statistics': 0.2.5
 
   '@mark1russell7/template-cli@0.1.9':
