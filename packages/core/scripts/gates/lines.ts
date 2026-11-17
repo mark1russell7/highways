@@ -3,7 +3,7 @@
 // This module has only the parts of highways: the cases of a mixed pair, of a time test and of the sections gate.
 // It imports a package, so the modules that start with no install (`time-gate.ts`, `sections-gate-verdict.ts`) do not import it.
 import { gateLine, jobModels, type CaseRead, type GateLine } from "@mark1russell7/rigor-bench";
-import { recordVerdict, type GateCheck, type GateRecord } from "../sections-gate-verdict.ts";
+import { gateEnd, noReadText, recordVerdict, type GateCheck, type GateRun } from "../sections-gate-verdict.ts";
 import type { TimeCheck, TimeTest } from "./time-gate.ts";
 
 /** A record with a value of each measure, for an input and a seed. */
@@ -71,7 +71,7 @@ export function timeLine(t: TimeTest, title: string): GateLine | undefined {
  * A check that cannot decide is `cannot decide`, and a check with no time is `no read`.
  * A fail against the parent is `slower`, and a fail against the fixed base is `beyond` its limit.
  */
-export function checkReads(record: GateRecord): CaseRead[] {
+export function checkReads(record: GateRun): CaseRead[] {
   const read = `${record.router} on ${record.fixture}, ${record.rounds} rounds of each arm`;
   const word = (c: GateCheck): string => (c.verdict === "not measured" ? "no read" : c.verdict !== "fail" ? c.verdict : c.check === "parent" ? "slower" : "beyond");
   return recordVerdict(record).checks.map((c) => ({ case: `${read}, against the ${c.check}`, outcome: word(c) }));
@@ -80,17 +80,19 @@ export function checkReads(record: GateRecord): CaseRead[] {
 /**
  * This function gives the check line of a run of the sections gate that does not pass.
  * A first run that cannot decide only reports, because the job `retry` decides. So its line is a warning. Each other line is an error.
+ * A second run that cannot decide is a no read, for example "no read: cannot decide at 20 rounds", and its line is an error.
  * The four arms of a run time on one runner, so the line names one CPU model with 1 job. A pass gives no line.
  */
-export function checkLine(record: GateRecord): GateLine | undefined {
+export function checkLine(record: GateRun): GateLine | undefined {
   const g = recordVerdict(record);
-  if (g.outcome === "pass") return undefined;
-  const retry = g.outcome === "cannot decide" && record.attempt === 1;
+  const end = gateEnd(g.outcome, record.attempt);
+  if (end === "pass") return undefined;
+  const retry = end === "retry";
   const next =
-    g.outcome === "cannot decide"
-      ? retry
-        ? "The job retry times the gate on a fresh runner."
-        : "The first run could not decide too, so the gate fails."
+    end === "retry"
+      ? "The job retry times the gate on a fresh runner, with 2 times the rounds."
+      : end === "no read"
+        ? `The gate fails with a ${noReadText(record.rounds)}. The first run could not decide too.`
       : g.words === "not measured"
         ? `${record.skipped === null ? "" : `${record.skipped} `}The gate fails (FAIL-CLOSED).`
         : "The gate fails.";

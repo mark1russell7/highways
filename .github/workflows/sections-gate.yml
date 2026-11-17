@@ -4,11 +4,13 @@
 # The step commits resolves the head and the parent to full hashes one time (GATE-CONFIRM-SHA). Each later step gets only these hashes.
 # A dispatch with `-f head=<sha>` times that commit against its first parent. A name that does not resolve fails the job.
 # Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`.
-# A run with an A/A spread above the noise cap log(1.06) on |log r| cannot decide. Then the job `retry` runs the gate once more on a fresh runner.
+# `armOrder` of `@mark1russell7/rigor-bench` gives the order of the arms in each round, and the record keeps the order of each round.
+# The check against the parent uses `timeVerdict` of the home, with the margin log(1.05) and the pool of `packages/core/scripts/data/sections-gate/aa-pool.json`.
+# The check against the fixed base uses `limitVerdict` of the home, with the limit 1.10 and the A/A noise of the rounds of the run.
+# A check that cannot decide makes the run cannot decide, for example an A/A spread above the noise cap log(1.06) on |log r|.
+# Then the job `retry` runs the gate once more on a fresh runner, with 2 times the rounds.
 # Such a run writes a warning "No read" to the check, with the case, the rounds and the CPU model, so the pass of the retry does not hide it.
-# A second run that cannot decide fails, so a noisy run does not pass.
-# The check against the parent uses `timeVerdict` of `@mark1russell7/rigor-bench`, with the margin log(1.05) and the pool of `packages/core/scripts/data/sections-gate/aa-pool.json`.
-# The check against the fixed base fails above 1.10.
+# A second run that cannot decide is a no read, for example "no read: cannot decide at 20 rounds". A no read fails, so a noisy run does not pass.
 # The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`. `docs/PROMOTION.md` gives the values and their reasons.
 name: Sections gate
 
@@ -29,7 +31,7 @@ on:
         description: "The commit to time the head against. The default is the first parent of the head."
         default: ""
       rounds:
-        description: "The timed rounds of each arm, from 1 to 20."
+        description: "The timed rounds of each arm in the first run, from 1 to 20. The retry times 2 times the rounds, at most 20."
         default: "10"
 
 permissions:
@@ -89,8 +91,8 @@ jobs:
     # The job times 4 arms x 10 rounds = 40 routes of sections-tree at 10 000 nodes. One route takes 30 to 60 s, so the routes take 20 to 40 min.
     # Each child loads its core and reads the board in about 3 s: 2 min more. The 3 or 4 worktrees and their installs take about 5 min.
     # The sum is 27 to 47 min. The limit is 2 times the worst case: 95 min.
-    # The jobs gate and retry run one after the other. The runs so far took 22 and 32 min, so the two runs take 2 x 32 = 64 min at the most.
-    # With the limits, the workflow takes 2 x 95 = 190 min at the most.
+    # The jobs gate and retry run one after the other. The runs so far took 22 and 32 min, and the retry has 2 times the rounds.
+    # So the two runs take about 32 + 64 = 96 min at the most. With the limits, the workflow takes 95 + 180 = 275 min at the most.
     timeout-minutes: 95
     outputs:
       # The value is false when the run cannot decide. Then the job retry runs.
@@ -159,9 +161,10 @@ jobs:
     needs: [changes, gate]
     if: needs.changes.outputs.match == 'true' && needs.gate.result == 'success' && needs.gate.outputs.decided == 'false'
     runs-on: ubuntu-latest
-    # The same work as the job gate: 27 to 47 min, and the limit is 95 min. The jobs gate and retry take 2 x 32 = 64 min at the most so far.
-    # With the limits, the workflow takes 2 x 95 = 190 min at the most.
-    timeout-minutes: 95
+    # The job times 2 times the rounds of the job gate: 4 arms x 20 rounds = 80 routes. One route takes 30 to 60 s, so the routes take 40 to 80 min.
+    # The children load their core in about 4 min more, and the worktrees and their installs take about 5 min. The sum is 49 to 89 min.
+    # The limit is 2 times the worst case: 180 min. With the limits, the workflow takes 95 + 180 = 275 min at the most.
+    timeout-minutes: 180
     env:
       ROUNDS: ${{ inputs.rounds || '10' }}
       # The job gate resolved the commits one time. This job times the same full hashes, also when the branch moved.
@@ -182,7 +185,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Time the head against the parent and the fixed base once more
         run: |
-          # In the second run, a run that cannot decide exits with the code 1, so a noisy run does not pass.
+          # The script times 2 times the rounds of the input. A second run that cannot decide is a no read, and it exits with the code 1.
+          # The record and the summary say "no read: cannot decide at N rounds". So a noisy run does not pass, and the check is not a skip.
           status=0
           node packages/core/scripts/sections-bisect.ts --gate --attempt 2 --head "$HEAD_SHA" --head-input "$HEAD_INPUT" --parent "$PARENT_SHA" --parent-input "$PARENT_INPUT" --rounds "$ROUNDS" --trees "$RUNNER_TEMP/trees" --out "$GITHUB_WORKSPACE/out" > /dev/null || status=$?
           [ -f out/sections-gate.md ] && cat out/sections-gate.md >> "$GITHUB_STEP_SUMMARY"

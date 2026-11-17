@@ -65,6 +65,11 @@ export interface PairedOptions<I> {
   readonly env?: PairedEnv;
   /** The context of the run. The default is `pairedContext()`. */
   readonly context?: string;
+  /**
+   * The order of the arm ids in one round of mode `fresh`. It gets the ids of the arms, with the A/A arm, and the index of the round.
+   * The default turns the arms by the round (`armOrder`). With this option, the report keeps the order of each round in `orders`.
+   */
+  readonly order?: (arms: readonly string[], round: number) => readonly string[];
 }
 
 /** The statistics of the ratios of one arm over the base. */
@@ -112,6 +117,11 @@ export interface PairedReport {
   readonly ratios: Readonly<Record<string, PairedRatio>>;
   /** The ratios of the A/A arm. It is `null` without the A/A arm. */
   readonly noiseFloor: { readonly median: number; readonly p10: number; readonly p90: number } | null;
+  /**
+   * The arm ids of each round, in the order of the run. Only a run of mode `fresh` with the option `order` has it.
+   * A reader takes the first arm of a round from it. A report with no orders has the order of `armOrder`.
+   */
+  readonly orders?: readonly (readonly string[])[];
 }
 
 /**
@@ -221,6 +231,8 @@ function armsOf<I>(o: PairedOptions<I>): Arm<I>[] {
 export interface RawTimes {
   readonly ms: Map<string, Map<string, number[]>>;
   readonly peak: Map<string, Map<string, number>>;
+  /** The arm ids of each round, in the order of the run. The report keeps them. */
+  readonly orders?: string[][];
 }
 
 /** This function makes empty raw times for the inputs and the arms. */
@@ -298,6 +310,7 @@ export function pairedReport<I>(mode: Mode, env: PairedEnv, context: string | un
     inputs: rows,
     ratios,
     noiseFloor: floor === undefined ? null : { median: floor.median, p10: floor.p10, p90: floor.p90 },
+    ...(raw.orders === undefined ? {} : { orders: raw.orders }),
   };
 }
 
@@ -357,15 +370,33 @@ function measureProcess<I>(o: PairedOptions<I>, arms: readonly Arm<I>[]): Paired
   return pairedReport("process", o.env ?? pairedEnv(), o.context ?? pairedContext(), arms, o.inputs, raw);
 }
 
-/** This function times the arms with a fresh process for each arm, each input and each round. In round r, each input takes the arms rotated by r. */
+/**
+ * This function gives the indexes of the arms in one round from the option `order`. An order that is not each arm one time throws a `RangeError`.
+ */
+function orderOf(order: NonNullable<PairedOptions<unknown>["order"]>, ids: readonly string[], round: number): number[] {
+  const turn = order(ids, round);
+  const at = turn.map((id) => ids.indexOf(id));
+  if (turn.length !== ids.length || at.some((i) => i < 0) || new Set(at).size !== ids.length) {
+    throw new RangeError(`The order of round ${round} is not each arm one time: ${JSON.stringify(turn)}.`);
+  }
+  return at;
+}
+
+/**
+ * This function times the arms with a fresh process for each arm, each input and each round.
+ * In round r, each input takes the arms in the order of the option `order`, else rotated by r.
+ */
 async function measureFresh<I>(o: PairedOptions<I>): Promise<PairedReport> {
   const arms = armsOf(o);
   const start = o.startChild ?? startProcess;
   const warmup = o.warmup ?? 1;
-  const raw = rawOf(o.inputs, arms);
+  const ids = arms.map((a) => a.id);
+  const raw: RawTimes = o.order === undefined ? rawOf(o.inputs, arms) : { ...rawOf(o.inputs, arms), orders: [] };
   for (let round = 0; round < o.repeats; round++) {
+    const turn = o.order === undefined ? armOrder(arms.length, round, "fresh") : orderOf(o.order, ids, round);
+    raw.orders?.push(turn.map((at) => ids[at]!));
     for (const input of o.inputs) {
-      for (const at of armOrder(arms.length, round, "fresh")) {
+      for (const at of turn) {
         const arm = arms[at]!;
         // The children run one at a time, because two children at one time change the times of each other.
         const result = await start(arm.command!, input.id, warmup);

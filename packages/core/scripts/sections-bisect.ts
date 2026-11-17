@@ -20,9 +20,12 @@
 //   The options `--head-input` and `--parent-input` give the input texts for the record, for example `HEAD^1`.
 //   It makes a git worktree of the base, the parent, the head and the fixed base of `data/sections-gate/fixed-base.json`.
 //   `confirmPair` times the parent, the head, the fixed base and the A/A arm of the parent on `sections-tree`, on the board of the base.
-//   `timeVerdict` of `@mark1russell7/rigor-bench` decides the check against the parent, with the pool `data/sections-gate/aa-pool.json`. The record keeps its verdict.
+//   `armOrder` of `@mark1russell7/rigor-bench` gives the order of the arms in each round, and the record keeps the order of each round.
+//   `timeVerdict` of the home decides the check against the parent, with the pool `data/sections-gate/aa-pool.json`.
+//   `limitVerdict` of the home decides the check against the fixed base. The record keeps the two verdicts.
 //   It writes `<dir>/sections-gate.json` and `<dir>/sections-gate.md`. The exit code is 0 for a pass and 1 for a fail.
-//   The exit code is 3 when the first run (`--attempt 1`) cannot decide. A second run that cannot decide exits with the code 1.
+//   The exit code is 3 when the first run (`--attempt 1`) cannot decide. The second run (`--attempt 2`) times 2 times the rounds.
+//   A second run that cannot decide is a no read: it exits with the code 1.
 // `scripts/sections-bisect-verdict.ts` has the plan and the verdict. `scripts/sections-confirm-verdict.ts` has them for the confirm mode.
 // `scripts/sections-gate-verdict.ts` has the checks of the gate.
 import { spawnSync } from "node:child_process";
@@ -70,14 +73,20 @@ import {
   FIXED_ARM,
   GATE_ROUNDS,
   GATE_ROUTER,
+  FIXED_LIMIT,
   GATE_SCHEMA,
   POOL_FILE,
+  attemptRounds,
+  fixedRecord,
   gateExit,
   gateOptions,
   gateText,
   homeRecord,
   parseFixedBase,
   parsePool,
+  sealRecord,
+  type FixedVerdict,
+  type GateRun,
   type GateRecord,
   type HomeVerdict,
 } from "./sections-gate-verdict.ts";
@@ -252,6 +261,7 @@ async function runPair(pair: number, commitRef: string, parentRef: string, trees
  * This function times the sections gate: the parent, the checkout, the fixed base and the A/A arm of the parent. Each arm is a fresh process on the board of the base.
  * The head and the parent are full hashes that the job resolved one time (`scripts/gates/commits.ts`). The input texts go into the record.
  * The fixed base comes from the file `BASE_FILE` of the checkout, and the pool of the home verdict comes from the file `POOL_FILE`.
+ * The value `rounds` is the count of timed rounds of this run: `attemptRounds` of the input and the number of the run.
  */
 async function runGate(commits: GateCommits, treesDir: string, out: string, rounds: number, attempt: 1 | 2): Promise<GateRecord> {
   const { root, base, head: checkout } = refsOfRun();
@@ -272,16 +282,23 @@ async function runGate(commits: GateCommits, treesDir: string, out: string, roun
     // Each arm routes the same board: the fixture of the base of the bisect. So the fixed base and the head route the same input.
     const file = await writeBoard(treeOf(base), out);
     const child = (sha: string): string[] => [...NODE, SCRIPT, "--child", "--tree", treeOf(sha), "--board", file];
-    report = await confirmPair({ parent: child(parent.sha), commit: child(head), others: [{ id: FIXED_ARM, command: child(fixed.sha) }], inputs: routers, rounds });
+    // Only this job needs the installed packages of the home, so the other modes of this script start with no install.
+    // The order of the home puts each arm of a pair first in one of each 2 rounds, and the report keeps the order of each round.
+    const { armOrder } = await import("@mark1russell7/rigor-bench");
+    const others = [{ id: FIXED_ARM, command: child(fixed.sha) }];
+    report = await confirmPair({ parent: child(parent.sha), commit: child(head), others, inputs: routers, rounds, order: armOrder });
   }
   let home: HomeVerdict | null = null;
+  let fixedCheck: FixedVerdict | null = null;
   if (report !== null) {
-    // Only this job needs the installed packages of the home, so the other modes of this script start with no install.
-    const { homeVerdict } = await import("./gates/home-verdict.ts");
+    const { homeVerdict, limitHome } = await import("./gates/home-verdict.ts");
     // The home decides the check against the parent: the noise cap, the pooled band and the margin are its options.
     home = homeRecord(homeVerdict(report, GATE_ROUTER, COMMIT_ARM, gateOptions(pool)));
+    // The home decides the check against the fixed base: the claim "head / fixed base is at most FIXED_LIMIT", with the A/A rounds of this run.
+    fixedCheck = fixedRecord(limitHome(report, GATE_ROUTER, FIXED_ARM, COMMIT_ARM, FIXED_LIMIT));
   }
-  return { schema: GATE_SCHEMA, attempt, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh"), report, home };
+  const run: Omit<GateRun, "report" | "home" | "fixedCheck"> = { schema: GATE_SCHEMA, attempt, board, fixture: BISECT_FIXTURE, router: GATE_ROUTER, rounds, head: headSide, parent, fixed, fixedBase, skipped, env: envOf("fresh") };
+  return sealRecord({ ...run, report, home, fixedCheck });
 }
 
 if (args.includes("--child")) {
@@ -299,11 +316,12 @@ if (args.includes("--child")) {
   if (opt("--rounds") !== undefined) parseRounds(opt("--rounds"));
   console.log(JSON.stringify(parsePairs(opt("--plan"))));
 } else if (args.includes("--gate")) {
-  const rounds = parseRounds(opt("--rounds") ?? String(GATE_ROUNDS));
-  const out = resolve(need("--out"));
-  mkdirSync(out, { recursive: true });
   const attempt = opt("--attempt") ?? "1";
   if (attempt !== "1" && attempt !== "2") throw new Error(`The attempt of the gate is 1 or 2, not ${attempt}.`);
+  // The input gives the rounds of the first run. The second run times 2 times the rounds, at most 20.
+  const rounds = attemptRounds(parseRounds(opt("--rounds") ?? String(GATE_ROUNDS)), attempt === "1" ? 1 : 2);
+  const out = resolve(need("--out"));
+  mkdirSync(out, { recursive: true });
   // The job resolves the names one time, so this mode takes only full hashes (FAIL-CLOSED).
   const commitOf = (role: "head" | "parent"): GateCommit => {
     const sha = requireFullHash(`--${role}`, opt(`--${role}`));

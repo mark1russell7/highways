@@ -159,6 +159,27 @@ describe("measureIsolated in mode fresh", () => {
     expect(r.inputs[0]!.peakRss).toEqual({ A: 20, B: 40 });
   });
 
+  it("takes the order of each round from the option order, and the report keeps the order of each round", async () => {
+    const log: string[] = [];
+    const arms = ["A", "B"].map((id) => ({ id, command: [id] }));
+    // A made-up order: the even rounds give the arms in reverse.
+    const order = (ids: readonly string[], round: number): readonly string[] => (round % 2 === 0 ? [...ids].reverse() : ids);
+    const r = await measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 2, mode: "fresh", aa: false, startChild: fakeStart({ A: 1, B: 1 }, log), env, order });
+    expect(log.map((l) => l.split(":")[0])).toEqual(["B", "A", "A", "B"]);
+    expect(r.orders).toEqual([["B", "A"], ["A", "B"]]);
+    // With no option, the order turns the arms by the round, and the report has no orders.
+    const plain = await measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 2, mode: "fresh", aa: false, startChild: fakeStart({ A: 1, B: 1 }, []), env });
+    expect(plain.orders).toBeUndefined();
+  });
+
+  it("rejects an order that does not give each arm one time", async () => {
+    const arms = ["A", "B"].map((id) => ({ id, command: [id] }));
+    const twice = (): readonly string[] => ["A", "A"];
+    await expect(measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 1, mode: "fresh", aa: false, startChild: fakeStart({ A: 1, B: 1 }, []), env, order: twice })).rejects.toThrow(RangeError);
+    const short = (): readonly string[] => ["A"];
+    await expect(measureIsolated({ arms, inputs: [{ id: "x" }], repeats: 1, mode: "fresh", aa: false, startChild: fakeStart({ A: 1, B: 1 }, []), env, order: short })).rejects.toThrow(/not each arm one time/);
+  });
+
   it("rejects when a child fails or gives no time", async () => {
     const arms = [{ id: "A", command: ["A"] }, { id: "B", command: ["B"] }];
     const failing = async (): Promise<ChildResult> => {

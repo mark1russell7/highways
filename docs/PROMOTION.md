@@ -307,22 +307,27 @@ This file does not copy the floors of the other projects:
 The workflow `Sections gate` (`.github/workflows/sections-gate.yml`) fails a pull request when `sections-tree` gets slower at 10 000 nodes (GATE-LIMITS slices 1 to 3). It starts on each pull request that changes `packages/core/src`.
 
 - One job times four arms in turn: the parent of the pull request, the head, the A/A copy of the parent and the fixed base. Each route has its own fresh process.
-- Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`. Each arm has 10 rounds.
+- Each arm routes the same board: the fixture `large-clustered` of `fa1dd82~1`. Each arm has 10 rounds, and 20 rounds in the retry.
+- `armOrder` of `@mark1russell7/rigor-bench` gives the order of the arms in each round. In each 2 rounds, each arm of a pair goes first one time.
+- The record keeps the order of each round in its field `report.orders`.
 - An A/A round ratio is the time of the A/A arm over the time of the parent in one round. Each round is one case of `@mark1russell7/rigor-bench`.
-- The A/A spread is p90 of \|log r\| over the A/A round ratios. The ratio of a check is a median time over the median time of the other side.
+- The A/A spread is p90 of \|log r\| over the A/A round ratios.
+- The ratio of the check against the parent is the median time of the head over the median time of the parent.
+- The ratio of the check against the fixed base is the median of the round ratios head/fixed base.
 
 | Rule | Value | What it does | Reason |
 |---|---|---|---|
 | The noise cap | log(1.06) = 0.058 on \|log r\| | A run with an A/A spread above the cap cannot decide. | The quiet run 41542329976 (#257) had the spread 0.027. The cap is approximately 2 times that spread. |
-| The second run | 1 | After a run that cannot decide, the job `retry` starts the gate once more on a fresh runner. A second run that cannot decide fails the gate. | A noisy runner is often one bad runner. A run that cannot decide does not pass at any time. |
+| The second run | 1, with 2 times the rounds, at most 20 | After a run that cannot decide, the job `retry` starts the gate once more on a fresh runner, with 20 rounds. A second run that cannot decide is a no read, for example "no read: cannot decide at 20 rounds". A no read fails the gate. | A noisy runner is often one bad runner. More rounds make the interval of a median narrower. A run that cannot decide does not pass at any time. |
 | The paths | `scripts/gates/scope.ts` | The job `changes` reads the imports of the measured route. A change outside them skips the gate. A walk that fails gives `**`, so the gate runs. | A change of a router that the gate does not measure gave a noise result on #303. Of the last 30 pull requests on the old paths, 10 skip. |
 | The daily run | 1 for each day on main | The schedule times main in full. The check against the fixed base shows a rise that many pull requests made together. | A skip shows no missed effect for later pull requests. |
 | Against the parent | `timeVerdict`, rule `difference`, margin max(log(1.05), the pooled A/A spread) | The outcome `slower` fails. The outcome `cannot decide` starts the second run. The outcomes `same` and `faster` pass. | The home decides with an interval, not with one ratio. The floor log(1.05) keeps the step of 5 % of slice 1 as the band `same`. |
-| Against the fixed base | 1.10 | The check fails when the ratio head/fixed base is above 1.10. | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
+| Against the fixed base | `limitVerdict`, limit 1.10, the A/A band of the same rounds | The outcome `beyond` fails. The outcome `cannot decide` starts the second run. The outcome `within` passes. | A check against the parent misses a slow drift in many small steps. SECTIONS-SLOW found such a drift: each step stays below its minimum effect. The fixed base adds the steps. |
 
 - A review gave the values of slice 1 on 2026-11-02, and the cap, the second run and the pool on 2026-11-03. Change a value only with a reason from the A/A data of the gate runs. The pull request of the change tells that reason.
 - The summary of each run (`sections-gate.md`) shows the A/A spread of the run, the cap and the pool with its count of runs and cases. It also shows the margin, the interval and the outcome.
-- The record `sections-gate.json` (schema `sections-gate/3`) keeps the same facts in its field `home`.
+- The record `sections-gate.json` (schema `sections-gate/4`) keeps the same facts in its field `home`. Its field `fixedCheck` keeps the limit verdict.
+- The field `end` of the record is `pass`, `fail`, `retry` or `no read`. The field `noRead` keeps the text of a no read.
 - The job resolves the inputs `head` and `parent` to full hashes one time, at the start (GATE-CONFIRM-SHA). Then each job times only these hashes. A name that does not resolve fails the job.
 - The default head is the checkout, and the default parent is the first parent of the head. A dispatch with `-f head=<sha>` times that commit against its first parent.
 - The summary and the record give the input text and the full hash of each commit, for example "the parent: `HEAD^1` = `414ec5f...`".
@@ -405,12 +410,41 @@ The two agree on the step of 3 %. The margin log(1.05) is the claim of the gate:
 
 The other rules stay local:
 
-- The check against the fixed base stays local code. It moves to `limitVerdict` of the home in GATE-FIXED-ROUNDS.
-- `limitVerdict` needs 6 rounds or more for each case and 5 A/A cases or more. The gate has 10 rounds of one case.
 - The confirm mode of `Sections bisect` keeps its local band rule. On the noisy run, that rule says `inside`, and the home says `cannot decide`.
 - The fixed base is in `packages/core/scripts/data/sections-gate/fixed-base.json`, with its date and its reason. The first fixed base is the head of `main` when the gate merges.
 - Move the fixed base only in a commit that tells the reason. An example is a feature that costs time on purpose.
 - A check with no time does not pass, so the gate fails (FAIL-CLOSED).
+
+### The check against the fixed base
+
+Since GATE-FIXED-ROUNDS, `limitVerdict` of `@mark1russell7/rigor-bench` (0.2.57 or later) decides the check against the fixed base. `limitHome` of `scripts/gates/home-verdict.ts` gives it the rounds of the run.
+
+- Each round gives one ratio: the time of the head over the time of the fixed base. The one case has the name of the measured route.
+- The A/A rounds of the same run give the band exp(-noise) to exp(noise).
+- The bound is the high end of the interval of the median ratio, times exp(noise). The floor is the low end, times exp(-noise).
+- The outcome is `within` when the bound is at most 1.10, and `beyond` when the floor is above 1.10. Each other case is `cannot decide`.
+- `limitVerdict` refuses rounds where one arm of a pair goes first more often than the other arm.
+- The old local order turned the arms by 1 in each round. So the head went before the fixed base in 8 of 10 rounds. `armOrder` of the home replaces that order.
+
+The old rule compared the ratio of the two medians with 1.10. It did not see the interval or the noise. So a noisy run passed it. An example is the run 41548965076: its ratio is 0.999, but its bound is 1.235.
+
+The table below gives drifts on the noise of the 24 stored records of the gate, from the run 43808271974 to the run 44069300009.
+
+- A probe scaled the head of each record to the median ratio 1.00, 1.08 or 1.12 against the fixed base.
+- These records are older than the stored order. So the probe gave them the order of `armOrder`.
+- The 20 rounds are the gate and the retry of one workflow run, 10 rounds of each. They come from two runners, so that column is only an estimate.
+
+| Drift against the fixed base | 10 rounds, 24 records | 20 rounds, 5 workflow runs |
+|---|---|---|
+| 1.00 | `within` 20, `cannot decide` 4 | `within` 5 |
+| 1.08 | `cannot decide` 22, `within` 2 | `cannot decide` 5 |
+| 1.12 | `cannot decide` 22, `beyond` 2 | `cannot decide` 5 |
+
+- On most runners, a drift of 8 % or 12 % cannot decide, also after the retry. Thus it is a no read, and a no read fails the gate.
+- On the median record, the bound is 1.041 times the median ratio. Over the records, that factor goes from 1.012 to 1.200.
+- So on a usual runner, the check passes a head up to a median ratio of approximately 1.05.
+- The heads of the 24 records have the median ratios 0.93 to 0.99. The new rule gives `within` on 23 records.
+- The one other record (44069300009, the job `gate`) is `cannot decide`. Its run could not decide with the old rule too, and its retry is `within`.
 
 <!-- shared:order-of-promotions -->
 ## The order of promotions

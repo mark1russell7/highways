@@ -1,15 +1,19 @@
 // The verdict of the sections time gate (GATE-LIMITS slices 1 to 3). The workflow `Sections gate` (.github/workflows/sections-gate.yml) starts it.
 // One job times `sections-tree` on the board of the bisect (10 000 nodes) in fresh processes, with four arms in turn:
 // the parent of the pull request, the head, the A/A copy of the parent and the fixed base of `data/sections-gate/fixed-base.json`.
+// `armOrder` of the bench home `@mark1russell7/rigor-bench` gives the order of the arms in each round. The report keeps the order of each round.
 // The gate has two checks (docs/PROMOTION.md, "The sections time gate"):
-// - Against the parent: `timeVerdict` of the bench home `@mark1russell7/rigor-bench` decides, with the options of `gateOptions`.
+// - Against the parent: `timeVerdict` of the home decides, with the options of `gateOptions`.
 //   These options are the noise cap `NOISE_CAP`, the pool of `data/sections-gate/aa-pool.json` and the floor `PARENT_FLOOR`.
-//   The outcome `slower` fails, `same` and `faster` pass, and `cannot decide` starts the job `retry` on a fresh runner.
-// - Against the fixed base: the ratio head/fixed base fails above `FIXED_LIMIT`. A check against the parent alone misses a slow drift in many small steps.
-//   This check stays local code until GATE-FIXED-ROUNDS, because `limitVerdict` of the home needs 6 rounds or more for each case.
+//   The outcome `slower` fails, and `same` and `faster` pass.
+// - Against the fixed base: `limitVerdict` of the home decides the claim "head / fixed base is at most `FIXED_LIMIT`".
+//   The A/A rounds of the same run give its noise (`aaFrom: "rounds"`). The outcome `beyond` fails, and `within` passes.
+//   A check against the parent alone misses a slow drift in many small steps.
+// A check that cannot decide starts the job `retry` on a fresh runner, with `RETRY_FACTOR` times the rounds.
+// A second run that cannot decide is a no read, and a no read fails. So a run that cannot decide does not pass at any time.
 // This module imports only node modules, the gates and types, so a job with no installed packages can start it.
-// Only the caller calls the home: `scripts/gates/home-verdict.ts` gives the verdict, and `homeRecord` keeps its facts in the record.
-import type { PairedTime, PoolOptions, TimeOutcome, TimeVerdict, VerdictOptions } from "@mark1russell7/rigor-bench";
+// Only the caller calls the home: `scripts/gates/home-verdict.ts` gives the verdicts. `homeRecord` and `fixedRecord` keep their facts in the record.
+import type { LimitOutcome, LimitVerdict, PairedTime, PoolOptions, TimeOutcome, TimeVerdict, VerdictOptions } from "@mark1russell7/rigor-bench";
 import { aaId, type PairedReport, type RecordEnv } from "./gates/paired.ts";
 import { COMMIT_ARM, PARENT_ARM, aaRatios, armRows, spreadOf, type ArmRow } from "./gates/pair-confirm.ts";
 import { InputError } from "./gates/inputs.ts";
@@ -17,18 +21,35 @@ import { type Side } from "./sections-confirm-verdict.ts";
 
 /** The router of the gate. SECTIONS-SLOW found its drift. */
 export const GATE_ROUTER = "sections-tree";
-/** The timed rounds of each arm by default. */
+/**
+ * The timed rounds of each arm in the first run by default. In each 2 rounds, `armOrder` puts each arm of a pair first one time.
+ * The limit verdict needs 6 rounds or more for an interval at the level 0.95.
+ */
 export const GATE_ROUNDS = 10;
+/** The rounds of the second run, the job `retry`, are this factor times the rounds of the first run. */
+export const RETRY_FACTOR = 2;
+/** The most timed rounds of one run. The time-out of the job `retry` holds 20 rounds. */
+export const GATE_MAX_ROUNDS = 20;
+
+/**
+ * This function gives the timed rounds of each arm in a run: `rounds` in the first run.
+ * The second run has `RETRY_FACTOR` times `rounds`, at most `GATE_MAX_ROUNDS`.
+ */
+export const attemptRounds = (rounds: number, attempt: 1 | 2): number => (attempt === 1 ? rounds : Math.min(GATE_MAX_ROUNDS, RETRY_FACTOR * rounds));
 /** The id of the arm of the fixed base. */
 export const FIXED_ARM = "fixed";
 /** The limit of the ratio head/fixed base: 1.10. */
 export const FIXED_LIMIT = 1.1;
 /** The schema of the file of the fixed base. */
 export const BASE_SCHEMA = "sections-gate-base/1";
-/** The schema of the record of the gate. Version 3 keeps the facts of the home verdict that decides: the noise, the pool and the margin. */
-export const GATE_SCHEMA = "sections-gate/3";
+/**
+ * The schema of the record of the gate. Version 3 keeps the facts of the home verdict that decides: the noise, the pool and the margin.
+ * Version 4 keeps the order of each round in the report and the end of the run.
+ * It also keeps the limit verdict of the check against the fixed base.
+ */
+export const GATE_SCHEMA = "sections-gate/4";
 /** The schemas of the records that the pool reads. */
-export const GATE_SCHEMAS: readonly string[] = ["sections-gate/1", "sections-gate/2", GATE_SCHEMA];
+export const GATE_SCHEMAS: readonly string[] = ["sections-gate/1", "sections-gate/2", "sections-gate/3", GATE_SCHEMA];
 /**
  * The noise cap on the A/A spread of the run, on the log scale of the home: `Math.log(1.06)`, approximately 0.058.
  * Slice 2 had the cap 0.06 on |r - 1|. A ratio of 1.06 has |log r| = 0.058, so the cap keeps the rule of slice 2.
@@ -204,18 +225,78 @@ export type GateVerdict = "pass" | "fail" | "not measured" | "cannot decide";
 /** One check of the gate. */
 export interface GateCheck {
   readonly check: "parent" | "fixed base";
-  /** The median time of the head over the median time of the other side. */
+  /**
+   * For the check against the parent, the median time of the head over the median time of the parent.
+   * For the check against the fixed base, the median of the round ratios head / fixed base of the limit verdict.
+   */
   readonly ratio: number | null;
   /**
-   * The ratio limit. Above it, the check against the fixed base fails.
+   * For the check against the fixed base, the limit `FIXED_LIMIT` of the claim of `limitVerdict`.
    * For the check against the parent, it is the high end of the band `same` of the home, `exp(margin)`.
    */
   readonly limit: number | null;
   readonly verdict: GateVerdict;
 }
 
-/** The outcome of one run of the gate. A run that cannot decide starts the second run. */
+/** The outcome of one run of the gate. A first run that cannot decide starts the second run. */
 export type GateOutcome = "pass" | "fail" | "cannot decide";
+
+/**
+ * The end of one run of the gate. Only `pass` passes.
+ * The end `retry` is a first run that cannot decide. The end `no read` is a second run that cannot decide, and it fails the check.
+ */
+export type GateEnd = "pass" | "fail" | "retry" | "no read";
+
+/** This function gives the end of a run from its outcome and its number, 1 or 2. */
+export function gateEnd(outcome: GateOutcome, attempt: 1 | 2): GateEnd {
+  if (outcome !== "cannot decide") return outcome;
+  return attempt === 1 ? "retry" : "no read";
+}
+
+/** This function gives the words of a no read, with the timed rounds of the run, for the record and the summary of the job. */
+export const noReadText = (rounds: number): string => `no read: cannot decide at ${rounds} rounds`;
+
+/** The limit verdict of the home on the head against the fixed base, as the record keeps it. It decides the check against the fixed base. */
+export interface FixedVerdict {
+  readonly outcome: LimitOutcome;
+  readonly reason: string;
+  /** The limit of the claim: `FIXED_LIMIT`. */
+  readonly limit: number;
+  /** The median of the round ratios head / fixed base, and the count of the rounds. They are `null` without a case. */
+  readonly ratio: number | null;
+  readonly rounds: number | null;
+  /** The ends of the interval of the median of the round ratios. They are `null` without a case. */
+  readonly low: number | null;
+  readonly high: number | null;
+  /** The noise of the A/A rounds on the log scale. The bound is `high` times `exp(noise)`, and the floor is `low` times `exp(-noise)`. */
+  readonly noise: number | null;
+  readonly bound: number | null;
+  readonly floor: number | null;
+}
+
+/** This function keeps the facts of a limit verdict of the home on one case in the form of the record. A verdict with no case gives `null` values. */
+export function fixedRecord(v: LimitVerdict): FixedVerdict {
+  const c = v.cases[0];
+  return {
+    outcome: v.outcome,
+    reason: v.reason,
+    limit: v.limit,
+    ratio: c?.ratio ?? null,
+    rounds: c?.rounds ?? null,
+    low: c?.low ?? null,
+    high: c?.high ?? null,
+    noise: c?.noise ?? null,
+    bound: c?.bound ?? null,
+    floor: c?.floor ?? null,
+  };
+}
+
+/** This function maps an outcome of the limit verdict to the verdict of the check against the fixed base. Only `beyond` fails. */
+export function fixedVerdictOf(outcome: LimitOutcome): GateVerdict {
+  if (outcome === "beyond") return "fail";
+  if (outcome === "cannot decide") return "cannot decide";
+  return "pass";
+}
 
 /** The verdict of the home on the head against the parent, as the record keeps it. The home decides the check against the parent with it. */
 export interface HomeVerdict {
@@ -253,6 +334,8 @@ export interface GateResult {
   readonly fixed: ArmRow | null;
   /** The verdict of the home that decides the check against the parent. It is `null` when the job timed no arm. */
   readonly home: HomeVerdict | null;
+  /** The limit verdict of the home that decides the check against the fixed base. It is `null` when the job timed no arm. */
+  readonly fixedCheck: FixedVerdict | null;
   /** This value is `true` when the home finds the A/A spread of the run above `NOISE_CAP`. */
   readonly noisy: boolean;
   /** The head against the parent, in the words of the home: faster, slower, same or cannot decide. */
@@ -265,12 +348,6 @@ export interface GateResult {
   readonly reason: string;
 }
 
-/** This function compares a ratio with a limit. A ratio on the limit passes. */
-function checkOf(ratio: number | null, limit: number | null): GateVerdict {
-  if (ratio === null || limit === null || !Number.isFinite(ratio)) return "not measured";
-  return ratio > limit ? "fail" : "pass";
-}
-
 /** This function maps an outcome of the home to the verdict of the check against the parent. Only `slower` fails. */
 export function parentVerdictOf(outcome: TimeOutcome): GateVerdict {
   if (outcome === "slower") return "fail";
@@ -281,26 +358,28 @@ export function parentVerdictOf(outcome: TimeOutcome): GateVerdict {
 const fmt = (x: number | null | undefined, d = 3): string => (x == null ? "-" : Number.isFinite(x) ? x.toFixed(d) : String(x));
 
 /**
- * This function gives the checks and the outcome of the gate on a report and the verdict of the home on the same report.
+ * This function gives the checks and the outcome of the gate on a report and the two verdicts of the home on the same report.
  *
  * - The report has the base `parent`, the arms `commit` and `fixed`, and the A/A arm. Else the function throws a `RangeError`.
  * - A check with no time gives `not measured`, and the run fails (FAIL-CLOSED). A missing verdict of the home is a check with no time.
- * - The check against the fixed base fails above `FIXED_LIMIT`. The two medians come from the same job. A failed check fails the run.
- * - The home decides the check against the parent: `slower` fails, `cannot decide` cannot decide, `same` and `faster` pass.
+ * - The limit verdict decides the check against the fixed base: `beyond` fails, `cannot decide` cannot decide, and `within` passes.
+ * - The time verdict decides the check against the parent: `slower` fails, `cannot decide` cannot decide, and `same` and `faster` pass.
+ * - A failed check fails the run. Else a check that cannot decide makes the run cannot decide.
  */
-export function gateVerdict(report: PairedReport, home: HomeVerdict | null, router: string = GATE_ROUTER): GateResult {
+export function gateVerdict(report: PairedReport, home: HomeVerdict | null, fixedCheck: FixedVerdict | null, router: string = GATE_ROUTER): GateResult {
   if (report.base !== PARENT_ARM || !report.arms.includes(COMMIT_ARM) || !report.arms.includes(FIXED_ARM) || !report.arms.includes(aaId(PARENT_ARM)))
     throw new RangeError(`A gate report has the base ${PARENT_ARM}, the arms ${COMMIT_ARM} and ${FIXED_ARM}, and the A/A arm ${aaId(PARENT_ARM)}.`);
   const parent = armRows(report, COMMIT_ARM).find((r) => r.input === router) ?? null;
   const fixed = armRows(report, FIXED_ARM).find((r) => r.input === router) ?? null;
   const ratio = parent?.ratio ?? null;
-  const toFixed = parent?.armMs != null && fixed?.armMs != null && fixed.armMs > 0 ? parent.armMs / fixed.armMs : null;
   const measured = parent !== null && ratio !== null && Number.isFinite(ratio) && home !== null;
   const toParent: GateVerdict = measured ? parentVerdictOf(home.outcome) : "not measured";
   const limit = home?.margin == null ? null : Math.exp(home.margin);
+  const toFixed = fixedCheck?.ratio ?? null;
+  const fixedMeasured = fixed !== null && fixedCheck !== null && toFixed !== null && Number.isFinite(toFixed);
   const checks: [GateCheck, GateCheck] = [
     { check: "parent", ratio, limit, verdict: toParent },
-    { check: "fixed base", ratio: toFixed, limit: FIXED_LIMIT, verdict: checkOf(toFixed, FIXED_LIMIT) },
+    { check: "fixed base", ratio: toFixed, limit: FIXED_LIMIT, verdict: fixedMeasured ? fixedVerdictOf(fixedCheck.outcome) : "not measured" },
   ];
   const words: GateResult["words"] = measured ? home.outcome : "not measured";
   const noisy = home?.noise?.noisy ?? false;
@@ -311,21 +390,26 @@ export function gateVerdict(report: PairedReport, home: HomeVerdict | null, rout
     reason = "A check has no time, so the run fails (FAIL-CLOSED).";
   } else if (checks[1].verdict === "fail") {
     outcome = "fail";
-    reason = `The head is ${fmt(toFixed)} times the fixed base, above the limit ${fmt(FIXED_LIMIT, 2)}.`;
-  } else if (checks[0].verdict === "cannot decide") {
-    outcome = "cannot decide";
-    reason = `The home cannot decide the head against the parent. ${home!.reason}`;
+    reason = `The home finds the head beyond the limit ${fmt(FIXED_LIMIT, 2)} of the fixed base (ratio ${fmt(toFixed)}, floor ${fmt(fixedCheck!.floor)}). ${fixedCheck!.reason}`;
   } else if (checks[0].verdict === "fail") {
     outcome = "fail";
     reason = `The home finds the head slower than the parent (ratio ${fmt(ratio)}). ${home!.reason}`;
+  } else if (checks[0].verdict === "cannot decide" || checks[1].verdict === "cannot decide") {
+    outcome = "cannot decide";
+    const parts: string[] = [];
+    if (checks[0].verdict === "cannot decide") parts.push(`The home cannot decide the head against the parent. ${home!.reason}`);
+    if (checks[1].verdict === "cannot decide") {
+      parts.push(`The home cannot decide the head against the limit ${fmt(FIXED_LIMIT, 2)} of the fixed base (ratio ${fmt(toFixed)}, bound ${fmt(fixedCheck!.bound)}). ${fixedCheck!.reason}`);
+    }
+    reason = parts.join(" ");
   } else {
     outcome = "pass";
-    reason = `The home finds the head ${home!.outcome} against the parent (ratio ${fmt(ratio)}), and the head is ${fmt(toFixed)} times the fixed base (limit ${fmt(FIXED_LIMIT, 2)}).`;
+    reason = `The home finds the head ${home!.outcome} against the parent (ratio ${fmt(ratio)}), and within the limit ${fmt(FIXED_LIMIT, 2)} of the fixed base (ratio ${fmt(toFixed)}, bound ${fmt(fixedCheck!.bound)}).`;
   }
-  return { parent, fixed, home, noisy, words, checks, outcome, pass: outcome === "pass", reason };
+  return { parent, fixed, home, fixedCheck, noisy, words, checks, outcome, pass: outcome === "pass", reason };
 }
 
-/** The record of one run of the gate, with the schema `sections-gate/3`. */
+/** The record of one run of the gate, with the schema `sections-gate/4`. */
 export interface GateRecord {
   readonly schema: typeof GATE_SCHEMA;
   /** The run of the gate: 1 for the job `gate`, 2 for the job `retry` on a fresh runner after a run that cannot decide. */
@@ -334,6 +418,7 @@ export interface GateRecord {
   readonly board: Side;
   readonly fixture: string;
   readonly router: string;
+  /** The timed rounds of each arm in this run. The second run has `RETRY_FACTOR` times the rounds of the first run. */
   readonly rounds: number;
   /** The timed head. Its `ref` is the input text, for example `HEAD`, and its `sha` is the full hash that the job resolved one time. */
   readonly head: Side;
@@ -345,20 +430,33 @@ export interface GateRecord {
   /** The reason when the job timed no arm, else `null`. */
   readonly skipped: string | null;
   readonly env: RecordEnv;
-  /** The paired report with the arms `parent`, `commit`, `fixed` and `parent~aa`. It is `null` when the job timed no arm. */
+  /**
+   * The paired report with the arms `parent`, `commit`, `fixed` and `parent~aa`. It is `null` when the job timed no arm.
+   * Its field `orders` keeps the order of the arms in each round, so a reader does not make the order again.
+   */
   readonly report: PairedReport | null;
   /** The verdict of the home on the same rounds, with the pool of the head. It decides the check against the parent. It is `null` when the job timed no arm. */
   readonly home: HomeVerdict | null;
+  /** The limit verdict of the home on the same rounds. It decides the check against the fixed base. It is `null` when the job timed no arm. */
+  readonly fixedCheck: FixedVerdict | null;
+  /** The end of the run: `pass`, `fail`, `retry` or `no read`. Only `pass` passes. `sealRecord` gives it. */
+  readonly end: GateEnd;
+  /** The words of a no read, for example "no read: cannot decide at 20 rounds". It is `null` for each other end. */
+  readonly noRead: string | null;
 }
 
+/** The record of one run of the gate before its end. */
+export type GateRun = Omit<GateRecord, "end" | "noRead">;
+
 /** This function gives the result of a record. A record with no report gives two checks with no time, and the run fails. */
-export function recordVerdict(record: GateRecord): GateResult {
+export function recordVerdict(record: GateRun): GateResult {
   if (record.report === null) {
     const none = (check: GateCheck["check"], limit: number | null): GateCheck => ({ check, ratio: null, limit, verdict: "not measured" });
     return {
       parent: null,
       fixed: null,
       home: record.home,
+      fixedCheck: record.fixedCheck,
       noisy: false,
       words: "not measured",
       checks: [none("parent", null), none("fixed base", FIXED_LIMIT)],
@@ -367,28 +465,40 @@ export function recordVerdict(record: GateRecord): GateResult {
       reason: "The job timed no arm, so the run fails (FAIL-CLOSED).",
     };
   }
-  return gateVerdict(record.report, record.home, record.router);
+  return gateVerdict(record.report, record.home, record.fixedCheck, record.router);
+}
+
+/** This function gives the record of a run with its end. A second run that cannot decide gets the end `no read` and the words of `noReadText`. */
+export function sealRecord(run: GateRun): GateRecord {
+  const end = gateEnd(recordVerdict(run).outcome, run.attempt);
+  return { ...run, end, noRead: end === "no read" ? noReadText(run.rounds) : null };
 }
 
 /** The exit code of the script for the first run that cannot decide. The workflow then starts the job `retry`. */
 export const EXIT_CANNOT_DECIDE = 3;
 
-/** This function gives the exit code of the script for a record. The code is 0 for a pass, 1 for a fail and 3 for a first run that cannot decide. */
-export function gateExit(record: GateRecord): 0 | 1 | typeof EXIT_CANNOT_DECIDE {
-  const g = recordVerdict(record);
-  if (g.outcome === "pass") return 0;
-  // The second run that cannot decide fails, so a run that cannot decide does not pass at any time.
-  if (g.outcome === "cannot decide" && record.attempt === 1) return EXIT_CANNOT_DECIDE;
+/**
+ * This function gives the exit code of the script for a record. The code is 0 for a pass, 1 for a fail and 3 for a first run that cannot decide.
+ * A no read has the code 1, so a run that cannot decide does not pass at any time.
+ */
+export function gateExit(record: GateRun): 0 | 1 | typeof EXIT_CANNOT_DECIDE {
+  const end = gateEnd(recordVerdict(record).outcome, record.attempt);
+  if (end === "pass") return 0;
+  if (end === "retry") return EXIT_CANNOT_DECIDE;
   return 1;
 }
 
 /** This function gives the outcome of a record in words, with the next step. */
-export function outcomeText(record: GateRecord): string {
+export function outcomeText(record: GateRun): string {
   const g = recordVerdict(record);
-  if (g.outcome === "pass") return `The gate passes. ${g.reason}`;
-  if (g.outcome === "fail") return `The gate fails. ${g.reason}`;
-  if (record.attempt === 1) return `This run cannot decide. ${g.reason} The job \`retry\` runs the gate once more on a fresh runner.`;
-  return `The gate fails. ${g.reason} The first run could not decide too, and such a run does not pass.`;
+  const end = gateEnd(g.outcome, record.attempt);
+  if (end === "pass") return `The gate passes. ${g.reason}`;
+  if (end === "fail") return `The gate fails. ${g.reason}`;
+  if (end === "retry") {
+    const more = attemptRounds(record.rounds, 2);
+    return `This run cannot decide at ${record.rounds} rounds. ${g.reason} The job \`retry\` runs the gate once more on a fresh runner, with ${more} rounds.`;
+  }
+  return `**The gate fails with a ${noReadText(record.rounds)}.** ${g.reason} The first run could not decide too. A run that cannot decide does not pass.`;
 }
 
 /** This function writes a time in ms, or in s above 10 s. */
@@ -400,17 +510,19 @@ const short = (s: Side): string => `\`${s.sha.slice(0, 7)}\``;
 const named = (s: Side): string => (s.ref === s.sha ? `\`${s.sha}\`` : `\`${cell(s.ref)}\` = \`${s.sha}\``);
 
 /** This function gives the Markdown text of a record of the gate: the outcome, the noise, the pool, the two checks and the times. */
-export function gateText(record: GateRecord): string[] {
+export function gateText(record: GateRun): string[] {
   const g = recordVerdict(record);
   const p = g.parent;
   const h = record.home;
+  const f = record.fixedCheck;
+  const end = gateEnd(g.outcome, record.attempt);
   const lines = [
-    `# The sections time gate, run ${record.attempt} of 2: ${g.outcome}`,
+    `# The sections time gate, run ${record.attempt} of 2: ${end === "no read" ? noReadText(record.rounds) : end}`,
     "",
     outcomeText(record),
     "",
     `The job times \`${record.router}\` on the fixture \`${record.fixture}\` of \`fa1dd82~1\` (${short(record.board)}), with 10 000 nodes. Each arm routes the same board.`,
-    `Each route has its own fresh process. Each arm has ${record.rounds} rounds, and in each round the arms take turns. The A/A arm is a second copy of the parent.`,
+    `Each route has its own fresh process. Each arm has ${record.rounds} rounds. \`armOrder\` of the home gives the order of the arms in each round, and the record keeps it. The A/A arm is a second copy of the parent.`,
     "",
     `- The head: ${named(record.head)} ${cell(record.head.subject)}`,
     `- The parent: ${named(record.parent)} ${cell(record.parent.subject)}`,
@@ -435,12 +547,27 @@ export function gateText(record: GateRecord): string[] {
     "|---|---:|---:|---|",
     ...g.checks.map((c) => `| head / ${c.check} | ${fmt(c.ratio)} | ${fmt(c.limit)} | ${c.verdict} |`),
     "",
-    "`timeVerdict` of `@mark1russell7/rigor-bench` (rule `difference`) decides the check against the parent. Its outcome `slower` fails, and `cannot decide` starts the retry.",
-    "The margin is the larger of the floor log(1.05) and the pooled A/A spread. The limit of the check against the fixed base is 1.10.",
+    "`timeVerdict` of `@mark1russell7/rigor-bench` (rule `difference`) decides the check against the parent. Its outcome `slower` fails.",
+    "The margin is the larger of the floor log(1.05) and the pooled A/A spread.",
+    "`limitVerdict` of the home decides the check against the fixed base, with the limit 1.10 and the A/A noise of the rounds of this run. Its outcome `beyond` fails.",
+    "A check that cannot decide starts the retry with 2 times the rounds. A second run that cannot decide is a no read, and it fails.",
     `The A/A spread of the home is p90 of |log r| over the A/A round ratios. The ${p?.aa.length ?? 0} A/A round ratios of this run are ${p === null || p.aa.length === 0 ? "-" : p.aa.map((r) => fmt(r)).join(", ")}.`,
     "",
   );
+  if (f !== null) {
+    lines.push(
+      "| the head against the fixed base | value |",
+      "|---|---|",
+      `| the median of the round ratios | ${fmt(f.ratio)}, over ${f.rounds ?? "-"} rounds |`,
+      `| its interval at 0.95 | ${f.low == null ? "-" : `${fmt(f.low)} to ${fmt(f.high)}`} |`,
+      `| the A/A noise of the rounds, on \\|log r\\| | ${fmt(f.noise)} |`,
+      `| the floor and the bound | ${f.floor == null ? "-" : `${fmt(f.floor)} to ${fmt(f.bound)}`}. Within: the bound is at most ${fmt(f.limit, 2)}. Beyond: the floor is above it. |`,
+      `| the outcome | ${f.outcome} |`,
+      "",
+    );
+  }
   if (h !== null) lines.push(`The reason of the home: ${cell(h.reason)}`, "");
+  if (f !== null) lines.push(`The reason of the limit verdict: ${cell(f.reason)}`, "");
   lines.push(
     "| arm | median time |",
     "|---|---:|",
