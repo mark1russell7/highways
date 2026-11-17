@@ -1,5 +1,14 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.0
+
+The release train changes the range of `@mark1russell7/rigor-generators`, `@mark1russell7/rigor-statistics` to a version outside the old range. The public types name @mark1russell7/rigor-generators, @mark1russell7/rigor-statistics, so its new version outside the old range can change them.
+
+### Breaking
+
+- The range `^0.1.1` of `@mark1russell7/rigor-generators` in `dependencies` does not hold `0.2.0`, so it changes.
+- The range `^0.1.22` of `@mark1russell7/rigor-statistics` in `dependencies` does not hold `0.2.10`, so it changes.
+
 ## 0.18.0
 
 The release train changes the range of `@mark1russell7/layout-contract` to a version outside the old range. The public types name @mark1russell7/layout-contract, so its new version outside the old range can change them.
