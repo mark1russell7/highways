@@ -25,7 +25,7 @@ defaults:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@1702dade663a51743de475fcaae8ce77fd77f456 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@2030c7dec9485afebb504772f79f41f23bdb2df7 # main
     # The gate test of the atlas (atlas-history.test.ts) reads the commit that added the newest weekly record, so the checkout gets the whole history.
     with:
       fetch-depth: 0
@@ -57,13 +57,22 @@ jobs:
           path: ${{ runner.temp }}/heap.jsonl
           if-no-files-found: warn
 
+  # The site of .github/site.json: the build, the site check and the probe, with no deploy (CI.md of the
+  # template, "The site config"). The Pages workflow deploys the same site from main.
+  site:
+    uses: mark1russell7/template/.github/workflows/reusable-pages-check.yml@2030c7dec9485afebb504772f79f41f23bdb2df7 # main
+    permissions:
+      contents: read
+    with:
+      timeout-minutes: 15
+
   # The check of the ruleset (CI.md, "The check of the ruleset"). It needs each other job of this file.
   # A job that its own if skips fails it, unless ALLOW_SKIP names the job (template #85). Add each new job of the gate to needs.
   # The cells of Xplat have their own check "Xplat OK" in xplat.yml.
   ci-ok:
     name: CI OK
     if: ${{ !cancelled() }}
-    needs: [ci, heap, presets]
+    needs: [ci, heap, presets, site]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
