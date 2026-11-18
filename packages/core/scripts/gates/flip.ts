@@ -1,7 +1,7 @@
 // The flip tests of the gate checks (GATE-FLIP): an injected fault of a stated size turns a check red, and a copy with no fault stays green in the same job.
 // `node packages/core/scripts/gates/flip.ts --check <heap|work|sections|verdict|xplat> --out <dir> [--rounds <n>] [--trees <dir>] [--cells <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
 // The exit code is 0 only when each arm gives its stated exit code and its stated reason. So a crash is not a red, and a run that cannot decide is not a green.
-// An arm that ends on a run that cannot decide is a no read of the flip: the exit code is 3, and the record is not a pass and not a fail.
+// An arm that ends on a run that cannot decide is a no read of the flip: the exit code is 3, so the job shows red. A no read is not a pass, and it shows no fault of the gate.
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
@@ -394,7 +394,7 @@ export function flipTable(record: FlipRecord): string {
     return `| ${a.id} | ${a.fault ?? "none"} | ${a.exit} | ${a.want.exit} | ${a.want.reason} | ${a.runs ?? ""} | ${ratio} | ${stated} |`;
   });
   const words = { pass: "passed", fail: "failed", "no read": "no read" } as const;
-  const note = record.outcome === "no read" ? ["An arm ended on a run that cannot decide, so the runner was too noisy. A no read is not a pass and not a fail.", ""] : [];
+  const note = record.outcome === "no read" ? ["An arm ended on a run that cannot decide, so the runner was too noisy. The job shows red (exit 3). A no read is not a pass, and it shows no fault of the gate.", ""] : [];
   if (record.start !== undefined) note.push(record.start.reason, "");
   return [`## The flip of \`${record.check}\`: ${words[record.outcome]}`, "", ...note, "| Arm | Fault | Exit | Exit wanted | Reason wanted | Runs | Ratio | As stated |", "| --- | --- | --- | --- | --- | --- | --- | --- |", ...rows, ""].join("\n");
 }
