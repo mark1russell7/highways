@@ -16,6 +16,7 @@ on:
           - through-check
           - paint-tie
           - joint-win
+          - session-time
 
 permissions:
   contents: read

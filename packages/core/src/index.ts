@@ -1,6 +1,8 @@
 export * from "./geom.ts";
 export { Grid, segmentBounds } from "./grid.ts";
 export * from "./model.ts";
+// The session of a router: many sets of edges among the same nodes.
+export { routerSession } from "./session.ts";
 export * from "./fixtures.ts";
 export * from "./cases.ts";
 export * from "./plugs.ts";
