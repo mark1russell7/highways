@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rng } from "./fixtures.ts";
 import { dist, type Point } from "./geom.ts";
 import type { Node } from "./model.ts";
+import { STAMP_END, STAMPS } from "./stamps.ts";
 import { CornerGraph, Obstacles, SoftGraph, type CornerGraphOptions, type Terminal } from "./visibility.ts";
 import { WORK } from "./work.ts";
 
@@ -203,6 +204,53 @@ describe("the search of the corner graph (SEARCH-SPEED)", () => {
   }
 });
 
+describe("the stamps of the search of the corner graph", () => {
+  it("gives the paths and the work of the reference search when the stamps start again (limits 1, 2, 3 and 7)", () => {
+    // Each graph has the default limit when the test makes it. Thus the lower limits come to a graph that has a stamp above them.
+    const made = BOARDS.map(([seed, count, side, far, options]) => {
+      const nodes = board(seed, count, side, far);
+      const obstacles = new Obstacles(nodes, 180);
+      const graph = new CornerGraph(nodes, obstacles, options);
+      return { seed, nodes, obstacles, graph, part: partsOf(graph), options };
+    });
+    const starts = STAMPS.searchStarts;
+    const gridStarts = STAMPS.gridStarts;
+    let compared = 0;
+    try {
+      for (const limit of [STAMP_END, 1, 2, 3, 7]) {
+        STAMPS.limit = limit;
+        for (const { seed, nodes, obstacles, graph, part, options } of made) {
+          const random = rng(400 + seed);
+          const cost = (i: number, j: number, d: number): number => d * (1 + ((i * 7 + j * 13) % 5) / 4);
+          for (let q = 0; q < 40; q++) {
+            const a = pointOf(random, nodes);
+            const b = pointOf(random, nodes);
+            if (obstacles.clear(a, b, options.margin / 2)) continue;
+            const withCost = q % 2 === 1;
+            // The reference search has its own marks, so the limit does not change its search.
+            const ref = withCost
+              ? referenceSearch(graph, part, [{ point: a, cost: 0 }], [{ point: b, cost: 0 }], 2 * options.k, cost, 1)
+              : referenceSearch(graph, part, [{ point: a, cost: 0 }], [{ point: b, cost: 0 }], 2 * options.k);
+            if (ref === "skip") continue;
+            const before = WORK.corner;
+            const got = withCost ? graph.path(a, b, cost, 1) : graph.path(a, b);
+            expect(got, `limit ${limit}, board ${seed}, pair ${q}`).toEqual(ref?.points);
+            expect(WORK.corner - before, `limit ${limit}, board ${seed}, pair ${q} (work)`).toBe(ref?.settled ?? 0);
+            if (limit !== STAMP_END) compared++;
+          }
+        }
+      }
+    } finally {
+      STAMPS.limit = STAMP_END;
+    }
+    expect(compared).toBeGreaterThan(4 * 4 * 5);
+    // With the limit 7, a graph starts its stamps again at each seventh search. With the limit 1, it starts them again at each search.
+    expect(STAMPS.searchStarts - starts).toBeGreaterThan(compared / 4);
+    // The grid of the boxes and the grid of the corners have the same limit.
+    expect(STAMPS.gridStarts - gridStarts).toBeGreaterThan(compared);
+  });
+});
+
 /** This function gives at most `k` points of `points` nearest to `p`, nearest first, and equal distances by index. The point `self` does not count. */
 function nearestOf(points: readonly Point[], p: Point, k: number, self = -1): number[] {
   return points
@@ -320,4 +368,44 @@ describe("the search of the soft graph (SECTIONS-SLOW)", () => {
       expect(through).toBeGreaterThan(10);
     });
   }
+
+  it("gives the paths of the reference search when the stamps start again (limits 1, 2, 3 and 7)", () => {
+    const [seed, count, side, k] = BOARDS_SOFT[0]!;
+    const nodes = board(seed, count, side);
+    const obstacles = new Obstacles(nodes, 180);
+    // The graph has the default limit when the test makes it. Thus the lower limits come to a graph that has a stamp above them.
+    const graph = new SoftGraph(nodes, obstacles, { margin: 5, k });
+    const random = rng(500 + seed);
+    const starts = STAMPS.searchStarts;
+    let through = 0;
+    let searches = 0;
+    try {
+      for (const limit of [STAMP_END, 1, 2, 3, 7]) {
+        STAMPS.limit = limit;
+        for (let q = 0; q < 24; q++) {
+          const s = nodes[Math.floor(random() * nodes.length)]!;
+          const t = nodes[Math.floor(random() * nodes.length)]!;
+          const a = { x: s.box.x + s.box.w / 2, y: s.box.y + s.box.h / 2 };
+          const b = { x: t.box.x + t.box.w / 2, y: t.box.y + t.box.h / 2 };
+          // Each search gives the boxes other costs, so a cost that a search before the new start kept does not count.
+          const far = 50 + random() * 400;
+          const near = new Set(nodes.filter(() => random() < 0.2));
+          const cost = (n: Node): number => (n === s || n === t ? 0 : near.has(n) ? far / 7 : far);
+          // The reference search makes new arrays for each search, so the limit does not change its search.
+          const want = referenceSoftPath(graph, nodes, obstacles, k, a, b, cost);
+          expect(graph.path(a, b, cost), `limit ${limit}, pair ${q}`).toEqual(want);
+          if (limit !== STAMP_END) {
+            searches++;
+            if (want.length > 2) through++;
+          }
+        }
+      }
+    } finally {
+      STAMPS.limit = STAMP_END;
+    }
+    expect(through).toBeGreaterThan(20);
+    // The graph starts its stamps again at each search with the limit 1, and at each second, third and seventh search with the other limits.
+    expect(STAMPS.searchStarts - starts).toBe(24 + 12 + 8 + 3);
+    expect(searches).toBe(4 * 24);
+  });
 });

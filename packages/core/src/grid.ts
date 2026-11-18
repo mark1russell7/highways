@@ -1,4 +1,5 @@
 import type { Box, Point } from "./geom.ts";
+import { STAMPS } from "./stamps.ts";
 import { WORK } from "./work.ts";
 
 /**
@@ -15,7 +16,8 @@ export class Grid<T> {
   readonly #lists: number[][] = [];
   readonly #items: T[] = [];
   readonly #ids = new Map<T, number>();
-  // The stamp of the last query that gave each item, by the index of the item.
+  // The stamp of the last query that gave each item, by the index of the item. The value 0 is the stamp of no query.
+  // The queries of one grid share these marks. A query that starts in a visit of a different query changes the marks of that query.
   #seen = new Int32Array(16);
   #stamp = 0;
 
@@ -59,6 +61,16 @@ export class Grid<T> {
       this.#keys[to] = keys[h]!;
       this.#slots[to] = slots[h]!;
     }
+  }
+
+  /**
+   * This method sets the mark of each item to 0, so that the next query takes the stamp 1.
+   * A query starts it when the stamp is at the limit of `STAMPS`. Thus each stamp fits in the 32-bit values of `#seen`.
+   */
+  #restart(): void {
+    this.#seen.fill(0);
+    this.#stamp = 0;
+    STAMPS.gridStarts++;
   }
 
   #id(item: T): number {
@@ -124,6 +136,7 @@ export class Grid<T> {
    * The walk stops when `visit` gives true, and then the method gives true.
    */
   #walk(a: Point, b: Point, margin: number, visit: (item: T) => boolean | void): boolean {
+    if (this.#stamp >= STAMPS.limit) this.#restart();
     const stamp = ++this.#stamp;
     const c = this.#cell;
     const items = this.#items;
@@ -196,6 +209,7 @@ export class Grid<T> {
 
   /** This method gives each item whose buckets touch the box to `visit`, one time each. */
   query(b: Box, visit: (item: T) => void): void {
+    if (this.#stamp >= STAMPS.limit) this.#restart();
     this.#take(++this.#stamp, b.x, b.y, b.x + b.w, b.y + b.h, visit);
   }
 

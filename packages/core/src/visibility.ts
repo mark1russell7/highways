@@ -3,6 +3,7 @@ import { freeRegions } from "./free-regions.ts";
 import { dist, inBox, inflate, segmentHitsBox, segmentHitsRect, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
 import type { Node } from "./model.ts";
+import { STAMPS } from "./stamps.ts";
 import { WORK } from "./work.ts";
 
 /** The nodes as obstacles, with a grid for fast tests. */
@@ -163,7 +164,7 @@ export class CornerGraph {
   readonly #cell: number;
   readonly #pad: number;
   readonly #k: number;
-  // The work arrays of A*, made once and cleared by a stamp.
+  // The work arrays of A*, made once and cleared by a stamp. The value 0 is the stamp of no search.
   #g = new Float64Array(0);
   #parent = new Int32Array(0);
   #open = new Int32Array(0);
@@ -592,6 +593,7 @@ export class CornerGraph {
       this.#goalTail = new Float64Array(n);
       this.#goalAt = new Int32Array(n);
     }
+    if (this.#stamp >= STAMPS.limit) this.#restart();
     const stamp = ++this.#stamp;
     const points = this.points;
     // The cost from each corner near a point of `to` to that point, and the index of that point.
@@ -709,6 +711,18 @@ export class CornerGraph {
     }
   }
 
+  /**
+   * This method sets the stamps of the work arrays of the search to 0, so that the next search takes the stamp 1.
+   * A search starts it when the stamp is at the limit of `STAMPS`. Thus each stamp fits in the 32-bit values of the arrays.
+   */
+  #restart(): void {
+    this.#open.fill(0);
+    this.#closed.fill(0);
+    this.#goalAt.fill(0);
+    this.#stamp = 0;
+    STAMPS.searchStarts++;
+  }
+
   /** This method tells if a corner of `starts` and a corner of `goal` are in one connected part of the graph. */
   #joined(starts: readonly number[], goal: ReadonlyMap<number, number>): boolean {
     const part = (this.#part ??= this.#parts());
@@ -806,6 +820,7 @@ export class SoftGraph {
   readonly #cell: number;
   readonly #k: number;
   // The state of one search. A value of `#g`, `#closed`, `#goalTail` or `#cost` counts only when its stamp is the stamp of the search.
+  // The value 0 is the stamp of no search.
   readonly #g: Float64Array;
   readonly #gAt: Int32Array;
   readonly #parent: Int32Array;
@@ -935,6 +950,7 @@ export class SoftGraph {
       return c;
     };
     // A search starts a new stamp in place of new arrays. A vertex without the stamp in `#gAt` has the cost Infinity.
+    if (this.#stamp >= STAMPS.limit) this.#restart();
     const stamp = ++this.#stamp;
     const g = this.#g;
     const gAt = this.#gAt;
@@ -1003,6 +1019,19 @@ export class SoftGraph {
     for (let i = bestEnd; i >= 0; i = parent[i]!) out.push(points[i]!);
     out.push(from);
     return out.reverse();
+  }
+
+  /**
+   * This method sets the stamps of the state of the search to 0, so that the next search takes the stamp 1.
+   * A search starts it when the stamp is at the limit of `STAMPS`. Thus each stamp fits in the 32-bit values of the arrays.
+   */
+  #restart(): void {
+    this.#gAt.fill(0);
+    this.#closed.fill(0);
+    this.#goalAt.fill(0);
+    this.#costAt.fill(0);
+    this.#stamp = 0;
+    STAMPS.searchStarts++;
   }
 }
 

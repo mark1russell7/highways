@@ -7,6 +7,7 @@ import { withStableOrder } from "./order/index.ts";
 import { withRepair } from "./repair/index.ts";
 import { byCollection, cornersRouter, plugsRouter, straightRouter, trunksRouter, type CornersOptions } from "./routers/index.ts";
 import { routerSession } from "./session.ts";
+import { STAMP_END, STAMPS } from "./stamps.ts";
 import { plugStrategies } from "./strategies/builtins.ts";
 import { defineStrategy } from "./strategies/model.ts";
 import type { WayFinder } from "./ways.ts";
@@ -226,6 +227,121 @@ describe("routerSession with the router corners", () => {
       expect(() => routerSession(corners, graph)).toThrow(RangeError);
     }
   });
+});
+
+/** The record of one session: the result of each set of edges, and the work of the start of the session and of each route. */
+interface SessionRecord {
+  readonly results: readonly Result[];
+  /** The tests of sight and the visits of corners: first of the start of the session, then of each route. */
+  readonly work: readonly (readonly [number, number])[];
+  /** The number of ways that the corner graphs of the lower steps of the margin gave. It is 0 for a router without the rule `keepWays`. */
+  readonly lower: number;
+}
+
+// The ways of the router of the last route with the rule `keepWays`.
+let keptWays: WayFinder | undefined;
+
+/** This plug rule places no plug, so each edge gets the plugs of `facing`. It keeps the ways of the router in `keptWays`. */
+const keepWays = defineStrategy<"plugs", object>({
+  step: "plugs",
+  name: "keep",
+  describe: "This rule keeps the ways of the router.",
+  defaults: {},
+  run: (input) => {
+    keptWays = input.ways;
+    return [];
+  },
+});
+
+/** This function gives the ways that the rule `keepWays` kept since the last call, and forgets them. */
+function takeWays(): WayFinder | undefined {
+  const ways = keptWays;
+  keptWays = undefined;
+  return ways;
+}
+
+/** This function makes one session, routes each set of edges in it, and gives the record. */
+function sessionRecord(router: Router, graph: Graph, sets: readonly (readonly Edge[])[]): SessionRecord {
+  const results: Result[] = [];
+  const work: [number, number][] = [];
+  let lower = 0;
+  takeWays();
+  let sight = WORK.sight;
+  let corner = WORK.corner;
+  const step = (): void => {
+    work.push([WORK.sight - sight, WORK.corner - corner]);
+    sight = WORK.sight;
+    corner = WORK.corner;
+  };
+  const session = routerSession(router, graph);
+  step();
+  for (const edges of sets) {
+    results.push(session.route(edges));
+    step();
+    for (const count of takeWays()?.lowerWays ?? []) lower += count;
+  }
+  session.dispose();
+  return { results, work, lower };
+}
+
+describe("the stamps of a session of the router corners", () => {
+  // A session keeps its grids and its corner graphs, so their stamps grow with each route. The test lowers the limit of the stamps.
+  // Thus a few routes bring each stamp to the limit many times, as 2^31 queries do with the default limit.
+  const reg = highwaysRegistry();
+  // The test makes each board with the default limit, because `makeFixture` uses a grid too.
+  const boards: readonly { readonly label: string; readonly router: Router; readonly graph: Graph; readonly lower: boolean }[] = [
+    { label: "clustered", router: cornersRouter({ name: "corners" }), graph: makeFixture({ name: "t", kind: "clustered", nodes: 40, edgesPerNode: 2, seed: 2, fixedPorts: 0.3 }), lower: false },
+    {
+      label: "hubs with side plugs",
+      router: cornersRouter({ name: "corners-side", plugs: "side" }),
+      graph: makeFixture({ name: "t", kind: "hubs", nodes: 40, edgesPerNode: 2, seed: 1, fixedPorts: 0.3 }),
+      lower: false,
+    },
+    // The boxes of this board are 4 apart, so the session makes the corner graphs of the lower steps of the margin. Each has its own stamps.
+    { label: "escape", router: cornersRouter({ name: "keep", plug: keepWays }), graph: reg.generate("escape", 1, { gap: 4, nets: 60 }).graph, lower: true },
+  ];
+
+  for (const { label, router, graph, lower } of boards) {
+    it(`gives the results and the work of the default limit when the stamps start again, on the board ${label} (limits 1, 2, 3 and 7)`, () => {
+      const sets = edgeSets(graph, mulberry32(11));
+      const plain = sets.map((edges) => router.route({ ...graph, edges }));
+      const bytes = plain.map((result) => JSON.stringify(result));
+      const want = sessionRecord(router, graph, sets);
+      expect(want.results).toStrictEqual(plain);
+      // The session of the board `escape` used the lower corner graphs, so the test brings their stamps to the limit too.
+      if (lower) expect(want.lower).toBeGreaterThan(0);
+      for (const limit of [1, 2, 3, 7]) {
+        const grids = STAMPS.gridStarts;
+        const searches = STAMPS.searchStarts;
+        let got: SessionRecord;
+        let gridStarts: number;
+        let searchStarts: number;
+        let again: Result[];
+        try {
+          STAMPS.limit = limit;
+          got = sessionRecord(router, graph, sets);
+          gridStarts = STAMPS.gridStarts - grids;
+          searchStarts = STAMPS.searchStarts - searches;
+          // The plain route makes its grids and its corner graphs with the low limit too.
+          again = sets.map((edges) => router.route({ ...graph, edges }));
+        } finally {
+          STAMPS.limit = STAMP_END;
+        }
+        // The one session came to the limit of the stamps of its grids and of its searches many times.
+        expect(gridStarts, `${label} limit ${limit}: the starts of the grids`).toBeGreaterThan(100);
+        expect(searchStarts, `${label} limit ${limit}: the starts of the searches`).toBeGreaterThan(3);
+        sets.forEach((_, i) => {
+          expect(got.results[i], `${label} limit ${limit} set ${i}`).toStrictEqual(plain[i]);
+          expect(JSON.stringify(got.results[i]), `${label} limit ${limit} set ${i} (bytes)`).toBe(bytes[i]);
+          expect(again[i], `${label} limit ${limit} set ${i} (plain)`).toStrictEqual(plain[i]);
+          expect(JSON.stringify(again[i]), `${label} limit ${limit} set ${i} (plain, bytes)`).toBe(bytes[i]);
+        });
+        // A query that gives an item two times, or a search that loses its marks, changes the work.
+        expect(got.work, `${label} limit ${limit}: the work`).toEqual(want.work);
+        expect(got.lower, `${label} limit ${limit}: the ways of the lower corner graphs`).toBe(want.lower);
+      }
+    }, 60_000);
+  }
 });
 
 describe("routerSession with a router that has no session", () => {
