@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
+import { rng } from "../../fixtures.ts";
 import type { Box } from "../../geom.ts";
 import type { Graph, Level, Result, Route } from "../../model.ts";
-import { laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeBalance, routeSeparation, runProfile } from "./lanes.ts";
+import { falseJoins, laneArea, laneCrossings, laneFidelity, lanesThrough, occupiedArea, openLanes, orthogonality, routeBalance, routeSeparation, runProfile } from "./lanes.ts";
 import { linkAgreement } from "./levels.ts";
 
 const route = (edge: string, ...points: [number, number][]): Route => ({ edge, points: points.map(([x, y]) => ({ x, y })) });
+/** A graph of edges with their collections. An edge with the value `undefined` has no collection. */
+const grouped = (keys: Record<string, string | undefined>): Graph => ({
+  nodes: [],
+  edges: Object.entries(keys).map(([id, collection]) => ({ id, source: { node: "s" }, target: { node: "t" }, ...(collection === undefined ? {} : { data: { collection } }) })),
+});
 const run = (id: string, edges: string[], ...points: [number, number][]) => ({ id, key: id, edges, points: points.map(([x, y]) => ({ x, y })) });
 const B = (x: number, y: number, w: number, h: number): Box => ({ x, y, w, h });
 
@@ -22,6 +28,129 @@ describe("routeSeparation (R12)", () => {
     expect(routeSeparation([route("a", [0, 0], [10, 0], [10, 2], [0, 2])])).toBe(0);
     expect(routeSeparation([route("a", [0, 0], [10, 0]), route("b", [0, 0], [10, 0])])).toBe(0);
     expect(routeSeparation([])).toBe(0);
+  });
+});
+
+describe("falseJoins (B12)", () => {
+  // Two parallel legs of 10 units, 2 units apart.
+  const pair = [route("a", [0, 0], [10, 0]), route("b", [0, 2], [10, 2])];
+  const AB = grouped({ a: "A", b: "B" });
+  // 40 routes of 4 points on a board of 60 units, from a seed. Many legs are near other legs.
+  const scatter = (seed: number): Route[] => {
+    const R = rng(seed);
+    const at = (): [number, number] => [Math.round(R() * 12) * 5, Math.round(R() * 12) * 5];
+    return Array.from({ length: 40 }, (_, i) => route(`e${i}`, at(), at(), at(), at()));
+  };
+  const keysOf = (routes: readonly Route[], key: (i: number) => string | undefined): Graph => grouped(Object.fromEntries(routes.map((r, i) => [r.edge, key(i)])));
+
+  it("gives 0 for no routes and for routes without ink", () => {
+    expect(falseJoins(AB, [])).toEqual({ share: 0, length: 0, ink: 0, edges: [] });
+    expect(falseJoins(AB, [route("a", [5, 5]), route("b", [5, 5], [5, 5])])).toEqual({ share: 0, length: 0, ink: 0, edges: [{ edge: "a", length: 0, share: 0 }, { edge: "b", length: 0, share: 0 }] });
+  });
+
+  it("gives 0 for one group, for each geometry", () => {
+    const one = grouped({ a: "A", b: "A" });
+    expect(falseJoins(one, pair).share).toBe(0);
+    expect(falseJoins(one, [route("a", [0, 0], [10, 0], [10, 10]), route("b", [0, 0], [10, 0], [10, 10])]).share).toBe(0);
+    expect(falseJoins(one, [route("a", [0, 0], [10, 0]), route("b", [5, 0], [15, 0])]).share).toBe(0);
+    for (const seed of [1, 2, 3]) {
+      const routes = scatter(seed);
+      const f = falseJoins(keysOf(routes, () => "A"), routes);
+      expect(f.ink).toBeGreaterThan(0);
+      expect(f.length).toBe(0);
+      expect(f.edges.every((e) => e.length === 0 && e.share === 0)).toBe(true);
+      // The same routes with a key for each edge have false joins, so the 0 comes from the one group.
+      expect(falseJoins(keysOf(routes, (i) => `k${i}`), routes).share).toBeGreaterThan(0);
+    }
+  });
+
+  it("gives 1 for two edges of two keys on the same polyline", () => {
+    const routes = [route("a", [0, 0], [10, 0], [10, 10]), route("b", [0, 0], [10, 0], [10, 10])];
+    expect(falseJoins(AB, routes)).toEqual({ share: 1, length: 20, ink: 20, edges: [{ edge: "a", length: 20, share: 1 }, { edge: "b", length: 20, share: 1 }] });
+    // R12 does not see one shared leg.
+    expect(routeSeparation(routes)).toBe(0);
+  });
+
+  it("counts two parallel legs of two keys nearer than `near`, and not farther legs", () => {
+    expect(falseJoins(AB, pair)).toEqual({ share: 1, length: 20, ink: 20, edges: [{ edge: "a", length: 10, share: 1 }, { edge: "b", length: 10, share: 1 }] });
+    // The projections overlap on 5 units of each leg of 10 units.
+    expect(falseJoins(AB, [route("a", [0, 0], [10, 0]), route("b", [5, 2], [15, 2])]).share).toBeCloseTo(0.5);
+    // The default of `near` is 4, and a leg at that distance is not nearer.
+    expect(falseJoins(AB, [route("a", [0, 0], [10, 0]), route("b", [0, 3.99], [10, 3.99])]).share).toBe(1);
+    expect(falseJoins(AB, [route("a", [0, 0], [10, 0]), route("b", [0, 4], [10, 4])]).share).toBe(0);
+    const far = [route("a", [0, 0], [10, 0]), route("b", [0, 10], [10, 10])];
+    expect(falseJoins(AB, far).share).toBe(0);
+    expect(falseJoins(AB, far, { near: 12 }).share).toBe(1);
+    // Two legs on one line, one after the other, do not cover each other.
+    expect(falseJoins(AB, [route("a", [0, 0], [10, 0]), route("b", [10, 0], [20, 0])]).share).toBe(0);
+  });
+
+  it("does not count a crossing at a wide angle", () => {
+    // A crossing at a right angle gives 0: no leg is parallel to the other leg.
+    expect(falseJoins(AB, [route("a", [0, 5], [10, 5]), route("b", [5, 0], [5, 10])]).share).toBe(0);
+    // The legs make an angle of 11.3 degrees. The default of `maxAngle` is 5.
+    const slant = [route("a", [0, 0], [10, 0]), route("b", [0, 1], [10, 3])];
+    expect(falseJoins(AB, slant).share).toBe(0);
+    expect(falseJoins(AB, slant, { maxAngle: 15 }).share).toBeGreaterThan(0.9);
+  });
+
+  it("counts two legs at a small angle only where they are near", () => {
+    // The leg `b` goes away from the leg `a` at 3.4 degrees. It is 4 units from `a` at x = 50.12.
+    const routes = [route("a", [0, 0], [100, 0]), route("b", [0, 1], [100, 7])];
+    const f = falseJoins(AB, routes);
+    expect(f.edges[0]!.length).toBeCloseTo((4 * Math.sqrt(10036) - 100) / 6, 9);
+    expect(f.edges[1]!.length).toBeCloseTo(Math.sqrt(10036) / 2, 9);
+    expect(f.share).toBeCloseTo(0.5006, 4);
+    // R12 reads the least distance of the two legs, so it counts their full overlap.
+    expect(routeSeparation(routes)).toBeGreaterThan(0.99);
+  });
+
+  it("makes an edge with no key a group alone", () => {
+    expect(falseJoins(grouped({ a: "A", b: undefined }), pair).share).toBe(1);
+    expect(falseJoins(grouped({ a: undefined, b: undefined }), pair).share).toBe(1);
+    // The graph does not have the edge `x`.
+    expect(falseJoins(AB, [route("a", [0, 0], [10, 0]), route("x", [0, 2], [10, 2])]).share).toBe(1);
+  });
+
+  it("reads the key from the rule", () => {
+    const graph: Graph = { nodes: [], edges: ["a", "b"].map((id) => ({ id, source: { node: "s" }, target: { node: "t" }, data: { collection: id, topic: "T" } })) };
+    expect(falseJoins(graph, pair).share).toBe(1);
+    expect(falseJoins(graph, pair, { rule: (e) => e.data?.["topic"] as string }).share).toBe(0);
+  });
+
+  it("gives values for each edge that agree with the total", () => {
+    // The edges `a` and `b` have different keys and share the leg from (10, 0) to (20, 0).
+    const f = falseJoins(grouped({ a: "A", b: "B", c: "A" }), [route("a", [0, 0], [10, 0], [20, 0]), route("b", [10, 0], [20, 0], [20, 10]), route("c", [0, 30], [10, 30])]);
+    expect(f).toEqual({ share: 0.25, length: 10, ink: 40, edges: [{ edge: "a", length: 10, share: 0.5 }, { edge: "b", length: 10, share: 0.5 }, { edge: "c", length: 0, share: 0 }] });
+    // Without a shared leg, the lengths of the edges add up to the total.
+    const routes = [route("a", [0, 0], [10, 0], [10, 10]), route("b", [0, 2], [8, 2], [8, 10]), route("c", [0, 40], [10, 40])];
+    const g = falseJoins(grouped({ a: "A", b: "B", c: "C" }), routes);
+    expect(g.edges.map((e) => e.edge)).toEqual(["a", "b", "c"]);
+    expect(g.edges.reduce((sum, e) => sum + e.length, 0)).toBeCloseTo(g.length, 9);
+    expect(g.share).toBeCloseTo(g.length / g.ink, 12);
+    expect(g.edges[2]).toEqual({ edge: "c", length: 0, share: 0 });
+    for (const seed of [4, 5]) {
+      const many = scatter(seed);
+      const h = falseJoins(keysOf(many, (i) => (i % 5 === 0 ? undefined : `k${i % 3}`)), many);
+      expect(h.share).toBeGreaterThan(0);
+      expect(h.share).toBeLessThanOrEqual(1);
+      expect(h.length).toBeLessThanOrEqual(h.ink);
+      // A shared leg is in each of its edges and one time in the total.
+      expect(h.edges.reduce((sum, e) => sum + e.length, 0)).toBeGreaterThanOrEqual(h.length - 1e-9);
+      for (const e of h.edges) {
+        expect(e.share).toBeGreaterThanOrEqual(0);
+        expect(e.share).toBeLessThanOrEqual(1);
+        expect(e.length).toBeLessThanOrEqual(h.length + 1e-9);
+      }
+    }
+  });
+
+  it("gives the same bytes for the same input", () => {
+    const routes = scatter(6);
+    const graph = keysOf(routes, (i) => (i % 7 === 0 ? undefined : `k${i % 4}`));
+    const first = JSON.stringify(falseJoins(graph, routes));
+    expect(JSON.stringify(falseJoins(graph, routes))).toBe(first);
+    expect(JSON.stringify(falseJoins(keysOf(scatter(6), (i) => (i % 7 === 0 ? undefined : `k${i % 4}`)), scatter(6)))).toBe(first);
   });
 });
 

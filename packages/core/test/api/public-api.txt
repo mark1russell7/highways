@@ -154,6 +154,8 @@ type CubuOptions: build/index.d.ts#CubuOptions
 CurriculumOptions: build/index.d.ts#CurriculumOptions
 CurriculumOrder: build/index.d.ts#CurriculumOrder
 CurriculumRule: build/index.d.ts#CurriculumRule
+CurveAgreement: build/index.d.ts#CurveAgreement
+CurveAgreementOptions: build/index.d.ts#CurveAgreementOptions
 CurveBenchOptions: build/index.d.ts#CurveBenchOptions
 CurveBenchRow: build/index.d.ts#CurveBenchRow
 CurveCheck: build/index.d.ts#CurveCheck
@@ -229,6 +231,9 @@ FLOW_FIELD_DEFAULTS: build/index.d.ts#FLOW_FIELD_DEFAULTS
 FRAME_ROWS: build/index.d.ts#FRAME_ROWS
 FRECHET_DEFAULTS: build/index.d.ts#FRECHET_DEFAULTS
 FRONT_OBJECTIVES: build/index.d.ts#FRONT_OBJECTIVES
+FalseJoinEdge: build/index.d.ts#FalseJoinEdge
+FalseJoinOptions: build/index.d.ts#FalseJoinOptions
+FalseJoins: build/index.d.ts#FalseJoins
 type FamilyRegistry: @mark1russell7/layout-contract#FamilyRegistry (external)
 type FdebOptions: build/index.d.ts#FdebOptions
 type FieldEnd: build/index.d.ts#FieldEnd
@@ -974,6 +979,7 @@ cubicAt: build/index.d.ts#cubicAt
 cubuPlan: build/index.d.ts#cubuPlan
 curriculum: build/index.d.ts#curriculum
 curvatureVariation: build/index.d.ts#curvatureVariation
+curveAgreement: build/index.d.ts#curveAgreement
 curveDeviation: build/index.d.ts#curveDeviation
 curveFaults: build/index.d.ts#curveFaults
 curveJoints: build/index.d.ts#curveJoints
@@ -1026,6 +1032,7 @@ exactStretch: build/index.d.ts#exactStretch
 exactStretches: build/index.d.ts#exactStretches
 exercised: @mark1russell7/layout-contract#exercised (external)
 facingEnds: build/index.d.ts#facingEnds
+falseJoins: build/index.d.ts#falseJoins
 familyCell: build/index.d.ts#familyCell
 familyKind: @mark1russell7/layout-contract#familyKind (external)
 familyOf: build/index.d.ts#familyOf
@@ -2335,6 +2342,24 @@ export type CurriculumOrder = "R1-R12-R2" | "R12-R1-R2" | "R1-R2-R12";
 ### build/index.d.ts#CurriculumRule
 export type CurriculumRule = "R1" | "R12" | "R2";
 
+### build/index.d.ts#CurveAgreement
+export interface CurveAgreement {
+  readonly runs: number;
+  readonly length: number;
+  readonly read: number;
+  readonly apart: number;
+  readonly share: number;
+  readonly max: number;
+}
+
+### build/index.d.ts#CurveAgreementOptions
+export interface CurveAgreementOptions {
+  readonly apart?: number;
+  readonly tolerance?: number;
+  readonly step?: number;
+  readonly ends?: number;
+}
+
 ### build/index.d.ts#CurveBenchOptions
 export interface CurveBenchOptions {
   readonly radius?: number;
@@ -2734,6 +2759,28 @@ export declare const FRECHET_DEFAULTS: Readonly<Required<Omit<FrechetOptions, "m
 
 ### build/index.d.ts#FRONT_OBJECTIVES
 export declare const FRONT_OBJECTIVES: Readonly<Record<Step, readonly Objective[]>>;
+
+### build/index.d.ts#FalseJoinEdge
+export interface FalseJoinEdge {
+  readonly edge: string;
+  readonly length: number;
+  readonly share: number;
+}
+
+### build/index.d.ts#FalseJoinOptions
+export interface FalseJoinOptions {
+  readonly rule?: GroupRule;
+  readonly near?: number;
+  readonly maxAngle?: number;
+}
+
+### build/index.d.ts#FalseJoins
+export interface FalseJoins {
+  readonly share: number;
+  readonly length: number;
+  readonly ink: number;
+  readonly edges: readonly FalseJoinEdge[];
+}
 
 ### build/index.d.ts#FdebOptions
 interface FdebOptions extends Pick<WayOptions, "margin" | "k"> {
@@ -6686,6 +6733,9 @@ export declare function curriculum(graph: Graph, list: readonly PortfolioSetting
 ### build/index.d.ts#curvatureVariation
 export declare function curvatureVariation(points: readonly Point[], tolerance?: number): number;
 
+### build/index.d.ts#curveAgreement
+export declare function curveAgreement(routes: readonly Route[], curve: (route: Route) => readonly CurveSegment[], options?: CurveAgreementOptions): CurveAgreement;
+
 ### build/index.d.ts#curveDeviation
 export declare function curveDeviation(samples: readonly Point[], polyline: readonly Point[], step: number): number;
 
@@ -6843,6 +6893,9 @@ export declare function exactStretches(graph: Graph, o?: Readonly<WayOptions>): 
 
 ### build/index.d.ts#facingEnds
 export declare function facingEnds(input: PlugInput): PlugPair[];
+
+### build/index.d.ts#falseJoins
+export declare function falseJoins(graph: Graph, routes: readonly Route[], options?: FalseJoinOptions): FalseJoins;
 
 ### build/index.d.ts#familyCell
 export declare const familyCell: (input: {

@@ -1,6 +1,7 @@
 import { dist, frechet, pointSegmentDistance, segmentsCross, type Point } from "../../geom.ts";
 import { Grid } from "../../grid.ts";
-import type { Graph, Result, Route } from "../../model.ts";
+import type { Graph, GroupRule, Result, Route } from "../../model.ts";
+import { byCollection } from "../../routers/trunks.ts";
 import { laneRoutes, runKey, segmentsOf, type SegmentGraph } from "../../segments.ts";
 import { measureRouteFaults } from "../links.ts";
 import { segmentKey } from "./routes.ts";
@@ -118,9 +119,187 @@ export function routeSeparation(routes: readonly Route[], near: number = MEASURE
   return Math.min(1, close / ink);
 }
 
-/** This function gives the sine of the largest angle between two legs that R12 and R16 count as parallel. */
+/** This function gives the sine of the largest angle between two legs that R12, R16 and B12 count as parallel. */
 function parallelSine(maxAngle: number): number {
   return Math.sin((maxAngle * Math.PI) / 180);
+}
+
+/** The options of `falseJoins`. */
+export interface FalseJoinOptions {
+  /** The rule that gives the group key of each edge. The default is `byCollection`, which reads the string `data.collection`. */
+  readonly rule?: GroupRule;
+  /** A leg nearer than this distance reads as one line with the ink. The default is `MEASURE_LANE_WIDTH`, as in R12. */
+  readonly near?: number;
+  /** Two legs are parallel when the angle between them is this value or less, in degrees. The default is 5, as in R12. */
+  readonly maxAngle?: number;
+}
+
+/** The false joins of the route of one edge. */
+export interface FalseJoinEdge {
+  /** The id of the edge of the route. */
+  readonly edge: string;
+  /** The length of the false-join part of the legs of the route. */
+  readonly length: number;
+  /** The value `length` over the length of the legs of the route, from 0 to 1. A route without a leg gives 0. */
+  readonly share: number;
+}
+
+/** The false joins of routes (B12 of MEAS0). */
+export interface FalseJoins {
+  /** The value `length` over `ink`, from 0 to 1. Lower is better. Routes without ink give 0. */
+  readonly share: number;
+  /** The length of the false-join part of the ink. Each part counts one time. */
+  readonly length: number;
+  /** The ink of the routes: the length of their legs. A leg that several routes share counts one time. */
+  readonly ink: number;
+  /** The false joins of each route, in the order of the routes. A caller counts the routes above a limit from them. */
+  readonly edges: readonly FalseJoinEdge[];
+}
+
+/**
+ * This function gives the part of the x axis that is nearer than `near` to the segment from `(p, dp)` to `(q, dq)`.
+ * The points nearer than `near` to a segment make a convex shape: a band along the segment and a disc at each end.
+ * Thus the part is one interval. The function gives `undefined` when no point of the axis is that near.
+ */
+function nearSpan(p: number, dp: number, q: number, dq: number, near: number): [number, number] | undefined {
+  let lo = Number.POSITIVE_INFINITY;
+  let hi = Number.NEGATIVE_INFINITY;
+  // The disc at each end of the segment.
+  for (const [x, y] of [
+    [p, dp],
+    [q, dq],
+  ] as const) {
+    if (Math.abs(y) >= near) continue;
+    const half = Math.sqrt(near * near - y * y);
+    lo = Math.min(lo, x - half);
+    hi = Math.max(hi, x + half);
+  }
+  // The band: the foot of the point on the segment is between its ends, and the distance to its line is less than `near`.
+  const w = q - p;
+  const h = dq - dp;
+  const l2 = w * w + h * h;
+  if (l2 > 0) {
+    // The foot of `(x, 0)` is at the share `(w·x + foot) / l2` of the segment. Its distance to the line is `abs(h·x + off) / sqrt(l2)`.
+    const foot = -p * w - dp * h;
+    const off = dp * w - p * h;
+    const reach = near * Math.sqrt(l2);
+    let from = Number.NEGATIVE_INFINITY;
+    let to = Number.POSITIVE_INFINITY;
+    let open = true;
+    if (w === 0) open = foot >= 0 && foot <= l2;
+    else {
+      from = Math.min(-foot / w, (l2 - foot) / w);
+      to = Math.max(-foot / w, (l2 - foot) / w);
+    }
+    if (h === 0) open = open && Math.abs(off) < reach;
+    else {
+      from = Math.max(from, Math.min((-reach - off) / h, (reach - off) / h));
+      to = Math.min(to, Math.max((-reach - off) / h, (reach - off) / h));
+    }
+    if (open && from < to) {
+      lo = Math.min(lo, from);
+      hi = Math.max(hi, to);
+    }
+  }
+  return lo < hi ? [lo, hi] : undefined;
+}
+
+/**
+ * This function gives the false joins of routes (B12 of MEAS0). They are the share of the ink where edges of two groups or more read as one line.
+ *
+ * The group key of an edge comes from `rule`. An edge without a key is a group alone, and so is an edge that the graph does not have.
+ * A leg is a drawn segment of `S`, and a leg that several routes share counts one time, as in R12.
+ *
+ * For a point `p` of a leg, `K(p)` holds the keys of the edges of that leg. It also holds the keys of each other leg with three properties.
+ * The leg is within `maxAngle` degrees of parallel to the leg of `p`. Its projection on the leg of `p` covers `p`. Its distance from `p` is less than `near`.
+ * The point `p` is a false join when `K(p)` has two keys or more.
+ *
+ * `fj = length(the false-join part of the ink) / ink(S)`. Each part counts one time, so the scale is 0 to 1. Lower is better.
+ * A crossing at a wide angle is not a false join. A grid of buckets finds the near legs, so the cost is `n log n` for an even density.
+ *
+ * R12 counts two legs of one group, and this function does not. This function counts a leg that edges of two keys share, and R12 does not.
+ * R12 reads the distance of two legs. This function reads the distance at each point, so two legs at a small angle count only where they are near.
+ */
+export function falseJoins(graph: Graph, routes: readonly Route[], options: FalseJoinOptions = {}): FalseJoins {
+  const rule = options.rule ?? byCollection;
+  const near = options.near ?? MEASURE_LANE_WIDTH;
+  const sin = parallelSine(options.maxAngle ?? 5);
+  const byId = new Map(graph.edges.map((e) => [e.id, e] as const));
+  const keyOf = (id: string): string => {
+    const e = byId.get(id);
+    return (e === undefined ? undefined : rule(e)) ?? `\u0000${id}`;
+  };
+  // Each leg one time, with the keys of the edges that draw it. `at` gives the index of the leg of a segment.
+  const at = new Map<string, number>();
+  const legs: { readonly a: Point; readonly b: Point; readonly keys: Set<string> }[] = [];
+  for (const r of routes) {
+    const key = keyOf(r.edge);
+    for (let i = 1; i < r.points.length; i++) {
+      const a = r.points[i - 1]!;
+      const b = r.points[i]!;
+      const k = segmentKey(a, b);
+      if (k === undefined) continue;
+      let j = at.get(k);
+      if (j === undefined) {
+        j = legs.length;
+        at.set(k, j);
+        legs.push({ a, b, keys: new Set() });
+      }
+      legs[j]!.keys.add(key);
+    }
+  }
+  // The one key of each leg with one key. A leg with two keys or more has `undefined`.
+  const only = legs.map((l) => (l.keys.size === 1 ? [...l.keys][0] : undefined));
+  const lengths = legs.map((l) => dist(l.a, l.b));
+  const grid = new Grid<number>(Math.max(16, 4 * near));
+  legs.forEach((l, i) => grid.addSegment(i, l.a, l.b));
+  // The length of the false-join part of each leg.
+  const joined = legs.map((s, i) => {
+    const length = lengths[i]!;
+    // The edges of the leg itself have two keys or more, so each point of the leg is a false join.
+    if (only[i] === undefined) return length;
+    const ux = (s.b.x - s.a.x) / length;
+    const uy = (s.b.y - s.a.y) / length;
+    const cover: [number, number][] = [];
+    grid.querySegment(s.a, s.b, near, (j) => {
+      const t = legs[j]!;
+      if (j === i || only[j] === only[i]) return;
+      const tx = t.b.x - t.a.x;
+      const ty = t.b.y - t.a.y;
+      if (Math.abs(ux * ty - uy * tx) > sin * lengths[j]!) return;
+      // The ends of `t` in the frame of `s`: the place along `s`, and the offset along its normal.
+      const p = (t.a.x - s.a.x) * ux + (t.a.y - s.a.y) * uy;
+      const q = (t.b.x - s.a.x) * ux + (t.b.y - s.a.y) * uy;
+      const lo = Math.max(0, Math.min(p, q));
+      const hi = Math.min(length, Math.max(p, q));
+      if (hi - lo <= 1e-9) return;
+      const span = nearSpan(p, (t.a.y - s.a.y) * ux - (t.a.x - s.a.x) * uy, q, (t.b.y - s.a.y) * ux - (t.b.x - s.a.x) * uy, near);
+      if (span === undefined) return;
+      const from = Math.max(lo, span[0]);
+      const to = Math.min(hi, span[1]);
+      if (to - from > 1e-9) cover.push([from, to]);
+    });
+    return Math.min(length, unionLength(cover));
+  });
+  const edges = routes.map((r): FalseJoinEdge => {
+    // A route that draws a leg two times counts the leg one time, as the ink does.
+    const own = new Set<number>();
+    for (let i = 1; i < r.points.length; i++) {
+      const k = segmentKey(r.points[i - 1]!, r.points[i]!);
+      const j = k === undefined ? undefined : at.get(k);
+      if (j !== undefined) own.add(j);
+    }
+    let all = 0;
+    let bad = 0;
+    for (const j of own) {
+      all += lengths[j]!;
+      bad += joined[j]!;
+    }
+    return { edge: r.edge, length: bad, share: all > 0 ? Math.min(1, bad / all) : 0 };
+  });
+  const ink = lengths.reduce((sum, l) => sum + l, 0);
+  const length = joined.reduce((sum, l) => sum + l, 0);
+  return { share: ink > 0 ? Math.min(1, length / ink) : 0, length, ink, edges };
 }
 
 /** The lane balance of the routes (R16 of MEAS0). */

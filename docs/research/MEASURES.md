@@ -379,6 +379,7 @@ A bundle saves ink and shows the structure of the flow. It also hides the path o
 | B9 | Lane fidelity | Open lanes near their routes | `lf(e) = frechet(lane(e), r_e) / (laneWidth · k / 2)`, with `k` the edges of the widest shared segment of `e` | ratio, `≤ 1` is correct, `↓` | `quadratic` for each route, `linear` in `m` for short routes | score | yes, `B9.median` and `B9.max` of the screen | [Nguyen 2017][nguyen17], [Eiter 1994][eiter94] |
 | B10 | Gap closed | Ink saved near the optimum | `gc = (B1(s) - B1(b)) / (B1* - B1(b))`. `b` is the baseline, and `B1*` is the optimum at the smallest cap at or above the largest stretch of `s`. | share of the gap, `↑`. 0 is the baseline, and 1 is the optimum | an exact solve for each input, kept in a file | score | yes, `gap` of the screen on `exact-v1`, with `gap.cap` and the views `gap.collection` and `gap.all` | [Magnanti and Wong 1984][magnanti84] |
 | B11 | Route overlap | Routes that a reader can follow | `share`: length on a line with two routes or more, over all length. `peak`: the most routes on one piece of a line. | 0..1 and count, `↓` | `n log n` | score | yes, `B11.share` and `B11.peak` of the suite | [Holten 2006][holten06] |
+| B12 | False joins | Lines that join only the edges of one group | `K(p)` is the set of the group keys of the edges with a leg through `p`, or with a leg within 5° of parallel and nearer than `s_min` whose projection covers `p`. `fj = length(p in S : count(K(p)) ≥ 2) / ink(S)` | share 0..1, `↓` | `n log n` | score | no, only the function `falseJoins`, which also gives the share of each edge | Own (JOIN-MEASURES) |
 
 ### The read of `route.bundle.ambiguity`
 
@@ -408,6 +409,11 @@ The key shows the same fault. On `mid-clustered`, `shared` with a random key rea
 - B4 here uses one step: two nodes are neighbours when their routes share a segment. [Wallinger 2022][wallinger22] also follows paths of two steps and more. MEAS1 starts with one step, because it is the cheapest.
 - `laneRoutes` and `runKey` let a reader open each bundle. Thus a bundle of this library can hide a path only while it is closed. B4 measures the closed view.
 - B10 needs a known optimum, so only the set `exact-v1` gives it. [`GAP.md`](GAP.md) ranks the strategies by B10.
+- B12 reads the group key of each edge from a rule, as the routers do. An edge without a key is a group alone.
+- B12 is not R12 with a filter. R12 counts two near legs of one group, and B12 does not.
+- B12 counts a leg that edges of two groups share. R12 does not see that leg, because it is one leg.
+- B12 reads the distance at each point of a leg. Thus two legs at a small angle count only where they are nearer than `s_min`.
+- No suite and no screen reads B12, so no gate holds it.
 
 ## Curves
 
@@ -428,12 +434,19 @@ A curve must stay near its route, keep clear of the boxes and look smooth. G0 co
 | C9 | Loops and cusps | Curves with no loop | `count(curves that cross themselves, or have a point of zero speed, where the polyline does not cross itself)` | count, `↓` | `n log n` for each curve | rule candidate | yes, the count `curve-simple` of the suite | [Yuksel 2011][yuksel11] |
 | C10 | End tangent | Curves that leave and enter along the plug normal | `angle(T(0), normal)` and `angle(-T(L), normal)` | degrees, `↓` | `linear` | rule candidate for `spline` with normals | yes, the count `curve-ends` of the suite | Own (CURVE), [Hobby 1986][hobby86] |
 | C11 | Curvature extrema | Few changes in the bend | `count(local extrema of κ) + count(sign changes of κ)` for each curve | count, `↓` | `linear` | score | no | [Levien 2009][levien09], [Moreton 1993][moreton93] |
+| C12 | Run agreement | One line where routes share a run | For a place `x` of a shared run, `gap(x)` is the largest distance between the points of the curves of two routes of the run nearest to `x`. `share = length(x : gap(x) > apart) / length(x)`, and `max = max_x gap(x)` | share 0..1, `↓`, and units, `↓` | `n log n` | score | no, only the function `curveAgreement` | Own (JOIN-MEASURES) |
 
 ### Notes on the curves
 
 - MEAS1 measures C2 to C5 on the samples of `sampleCurve`, from the turn of each pair of sample legs. A tolerance of 0.25 units gives a stable estimate.
 - C3 and C4 multiply by powers of the length `L`. Thus the value of a curve does not change when the board changes its scale.
 - The type `rounded` uses quadratic pieces, and the type `arc` uses circular arcs. Both are G1 but not G2, because the curvature jumps at the ends of each arc. A clothoid corner of CURV2 is G2. C2 shows the difference.
+- A shared run of C12 is a sequence of equal points of two routes or more, in the same direction or in the opposite direction. A run ends where its set of routes changes.
+- C12 gives the count of the runs. With a count of 0, the routes share no run, and the share of 0 is not a pass.
+- An example has two routes that come from two sides onto a run of 200 units. It uses the defaults: `apart` is 1 unit, and the tolerance of the samples is 0.25.
+- In the example, `straight` gives a gap of 0. `spline` gives a largest gap of 11.3 units, and it is apart on 43% of the run.
+- In the example, `smooth` has a gap only at the corner where the routes part: 2.3 units, on 0.9% of the run. `rounded` with a radius of 18 has 6.4 units there, on 6.3%.
+- The two round corners of a fork are on the two sides of the run. The option `ends` of C12 keeps the ends of each run out of the read.
 
 ## Groups
 

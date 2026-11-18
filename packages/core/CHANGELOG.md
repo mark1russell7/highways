@@ -1,5 +1,25 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.2
+
+This version is a PATCH: it adds two functions and their types. No output changes.
+
+### Two measures of the joins
+
+- The new function `falseJoins(graph, routes, options)` gives the measure B12: the share of the ink where edges of two groups or more read as one line.
+- A point of a leg is a false join when edges of two group keys draw the leg.
+- A point is also a false join when a parallel leg of a different key is nearer than `near` and its projection covers the point.
+- The group key of an edge comes from the option `rule`, with the default `byCollection`. An edge without a key is a group alone.
+- The options `near` and `maxAngle` have the defaults of `routeSeparation`: 4 units and 5 degrees.
+- The result has the share, the length of the false joins, the ink and the values of each edge.
+- The new function `curveAgreement(routes, curve, options)` gives the measure C12: the gap between the drawn curves of routes on a run of points that they share.
+- The parameter `curve` gives the drawn curve of a route, for example with `curveOf`.
+- The result has the count of the runs, their length and the length that the function read. It also has the length with a gap above `apart`, the share and the largest gap.
+- A count of 0 tells that the routes share no run. Thus a gate can tell "no read" from a good value.
+- The defaults are 1 unit for `apart`, 0.25 for `tolerance` and 1 unit for `step`. The option `ends` keeps the ends of each run out of the read.
+- No suite, no screen and no gate reads the two measures. `measureQuality` and the type `Quality` do not change.
+- The note on the measures has the rows B12 and C12.
+
 ## 0.19.1
 
 This version is a PATCH: it adds an optional method, a type and an export. No output changes.

@@ -1,7 +1,10 @@
 import type { CurveSegment } from "../../curves/model.ts";
+import { sampleCurve } from "../../curves/sample.ts";
 import type { CurveSpace } from "../../curves/space.ts";
-import { dist, frechet, polylineLength, segmentsCross, turns, type Point } from "../../geom.ts";
+import { dist, frechet, polylineLength, segmentsCross, turns, type Box, type Point } from "../../geom.ts";
 import { Grid } from "../../grid.ts";
+import { nearestOnLine } from "../../highways/sbeb/index.ts";
+import type { Route } from "../../model.ts";
 import { TOLERANCE } from "../properties.ts";
 
 const EPS = 1e-9;
@@ -262,4 +265,233 @@ function drawnFrames(segments: readonly CurveSegment[]): { first: Point | undefi
     at = s.to;
   }
   return { first, last };
+}
+
+/** The options of `curveAgreement`. */
+export interface CurveAgreementOptions {
+  /** Two curves with a gap larger than this value show as two lines. The default is 1 unit. */
+  readonly apart?: number;
+  /** The tolerance of `sampleCurve` for the samples of each curve. The default is 0.25. */
+  readonly tolerance?: number;
+  /** The largest distance between two places of a shared segment where the function reads the gap. The default is 1 unit. */
+  readonly step?: number;
+  /**
+   * The length at each end of a run that the function does not read. The default is 0, and then the function reads each run in full.
+   * At the end of a run, the routes part, and each curve turns in its own direction. A caller gives the radius of its corners to read only the part between them.
+   */
+  readonly ends?: number;
+}
+
+/** The agreement of the curves of routes on their shared runs (C12 of MEAS0). */
+export interface CurveAgreement {
+  /** The count of the shared runs. With the value 0, the routes share no run, and the other values give no read. */
+  readonly runs: number;
+  /** The length of the shared runs. A run of three routes or more counts one time. */
+  readonly length: number;
+  /** The length of the parts of the runs that the function read. Without the option `ends`, this value is `length`. */
+  readonly read: number;
+  /** The length of the read parts where the gap is larger than the option `apart`. */
+  readonly apart: number;
+  /** The value `apart` over `read`, from 0 to 1. Lower is better. Routes with no read part give 0. */
+  readonly share: number;
+  /** The largest gap at a read place of a run, in units of the board. */
+  readonly max: number;
+}
+
+/** The first reach of the search for the sample nearest to a place. The reach doubles until the search finds the sample. */
+const NEAREST_REACH = 8;
+
+/** The samples of the curve of one route, as legs in a grid of buckets. */
+interface SampledCurve {
+  /** Each leg goes from its lower end to its higher end. Thus two equal legs in opposite directions give the same nearest point. */
+  readonly legs: readonly (readonly [Point, Point])[];
+  readonly grid: Grid<number>;
+  /** The bounds of the samples. */
+  readonly box: Box;
+}
+
+/** This function gives the legs of the samples of a curve, with their grid and their bounds. A curve of one sample has one leg of length 0. */
+function sampledCurve(samples: readonly Point[]): SampledCurve {
+  const legs: [Point, Point][] = [];
+  const grid = new Grid<number>(2 * NEAREST_REACH);
+  let x0 = Number.POSITIVE_INFINITY;
+  let y0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let y1 = Number.NEGATIVE_INFINITY;
+  for (let i = 0; i < samples.length; i++) {
+    const b = samples[i]!;
+    x0 = Math.min(x0, b.x);
+    y0 = Math.min(y0, b.y);
+    x1 = Math.max(x1, b.x);
+    y1 = Math.max(y1, b.y);
+    if (i === 0 && samples.length > 1) continue;
+    const a = samples[Math.max(0, i - 1)]!;
+    grid.addSegment(legs.length, a, b);
+    legs.push(a.x < b.x || (a.x === b.x && a.y <= b.y) ? [a, b] : [b, a]);
+  }
+  return { legs, grid, box: { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } };
+}
+
+/**
+ * This function gives the point of the samples of a curve nearest to `p`. A curve with no sample gives `undefined`.
+ * Among legs at the same distance, the first leg of the curve gives the point.
+ */
+function nearestSample(c: SampledCurve, p: Point): Point | undefined {
+  if (c.legs.length === 0) return undefined;
+  const best = { point: undefined as Point | undefined, d: Number.POSITIVE_INFINITY, leg: -1 };
+  const take = (i: number): void => {
+    const q = nearestOnLine(c.legs[i]!, p);
+    const d = dist(p, q);
+    if (d < best.d || (d === best.d && i < best.leg)) {
+      best.point = q;
+      best.d = d;
+      best.leg = i;
+    }
+  };
+  // A leg nearer than `reach` has a bucket in the box of the query. Thus a point within `reach` is the nearest point.
+  // A reach of `far` or more holds the bounds of the samples, and then the search reads each leg.
+  const far = Math.max(p.x - c.box.x, c.box.x + c.box.w - p.x, p.y - c.box.y, c.box.y + c.box.h - p.y);
+  for (let reach = NEAREST_REACH; reach < far; reach *= 2) {
+    c.grid.query({ x: p.x - reach, y: p.y - reach, w: 2 * reach, h: 2 * reach }, take);
+    if (best.d <= reach) return best.point;
+  }
+  for (let i = 0; i < c.legs.length; i++) take(i);
+  return best.point;
+}
+
+/** A segment that two routes or more share, with the points of its first route and the indexes of its routes in ascending order. */
+interface SharedSegment {
+  readonly a: Point;
+  readonly b: Point;
+  readonly routes: number[];
+}
+
+/**
+ * This function gives the agreement of the drawn curves of routes on the runs that the routes share (C12 of MEAS0).
+ * Routes that share a run of points must show one line on the run. A curve through the points of each route does not always do so.
+ *
+ * Two points are equal when they have the same place. A point takes the oldest place within `TOLERANCE`, or else it makes a new place.
+ * A shared segment is a pair of points in sequence that two routes or more have, in the same direction or in the opposite direction.
+ * A shared run is the longest sequence of shared segments in sequence in their first route, with the same set of routes.
+ * Thus a run of two routes is the longest sequence of two or more equal points in sequence. No two runs share a segment.
+ *
+ * The function `curve` gives the drawn curve of a route, for example with `curveOf`. `sampleCurve` gives its samples with the option `tolerance`.
+ * The function reads the gap at places of each shared segment, at a distance of `step` or less.
+ *
+ * Each route of the segment gives its sample point nearest to the place. The gap at the place is the largest distance between two of these points.
+ * Between two places, the gap is linear. Each sample is within `tolerance` of its curve, so a small `tolerance` gives a gap near the true gap.
+ *
+ * Two routes part at the end of a run, and there the two curves turn to different sides. Thus a curve with round corners has a gap there.
+ * The option `ends` keeps the two ends of each run out of the read. Then `read` tells the length that the function read.
+ *
+ * The cost is linear in the count of the places for an even density: grids of buckets find the equal points and the near samples.
+ * A place on a segment of `k` routes reads `k` nearest points and `k (k - 1) / 2` distances.
+ */
+export function curveAgreement(routes: readonly Route[], curve: (route: Route) => readonly CurveSegment[], options: CurveAgreementOptions = {}): CurveAgreement {
+  const limit = options.apart ?? 1;
+  const tolerance = options.tolerance ?? 0.25;
+  const step = options.step !== undefined && options.step > 0 ? options.step : 1;
+  const ends = Math.max(0, options.ends ?? 0);
+  // The places of the points. The grid gives the places near a point.
+  const places: Point[] = [];
+  const found = new Grid<number>(16);
+  const placeOf = (p: Point): number => {
+    let id = places.length;
+    found.query({ x: p.x - TOLERANCE, y: p.y - TOLERANCE, w: 2 * TOLERANCE, h: 2 * TOLERANCE }, (i) => {
+      if (i < id && dist(places[i]!, p) <= TOLERANCE) id = i;
+    });
+    if (id === places.length) {
+      places.push(p);
+      found.add(id, { x: p.x, y: p.y, w: 0, h: 0 });
+    }
+    return id;
+  };
+  // The segments of each route, without the segments between two points of one place.
+  const byPlaces = new Map<string, SharedSegment>();
+  const segments = routes.map((r, index) => {
+    const ids = r.points.map(placeOf);
+    const out: SharedSegment[] = [];
+    for (let i = 1; i < ids.length; i++) {
+      const u = ids[i - 1]!;
+      const v = ids[i]!;
+      if (u === v) continue;
+      const key = u < v ? `${u}:${v}` : `${v}:${u}`;
+      let s = byPlaces.get(key);
+      if (s === undefined) {
+        s = { a: r.points[i - 1]!, b: r.points[i]!, routes: [] };
+        byPlaces.set(key, s);
+      }
+      if (s.routes[s.routes.length - 1] !== index) s.routes.push(index);
+      out.push(s);
+    }
+    return out;
+  });
+  // The samples of a curve, only for a route on a shared segment.
+  const sampled: (SampledCurve | undefined)[] = [];
+  const samplesOf = (index: number): SampledCurve => (sampled[index] ??= sampledCurve(sampleCurve(curve(routes[index]!), tolerance)));
+  const gapAt = (curves: readonly SampledCurve[], p: Point): number => {
+    const near: Point[] = [];
+    for (const c of curves) {
+      const q = nearestSample(c, p);
+      if (q !== undefined) near.push(q);
+    }
+    let gap = 0;
+    for (let i = 0; i < near.length; i++) for (let j = i + 1; j < near.length; j++) gap = Math.max(gap, dist(near[i]!, near[j]!));
+    return gap;
+  };
+  // The shared runs. Each route gives the runs of the segments that it draws first, in its direction.
+  const runs: SharedSegment[][] = [];
+  const done = new Set<SharedSegment>();
+  segments.forEach((list, index) => {
+    let run: SharedSegment[] | undefined;
+    for (const s of list) {
+      if (s.routes.length < 2 || s.routes[0] !== index || done.has(s)) {
+        run = undefined;
+        continue;
+      }
+      done.add(s);
+      const before = run?.[run.length - 1];
+      if (run !== undefined && before !== undefined && before.routes.length === s.routes.length && before.routes.every((r, i) => r === s.routes[i])) run.push(s);
+      else {
+        run = [s];
+        runs.push(run);
+      }
+    }
+  });
+  let length = 0;
+  let read = 0;
+  let apart = 0;
+  let max = 0;
+  for (const run of runs) {
+    const total = run.reduce((sum, s) => sum + dist(s.a, s.b), 0);
+    length += total;
+    let curves: SampledCurve[] | undefined;
+    let before = 0;
+    for (const s of run) {
+      const l = dist(s.a, s.b);
+      // The part of the segment that is not within `ends` of an end of the run.
+      const from = ends > 0 ? Math.max(0, ends - before) : 0;
+      const to = ends > 0 ? Math.min(l, total - ends - before) : l;
+      before += l;
+      if (to <= from) continue;
+      curves ??= s.routes.map(samplesOf);
+      const n = Math.max(1, Math.ceil((to - from) / step));
+      read += to - from;
+      let last = 0;
+      for (let k = 0; k <= n; k++) {
+        const t = from + ((to - from) * k) / n;
+        const p = t <= 0 ? s.a : t >= l ? s.b : { x: s.a.x + (s.b.x - s.a.x) * (t / l), y: s.a.y + (s.b.y - s.a.y) * (t / l) };
+        const gap = gapAt(curves, p);
+        max = Math.max(max, gap);
+        if (k > 0) {
+          // The share of the step where the linear gap is above the limit.
+          const low = Math.min(last, gap);
+          const high = Math.max(last, gap);
+          apart += ((to - from) / n) * (low > limit ? 1 : high > limit ? (high - limit) / (high - low) : 0);
+        }
+        last = gap;
+      }
+    }
+  }
+  return { runs: runs.length, length, read, apart, share: read > 0 ? Math.min(1, apart / read) : 0, max };
 }
