@@ -14,7 +14,9 @@ const config: Config = boundaries(import.meta.dirname, {
       severity: "error",
       comment:
         "The core knows no renderer. Its source imports only its own files, the modules of Node and the dependencies of its package.json.",
-      from: { path: "^packages/core/src/" },
+      // A test helper (*.test-util.ts) is test code, so it can import vitest. The default test pattern of boundaries does not
+      // match it yet. This pathNot ends when the default does.
+      from: { path: "^packages/core/src/", pathNot: ["\\.test-util\\.[cm]?[jt]s$"] },
       to: {
         dependencyTypesNot: ["core"],
         pathNot: ["^packages/core/src/", `node_modules/@mark1russell7/(${CORE_DEPENDENCIES.join("|")})/`],
