@@ -202,6 +202,27 @@ Each built-in router sets the field. The controls `straight` and `plugs` go thro
 - A clean route does not have the field, so its bytes do not change.
 - `laneRoutes` keeps the field. The routers with the field are `corners`, `trunks`, `shared` and `sections`, and each plan that `follow` gives.
 
+### A session for many sets of edges
+
+A caller that routes a few edges among the same nodes many times makes one session.
+
+- `routerSession(router, graph)` gives a session on the nodes of `graph`. `session.route(edges)` routes one set of edges.
+- `session.route(edges)` gives the same result as `router.route({ ...graph, edges })`: the same routes, points and notes.
+- The session of `corners` keeps the obstacles and the corner graph of the nodes. Thus a route of 2 edges does not make them again.
+- Each other router gets a session with no kept work. Its `route(edges)` is one whole `router.route`.
+- A wrapped router, for example `withRepair(router)`, also gets a session with no kept work.
+- The session holds a snapshot of the nodes. After a change of a node, make a new session.
+- `session.dispose()` releases the data of the session. After it, `session.route` throws an `Error`.
+
+```ts
+import { cornersRouter, routerSession } from "@mark1russell7/highways";
+
+const session = routerSession(cornersRouter({ name: "corners" }), graph);
+const first = session.route(graph.edges.slice(0, 2));
+const second = session.route(graph.edges.slice(2, 3));
+session.dispose();
+```
+
 ## Curve types
 
 A router gives polylines. The curve layer turns a polyline into a curve of a type. The polyline can come from any router, from a lane of `laneRoutes` or from a link of a zoom level.

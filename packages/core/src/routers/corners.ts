@@ -1,8 +1,9 @@
 import { center } from "../geom.ts";
-import { nodeIndex, resolvePorts, splitFrames, type Edge, type Graph, type Node, type Result, type Route, type Router } from "../model.ts";
+import { checkParents, nodeIndex, resolvePorts, splitFrames, type Edge, type Graph, type InnerEdge, type Node, type Result, type Route, type Router, type RouterSession } from "../model.ts";
 import { placePlug, type Plug } from "../plugs.ts";
 import { spacePlugs } from "../plugs/justify.ts";
 import { sidePlugs } from "../plugs/side.ts";
+import { DISPOSED, plainSession } from "../session.ts";
 import type { PlugPair, Strategy } from "../strategies/model.ts";
 import { joinNote, markThrough } from "../through.ts";
 import { WayFinder } from "../ways.ts";
@@ -45,49 +46,77 @@ export interface CornersOptions extends FrameOptions {
  * Each edge leaves its plug along the normal of the side. It goes a shortest way (A*) through a sparse visibility graph
  * of the box corners, without the needless corners. It enters the target plug along its normal.
  * An inner edge (`splitFrames`) gets an inner route in the bounds of its frame (`frameRoutes`), after the outer routes.
+ *
+ * The method `session` of the router keeps the obstacles and the corner graph of the nodes of a graph.
+ * Each `route(edges)` of that session then makes only the ways of its edges, so a few edges among many nodes take a short time.
  */
 export function cornersRouter(options: CornersOptions): Router {
-  const router: Router = {
-    name: options.name,
-    route(input: Graph): Result {
-      const { graph, inner } = splitFrames(resolvePorts(input));
-      const byId = nodeIndex(graph);
-      const ways = new WayFinder(graph.nodes, options);
-      const routes: Route[] = [];
-      // The inner routes come after the outer routes.
-      const done = (): Result => {
-        const outer = markThrough(graph, routes, ways.obstacles);
-        return { routes: inner.length > 0 ? [...outer, ...frameRoutes(graph, inner, options)] : outer, ...joinNote(ways) };
-      };
-      if (!options.plug && (options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
-        for (const e of graph.edges) {
-          const s = byId.get(e.source.node);
-          const t = byId.get(e.target.node);
-          if (!s || !t) continue;
-          const ps = placePlug(s, e.source, center(t.box));
-          const pt = placePlug(t, e.target, center(s.box));
-          routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
-        }
-        return done();
-      }
-      // First the plugs of each edge, then the gaps of the plugs of each side, then the ways between the plugs.
-      const ends: [Edge, Node, Node, Plug, Plug][] = [];
-      const placed = options.plug ? plugsByEdge(options.plug.run({ graph, ways }, options.plugOptions)) : undefined;
+  // The routes of the edges of `graph`. The index `byId` and the ways `ways` are those of the nodes of `graph`.
+  const routeOn = (graph: Graph, inner: readonly InnerEdge[], byId: ReadonlyMap<string, Node>, ways: WayFinder): Result => {
+    const routes: Route[] = [];
+    // The inner routes come after the outer routes.
+    const done = (): Result => {
+      const outer = markThrough(graph, routes, ways.obstacles);
+      return { routes: inner.length > 0 ? [...outer, ...frameRoutes(graph, inner, options)] : outer, ...joinNote(ways) };
+    };
+    if (!options.plug && (options.plugs ?? "facing") === "facing" && !((options.plugGap ?? 0) > 0)) {
       for (const e of graph.edges) {
         const s = byId.get(e.source.node);
         const t = byId.get(e.target.node);
         if (!s || !t) continue;
-        const own = placed?.get(e.id)?.shift();
-        const [ps, pt]: [Plug, Plug] = own
-          ? [own.source, own.target]
-          : options.plugs === "side" && !placed
-            ? sidePlugs(ways, s, e.source, t, e.target)
-            : [placePlug(s, e.source, center(t.box)), placePlug(t, e.target, center(s.box))];
-        ends.push([e, s, t, ps, pt]);
+        const ps = placePlug(s, e.source, center(t.box));
+        const pt = placePlug(t, e.target, center(s.box));
+        routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
       }
-      if ((options.plugGap ?? 0) > 0) spacePlugs(ends, options.plugGap!);
-      for (const [e, s, t, ps, pt] of ends) routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
       return done();
+    }
+    // First the plugs of each edge, then the gaps of the plugs of each side, then the ways between the plugs.
+    const ends: [Edge, Node, Node, Plug, Plug][] = [];
+    const placed = options.plug ? plugsByEdge(options.plug.run({ graph, ways }, options.plugOptions)) : undefined;
+    for (const e of graph.edges) {
+      const s = byId.get(e.source.node);
+      const t = byId.get(e.target.node);
+      if (!s || !t) continue;
+      const own = placed?.get(e.id)?.shift();
+      const [ps, pt]: [Plug, Plug] = own
+        ? [own.source, own.target]
+        : options.plugs === "side" && !placed
+          ? sidePlugs(ways, s, e.source, t, e.target)
+          : [placePlug(s, e.source, center(t.box)), placePlug(t, e.target, center(s.box))];
+      ends.push([e, s, t, ps, pt]);
+    }
+    if ((options.plugGap ?? 0) > 0) spacePlugs(ends, options.plugGap!);
+    for (const [e, s, t, ps, pt] of ends) routes.push({ edge: e.id, points: ways.between(ps, pt, new Set<Node>([s, t])) });
+    return done();
+  };
+  const router: Router = {
+    name: options.name,
+    route(input: Graph): Result {
+      const { graph, inner } = splitFrames(resolvePorts(input));
+      return routeOn(graph, inner, nodeIndex(graph), new WayFinder(graph.nodes, options));
+    },
+    // The session keeps the parts of `route` that read only the nodes: the plugs of `resolvePorts`, the index of the nodes and the ways.
+    // The split of the inner edges, the plugs, the marks of `through` and the inner routes read the edges, so each route makes them again.
+    session(this: Router | undefined, input: Graph): RouterSession {
+      // A copy of this router with a different `route` gives other results. Its session routes with the `route` of the copy.
+      if (this !== undefined && this.route !== router.route) return plainSession(this, input);
+      const resolved = resolvePorts(input);
+      const byId = nodeIndex(resolved);
+      // A bad parent throws here, as it does in `route`.
+      checkParents(resolved, byId);
+      let kept: { readonly resolved: Graph; readonly byId: ReadonlyMap<string, Node>; readonly ways: WayFinder } | undefined = { resolved, byId, ways: new WayFinder(resolved.nodes, options) };
+      return {
+        route(edges: readonly Edge[]): Result {
+          if (kept === undefined) throw new Error(DISPOSED);
+          const { graph, inner } = splitFrames({ ...kept.resolved, edges });
+          // The counts of the lower steps start at 0, as in the new ways of `route`. The other state of the ways changes no result.
+          kept.ways.lowerWays.fill(0);
+          return routeOn(graph, inner, kept.byId, kept.ways);
+        },
+        dispose(): void {
+          kept = undefined;
+        },
+      };
     },
   };
   return options.maxNodes === undefined ? router : { ...router, maxNodes: options.maxNodes };

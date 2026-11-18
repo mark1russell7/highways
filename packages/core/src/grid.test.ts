@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rng } from "./fixtures.ts";
 import { segmentBoxDistance, segmentHitsBox, type Box, type Point } from "./geom.ts";
 import { Grid } from "./grid.ts";
+import { STAMP_END, STAMPS } from "./stamps.ts";
 import { WORK } from "./work.ts";
 
 describe("Grid", () => {
@@ -271,6 +272,55 @@ describe("the walk of the grid (SECTIONS-SLOW step 3)", () => {
       expect(got).toEqual(want);
     });
   }
+
+  it("gives the visits and the work counts of the reference grid when the stamps start again (limits 1, 2, 3 and 7)", () => {
+    const starts = STAMPS.gridStarts;
+    try {
+      for (const limit of [1, 2, 3, 7]) {
+        for (let seed = 1; seed <= 6; seed++) {
+          const cell = seed % 3 === 0 ? 2 : 40 * seed;
+          // The reference grid has its own stamps, so the limit does not change it.
+          STAMPS.limit = limit;
+          const got = gridScript(new Grid<number>(cell), 7100 + seed, cell);
+          const want = gridScript(new ReferenceGrid<number>(cell), 7100 + seed, cell);
+          expect(got, `limit ${limit}, script ${seed}`).toEqual(want);
+        }
+      }
+    } finally {
+      STAMPS.limit = STAMP_END;
+    }
+    // Each script has more than 100 queries, so each grid came to its limit many times.
+    expect(STAMPS.gridStarts - starts).toBeGreaterThan(24 * 10);
+  });
+
+  it("has a default limit that is the largest value of a mark", () => {
+    expect(STAMPS.limit).toBe(STAMP_END);
+    // The marks are 32-bit values. The next stamp after the default limit does not fit in a mark.
+    expect(new Int32Array([STAMP_END])[0]).toBe(STAMP_END);
+    expect(new Int32Array([STAMP_END + 1])[0]).not.toBe(STAMP_END + 1);
+  });
+
+  it("starts the stamps again when the limit goes below the stamp of a grid", () => {
+    const grid = new Grid<string>(10);
+    grid.add("big", { x: 0, y: 0, w: 100, h: 100 });
+    const visits = (): string[] => {
+      const got: string[] = [];
+      grid.query({ x: 0, y: 0, w: 100, h: 100 }, (x) => got.push(x));
+      grid.querySegment({ x: 0, y: 0 }, { x: 100, y: 100 }, 5, (x) => got.push(x));
+      return got;
+    };
+    for (let q = 0; q < 10; q++) expect(visits()).toEqual(["big", "big"]);
+    const starts = STAMPS.gridStarts;
+    try {
+      STAMPS.limit = 4;
+      for (let q = 0; q < 10; q++) expect(visits()).toEqual(["big", "big"]);
+    } finally {
+      STAMPS.limit = STAMP_END;
+    }
+    // The stamp of the grid was 20, above the new limit. The 20 queries then took the stamps 1 to 4, five times.
+    expect(STAMPS.gridStarts - starts).toBe(5);
+    expect(visits()).toEqual(["big", "big"]);
+  });
 
   it("gives the step counts of the reference grid for lengths near a whole number of half buckets", () => {
     const R = rng(77);

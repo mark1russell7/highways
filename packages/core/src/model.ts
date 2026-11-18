@@ -169,12 +169,37 @@ export interface SharedRun {
 /** A grouping rule gives each edge a key. The edges from one plug with one key make a bundle. An edge without a key stays alone. */
 export type GroupRule = (edge: Edge) => string | undefined;
 
+/**
+ * A session of a router on the nodes of one graph. It routes many sets of edges among the same nodes.
+ * The session holds a snapshot of the nodes. A change of a node, for example of its box, needs a new session.
+ */
+export interface RouterSession {
+  /**
+   * This method gives the result of `router.route({ ...graph, edges })`, where `graph` is the graph of the session.
+   * The routes, their points and the notes of the result are the same. After `dispose`, the method throws an `Error`.
+   */
+  route(edges: readonly Edge[]): Result;
+  /** This method releases the data that the session holds. A second call does nothing. */
+  dispose(): void;
+}
+
 /** A router: a strategy with a name. The same input must give the same result. */
 export interface Router {
   readonly name: string;
   /** The benchmark skips a fixture with more nodes than this. Without it, the router takes each fixture. */
   readonly maxNodes?: number;
   route(graph: Graph): Result;
+  /**
+   * This method makes a session on the nodes of `graph`. The session keeps the work that depends only on the nodes.
+   * `session.route(edges)` gives the same result as `route({ ...graph, edges })`. The session does not read the edges of `graph`.
+   *
+   * The session holds a snapshot of the nodes. A change of a node needs a new session.
+   * The method throws the error that `route` throws for the nodes, for example a `RangeError` for a bad plug.
+   *
+   * A router without this method gets a session from `routerSession`.
+   * A copy of a router with a different `route` must replace this method, or it must not keep it.
+   */
+  session?(graph: Graph): RouterSession;
 }
 
 /** This function gives a map from the id of each node to the node. */

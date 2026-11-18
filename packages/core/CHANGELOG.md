@@ -1,5 +1,29 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.1
+
+This version is a PATCH: it adds an optional method, a type and an export. No output changes.
+
+### A session of a router
+
+- The type `Router` has a new optional method `session(graph)`. It gives a `RouterSession` with `route(edges)` and `dispose()`.
+- `session.route(edges)` gives the result of `router.route({ ...graph, edges })`: the same routes, the same points and the same notes.
+- The session of `cornersRouter` keeps the obstacles and the corner graph of the nodes. A route of a few edges among many nodes does not make them again.
+- The new function `routerSession(router, graph)` gives the session of each router. A router without the method gets a session with no kept work.
+- A copy of a router of `cornersRouter` with a different `route`, for example `withRepair(router)`, gets a session with no kept work. Thus it keeps its own results.
+- The session holds a snapshot of the nodes. A change of a node needs a new session.
+- A test compares the session with the plain route on 350 sets of edges for 10 sets of options of `corners`, and on 105 sets for 3 other routers.
+- The script `scripts/session-time.ts` times the plain route and the session for 2 edges among 400, 800 and 2000 nodes. The workflow `Records` starts it.
+
+### The stamps of a long session
+
+- A grid and the search of a corner graph mark their entries with a stamp. Each query takes the next stamp, and a mark is a 32-bit value.
+- A session keeps its grids and its corner graphs for each route, so a stamp can come to the largest 32-bit value.
+- At that value, a grid and a search set their marks to 0 and start again at the stamp 1. The cost is one test for each query.
+- Without this new start, a grid gives an item more than one time after 2^31 queries, and a search does not end after 2^31 searches.
+- The search of `SoftGraph` has the same stamps and the same new start. No session keeps a `SoftGraph`.
+- A test lowers the limit, so that one session comes to it many times. Each result keeps the value, the bytes and the work of the default limit.
+
 ## 0.19.0
 
 The release train changes the range of `@mark1russell7/rigor-generators`, `@mark1russell7/rigor-statistics` to a version outside the old range. The public types name @mark1russell7/rigor-generators, @mark1russell7/rigor-statistics, so its new version outside the old range can change them.

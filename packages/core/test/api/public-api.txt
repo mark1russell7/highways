@@ -605,6 +605,7 @@ RouteStabilityOptions: build/index.d.ts#RouteStabilityOptions
 RoutedStep: build/index.d.ts#RoutedStep
 Router: build/index.d.ts#Router
 RouterPreset: build/index.d.ts#RouterPreset
+RouterSession: build/index.d.ts#RouterSession
 RowFit: build/index.d.ts#RowFit
 RuleCount: build/index.d.ts#RuleCount
 RunOrder: build/index.d.ts#RunOrder
@@ -1389,6 +1390,7 @@ routeSeparation: build/index.d.ts#routeSeparation
 routeSpace: build/index.d.ts#routeSpace
 routeStability: build/index.d.ts#routeStability
 routeSymmetry: build/index.d.ts#routeSymmetry
+routerSession: build/index.d.ts#routerSession
 routerStrategies: build/index.d.ts#routerStrategies
 routersOf: build/index.d.ts#routersOf
 rowFit: build/index.d.ts#rowFit
@@ -4880,10 +4882,17 @@ export interface Router {
   readonly name: string;
   readonly maxNodes?: number;
   route(graph: Graph): Result;
+  session?(graph: Graph): RouterSession;
 }
 
 ### build/index.d.ts#RouterPreset
 export type RouterPreset<O> = Omit<O, "name" | "maxNodes">;
+
+### build/index.d.ts#RouterSession
+export interface RouterSession {
+  route(edges: readonly Edge[]): Result;
+  dispose(): void;
+}
 
 ### build/index.d.ts#RowFit
 export interface RowFit {
@@ -8066,6 +8075,9 @@ export declare function routeStability(graph: Graph, before: Result, after: Resu
 
 ### build/index.d.ts#routeSymmetry
 export declare function routeSymmetry(graph: Graph, routes: readonly Route[]): number | undefined;
+
+### build/index.d.ts#routerSession
+export declare function routerSession(router: Router, graph: Graph): RouterSession;
 
 ### build/index.d.ts#routerStrategies
 export declare const routerStrategies: {
