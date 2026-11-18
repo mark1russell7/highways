@@ -442,7 +442,7 @@ A curve must stay near its route, keep clear of the boxes and look smooth. G0 co
 - C3 and C4 multiply by powers of the length `L`. Thus the value of a curve does not change when the board changes its scale.
 - The type `rounded` uses quadratic pieces, and the type `arc` uses circular arcs. Both are G1 but not G2, because the curvature jumps at the ends of each arc. A clothoid corner of CURV2 is G2. C2 shows the difference.
 - A shared run of C12 is a sequence of equal points of two routes or more, in the same direction or in the opposite direction. A run ends where its set of routes changes.
-- C12 gives the count of the runs. A count of 0 tells that the routes share no run, so the share is not a good value there.
+- C12 gives the count of the runs. With a count of 0, the routes share no run, and the share of 0 is not a pass.
 - An example has two routes that come from two sides onto a run of 200 units. It uses the defaults: `apart` is 1 unit, and the tolerance of the samples is 0.25.
 - In the example, `straight` gives a gap of 0. `spline` gives a largest gap of 11.3 units, and it is apart on 43% of the run.
 - In the example, `smooth` has a gap only at the corner where the routes part: 2.3 units, on 0.9% of the run. `rounded` with a radius of 18 has 6.4 units there, on 6.3%.
