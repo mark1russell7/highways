@@ -32,6 +32,8 @@ export interface PairOptions {
   readonly env?: PairedEnv;
   /** The context of the run. The default is the context of this process. */
   readonly context?: string;
+  /** The order of the arm ids in each round. The default turns the arms by the round. The report keeps the order of each round. */
+  readonly order?: (arms: readonly string[], round: number) => readonly string[];
 }
 
 /**
@@ -55,6 +57,7 @@ export function confirmPair(o: PairOptions): Promise<PairedReport> {
     ...(o.startChild === undefined ? {} : { startChild: o.startChild }),
     ...(o.env === undefined ? {} : { env: o.env }),
     ...(o.context === undefined ? {} : { context: o.context }),
+    ...(o.order === undefined ? {} : { order: o.order }),
   });
 }
 
