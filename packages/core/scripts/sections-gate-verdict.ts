@@ -40,6 +40,8 @@ export const attemptRounds = (rounds: number, attempt: 1 | 2): number => (attemp
 export const FIXED_ARM = "fixed";
 /** The limit of the ratio head/fixed base: 1.10. */
 export const FIXED_LIMIT = 1.1;
+/** The start of the reason of a run that fails the check against the fixed base. The flip of the sections gate wants this text. */
+export const FIXED_BEYOND_TEXT = `The home finds the head beyond the limit ${FIXED_LIMIT.toFixed(2)} of the fixed base`;
 /** The schema of the file of the fixed base. */
 export const BASE_SCHEMA = "sections-gate-base/1";
 /**
@@ -390,7 +392,7 @@ export function gateVerdict(report: PairedReport, home: HomeVerdict | null, fixe
     reason = "A check has no time, so the run fails (FAIL-CLOSED).";
   } else if (checks[1].verdict === "fail") {
     outcome = "fail";
-    reason = `The home finds the head beyond the limit ${fmt(FIXED_LIMIT, 2)} of the fixed base (ratio ${fmt(toFixed)}, floor ${fmt(fixedCheck!.floor)}). ${fixedCheck!.reason}`;
+    reason = `${FIXED_BEYOND_TEXT} (ratio ${fmt(toFixed)}, floor ${fmt(fixedCheck!.floor)}). ${fixedCheck!.reason}`;
   } else if (checks[0].verdict === "fail") {
     outcome = "fail";
     reason = `The home finds the head slower than the parent (ratio ${fmt(ratio)}). ${home!.reason}`;

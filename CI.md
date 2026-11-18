@@ -271,7 +271,7 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 | Check | It can fail on | It cannot fail on | Flip test |
 |---|---|---|---|
 | `CI OK` | The tests, the types, the lint and the heap gate. A router with no budget fails as a no read. | Time. | `heap`: a fault of 150 MB, and a budget of `null`. |
-| `Sections gate OK` | The time of `sections-tree` at 10 000 nodes, against the parent and against the fixed base. A second run that cannot decide fails. | The time of other routers. | `sections`: a spin of 20% of the route time. |
+| `Sections gate OK` | The time of `sections-tree` at 10 000 nodes, against the parent and against the fixed base. A second run that cannot decide fails. | The time of other routers. | `sections`: a spin of 70% of the route time, which the check against the fixed base must find. This flip holds only the check against the fixed base. The check against the parent has no flip at this time (GATE-FLIP-PARENT). An arm that ends on a run that cannot decide gives the outcome no read (exit 3). The job then shows red in Actions, and its table says "no read". A no read is not a pass. |
 | `Search work OK` | Gate (b): the stops of Linux and Windows differ. | Gate (a), the fit of the work to the time. A fail of this fit, or a fit with no point, writes a warning to the check line. | `work`: a copy with one stop changed. |
 | `Scale OK` | A missing input, or a job that stops. | The parity of the records, and the time. The tables only report them. A route over the time limit writes a warning "No read". | None at this time. |
 | `Search objective OK` | A missing set or input, or a job that stops. | The correlation, the variants and the time. The tables only report them. | None at this time. |

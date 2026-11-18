@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { ROUTERS } from "../../src/routers/index.ts";
-import { changeOneStop, flipPassed, flipTable, judge, SCHEMA, SECTIONS_FILE, withSpin, type ArmRead, type FlipArm } from "./flip.ts";
+import { changeOneStop, flipOutcome, flipPassed, flipTable, judge, SCHEMA, SECTIONS_FILE, SECTIONS_WANT, sectionsAttempts, withSpin, type ArmRead, type FlipArm } from "./flip.ts";
 import { firstDifference } from "./same-stops.ts";
 
 const read = (over: Partial<ArmRead>): ArmRead => ({ id: "a", fault: null, exit: 0, text: "pass", ...over });
@@ -38,6 +38,59 @@ describe("flipPassed", () => {
   });
 });
 
+describe("flipOutcome", () => {
+  const noRead = judge(read({ exit: 1, text: "cannot decide, in the words of the home cannot decide: no read", runs: 4, noRead: true }), { exit: 1, reason: "no read" });
+
+  it("reads an arm with no read as not stated, whatever its exit code and text", () => {
+    expect(noRead.ok).toBe(false);
+  });
+
+  it("gives pass, fail and no read", () => {
+    expect(flipOutcome([clean, fault])).toBe("pass");
+    expect(flipOutcome([noRead, fault])).toBe("no read");
+    expect(flipOutcome([clean, { ...fault, ok: false }])).toBe("fail");
+    expect(flipOutcome([clean])).toBe("fail");
+  });
+
+  it("puts a fail before a no read", () => {
+    expect(flipOutcome([noRead, { ...fault, ok: false }])).toBe("fail");
+  });
+
+  it("names a no read in the table", () => {
+    const table = flipTable({ schema: SCHEMA, check: "sections", arms: [noRead, fault], passed: false, outcome: "no read", env: { cpu: "c", cores: 1, os: "linux", arch: "x64", node: "v26", mode: "fresh" } });
+    expect(table).toContain("## The flip of `sections`: no read");
+    expect(table).toContain("| 4 |  | no read |");
+  });
+});
+
+describe("the wanted reads of the sections flip", () => {
+  // The texts of the runs of the job sections of run 44204869166, with the outcome first, as sectionsFlip writes them.
+  const beyond = "fail, in the words of the home cannot decide: The home finds the head beyond the limit 1.10 of the fixed base (ratio 1.420, floor 1.250).";
+  const slower = "fail, in the words of the home slower: The home finds the head slower than the parent (ratio 1.232).";
+  const unread = "cannot decide, in the words of the home cannot decide: The home cannot decide the head against the limit 1.10 of the fixed base (ratio 1.149, bound 1.214).";
+  const closed = "fail, in the words of the home not measured: A check has no time, so the run fails (FAIL-CLOSED).";
+  const passed = "pass, in the words of the home same: The home finds the head same against the parent (ratio 0.998).";
+
+  it("takes only a decided fail of the check against the fixed base as the red of the slower arm", () => {
+    expect(judge(read({ fault: "spin", exit: 1, text: beyond }), SECTIONS_WANT.slower).ok).toBe(true);
+    expect(judge(read({ fault: "spin", exit: 1, text: slower }), SECTIONS_WANT.slower).ok).toBe(false);
+    expect(judge(read({ fault: "spin", exit: 1, text: unread }), SECTIONS_WANT.slower).ok).toBe(false);
+    expect(judge(read({ fault: "spin", exit: 1, text: closed }), SECTIONS_WANT.slower).ok).toBe(false);
+  });
+
+  it("gives the clean arm up to 3 runs of 2 times the rounds, after a first run of the base rounds or in its place", () => {
+    expect(sectionsAttempts("clean", "1")).toEqual(["1", "2", "2", "2"]);
+    expect(sectionsAttempts("clean", "2")).toEqual(["2", "2", "2"]);
+    expect(sectionsAttempts("slower", "1")).toEqual(["1", "2"]);
+    expect(sectionsAttempts("slower", "2")).toEqual(["1", "2"]);
+  });
+
+  it("takes only a pass as the green of the clean arm, and not a text that says it does not pass", () => {
+    expect(judge(read({ exit: 0, text: passed }), SECTIONS_WANT.clean).ok).toBe(true);
+    expect(judge(read({ exit: 0, text: `${unread} A run that cannot decide does not pass.` }), SECTIONS_WANT.clean).ok).toBe(false);
+  });
+});
+
 describe("withSpin", () => {
   it("wraps the router of the real file", () => {
     const source = readFileSync(new URL(`../../../../${SECTIONS_FILE}`, import.meta.url), "utf8");
@@ -71,7 +124,7 @@ describe("the stops", () => {
 
 describe("flipTable", () => {
   it("states the result and each arm", () => {
-    const table = flipTable({ schema: SCHEMA, check: "heap", arms: [clean, fault], passed: true, env: {} as never });
+    const table = flipTable({ schema: SCHEMA, check: "heap", arms: [clean, fault], passed: true, outcome: "pass", env: {} as never });
     expect(table).toContain("The flip of `heap`: passed");
     expect(table).toContain("| b | 150 MB | 1 | 1 | above |");
   });
@@ -81,5 +134,31 @@ describe("the budgets of the heap gate", () => {
   it("name each default router, so that no default router is out of the gate", () => {
     const budgets = JSON.parse(readFileSync(new URL("../data/heap/budgets.json", import.meta.url), "utf8")) as { routers: Readonly<Record<string, unknown>> };
     for (const router of ROUTERS) expect(Object.keys(budgets.routers)).toContain(router.name);
+  });
+});
+
+describe("the static imports of flip.ts", () => {
+  // The job summary of xplat.yml starts `flip.ts --check xplat` with no installed package. Node strips an `import type`, so it loads nothing.
+  it("load no package, so the job summary of xplat.yml can start the flip with no install", () => {
+    const patterns = [/^import\s+(?!type\s)[^;"]*?\sfrom\s*"([^"]+)"/gm, /^import\s*"([^"]+)"/gm, /^export\s+(?!type\s)(?:\*|\{[^}]*\})\s*from\s*"([^"]+)"/gm];
+    const seen = new Set<string>();
+    const packages: string[] = [];
+    const visit = (url: URL): void => {
+      if (seen.has(url.href)) return;
+      seen.add(url.href);
+      const src = readFileSync(url, "utf8");
+      for (const pattern of patterns) {
+        for (const m of src.matchAll(pattern)) {
+          const spec = m[1]!;
+          if (spec.startsWith("node:")) continue;
+          if (spec.startsWith(".")) visit(new URL(spec, url));
+          else packages.push(`${url.pathname.split("/scripts/")[1] ?? url.pathname}: ${spec}`);
+        }
+      }
+    };
+    visit(new URL("./flip.ts", import.meta.url));
+    expect(packages).toEqual([]);
+    // The walk reaches the files of the verdict, so it reads more than flip.ts.
+    expect([...seen].some((href) => href.endsWith("/sections-gate-verdict.ts"))).toBe(true);
   });
 });

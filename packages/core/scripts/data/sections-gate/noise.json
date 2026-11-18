@@ -1,0 +1,146 @@
+{
+  "schema": "sections-noise/1",
+  "runs": [
+    {
+      "source": "gate",
+      "run": 44025884055,
+      "job": "gate",
+      "date": "2026-11-17",
+      "cpu": "Intel(R) Xeon(R) 6975P-C",
+      "rounds": 10,
+      "spread": 0.017103421524841483,
+      "noisy": false
+    },
+    {
+      "source": "gate",
+      "run": 44032274620,
+      "job": "gate",
+      "date": "2026-11-17",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 10,
+      "spread": 0.07361766959063785,
+      "noisy": true
+    },
+    {
+      "source": "gate",
+      "run": 44032274620,
+      "job": "retry",
+      "date": "2026-11-17",
+      "cpu": "Intel(R) Xeon(R) 6975P-C",
+      "rounds": 10,
+      "spread": 0.024609811443457277,
+      "noisy": false
+    },
+    {
+      "source": "gate",
+      "run": 44069300009,
+      "job": "gate",
+      "date": "2026-11-17",
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "rounds": 10,
+      "spread": 0.12479335396368108,
+      "noisy": true
+    },
+    {
+      "source": "gate",
+      "run": 44069300009,
+      "job": "retry",
+      "date": "2026-11-17",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "rounds": 10,
+      "spread": 0.0437427697665092,
+      "noisy": false
+    },
+    {
+      "source": "flip",
+      "run": 44078650092,
+      "job": "clean-1",
+      "date": "2026-11-17",
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "rounds": 10,
+      "spread": 0.03333453710088695,
+      "noisy": false
+    },
+    {
+      "source": "flip",
+      "run": 44078650092,
+      "job": "slower-1",
+      "date": "2026-11-17",
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "rounds": 10,
+      "spread": 0.01706945229648151,
+      "noisy": false
+    },
+    {
+      "source": "gate",
+      "run": 44191001874,
+      "job": "gate",
+      "date": "2026-11-17",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 10,
+      "spread": 0.14011279069588467,
+      "noisy": true
+    },
+    {
+      "source": "gate",
+      "run": 44191001874,
+      "job": "retry",
+      "date": "2026-11-17",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 20,
+      "spread": 0.014469709657928802,
+      "noisy": false
+    },
+    {
+      "source": "gate",
+      "run": 44203952542,
+      "job": "gate",
+      "date": "2026-11-17",
+      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "rounds": 10,
+      "spread": 0.018558274064364253,
+      "noisy": false
+    },
+    {
+      "source": "flip",
+      "run": 44204869166,
+      "job": "clean-1",
+      "date": "2026-11-18",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 10,
+      "spread": 0.06751383748256194,
+      "noisy": true
+    },
+    {
+      "source": "flip",
+      "run": 44204869166,
+      "job": "clean-2",
+      "date": "2026-11-18",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 20,
+      "spread": 0.04873659952379548,
+      "noisy": false
+    },
+    {
+      "source": "flip",
+      "run": 44204869166,
+      "job": "slower-1",
+      "date": "2026-11-18",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 10,
+      "spread": 0.09514028926729097,
+      "noisy": true
+    },
+    {
+      "source": "flip",
+      "run": 44204869166,
+      "job": "slower-2",
+      "date": "2026-11-18",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "rounds": 20,
+      "spread": 0.06605436915876423,
+      "noisy": true
+    }
+  ],
+  "flips": []
+}

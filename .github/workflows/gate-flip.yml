@@ -6,11 +6,13 @@
 # - Each week on its own minute, because a gate that proves itself only when its code changes misses a drift of the runners and the bench.
 # - On a push to main that changes gate code. The job `which` selects the jobs from the changed files:
 #   - `quick` reads `scripts/heap.ts`, `scripts/data/heap/`, `scripts/search-work.ts`, `gates/same-stops.ts`, `scripts/screen-verdict.ts` and `search-work.yml`.
-#   - `sections` reads `scripts/sections-bisect.ts`, `scripts/sections-gate-verdict.ts`, the time gates of `gates/`, `scripts/data/sections-gate/` and `sections-gate.yml`.
+#   - `sections` reads `scripts/sections-bisect.ts`, `scripts/sections-gate-verdict.ts`, `scripts/sections-noise.ts`, the time gates of `gates/`, `scripts/data/sections-gate/` and `sections-gate.yml`.
 #   - Both read `gates/flip.ts`, `gates/flip-memory.ts` and this file.
 #   - A change of the lock file does not start a job, because the release train changes it often. The weekly run reads it.
 #
-# The job `sections` runs the gate for each arm, 27 to 47 min, and a run that cannot decide takes a second run. So 2 arms take 188 min at the most.
+# The job `sections` runs the gate for each arm. A run of 10 rounds takes about 26 min, and a run of 20 rounds about 52 min (run 44204869166).
+# The clean arm takes up to 26 + 3 * 52 = 182 min, and the slower arm up to 26 + 52 = 78 min. So the job takes 260 min at the most.
+# The clean arm starts at 20 rounds on a CPU model that the noise table finds noisy, and then takes up to 156 min.
 name: Gate flip
 
 on:
@@ -74,7 +76,7 @@ jobs:
           sections=false
           both='^(packages/core/scripts/gates/flip(-memory)?\.ts|\.github/workflows/gate-flip\.yml)$'
           quickFiles='^(packages/core/scripts/heap\.ts|packages/core/scripts/data/heap/|packages/core/scripts/search-work\.ts|packages/core/scripts/screen-verdict\.ts|packages/core/scripts/gates/same-stops\.ts|\.github/workflows/search-work\.yml)'
-          sectionsFiles='^(packages/core/scripts/sections-bisect\.ts|packages/core/scripts/sections-gate-verdict\.ts|packages/core/scripts/gates/(commits|home-verdict|pair-confirm|paired|scope|time-gate)\.ts|packages/core/scripts/data/sections-gate/|\.github/workflows/sections-gate\.yml)'
+          sectionsFiles='^(packages/core/scripts/sections-bisect\.ts|packages/core/scripts/sections-gate-verdict\.ts|packages/core/scripts/sections-noise\.ts|packages/core/scripts/gates/(commits|home-verdict|pair-confirm|paired|scope|time-gate)\.ts|packages/core/scripts/data/sections-gate/|\.github/workflows/sections-gate\.yml)'
           if [ "$EVENT" = push ]; then
             # A base that the checkout does not hold starts both jobs, so a push does not skip a flip.
             if changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA"); then
@@ -128,7 +130,7 @@ jobs:
     needs: which
     if: needs.which.outputs.sections == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 300
     env:
       ROUNDS: ${{ inputs.rounds || '10' }}
     steps:
