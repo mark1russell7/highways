@@ -446,6 +446,20 @@ The table below gives drifts on the noise of the 24 stored records of the gate, 
 - The heads of the 24 records have the median ratios 0.93 to 0.99. The new rule gives `within` on 23 records.
 - The one other record (44069300009, the job `gate`) is `cannot decide`. Its run could not decide with the old rule too, and its retry is `within`.
 
+### The resolution of the check at 20 rounds
+
+The resolution is the least distance from 1.10 that the check decides. The table above has 5 sets of 20 rounds. In each set, a probe scaled the head, and found the median ratio where the outcome changes.
+
+| Outcome | The 5 workflow runs | Worst run | Spread |
+|---|---|---|---|
+| `within` | up to 1.046, 1.051, 1.054, 1.061, 1.070 | 1.046 | 0.024 |
+| `beyond` | above 1.136, 1.146, 1.147, 1.159, 1.168 | 1.168 | 0.032 |
+
+- Thus the check decides a head only 0.054 or more below 1.10, or 0.068 or more above it. Each head between them is a no read, and a no read fails the gate.
+- A wide band comes from the noise, not from the limit. Do not move the limit or the band of noise to get a read.
+- To make the band narrower, lower the noise: more rounds, a quieter runner or a shorter case.
+- Or promote a new fixed base nearer to the head. Then the drift starts again from 1.00.
+
 <!-- shared:order-of-promotions -->
 ## The order of promotions
 
