@@ -42,6 +42,8 @@ export const FIXED_ARM = "fixed";
 export const FIXED_LIMIT = 1.1;
 /** The start of the reason of a run that fails the check against the fixed base. The flip of the sections gate wants this text. */
 export const FIXED_BEYOND_TEXT = `The home finds the head beyond the limit ${FIXED_LIMIT.toFixed(2)} of the fixed base`;
+/** The start of the reason of a run that fails the check against the parent. The flip `parent` wants this text. */
+export const PARENT_SLOWER_TEXT = "The home finds the head slower than the parent";
 /** The schema of the file of the fixed base. */
 export const BASE_SCHEMA = "sections-gate-base/1";
 /**
@@ -395,7 +397,7 @@ export function gateVerdict(report: PairedReport, home: HomeVerdict | null, fixe
     reason = `${FIXED_BEYOND_TEXT} (ratio ${fmt(toFixed)}, floor ${fmt(fixedCheck!.floor)}). ${fixedCheck!.reason}`;
   } else if (checks[0].verdict === "fail") {
     outcome = "fail";
-    reason = `The home finds the head slower than the parent (ratio ${fmt(ratio)}). ${home!.reason}`;
+    reason = `${PARENT_SLOWER_TEXT} (ratio ${fmt(ratio)}). ${home!.reason}`;
   } else if (checks[0].verdict === "cannot decide" || checks[1].verdict === "cannot decide") {
     outcome = "cannot decide";
     const parts: string[] = [];
