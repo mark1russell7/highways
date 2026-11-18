@@ -989,8 +989,10 @@ The [note on the measures](https://github.com/mark1russell7/highways/blob/main/d
 | R4, R5 | `totalTurn`, `detourSpread` |
 | R11 | `plugSpacing`: the gaps between the plugs of each side |
 | B1, B4 | `inkSaved`, `ambiguity` |
+| B12 | `falseJoins`: the share of the ink where edges of two groups or more read as one line, for all routes and for each edge |
 | C1, C2, C3 | `g1Defect`, `g2Defect`, `bendingEnergy` |
 | C4, C8 | `curvatureVariation`, `curveDeviation` |
+| C12 | `curveAgreement`: the gap between the curves of the routes on each run of points that they share |
 | Z5 | `levelRatio`: the largest ratio of the item counts of two levels, and the spread of the ratios |
 | Z6, Z7, Z8 | `nestingFaults`, `positionStability`, `orderStability` |
 | Z10 | `changeGraph` makes a seeded small change, and `routeStability` compares the routes |
