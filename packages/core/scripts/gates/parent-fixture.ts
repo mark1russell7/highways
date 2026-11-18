@@ -7,7 +7,7 @@
 // - `fixtureOf` of `parent-flip.ts` refuses a record that is not quiet, that does not pass or that the replay does not give again.
 // - The script writes the fixture to `--out`, or to `data/gate-flip/parent-run.json`. Commit the file in a pull request.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,12 +21,21 @@ const CORE = resolve(fileURLToPath(import.meta.url), "..", "..", "..");
 /** The artifact of the job `sections` of `Gate flip`. */
 const FLIP_ARTIFACT = "gate-flip-sections";
 
-/** This function reads the record of one arm from the artifact of a run. The download uses argv and no shell. */
+/**
+ * This function gives the text of the record of one arm from the artifact of a run. The download uses argv and no shell.
+ * The function removes the folder of the download at the end, also after an error.
+ */
 function downloadRecord(run: number, arm: string, attempt: number): string {
   const dir = mkdtempSync(join(tmpdir(), "parent-fixture-"));
-  const out = spawnSync("gh", ["run", "download", String(run), "--name", FLIP_ARTIFACT, "--dir", dir], { cwd: CORE, encoding: "utf8" });
-  if (out.status !== 0) throw new InputError(`gh run download ${run} --name ${FLIP_ARTIFACT}: ${(out.stderr || String(out.error)).trim()}`);
-  return join(dir, "sections", `${arm}-${attempt}`, "sections-gate.json");
+  try {
+    const out = spawnSync("gh", ["run", "download", String(run), "--name", FLIP_ARTIFACT, "--dir", dir], { cwd: CORE, encoding: "utf8" });
+    if (out.status !== 0) throw new InputError(`gh run download ${run} --name ${FLIP_ARTIFACT}: ${(out.stderr || String(out.error)).trim()}`);
+    const file = join(dir, "sections", `${arm}-${attempt}`, "sections-gate.json");
+    if (!existsSync(file)) throw new InputError(`The artifact ${FLIP_ARTIFACT} of the run ${run} has no record of the arm ${arm}-${attempt}.`);
+    return readFileSync(file, "utf8");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 function main(): void {
@@ -44,8 +53,8 @@ function main(): void {
   const attempt = Number(values.attempt);
   if (!Number.isInteger(run) || run <= 0) throw new InputError("Give the id of the run of `Gate flip` with `--run <id>`.");
   if (!Number.isInteger(attempt) || attempt <= 0) throw new InputError(`The attempt ${values.attempt} is not a whole number above 0.`);
-  const recordFile = values.record ?? downloadRecord(run, values.arm, attempt);
-  const record = JSON.parse(readFileSync(recordFile, "utf8")) as GateRecord;
+  const text = values.record === undefined ? downloadRecord(run, values.arm, attempt) : readFileSync(values.record, "utf8");
+  const record = JSON.parse(text) as GateRecord;
   const pool = parsePool(readFileSync(values.pool ?? join(CORE, POOL_FILE), "utf8"));
   const fixture = fixtureOf(record, pool, { run, job: "sections", arm: values.arm, attempt });
   const out = values.out ?? join(CORE, PARENT_RUN_FILE);
