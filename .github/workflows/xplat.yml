@@ -36,7 +36,7 @@ permissions:
 concurrency:
   # Each set of inputs has its own group, so the dispatches of a flip do not cancel each other.
   group: xplat-${{ github.ref }}-${{ inputs.all }}-${{ inputs.run }}-${{ inputs.fault }}-${{ inputs.near }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
   run:
