@@ -1,4 +1,4 @@
-import type { Point } from "../../geom.ts";
+import { pointSegmentDistance, type Point } from "../../geom.ts";
 import { cornerTangent, spiralCorners, type SpiralShape } from "../corner.ts";
 import { fitPieces, type CubicPiece } from "../fit.ts";
 import type { CurveSegment } from "../model.ts";
@@ -60,15 +60,7 @@ const DENSE = 256;
 /** This function gives the distance from the point `q` to the part of the polyline `p` from the index `from` to the index `to`. */
 function distanceTo(q: Point, p: readonly Point[], from: number, to: number): number {
   let best = Infinity;
-  for (let i = Math.max(1, from); i <= Math.min(p.length - 1, to); i++) {
-    const a = p[i - 1]!;
-    const b = p[i]!;
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const l2 = dx * dx + dy * dy;
-    const t = l2 > 0 ? Math.max(0, Math.min(1, ((q.x - a.x) * dx + (q.y - a.y) * dy) / l2)) : 0;
-    best = Math.min(best, Math.hypot(a.x + t * dx - q.x, a.y + t * dy - q.y));
-  }
+  for (let i = Math.max(1, from); i <= Math.min(p.length - 1, to); i++) best = Math.min(best, pointSegmentDistance(q, p[i - 1]!, p[i]!));
   return best;
 }
 

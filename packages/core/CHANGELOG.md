@@ -1,5 +1,18 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.3
+
+This version is a PATCH: three private functions use their home, and the range of a dependency goes up. No output changes.
+
+### The nearest point of a segment comes from its home
+
+- The router `adam` uses `nearestOnSegment` of `@mark1russell7/layout-contract` for the point of a leg nearest to a point.
+- `nearestOnLine` of `sbeb` uses `nearestOnSegment` for each leg. Its choice between the legs does not change.
+- The error of a clothoid fit uses `pointSegmentDistance` for the distance to each leg of the dense polyline.
+- Each of the three copies had the float formula of the home. Thus each route, each curve and each record has the same bytes.
+- The range of `@mark1russell7/layout-contract` is `^0.10.6`, the first version with `nearestOnSegment`.
+- The roadmap item NEAREST-COPIES moves the other five copies.
+
 ## 0.19.2
 
 This version is a PATCH: it adds two functions and their types. No output changes.
