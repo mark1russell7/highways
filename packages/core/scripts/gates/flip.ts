@@ -1,6 +1,7 @@
 // The flip tests of the gate checks (GATE-FLIP): an injected fault of a stated size turns a check red, and a copy with no fault stays green in the same job.
 // `node packages/core/scripts/gates/flip.ts --check <heap|work|sections|verdict|xplat> --out <dir> [--rounds <n>] [--trees <dir>] [--cells <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
 // The exit code is 0 only when each arm gives its stated exit code and its stated reason. So a crash is not a red, and a run that cannot decide is not a green.
+// An arm that ends on a run that cannot decide is a no read of the flip: the exit code is 3, and the record is not a pass and not a fail.
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
@@ -11,24 +12,41 @@
 //   This arm needs no installed package, so the job `summary` of `xplat.yml` can start it.
 // - `--inject <route|short> --cells <dir>` changes one real cell in place, for the dispatch that reads the gate of that workflow.
 //
-// The commits of `sections` are made with the plumbing of git, so the checkout does not change. An arm that cannot decide takes the second attempt, as the job `retry` does.
+// The commits of `sections` are made with the plumbing of git, so the checkout does not change.
+// An arm that cannot decide takes the second attempt with 2 times the rounds, as the job `retry` does. Each later run takes `--attempt 2` again (`sectionsAttempts`).
+// The clean arm starts with 2 times the rounds on a CPU model with a noisy share above 1/2 in the noise table (`startChoice` of `sections-noise.ts`).
 import { spawnSync } from "node:child_process";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { recordVerdict, type GateRecord } from "../sections-gate-verdict.ts";
+import { FIXED_BEYOND_TEXT, recordVerdict, type GateRecord } from "../sections-gate-verdict.ts";
+import { NOISE_FILE, parseNoise, startChoice, type FlipOutcome, type StartChoice } from "../sections-noise.ts";
 import { envOf, type RecordEnv } from "./paired.ts";
 
 /** The schema of the record. */
-export const SCHEMA = "gate-flip/1";
+export const SCHEMA = "gate-flip/2";
 /** The router of the flip of the heap gate. */
 export const HEAP_ROUTER = "corners";
 /** The fault of the heap gate, in MB. The budget of `corners` is 221 MB, and its peak is 147 MB. */
 export const HEAP_FAULT_MB = 150;
-/** The fault of the sections gate: the spin as a share of the route time. The margin of the gate against the parent is log(1.05). */
-export const SECTIONS_FAULT_SHARE = 0.2;
+/**
+ * The fault of the sections gate: the spin as a share of the route time. The check against the fixed base must decide `beyond` on a noisy run too.
+ * A replay of 14 gate runs of CI (2026-11-17 and 18) gives the floor of that check with no fault. The lowest floor is 0.754, and the spread (p90 - p10) is 0.106.
+ * So the share is 1.10 / (0.754 - 0.106) - 1 = 0.70, to a tenth above. With this share, each of the 14 runs gives `beyond` at its first run.
+ */
+export const SECTIONS_FAULT_SHARE = 0.7;
+/**
+ * The most runs of 2 times the rounds for the clean arm of the flip of the sections gate. The clean arm passes only on a quiet run.
+ * In the same replay, 1 of 3 runs of 20 rounds on the noisiest CPU model was noisy (Wilson 95 %: 0.06 to 0.79). That model had 4 of 10 jobs.
+ * So the share of flips with no read is approximately 0.4 * (1/3)^3 = 0.015, and 0.2 at the top of the interval. `flipNoReads` holds that share.
+ */
+export const CLEAN_LATE_RUNS = 3;
+/** The arms of the flip of the sections gate. */
+export type SectionsArm = "clean" | "slower";
+/** The exit code of a flip with no read: an arm ended on a run that cannot decide. */
+export const EXIT_NO_READ = 3;
 /** The file that the fault of the sections gate changes. */
 export const SECTIONS_FILE = "packages/core/src/routers/sections.ts";
 
@@ -47,6 +65,10 @@ export interface ArmRead {
   readonly text: string;
   /** The ratio of the head against the parent, for a time check. */
   readonly ratio?: number | null;
+  /** The count of the runs of the gate that the arm took, for a time check. */
+  readonly runs?: number;
+  /** This value is `true` when the last run of the arm cannot decide. Such an arm is a no read, and it is not as stated. */
+  readonly noRead?: boolean;
 }
 
 /** What an arm must give. */
@@ -69,17 +91,50 @@ export interface FlipRecord {
   readonly arms: readonly FlipArm[];
   /** This value is `true` when each arm gives its stated exit code and reason, and the arms hold a clean copy and a fault. */
   readonly passed: boolean;
+  readonly outcome: FlipOutcome;
+  /** The rounds of the first run of the clean arm and the reason, for the flip of the sections gate. */
+  readonly start?: StartChoice;
   readonly env: RecordEnv;
 }
 
-/** This function compares what an arm gave with what it must give. An exit code alone does not pass, so a crash is not a red. */
+/**
+ * This function compares what an arm gave with what it must give. An exit code alone does not pass, so a crash is not a red.
+ * An arm with no read is not as stated, whatever its exit code and text.
+ */
 export function judge(read: ArmRead, want: ArmWant): FlipArm {
-  return { ...read, want, ok: read.exit === want.exit && read.text.includes(want.reason) };
+  return { ...read, want, ok: read.noRead !== true && read.exit === want.exit && read.text.includes(want.reason) };
 }
 
 /** This function decides a flip. It needs a clean arm that exits with 0 and a fault arm that does not. */
 export function flipPassed(arms: readonly FlipArm[]): boolean {
   return arms.every((a) => a.ok) && arms.some((a) => a.fault === null && a.exit === 0) && arms.some((a) => a.fault !== null && a.exit !== 0);
+}
+
+/**
+ * This function gives the outcome of a flip. An arm that is not as stated and has a read is a fail, and a fail comes first.
+ * Else an arm with no read makes a no read. Else the outcome is that of `flipPassed`.
+ */
+export function flipOutcome(arms: readonly FlipArm[]): FlipOutcome {
+  if (arms.some((a) => !a.ok && a.noRead !== true)) return "fail";
+  if (arms.some((a) => a.noRead === true)) return "no read";
+  return flipPassed(arms) ? "pass" : "fail";
+}
+
+/** The wanted read of each arm of the flip of the sections gate. The text of a run starts with its outcome. */
+export const SECTIONS_WANT = {
+  clean: { exit: 0, reason: "pass, in the words of the home" },
+  slower: { exit: 1, reason: FIXED_BEYOND_TEXT },
+} as const satisfies Readonly<Record<SectionsArm, ArmWant>>;
+
+/**
+ * This function gives the value of `--attempt` for each run of an arm of the flip of the sections gate, in order. An arm stops at its first run that decides.
+ * The slower arm decides on a noisy run too, because the check against the fixed base has no noise cap. So it keeps the 2 runs of the gate.
+ * The clean arm starts with `--attempt` equal to `start`, and then takes up to `CLEAN_LATE_RUNS` runs of 2 times the rounds.
+ */
+export function sectionsAttempts(arm: SectionsArm, start: "1" | "2"): readonly ("1" | "2")[] {
+  if (arm === "slower") return ["1", "2"];
+  const late = Array.from({ length: CLEAN_LATE_RUNS }, () => "2" as const);
+  return start === "1" ? ["1", ...late] : late;
 }
 
 /** This function gives the source of the fault of the sections gate. The router spins for the share of its route time, after the route. */
@@ -297,33 +352,49 @@ function commitOn(root: string, parent: string, message: string, changed?: { pat
   return git(root, ["commit-tree", tree, "-p", parent, "-m", message], { env: who });
 }
 
-/** This function gives the flip of the sections gate. Each arm takes up to two runs of the gate. */
-function sectionsFlip(dir: string, trees: string, rounds: string): FlipArm[] {
+/**
+ * This function gives the flip of the sections gate. Each arm takes the runs of `sectionsAttempts`, and it stops at its first run that decides.
+ * The noise table of the checkout and the CPU model of this computer choose the first rounds of the clean arm.
+ */
+function sectionsFlip(dir: string, trees: string, rounds: string): { arms: FlipArm[]; start: StartChoice } {
   const root = git(here("."), ["rev-parse", "--show-toplevel"]);
   const parent = git(root, ["rev-parse", "HEAD"]);
-  const gateOf = (id: string, head: string, fault: string | null): ArmRead => {
+  const start = startChoice(parseNoise(readFileSync(here(`../../${NOISE_FILE}`), "utf8")), envOf("fresh").cpu, Number(rounds));
+  console.log(start.reason);
+  const gateOf = (id: SectionsArm, head: string, fault: string | null): ArmRead => {
     let read: ArmRead = { id, fault, exit: null, text: "The gate did not run." };
-    for (const attempt of ["1", "2"]) {
-      const out = join(dir, `${id}-${attempt}`);
-      const run = spawnSync(process.execPath, [here("../sections-bisect.ts"), "--gate", "--attempt", attempt, "--head", head, "--head-input", `flip ${id}`, "--parent", parent, "--parent-input", "the checkout", "--trees", trees, "--out", out, "--rounds", rounds], { stdio: ["ignore", "inherit", "inherit"] });
+    const attempts = sectionsAttempts(id, start.attempt);
+    for (const [k, attempt] of attempts.entries()) {
+      const runs = k + 1;
+      const out = join(dir, `${id}-${runs}`);
+      const gate = spawnSync(process.execPath, [here("../sections-bisect.ts"), "--gate", "--attempt", attempt, "--head", head, "--head-input", `flip ${id}`, "--parent", parent, "--parent-input", "the checkout", "--trees", trees, "--out", out, "--rounds", rounds], { stdio: ["ignore", "inherit", "inherit"] });
       const verdict = recordVerdict(JSON.parse(readFileSync(join(out, "sections-gate.json"), "utf8")) as GateRecord);
-      read = { id, fault, exit: run.status, text: `${verdict.outcome}, in the words of the home ${verdict.words}: ${verdict.reason}`, ratio: verdict.parent?.ratio ?? null };
-      if (verdict.outcome !== "cannot decide") break;
+      const noRead = verdict.outcome === "cannot decide";
+      read = { id, fault, exit: gate.status, text: `${verdict.outcome}, in the words of the home ${verdict.words}: ${verdict.reason}`, ratio: verdict.parent?.ratio ?? null, runs, noRead };
+      if (!noRead) break;
     }
     return read;
   };
   const clean = commitOn(root, parent, "flip: no change");
   const spin = commitOn(root, parent, "flip: a slower route", { path: SECTIONS_FILE, text: withSpin(readFileSync(join(root, SECTIONS_FILE), "utf8"), SECTIONS_FAULT_SHARE) });
-  return [
-    judge(gateOf("clean", clean, null), { exit: 0, reason: "pass" }),
-    judge(gateOf("slower", spin, `a spin of ${SECTIONS_FAULT_SHARE * 100} % of the route time`), { exit: 1, reason: "the home slower" }),
+  const arms = [
+    judge(gateOf("clean", clean, null), SECTIONS_WANT.clean),
+    judge(gateOf("slower", spin, `a spin of ${Math.round(SECTIONS_FAULT_SHARE * 100)} % of the route time`), SECTIONS_WANT.slower),
   ];
+  return { arms, start };
 }
 
 /** This function writes the table of a record. */
 export function flipTable(record: FlipRecord): string {
-  const rows = record.arms.map((a) => `| ${a.id} | ${a.fault ?? "none"} | ${a.exit} | ${a.want.exit} | ${a.want.reason} | ${a.ratio === undefined || a.ratio === null ? "" : a.ratio.toFixed(3)} | ${a.ok ? "yes" : "no"} |`);
-  return [`## The flip of \`${record.check}\`: ${record.passed ? "passed" : "failed"}`, "", "| Arm | Fault | Exit | Exit wanted | Reason wanted | Ratio | As stated |", "| --- | --- | --- | --- | --- | --- | --- |", ...rows, ""].join("\n");
+  const rows = record.arms.map((a) => {
+    const ratio = a.ratio === undefined || a.ratio === null ? "" : a.ratio.toFixed(3);
+    const stated = a.noRead === true ? "no read" : a.ok ? "yes" : "no";
+    return `| ${a.id} | ${a.fault ?? "none"} | ${a.exit} | ${a.want.exit} | ${a.want.reason} | ${a.runs ?? ""} | ${ratio} | ${stated} |`;
+  });
+  const words = { pass: "passed", fail: "failed", "no read": "no read" } as const;
+  const note = record.outcome === "no read" ? ["An arm ended on a run that cannot decide, so the runner was too noisy. A no read is not a pass and not a fail.", ""] : [];
+  if (record.start !== undefined) note.push(record.start.reason, "");
+  return [`## The flip of \`${record.check}\`: ${words[record.outcome]}`, "", ...note, "| Arm | Fault | Exit | Exit wanted | Reason wanted | Runs | Ratio | As stated |", "| --- | --- | --- | --- | --- | --- | --- | --- |", ...rows, ""].join("\n");
 }
 
 if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
@@ -335,17 +406,17 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   const dir = mkdtempSync(join(tmpdir(), "gate-flip-"));
-  const flips: Readonly<Record<string, () => FlipArm[]>> = {
-    heap: () => heapFlip(dir),
-    work: () => workFlip(dir),
+  const flips: Readonly<Record<string, () => { arms: FlipArm[]; start?: StartChoice }>> = {
+    heap: () => ({ arms: heapFlip(dir) }),
+    work: () => ({ arms: workFlip(dir) }),
     sections: () => sectionsFlip(join(out, "sections"), resolve(values.trees ?? join(dir, "trees")), values.rounds),
-    verdict: () => verdictFlip(dir),
-    xplat: () => xplatFlip(dir, resolve(values.cells)),
+    verdict: () => ({ arms: verdictFlip(dir) }),
+    xplat: () => ({ arms: xplatFlip(dir, resolve(values.cells)) }),
   };
   const flip = flips[values.check ?? ""];
   if (flip === undefined) throw new Error(`The check is heap, work, sections, verdict or xplat, not "${values.check}".`);
-  const arms = flip();
-  const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), env: envOf("fresh") };
+  const { arms, start } = flip();
+  const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), outcome: flipOutcome(arms), ...(start === undefined ? {} : { start }), env: envOf("fresh") };
   writeFileSync(join(out, `gate-flip-${record.check}.json`), JSON.stringify(record, null, 1) + "\n");
   const table = flipTable(record);
   writeFileSync(join(out, `gate-flip-${record.check}.md`), table);
@@ -354,5 +425,5 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   // An empty name is no file, as in `writeGateLine` of `@mark1russell7/rigor-bench`.
   if (summary !== undefined && summary !== "") appendFileSync(summary, table + "\n");
   rmSync(dir, { recursive: true, force: true });
-  if (!record.passed) process.exitCode = 1;
+  if (record.outcome !== "pass") process.exitCode = record.outcome === "no read" ? EXIT_NO_READ : 1;
 }
