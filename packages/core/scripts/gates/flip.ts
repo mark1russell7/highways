@@ -1,11 +1,13 @@
 // The flip tests of the gate checks (GATE-FLIP): an injected fault of a stated size turns a check red, and a copy with no fault stays green in the same job.
-// `node packages/core/scripts/gates/flip.ts --check <heap|work|sections|verdict|xplat> --out <dir> [--rounds <n>] [--trees <dir>] [--cells <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
+// `node packages/core/scripts/gates/flip.ts --check <heap|work|sections|parent|verdict|xplat> --out <dir> [--rounds <n>] [--trees <dir>] [--cells <dir>]` writes `<dir>/gate-flip-<check>.json` and `.md`.
 // The exit code is 0 only when each arm gives its stated exit code and its stated reason. So a crash is not a red, and a run that cannot decide is not a green.
 // An arm that ends on a run that cannot decide is a no read of the flip: the exit code is 3, so the job shows red. A no read is not a pass, and it shows no fault of the gate.
 //
 // - `heap` runs the gate of `scripts/heap.ts` on `corners` at its real budget: clean, with a fault of `HEAP_FAULT_MB`, and with a budget of `null`.
 // - `work` runs the compare of `same-stops.ts` on real stops: the same file twice, and a copy with one stop changed.
 // - `sections` runs `sections-bisect.ts --gate` on two commits on top of the checkout: an empty commit, and a commit that spins `SECTIONS_FAULT_SHARE` of the route time.
+// - `parent` replays a quiet run of the sections gate from CI (`parent-flip.ts`): as recorded, and with each head time times the margin of the check against the parent.
+//   The replay has no runner noise, so this flip holds the check against the parent on each run of the job `quick`.
 // - `verdict` runs `screen-verdict.ts --check` on records that it makes: the same snapshot, a moved label, a row with no records, and records with one missing.
 // - `xplat` runs `xplat-summary.ts` on copies of the real rows of the reference cell in `--cells`.
 //   The arms are a clean copy, a route, an exact result and a repeat that differ, and rows removed from one cell and from each cell.
@@ -15,14 +17,14 @@
 // The commits of `sections` are made with the plumbing of git, so the checkout does not change.
 // An arm that cannot decide takes the second attempt with 2 times the rounds, as the job `retry` does. Each later run takes `--attempt 2` again (`sectionsAttempts`).
 // The clean arm starts with 2 times the rounds on a CPU model with a noisy share above 1/2 in the noise table (`startChoice` of `sections-noise.ts`).
-// `sections-noise.ts` imports `@mark1russell7/rigor-statistics`, so only the arm `sections` loads it, with a dynamic import. A test holds that the static imports of this file load no package.
+// `sections-noise.ts` imports `@mark1russell7/rigor-statistics`, so only the arm `sections` loads it, with a dynamic import. The arm `parent` loads `parent-flip.ts` in the same way. A test holds that the static imports of this file load no package.
 import { spawnSync } from "node:child_process";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { FIXED_BEYOND_TEXT, recordVerdict, type GateRecord } from "../sections-gate-verdict.ts";
+import { FIXED_BEYOND_TEXT, PARENT_SLOWER_TEXT, recordVerdict, type GateRecord } from "../sections-gate-verdict.ts";
 import type { FlipOutcome, StartChoice } from "../sections-noise.ts";
 import { envOf, type RecordEnv } from "./paired.ts";
 
@@ -125,6 +127,12 @@ export function flipOutcome(arms: readonly FlipArm[]): FlipOutcome {
 export const SECTIONS_WANT = {
   clean: { exit: 0, reason: "pass, in the words of the home" },
   slower: { exit: 1, reason: FIXED_BEYOND_TEXT },
+} as const satisfies Readonly<Record<SectionsArm, ArmWant>>;
+
+/** The wanted read of each arm of the flip of the check against the parent. The slower arm passes the check against the fixed base, so only the check against the parent fails it. */
+export const PARENT_WANT = {
+  clean: { exit: 0, reason: "pass, in the words of the home" },
+  slower: { exit: 1, reason: PARENT_SLOWER_TEXT },
 } as const satisfies Readonly<Record<SectionsArm, ArmWant>>;
 
 /**
@@ -386,6 +394,13 @@ async function sectionsFlip(dir: string, trees: string, rounds: string): Promise
   return { arms, start };
 }
 
+/** This function gives the flip of the check against the parent of the sections gate, from the fixture of `parent-flip.ts`. */
+async function parentFlip(): Promise<FlipArm[]> {
+  const { PARENT_RUN_FILE, parentFlip: replay, parseParentRun } = await import("./parent-flip.ts");
+  const { clean, slower } = replay(parseParentRun(readFileSync(here(`../../${PARENT_RUN_FILE}`), "utf8")));
+  return [judge(clean, PARENT_WANT.clean), judge(slower, PARENT_WANT.slower)];
+}
+
 /** This function writes the table of a record. */
 export function flipTable(record: FlipRecord): string {
   const rows = record.arms.map((a) => {
@@ -412,11 +427,12 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
     heap: () => ({ arms: heapFlip(dir) }),
     work: () => ({ arms: workFlip(dir) }),
     sections: () => sectionsFlip(join(out, "sections"), resolve(values.trees ?? join(dir, "trees")), values.rounds),
+    parent: async () => ({ arms: await parentFlip() }),
     verdict: () => ({ arms: verdictFlip(dir) }),
     xplat: () => ({ arms: xplatFlip(dir, resolve(values.cells)) }),
   };
   const flip = flips[values.check ?? ""];
-  if (flip === undefined) throw new Error(`The check is heap, work, sections, verdict or xplat, not "${values.check}".`);
+  if (flip === undefined) throw new Error(`The check is heap, work, sections, parent, verdict or xplat, not "${values.check}".`);
   const { arms, start } = await flip();
   const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), outcome: flipOutcome(arms), ...(start === undefined ? {} : { start }), env: envOf("fresh") };
   writeFileSync(join(out, `gate-flip-${record.check}.json`), JSON.stringify(record, null, 1) + "\n");

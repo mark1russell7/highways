@@ -1,0 +1,352 @@
+{
+  "schema": "gate-flip-parent/1",
+  "note": "The clean arm of the flip of the sections gate in the run 44229911435 of gate-flip.yml (job sections, first run). Its A/A spread is below the noise cap. The pool is the file data/sections-gate/aa-pool.json at its parent.",
+  "source": {
+    "run": 44229911435,
+    "job": "sections",
+    "arm": "clean",
+    "attempt": 1
+  },
+  "record": {
+    "schema": "sections-gate/4",
+    "attempt": 1,
+    "board": {
+      "ref": "0dff3fd6a03b03878d29f78527dd0776737c4805",
+      "sha": "0dff3fd6a03b03878d29f78527dd0776737c4805",
+      "subject": "ci(profile): call the script with pnpm run (profile is a pnpm command)"
+    },
+    "fixture": "large-clustered",
+    "router": "sections-tree",
+    "rounds": 10,
+    "head": {
+      "ref": "flip clean",
+      "sha": "d41504bc652d6ed733096160a5231e938c6a57b8",
+      "subject": "flip: no change"
+    },
+    "parent": {
+      "ref": "the checkout",
+      "sha": "eabc350d01f4fd2481aec38f7b940e9f8850b761",
+      "subject": "ci(gates): GATE-FLIP-NOISE: the sections flip decides on a noisy runner"
+    },
+    "fixed": {
+      "ref": "25a2be43b2eff6d771fc765b06c94f9b9cc0cb80",
+      "sha": "25a2be43b2eff6d771fc765b06c94f9b9cc0cb80",
+      "subject": "perf(core): SEARCH-SPEED: the corner-graph search keeps one heap entry for each corner (#259)"
+    },
+    "fixedBase": {
+      "schema": "sections-gate-base/1",
+      "commit": "25a2be43b2eff6d771fc765b06c94f9b9cc0cb80",
+      "date": "2026-11-03",
+      "reason": "SEARCH-SPEED gain (#259). The confirm run 41646787837 on main is quiet (A/A spread 0.008) and gives head / old fixed base bce22a5 = 0.809. The PR run of #261 gave 0.774. The fixed base moves to 25a2be4, so the gate keeps the gain."
+    },
+    "skipped": null,
+    "env": {
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "cores": 4,
+      "os": "linux",
+      "arch": "x64",
+      "node": "v26.13.1",
+      "mode": "fresh",
+      "context": "ci"
+    },
+    "report": {
+      "schema": "paired-time/1",
+      "mode": "fresh",
+      "context": "ci",
+      "env": {
+        "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+        "cores": 4,
+        "os": "linux",
+        "arch": "x64",
+        "node": "v26.13.1",
+        "runner": "GitHub Actions 1000409006"
+      },
+      "base": "parent",
+      "arms": [
+        "parent",
+        "commit",
+        "fixed",
+        "parent~aa"
+      ],
+      "inputs": [
+        {
+          "id": "sections-tree",
+          "group": "sections-tree",
+          "ms": {
+            "parent": [
+              40869.718452,
+              40441.824084,
+              39422.034525,
+              41111.90025100001,
+              40360.753736,
+              39958.984819,
+              39108.674556,
+              39730.383341,
+              40496.52449,
+              39533.391716
+            ],
+            "commit": [
+              39650.186083,
+              39924.703076000005,
+              40072.158789999994,
+              39876.631092,
+              39545.615946,
+              40451.099609,
+              39654.349704,
+              39444.116969999995,
+              39627.524810999996,
+              39665.58319
+            ],
+            "fixed": [
+              43427.14782,
+              41241.463264,
+              41204.205756,
+              41309.343963,
+              40921.747921999995,
+              41739.738918,
+              41610.688493,
+              41261.387815999995,
+              41474.198737,
+              42215.525694
+            ],
+            "parent~aa": [
+              40818.451474,
+              39647.249464,
+              39985.174006,
+              40989.434189,
+              39876.614432,
+              39995.260589,
+              40002.195005,
+              40066.251752,
+              39876.355992000004,
+              40494.140688
+            ]
+          },
+          "median": {
+            "parent": 40159.869277499994,
+            "commit": 39659.966447,
+            "fixed": 41391.771349999995,
+            "parent~aa": 39998.727797
+          },
+          "ratio": {
+            "commit": 0.9875521798378942,
+            "fixed": 1.0306749522511565,
+            "parent~aa": 0.9959874998748993
+          },
+          "peakRss": {
+            "parent": 586387456,
+            "commit": 575610880,
+            "fixed": 575086592,
+            "parent~aa": 524820480
+          }
+        }
+      ],
+      "ratios": {
+        "commit": {
+          "inputs": 1,
+          "median": 0.9875521798378942,
+          "p10": 0.9875521798378942,
+          "p90": 0.9875521798378942,
+          "moved": 1,
+          "groups": {
+            "sections-tree": 0.9875521798378942
+          },
+          "groupMean": 0.9875521798378942,
+          "groupSD": 0
+        },
+        "fixed": {
+          "inputs": 1,
+          "median": 1.0306749522511565,
+          "p10": 1.0306749522511565,
+          "p90": 1.0306749522511565,
+          "moved": 1,
+          "groups": {
+            "sections-tree": 1.0306749522511565
+          },
+          "groupMean": 1.0306749522511565,
+          "groupSD": 0
+        },
+        "parent~aa": {
+          "inputs": 1,
+          "median": 0.9959874998748993,
+          "p10": 0.9959874998748993,
+          "p90": 0.9959874998748993,
+          "moved": 0,
+          "groups": {
+            "sections-tree": 0.9959874998748993
+          },
+          "groupMean": 0.9959874998748993,
+          "groupSD": 0
+        }
+      },
+      "noiseFloor": {
+        "median": 0.9959874998748993,
+        "p10": 0.9959874998748993,
+        "p90": 0.9959874998748993
+      },
+      "orders": [
+        [
+          "parent",
+          "commit",
+          "fixed",
+          "parent~aa"
+        ],
+        [
+          "parent~aa",
+          "fixed",
+          "commit",
+          "parent"
+        ],
+        [
+          "commit",
+          "fixed",
+          "parent~aa",
+          "parent"
+        ],
+        [
+          "parent",
+          "parent~aa",
+          "fixed",
+          "commit"
+        ],
+        [
+          "fixed",
+          "parent~aa",
+          "parent",
+          "commit"
+        ],
+        [
+          "commit",
+          "parent",
+          "parent~aa",
+          "fixed"
+        ],
+        [
+          "parent~aa",
+          "parent",
+          "commit",
+          "fixed"
+        ],
+        [
+          "fixed",
+          "commit",
+          "parent",
+          "parent~aa"
+        ],
+        [
+          "parent",
+          "commit",
+          "fixed",
+          "parent~aa"
+        ],
+        [
+          "parent~aa",
+          "fixed",
+          "commit",
+          "parent"
+        ]
+      ]
+    },
+    "home": {
+      "outcome": "same",
+      "reason": "The interval of the candidate median over the A/A median is [0.9688, 1.0145]. The interval is in the margin of 0.0488.",
+      "low": 0.9687932806976768,
+      "high": 1.01446311221833,
+      "margin": 0.04879016416943205,
+      "noise": {
+        "spread": 0.022732188185105313,
+        "cap": 0.058268908123975824,
+        "noisy": false
+      },
+      "pool": {
+        "cases": 30,
+        "runs": 3,
+        "spread": 0.0418153034056572,
+        "floor": 0.04879016416943205,
+        "pooled": false
+      }
+    },
+    "fixedCheck": {
+      "outcome": "within",
+      "reason": "The largest bound of a case within is 0.9913 in the case \"sections-tree\", and it is at most the limit 1.1.",
+      "limit": 1.1,
+      "ratio": 0.9606258844041393,
+      "rounds": 10,
+      "low": 0.9395970448767282,
+      "high": 0.9691267999655769,
+      "noise": 0.022590029696183775,
+      "bound": 0.9912685529979699,
+      "floor": 0.9186094672372412
+    },
+    "end": "pass",
+    "noRead": null
+  },
+  "pool": {
+    "schema": "sections-gate-pool/1",
+    "runs": [
+      {
+        "run": 41551225572,
+        "job": "gate",
+        "date": "2026-11-03",
+        "commit": "7fca193547650d772ea2d1fa145279dc4d3ffaa3",
+        "parent": "eb963ff0fb01f10c02b6d0e195fd5b6a6b26559f",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "spread": 0.03328480326935531,
+        "ratios": [
+          0.9669927520216217,
+          1.0037432806166948,
+          0.9948188760075823,
+          0.9686277688180492,
+          0.9810576296182473,
+          1.0207442568138583,
+          1.0129480923589185,
+          0.9642171991118514,
+          1.000493383413644,
+          1.0095708532163667
+        ]
+      },
+      {
+        "run": 41548991752,
+        "job": "gate",
+        "date": "2026-11-02",
+        "commit": "368c0191f518c764e6cd0c3c2dde5596497a06b2",
+        "parent": "eb963ff0fb01f10c02b6d0e195fd5b6a6b26559f",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "spread": 0.05106312900697124,
+        "ratios": [
+          1.0477979422527517,
+          0.9195501902050527,
+          1.0367735611135669,
+          0.9709931675446336,
+          0.9784806737325332,
+          1.0212385475545405,
+          0.9853247556253605,
+          1.0421371802200816,
+          1.0332154007367702,
+          1.005539584316846
+        ]
+      },
+      {
+        "run": 41542329976,
+        "job": "gate",
+        "date": "2026-11-02",
+        "commit": "4efe31c1416a6dc1bf4c016f5df526303cc1582e",
+        "parent": "bce22a5590ec8dd49d92b84f1e056cc1ca02b800",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "spread": 0.027319149137890807,
+        "ratios": [
+          1.0243603929473581,
+          0.9930506652065185,
+          0.9832138807403585,
+          0.9891736498981256,
+          0.9929105805028549,
+          0.9460520451473151,
+          0.9953826167895091,
+          1.0094870191762517,
+          1.009673970124294,
+          0.9905562678364809
+        ]
+      }
+    ]
+  }
+}
