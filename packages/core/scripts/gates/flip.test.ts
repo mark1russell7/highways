@@ -136,3 +136,29 @@ describe("the budgets of the heap gate", () => {
     for (const router of ROUTERS) expect(Object.keys(budgets.routers)).toContain(router.name);
   });
 });
+
+describe("the static imports of flip.ts", () => {
+  // The job summary of xplat.yml starts `flip.ts --check xplat` with no installed package. Node strips an `import type`, so it loads nothing.
+  it("load no package, so the job summary of xplat.yml can start the flip with no install", () => {
+    const patterns = [/^import\s+(?!type\s)[^;"]*?\sfrom\s*"([^"]+)"/gm, /^import\s*"([^"]+)"/gm, /^export\s+(?!type\s)(?:\*|\{[^}]*\})\s*from\s*"([^"]+)"/gm];
+    const seen = new Set<string>();
+    const packages: string[] = [];
+    const visit = (url: URL): void => {
+      if (seen.has(url.href)) return;
+      seen.add(url.href);
+      const src = readFileSync(url, "utf8");
+      for (const pattern of patterns) {
+        for (const m of src.matchAll(pattern)) {
+          const spec = m[1]!;
+          if (spec.startsWith("node:")) continue;
+          if (spec.startsWith(".")) visit(new URL(spec, url));
+          else packages.push(`${url.pathname.split("/scripts/")[1] ?? url.pathname}: ${spec}`);
+        }
+      }
+    };
+    visit(new URL("./flip.ts", import.meta.url));
+    expect(packages).toEqual([]);
+    // The walk reaches the files of the verdict, so it reads more than flip.ts.
+    expect([...seen].some((href) => href.endsWith("/sections-gate-verdict.ts"))).toBe(true);
+  });
+});

@@ -15,6 +15,7 @@
 // The commits of `sections` are made with the plumbing of git, so the checkout does not change.
 // An arm that cannot decide takes the second attempt with 2 times the rounds, as the job `retry` does. Each later run takes `--attempt 2` again (`sectionsAttempts`).
 // The clean arm starts with 2 times the rounds on a CPU model with a noisy share above 1/2 in the noise table (`startChoice` of `sections-noise.ts`).
+// `sections-noise.ts` imports `@mark1russell7/rigor-statistics`, so only the arm `sections` loads it, with a dynamic import. A test holds that the static imports of this file load no package.
 import { spawnSync } from "node:child_process";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -22,7 +23,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { FIXED_BEYOND_TEXT, recordVerdict, type GateRecord } from "../sections-gate-verdict.ts";
-import { NOISE_FILE, parseNoise, startChoice, type FlipOutcome, type StartChoice } from "../sections-noise.ts";
+import type { FlipOutcome, StartChoice } from "../sections-noise.ts";
 import { envOf, type RecordEnv } from "./paired.ts";
 
 /** The schema of the record. */
@@ -356,7 +357,8 @@ function commitOn(root: string, parent: string, message: string, changed?: { pat
  * This function gives the flip of the sections gate. Each arm takes the runs of `sectionsAttempts`, and it stops at its first run that decides.
  * The noise table of the checkout and the CPU model of this computer choose the first rounds of the clean arm.
  */
-function sectionsFlip(dir: string, trees: string, rounds: string): { arms: FlipArm[]; start: StartChoice } {
+async function sectionsFlip(dir: string, trees: string, rounds: string): Promise<{ arms: FlipArm[]; start: StartChoice }> {
+  const { NOISE_FILE, parseNoise, startChoice } = await import("../sections-noise.ts");
   const root = git(here("."), ["rev-parse", "--show-toplevel"]);
   const parent = git(root, ["rev-parse", "HEAD"]);
   const start = startChoice(parseNoise(readFileSync(here(`../../${NOISE_FILE}`), "utf8")), envOf("fresh").cpu, Number(rounds));
@@ -406,7 +408,7 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   const dir = mkdtempSync(join(tmpdir(), "gate-flip-"));
-  const flips: Readonly<Record<string, () => { arms: FlipArm[]; start?: StartChoice }>> = {
+  const flips: Readonly<Record<string, () => { arms: FlipArm[]; start?: StartChoice } | Promise<{ arms: FlipArm[]; start?: StartChoice }>>> = {
     heap: () => ({ arms: heapFlip(dir) }),
     work: () => ({ arms: workFlip(dir) }),
     sections: () => sectionsFlip(join(out, "sections"), resolve(values.trees ?? join(dir, "trees")), values.rounds),
@@ -415,7 +417,7 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === realpathS
   };
   const flip = flips[values.check ?? ""];
   if (flip === undefined) throw new Error(`The check is heap, work, sections, verdict or xplat, not "${values.check}".`);
-  const { arms, start } = flip();
+  const { arms, start } = await flip();
   const record: FlipRecord = { schema: SCHEMA, check: values.check!, arms, passed: flipPassed(arms), outcome: flipOutcome(arms), ...(start === undefined ? {} : { start }), env: envOf("fresh") };
   writeFileSync(join(out, `gate-flip-${record.check}.json`), JSON.stringify(record, null, 1) + "\n");
   const table = flipTable(record);
