@@ -1,6 +1,6 @@
 {
   "schema": "gate-flip-parent/1",
-  "note": "The clean arm of the flip of the sections gate in the run 44229911435 of gate-flip.yml (job sections, first run). Its A/A spread is below the noise cap. The pool is the file data/sections-gate/aa-pool.json at its parent.",
+  "note": "The clean arm of the job sections of the workflow Gate flip in the run 44229911435 (run 1 of the gate). Its A/A spread is below the noise cap, and the replay with the pool gives its verdicts.",
   "source": {
     "run": 44229911435,
     "job": "sections",
