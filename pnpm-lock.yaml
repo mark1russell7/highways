@@ -215,8 +215,8 @@ importers:
   packages/core:
     dependencies:
       '@mark1russell7/layout-contract':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.6
+        version: 0.10.6
       '@mark1russell7/predicates':
         specifier: ^0.1.0
         version: 0.1.5
@@ -573,8 +573,8 @@ packages:
   '@mark1russell7/highways@0.8.0':
     resolution: {integrity: sha512-Gw9nJB2tCto2VQNonWCk/9oz7gewKFd/2RELZ00x1L1g5dY5eUt4JEUgjuRm6wEi1BGRWaF03UJ2eDtesvk0xA==}
 
-  '@mark1russell7/layout-contract@0.10.0':
-    resolution: {integrity: sha512-I+7OUWzOky/Xdjll45pe6Azxqd/5XjaJrH3YdE6WXWn/ttw1rgd/AWrPMTDn6X8VTNpPL8pD829SICcT4RIKZg==}
+  '@mark1russell7/layout-contract@0.10.6':
+    resolution: {integrity: sha512-/al3v3Q/DH9QvSVZdAqxjKIcoC53FfhCR6T6p819lUIMFglNswy8AaXEo3EZ7rz0xBwBj5C4X0bPLWitrcOsLg==}
     engines: {node: '>=22.12'}
 
   '@mark1russell7/layout-contract@0.2.21':
@@ -2155,7 +2155,7 @@ snapshots:
     dependencies:
       '@mark1russell7/layout-contract': 0.2.21
 
-  '@mark1russell7/layout-contract@0.10.0':
+  '@mark1russell7/layout-contract@0.10.6':
     dependencies:
       '@mark1russell7/predicates': 0.1.5
       '@mark1russell7/rigor-generators': 0.1.16

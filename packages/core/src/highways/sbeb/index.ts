@@ -1,3 +1,4 @@
+import { nearestOnSegment } from "@mark1russell7/layout-contract";
 import { boardUnit } from "../../bench/measures/routes.ts";
 import { dist, type Point } from "../../geom.ts";
 import { byCollection } from "../../routers/trunks.ts";
@@ -219,13 +220,7 @@ export function nearestOnLine(line: readonly Point[], p: Point): Point {
   let best = line[0]!;
   let bestD = dist(p, best);
   for (let i = 1; i < line.length; i++) {
-    const a = line[i - 1]!;
-    const b = line[i]!;
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const l2 = dx * dx + dy * dy;
-    const u = l2 > 0 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2)) : 0;
-    const q = { x: a.x + u * dx, y: a.y + u * dy };
+    const q = nearestOnSegment(p, line[i - 1]!, line[i]!);
     const d = dist(p, q);
     if (d < bestD) [best, bestD] = [q, d];
   }

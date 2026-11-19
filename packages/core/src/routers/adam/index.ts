@@ -1,3 +1,4 @@
+import { nearestOnSegment } from "@mark1russell7/layout-contract";
 import { checkProperties } from "../../bench/properties.ts";
 import { measureQuality } from "../../bench/quality.ts";
 import { rng } from "../../fixtures.ts";
@@ -55,15 +56,6 @@ interface Leg {
   readonly ny: number;
   /** The boxes near the leg. */
   readonly boxes: readonly Box[];
-}
-
-/** This function gives the point of the segment `ab` nearest to `p`. */
-function nearestOn(p: Point, a: Point, b: Point): Point {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const l2 = dx * dx + dy * dy;
-  const t = l2 > 0 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2)) : 0;
-  return { x: a.x + t * dx, y: a.y + t * dy };
 }
 
 /** This function gives the point of a box nearest to `p`. A point in the box gives the nearest point of its border. */
@@ -207,7 +199,7 @@ export function adamRoutes(input: Graph, result: Result, options: Partial<AdamOp
       for (let s = 0; s < count; s++) {
         const other = all[Math.floor(random() * all.length)]!;
         if (other.route === l.route) continue;
-        const q = nearestOn(mid, pointOf(other.route, other.k), pointOf(other.route, other.k + 1));
+        const q = nearestOnSegment(mid, pointOf(other.route, other.k), pointOf(other.route, other.k + 1));
         const dx = mid.x - q.x;
         const dy = mid.y - q.y;
         const d = Math.sqrt(dx * dx + dy * dy);
