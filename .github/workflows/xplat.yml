@@ -109,7 +109,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         # The full versions, so a new node reaches this check only on the pull request of Renovate that moves it. `CELLS` names the majors.
         node:
-          - 24.22.2 # node-24
+          - 24.22.3 # node-24
           - 26.13.0 # node-26
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -213,7 +213,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         # The full versions, so a new node reaches this check only on the pull request of Renovate that moves it. `CELLS` names the majors.
         node:
-          - 24.22.2 # node-24
+          - 24.22.3 # node-24
           - 26.13.0 # node-26
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
