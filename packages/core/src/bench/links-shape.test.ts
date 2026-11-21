@@ -17,6 +17,8 @@ describe("the link measures with true shapes", () => {
   // The fixtures of 1,000 nodes or fewer. The larger fixtures are for the benchmark.
   const fixtures = FIXTURES.filter((f) => f.nodes <= 1000);
 
+  // Each test routes all the fixtures of 1,000 nodes or fewer. The 5 s default is too short: on 2026-11-18 to 11-21,
+  // "shared" took 3.3 to 5.1 s in the checks job and 7.9 to 16.2 s in the coverage job. The limit is 30 s.
   for (const name of ["straight", "shared", "corners"]) {
     it(`gives the count of countLinksThroughShapes of the contract on each fixture for ${name}`, () => {
       const router = asRouter(getStrategy(STRATEGIES, "router", name));
@@ -31,7 +33,7 @@ describe("the link measures with true shapes", () => {
         });
         expect(measureRouteFaults(graph, result).through, `${name} ${spec.name}`).toBe(countLinksThroughShapes(boxes, links, TOLERANCE));
       }
-    });
+    }, 30_000);
   }
 
   // A circle of radius 50 in the box from (100, 0) to (200, 100). A route cuts the corner of the box near (100, 0).
