@@ -1,5 +1,9 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.4
+
+An automated dependency update changes the shipped files, so this PATCH ships them.
+
 ## 0.19.3
 
 This version is a PATCH: three private functions use their home, and the range of a dependency goes up. No output changes.
