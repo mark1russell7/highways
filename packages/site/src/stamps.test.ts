@@ -32,7 +32,7 @@ describe("the stamps of the Results page (VERDICT-STAMPS)", () => {
   it("gives stamps of the form data-stamp/1 for the committed verdicts", () => {
     const root = fileURLToPath(new URL("../../../", import.meta.url));
     const headers = snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader);
-    const parsed = parseDataStamps(verdictStamps(headers, "mark1russell7/highways"));
+    const parsed = parseDataStamps(verdictStamps(headers, "metrograph-labs/highways"));
     expect(parsed.ok ? [] : parsed.faults).toEqual([]);
   });
 });
@@ -61,7 +61,7 @@ describe("the stamp of the home page (HOME-STAMPS)", () => {
     const root = fileURLToPath(new URL("../../../", import.meta.url));
     const headers = snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader);
     const bench = JSON.parse(readFileSync(join(root, "docs/research/bench/bench-meta.json"), "utf8")) as BenchHeader;
-    const parsed = parseDataStamps(siteDataStamps(headers, bench, "mark1russell7/highways"));
+    const parsed = parseDataStamps(siteDataStamps(headers, bench, "metrograph-labs/highways"));
     expect(parsed.ok ? [] : parsed.faults).toEqual([]);
   });
 });

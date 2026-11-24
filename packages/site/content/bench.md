@@ -4,4 +4,4 @@ This table shows the committed snapshot of one run of the workflow `Bench`, in `
 
 The column "Time ÷ shared" divides the time of the router by the time of `shared`. The two routers route the fixture in turn on the same CPU, so the ratio does not change with the speed of the runner. Only a snapshot with the paired arm has this column.
 
-The workflow [`Bench`](https://github.com/mark1russell7/highways/actions/workflows/bench.yml) races the routers on all the fixtures, to 100 000 nodes. Its summary has the full table.
+The workflow [`Bench`](https://github.com/metrograph-labs/highways/actions/workflows/bench.yml) races the routers on all the fixtures, to 100 000 nodes. Its summary has the full table.

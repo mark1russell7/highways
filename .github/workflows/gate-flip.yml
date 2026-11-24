@@ -26,7 +26,7 @@ on:
         description: "The timed rounds of each arm of the sections gate."
         default: "10"
   schedule:
-    - cron: "21 3 * * 0"
+    - cron: "46 3 * * 0"
   push:
     branches: [main]
     paths:

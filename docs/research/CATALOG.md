@@ -95,7 +95,7 @@ The other counts are for the 248 distinct ideas.
 | `prototyped` | 2 |
 | `screened`, `built`, `kept` and `dropped` | 0 |
 
-HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) added the strategy `corridors`, which is the build of `HWY-031`. BUILD-Q1 screened it. Refer to [Queue builds](#queue-builds).
+HWY-STEP ([#67](https://github.com/metrograph-labs/highways/pull/67)) added the strategy `corridors`, which is the build of `HWY-031`. BUILD-Q1 screened it. Refer to [Queue builds](#queue-builds).
 
 ## The duplicate groups
 
@@ -983,7 +983,7 @@ The top 10:
 | 9 | `RULE-020` Adam with a seeded sample of pairs | `router` | 11.73 | `idea:RULE-019` |
 | 10 | `RULE-047` Pull toward the lane slots of the highway skeleton | `highway` | 11.5 | |
 
-The [results page](https://mark1russell7.github.io/highways/results.html) shows the top 20 and the count of each status.
+The [results page](https://metrograph-labs.github.io/highways/results.html) shows the top 20 and the count of each status.
 
 ### Queue calibration
 
@@ -1094,7 +1094,7 @@ BUILD-QUEUE takes the ideas from the top of the queue (direction 10). Each build
 
 ### BUILD-Q1: the corridor signatures (`HWY-031`)
 
-- HWY-STEP ([#67](https://github.com/mark1russell7/highways/pull/67)) built this idea as the strategy `corridors`. The strategy has its folder, its tests, a schema for each param of the record and a row in the benchmark. BUILD-Q1 adds no strategy. It adds the screen module `packages/core/scripts/screens/build-q1.ts` with the params of the record.
+- HWY-STEP ([#67](https://github.com/metrograph-labs/highways/pull/67)) built this idea as the strategy `corridors`. The strategy has its folder, its tests, a schema for each param of the record and a row in the benchmark. BUILD-Q1 adds no strategy. It adds the screen module `packages/core/scripts/screens/build-q1.ts` with the params of the record.
 - The runs: [40764071893](https://github.com/mark1russell7/highways/actions/runs/40764071893) (`screen-v1`) and [40764744994](https://github.com/mark1russell7/highways/actions/runs/40764744994) (`screen-v2`).
 - `corridors` saves more ink than `shared` on hub-chain and many-groups, where `shared` bundles almost nothing. It saves less on dense-groups and small-clustered (B1 0.118 against 0.323 on dense-groups of `screen-v2`). Thus B1 has no side.
 - B3 q0.95 is `better` on both sets. Only many-groups is against it (1.017 against 1.000 on `screen-v2`).

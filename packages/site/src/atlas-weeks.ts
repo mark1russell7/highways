@@ -9,7 +9,7 @@ export const ATLAS_WEEKS_FORMAT = "atlas-weeks/1";
 export const ATLAS_WEEKS_FILE = "atlas-weeks.json";
 
 /** The address of the live site. The build compares its weeks with the weeks of the live site. */
-export const LIVE_SITE = "https://mark1russell7.github.io/highways/";
+export const LIVE_SITE = "https://metrograph-labs.github.io/highways/";
 
 /** The days from one weekly record to the next. */
 export const WEEK_DAYS = 7;

@@ -1,4 +1,4 @@
-# Builds packages/site and publishes it to GitHub Pages at https://mark1russell7.github.io/highways/, with
+# Builds packages/site and publishes it to GitHub Pages at https://metrograph-labs.github.io/highways/, with
 # the shared Pages workflow of mark1russell7 (reusable-pages.yml of mark1russell7/template, its CI.md).
 # The Pages source of the repository is "GitHub Actions" (Settings > Pages).
 # The build runs no benchmark. The site reads only committed files: the benchmark snapshot of docs/research/bench/
@@ -21,9 +21,9 @@ on:
   workflow_dispatch:
   # Each day, in case a release fails after it publishes
   schedule:
-    - cron: "32 5 * * *"
+    - cron: "8 5 * * *"
     # Each Sunday soon after the end of Saturday in UTC, so the atlas page gets the record of the week (ATLAS-WEEKLY)
-    - cron: "32 1 * * 0"
+    - cron: "8 1 * * 0"
 
 permissions: {}
 
