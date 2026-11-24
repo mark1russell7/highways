@@ -1,6 +1,6 @@
 # The weekly records of the atlas
 
-Each file `<date>.json` holds the leader of each region of the committed verdict snapshots on that date. The [atlas page](https://mark1russell7.github.io/highways/atlas.html) of the site reads all the records at build time.
+Each file `<date>.json` holds the leader of each region of the committed verdict snapshots on that date. The [atlas page](https://metrograph-labs.github.io/highways/atlas.html) of the site reads all the records at build time.
 
 No person writes the weekly record. The build of the site derives each week after the newest file of this folder from the git history. The section [The derived weeks](#the-derived-weeks) tells how.
 

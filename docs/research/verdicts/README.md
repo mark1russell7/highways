@@ -1,6 +1,6 @@
 # The verdict snapshots
 
-Each file `<set>-<step>.json` holds the verdicts of one screen against the default of its step. `STEP_BASE` of `screen-verdict.ts` gives the defaults. The [results page](https://mark1russell7.github.io/highways/results.html) of the site reads these files at build time.
+Each file `<set>-<step>.json` holds the verdicts of one screen against the default of its step. `STEP_BASE` of `screen-verdict.ts` gives the defaults. The [results page](https://metrograph-labs.github.io/highways/results.html) of the site reads these files at build time.
 
 ## The fields
 

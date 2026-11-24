@@ -28,7 +28,7 @@ export interface BenchLabel {
 /** A snapshot that is older than this number of days at the build date gets the warning. */
 export const STALE_DAYS = 1;
 
-const REPO = "https://github.com/mark1russell7/highways";
+const REPO = "https://github.com/metrograph-labs/highways";
 
 /** This function gives the day number of a date of the form `YYYY-MM-DD`, or `undefined` when the text is not such a date. */
 function dayOf(date: string | undefined): number | undefined {

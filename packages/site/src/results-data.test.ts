@@ -23,7 +23,7 @@ describe("results data", () => {
     expect(rows.map((r) => r.id)).toEqual(["A1", "B2", "REL1"]);
     expect(linkHtml(rows[0]!.link)).toContain("/commit/abcdef1");
     expect(linkHtml(rows[1]!.link)).toContain("/pull/12");
-    expect(absoluteLinks(rows[1]!.item)).toContain("](https://github.com/mark1russell7/highways/blob/main/docs/research/A.md#b)");
+    expect(absoluteLinks(rows[1]!.item)).toContain("](https://github.com/metrograph-labs/highways/blob/main/docs/research/A.md#b)");
   });
 
   it("takes the kept records and the opt-in rows that are not releases", () => {

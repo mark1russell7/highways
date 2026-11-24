@@ -8,7 +8,7 @@ name: Predicate dump
 on:
   # The minute 46 is scheduleMinute of conventions for this repository and file (the rule runner-budget).
   schedule:
-    - cron: "46 2 1 * *"
+    - cron: "33 2 1 * *"
   workflow_dispatch:
     inputs:
       sets:
