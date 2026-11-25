@@ -335,7 +335,7 @@ const timeReports = (opt("--time") ?? "")
 if (opt("--time") !== undefined && timeReports.length === 0) throw new Error(`The files of --time (${opt("--time")}) give no paired time report.`);
 
 const out: string[] = [`# The promotion test of \`${candidate}\` against \`${baseline}\` (step \`${step}\`)`, ""];
-// The record names the CI run of the jobs of the time test, so each limit has its runs next to it (STRATEGY.md 2026-11-02).
+// The record names the CI run of the jobs of the time test, so each limit has its runs next to it.
 const timeRun = process.env["GITHUB_RUN_ID"] === undefined ? undefined : `${process.env["GITHUB_SERVER_URL"] ?? "https://github.com"}/${process.env["GITHUB_REPOSITORY"] ?? ""}/actions/runs/${process.env["GITHUB_RUN_ID"]}`;
 const json: Record<string, unknown> = { candidate, baseline, step, ...(timeRun === undefined ? {} : { timeRun }), sets: [] };
 for (const s of sets) {
