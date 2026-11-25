@@ -7,6 +7,7 @@
   "commit": "d7951a70aea3f4ee11036f9da6dbfad2d26c3848",
   "date": "2026-11-13",
   "core": "0.18.0",
+  "verified": {"core":"0.19.3","run":45107781474,"commit":"8be55855a1e2fec64060869d44e0c50ea84f97aa","date":"2026-11-23"},
   "script": "d7951a70aea3f4ee11036f9da6dbfad2d26c3848",
   "rows": [
     {"strategy":"keys","guard":"R1","measure":"route.crossings","label":"worse","old":"worse","stratified":-255.44444444444446,"pooled":-328.14285714285717,"p":0.009765625,"families":[{"family":"dense-groups","n":3,"mean":-1102,"sign":-1},{"family":"hub-chain","n":1,"mean":0,"sign":0},{"family":"many-groups","n":1,"mean":-2,"sign":-1},{"family":"packed-grid","n":3,"mean":0,"sign":0},{"family":"small-clustered","n":3,"mean":-428.6666666666667,"sign":-1},{"family":"tiny-uniform","n":3,"mean":0,"sign":0}],"breadth":{"against":0,"of":6,"ties":3},"through":280,"baseThrough":280},
