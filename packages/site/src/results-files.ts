@@ -106,7 +106,7 @@ export function buildInfo(root: string, env: Readonly<Record<string, string | un
 
 /** This function gives the data line of a page as HTML: the core release, the commit and the date of the build. */
 export function dataLineHtml(info: BuildInfo): string {
-  const repo = "https://github.com/mark1russell7/highways";
+  const repo = "https://github.com/metrograph-labs/highways";
   const commit = info.commit === "" ? "a local checkout" : `commit <a href="${repo}/commit/${info.commit}"><code>${info.commit.slice(0, 7)}</code></a>`;
   return `Core <a href="https://www.npmjs.com/package/@mark1russell7/highways/v/${info.core}"><code>${info.core}</code></a>. Built from ${commit} on ${info.date}.`;
 }

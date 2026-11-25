@@ -207,7 +207,7 @@ The line data of the profile shows two costs in the walk:
 - The look-up of each bucket takes 2.0 % of all the time. The key of a bucket is not a small integer, so the map hashes a boxed number.
 - `Math.hypot` takes 1.8 % of all the time. It gives the number of steps of each segment.
 
-The fix ([#280](https://github.com/mark1russell7/highways/pull/280)) keeps the buckets in a table with open addressing, by the same keys. Each key gives the same list of items.
+The fix ([#280](https://github.com/metrograph-labs/highways/pull/280)) keeps the buckets in a table with open addressing, by the same keys. Each key gives the same list of items.
 
 A segment parallel to an axis uses its other side as its length. `Math.hypot` gives the same value.
 For a different segment, a square root gives the length. The square root and `Math.hypot` differ by a few units in the last place.

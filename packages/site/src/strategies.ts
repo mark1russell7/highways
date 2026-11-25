@@ -14,7 +14,7 @@ const $ = <T extends HTMLElement>(id: string): T => {
 
 /** This function escapes a text and shows each span between backticks as code. */
 const code = (text: string): string => esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
-const REPO = "https://github.com/mark1russell7/highways";
+const REPO = "https://github.com/metrograph-labs/highways";
 
 /** The mark and the class of each verdict label, as on the results page. */
 const GLYPH: Readonly<Record<VerdictLabel, string>> = { better: "▲", worse: "▼", "depends on the mix": "◆", "no verdict": "○" };

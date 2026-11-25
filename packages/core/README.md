@@ -2,7 +2,7 @@
 
 `@mark1russell7/highways` routes the edges of large graphs. It knows no renderer. It takes boxes and edges, and it gives polylines and zoom levels.
 
-The [repository README](https://github.com/mark1russell7/highways#readme) tells the idea, the routers and the benchmark. The [site](https://mark1russell7.github.io/highways/) shows a live map.
+The [repository README](https://github.com/metrograph-labs/highways#readme) tells the idea, the routers and the benchmark. The [site](https://metrograph-labs.github.io/highways/) shows a live map.
 
 ## Install
 
@@ -981,7 +981,7 @@ configId(routeSpace, { space: "highways", stages: { routing: { option: "corridor
 
 ## Measures and the report
 
-The [note on the measures](https://github.com/mark1russell7/highways/blob/main/docs/research/MEASURES.md) gives an id, a formula and a scale to each measure. Each measure is a pure function, and its TSDoc names its id.
+The [note on the measures](https://github.com/metrograph-labs/highways/blob/main/docs/research/MEASURES.md) gives an id, a formula and a scale to each measure. Each measure is a pure function, and its TSDoc names its id.
 
 | Ids | Functions |
 |---|---|
@@ -1065,7 +1065,7 @@ const { graph } = highwaysRegistry().generate("fan-out", 4, { leaves: 40 });
 console.log(graph.nodes.length, signTestPower(15)); // 41 12
 ```
 
-[The corpus families](https://github.com/mark1russell7/highways/blob/main/docs/LAYOUT-RECORDS.md#the-corpus-families-corpus-gen) give the dimensions of each family.
+[The corpus families](https://github.com/metrograph-labs/highways/blob/main/docs/LAYOUT-RECORDS.md#the-corpus-families-corpus-gen) give the dimensions of each family.
 
 ## The same routes on each platform
 

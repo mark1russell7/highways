@@ -12,7 +12,7 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const REPO = "https://github.com/mark1russell7/highways";
+const REPO = "https://github.com/metrograph-labs/highways";
 /** The date of the viewer. A page built some time ago still shows the true age of its records. */
 const TODAY = new Date().toISOString().slice(0, 10);
 const DAY_MS = 86_400_000;

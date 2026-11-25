@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mark1russell7/highways/docs/research/ideas/schema.json",
+  "$id": "https://github.com/metrograph-labs/highways/docs/research/ideas/schema.json",
   "title": "Idea record",
   "description": "One idea of the catalog (IDEA0). Each family file holds an array of these records. docs/research/CATALOG.md tells the fields.",
   "type": "object",

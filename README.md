@@ -4,11 +4,11 @@
 
 The core is plain TypeScript. It knows no renderer. It takes boxes and edges, and it gives polylines and zoom levels.
 
-The site [mark1russell7.github.io/highways](https://mark1russell7.github.io/highways/) shows a live map. Pick a router and a fixture, and your browser routes the graph. The site also shows the benchmark.
+The site [metrograph-labs.github.io/highways](https://metrograph-labs.github.io/highways/) shows a live map. Pick a router and a fixture, and your browser routes the graph. The site also shows the benchmark.
 
-The [results page](https://mark1russell7.github.io/highways/results.html) shows the committed verdicts of the screens, the ideas and the newest items of the roadmap. Each merge to `main` builds it again.
+The [results page](https://metrograph-labs.github.io/highways/results.html) shows the committed verdicts of the screens, the ideas and the newest items of the roadmap. Each merge to `main` builds it again.
 
-The [strategies page](https://mark1russell7.github.io/highways/strategies.html) has a card for each strategy of the registry. A card shows the ideas that the strategy builds, with their papers, math and cost. It also shows the options, the verdicts and the time in the benchmark. The map [`strategy-ideas.ts`](packages/core/scripts/strategy-ideas.ts) links each strategy and its options to their idea records. It reads the ids in the text `describe`, and a test checks each id.
+The [strategies page](https://metrograph-labs.github.io/highways/strategies.html) has a card for each strategy of the registry. A card shows the ideas that the strategy builds, with their papers, math and cost. It also shows the options, the verdicts and the time in the benchmark. The map [`strategy-ideas.ts`](packages/core/scripts/strategy-ideas.ts) links each strategy and its options to their idea records. It reads the ids in the text `describe`, and a test checks each id.
 
 ## The idea
 
@@ -104,15 +104,15 @@ A renderer uses these segments for the three views of a bundle:
 - **Expand:** draw the route of each edge.
 - **Open some runs:** `laneRoutes(result, open, laneWidth, maxWidth)` pulls apart only the shared segments whose key is in `open`. The other segments stay as one way. `runKey(edges)` gives the key of a segment: its sorted edge ids, joined with commas.
 
-The [examples page](https://mark1russell7.github.io/highways/examples.html) shows these views on boards of made-up data.
+The [examples page](https://metrograph-labs.github.io/highways/examples.html) shows these views on boards of made-up data.
 
-The [compare page](https://mark1russell7.github.io/highways/compare.html) puts the strategies of one step side by side. Each panel shows the output of a strategy and its measures, and a mark shows the best value of each measure. The page covers each step of the pipeline and each strategy of the registry.
+The [compare page](https://metrograph-labs.github.io/highways/compare.html) puts the strategies of one step side by side. Each panel shows the output of a strategy and its measures, and a mark shows the best value of each measure. The page covers each step of the pipeline and each strategy of the registry.
 
 ## The curve types
 
 `curveOf(points, { type })` turns a polyline into a curve: `straight`, `rounded`, `spline`, `arc`, `smooth` or `clothoid`. The curve is a list of segments for any renderer. `toSvgPath` writes SVG path data, and `sampleCurve` gives points. With `curveSpace(boxes)`, a curve goes through no box that its polyline avoids. The [package README](packages/core/README.md) tells the API.
 
-The [compare page](https://mark1russell7.github.io/highways/compare.html) runs each strategy of a step on the same board. It marks the best value of each measure and the Pareto front.
+The [compare page](https://metrograph-labs.github.io/highways/compare.html) runs each strategy of a step on the same board. It marks the best value of each measure and the Pareto front.
 
 ## Room for the links
 

@@ -13,7 +13,7 @@ const $ = <T extends HTMLElement>(id: string): T => {
   return el as T;
 };
 
-const REPO = "https://github.com/mark1russell7/highways";
+const REPO = "https://github.com/metrograph-labs/highways";
 const count = (n: number): string => n.toLocaleString("en-US");
 const fileLink = (file: string): string => `<a href="${REPO}/blob/main/${SWEEP_DIR}/${encodeURIComponent(file)}"><code>${esc(file)}</code></a>`;
 const facts = data.facts;

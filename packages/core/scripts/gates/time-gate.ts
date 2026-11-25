@@ -112,10 +112,10 @@ export interface TimeTest {
 export function pairedTimeTest(reports: readonly PairedReport[], baseline: string, candidate: string, keys: ReadonlySet<string> | undefined, limits: TimeLimits): TimeTest {
   const aa = aaId(baseline);
   const pair = reports.filter((r) => r.base === baseline && r.arms.includes(candidate) && r.arms.includes(aa));
-  // Each case runs in its own fresh processes (BENCH-FRESH-CASES, STRATEGY.md 2026-11-02). A report of mode process does not count.
+  // Each case runs in its own fresh processes. A report of mode process does not count.
   const matched = pair.filter((r) => r.mode === "fresh");
   const inProcess = pair.length - matched.length;
-  // A job counts only when its A/A band contains 1. A job with a band that does not contain 1 measured the runner (STRATEGY.md 2026-11-02).
+  // A job counts only when its A/A band contains 1. A job with a band that does not contain 1 measured the runner.
   const mine = matched.filter((r) => r.noiseFloor === null || (r.noiseFloor.p10 <= 1 && r.noiseFloor.p90 >= 1));
   const outside = matched.length - mine.length;
   const empty = {
@@ -190,7 +190,7 @@ export function pairedTimeTest(reports: readonly PairedReport[], baseline: strin
 
 /**
  * This function gives one check of the time test, with its resolution from the A/A values of the reports.
- * The resolution is the worst A/A value plus the spread of the A/A values, with no margin factor (STRATEGY.md 2026-11-02).
+ * The resolution is the worst A/A value plus the spread of the A/A values, with no margin factor.
  */
 function check(name: "median" | "tail", worst: number, limit: number, aaValues: readonly number[]): TimeCheck {
   const aa = aaValues.reduce((x, y) => Math.max(x, y), Number.NEGATIVE_INFINITY);

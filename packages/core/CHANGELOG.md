@@ -1,5 +1,9 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.4
+
+This version is a PATCH: the repository moved to metrograph-labs. The fields `repository` and `homepage` of `package.json` and the links of the README name the new repository. The code does not change.
+
 ## 0.19.3
 
 This version is a PATCH: three private functions use their home, and the range of a dependency goes up. No output changes.

@@ -127,7 +127,7 @@ function committedResults(): Plugin {
 export default defineConfig({
   base,
   // The freshness gate of the Pages workflow reads the stamps of the verdicts (VERDICT-STAMPS) and of the benchmark snapshot (HOME-STAMPS).
-  plugins: [committedResults(), siteKpi(kpiInput, env), siteStamps(() => siteDataStamps(snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader), benchMeta(), "mark1russell7/highways"))],
+  plugins: [committedResults(), siteKpi(kpiInput, env), siteStamps(() => siteDataStamps(snapshotFiles(root).map((f) => JSON.parse(f.text) as VerdictHeader), benchMeta(), "metrograph-labs/highways"))],
   worker: { format: "es" },
   build: {
     target: "es2022",

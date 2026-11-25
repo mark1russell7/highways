@@ -526,7 +526,7 @@ export interface ResultsInput {
 /** The number of Shipped rows that the page shows. */
 export const SHIPPED_COUNT = 10;
 
-const REPO = "https://github.com/mark1russell7/highways";
+const REPO = "https://github.com/metrograph-labs/highways";
 
 /** This function changes the links of a roadmap row that are relative to `docs/` to links on GitHub. */
 export function absoluteLinks(markdown: string): string {

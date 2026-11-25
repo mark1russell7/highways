@@ -279,7 +279,7 @@ A gate check holds a gain only when it can fail on that gain. Each check below s
 | `Xplat OK` | A route, an exact result or a repeat that differs between the cells. A cell that does not hold the stated rows. A failed download of the inputs. A missing cell, or a job that stops. | The time and the quality. The tables only report them. | `xplat`: a route, an exact result and a repeat that differ, one short cell and 4 short cells, against a copy with no fault. |
 | `Security OK` | The dependency review, the scan of the packages and the scan of the code. | Each measure of a route. It reads no measure. | Not applicable. |
 
-Two rulesets make all 8 checks of this table necessary on `main`, so one ruleset alone does not hold the list. Read the list with `gh api repos/mark1russell7/highways/rules/branches/main`.
+Two rulesets make all 8 checks of this table necessary on `main`, so one ruleset alone does not hold the list. Read the list with `gh api repos/metrograph-labs/highways/rules/branches/main`.
 
 A ruleset makes `Scale OK`, `Search objective OK` and `Screen OK` necessary, and they read inputs only. A ruleset also makes `Search work OK` necessary, and only its gate (b) judges a result.
 

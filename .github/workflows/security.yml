@@ -9,7 +9,7 @@ on:
     branches: [main]
   # A weekly scan finds the new advisories for the dependencies that do not change
   schedule:
-    - cron: "6 5 * * 1"
+    - cron: "12 5 * * 1"
   workflow_dispatch:
 
 permissions: {}
@@ -32,6 +32,6 @@ jobs:
       security-events: write
       actions: read
     steps:
-      - uses: mark1russell7/template/.github/actions/security-scan@02fda5f29cc4edb08cd7e3c493be8fea055ffb22 # main
+      - uses: mark1russell7/template/.github/actions/security-scan@734075fad8c45edf8417b0e9412574ca6c2ef7b4 # main
 
   # The check of the ruleset (CI.md, "The check of the ruleset"): the scans of this file passed.
