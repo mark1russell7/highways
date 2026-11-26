@@ -4,7 +4,7 @@ This note is the result of the item MEAS2 of the [roadmap](../ROADMAP.md). It ra
 
 - The gap closed tells how much of the way from a baseline to the optimum a strategy goes. A value of 0 is the baseline, and a value of 1 is the optimum.
 - The optima come from the exact model of fixed-charge network design (HWY-040), solved with HiGHS. The file [`optima-exact-v1.json`](../../packages/core/src/bench/exact/optima-exact-v1.json) keeps them.
-- The tables come from the CI run [40617468092](https://github.com/mark1russell7/highways/actions/runs/40617468092) of the workflow `Screen`, at the commit `92d6640`. The run has 8120 records.
+- The tables come from the CI run [40617468092](https://github.com/metrograph-labs/highways/actions/runs/40617468092) of the workflow `Screen`, at the commit `92d6640`. The run has 8120 records.
 - The run did not include the strategies of wave 3D (#93). The screen module `scripts/screens/meas2.ts` adds them at the next run.
 - The note [`BOUNDS.md`](BOUNDS.md) gives the gap closed at each cap, and at 18, 24 and 40 nodes (EXACT-BOUNDS).
 - The note [`ORACLE.md`](ORACLE.md) gives the best strategy of each input. Its oracle closes a median of 0.947 of the gap.

@@ -11,7 +11,7 @@ The joint bench of layout-contract routes 24 inputs on linux with node 26 and on
 - The workflow `Xplat` runs the trace on ubuntu and windows, with node 24 and node 26. Only when a chunk differs, it then logs that chunk in full, with the stack of each call.
 - Each pull request starts `Xplat`. Its job `inputs` skips the cells when the pull request does not change the core or the trace. The check `Xplat OK` of the ruleset needs each job (CI-OK). It fails on a route that differs, on `corners`, `shared`, `shared-stretch` and `sections` only ([`CI.md`](../../CI.md)). A claim below is a read of the run that it names.
 - `packages/core/scripts/xplat-summary.ts` compares the cells. The inputs are the 24 inputs of the layout-contract run 40688908137. The folder `packages/core/scripts/data/xplat` keeps 3 of them.
-- The data comes from the CI run [40691194197](https://github.com/mark1russell7/highways/actions/runs/40691194197) of the workflow `Xplat`, at `highways` 0.7.0.
+- The data comes from the CI run [40691194197](https://github.com/metrograph-labs/highways/actions/runs/40691194197) of the workflow `Xplat`, at `highways` 0.7.0.
 
 ### The cells
 
@@ -56,7 +56,7 @@ The call logs of node 24 and node 26 differ in 54 of 153 routes. In each of the 
 - Thus three lanes can make a cycle: P before Q, Q before R and R before P.
 - The JavaScript specification does not define the result of a sort when the compare function is not consistent. Two engines can give two orders, and each is correct by the specification.
 
-The sort probe of the trace shows the change of the engine. The CI run [40693515449](https://github.com/mark1russell7/highways/actions/runs/40693515449) gives its data.
+The sort probe of the trace shows the change of the engine. The CI run [40693515449](https://github.com/metrograph-labs/highways/actions/runs/40693515449) gives its data.
 
 - The probe sorts a fixed shuffle of n numbers, and records the pairs that the engine gives to the compare function.
 - For 3 to 7 numbers, V8 13.6 and V8 14.6 give the pairs in a different sequence. For 2 numbers, and for 8 to 100 numbers, the sequence is the same.

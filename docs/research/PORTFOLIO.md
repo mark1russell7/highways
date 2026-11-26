@@ -27,15 +27,15 @@ This note is the result of the item PORTFOLIO of the [roadmap](../ROADMAP.md). A
 
 | Set | CI run | Records | Commit |
 |---|---|---:|---|
-| `exact-v1` | [40624133769](https://github.com/mark1russell7/highways/actions/runs/40624133769) | 10480 | `725206f` |
-| `screen-v1`, `small-clustered` | [40624136019](https://github.com/mark1russell7/highways/actions/runs/40624136019) | 786 | `725206f` |
-| `screen-v1`, `dense-groups` | [40624138382](https://github.com/mark1russell7/highways/actions/runs/40624138382) | 786 | `725206f` |
-| `screen-v1`, `hub-chain` | [40624140683](https://github.com/mark1russell7/highways/actions/runs/40624140683) | 262 | `725206f` |
-| `screen-v1`, `many-groups` | [40624142811](https://github.com/mark1russell7/highways/actions/runs/40624142811) | 262 | `725206f` |
-| `screen-v1`, `tiny-uniform` | [40624145062](https://github.com/mark1russell7/highways/actions/runs/40624145062) | 786 | `725206f` |
-| `screen-v1`, `packed-grid` | [40624147552](https://github.com/mark1russell7/highways/actions/runs/40624147552) | 786 | `725206f` |
-| the times | [40624849185](https://github.com/mark1russell7/highways/actions/runs/40624849185) | 47160 | branch `portfolio` |
-| the report | [40626512090](https://github.com/mark1russell7/highways/actions/runs/40626512090) | | branch `portfolio` |
+| `exact-v1` | [40624133769](https://github.com/metrograph-labs/highways/actions/runs/40624133769) | 10480 | `725206f` |
+| `screen-v1`, `small-clustered` | [40624136019](https://github.com/metrograph-labs/highways/actions/runs/40624136019) | 786 | `725206f` |
+| `screen-v1`, `dense-groups` | [40624138382](https://github.com/metrograph-labs/highways/actions/runs/40624138382) | 786 | `725206f` |
+| `screen-v1`, `hub-chain` | [40624140683](https://github.com/metrograph-labs/highways/actions/runs/40624140683) | 262 | `725206f` |
+| `screen-v1`, `many-groups` | [40624142811](https://github.com/metrograph-labs/highways/actions/runs/40624142811) | 262 | `725206f` |
+| `screen-v1`, `tiny-uniform` | [40624145062](https://github.com/metrograph-labs/highways/actions/runs/40624145062) | 786 | `725206f` |
+| `screen-v1`, `packed-grid` | [40624147552](https://github.com/metrograph-labs/highways/actions/runs/40624147552) | 786 | `725206f` |
+| the times | [40624849185](https://github.com/metrograph-labs/highways/actions/runs/40624849185) | 47160 | branch `portfolio` |
+| the report | [40626512090](https://github.com/metrograph-labs/highways/actions/runs/40626512090) | | branch `portfolio` |
 
 - The pool is the 262 strategies of the screen module `scripts/screens/meas2.ts` at `725206f`, with the built-in routers. It has the strategies of wave 3E. Wave 3F is not on `main`, so it is not in the pool.
 - The records of `ORACLE.md` came from `cc6f8e0`, before wave 3E. Thus this note screens the whole pool again, at one commit.
@@ -225,7 +225,7 @@ The prediction of the item was written before the work.
 
 ## The rule of the caller (PORTFOLIO-RULE)
 
-This section is the result of the item PORTFOLIO-RULE of the [roadmap](../ROADMAP.md). It uses the records of `exact-v1` of the run [40624133769](https://github.com/mark1russell7/highways/actions/runs/40624133769) again. It adds no strategy.
+This section is the result of the item PORTFOLIO-RULE of the [roadmap](../ROADMAP.md). It uses the records of `exact-v1` of the run [40624133769](https://github.com/metrograph-labs/highways/actions/runs/40624133769) again. It adds no strategy.
 
 ### The cause of the reversed pairs
 
@@ -332,8 +332,8 @@ The prediction was written before the work.
 
 This section is the result of the item EXACT-BOUNDS of the [roadmap](../ROADMAP.md). The curve of PORTFOLIO-RULE also runs at each cap: 1.1, 1.25 and 1.5. [`BOUNDS.md`](BOUNDS.md) gives the bounds past 10 nodes.
 
-- The records come from the CI run [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) of the workflow `Screen` on `exact-v1`. The run has 11880 records of 297 strategies, with wave 3F.
-- The report comes from the CI run [40633116748](https://github.com/mark1russell7/highways/actions/runs/40633116748) of the workflow `Portfolio`.
+- The records come from the CI run [40631516113](https://github.com/metrograph-labs/highways/actions/runs/40631516113) of the workflow `Screen` on `exact-v1`. The run has 11880 records of 297 strategies, with wave 3F.
+- The report comes from the CI run [40633116748](https://github.com/metrograph-labs/highways/actions/runs/40633116748) of the workflow `Portfolio`.
 - At one cap, the portfolio chooses by B1 only among the runs at or below the cap. Each input has a proven optimum at each cap and each rule.
 - The baseline `shared` stays the fallback output at each cap. Its stretch is above 1.1 on 5 of 40 inputs. There it keeps its gap closed.
 - An input counts at a cap only when the optimum at the cap is above the baseline of the rule. At the cap 1.1 with the rule `all`, 38 of 40 inputs count.
@@ -388,7 +388,7 @@ This section is the result of the item PORTFOLIO-API of the [roadmap](../ROADMAP
 
 The router chooses the band from the node count at call time: up to 12 nodes, 13 to 24 nodes, and 25 to 40 nodes. A larger graph uses the band of 25 to 40 nodes.
 
-- The records come from the CI run [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) on `exact-v1` (10 nodes), and from the 12 runs of EXACT-BOUNDS on `exact-v1-bounds` (18, 24 and 40 nodes).
+- The records come from the CI run [40631516113](https://github.com/metrograph-labs/highways/actions/runs/40631516113) on `exact-v1` (10 nodes), and from the 12 runs of EXACT-BOUNDS on `exact-v1-bounds` (18, 24 and 40 nodes).
 - The script [`scripts/portfolio-sets.ts`](../../packages/core/scripts/portfolio-sets.ts) (`pnpm portfolio:sets`) keeps a short table of the runs in `scripts/data/portfolio-runs.json.gz`. From it, the script writes the sets to `src/portfolio/sets.ts`. The test `sets.test.ts` checks that the file is current.
 - The seeds 0 to 4 of each band choose the set. The seeds 5 to 9 test it. Each rule and cap has the same split.
 - The value is the gap closed at the cap, with the midpoint of the interval of [`BOUNDS.md`](BOUNDS.md) above 10 nodes.
@@ -440,11 +440,11 @@ The screen module [`scripts/screens/portfolio-api.ts`](../../packages/core/scrip
 
 | Set | CI runs of the workflow `Screen` |
 |---|---|
-| `exact-v1` | [40649456144](https://github.com/mark1russell7/highways/actions/runs/40649456144) |
-| `exact-v1-bounds`, 18 nodes | [40649458704](https://github.com/mark1russell7/highways/actions/runs/40649458704), [40649461187](https://github.com/mark1russell7/highways/actions/runs/40649461187), [40649463378](https://github.com/mark1russell7/highways/actions/runs/40649463378), [40649465760](https://github.com/mark1russell7/highways/actions/runs/40649465760) |
-| `exact-v1-bounds`, 24 nodes | [40649468315](https://github.com/mark1russell7/highways/actions/runs/40649468315), [40649470298](https://github.com/mark1russell7/highways/actions/runs/40649470298), [40649472758](https://github.com/mark1russell7/highways/actions/runs/40649472758), [40649475187](https://github.com/mark1russell7/highways/actions/runs/40649475187) |
-| `exact-v1-bounds`, 40 nodes | [40649477333](https://github.com/mark1russell7/highways/actions/runs/40649477333), [40649479774](https://github.com/mark1russell7/highways/actions/runs/40649479774), [40649481965](https://github.com/mark1russell7/highways/actions/runs/40649481965), [40649484540](https://github.com/mark1russell7/highways/actions/runs/40649484540) |
-| `screen-v1` | [40649453791](https://github.com/mark1russell7/highways/actions/runs/40649453791) |
+| `exact-v1` | [40649456144](https://github.com/metrograph-labs/highways/actions/runs/40649456144) |
+| `exact-v1-bounds`, 18 nodes | [40649458704](https://github.com/metrograph-labs/highways/actions/runs/40649458704), [40649461187](https://github.com/metrograph-labs/highways/actions/runs/40649461187), [40649463378](https://github.com/metrograph-labs/highways/actions/runs/40649463378), [40649465760](https://github.com/metrograph-labs/highways/actions/runs/40649465760) |
+| `exact-v1-bounds`, 24 nodes | [40649468315](https://github.com/metrograph-labs/highways/actions/runs/40649468315), [40649470298](https://github.com/metrograph-labs/highways/actions/runs/40649470298), [40649472758](https://github.com/metrograph-labs/highways/actions/runs/40649472758), [40649475187](https://github.com/metrograph-labs/highways/actions/runs/40649475187) |
+| `exact-v1-bounds`, 40 nodes | [40649477333](https://github.com/metrograph-labs/highways/actions/runs/40649477333), [40649479774](https://github.com/metrograph-labs/highways/actions/runs/40649479774), [40649481965](https://github.com/metrograph-labs/highways/actions/runs/40649481965), [40649484540](https://github.com/metrograph-labs/highways/actions/runs/40649484540) |
+| `screen-v1` | [40649453791](https://github.com/metrograph-labs/highways/actions/runs/40649453791) |
 
 - **The gap closed.** The 54 cells are each band, rule, cap and k. In each cell, the median gap closed of the router on the test seeds is equal to that of the offline choice. So each share of the table above is also the share of the router.
 - **The key against the guard.** The key of the router and the guard of the records do not always choose the same member. Under `collection` at the cap 1.1, the router and the offline choice have a different B1 on some test inputs. At 13 to 24 nodes, 16 to 19 of 40 inputs differ. At 25 to 40 nodes, 9 of 20 differ. There the base `shared` has edges above the cap. The key counts each of them as a hard break, so a member in the cap with less ink wins. In the other cells, 0 to 3 inputs differ.
@@ -464,7 +464,7 @@ The median time of the router, one member after the other, on a CI machine. `sha
 - At 40 nodes and k = 3, the router takes 51 to 176 ms. The members take most of it: the records of EXACT-BOUNDS give 33 to 164 ms for `shared` and the same 3 members. The key adds approximately 10 to 20 ms.
 - The set of `all` at the cap 1.25 holds `w3d:kdeeb-routes` and `w3e:mlseb+stretch`. They are the slowest members.
 - On `screen-v1`, the boards of 96 to 150 nodes take 0.4 to 1.8 s (median), against 20 ms for `shared`. The sets come from boards of 40 nodes or fewer. Above 40 nodes, set `budgetMs` to keep the time in a limit.
-- The workflow `Bench` races the router with its defaults in the part `opt-in`. In the run [40651207340](https://github.com/mark1russell7/highways/actions/runs/40651207340), the router took 1.1 s at 100 nodes, 32 s at 400 nodes and 546 s at 1 000 nodes. So the part stops at 400 nodes. Since PORTFOLIO-FIT, the default is the fit. The section [The fit of the router](#the-fit-of-the-router-portfolio-fit) has its new times.
+- The workflow `Bench` races the router with its defaults in the part `opt-in`. In the run [40651207340](https://github.com/metrograph-labs/highways/actions/runs/40651207340), the router took 1.1 s at 100 nodes, 32 s at 400 nodes and 546 s at 1 000 nodes. So the part stops at 400 nodes. Since PORTFOLIO-FIT, the default is the fit. The section [The fit of the router](#the-fit-of-the-router-portfolio-fit) has its new times.
 
 ### The predictions of PORTFOLIO-API
 
@@ -501,7 +501,7 @@ The published package `@mark1russell7/highways` has one run-time dependency sinc
 - `utf8`, because the contract does not export it
 - the seeds, the random generator and `round3`.
 
-A minified bundle of the core (`esbuild`, `src/index.ts`) has 435 086 bytes with the contract and 427 057 bytes without it. So the contract adds 8 029 bytes, approximately 7.8 KB. The CI run [40661133199](https://github.com/mark1russell7/highways/actions/runs/40661133199) of the workflow `Portfolio` measured it.
+A minified bundle of the core (`esbuild`, `src/index.ts`) has 435 086 bytes with the contract and 427 057 bytes without it. So the contract adds 8 029 bytes, approximately 7.8 KB. The CI run [40661133199](https://github.com/metrograph-labs/highways/actions/runs/40661133199) of the workflow `Portfolio` measured it.
 
 ### One key
 
@@ -521,14 +521,14 @@ The default of the router is deterministic. [The promotion rule](../PROMOTION.md
 
 The script `portfolio-sets.ts` makes the fit from the times of CI:
 
-- The run [40658558076](https://github.com/mark1russell7/highways/actions/runs/40658558076) timed each member and the key on 10 to 150 nodes (`portfolio:time --members`). `scripts/data/portfolio-times.json` keeps the medians.
+- The run [40658558076](https://github.com/metrograph-labs/highways/actions/runs/40658558076) timed each member and the key on 10 to 150 nodes (`portfolio:time --members`). `scripts/data/portfolio-times.json` keeps the medians.
 - A member leaves the pool of a band when it alone takes more than 50 ms in that band. The sets come from this pool, so 2 sets changed.
 - The fit is the longest start of the set whose model time is at or below 40 ms. The model time is the time of `shared`, plus the setup of the key, plus each member.
 - A member leaves the fit at the first size where it does not fit. Its node limit is the last size where it fits.
 
 The setup of the key is the stretch network of the graph and the facts of the base. It takes 22 ms at 40 nodes, 65 ms at 64 nodes and 190 ms at 100 nodes. So above 40 nodes, the fit is `shared` alone. At 40 nodes, the fit is `shared` alone in 4 of 6 cells, because the node limits stop at 32 nodes.
 
-The share of the oracle gain on the test seeds, at k = 5, at k = 5 with a budget, and at the fit (CI run [40661449005](https://github.com/mark1russell7/highways/actions/runs/40661449005)):
+The share of the oracle gain on the test seeds, at k = 5, at k = 5 with a budget, and at the fit (CI run [40661449005](https://github.com/metrograph-labs/highways/actions/runs/40661449005)):
 
 | rule | cap | band | test | k = 5 | 16 ms | 50 ms | 100 ms | fit |
 |---|---:|---|---:|---:|---:|---:|---:|---:|
@@ -567,7 +567,7 @@ The time of the router in CI, one member after the other. Each cell gives the ra
 - The fit has a median of 50 ms or less in each band up to 40 nodes.
 - A budget is not a hard limit. The router examines the budget between two members, so one slow member goes past it. On `screen-v1`, the budget of 50 ms gives a median of 142 to 239 ms.
 - On `screen-v1`, the fit keeps 14% to 94% of the oracle gain, against 14% to 146% at k = 5. Most of its gain comes from the boards of 10 nodes.
-- In the part `opt-in` of the workflow `Bench` (run [40660432890](https://github.com/mark1russell7/highways/actions/runs/40660432890)), the fit took 47 ms at 10 nodes, 37 ms at 100 nodes and 148 ms at 400 nodes.
+- In the part `opt-in` of the workflow `Bench` (run [40660432890](https://github.com/metrograph-labs/highways/actions/runs/40660432890)), the fit took 47 ms at 10 nodes, 37 ms at 100 nodes and 148 ms at 400 nodes.
 
 ### The predictions of PORTFOLIO-FIT
 
@@ -586,7 +586,7 @@ This section is the result of the item PORTFOLIO-SPEED of the [roadmap](../ROADM
 
 ### The profile
 
-The script `portfolio:time --breakdown` times each part of the setup of the key, and the router in each form. It uses the 4 classes of `exact-v1`, the seeds 0 to 2 and 5 repeats. Each cell is a median in ms, before and after the change (CI runs [40664327269](https://github.com/mark1russell7/highways/actions/runs/40664327269) and [40664691452](https://github.com/mark1russell7/highways/actions/runs/40664691452)):
+The script `portfolio:time --breakdown` times each part of the setup of the key, and the router in each form. It uses the 4 classes of `exact-v1`, the seeds 0 to 2 and 5 repeats. Each cell is a median in ms, before and after the change (CI runs [40664327269](https://github.com/metrograph-labs/highways/actions/runs/40664327269) and [40664691452](https://github.com/metrograph-labs/highways/actions/runs/40664691452)):
 
 | nodes | `shared` | network | distances | setup | key and pick in k = 3 | share of the setup |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -606,7 +606,7 @@ The router with k = 3 takes 7% to 17% less time at 40 nodes and 15% to 24% less 
 
 ### The check of the values
 
-The script `portfolio:time --check-stretch` routes each input of 3 sets with each strategy of the pool. It compares the stretch of each edge of the new function and of the old function (CI run [40664694253](https://github.com/mark1russell7/highways/actions/runs/40664694253)):
+The script `portfolio:time --check-stretch` routes each input of 3 sets with each strategy of the pool. It compares the stretch of each edge of the new function and of the old function (CI run [40664694253](https://github.com/metrograph-labs/highways/actions/runs/40664694253)):
 
 | set | records | edges | missing | largest difference | edges above 0.001 | records with another `gap.stretch` |
 |---|---:|---:|---:|---:|---:|---:|
@@ -620,14 +620,14 @@ The script `portfolio:time --check-stretch` routes each input of 3 sets with eac
 
 ### The bands above 40 nodes
 
-The script `portfolio:time --guard-records` routes the 4 classes of `exact-v1` at 64 and 100 nodes, with the seeds 0 to 9 and the 75 members (CI run [40665016754](https://github.com/mark1russell7/highways/actions/runs/40665016754)). Each line has the values of the guard: B1, the stretch, the flag of mixed collections and the hard breaks.
+The script `portfolio:time --guard-records` routes the 4 classes of `exact-v1` at 64 and 100 nodes, with the seeds 0 to 9 and the 75 members (CI run [40665016754](https://github.com/metrograph-labs/highways/actions/runs/40665016754)). Each line has the values of the guard: B1, the stretch, the flag of mixed collections and the hard breaks.
 
 - These boards have no optima. So the value of a run is its B1 under the guard, and the oracle is the best member of the pool.
 - `portfolio-sets.ts --large` adds these records to the short table, as the set `exact-large`.
 - The bands are `n1-12`, `n13-24`, `n25-40`, `n41-64` and `n65-128`. An input above 128 nodes uses `n65-128`.
 - Under the cap 1.1 and the rule `collection`, no member gives more B1 than the base. So these 2 sets are empty.
 
-The fit uses the times of the members of the run 40658558076, and the times of the setup of the run [40665256727](https://github.com/mark1russell7/highways/actions/runs/40665256727) (`portfolio-sets.ts --setup-time`). The members did not change. At 40 nodes, the median ratio of the times of the members of the two runs is 1.00. One member can change by a factor of up to 1.8.
+The fit uses the times of the members of the run 40658558076, and the times of the setup of the run [40665256727](https://github.com/metrograph-labs/highways/actions/runs/40665256727) (`portfolio-sets.ts --setup-time`). The members did not change. At 40 nodes, the median ratio of the times of the members of the two runs is 1.00. One member can change by a factor of up to 1.8.
 
 The fit of the large bands, on the test seeds 5 to 9 (20 boards in each band):
 
@@ -641,7 +641,7 @@ The fit of the large bands, on the test seeds 5 to 9 (20 boards in each band):
 - At 25 to 40 nodes, the cheaper setup lets more members run at 40 nodes. 10 node limits go from 32 to 40.
 - The shares at the fit at 1 to 40 nodes do not change by more than 6 points. The script tests each fit without its node limits.
 
-The time of the router with the new fit, on the seeds 0 to 4 with 5 repeats (CI run [40666269015](https://github.com/mark1russell7/highways/actions/runs/40666269015)). Each cell gives the range of the medians over the 6 rules and caps, then the range of the q95, in ms:
+The time of the router with the new fit, on the seeds 0 to 4 with 5 repeats (CI run [40666269015](https://github.com/metrograph-labs/highways/actions/runs/40666269015)). Each cell gives the range of the medians over the 6 rules and caps, then the range of the q95, in ms:
 
 | nodes | `shared` | setup | fit | k = 3 |
 |---:|---:|---:|---|---|
@@ -696,7 +696,7 @@ The ratio is the time of the workspace over the time of 0.5.1. The interval is o
 
 ### The order of the arms
 
-Mode `fresh` rotates the arms by round. With 3 arms, one arm of a pair goes first in 2 of 3 rounds. The A/A copy is an arm, so each paired use here has 3 arms. The record [`arm-order/1`](../../packages/core/scripts/data/arm-order/record.json) reads run [41455276356](https://github.com/mark1russell7/highways/actions/runs/41455276356) on an AMD EPYC 7763: 5 jobs, 96 inputs and 50 rounds of each input.
+Mode `fresh` rotates the arms by round. With 3 arms, one arm of a pair goes first in 2 of 3 rounds. The A/A copy is an arm, so each paired use here has 3 arms. The record [`arm-order/1`](../../packages/core/scripts/data/arm-order/record.json) reads run [41455276356](https://github.com/metrograph-labs/highways/actions/runs/41455276356) on an AMD EPYC 7763: 5 jobs, 96 inputs and 50 rounds of each input.
 
 | Pair | Group | Inputs | Difference | Shuffle q95 | Bias | Shuffle q95 |
 |---|---|---:|---:|---:|---:|---:|
@@ -733,7 +733,7 @@ This section is the result of the item FIT-COST of the [roadmap](../ROADMAP.md).
 
 ### The cost in the router
 
-The script `portfolio:time --member-cost` times each member alone and in the router, on the same board. It uses the 4 classes of `exact-v1`, 9 sizes from 10 to 128 nodes, the seeds 0 to 2 and 5 repeats (CI run [40670255629](https://github.com/mark1russell7/highways/actions/runs/40670255629)). The router runs each rule and cap with k = 8. In the router, the cost of a member is its run and the key on its output. Each cell is a median in ms. A ratio gives the median over the rows, then the q10 and the q90:
+The script `portfolio:time --member-cost` times each member alone and in the router, on the same board. It uses the 4 classes of `exact-v1`, 9 sizes from 10 to 128 nodes, the seeds 0 to 2 and 5 repeats (CI run [40670255629](https://github.com/metrograph-labs/highways/actions/runs/40670255629)). The router runs each rule and cap with k = 8. In the router, the cost of a member is its run and the key on its output. Each cell is a median in ms. A ratio gives the median over the rows, then the q10 and the q90:
 
 | band | rows | run alone | key alone | hash | in the router | router / run alone | router / (run + key) alone |
 |---|---:|---:|---:|---:|---:|---|---|
@@ -754,19 +754,19 @@ The script `portfolio:time --member-cost` times each member alone and in the rou
 - `portfolio-times.json` keeps the run alone and the key of each member apart, with the schema `portfolio-times/2`.
 - A member stays in the pool of a band when its run and its key take 50 ms or less. The fit admits members while the model time is at or below `FIT_TARGET_MS`.
 - The model time is the time of `shared`, plus the setup of the key, plus the run and the key of each member.
-- The times come from one run on one CI machine: [40670252502](https://github.com/mark1russell7/highways/actions/runs/40670252502) (`portfolio:time --members`). Before this item, the times came from two runs.
+- The times come from one run on one CI machine: [40670252502](https://github.com/metrograph-labs/highways/actions/runs/40670252502) (`portfolio:time --members`). Before this item, the times came from two runs.
 
 The router check runs the fit on the test seeds 5 to 9, at 8 sizes from 10 to 128 nodes, with 5 repeats. The highest median of the 48 cells, for each target, in ms:
 
 | `FIT_TARGET_MS` | first run | second run |
 |---:|---:|---:|
-| 50 | 54.4 ([40674619751](https://github.com/mark1russell7/highways/actions/runs/40674619751)) | - |
-| 45 | 48.2 ([40675156189](https://github.com/mark1russell7/highways/actions/runs/40675156189)) | 53.2 ([40675173532](https://github.com/mark1russell7/highways/actions/runs/40675173532)) |
-| 42 | 47.6 ([40675819975](https://github.com/mark1russell7/highways/actions/runs/40675819975)) | 39.1 ([40675823757](https://github.com/mark1russell7/highways/actions/runs/40675823757)) |
-| 40 | 47.3 ([40675813099](https://github.com/mark1russell7/highways/actions/runs/40675813099)) | 45.2 ([40675816377](https://github.com/mark1russell7/highways/actions/runs/40675816377)) |
+| 50 | 54.4 ([40674619751](https://github.com/metrograph-labs/highways/actions/runs/40674619751)) | - |
+| 45 | 48.2 ([40675156189](https://github.com/metrograph-labs/highways/actions/runs/40675156189)) | 53.2 ([40675173532](https://github.com/metrograph-labs/highways/actions/runs/40675173532)) |
+| 42 | 47.6 ([40675819975](https://github.com/metrograph-labs/highways/actions/runs/40675819975)) | 39.1 ([40675823757](https://github.com/metrograph-labs/highways/actions/runs/40675823757)) |
+| 40 | 47.3 ([40675813099](https://github.com/metrograph-labs/highways/actions/runs/40675813099)) | 45.2 ([40675816377](https://github.com/metrograph-labs/highways/actions/runs/40675816377)) |
 
 - Two runs of the same fit differ by up to 30% in one cell. Each run gets other CI machines.
-- A second run of the times ([40670281850](https://github.com/mark1russell7/highways/actions/runs/40670281850)) changes the fit at 50 ms in 2 cells, at 13 to 24 nodes.
+- A second run of the times ([40670281850](https://github.com/metrograph-labs/highways/actions/runs/40670281850)) changes the fit at 50 ms in 2 cells, at 13 to 24 nodes.
 - So `FIT_TARGET_MS` is 42 ms. The fit at 40 ms has the same times, and it keeps less of the gain.
 
 The pool changes 5 sets:
@@ -792,7 +792,7 @@ The time of the router with the new fit, from the run 40675819975. Each cell giv
 - The median is 48 ms or less in each of the 48 cells, in the two runs.
 - The q95 is above 80 ms in 1 cell: `collection` 1.1 at 10 nodes, with 91 and 85 ms. 10 nodes is the first size that each shard times.
 
-The share of the oracle gain at the fit, on the test seeds 5 to 9, before and after this item (`portfolio:sets`, CI run [40675696325](https://github.com/mark1russell7/highways/actions/runs/40675696325)). A share of 0% tells that the fit gets the B1 of the best single strategy:
+The share of the oracle gain at the fit, on the test seeds 5 to 9, before and after this item (`portfolio:sets`, CI run [40675696325](https://github.com/metrograph-labs/highways/actions/runs/40675696325)). A share of 0% tells that the fit gets the B1 of the best single strategy:
 
 | rule | cap | n1-12 | n13-24 | n25-40 | n41-64 | n65-128 |
 |---|---:|---|---|---|---|---|
@@ -833,7 +833,7 @@ This section is the result of the item HASH-LAZY of the [roadmap](../ROADMAP.md)
 
 ### The cost in the router
 
-The script `portfolio:time --member-cost` times each member alone and in the router, as in FIT-COST (CI run [40681245872](https://github.com/mark1russell7/highways/actions/runs/40681245872)). After this item, the key has no hash. The column `hash` gives the hash of the output alone. The rows do not use the last member of each pick, because the time after it holds the pick and the two hashes. Each cell is a median in ms:
+The script `portfolio:time --member-cost` times each member alone and in the router, as in FIT-COST (CI run [40681245872](https://github.com/metrograph-labs/highways/actions/runs/40681245872)). After this item, the key has no hash. The column `hash` gives the hash of the output alone. The rows do not use the last member of each pick, because the time after it holds the pick and the two hashes. Each cell is a median in ms:
 
 | band | rows | run alone | key alone | hash | in the router | router / run alone | router / (run + key) alone |
 |---|---:|---:|---:|---:|---:|---|---|
@@ -853,7 +853,7 @@ The script `portfolio:time --member-cost` times each member alone and in the rou
 - The model time of the fit is the time of `shared`, the setup of the key, and the run and the key of each member. It also adds the hash of the base and the largest hash of the members.
 - The largest hash is the worst case: the pick moves to the slowest hash of the set.
 - Each shard of `portfolio:time` runs its first board once before it starts the clock. So each time is a warm median.
-- The times come from one run on one CI machine: [40681241949](https://github.com/mark1russell7/highways/actions/runs/40681241949) (`portfolio:time --members`).
+- The times come from one run on one CI machine: [40681241949](https://github.com/metrograph-labs/highways/actions/runs/40681241949) (`portfolio:time --members`).
 
 ### The target of the fit
 
@@ -861,9 +861,9 @@ The router check runs the fit on the test seeds 5 to 9, at 8 sizes from 10 to 12
 
 | `FIT_TARGET_MS` | fit | first run | second run |
 |---:|---|---:|---:|
-| 50 | [40684785728](https://github.com/mark1russell7/highways/actions/runs/40684785728) | 53.7 ([40684977648](https://github.com/mark1russell7/highways/actions/runs/40684977648)) | 54.5 ([40684981137](https://github.com/mark1russell7/highways/actions/runs/40684981137)) |
-| 45 | [40684782540](https://github.com/mark1russell7/highways/actions/runs/40684782540) | 49.8 ([40684970091](https://github.com/mark1russell7/highways/actions/runs/40684970091)) | 49.0 ([40684974034](https://github.com/mark1russell7/highways/actions/runs/40684974034)) |
-| 42 | [40684779080](https://github.com/mark1russell7/highways/actions/runs/40684779080) | 47.7 ([40684962277](https://github.com/mark1russell7/highways/actions/runs/40684962277)) | 39.8 ([40684966052](https://github.com/mark1russell7/highways/actions/runs/40684966052)) |
+| 50 | [40684785728](https://github.com/metrograph-labs/highways/actions/runs/40684785728) | 53.7 ([40684977648](https://github.com/metrograph-labs/highways/actions/runs/40684977648)) | 54.5 ([40684981137](https://github.com/metrograph-labs/highways/actions/runs/40684981137)) |
+| 45 | [40684782540](https://github.com/metrograph-labs/highways/actions/runs/40684782540) | 49.8 ([40684970091](https://github.com/metrograph-labs/highways/actions/runs/40684970091)) | 49.0 ([40684974034](https://github.com/metrograph-labs/highways/actions/runs/40684974034)) |
+| 42 | [40684779080](https://github.com/metrograph-labs/highways/actions/runs/40684779080) | 47.7 ([40684962277](https://github.com/metrograph-labs/highways/actions/runs/40684962277)) | 39.8 ([40684966052](https://github.com/metrograph-labs/highways/actions/runs/40684966052)) |
 
 - `FIT_TARGET_MS` is 45 ms. It is the highest target with a median of 50 ms or less in each of the 48 cells, in the two runs.
 - The margin to 50 ms is small: 0.2 ms in the first run. The next change of the members or of the key needs a new check.
@@ -900,7 +900,7 @@ The time of the router with the fit at 45 ms, from the run 40684970091. Each cel
 - The median is 50 ms or less in each of the 48 cells, in the two runs. The highest q95 is 69 ms and 67 ms.
 - With the warm-up, `collection` 1.1 at 10 nodes has a q95 of 47 ms in the two runs. With FIT-COST, it was 91 ms and 85 ms.
 
-The share of the oracle gain at the fit, on the test seeds 5 to 9 (`portfolio:sets`, CI run [40684782540](https://github.com/mark1russell7/highways/actions/runs/40684782540)). A cell with 3 values gives 0.5.1, 0.6.0 and this item:
+The share of the oracle gain at the fit, on the test seeds 5 to 9 (`portfolio:sets`, CI run [40684782540](https://github.com/metrograph-labs/highways/actions/runs/40684782540)). A cell with 3 values gives 0.5.1, 0.6.0 and this item:
 
 | rule | cap | n1-12 | n13-24 | n25-40 | n41-64 | n65-128 |
 |---|---:|---|---|---|---|---|

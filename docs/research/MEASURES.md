@@ -570,7 +570,7 @@ MEAS2 adds small boards with a known optimum: the set `exact-v1`. The exact mode
 
 #### The size ladder
 
-The size ladder finds the largest board that HiGHS solves to a proven optimum within 300 s. CI solved the ladder in the [run 40613531631](https://github.com/mark1russell7/highways/actions/runs/40613531631), at the cap 1.5, with 3 seeds of each class and both rules.
+The size ladder finds the largest board that HiGHS solves to a proven optimum within 300 s. CI solved the ladder in the [run 40613531631](https://github.com/metrograph-labs/highways/actions/runs/40613531631), at the cap 1.5, with 3 seeds of each class and both rules.
 
 | Nodes | Proven, both rules | Proven, rule `collection` | Proven, rule `all` | Largest finite MIP gap at 300 s |
 |---:|---:|---:|---:|---:|
@@ -582,7 +582,7 @@ The size ladder finds the largest board that HiGHS solves to a proven optimum wi
 | 40 | 0 of 24 | 0 of 12 | 0 of 12 | 0.952 |
 
 - The largest size proven on each class and each rule is 10 nodes. For the rule `collection` alone, it is 14 nodes.
-- Thus `exact-v1` has boards of 10 nodes and 15 edges. All 240 optima of `exact-v1` are proven ([run 40616274264](https://github.com/mark1russell7/highways/actions/runs/40616274264)). The longest solve took 223 s.
+- Thus `exact-v1` has boards of 10 nodes and 15 edges. All 240 optima of `exact-v1` are proven ([run 40616274264](https://github.com/metrograph-labs/highways/actions/runs/40616274264)). The longest solve took 223 s.
 - At 30 nodes and more, HiGHS proves no optimum within 300 s. On some boards of 30 and 40 nodes, HiGHS gives no finite MIP gap.
 
 ## Proposed hard rules

@@ -197,7 +197,7 @@ A default is deterministic. A portfolio limits its work by the member count and 
 
 ## The measures of each step
 
-The ids are the ids of [the measure note](research/MEASURES.md). The ids of the `pack` measures are the ids of the [packing measure note](https://github.com/mark1russell7/packing/blob/main/docs/MEASURES.md).
+The ids are the ids of [the measure note](research/MEASURES.md). The ids of the `pack` measures are the ids of the [packing measure note](https://github.com/metrograph-labs/packing/blob/main/docs/MEASURES.md).
 
 | Step | Guard measures |
 |---|---|

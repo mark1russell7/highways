@@ -1,6 +1,6 @@
 # The layout inputs and the run records
 
-This document gives the input format and the record format of the screen of `highways`. The packer `packing` uses the same formats. Its twin document is [`docs/FORMAT.md`](https://github.com/mark1russell7/packing/blob/main/docs/FORMAT.md) in `mark1russell7/packing`, from commit `776261d`. Change both documents together.
+This document gives the input format and the record format of the screen of `highways`. The packer `packing` uses the same formats. Its twin document is [`docs/FORMAT.md`](https://github.com/metrograph-labs/packing/blob/main/docs/FORMAT.md) in `mark1russell7/packing`, from commit `776261d`. Change both documents together.
 
 One input file feeds the two stages. A joint run packs an input, and then routes the edges of the same input.
 
@@ -510,7 +510,7 @@ Since SCREEN-MEASURES, the screen adds 11 more measures. `docs/research/MEASURES
 
 ## The measures of the packer
 
-The packer measures are the measures of `packing`. Its [measure note](https://github.com/mark1russell7/packing/blob/main/docs/MEASURES.md) is the source. This table is a copy for the joint harness.
+The packer measures are the measures of `packing`. Its [measure note](https://github.com/metrograph-labs/packing/blob/main/docs/MEASURES.md) is the source. This table is a copy for the joint harness.
 
 | Name | Unit | Better | Where |
 |---|---|---|---|
