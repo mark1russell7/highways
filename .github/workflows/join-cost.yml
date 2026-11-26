@@ -35,7 +35,7 @@ jobs:
       match: ${{ steps.changes.outputs.match }}
     steps:
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@e02850432a16bdeafe8d3850b54cfbe927b1fee4 # main
+        uses: mark1russell7/template/.github/actions/changes@19a14ae7da54e6e529ef90c5c4ab872867f152b9 # main
         with:
           paths: |
             packages/core/src/visibility.ts
