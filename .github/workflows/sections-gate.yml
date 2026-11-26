@@ -71,7 +71,7 @@ jobs:
             echo PATHS
           } >> "$GITHUB_OUTPUT"
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@e02850432a16bdeafe8d3850b54cfbe927b1fee4 # main
+        uses: mark1russell7/template/.github/actions/changes@19a14ae7da54e6e529ef90c5c4ab872867f152b9 # main
         with:
           paths: ${{ steps.scope.outputs.paths }}
       # This step gives the paths to the matcher of the action. A change inside the walk runs the gate, and a change outside it skips. Any other result fails the job.
@@ -210,7 +210,7 @@ jobs:
     timeout-minutes: 2
     permissions: {}
     steps:
-      - uses: mark1russell7/template/.github/actions/gate-summary@e02850432a16bdeafe8d3850b54cfbe927b1fee4 # main
+      - uses: mark1russell7/template/.github/actions/gate-summary@19a14ae7da54e6e529ef90c5c4ab872867f152b9 # main
         with:
           needs: ${{ toJSON(needs) }}
           # The job retry is skipped after a first run that decides. That skip is a pass. A failed or cancelled retry fails the check.
