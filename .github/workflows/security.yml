@@ -32,6 +32,6 @@ jobs:
       security-events: write
       actions: read
     steps:
-      - uses: mark1russell7/template/.github/actions/security-scan@734075fad8c45edf8417b0e9412574ca6c2ef7b4 # main
+      - uses: mark1russell7/template/.github/actions/security-scan@e02850432a16bdeafe8d3850b54cfbe927b1fee4 # main
 
   # The check of the ruleset (CI.md, "The check of the ruleset"): the scans of this file passed.
