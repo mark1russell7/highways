@@ -126,7 +126,7 @@ These hot spots stay. Each fix is larger than this item, and each fix must keep 
 
 An earlier run of the layout cover took 4 to 38 minutes for one route at 1000 nodes on six routers. This run times the same six routers on the released core at five sizes. It also times one packed board of 1000 nodes.
 
-- The run: [Scale 42135842178](https://github.com/mark1russell7/highways/actions/runs/42135842178), on one runner model (AMD EPYC 9V74), Node 26.13.0.
+- The run: [Scale 42135842178](https://github.com/metrograph-labs/highways/actions/runs/42135842178), on one runner model (AMD EPYC 9V74), Node 26.13.0.
 - The boards: `makeFixture` uniform boards with 4 edges for each node, at 125, 250, 500, 1000 and 2000 nodes. The packed board is `joint-v2/rect-grid.freeHeight.holes.none.bimodal.n1000.e-dense.hubs.none.free.sp-gap/s2`, with 1000 nodes and 4000 edges.
 - The method: 2 rounds, and two arms `a` and `b` in fresh processes for each size. The A/A ratio is `b ÷ a`. The order of the sizes turns each round. The limit is 10 minutes for one route.
 - The records: [`budget/2026-11-06/rows.jsonl`](budget/2026-11-06/rows.jsonl) and its table [`scale.md`](budget/2026-11-06/scale.md).

@@ -20,10 +20,10 @@ This note is the result of the item EXACT-BOUNDS of the [roadmap](../ROADMAP.md)
 
 | Set | CI run | Commit |
 |---|---|---|
-| the solves of `exact-v1-bounds` | [40631513534](https://github.com/mark1russell7/highways/actions/runs/40631513534) | `71fb29c` |
-| the screen of `exact-v1` | [40631516113](https://github.com/mark1russell7/highways/actions/runs/40631516113) | `71fb29c` |
-| the screens of `exact-v1-bounds`, one for each of the 12 families | [40644555345](https://github.com/mark1russell7/highways/actions/runs/40644555345) to [40644583603](https://github.com/mark1russell7/highways/actions/runs/40644583603) | `5545ed6` |
-| the report | [40645753347](https://github.com/mark1russell7/highways/actions/runs/40645753347) | `5545ed6` |
+| the solves of `exact-v1-bounds` | [40631513534](https://github.com/metrograph-labs/highways/actions/runs/40631513534) | `71fb29c` |
+| the screen of `exact-v1` | [40631516113](https://github.com/metrograph-labs/highways/actions/runs/40631516113) | `71fb29c` |
+| the screens of `exact-v1-bounds`, one for each of the 12 families | [40644555345](https://github.com/metrograph-labs/highways/actions/runs/40644555345) to [40644583603](https://github.com/metrograph-labs/highways/actions/runs/40644583603) | `5545ed6` |
+| the report | [40645753347](https://github.com/metrograph-labs/highways/actions/runs/40645753347) | `5545ed6` |
 
 - The set `exact-v1-bounds` has the 4 classes of `exact-v1` at 18, 24 and 40 nodes, with 10 seeds for each class. [`LAYOUT-RECORDS.md`](../LAYOUT-RECORDS.md#the-screen-set-exact-v1-bounds) gives the generators.
 - Each solve has a time limit of 300 s. The file [`optima-exact-v1-bounds.json`](../../packages/core/src/bench/exact/optima-exact-v1-bounds.json) keeps the 720 rows.
