@@ -1,5 +1,9 @@
 # Changelog of `@mark1russell7/highways`
 
+## 0.19.5
+
+An automated dependency update changes the shipped files, so this PATCH ships them.
+
 ## 0.19.4
 
 This version is a PATCH: the repository moved to metrograph-labs. The fields `repository` and `homepage` of `package.json` and the links of the README name the new repository. The code does not change.
